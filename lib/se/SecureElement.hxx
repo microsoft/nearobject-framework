@@ -4,7 +4,6 @@
 
 class SecureElement
 {
-
 };
 
 #endif // __SECURE_ELEMENT_HXX__

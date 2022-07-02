@@ -4,12 +4,10 @@
 
 class ApduCommand
 {
-
 };
 
 class ApduResponse
 {
-
 };
 
 #endif // __APDU_HXX__

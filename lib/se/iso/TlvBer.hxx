@@ -6,7 +6,6 @@
 
 class TlvBer : public Tlv
 {
-
 };
 
 #endif // __TLV_BER_HXX__

@@ -4,7 +4,6 @@
 
 class UwbService
 {
-
 };
 
 #endif // __UWB_SERVICE_HXX__

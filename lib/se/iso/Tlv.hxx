@@ -4,7 +4,6 @@
 
 class Tlv
 {
-
 };
 
 using TlvSimple = Tlv;
