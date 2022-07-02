@@ -23,7 +23,7 @@ AlwaysBreakTemplateDeclarations: Yes
 BasedOnStyle: WebKit
 BinPackArguments: false
 BinPackParameters: false
-BraceWrapping: 
+BraceWrapping:
   # AfterCaseLabel: false
   AfterClass: true
   AfterControlStatement: false
@@ -49,7 +49,7 @@ BreakStringLiterals: false
 ColumnLimit: 0
 CompactNamespaces: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
-ConstructorInitializerIndentWidth : 4
+ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 4
 Cpp11BracedListStyle: false
 # DeriveLineEnding: true
