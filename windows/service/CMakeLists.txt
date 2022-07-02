@@ -3,6 +3,7 @@ add_executable(winuwbservice "")
 
 target_sources(winuwbservice
     PRIVATE
+        Main.cxx
         UwbService.hxx
         UwbService.cxx
 )
