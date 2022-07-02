@@ -1,3 +1,3 @@
-# Windows UWB Service Framework
+# UltraWideband (UWB) Framework
 
 TODO
