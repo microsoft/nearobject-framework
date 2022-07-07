@@ -3,6 +3,7 @@ add_library(uwbuci STATIC "")
 
 target_sources(uwbuci
     PRIVATE
+        ControlMessage.cxx
         ControlMessage.hxx
         ControlPacket.hxx
 )
