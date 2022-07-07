@@ -8,6 +8,16 @@ target_sources(uwb
         UwbDevice.cxx
 )
 
+target_include_directories(uwb
+    PRIVATE
+        uci
+)
+
+target_link_libraries(uwb
+    PRIVATE
+        uwbuci
+)
+
 set_target_properties(uwb PROPERTIES FOLDER lib/uwb)
 
 add_subdirectory(uci)
