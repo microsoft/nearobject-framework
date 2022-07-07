@@ -13,6 +13,9 @@ target_include_directories(winuwbservice
         ../lib/se
         ../lib/se/globalplatform
         ../lib/se/iso
+        ../lib/secureproximity
+        ../lib/uwb
+        ../lib/uwb/uci
 )
 
 target_link_libraries(winuwbservice
@@ -20,6 +23,8 @@ target_link_libraries(winuwbservice
         se
         seiso
         seglobalplatform
+        uwb
+        uwbuci
 )
 
 set_target_properties(winuwbservice PROPERTIES FOLDER windows/service)
