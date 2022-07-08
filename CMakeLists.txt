@@ -17,4 +17,5 @@ set(UWB_DIR_LIB ${CMAKE_CURRENT_LIST_DIR}/lib)
 set(UWB_DIR_WINDOWS ${CMAKE_CURRENT_LIST_DIR}/windows)
 
 add_subdirectory(lib)
+add_subdirectory(linux)
 add_subdirectory(windows)
