@@ -19,7 +19,8 @@ ApduCommand::ApduCommand(std::byte cla, std::byte ins, std::byte p1, std::byte p
     m_payload[2] = p1;
     m_payload[3] = p2;
     m_payload.insert(std::next(std::cbegin(m_payload), 4), std::cbegin(data), std::cend(data));
-    m_data = gsl::span<std::byte>{ std::next(std::data(m_payload), 4), std::size(data) };
+    m_dataView = gsl::span<std::byte>{ std::next(std::data(m_payload), 4), std::size(data) };
+    m_payloadView = gsl::span<std::byte>{ std::next(std::data(m_payload)), std::size(m_payload) };
 }
 
 const std::byte
@@ -48,7 +49,12 @@ ApduCommand::P2() const
 
 gsl::span<std::byte> ApduCommand::Data() const
 {
-    return m_data;
+    return m_dataView;
+}
+
+gsl::span<std::byte> ApduCommand::Payload() const
+{
+    return m_payloadView;
 }
 
 /* static */

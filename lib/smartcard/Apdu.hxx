@@ -22,12 +22,14 @@ public:
     const std::byte P1() const;
     const std::byte P2() const;
     gsl::span<std::byte> Data() const;
+    gsl::span<std::byte> Payload() const;
     
 public:
     static ApduCommand FromVector(const std::vector<std::byte>& buffer);
 
 private:
-    gsl::span<std::byte> m_data;
+    gsl::span<std::byte> m_dataView;
+    gsl::span<std::byte> m_payloadView;
     std::vector<std::byte> m_payload;
 };
 
