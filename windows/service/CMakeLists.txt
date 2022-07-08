@@ -17,7 +17,7 @@ target_include_directories(winuwbservice
     PRIVATE
         ${UWB_DIR_LIB}/se
         ${UWB_DIR_LIB}/se/globalplatform
-        ${UWB_DIR_LIB}/se/iso
+        ${UWB_DIR_LIB}/smartcard
         ${UWB_DIR_LIB}/secureproximity
         ${UWB_DIR_LIB}/uwb
         ${UWB_DIR_LIB}/uwb/uci
@@ -26,8 +26,8 @@ target_include_directories(winuwbservice
 target_link_libraries(winuwbservice
     PRIVATE
         se
-        seiso
         seglobalplatform
+        smartcard
         uwb
         uwbuci
 )
