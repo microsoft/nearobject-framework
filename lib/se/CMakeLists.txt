@@ -12,4 +12,3 @@ target_sources(se
 set_target_properties(se PROPERTIES FOLDER lib/se)
 
 add_subdirectory(globalplatform)
-add_subdirectory(iso)

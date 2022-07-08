@@ -2,7 +2,9 @@
 #ifndef __TLV_HXX__
 #define __TLV_HXX__
 
-namespace iso7816
+namespace smartcard
+{
+namespace encoding
 {
 
 class Tlv
@@ -11,6 +13,7 @@ class Tlv
 
 using TlvSimple = Tlv;
 
-} // namespace iso7816
+} // namespace encoding
+} // namespace smartcard
 
 #endif // __TLV_HXX__

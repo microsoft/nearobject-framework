@@ -2,7 +2,7 @@
 #ifndef __APDU_HXX__
 #define __APDU_HXX__
 
-namespace iso7816
+namespace smartcard
 {
 
 class ApduCommand
@@ -13,6 +13,6 @@ class ApduResponse
 {
 };
 
-} // namespace iso7816
+} // namespace smartcard
 
 #endif // __APDU_HXX__

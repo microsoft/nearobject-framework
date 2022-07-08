@@ -4,13 +4,16 @@
 
 #include "Tlv.hxx"
 
-namespace iso7816
+namespace smartcard
+{
+namespace encoding
 {
 
 class TlvBer : public Tlv
 {
 };
 
-} // namespace iso7816
+} // namespace encoding
+} // namespace smartcard
 
 #endif // __TLV_BER_HXX__
