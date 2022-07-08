@@ -3,6 +3,8 @@
 
 #include <stdexcept>
 
+using namespace secureproximity;
+
 ISecureDeviceChannel*
 SecureDevice::CreateChannel(SecureDeviceChannelParameters)
 {

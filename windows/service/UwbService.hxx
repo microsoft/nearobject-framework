@@ -6,6 +6,11 @@
 #include <mutex>
 #include <thread>
 
+namespace windows
+{
+namespace uwb
+{
+
 class UwbService
 {
 public:
@@ -27,5 +32,8 @@ private:
     std::mutex m_runEventGate;
     std::condition_variable m_runEvent;
 };
+
+} // namespace uwb
+} // namespace windows
 
 #endif // __UWB_SERVICE_HXX__

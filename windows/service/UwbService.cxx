@@ -1,6 +1,8 @@
 
 #include "UwbService.hxx"
 
+using namespace windows::uwb;
+
 void
 UwbService::Start()
 {

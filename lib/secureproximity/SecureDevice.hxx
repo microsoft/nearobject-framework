@@ -4,11 +4,16 @@
 
 #include "ISecureDevice.hxx"
 
+namespace secureproximity
+{
+
 class SecureDevice :
     public ISecureDevice
 {
     ISecureDeviceChannel* 
     CreateChannel(SecureDeviceChannelParameters) override;
 };
+
+} // namespace secureproximity
 
 #endif //__SECURE_DEVICE_HXX__

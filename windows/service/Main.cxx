@@ -4,7 +4,7 @@
 int
 main(int argc, char *argv[])
 {
-    UwbService uwbService{};
+    windows::uwb::UwbService uwbService{};
     uwbService.Start();
     return 0;
 }
