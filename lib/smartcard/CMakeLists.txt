@@ -5,6 +5,7 @@ target_sources(smartcard
     PRIVATE
         Apdu.hxx
         Apdu.cxx
+        ISmartCard.hxx
         Tlv.hxx
         TlvBer.hxx
         TlvBer.cxx
