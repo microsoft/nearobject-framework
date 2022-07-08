@@ -4,6 +4,10 @@ add_executable(winuwbservice "")
 target_sources(winuwbservice
     PRIVATE
         Main.cxx
+        OobManager.hxx
+        ProfileManager.hxx
+        SecureDeviceManager.hxx
+        UwbDeviceManager.hxx
         UwbService.hxx
         UwbService.cxx
 )
