@@ -9,7 +9,7 @@ target_sources(windevsmartcard
 
 target_include_directories(windevsmartcard
     PRIVATE
-        ${UWB_DIR_LIB}/smartcard
+        ${UWB_DIR_LIB}
 )
 
 target_link_libraries(windevsmartcard
