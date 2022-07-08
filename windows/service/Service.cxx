@@ -6,7 +6,7 @@ using namespace windows::uwb;
 void
 Service::Start()
 {
-    m_threadMain = std::jthread([&]() {
+    m_threadMain = std::thread([&]() {
         Run();
     });
 }

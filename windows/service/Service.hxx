@@ -28,7 +28,7 @@ public:
 
 private:
     bool m_running = false;
-    std::jthread m_threadMain;
+    std::thread m_threadMain;
     std::mutex m_runEventGate;
     std::condition_variable m_runEvent;
 };
