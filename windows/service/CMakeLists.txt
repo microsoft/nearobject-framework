@@ -4,6 +4,7 @@ add_executable(winuwbservice "")
 target_sources(winuwbservice
     PRIVATE
         Main.cxx
+        OobManager.cxx
         OobManager.hxx
         ProfileManager.hxx
         SecureDeviceManager.hxx
@@ -14,12 +15,12 @@ target_sources(winuwbservice
 
 target_include_directories(winuwbservice
     PRIVATE
-        ../lib/se
-        ../lib/se/globalplatform
-        ../lib/se/iso
-        ../lib/secureproximity
-        ../lib/uwb
-        ../lib/uwb/uci
+        ${UWB_DIR_LIB}/se
+        ${UWB_DIR_LIB}/se/globalplatform
+        ${UWB_DIR_LIB}/se/iso
+        ${UWB_DIR_LIB}/secureproximity
+        ${UWB_DIR_LIB}/uwb
+        ${UWB_DIR_LIB}/uwb/uci
 )
 
 target_link_libraries(winuwbservice
