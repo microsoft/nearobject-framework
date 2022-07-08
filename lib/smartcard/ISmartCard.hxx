@@ -27,6 +27,16 @@ public:
     Transmit(const ApduCommand& command, ApduResponse& response, std::chrono::milliseconds timeout) = 0;
 
     /**
+     * @brief Asynchronously transmission request.
+     */
+    struct TransmitAsyncRequest
+    {
+        // TODO: should this indicate why submission failed? (ie. a status instead of bool?)
+        bool Submitted;
+        std::future<ApduResponse> Response;
+    };
+
+    /**
      * @brief Asynchronously transmits a command apdu and provides a future for
      * the response.
      * 
@@ -34,7 +44,7 @@ public:
      * @param timeout The timeout period after which the tranmission should be canceled.
      * @return std::future<smartcard::ApduResponse> 
      */
-    virtual std::future<ApduResponse>
+    virtual TransmitAsyncRequest
     TransmitAsync(const ApduCommand& command, std::chrono::milliseconds timeout) = 0;
 };
 
