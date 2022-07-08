@@ -7,9 +7,9 @@ target_sources(winuwbservice
         OobManager.hxx
         ProfileManager.hxx
         SecureDeviceManager.hxx
+        Service.hxx
+        Service.cxx
         UwbDeviceManager.hxx
-        UwbService.hxx
-        UwbService.cxx
 )
 
 target_include_directories(winuwbservice

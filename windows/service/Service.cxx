@@ -1,10 +1,10 @@
 
-#include "UwbService.hxx"
+#include "Service.hxx"
 
 using namespace windows::uwb;
 
 void
-UwbService::Start()
+Service::Start()
 {
     m_threadMain = std::jthread([&]() {
         Run();
@@ -12,17 +12,17 @@ UwbService::Start()
 }
 
 void
-UwbService::Stop()
+Service::Stop()
 {
 }
 
 void
-UwbService::HandleEvent()
+Service::HandleEvent()
 {
 }
 
 void
-UwbService::Run()
+Service::Run()
 {
     m_running = true;
 

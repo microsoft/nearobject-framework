@@ -1,6 +1,6 @@
 
-#ifndef __UWB_SERVICE_HXX__
-#define __UWB_SERVICE_HXX__
+#ifndef __SERVICE_HXX__
+#define __SERVICE_HXX__
 
 #include <condition_variable>
 #include <mutex>
@@ -11,7 +11,7 @@ namespace windows
 namespace uwb
 {
 
-class UwbService
+class Service
 {
 public:
     void
@@ -36,4 +36,4 @@ private:
 } // namespace uwb
 } // namespace windows
 
-#endif // __UWB_SERVICE_HXX__
+#endif // __SERVICE_HXX__
