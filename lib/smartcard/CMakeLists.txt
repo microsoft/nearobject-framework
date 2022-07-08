@@ -11,4 +11,9 @@ target_sources(smartcard
         TlvBer.cxx
 )
 
+target_link_libraries(smartcard
+    PUBLIC
+        GSL
+)
+
 set_target_properties(smartcard PROPERTIES FOLDER lib/smartcard)
