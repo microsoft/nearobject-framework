@@ -1,4 +1,4 @@
-# UltraWideband (UWB) Framework
+# Device Ranging and Ultra-Wideband (UWB) Framework
 
 ## Project Structure
 
