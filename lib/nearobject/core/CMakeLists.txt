@@ -12,12 +12,12 @@ target_sources(nearobject-core
 
 target_include_directories(nearobject-core
     PRIVATE
-        ${UWB_DIR_LIB}/se
-        ${UWB_DIR_LIB}/se/globalplatform
-        ${UWB_DIR_LIB}/smartcard
-        ${UWB_DIR_LIB}/secureproximity
-        ${UWB_DIR_LIB}/uwb
-        ${UWB_DIR_LIB}/uwb/uci
+        ${NOF_DIR_LIB}/se
+        ${NOF_DIR_LIB}/se/globalplatform
+        ${NOF_DIR_LIB}/smartcard
+        ${NOF_DIR_LIB}/secureproximity
+        ${NOF_DIR_LIB}/uwb
+        ${NOF_DIR_LIB}/uwb/uci
 )
 
 target_link_libraries(nearobject-core

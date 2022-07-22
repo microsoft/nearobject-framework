@@ -8,7 +8,7 @@ target_sources(winuwbservice
 
 target_include_directories(winuwbservice
     PRIVATE
-        ${UWB_DIR_LIB}
+        ${NOF_DIR_LIB}
 )
 
 target_link_libraries(winuwbservice

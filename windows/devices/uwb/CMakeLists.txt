@@ -9,7 +9,7 @@ target_sources(windevuwb
 
 target_include_directories(windevuwb
     PRIVATE
-        ${UWB_DIR_LIB}
+        ${NOF_DIR_LIB}
 )
 
 set_target_properties(windevuwb PROPERTIES FOLDER windows/devices)
