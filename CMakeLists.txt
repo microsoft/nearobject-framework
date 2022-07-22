@@ -34,10 +34,15 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Common source directories
 set(UWB_DIR_LIB ${CMAKE_CURRENT_LIST_DIR}/lib)
-set(UWB_DIR_WINDOWS ${CMAKE_CURRENT_LIST_DIR}/windows)
 set(UWB_DIR_LINUX ${CMAKE_CURRENT_LIST_DIR}/linux)
+set(UWB_DIR_WINDOWS ${CMAKE_CURRENT_LIST_DIR}/windows)
 
 add_subdirectory(lib)
-add_subdirectory(linux)
 add_subdirectory(tools)
-add_subdirectory(windows)
+
+# Conditional inclusion of OS-dependent source trees.
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  add_subdirectory(linux)
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+  add_subdirectory(windows)
+endif()
