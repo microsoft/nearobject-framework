@@ -14,6 +14,8 @@ namespace smartcard
 class ISmartcard
 {
 public:
+    virtual ~ISmartcard() = default;
+
     /**
      * @brief Synchronously transmits a command apdu and provides the response.
      * This must handle any fragmentation of both transmitting the command and

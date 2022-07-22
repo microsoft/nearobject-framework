@@ -26,7 +26,6 @@ target_link_libraries(nearobject-core
         seglobalplatform
         smartcard
         uwb
-        uwbuci
 )
 
 set_target_properties(nearobject-core PROPERTIES FOLDER lib/nearobject/core)

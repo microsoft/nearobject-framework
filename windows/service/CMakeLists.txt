@@ -13,11 +13,11 @@ target_include_directories(winuwbservice
 
 target_link_libraries(winuwbservice
     PRIVATE
+        nearobject-service
         se
         seglobalplatform
         smartcard
         uwb
-        uwbuci
 )
 
 set_target_properties(winuwbservice PROPERTIES FOLDER windows/service)

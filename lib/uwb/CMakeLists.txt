@@ -22,11 +22,4 @@ target_include_directories(uwb
         uci
 )
 
-target_link_libraries(uwb
-    PRIVATE
-        uwbuci
-)
-
 set_target_properties(uwb PROPERTIES FOLDER lib/uwb)
-
-add_subdirectory(uci)
