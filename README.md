@@ -29,7 +29,6 @@ cd slrp-framework
 mkdir build
 cd build
 cmake ..
-cd ..
 cmake --build .
 ```
 
