@@ -8,6 +8,12 @@ This project is organized to allow development both in the internal Windows buil
 
 Note that all language feature configuration is constrained by the Windows build system since it is the most limiting factor. As such, the current C++ language version being used is C++ 17. To fill in the gaps to newer C++ standards, the [Microsoft C++ Guidelines Support Library (GSL)](https://github.com/microsoft/GSL) is available to all CMake-based projects using the `GSL` link target, then including the headers as appropriate (eg. `#include <gsl/gsl.h>`). This provides implementations of post-C++17 features such as `std::span`, `narrow_cast`, etc..
 
+## Coding Guidelines
+
+Where possible, we will attempt to use primitives provided by the [C++ Standard Library](https://en.cppreference.com/w/cpp/header) for interoperability between common and OS-dependent code. The use of OS-specific primitives and libraries is reserved for scenarios where they are strictly needed (eg. calling an OS/System API), or where the highest possible performance is required and only the OS implementation can provide this. 
+
+The coding style is dictated by the `.clang-format` file in the root of the project. Please configure your editor to format sources accordingly. Above all, the coding style should be kept as consistent as possible.
+
 ## Development Environment Setup
 
 ### CMake
