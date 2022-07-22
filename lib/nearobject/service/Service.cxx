@@ -1,7 +1,7 @@
 
 #include "Service.hxx"
 
-using namespace windows::uwb;
+using namespace nearobject;
 
 void
 Service::Start()
@@ -36,3 +36,4 @@ Service::Run()
         HandleEvent();
     }
 }
+

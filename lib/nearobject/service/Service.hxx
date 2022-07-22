@@ -6,9 +6,7 @@
 #include <mutex>
 #include <thread>
 
-namespace windows
-{
-namespace uwb
+namespace nearobject
 {
 
 class Service
@@ -33,7 +31,6 @@ private:
     std::condition_variable m_runEvent;
 };
 
-} // namespace uwb
-} // namespace windows
+} // namespace nearobject
 
 #endif // __SERVICE_HXX__

@@ -1,11 +1,10 @@
 
-#include "Service.hxx"
+#include <nearobject/service/Service.hxx>
 
 int
 main(int argc, char *argv[])
 {
-    windows::uwb::Service uwbService{};
-    uwbService.Start();
-
+    nearobject::Service nearObjectService{};
+    nearObjectService.Start();
     return 0;
 }
