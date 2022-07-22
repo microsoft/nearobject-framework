@@ -3,6 +3,10 @@ add_library(nearobject-core STATIC "")
 
 target_sources(nearobject-core
     PRIVATE
+        ConnectionProfile.cxx
+        ConnectionProfile.hxx
+        ConnectionProfileManager.cxx
+        ConnectionProfileManager.hxx
         DeviceManager.hxx
         NearObject.hxx
         NearObject.cxx
@@ -14,7 +18,6 @@ target_sources(nearobject-core
         OobConnection.hxx
         OobManager.cxx
         OobManager.hxx
-        ProfileManager.hxx
         SecureDeviceManager.hxx
         ISecureDevice.hxx
         ISecureDeviceChannel.hxx

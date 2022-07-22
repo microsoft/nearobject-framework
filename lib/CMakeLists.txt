@@ -1,4 +1,3 @@
-add_subdirectory(fira)
 add_subdirectory(nearobject)
 add_subdirectory(se)
 add_subdirectory(smartcard)

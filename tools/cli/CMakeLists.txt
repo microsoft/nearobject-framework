@@ -15,10 +15,6 @@ target_link_libraries(nocli
     PRIVATE
         nearobject-core
         nearobject-service
-        se
-        seglobalplatform
-        smartcard
-        uwb
 )
 
 set_target_properties(nocli PROPERTIES FOLDER tools/cli)

@@ -4,9 +4,14 @@
 
 namespace nearobject
 {
+
+/**
+ * @brief Represents a near object.
+ */
 class NearObject
 {
 };
+
 } // namespace nearobject
 
 #endif // __NEAR_OBJECT_HXX__
