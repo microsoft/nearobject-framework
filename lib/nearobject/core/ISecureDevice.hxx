@@ -4,7 +4,7 @@
 
 #include "ISecureDeviceChannel.hxx"
 
-namespace secureproximity
+namespace nearobject
 {
 
 class ISecureDevice
@@ -13,6 +13,6 @@ class ISecureDevice
     CreateChannel(SecureDeviceChannelParameters) = 0;
 };
 
-} // namespace secureproximity
+} // namespace nearobject
 
 #endif //__I_SECURE_DEVICE_HXX__

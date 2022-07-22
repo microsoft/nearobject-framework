@@ -2,16 +2,13 @@
 #ifndef __SECURE_DEVICE_MANAGER_HXX__
 #define __SECURE_DEVICE_MANAGER_HXX__
 
-namespace windows
-{
-namespace uwb
+namespace nearobject
 {
 
 class SecureDeviceManager
 {
 };
 
-} // namespace uwb
-} // namespace windows
+} // namespace nearobject
 
 #endif // __SECURE_DEVICE_MANAGER_HXX__

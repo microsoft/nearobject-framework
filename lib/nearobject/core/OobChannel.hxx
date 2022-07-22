@@ -6,7 +6,7 @@
 
 #include <memory>
 
-namespace uwb
+namespace nearobject
 {
 
 class OobChannel
@@ -16,6 +16,6 @@ public:
     EstablishConnection() = 0;
 };
 
-} // namespace uwb
+} // namespace nearobject
 
 #endif // __OOB_CHANNEL_HXX__
