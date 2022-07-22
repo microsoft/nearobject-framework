@@ -2,13 +2,13 @@
 #ifndef __OOB_CONNECTION_HXX__
 #define __OOB_CONNECTION_HXX__
 
-namespace uwb
+namespace nearobject
 {
 
 class OobConnection
 {
 };
 
-} // namespace uwb
+} // namespace nearobject
 
 #endif // __OOB_CONNECTION_HXX__

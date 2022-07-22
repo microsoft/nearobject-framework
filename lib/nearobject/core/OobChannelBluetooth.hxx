@@ -4,7 +4,7 @@
 
 #include "OobChannel.hxx"
 
-namespace uwb
+namespace nearobject
 {
 
 class OobChannelBluetooth :
@@ -15,6 +15,6 @@ public:
     EstablishConnection() override;
 };
 
-} // namespace uwb
+} // namespace nearobject
 
 #endif // __OOB_CHANNEL_HXX__

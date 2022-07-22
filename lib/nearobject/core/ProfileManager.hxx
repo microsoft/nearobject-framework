@@ -2,16 +2,13 @@
 #ifndef __PROFILE_MANAGER_HXX__
 #define __PROFILE_MANAGER_HXX__
 
-namespace windows
-{
-namespace uwb
+namespace nearobject
 {
 
 class ProfileManager
 {
 };
 
-} // namespace uwb
-} // namespace windows
+} // namespace nearobject
 
 #endif // __PROFILE_MANAGER_HXX__
