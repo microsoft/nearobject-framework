@@ -33,9 +33,9 @@ FetchContent_MakeAvailable(GSL)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Common source directories
-set(UWB_DIR_LIB ${CMAKE_CURRENT_LIST_DIR}/lib)
-set(UWB_DIR_LINUX ${CMAKE_CURRENT_LIST_DIR}/linux)
-set(UWB_DIR_WINDOWS ${CMAKE_CURRENT_LIST_DIR}/windows)
+set(NOF_DIR_LIB ${CMAKE_CURRENT_LIST_DIR}/lib)
+set(NOF_DIR_LINUX ${CMAKE_CURRENT_LIST_DIR}/linux)
+set(NOF_DIR_WINDOWS ${CMAKE_CURRENT_LIST_DIR}/windows)
 
 add_subdirectory(lib)
 add_subdirectory(tools)

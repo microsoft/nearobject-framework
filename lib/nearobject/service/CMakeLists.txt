@@ -9,7 +9,7 @@ target_sources(nearobject-service
 
 target_include_directories(nearobject-service
     PRIVATE
-        ${UWB_DIR_LIB}/nearobject/core
+        ${NOF_DIR_LIB}/nearobject/core
 )
 
 set_target_properties(nearobject-service PROPERTIES FOLDER lib/nearobject/service)

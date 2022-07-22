@@ -8,7 +8,7 @@ target_sources(nocli
 
 target_include_directories(nocli
     PRIVATE
-        ${UWB_DIR_LIB}
+        ${NOF_DIR_LIB}
 )
 
 target_link_libraries(nocli
