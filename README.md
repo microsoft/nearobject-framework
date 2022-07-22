@@ -1,6 +1,6 @@
-# Secure Location, Ranging, and Proximity (SLRP) Device Framework
+# Near Object (NO) Framework
 
-This project is a framework for interacting with devices which provide secure location, ranging, and proximity services. There is a particular focus on [IEEE 802.15.4z-2020](https://standards.ieee.org/ieee/802.15.4z/10230/) Ultra-Wideband (UWB) devices using the [Fine Ranging Consortium (FiRa)](https://www.firaconsortium.org/), however, the framework is not limited to this.
+This project is a framework for interacting with short-range devices, providing secure location, ranging, radar, or proximity services. There is a particular focus on [IEEE 802.15.4z-2020](https://standards.ieee.org/ieee/802.15.4z/10230/) Ultra-Wideband (UWB) devices using the [Fine Ranging Consortium (FiRa)](https://www.firaconsortium.org/), however, the framework is not limited to this.
 
 ## Project Structure
 
@@ -30,10 +30,9 @@ A C++ compiler supporting C++17 is needed. On Windows, [Visual Studio 2022](http
 To bootstrap the build environment, instruct CMake to generate the build files. It is strongly recommended to do this in a directory that is separate from the source; this allows one to easily destroy and recreate the build environment without affecting the checked-out source and changes in progress. Typically, a new directory called `build` at the top-level project tree is used for this purpose:
 
 ```Shell
-git clone git@github.com:abeltrano/slrp-framework.git
-cd slrp-framework
-mkdir build
-cd build
+git clone git@github.com:abeltrano/nearobject-framework.git
+cd nearobject-framework
+mkdir build && cd $_ 
 cmake ..
 cmake --build .
 ```

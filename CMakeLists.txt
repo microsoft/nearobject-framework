@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.11)
 
-project(slrp-framework LANGUAGES CXX)
+project(nearobject-framework LANGUAGES CXX)
 
 # Set language configutation options. The C++ standard used must be the lowest
 # common denominator for all the OS-dependent projects. In practice, since this
