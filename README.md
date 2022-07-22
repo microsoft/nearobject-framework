@@ -14,7 +14,7 @@ Note that all language feature configuration is constrained by the Windows build
 
 Pre-requisites:
 
-* CMake version >= 3.21
+* CMake version >= 3.11
 * C++ 17 Compiler
 
 CMake may be installed in any form, as long as the version meets the minimum. One popular way of installing it on windows is to use [Chocolately](https://chocolatey.org/install) with `choco install -y cmake`. On Linux, all standard package managers provide a cmake package (eg. `apt-get install -y cmake`, `yum install -y cmake`, etc.).
