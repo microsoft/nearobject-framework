@@ -26,6 +26,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # Common source directories
 set(UWB_DIR_LIB ${CMAKE_CURRENT_LIST_DIR}/lib)
 set(UWB_DIR_WINDOWS ${CMAKE_CURRENT_LIST_DIR}/windows)
+set(UWB_DIR_LINUX ${CMAKE_CURRENT_LIST_DIR}/linux)
 
 add_subdirectory(lib)
 add_subdirectory(linux)
