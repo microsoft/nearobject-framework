@@ -19,4 +19,4 @@ private:
 };
 } // namespace nearobject
 
-#endif //  __NEAR_OBJECT_SESSION_EVENT_HANDLER_HXX__
+#endif // __NEAR_OBJECT_SESSION_EVENT_HANDLER_HXX__

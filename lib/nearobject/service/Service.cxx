@@ -36,4 +36,3 @@ Service::Run()
         HandleEvent();
     }
 }
-

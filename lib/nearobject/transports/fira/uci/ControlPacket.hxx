@@ -14,4 +14,3 @@ struct ControlPacket {
 } // namespace uwb
 
 #endif // __CONTROL_PACKET_HXX__
-
