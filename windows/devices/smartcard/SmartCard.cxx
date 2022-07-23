@@ -6,14 +6,14 @@
 using namespace windows::devices;
 
 void
-Smartcard::Transmit(const smartcard::ApduCommand& command, smartcard::ApduResponse& response, std::chrono::milliseconds timeout)
+Smartcard::TransmitImpl(const smartcard::ApduCommand& command, smartcard::ApduResponse& response, std::chrono::milliseconds timeout)
 {
     // TODO: Send IOCTL_SMARTCARD_TRANSMIT to underlying device and receive response.
     throw std::logic_error("not implemented");
 }
 
 smartcard::Smartcard::TransmitAsyncRequest
-Smartcard::TransmitAsync(const smartcard::ApduCommand& command, std::chrono::milliseconds timeout)
+Smartcard::TransmitAsyncImpl(const smartcard::ApduCommand& command, std::chrono::milliseconds timeout)
 {
     static constexpr bool SubmissionSucceeded = true;
     static constexpr bool SubmissionFailed = false;
