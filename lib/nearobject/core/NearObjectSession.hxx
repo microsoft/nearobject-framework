@@ -31,7 +31,9 @@ private:
     OnSessionClosed();
 
     /**
-     * @brief Get a copy of the currently registered event callbacks.
+     * @brief Get a copy of the currently registered event callbacks. Note that
+     * the returned vector contains resolved std::shared_ptr instances, not
+     * std::weak_ptr.
      * 
      * @return std::vector<std::shared_ptr<NearObjectSessionEventCallbacks>> 
      */

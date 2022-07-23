@@ -14,14 +14,20 @@ NearObjectSession::~NearObjectSession()
 std::vector<std::shared_ptr<NearObjectSessionEventCallbacks>> 
 NearObjectSession::GetEventCallbacks()
 {
-    std::vector<std::shared_ptr<NearObjectSessionEventCallbacks>> eventCallbacks{};
     const auto lock = std::scoped_lock{ m_eventCallbacksGate };
 
-    for (auto& eventCallbackWeak : m_eventCallbacks)
+    // Attempt to resolve each pointer, adding a copy to the return vector if
+    // successful, removing it from the registered callback vector otherwise.
+    std::vector<std::shared_ptr<NearObjectSessionEventCallbacks>> eventCallbacks{};
+    for (auto it = std::begin(m_eventCallbacks); it != std::end(m_eventCallbacks); it = std::next(it))
     {
-        if (auto eventCallback = eventCallbackWeak.lock())
+        if (const auto eventCallback = it->lock())
         {
-            eventCallbacks.push_back(std::move(eventCallback));
+            eventCallbacks.push_back(eventCallback);
+        }
+        else
+        {
+            m_eventCallbacks.erase(it);
         }
     }
 
