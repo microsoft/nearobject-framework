@@ -12,7 +12,7 @@ Smartcard::Transmit(const smartcard::ApduCommand& command, smartcard::ApduRespon
     throw std::logic_error("not implemented");
 }
 
-smartcard::ISmartcard::TransmitAsyncRequest
+smartcard::Smartcard::TransmitAsyncRequest
 Smartcard::TransmitAsync(const smartcard::ApduCommand& command, std::chrono::milliseconds timeout)
 {
     static constexpr bool SubmissionSucceeded = true;

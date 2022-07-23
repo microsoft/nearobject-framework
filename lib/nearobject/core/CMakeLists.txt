@@ -8,8 +8,8 @@ target_sources(nearobject-core
         ConnectionProfileManager.cxx
         ConnectionProfileManager.hxx
         DeviceManager.hxx
-        NearObject.hxx
         NearObject.cxx
+        NearObject.hxx
         OobChannel.cxx
         OobChannel.hxx
         OobChannelBluetooth.cxx
@@ -18,11 +18,10 @@ target_sources(nearobject-core
         OobConnection.hxx
         OobManager.cxx
         OobManager.hxx
-        SecureDeviceManager.hxx
-        ISecureDevice.hxx
-        ISecureDeviceChannel.hxx
         SecureDevice.cxx
         SecureDevice.hxx
+        SecureDeviceChannel.hxx
+        SecureDeviceManager.hxx
 )
 
 target_include_directories(nearobject-core

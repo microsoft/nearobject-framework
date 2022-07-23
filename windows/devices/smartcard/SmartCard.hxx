@@ -8,7 +8,7 @@
 #include <future>
 #include <vector>
 
-#include <smartcard/ISmartCard.hxx>
+#include <smartcard/SmartCard.hxx>
 
 namespace windows
 {
@@ -20,9 +20,9 @@ namespace devices
  * https://msdn.microsoft.com/en-us/library/windows/hardware/dn905601(v=vs.85).aspx
  */
 class Smartcard :
-    public smartcard::ISmartcard
+    public smartcard::Smartcard
 {
-public:
+private:
     /**
      * @brief Synchronously transmits a command apdu and provides the response.
      * This must handle any fragmentation of both transmitting the command and
@@ -33,7 +33,7 @@ public:
      * @param timeout The timeout period after which the tranmission should be canceled.
      */
     void
-    Transmit(const smartcard::ApduCommand& command, smartcard::ApduResponse& response, std::chrono::milliseconds timeout) override;
+    TransmitImpl(const smartcard::ApduCommand& command, smartcard::ApduResponse& response, std::chrono::milliseconds timeout) override;
 
     /**
      * @brief Asynchronously transmits a command apdu and provides a future for
@@ -41,12 +41,11 @@ public:
      * 
      * @param command The command apdu to send.
      * @param timeout The timeout period after which the tranmission should be canceled.
-     * @return smartcard::ISmartcard::TransmitAsyncRequest 
+     * @return smartcard::Smartcard::TransmitAsyncRequest 
      */
-    smartcard::ISmartcard::TransmitAsyncRequest
-    TransmitAsync(const smartcard::ApduCommand& command, std::chrono::milliseconds timeout) override;
+    smartcard::Smartcard::TransmitAsyncRequest
+    TransmitAsyncImpl(const smartcard::ApduCommand& command, std::chrono::milliseconds timeout) override;
 
-private:
     /**
      * @brief Construct a new Complete Pending Transmission object
      * 

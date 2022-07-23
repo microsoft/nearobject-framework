@@ -2,16 +2,20 @@
 #ifndef __SECURE_DEVICE_HXX__
 #define __SECURE_DEVICE_HXX__
 
-#include "ISecureDevice.hxx"
+#include "SecureDeviceChannel.hxx"
 
 namespace nearobject
 {
 
-class SecureDevice :
-    public ISecureDevice
+class SecureDevice
 {
-    ISecureDeviceChannel* 
-    CreateChannel(SecureDeviceChannelParameters) override;
+public:
+    SecureDeviceChannel* 
+    CreateChannel(SecureDeviceChannelParameters);
+
+private:
+    virtual SecureDeviceChannel* 
+    CreateChannelImpl(SecureDeviceChannelParameters) = 0;
 };
 
 } // namespace nearobject

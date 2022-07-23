@@ -1,12 +1,16 @@
 
 #include "SecureDevice.hxx"
 
-#include <stdexcept>
-
 using namespace nearobject;
 
-ISecureDeviceChannel*
-SecureDevice::CreateChannel(SecureDeviceChannelParameters)
+SecureDeviceChannel* 
+SecureDevice::CreateChannel(SecureDeviceChannelParameters params)
 {
-    throw std::logic_error("not implemented");
+    return CreateChannelImpl(params);
+}
+
+SecureDeviceChannel*
+SecureDevice::CreateChannelImpl(SecureDeviceChannelParameters /* params */)
+{
+    return nullptr;
 }

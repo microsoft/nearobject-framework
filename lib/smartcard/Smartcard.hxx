@@ -11,10 +11,10 @@
 namespace smartcard
 {
 
-class ISmartcard
+class Smartcard
 {
 public:
-    virtual ~ISmartcard() = default;
+    virtual ~Smartcard() = default;
 
     /**
      * @brief Synchronously transmits a command apdu and provides the response.
