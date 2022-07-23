@@ -10,6 +10,11 @@ target_sources(nearobject-core
         DeviceManager.hxx
         NearObject.cxx
         NearObject.hxx
+        NearObjectSessionEventCallbacks.hxx
+        NearObjectSessionEventHandler.cxx
+        NearObjectSessionEventHandler.hxx
+        NearObjectSession.cxx
+        NearObjectSession.hxx
         OobChannel.cxx
         OobChannel.hxx
         OobChannelBluetooth.cxx
