@@ -12,4 +12,9 @@ target_include_directories(nearobject-service
         ${NOF_DIR_LIB}/nearobject/core
 )
 
+target_link_libraries(nearobject-service
+    PRIVATE
+        Threads::Threads
+)
+
 set_target_properties(nearobject-service PROPERTIES FOLDER lib/nearobject/service)

@@ -22,6 +22,8 @@ FetchContent_Declare(GSL
 
 FetchContent_MakeAvailable(GSL)
 
+find_package(Threads REQUIRED)
+
 # Uncomment for verbose build information
 # set(CMAKE_VERBOSE_MAKEFILE ON)
 
@@ -36,6 +38,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(NOF_DIR_LIB ${CMAKE_CURRENT_LIST_DIR}/lib)
 set(NOF_DIR_LINUX ${CMAKE_CURRENT_LIST_DIR}/linux)
 set(NOF_DIR_WINDOWS ${CMAKE_CURRENT_LIST_DIR}/windows)
+
 
 add_subdirectory(lib)
 add_subdirectory(tools)
