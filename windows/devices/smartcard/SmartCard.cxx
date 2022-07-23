@@ -1,5 +1,5 @@
 
-#include "SmartCard.hxx"
+#include "Smartcard.hxx"
 
 #include <stdexcept>
 

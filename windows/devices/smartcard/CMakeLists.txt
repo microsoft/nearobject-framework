@@ -3,8 +3,8 @@ add_library(windevsmartcard STATIC "")
 
 target_sources(windevsmartcard
     PRIVATE
-        SmartCard.cxx
-        SmartCard.hxx
+        Smartcard.cxx
+        Smartcard.hxx
 )
 
 target_include_directories(windevsmartcard
