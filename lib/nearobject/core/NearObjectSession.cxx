@@ -40,7 +40,7 @@ NearObjectSession::OnSessionClosed()
     auto eventCallbacks = GetEventCallbacks();
     for (auto& eventCallback : eventCallbacks)
     {
-        eventCallback->SessionEnded();
+        eventCallback->OnNearObjectSessionEnded(this);
     }
 }
 
