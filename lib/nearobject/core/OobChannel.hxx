@@ -12,8 +12,14 @@ namespace nearobject
 class OobChannel
 {
 public:
+    virtual ~OobChannel() = default;
+
+    std::unique_ptr<OobConnection>
+    EstablishConnection();
+
+private:
     virtual std::unique_ptr<OobConnection>
-    EstablishConnection() = 0;
+    EstablishConnectionImpl() = 0;
 };
 
 } // namespace nearobject

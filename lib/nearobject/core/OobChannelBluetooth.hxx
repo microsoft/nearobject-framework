@@ -12,7 +12,7 @@ class OobChannelBluetooth :
 {
 public:
     std::unique_ptr<OobConnection>
-    EstablishConnection() override;
+    EstablishConnectionImpl() override;
 };
 
 } // namespace nearobject

@@ -25,8 +25,8 @@ public:
      * @param response The response apdu to populate
      * @param timeout The timeout period after which the tranmission should be canceled.
      */
-    virtual void
-    Transmit(const ApduCommand& command, ApduResponse& response, std::chrono::milliseconds timeout) = 0;
+    void
+    Transmit(const ApduCommand& command, ApduResponse& response, std::chrono::milliseconds timeout);
 
     /**
      * @brief Asynchronously transmission request.
@@ -47,7 +47,15 @@ public:
      * @return std::future<smartcard::ApduResponse> 
      */
     virtual TransmitAsyncRequest
-    TransmitAsync(const ApduCommand& command, std::chrono::milliseconds timeout) = 0;
+    TransmitAsync(const ApduCommand& command, std::chrono::milliseconds timeout);
+
+private:
+    virtual void
+    TransmitImpl(const ApduCommand& command, ApduResponse& response, std::chrono::milliseconds timeout) = 0;
+
+    virtual TransmitAsyncRequest
+    TransmitAsyncImpl(const ApduCommand& command, std::chrono::milliseconds timeout) = 0;
+
 };
 
 } // namespace smartcard
