@@ -4,6 +4,15 @@
 
 #include <cstdint>
 
+namespace nearobject
+{
+namespace transport
+{
+namespace fira
+{
+namespace uci
+{
+
 enum class StatusCode : uint8_t {
     // Generic Status Codes
     Ok = 0x00,
@@ -45,5 +54,10 @@ enum class StatusCode : uint8_t {
     // Proprietary Status Codes
     // Vendor Specific = 0x50-0xFF
 };
+
+} // namespace uci
+} // namespace fira
+} // namespace transport
+} // namespace nearobject
 
 #endif // __STATUS_CODES_HXX__

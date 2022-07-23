@@ -2,7 +2,11 @@
 #ifndef __DEVICE_STATE_HXX__
 #define __DEVICE_STATE_HXX__
 
-namespace uwb
+namespace nearobject
+{
+namespace transport
+{
+namespace fira
 {
 namespace uci
 {
@@ -16,7 +20,9 @@ enum class DeviceState {
     Error,
 };
 
-}
-} // namespace uwb
+} // namespace uci
+} // namespace fira
+} // namespace transport
+} // namespace nearobject
 
 #endif // __DEVICE_STATE_HXX__

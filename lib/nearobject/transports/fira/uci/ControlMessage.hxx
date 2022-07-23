@@ -2,7 +2,11 @@
 #ifndef __CONTROL_MESSAGE_HXX__
 #define __CONTROL_MESSAGE_HXX__
 
-namespace uwb
+namespace nearobject
+{
+namespace transport
+{
+namespace fira
 {
 namespace uci
 {
@@ -11,6 +15,8 @@ struct ControlMessage {
 };
 
 } // namespace uci
-} // namespace uwb
+} // namespace fira
+} // namespace transport
+} // namespace nearobject
 
 #endif // __CONTROL_MESSAGE_HXX__

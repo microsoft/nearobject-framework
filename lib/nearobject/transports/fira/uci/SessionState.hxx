@@ -2,7 +2,11 @@
 #ifndef __SESSION_STATE_HXX__
 #define __SESSION_STATE_HXX__
 
-namespace uwb
+namespace nearobject
+{
+namespace transport
+{
+namespace fira
 {
 namespace uci
 {
@@ -17,7 +21,9 @@ enum class SessionState {
     Active,
 };
 
-}
-} // namespace uwb
+} // namespace uci
+} // namespace fira
+} // namespace transport
+} // namespace nearobject
 
 #endif // __SESSION_STATE_HXX__
