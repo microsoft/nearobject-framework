@@ -8,7 +8,6 @@
 
 namespace nearobject
 {
-
 class ConnectionProfileManager
 {
 public:

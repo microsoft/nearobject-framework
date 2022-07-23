@@ -12,7 +12,6 @@ namespace fira
 {
 namespace uci
 {
-
 enum class StatusCode : uint8_t {
     // Generic Status Codes
     Ok = 0x00,

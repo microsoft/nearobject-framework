@@ -11,7 +11,6 @@ namespace smartcard
 {
 namespace encoding
 {
-
 class TlvBer : public Tlv
 {
 public:

@@ -6,7 +6,6 @@
 
 namespace se
 {
-
 struct SecureElementChannel {
     SecureElementChannel(uint8_t channelId);
     ~SecureElementChannel();

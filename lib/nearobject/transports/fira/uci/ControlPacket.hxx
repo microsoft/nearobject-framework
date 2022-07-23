@@ -10,7 +10,6 @@ namespace fira
 {
 namespace uci
 {
-
 struct ControlPacket {
 };
 

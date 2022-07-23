@@ -9,7 +9,6 @@
 
 namespace nearobject
 {
-
 class OobManager
 {
 public:

@@ -4,7 +4,6 @@
 
 namespace uwb
 {
-
 /**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
  * 5.1.

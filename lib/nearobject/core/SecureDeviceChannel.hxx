@@ -4,9 +4,7 @@
 
 namespace nearobject
 {
-
-struct SecureDeviceChannelParameters
-{
+struct SecureDeviceChannelParameters {
 };
 
 class SecureDeviceChannel

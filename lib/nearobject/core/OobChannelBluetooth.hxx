@@ -6,7 +6,6 @@
 
 namespace nearobject
 {
-
 class OobChannelBluetooth :
     public OobChannel
 {

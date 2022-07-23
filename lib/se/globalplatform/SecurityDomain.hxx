@@ -6,12 +6,11 @@ namespace se
 {
 namespace globalplatform
 {
-
 class SecurityDomain
 {
 };
 
-} // namespace se
 } // namespace globalplatform
+} // namespace se
 
 #endif // __SECURITY_DOMAIN_HXX__

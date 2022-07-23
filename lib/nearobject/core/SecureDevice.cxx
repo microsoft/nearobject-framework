@@ -3,14 +3,14 @@
 
 using namespace nearobject;
 
-SecureDeviceChannel* 
+SecureDeviceChannel*
 SecureDevice::CreateChannel(SecureDeviceChannelParameters params)
 {
     return CreateChannelImpl(params);
 }
 
 SecureDeviceChannel*
-SecureDevice::CreateChannelImpl(SecureDeviceChannelParameters /* params */)
+    SecureDevice::CreateChannelImpl(SecureDeviceChannelParameters /* params */)
 {
     return nullptr;
 }

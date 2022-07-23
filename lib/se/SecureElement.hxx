@@ -8,10 +8,10 @@
 
 namespace se
 {
-
 class SecureElement
 {
-    std::shared_ptr<SecureElementChannel> OpenChannel();
+    std::shared_ptr<SecureElementChannel>
+    OpenChannel();
 };
 
 } // namespace se

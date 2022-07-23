@@ -6,16 +6,15 @@
 
 namespace nearobject
 {
-
 class SecureDevice
 {
 public:
-    SecureDeviceChannel* 
-    CreateChannel(SecureDeviceChannelParameters);
+    SecureDeviceChannel*
+        CreateChannel(SecureDeviceChannelParameters);
 
 private:
-    virtual SecureDeviceChannel* 
-    CreateChannelImpl(SecureDeviceChannelParameters) = 0;
+    virtual SecureDeviceChannel*
+        CreateChannelImpl(SecureDeviceChannelParameters) = 0;
 };
 
 } // namespace nearobject

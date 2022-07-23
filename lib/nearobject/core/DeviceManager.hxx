@@ -4,7 +4,6 @@
 
 namespace nearobject
 {
-
 class DeviceManager
 {
 };

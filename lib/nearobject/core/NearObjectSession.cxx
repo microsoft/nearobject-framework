@@ -11,7 +11,7 @@ NearObjectSession::~NearObjectSession()
     OnSessionClosed();
 }
 
-std::vector<std::shared_ptr<NearObjectSessionEventCallbacks>> 
+std::vector<std::shared_ptr<NearObjectSessionEventCallbacks>>
 NearObjectSession::GetEventCallbacks()
 {
     const auto lock = std::scoped_lock{ m_eventCallbacksGate };
@@ -19,14 +19,10 @@ NearObjectSession::GetEventCallbacks()
     // Attempt to resolve each pointer, adding a copy to the return vector if
     // successful, removing it from the registered callback vector otherwise.
     std::vector<std::shared_ptr<NearObjectSessionEventCallbacks>> eventCallbacks{};
-    for (auto it = std::begin(m_eventCallbacks); it != std::end(m_eventCallbacks); it = std::next(it))
-    {
-        if (const auto eventCallback = it->lock())
-        {
+    for (auto it = std::begin(m_eventCallbacks); it != std::end(m_eventCallbacks); it = std::next(it)) {
+        if (const auto eventCallback = it->lock()) {
             eventCallbacks.push_back(eventCallback);
-        }
-        else
-        {
+        } else {
             m_eventCallbacks.erase(it);
         }
     }
@@ -38,8 +34,7 @@ void
 NearObjectSession::OnSessionClosed()
 {
     auto eventCallbacks = GetEventCallbacks();
-    for (auto& eventCallback : eventCallbacks)
-    {
+    for (auto& eventCallback : eventCallbacks) {
         eventCallback->OnNearObjectSessionEnded(this);
     }
 }

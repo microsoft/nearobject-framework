@@ -4,7 +4,6 @@
 
 namespace nearobject
 {
-
 /**
  * @brief Represents a near object.
  */

@@ -10,7 +10,6 @@
 
 namespace smartcard
 {
-
 class Smartcard
 {
 public:
@@ -31,8 +30,7 @@ public:
     /**
      * @brief Asynchronously transmission request.
      */
-    struct TransmitAsyncRequest
-    {
+    struct TransmitAsyncRequest {
         // TODO: should this indicate why submission failed? (ie. a status instead of bool?)
         bool Submitted;
         std::future<ApduResponse> Response;
@@ -55,7 +53,6 @@ private:
 
     virtual TransmitAsyncRequest
     TransmitAsyncImpl(const ApduCommand& command, std::chrono::milliseconds timeout) = 0;
-
 };
 
 } // namespace smartcard

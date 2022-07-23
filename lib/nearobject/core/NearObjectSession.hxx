@@ -23,7 +23,7 @@ public:
      * 
      * @param eventCallbacks 
      */
-    void 
+    void
     RegisterCallbacks(std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks);
 
 private:
@@ -37,7 +37,7 @@ private:
      * 
      * @return std::vector<std::shared_ptr<NearObjectSessionEventCallbacks>> 
      */
-    std::vector<std::shared_ptr<NearObjectSessionEventCallbacks>> 
+    std::vector<std::shared_ptr<NearObjectSessionEventCallbacks>>
     GetEventCallbacks();
 
 private:

@@ -5,7 +5,7 @@
 
 using namespace smartcard;
 
-ApduCommand::ApduCommand(std::byte cla, std::byte ins, std::byte p1, std::byte p2):
+ApduCommand::ApduCommand(std::byte cla, std::byte ins, std::byte p1, std::byte p2) :
     ApduCommand(cla, ins, p1, p2, {})
 {
 }
@@ -47,12 +47,14 @@ ApduCommand::P2() const
     return m_payload[3];
 }
 
-gsl::span<std::byte> ApduCommand::Data() const
+gsl::span<std::byte>
+ApduCommand::Data() const
 {
     return m_dataView;
 }
 
-gsl::span<std::byte> ApduCommand::Payload() const
+gsl::span<std::byte>
+ApduCommand::Payload() const
 {
     return m_payloadView;
 }
