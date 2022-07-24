@@ -10,7 +10,7 @@ struct NearObjectSessionEventCallbacks {
     /**
      * @brief Invoked when the session is ended.
      * 
-     * @param session The session that eneded.
+     * @param session The session that ended.
      * TODO: This should probably indicate why it ended.
      */
     virtual void

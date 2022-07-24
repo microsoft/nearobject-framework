@@ -19,7 +19,7 @@ public:
     ~NearObjectSession();
 
     /**
-     * @brief Reigster a set of callbacks for session events.
+     * @brief Register a set of callbacks for session events.
      * 
      * @param eventCallbacks 
      */
