@@ -3,6 +3,7 @@
 #include <iterator>
 
 #include "NearObjectSession.hxx"
+#include "NearObjectSessionEventCallbacks.hxx"
 
 using namespace nearobject;
 

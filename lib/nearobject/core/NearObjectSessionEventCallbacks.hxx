@@ -2,10 +2,10 @@
 #ifndef __NEAR_OBJECT_SESSION_EVENT_CALLBACKS_HXX__
 #define __NEAR_OBJECT_SESSION_EVENT_CALLBACKS_HXX__
 
+#include "NearObjectSession.hxx"
+
 namespace nearobject
 {
-class NearObjectSession;
-
 struct NearObjectSessionEventCallbacks {
     /**
      * @brief Invoked when the session is ended.

@@ -6,10 +6,10 @@
 #include <mutex>
 #include <vector>
 
-#include "NearObjectSessionEventCallbacks.hxx"
-
 namespace nearobject
 {
+struct NearObjectSessionEventCallbacks;
+
 /**
  * @brief Represents a communication session with a near object.
  */
