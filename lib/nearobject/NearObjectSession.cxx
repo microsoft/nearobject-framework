@@ -35,6 +35,10 @@ NearObjectSession::GetEventCallbacks()
 void
 NearObjectSession::OnSessionClosed()
 {
+    // TODO: All callbacks should probably be serialized to ensure that events
+    // firing in rapid succession don't get signaled out-of-order. Likely some
+    // form of a queue is needed.
+
     auto eventCallbacks = GetEventCallbacks();
     for (auto& eventCallback : eventCallbacks) {
         eventCallback->OnNearObjectSessionEnded(this);
