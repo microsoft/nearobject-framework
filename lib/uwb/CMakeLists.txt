@@ -11,9 +11,4 @@ target_sources(uwb
         UwbRangingSession.hxx
 )
 
-target_include_directories(uwb
-    PRIVATE
-        uci
-)
-
 set_target_properties(uwb PROPERTIES FOLDER lib/uwb)
