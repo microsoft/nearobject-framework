@@ -5,7 +5,7 @@
 #include <nearobject/NearObjectSession.hxx>
 #include <nearobject/NearObjectSessionEventCallbacks.hxx>
 
-TEST_CASE("Handlers can be reigstered", "[basic]")
+TEST_CASE("Handlers can be registered", "[basic]")
 {
     using namespace nearobject;
 
