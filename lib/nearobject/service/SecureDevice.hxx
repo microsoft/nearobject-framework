@@ -6,6 +6,8 @@
 
 namespace nearobject
 {
+namespace service
+{
 class SecureDevice
 {
 public:
@@ -17,6 +19,7 @@ private:
         CreateChannelImpl(SecureDeviceChannelParameters) = 0;
 };
 
+} // namespace service
 } // namespace nearobject
 
 #endif //__SECURE_DEVICE_HXX__

@@ -6,6 +6,8 @@
 
 namespace nearobject
 {
+namespace service
+{
 class OobChannelBluetooth :
     public OobChannel
 {
@@ -14,6 +16,7 @@ public:
     EstablishConnectionImpl() override;
 };
 
+} // namespace service
 } // namespace nearobject
 
 #endif // __OOB_CHANNEL_HXX__

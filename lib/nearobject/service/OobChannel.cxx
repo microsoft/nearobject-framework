@@ -1,7 +1,7 @@
 
 #include "OobChannel.hxx"
 
-using namespace nearobject;
+using namespace nearobject::service;
 
 std::unique_ptr<OobConnection>
 OobChannel::EstablishConnection()

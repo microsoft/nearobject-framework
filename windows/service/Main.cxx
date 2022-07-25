@@ -4,7 +4,7 @@
 int
 main(int argc, char *argv[])
 {
-    nearobject::Service nearObjectService{};
+    nearobject::service::Service nearObjectService{};
     nearObjectService.Start();
     return 0;
 }

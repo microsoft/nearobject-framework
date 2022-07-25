@@ -1,7 +1,7 @@
 
 #include "OobManager.hxx"
 
-using namespace nearobject;
+using namespace nearobject::service;
 
 void
 OobManager::RegisterOobChannel(std::unique_ptr<OobChannel> oobChannel)

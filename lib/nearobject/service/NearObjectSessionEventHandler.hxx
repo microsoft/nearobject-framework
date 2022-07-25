@@ -8,6 +8,8 @@ namespace nearobject
 {
 struct NearObjectSessionEventCallbacks;
 
+namespace service
+{
 class NearObjectSessionEventHandler final
 {
 public:
@@ -17,6 +19,8 @@ private:
     NearObjectSession *m_session{ nullptr };
     std::shared_ptr<NearObjectSessionEventCallbacks> m_callbacks{ nullptr };
 };
+
+} // namespace service
 } // namespace nearobject
 
 #endif // __NEAR_OBJECT_SESSION_EVENT_HANDLER_HXX__

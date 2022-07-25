@@ -1,7 +1,7 @@
 
 #include "SecureDevice.hxx"
 
-using namespace nearobject;
+using namespace nearobject::service;
 
 SecureDeviceChannel*
 SecureDevice::CreateChannel(SecureDeviceChannelParameters params)

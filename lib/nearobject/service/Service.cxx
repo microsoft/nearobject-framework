@@ -1,7 +1,7 @@
 
 #include "Service.hxx"
 
-using namespace nearobject;
+using namespace nearobject::service;
 
 void
 Service::Start()

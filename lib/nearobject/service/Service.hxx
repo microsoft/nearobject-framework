@@ -8,6 +8,8 @@
 
 namespace nearobject
 {
+namespace service
+{
 class Service
 {
 public:
@@ -30,6 +32,7 @@ private:
     std::condition_variable m_runEvent;
 };
 
+} // namespace service
 } // namespace nearobject
 
 #endif // __SERVICE_HXX__

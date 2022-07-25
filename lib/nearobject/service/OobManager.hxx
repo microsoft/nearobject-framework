@@ -9,6 +9,8 @@
 
 namespace nearobject
 {
+namespace service
+{
 class OobManager
 {
 public:
@@ -20,6 +22,7 @@ private:
     std::vector<std::unique_ptr<OobChannel>> m_oobChannels{};
 };
 
+} // namespace service
 } // namespace nearobject
 
 #endif // __OOB_MANAGER_HXX__

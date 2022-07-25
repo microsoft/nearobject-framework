@@ -8,6 +8,8 @@
 
 namespace nearobject
 {
+namespace service
+{
 class OobChannel
 {
 public:
@@ -21,6 +23,7 @@ private:
     EstablishConnectionImpl() = 0;
 };
 
+} // namespace service
 } // namespace nearobject
 
 #endif // __OOB_CHANNEL_HXX__

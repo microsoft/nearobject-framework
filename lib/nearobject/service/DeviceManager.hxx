@@ -4,10 +4,13 @@
 
 namespace nearobject
 {
+namespace service
+{
 class DeviceManager
 {
 };
 
+} // namespace service
 } // namespace nearobject
 
 #endif // __DEVICE_MANAGER_HXX__
