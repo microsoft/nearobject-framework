@@ -25,6 +25,9 @@ public:
     NearObjectDevice& operator=(NearObjectDevice&) = delete;
     NearObjectDevice& operator=(NearObjectDevice&&) = delete;
 
+    NearObjectDevice() = default;
+    virtual ~NearObjectDevice() = default;
+
     /**
      * @brief Holds the result of the StartSession() function. 
      */
