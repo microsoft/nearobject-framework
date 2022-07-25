@@ -28,7 +28,7 @@ public:
     Transmit(const ApduCommand& command, ApduResponse& response, std::chrono::milliseconds timeout);
 
     /**
-     * @brief Asynchronously transmission request.
+     * @brief Asynchronous transmission request.
      */
     struct TransmitAsyncRequest {
         // TODO: should this indicate why submission failed? (ie. a status instead of bool?)
