@@ -10,17 +10,18 @@ TEST_CASE("event handlers can be registered", "[basic]")
     using namespace nearobject;
 
     struct NearObjectSessionEventCallbacksNoop :
-        public NearObjectSessionEventCallbacks 
-    {
+        public NearObjectSessionEventCallbacks {
         void
         OnNearObjectSessionEnded(NearObjectSession *) override
-        {}
+        { }
 
-        void OnNearObjectRangingSessionStarted(NearObjectSession *) override
-        {}
+        void
+        OnNearObjectRangingSessionStarted(NearObjectSession *) override
+        { }
 
-        void OnNearObjectRangingSessionEnded(NearObjectSession *) override
-        {}
+        void
+        OnNearObjectRangingSessionEnded(NearObjectSession *) override
+        { }
     };
 
     NearObjectSession session{};
@@ -45,7 +46,7 @@ TEST_CASE("event handlers can be registered", "[basic]")
             public NearObjectSessionEventCallbacks {
             NearObjectSessionEventCallbacksCheckSessionPointer(NearObjectSession *session) :
                 Session(session)
-            {}
+            { }
 
             void
             OnNearObjectSessionEnded(NearObjectSession *session) override
@@ -53,14 +54,16 @@ TEST_CASE("event handlers can be registered", "[basic]")
                 CHECK(Session == session);
             }
 
-            void OnNearObjectRangingSessionStarted(NearObjectSession *session) override
+            void
+            OnNearObjectRangingSessionStarted(NearObjectSession *session) override
             {
-                CHECK(Session == session);   
+                CHECK(Session == session);
             }
 
-            void OnNearObjectRangingSessionEnded(NearObjectSession *session) override
+            void
+            OnNearObjectRangingSessionEnded(NearObjectSession *session) override
             {
-                CHECK(Session == session);   
+                CHECK(Session == session);
             }
 
             NearObjectSession *Session;
