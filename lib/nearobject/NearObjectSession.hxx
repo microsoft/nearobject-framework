@@ -26,9 +26,9 @@ public:
     void
     RegisterCallbacks(std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks);
 
-    enum class RangingStatus
+    enum class RangingSessionStatus
     {
-        Successful,
+        Running,
         Error,
         NotSupported,
         MaximumSessionsReached,
@@ -36,7 +36,7 @@ public:
 
     struct StartRangingSessionResult 
     {
-        RangingStatus Status;
+        RangingSessionStatus Status;
         // TODO: unique id?
     };
 
@@ -71,9 +71,9 @@ private:
      * @brief Create a New Ranging Session object
      * TODO: this probably needs to return a tracking object of some kind.
      * 
-     * @return RangingStatus 
+     * @return RangingSessionStatus 
      */
-    RangingStatus
+    RangingSessionStatus
     CreateNewRangingSession();
 
     /**

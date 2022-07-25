@@ -52,20 +52,20 @@ NearObjectSession::StartRangingSession()
 
     const auto lock = std::scoped_lock{ m_rangingStateGate };
     if (m_rangingSessionActive) {
-        result.Status = RangingStatus::MaximumSessionsReached;
+        result.Status = RangingSessionStatus::MaximumSessionsReached;
     } else {
         result.Status = CreateNewRangingSession();
-        m_rangingSessionActive = (result.Status == RangingStatus::Successful);
+        m_rangingSessionActive = (result.Status == RangingSessionStatus::Running);
     }
 
     return result;
 }
 
-NearObjectSession::RangingStatus
+NearObjectSession::RangingSessionStatus
 NearObjectSession::CreateNewRangingSession()
 {
     if (!IsRangingSupported()) {
-        return RangingStatus::NotSupported;
+        return RangingSessionStatus::NotSupported;
     }
 
     {
@@ -79,7 +79,7 @@ NearObjectSession::CreateNewRangingSession()
         eventCallback->OnNearObjectRangingSessionStarted(this);
     }
 
-    return RangingStatus::Successful;
+    return RangingSessionStatus::Running;
 }
 
 void
