@@ -15,7 +15,7 @@ Where possible, we will attempt to use primitives provided by the [C++ Standard 
 The coding style is dictated by the `.clang-format` file in the root of the project. Please configure your editor to format sources accordingly. Above all, the coding style should be kept as consistent as possible.
 
 Some other general guidelines:
-* Use `std::filesystem` for storage and UNIX path separators (`\`) where possible.
+* Use `std::filesystem` for storage and UNIX path separators (`/`) where possible.
 
 ## Development Environment Setup
 
