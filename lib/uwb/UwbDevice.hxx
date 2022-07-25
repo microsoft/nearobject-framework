@@ -5,7 +5,6 @@
 namespace uwb
 {
 
-
 class UwbDevice
 {
 };
