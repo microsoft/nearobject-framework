@@ -3,8 +3,23 @@ add_library(nearobject-service STATIC "")
 
 target_sources(nearobject-service
     PRIVATE
-        Service.hxx
+        ConnectionProfileManager.cxx
+        ConnectionProfileManager.hxx
+        DeviceManager.hxx
+        OobChannel.cxx
+        OobChannel.hxx
+        OobChannelBluetooth.cxx
+        OobChannelBluetooth.hxx
+        OobConnection.cxx
+        OobConnection.hxx
+        OobManager.cxx
+        OobManager.hxx
+        SecureDevice.cxx
+        SecureDevice.hxx
+        SecureDeviceChannel.hxx
+        SecureDeviceManager.hxx
         Service.cxx
+        Service.hxx
 )
 
 target_include_directories(nearobject-service

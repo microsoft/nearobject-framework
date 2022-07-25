@@ -4,7 +4,7 @@
 
 namespace nearobject
 {
-class ConnectionProfile
+class NearObjectConnectionProfile
 {
 };
 

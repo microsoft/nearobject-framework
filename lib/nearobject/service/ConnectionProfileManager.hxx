@@ -4,17 +4,20 @@
 
 #include <vector>
 
-#include "ConnectionProfile.hxx"
+#include "NearObjectConnectionProfile.hxx"
 
 namespace nearobject
+{
+namespace service
 {
 class ConnectionProfileManager
 {
 public:
-    std::vector<ConnectionProfile>
-    FindMatchingProfiles(const ConnectionProfile& connectionProfile) const;
+    std::vector<NearObjectConnectionProfile>
+    FindMatchingProfiles(const NearObjectConnectionProfile& connectionProfile) const;
 };
 
+} // namespace service
 } // namespace nearobject
 
 #endif // __CONNECTION_PROFILE_MANAGER_HXX__

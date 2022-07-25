@@ -3,30 +3,15 @@ add_library(nearobject-core STATIC "")
 
 target_sources(nearobject-core
     PRIVATE
-        ConnectionProfile.cxx
-        ConnectionProfile.hxx
-        ConnectionProfileManager.cxx
-        ConnectionProfileManager.hxx
-        DeviceManager.hxx
         NearObject.cxx
         NearObject.hxx
+        NearObjectConnectionProfile.cxx
+        NearObjectConnectionProfile.hxx
+        NearObjectSession.cxx
+        NearObjectSession.hxx
         NearObjectSessionEventCallbacks.hxx
         NearObjectSessionEventHandler.cxx
         NearObjectSessionEventHandler.hxx
-        NearObjectSession.cxx
-        NearObjectSession.hxx
-        OobChannel.cxx
-        OobChannel.hxx
-        OobChannelBluetooth.cxx
-        OobChannelBluetooth.hxx
-        OobConnection.cxx
-        OobConnection.hxx
-        OobManager.cxx
-        OobManager.hxx
-        SecureDevice.cxx
-        SecureDevice.hxx
-        SecureDeviceChannel.hxx
-        SecureDeviceManager.hxx
 )
 
 target_include_directories(nearobject-core
