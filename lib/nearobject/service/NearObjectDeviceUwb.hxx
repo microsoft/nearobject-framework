@@ -9,11 +9,14 @@ namespace nearobject
 namespace service
 {
 /**
- * @brief Represents a device which provides Near Object services.
+ * @brief A device providing Near Object services using UWB devices.
  */
 class NearObjectDeviceUwb :
     public NearObjectDevice
 {
+private:
+    StartSessionResult
+    StartSessionImpl(const NearObjectConnectionProfile& profile) override;
 };
 
 } // namespace service
