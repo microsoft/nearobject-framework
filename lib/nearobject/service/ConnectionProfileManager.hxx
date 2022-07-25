@@ -4,7 +4,7 @@
 
 #include <vector>
 
-#include "NearObjectConnectionProfile.hxx"
+#include <nearobject/NearObjectConnectionProfile.hxx>
 
 namespace nearobject
 {

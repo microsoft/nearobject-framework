@@ -2,7 +2,7 @@
 #ifndef __NEAR_OBJECT_SESSION_EVENT_HANDLER_HXX__
 #define __NEAR_OBJECT_SESSION_EVENT_HANDLER_HXX__
 
-#include "NearObjectSession.hxx"
+#include <nearobject/NearObjectSession.hxx>
 
 namespace nearobject
 {

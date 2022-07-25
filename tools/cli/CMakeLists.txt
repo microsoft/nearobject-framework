@@ -13,7 +13,7 @@ target_include_directories(nocli
 
 target_link_libraries(nocli
     PRIVATE
-        nearobject-core
+        nearobject
         nearobject-service
 )
 

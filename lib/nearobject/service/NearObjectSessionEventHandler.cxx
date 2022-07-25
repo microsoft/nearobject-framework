@@ -1,6 +1,6 @@
 
+#include <nearobject/NearObjectSessionEventCallbacks.hxx>
 #include "NearObjectSessionEventHandler.hxx"
-#include "NearObjectSessionEventCallbacks.hxx"
 
 using namespace nearobject;
 

@@ -6,6 +6,8 @@ target_sources(nearobject-service
         ConnectionProfileManager.cxx
         ConnectionProfileManager.hxx
         DeviceManager.hxx
+        NearObjectSessionEventHandler.cxx
+        NearObjectSessionEventHandler.hxx
         OobChannel.cxx
         OobChannel.hxx
         OobChannelBluetooth.cxx
@@ -24,12 +26,13 @@ target_sources(nearobject-service
 
 target_include_directories(nearobject-service
     PRIVATE
-        ${NOF_DIR_LIB}/nearobject/core
+        ${NOF_DIR_LIB}
 )
 
 target_link_libraries(nearobject-service
     PRIVATE
         Threads::Threads
+        nearobject
 )
 
 set_target_properties(nearobject-service PROPERTIES FOLDER lib/nearobject/service)
