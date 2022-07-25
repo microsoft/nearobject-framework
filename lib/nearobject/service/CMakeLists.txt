@@ -19,6 +19,7 @@ target_sources(nearobject-service
         SecureDevice.cxx
         SecureDevice.hxx
         SecureDeviceChannel.hxx
+        SecureDeviceManager.cxx
         SecureDeviceManager.hxx
         Service.cxx
         Service.hxx
