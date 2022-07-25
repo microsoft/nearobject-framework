@@ -5,7 +5,10 @@ target_sources(nearobject-service
     PRIVATE
         ConnectionProfileManager.cxx
         ConnectionProfileManager.hxx
-        DeviceManager.hxx
+        NearObjectDevice.cxx
+        NearObjectDevice.hxx
+        NearObjectDeviceManager.cxx
+        NearObjectDeviceManager.hxx
         NearObjectSessionEventHandler.cxx
         NearObjectSessionEventHandler.hxx
         OobChannel.cxx
@@ -19,8 +22,6 @@ target_sources(nearobject-service
         SecureDevice.cxx
         SecureDevice.hxx
         SecureDeviceChannel.hxx
-        SecureDeviceManager.cxx
-        SecureDeviceManager.hxx
         Service.cxx
         Service.hxx
 )
