@@ -33,6 +33,5 @@ target_link_libraries(nearobject
 
 set_target_properties(nearobject PROPERTIES FOLDER lib/nearobject)
 
-add_subdirectory(devices)
 add_subdirectory(protocols)
 add_subdirectory(service)
