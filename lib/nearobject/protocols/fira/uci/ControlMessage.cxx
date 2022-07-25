@@ -1,4 +1,4 @@
 
 #include "ControlMessage.hxx"
 
-using namespace nearobject::transport::fira::uci;
+using namespace nearobject::protocol::fira::uci;

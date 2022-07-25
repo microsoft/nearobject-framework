@@ -4,7 +4,7 @@
 
 namespace nearobject
 {
-namespace transport
+namespace protocol
 {
 namespace fira
 {
