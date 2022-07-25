@@ -7,6 +7,8 @@ target_sources(nearobject-service
         ConnectionProfileManager.hxx
         NearObjectDevice.cxx
         NearObjectDevice.hxx
+        NearObjectDeviceUwb.cxx
+        NearObjectDeviceUwb.hxx
         NearObjectDeviceManager.cxx
         NearObjectDeviceManager.hxx
         NearObjectSessionEventHandler.cxx

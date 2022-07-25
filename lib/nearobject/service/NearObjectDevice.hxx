@@ -6,6 +6,9 @@ namespace nearobject
 {
 namespace service
 {
+/**
+ * @brief Represents a device which provides Near Object services.
+ */
 class NearObjectDevice
 {
 public:
@@ -14,17 +17,8 @@ public:
     NearObjectDevice(NearObjectDevice&&) = delete;
     NearObjectDevice& operator=(NearObjectDevice&) = delete;
     NearObjectDevice& operator=(NearObjectDevice&&) = delete;
-
-    bool
-    operator==(const NearObjectDevice& other) const noexcept;
-
-    bool
-    IsSame(const NearObjectDevice& other) const noexcept;
-
-private:
-    virtual bool
-    IsSameImpl(const NearObjectDevice& other) const noexcept;
 };
+
 } // namespace service
 } // namespace nearobject
 

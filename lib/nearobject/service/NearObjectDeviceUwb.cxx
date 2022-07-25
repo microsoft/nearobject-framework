@@ -1,4 +1,4 @@
 
-#include "NearObjectDevice.hxx"
+#include "NearObjectDeviceUwb.hxx"
 
 using namespace nearobject::service;

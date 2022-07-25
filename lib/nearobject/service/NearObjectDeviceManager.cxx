@@ -11,7 +11,7 @@ NearObjectDeviceManager::AddDevice(std::shared_ptr<NearObjectDevice> nearObjectD
 {
     auto nearObjectDevicesLock = std::scoped_lock{ m_nearObjectDeviceGate };
     auto nearObjectDeviceExists = std::any_of(std::cbegin(m_nearObjectDevices), std::cend(m_nearObjectDevices), [&](const auto& nearObjectDeviceExisting) {
-        return nearObjectDevice->IsSame(*nearObjectDeviceExisting);
+        return /* TODO */ false;
     });
 
     if (nearObjectDeviceExists) {
