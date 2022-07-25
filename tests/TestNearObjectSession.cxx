@@ -15,6 +15,12 @@ TEST_CASE("event handlers can be registered", "[basic]")
         void
         OnNearObjectSessionEnded(NearObjectSession *) override
         {}
+
+        void OnNearObjectRangingSessionStarted(NearObjectSession *) override
+        {}
+
+        void OnNearObjectRangingSessionEnded(NearObjectSession *) override
+        {}
     };
 
     NearObjectSession session{};
@@ -37,6 +43,16 @@ TEST_CASE("event handlers can be registered", "[basic]")
             OnNearObjectSessionEnded(NearObjectSession *session) override
             {
                 CHECK(Session == session);
+            }
+
+            void OnNearObjectRangingSessionStarted(NearObjectSession *session) override
+            {
+                CHECK(Session == session);   
+            }
+
+            void OnNearObjectRangingSessionEnded(NearObjectSession *session) override
+            {
+                CHECK(Session == session);   
             }
 
             NearObjectSession *Session;

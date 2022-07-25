@@ -38,11 +38,79 @@ NearObjectSession::OnSessionClosed()
     // TODO: All callbacks should probably be serialized to ensure that events
     // firing in rapid succession don't get signaled out-of-order. Likely some
     // form of a queue is needed.
+    StopRangingSession();
 
-    auto eventCallbacks = GetEventCallbacks();
-    for (auto& eventCallback : eventCallbacks) {
+    for (const auto& eventCallback : GetEventCallbacks()) {
         eventCallback->OnNearObjectSessionEnded(this);
     }
+}
+
+NearObjectSession::StartRangingSessionResult
+NearObjectSession::StartRangingSession()
+{
+    StartRangingSessionResult result;
+
+    const auto lock = std::scoped_lock{ m_rangingStateGate };
+    if (m_rangingSessionActive) {
+        result.Status = RangingStatus::MaximumSessionsReached;
+    } else {
+        result.Status = CreateNewRangingSession();
+        m_rangingSessionActive = (result.Status == RangingStatus::Successful);
+    }
+
+    return result;
+}
+
+NearObjectSession::RangingStatus
+NearObjectSession::CreateNewRangingSession()
+{
+    if (!IsRangingSupported()) {
+        return RangingStatus::NotSupported;
+    }
+
+    {
+        const auto lock = std::scoped_lock{ m_rangingStateGate };
+        // TODO: actually create new ranging session
+        m_rangingSessionActive = true;
+
+    }
+
+    for (const auto& eventCallback : GetEventCallbacks()) {
+        eventCallback->OnNearObjectRangingSessionStarted(this);
+    }
+
+    return RangingStatus::Successful;
+}
+
+void
+NearObjectSession::StopRangingSession()
+{
+    const auto lock = std::scoped_lock{ m_rangingStateGate };
+    if (!m_rangingSessionActive) {
+        return;
+    }
+
+    // TODO: signal to device to stop ranging
+
+    m_rangingSessionActive = false;
+
+    for (const auto& eventCallback : GetEventCallbacks()) {
+        eventCallback->OnNearObjectRangingSessionEnded(this);
+    }
+}
+
+bool
+NearObjectSession::IsRangingActive() const noexcept
+{
+    const auto lock = std::scoped_lock{ m_rangingStateGate };
+    return m_rangingSessionActive;
+}
+
+bool
+NearObjectSession::IsRangingSupported() const noexcept
+{
+    // TODO: check session capabilities and return actual support
+    return true;
 }
 
 void
