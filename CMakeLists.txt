@@ -11,13 +11,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+include(CTest)
 include(FetchContent)
 
 # Configure GSL dependency
 FetchContent_Declare(GSL
-    GIT_REPOSITORY "https://github.com/microsoft/GSL"
-    GIT_TAG "v4.0.0"
-    GIT_SHALLOW ON
+  GIT_REPOSITORY "https://github.com/microsoft/GSL"
+  GIT_TAG "v4.0.0"
+  GIT_SHALLOW ON
 )
 
 FetchContent_MakeAvailable(GSL)
@@ -39,8 +40,8 @@ set(NOF_DIR_LIB ${CMAKE_CURRENT_LIST_DIR}/lib)
 set(NOF_DIR_LINUX ${CMAKE_CURRENT_LIST_DIR}/linux)
 set(NOF_DIR_WINDOWS ${CMAKE_CURRENT_LIST_DIR}/windows)
 
-
 add_subdirectory(lib)
+add_subdirectory(tests)
 add_subdirectory(tools)
 
 # Conditional inclusion of OS-dependent source trees.
