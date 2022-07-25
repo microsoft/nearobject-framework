@@ -1,11 +1,12 @@
 
 #include <nearobject/NearObjectSessionEventCallbacks.hxx>
+#include <nearobject/NearObjectSession.hxx>
+
 #include "NearObjectSessionEventHandler.hxx"
 
-using namespace nearobject;
 using namespace nearobject::service;
 
-NearObjectSessionEventHandler::NearObjectSessionEventHandler(NearObjectSession* session, std::shared_ptr<NearObjectSessionEventCallbacks> callbacks) :
+NearObjectSessionEventHandler::NearObjectSessionEventHandler(std::shared_ptr<NearObjectSession> session, std::shared_ptr<NearObjectSessionEventCallbacks> callbacks) :
     m_session(session),
     m_callbacks(callbacks)
 {

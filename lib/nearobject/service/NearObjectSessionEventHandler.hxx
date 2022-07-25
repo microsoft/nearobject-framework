@@ -2,10 +2,12 @@
 #ifndef __NEAR_OBJECT_SESSION_EVENT_HANDLER_HXX__
 #define __NEAR_OBJECT_SESSION_EVENT_HANDLER_HXX__
 
-#include <nearobject/NearObjectSession.hxx>
+#include <memory>
+
 
 namespace nearobject
 {
+class NearObjectSession;
 struct NearObjectSessionEventCallbacks;
 
 namespace service
@@ -13,10 +15,10 @@ namespace service
 class NearObjectSessionEventHandler final
 {
 public:
-    NearObjectSessionEventHandler(NearObjectSession *session, std::shared_ptr<NearObjectSessionEventCallbacks> callbacks);
+    NearObjectSessionEventHandler(std::shared_ptr<NearObjectSession> session, std::shared_ptr<NearObjectSessionEventCallbacks> callbacks);
 
 private:
-    NearObjectSession *m_session{ nullptr };
+    std::shared_ptr<NearObjectSession> m_session{ nullptr };
     std::shared_ptr<NearObjectSessionEventCallbacks> m_callbacks{ nullptr };
 };
 
