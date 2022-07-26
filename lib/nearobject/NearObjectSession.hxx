@@ -16,15 +16,9 @@ struct NearObjectSessionEventCallbacks;
 class NearObjectSession
 {
 public:
-    ~NearObjectSession();
+    NearObjectSession(std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks);
 
-    /**
-     * @brief Register a set of callbacks for session events.
-     * 
-     * @param eventCallbacks 
-     */
-    void
-    RegisterCallbacks(std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks);
+    ~NearObjectSession();
 
     enum class RangingSessionStatus
     {
@@ -85,22 +79,11 @@ private:
     bool
     IsRangingSupported() const noexcept;
 
-    /**
-     * @brief Get a copy of the currently registered event callbacks. Note that
-     * the returned vector contains resolved std::shared_ptr instances, not
-     * std::weak_ptr.
-     * 
-     * @return std::vector<std::shared_ptr<NearObjectSessionEventCallbacks>> 
-     */
-    std::vector<std::shared_ptr<NearObjectSessionEventCallbacks>>
-    GetEventCallbacks();
-
 private:
     mutable std::mutex m_rangingStateGate;
     bool m_rangingSessionActive = false;
 
-    std::mutex m_eventCallbacksGate;
-    std::vector<std::weak_ptr<NearObjectSessionEventCallbacks>> m_eventCallbacks;
+    std::weak_ptr<NearObjectSessionEventCallbacks> m_eventCallbacks;
 };
 
 } // namespace nearobject

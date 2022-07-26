@@ -11,8 +11,6 @@ target_sources(nearobject-service
         NearObjectDeviceUwb.hxx
         NearObjectDeviceManager.cxx
         NearObjectDeviceManager.hxx
-        NearObjectSessionEventHandler.cxx
-        NearObjectSessionEventHandler.hxx
         OobChannel.cxx
         OobChannel.hxx
         OobChannelBluetooth.cxx
