@@ -93,6 +93,22 @@ private:
     InvokeEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)>& executor);
 
     /**
+     * @brief Add a near object peer to this session.
+     *
+     * @param nearObjectAdded The near object peer to add.
+     */
+    void
+    AddNearObjectPeer(const std::shared_ptr<NearObject> nearObjectAdded);
+
+    /**
+     * @brief Remove a near object peer from this session.
+     *
+     * @param nearObjectRemoved The near object peer to remove.
+     */
+    void
+    RemoveNearObjectPeer(const std::shared_ptr<NearObject> nearObjectRemoved);
+
+    /**
      * @brief Ends this session.
      */
     void
@@ -131,6 +147,8 @@ private:
     std::optional<RangingSession> m_rangingSession;
 
     std::weak_ptr<NearObjectSessionEventCallbacks> m_eventCallbacks;
+
+    std::mutex m_nearObjectPeersGate;
     std::vector<std::shared_ptr<NearObject>> m_nearbyObjectPeers;
 };
 
