@@ -63,9 +63,9 @@ TEST_CASE("near object peers can be added at session creation", "[basic]")
 
     SECTION("creation with 1+ peers doesn't cause a crash")
     {
-        const std::vector<std::shared_ptr<NearObject>> nearObjects { 
-            std::make_shared<NearObject>(), 
-            std::make_shared<NearObject>(), 
+        const std::vector<std::shared_ptr<NearObject>> nearObjects{
+            std::make_shared<NearObject>(),
+            std::make_shared<NearObject>(),
             std::make_shared<NearObject>(),
         };
 
