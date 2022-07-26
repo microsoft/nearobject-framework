@@ -49,7 +49,7 @@ NearObjectSession::StartRangingSession()
 NearObjectSession::RangingSessionStatus
 NearObjectSession::CreateNewRangingSession()
 {
-    if (!IsRangingSupported()) {
+    if (!Capabilities.SupportsRanging) {
         return RangingSessionStatus::NotSupported;
     }
 
@@ -89,11 +89,4 @@ NearObjectSession::IsRangingActive() const noexcept
 {
     const auto lock = std::scoped_lock{ m_rangingStateGate };
     return m_rangingSessionActive;
-}
-
-bool
-NearObjectSession::IsRangingSupported() const noexcept
-{
-    // TODO: check session capabilities and return actual support
-    return true;
 }

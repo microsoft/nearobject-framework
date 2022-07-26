@@ -88,15 +88,6 @@ private:
     RangingSessionStatus
     CreateNewRangingSession();
 
-    /**
-     * @brief Determines if this session supports ranging.
-     *
-     * @return true
-     * @return false
-     */
-    bool
-    IsRangingSupported() const noexcept;
-
 public:
     const NearObjectCapabilities Capabilities;
 
