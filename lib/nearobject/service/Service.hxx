@@ -3,8 +3,11 @@
 #define __SERVICE_HXX__
 
 #include <condition_variable>
+#include <memory>
 #include <mutex>
 #include <thread>
+
+#include "NearObjectDeviceManager.hxx"
 
 namespace nearobject
 {
@@ -12,6 +15,13 @@ namespace service
 {
 class Service
 {
+public:
+    Service() = default;
+    Service(std::unique_ptr<NearObjectDeviceManager> nearObjectDeviceManager);
+
+private:
+    std::unique_ptr<NearObjectDeviceManager> m_nearObjectDeviceManager;
+
 public:
     void
     Start();

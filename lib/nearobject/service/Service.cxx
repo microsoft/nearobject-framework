@@ -3,6 +3,10 @@
 
 using namespace nearobject::service;
 
+Service::Service(std::unique_ptr<NearObjectDeviceManager> nearObjectDeviceManager) :
+    m_nearObjectDeviceManager(std::move(nearObjectDeviceManager))
+{}
+
 void
 Service::Start()
 {
