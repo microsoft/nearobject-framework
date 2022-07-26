@@ -77,6 +77,22 @@ public:
 
 private:
     /**
+     * @brief Resolves the event callback weak_ptr and executes the provided
+     * executor function if the pointer was valid.
+     *
+     * This handles synchronizing and serializing each event callback invocation
+     * to ensure the client receives them in order.
+     *
+     * @param executor The function to execute if the callback pointer was
+     * successfully resolved.
+     *
+     * @return true If the executor was executed.
+     * @return false If the executor was not executed.
+     */
+    bool
+    InvokeEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)>& executor);
+
+    /**
      * @brief Ends this session.
      */
     void

@@ -18,6 +18,20 @@ NearObjectSession::~NearObjectSession()
     EndSession();
 }
 
+bool
+NearObjectSession::InvokeEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)>& executor)
+{
+    // TODO: serialize all requests
+
+    const auto eventCallbacks = m_eventCallbacks.lock();
+    if (!eventCallbacks) {
+        return false;
+    }
+
+    executor(*eventCallbacks);
+    return true;
+} 
+
 void
 NearObjectSession::EndSession()
 {
@@ -26,9 +40,9 @@ NearObjectSession::EndSession()
     // form of a queue is needed.
     StopRangingSession();
 
-    if (const auto eventCallbacks  = m_eventCallbacks.lock()) {
-        eventCallbacks->OnNearObjectSessionEnded(this);
-    }
+    InvokeEventCallback([&](auto& eventCallbacks) {
+        eventCallbacks.OnNearObjectSessionEnded(this);
+    });
 }
 
 NearObjectSession::StartRangingSessionResult
@@ -60,9 +74,9 @@ NearObjectSession::CreateNewRangingSession()
     // TODO: actually create new ranging session
     m_rangingSession = std::move(rangingSession);
 
-    if (const auto eventCallbacks = m_eventCallbacks.lock()) {
-        eventCallbacks->OnNearObjectRangingSessionStarted(this);
-    }
+    InvokeEventCallback([&](auto& eventCallbacks){
+        eventCallbacks.OnNearObjectRangingSessionStarted(this);
+    });
 
     return RangingSessionStatus::Running;
 }
@@ -78,9 +92,9 @@ NearObjectSession::StopRangingSession()
     // TODO: signal to device to stop ranging
     m_rangingSession.reset();
 
-    if (const auto eventCallbacks = m_eventCallbacks.lock()) {
-        eventCallbacks->OnNearObjectRangingSessionEnded(this);
-    }
+    InvokeEventCallback([&](auto& eventCallbacks){
+        eventCallbacks.OnNearObjectRangingSessionEnded(this);
+    });
 }
 
 bool
