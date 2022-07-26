@@ -6,6 +6,7 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <vector>
 
 #include "NearObjectDeviceManager.hxx"
 
@@ -15,14 +16,13 @@ namespace service
 {
 class Service
 {
-public:
-    Service() = default;
-    Service(std::unique_ptr<NearObjectDeviceManager> nearObjectDeviceManager);
-
 private:
-    std::unique_ptr<NearObjectDeviceManager> m_nearObjectDeviceManager;
+    std::vector<std::unique_ptr<NearObjectDeviceManager>> m_nearObjectDeviceManagers{};
 
 public:
+    void
+    AddDeviceManager(std::unique_ptr<NearObjectDeviceManager> nearObjectDeviceManager);
+
     void
     Start();
 
