@@ -97,7 +97,7 @@ private:
      *
      * @param nearObjectAdded The near object peer to add.
      */
-    void
+    bool
     AddNearObjectPeer(const std::shared_ptr<NearObject> nearObjectAdded);
 
     /**
@@ -105,7 +105,7 @@ private:
      *
      * @param nearObjectRemoved The near object peer to remove.
      */
-    void
+    bool
     RemoveNearObjectPeer(const std::shared_ptr<NearObject> nearObjectRemoved);
 
     /**

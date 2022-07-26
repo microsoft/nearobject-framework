@@ -33,7 +33,7 @@ NearObjectSession::InvokeEventCallback(const std::function<void(NearObjectSessio
     return true;
 } 
 
-void
+bool
 NearObjectSession::AddNearObjectPeer(const std::shared_ptr<NearObject> nearObjectAdded)
 {
     const auto lock = std::scoped_lock{ m_nearObjectPeersGate };
@@ -43,16 +43,18 @@ NearObjectSession::AddNearObjectPeer(const std::shared_ptr<NearObject> nearObjec
     });
 
     if (nearObjectAlreadyMember) {
-        return;
+        return false;
     }
 
     m_nearbyObjectPeers.push_back(nearObjectAdded);
     InvokeEventCallback([&](auto& eventCallbacks){
         eventCallbacks.OnNearObjectSessionMembershipChanged(this, { nearObjectAdded }, {});
     });
+
+    return true;
 }
 
-void
+bool
 NearObjectSession::RemoveNearObjectPeer(const std::shared_ptr<NearObject> nearObjectRemoved)
 {
     const auto lock = std::scoped_lock{ m_nearObjectPeersGate };
@@ -61,14 +63,18 @@ NearObjectSession::RemoveNearObjectPeer(const std::shared_ptr<NearObject> nearOb
         return (*nearObject == *nearObjectRemoved);
     });
 
-    if (nearObjectToRemove != std::end(m_nearbyObjectPeers)) {
-        // No need to take an extra ref since the function argument guarantees
-        // its lifetime throughout this function.
-        m_nearbyObjectPeers.erase(nearObjectToRemove);
-        InvokeEventCallback([&](auto& eventCallbacks){
-            eventCallbacks.OnNearObjectSessionMembershipChanged(this, {}, { nearObjectRemoved });
-        });
+    if (nearObjectToRemove == std::cend(m_nearbyObjectPeers)) {
+        return false;
     }
+
+    // No need to take an extra ref since the function argument guarantees
+    // its lifetime throughout this function.
+    m_nearbyObjectPeers.erase(nearObjectToRemove);
+    InvokeEventCallback([&](auto& eventCallbacks){
+        eventCallbacks.OnNearObjectSessionMembershipChanged(this, {}, { nearObjectRemoved });
+    });
+
+    return true;
 }
 
 void
