@@ -25,6 +25,14 @@ struct NearObjectSessionEventCallbacksNoop :
     void
     OnNearObjectRangingSessionEnded(nearobject::NearObjectSession *) override
     { }
+
+    void
+    OnNearObjectSessionNearObjectPropertiesChanged(nearobject::NearObjectSession *session, const std::vector<std::shared_ptr<nearobject::NearObject>> nearObjectsChanged) override
+    { }
+
+    void
+    OnNearObjectSessionMembershipChanged(nearobject::NearObjectSession *session, const std::vector<std::shared_ptr<nearobject::NearObject>> nearObjectsAdded, const std::vector<std::shared_ptr<nearobject::NearObject>> nearObjectsRemoved) override
+    { }
 };
 
 TEST_CASE("session capabilities are accurate", "[basic]")
@@ -79,6 +87,18 @@ TEST_CASE("event handlers can be registered", "[basic]")
                 CHECK(Session == session);
             }
 
+            void
+            OnNearObjectSessionNearObjectPropertiesChanged(NearObjectSession *session, const std::vector<std::shared_ptr<NearObject>> /* nearObjectsChanged */) override
+            {
+                CHECK(Session == session);
+            }
+
+            void
+            OnNearObjectSessionMembershipChanged(NearObjectSession *session, const std::vector<std::shared_ptr<NearObject>> nearObjectsAdded, const std::vector<std::shared_ptr<NearObject>> nearObjectsRemoved) override
+            {
+                CHECK(Session == session);
+            }
+
             NearObjectSession *Session{ nullptr };
         };
 
@@ -87,5 +107,7 @@ TEST_CASE("event handlers can be registered", "[basic]")
         callbacks->Session = &session;
         session.StartRangingSession();
         session.StopRangingSession();
+        // TODO: trigger NO property changes
+        // TODO: trigger NO membership changes
     }
 }
