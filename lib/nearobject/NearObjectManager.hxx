@@ -9,6 +9,8 @@ namespace nearobject
 /**
  * @brief Central class managing the use of Near Object services. This class
  * exposes the primary API of the framework.
+ * 
+ * This class ties together all of the different framework components.
  */
 class NearObjectManager
 {
