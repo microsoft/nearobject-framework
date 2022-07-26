@@ -8,6 +8,7 @@
 #include <optional>
 #include <vector>
 
+#include "NearObject.hxx"
 #include "NearObjectCapabilities.hpp"
 
 namespace nearobject
@@ -22,11 +23,11 @@ class NearObjectSession
 public:
     /**
      * @brief Construct a new NearObjectSession object
-     * 
+     *
      * @param capabilities The capabilities supported by this session.
      * @param eventCallbacks The callbacks used to signal events from this session.
      */
-    NearObjectSession(NearObjectCapabilities capabilities, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks);
+    NearObjectSession(NearObjectCapabilities capabilities, const std::vector<std::shared_ptr<NearObject>> nearObjectPeers, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks);
 
     /**
      * @brief Destroy the NearObjectSession object
@@ -107,6 +108,7 @@ private:
     std::optional<RangingSession> m_rangingSession;
 
     std::weak_ptr<NearObjectSessionEventCallbacks> m_eventCallbacks;
+    std::vector<std::shared_ptr<NearObject>> m_nearbyObjectPeers;
 };
 
 } // namespace nearobject

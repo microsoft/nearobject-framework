@@ -7,10 +7,11 @@
 
 using namespace nearobject;
 
-NearObjectSession::NearObjectSession(NearObjectCapabilities capabilities, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) :
+NearObjectSession::NearObjectSession(NearObjectCapabilities capabilities, const std::vector<std::shared_ptr<NearObject>> nearObjectPeers, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) :
     Capabilities(capabilities),
+    m_nearbyObjectPeers(m_nearbyObjectPeers),
     m_eventCallbacks(eventCallbacks)
-{}
+{ }
 
 NearObjectSession::~NearObjectSession()
 {
