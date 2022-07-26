@@ -16,20 +16,12 @@ target_sources(nearobject
 
 target_include_directories(nearobject
     PRIVATE
-        ${CMAKE_CURRENT_LIST_DIR}
-        ${NOF_DIR_LIB}/se
-        ${NOF_DIR_LIB}/se/globalplatform
-        ${NOF_DIR_LIB}/smartcard
-        ${NOF_DIR_LIB}/uwb
-        ${NOF_DIR_LIB}/uwb/uci
+        ${NOF_DIR_LIB}
 )
 
 target_link_libraries(nearobject
-    PUBLIC
-        se
-        seglobalplatform
-        smartcard
-        uwb
+    PRIVATE
+        nearobject-service
 )
 
 set_target_properties(nearobject PROPERTIES FOLDER lib/nearobject)
