@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "NearObject.hxx"
-#include "NearObjectCapabilities.hpp"
+#include "NearObjectCapabilities.hxx"
 
 namespace nearobject
 {
