@@ -3,7 +3,9 @@
 #define __NEAR_OBJECT_DEVICE_HXX__
 
 #include <memory>
+#include <mutex>
 #include <optional>
+#include <vector>
 
 #include <nearobject/NearObjectConnectionProfile.hxx>
 
@@ -58,6 +60,10 @@ private:
      */
     virtual StartSessionResult
     StartSessionImpl(const NearObjectConnectionProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) = 0;
+
+protected:
+    std::mutex m_sessionsGate;
+    std::vector<std::weak_ptr<NearObjectSession>> m_sessions{};
 };
 
 } // namespace service
