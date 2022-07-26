@@ -75,9 +75,9 @@ NearObjectSession::CreateNewRangingSession()
         return RangingSessionStatus::NotSupported;
     }
 
-    RangingSession rangingSession{[&](){
+    RangingSession rangingSession{ [&]() {
         // TODO
-    }};
+    } };
 
     // TODO: actually create new ranging session
     m_rangingSession = std::move(rangingSession);
