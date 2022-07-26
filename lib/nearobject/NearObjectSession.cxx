@@ -7,29 +7,14 @@
 
 using namespace nearobject;
 
+
+NearObjectSession::NearObjectSession(std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) :
+    m_eventCallbacks(eventCallbacks)
+{}
+
 NearObjectSession::~NearObjectSession()
 {
     OnSessionClosed();
-}
-
-std::vector<std::shared_ptr<NearObjectSessionEventCallbacks>>
-NearObjectSession::GetEventCallbacks()
-{
-    const auto lock = std::scoped_lock{ m_eventCallbacksGate };
-
-    // Attempt to resolve each pointer, adding a copy to the return vector if
-    // successful, removing it from the registered callback vector otherwise.
-    std::vector<std::shared_ptr<NearObjectSessionEventCallbacks>> eventCallbacks{};
-    for (auto it = std::begin(m_eventCallbacks); it != std::end(m_eventCallbacks); ) {
-        if (const auto eventCallback = it->lock()) {
-            eventCallbacks.push_back(eventCallback);
-            it = std::next(it);
-        } else {
-            it = m_eventCallbacks.erase(it);
-        }
-    }
-
-    return eventCallbacks;
 }
 
 void
@@ -40,8 +25,8 @@ NearObjectSession::OnSessionClosed()
     // form of a queue is needed.
     StopRangingSession();
 
-    for (const auto& eventCallback : GetEventCallbacks()) {
-        eventCallback->OnNearObjectSessionEnded(this);
+    if (const auto eventCallbacks  = m_eventCallbacks.lock()) {
+        eventCallbacks->OnNearObjectSessionEnded(this);
     }
 }
 
@@ -75,8 +60,8 @@ NearObjectSession::CreateNewRangingSession()
 
     }
 
-    for (const auto& eventCallback : GetEventCallbacks()) {
-        eventCallback->OnNearObjectRangingSessionStarted(this);
+    if (const auto eventCallbacks = m_eventCallbacks.lock()) {
+        eventCallbacks->OnNearObjectRangingSessionStarted(this);
     }
 
     return RangingSessionStatus::Running;
@@ -94,8 +79,8 @@ NearObjectSession::StopRangingSession()
 
     m_rangingSessionActive = false;
 
-    for (const auto& eventCallback : GetEventCallbacks()) {
-        eventCallback->OnNearObjectRangingSessionEnded(this);
+    if (const auto eventCallbacks = m_eventCallbacks.lock()) {
+        eventCallbacks->OnNearObjectRangingSessionEnded(this);
     }
 }
 
@@ -111,11 +96,4 @@ NearObjectSession::IsRangingSupported() const noexcept
 {
     // TODO: check session capabilities and return actual support
     return true;
-}
-
-void
-NearObjectSession::RegisterCallbacks(std::weak_ptr<NearObjectSessionEventCallbacks> eventCallback)
-{
-    const auto lock = std::scoped_lock{ m_eventCallbacksGate };
-    m_eventCallbacks.push_back(eventCallback);
 }

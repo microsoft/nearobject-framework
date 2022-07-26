@@ -2,12 +2,16 @@
 #ifndef __NEAR_OBJECT_DEVICE_UWB_HXX__
 #define __NEAR_OBJECT_DEVICE_UWB_HXX__
 
+#include <memory>
+
 #include <uwb/UwbDevice.hxx>
 
 #include "NearObjectDevice.hxx"
 
 namespace nearobject
 {
+struct NearObjectSessionEventCallbacks;
+
 namespace service
 {
 /**
@@ -21,7 +25,7 @@ public:
 
 private:
     StartSessionResult
-    StartSessionImpl(const NearObjectConnectionProfile& profile) override;
+    StartSessionImpl(const NearObjectConnectionProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) override;
 
 private:
     std::unique_ptr<uwb::UwbDevice> m_uwbDevice{};

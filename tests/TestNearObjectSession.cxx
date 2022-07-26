@@ -24,18 +24,16 @@ TEST_CASE("event handlers can be registered", "[basic]")
         { }
     };
 
-    NearObjectSession session{};
-
     SECTION("registering a handler doesn't cause a crash")
     {
         const auto callbacksNoop = std::make_shared<NearObjectSessionEventCallbacksNoop>();
-        session.RegisterCallbacks(callbacksNoop);
+        NearObjectSession session(callbacksNoop);
     }
 
     SECTION("starting and ending a ranging session cause a crash")
     {
         const auto callbacksNoop = std::make_shared<NearObjectSessionEventCallbacksNoop>();
-        session.RegisterCallbacks(callbacksNoop);
+        NearObjectSession session(callbacksNoop);
         session.StartRangingSession();
         session.StopRangingSession();
     }
@@ -44,9 +42,6 @@ TEST_CASE("event handlers can be registered", "[basic]")
     {
         struct NearObjectSessionEventCallbacksCheckSessionPointer :
             public NearObjectSessionEventCallbacks {
-            NearObjectSessionEventCallbacksCheckSessionPointer(NearObjectSession *session) :
-                Session(session)
-            { }
 
             void
             OnNearObjectSessionEnded(NearObjectSession *session) override
@@ -66,11 +61,12 @@ TEST_CASE("event handlers can be registered", "[basic]")
                 CHECK(Session == session);
             }
 
-            NearObjectSession *Session;
+            NearObjectSession *Session{ nullptr };
         };
 
-        const auto callbacks = std::make_shared<NearObjectSessionEventCallbacksCheckSessionPointer>(&session);
-        session.RegisterCallbacks(callbacks);
+        const auto callbacks = std::make_shared<NearObjectSessionEventCallbacksCheckSessionPointer>();
+        NearObjectSession session(callbacks);
+        callbacks->Session = &session;
         session.StartRangingSession();
         session.StopRangingSession();
     }

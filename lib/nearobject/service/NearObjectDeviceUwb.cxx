@@ -1,15 +1,16 @@
 
 #include "NearObjectDeviceUwb.hxx"
 
-using namespace nearobject::service;
+#include <nearobject/NearObjectSessionEventCallbacks.hxx>
 
+using namespace nearobject::service;
 
 NearObjectDeviceUwb::NearObjectDeviceUwb(std::unique_ptr<uwb::UwbDevice> uwbDevice) :
     m_uwbDevice(std::move(uwbDevice))
 {}
 
 NearObjectDevice::StartSessionResult
-NearObjectDeviceUwb::StartSessionImpl(const NearObjectConnectionProfile& /* profile */)
+NearObjectDeviceUwb::StartSessionImpl(const NearObjectConnectionProfile& /* profile */, std::weak_ptr<NearObjectSessionEventCallbacks> /* eventCallbacks */)
 {
     return { std::nullopt };
 }
