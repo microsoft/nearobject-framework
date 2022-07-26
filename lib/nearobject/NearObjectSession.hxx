@@ -97,12 +97,14 @@ private:
     bool
     IsRangingSupported() const noexcept;
 
+public:
+    const NearObjectCapabilities Capabilities;
+
 private:
     mutable std::mutex m_rangingStateGate;
     bool m_rangingSessionActive = false;
 
     std::weak_ptr<NearObjectSessionEventCallbacks> m_eventCallbacks;
-    const NearObjectCapabilities Capabilities;
 };
 
 } // namespace nearobject
