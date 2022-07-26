@@ -2,8 +2,10 @@
 #ifndef __NEAR_OBJECT_SESSION_HXX__
 #define __NEAR_OBJECT_SESSION_HXX__
 
+#include <functional>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <vector>
 
 #include "NearObjectCapabilities.hpp"
@@ -88,12 +90,21 @@ private:
     RangingSessionStatus
     CreateNewRangingSession();
 
+    struct RangingSession
+    {
+        RangingSession(std::function<void()> rangingDataUpdated) :
+            RangingDataUpdated(rangingDataUpdated)
+        {}
+
+        std::function<void()> RangingDataUpdated;
+    };
+
 public:
     const NearObjectCapabilities Capabilities;
 
 private:
     mutable std::mutex m_rangingStateGate;
-    bool m_rangingSessionActive = false;
+    std::optional<RangingSession> m_rangingSession;
 
     std::weak_ptr<NearObjectSessionEventCallbacks> m_eventCallbacks;
 };

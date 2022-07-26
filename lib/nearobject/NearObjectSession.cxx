@@ -36,11 +36,10 @@ NearObjectSession::StartRangingSession()
     StartRangingSessionResult result;
 
     const auto lock = std::scoped_lock{ m_rangingStateGate };
-    if (m_rangingSessionActive) {
+    if (m_rangingSession.has_value()) {
         result.Status = RangingSessionStatus::MaximumSessionsReached;
     } else {
         result.Status = CreateNewRangingSession();
-        m_rangingSessionActive = (result.Status == RangingSessionStatus::Running);
     }
 
     return result;
@@ -53,12 +52,12 @@ NearObjectSession::CreateNewRangingSession()
         return RangingSessionStatus::NotSupported;
     }
 
-    {
-        const auto lock = std::scoped_lock{ m_rangingStateGate };
-        // TODO: actually create new ranging session
-        m_rangingSessionActive = true;
+    RangingSession rangingSession{[&](){
+        // TODO
+    }};
 
-    }
+    // TODO: actually create new ranging session
+    m_rangingSession = std::move(rangingSession);
 
     if (const auto eventCallbacks = m_eventCallbacks.lock()) {
         eventCallbacks->OnNearObjectRangingSessionStarted(this);
@@ -71,13 +70,12 @@ void
 NearObjectSession::StopRangingSession()
 {
     const auto lock = std::scoped_lock{ m_rangingStateGate };
-    if (!m_rangingSessionActive) {
+    if (!m_rangingSession.has_value()) {
         return;
     }
 
     // TODO: signal to device to stop ranging
-
-    m_rangingSessionActive = false;
+    m_rangingSession.reset();
 
     if (const auto eventCallbacks = m_eventCallbacks.lock()) {
         eventCallbacks->OnNearObjectRangingSessionEnded(this);
@@ -88,5 +86,5 @@ bool
 NearObjectSession::IsRangingActive() const noexcept
 {
     const auto lock = std::scoped_lock{ m_rangingStateGate };
-    return m_rangingSessionActive;
+    return m_rangingSession.has_value();
 }
