@@ -45,6 +45,14 @@ NearObjectSession::EndSession()
     });
 }
 
+void
+NearObjectSession::NearObjectPropertiesChanged(const std::shared_ptr<NearObject> nearObjectChanged)
+{
+    InvokeEventCallback([&](auto& eventCallbacks){
+        eventCallbacks.OnNearObjectSessionNearObjectPropertiesChanged(this, { nearObjectChanged });
+    });
+}
+
 NearObjectSession::StartRangingSessionResult
 NearObjectSession::StartRangingSession()
 {

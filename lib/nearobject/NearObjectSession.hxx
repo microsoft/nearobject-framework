@@ -99,6 +99,14 @@ private:
     EndSession();
 
     /**
+     * @brief Signal that the properties of the specified NearObject has changed.
+     *
+     * @param nearObjectChanged The near object that changed.
+     */
+    void
+    NearObjectPropertiesChanged(const std::shared_ptr<NearObject> nearObjectChanged);
+
+    /**
      * @brief Create a New Ranging Session object
      * TODO: this probably needs to return a tracking object of some kind.
      *
