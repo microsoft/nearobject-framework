@@ -5,11 +5,14 @@ target_sources(nearobject
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/NearObject.cxx
         ${CMAKE_CURRENT_SOURCE_DIR}/NearObjectConnectionProfile.cxx
+        ${CMAKE_CURRENT_SOURCE_DIR}/NearObjectManager.cxx
         ${CMAKE_CURRENT_SOURCE_DIR}/NearObjectSession.cxx
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/NearObject.hxx
         ${CMAKE_CURRENT_SOURCE_DIR}/NearObjectCapabilities.hxx
         ${CMAKE_CURRENT_SOURCE_DIR}/NearObjectConnectionProfile.hxx
+        ${CMAKE_CURRENT_SOURCE_DIR}/NearObjectConnectionProfileSecurity.hxx
+        ${CMAKE_CURRENT_SOURCE_DIR}/NearObjectManager.hxx
         ${CMAKE_CURRENT_SOURCE_DIR}/NearObjectSession.hxx
         ${CMAKE_CURRENT_SOURCE_DIR}/NearObjectSessionEventCallbacks.hxx
 )
