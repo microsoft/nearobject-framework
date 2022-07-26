@@ -8,6 +8,7 @@ target_sources(nearobject
         ${CMAKE_CURRENT_SOURCE_DIR}/NearObjectSession.cxx
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/NearObject.hxx
+        ${CMAKE_CURRENT_SOURCE_DIR}/NearObjectCapabilities.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/NearObjectConnectionProfile.hxx
         ${CMAKE_CURRENT_SOURCE_DIR}/NearObjectSession.hxx
         ${CMAKE_CURRENT_SOURCE_DIR}/NearObjectSessionEventCallbacks.hxx

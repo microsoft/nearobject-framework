@@ -6,6 +6,8 @@
 #include <mutex>
 #include <vector>
 
+#include "NearObjectCapabilities.hpp"
+
 namespace nearobject
 {
 struct NearObjectSessionEventCallbacks;
@@ -19,9 +21,10 @@ public:
     /**
      * @brief Construct a new NearObjectSession object
      * 
-     * @param eventCallbacks 
+     * @param capabilities The capabilities supported by this session.
+     * @param eventCallbacks The callbacks used to signal events from this session.
      */
-    NearObjectSession(std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks);
+    NearObjectSession(NearObjectCapabilities capabilities, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks);
 
     /**
      * @brief Destroy the NearObjectSession object
@@ -29,10 +32,9 @@ public:
     ~NearObjectSession();
 
     /**
-     * @brief The status of a ranging session. 
+     * @brief The status of a ranging session.
      */
-    enum class RangingSessionStatus
-    {
+    enum class RangingSessionStatus {
         Running,
         Error,
         NotSupported,
@@ -40,33 +42,32 @@ public:
     };
 
     /**
-     * @brief The result from starting a ranging session. 
+     * @brief The result from starting a ranging session.
      */
-    struct StartRangingSessionResult 
-    {
+    struct StartRangingSessionResult {
         RangingSessionStatus Status;
         // TODO: unique id?
     };
 
     /**
-     * @brief Starts a new ranging session. 
-     * 
-     * @return StartRangingSessionResult 
+     * @brief Starts a new ranging session.
+     *
+     * @return StartRangingSessionResult
      */
     StartRangingSessionResult
     StartRangingSession();
 
     /**
-     * @brief Stops the active ranging session, if applicable. 
+     * @brief Stops the active ranging session, if applicable.
      */
     void
     StopRangingSession();
 
     /**
-     * @brief Determines if there is an active ranging session. 
-     * 
-     * @return true 
-     * @return false 
+     * @brief Determines if there is an active ranging session.
+     *
+     * @return true
+     * @return false
      */
     bool
     IsRangingActive() const noexcept;
@@ -81,17 +82,17 @@ private:
     /**
      * @brief Create a New Ranging Session object
      * TODO: this probably needs to return a tracking object of some kind.
-     * 
-     * @return RangingSessionStatus 
+     *
+     * @return RangingSessionStatus
      */
     RangingSessionStatus
     CreateNewRangingSession();
 
     /**
      * @brief Determines if this session supports ranging.
-     * 
-     * @return true 
-     * @return false 
+     *
+     * @return true
+     * @return false
      */
     bool
     IsRangingSupported() const noexcept;
@@ -101,6 +102,7 @@ private:
     bool m_rangingSessionActive = false;
 
     std::weak_ptr<NearObjectSessionEventCallbacks> m_eventCallbacks;
+    const NearObjectCapabilities Capabilities;
 };
 
 } // namespace nearobject

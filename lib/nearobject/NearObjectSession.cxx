@@ -7,8 +7,8 @@
 
 using namespace nearobject;
 
-
-NearObjectSession::NearObjectSession(std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) :
+NearObjectSession::NearObjectSession(NearObjectCapabilities capabilities, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) :
+    Capabilities(capabilities),
     m_eventCallbacks(eventCallbacks)
 {}
 

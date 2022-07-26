@@ -24,16 +24,23 @@ TEST_CASE("event handlers can be registered", "[basic]")
         { }
     };
 
+    static constexpr NearObjectCapabilities AllCapabilitiesSupported = {
+        true,   // SupportsRanging
+        true,   // SupportsPositioning
+        true,   // SupportsSecureDevice
+        true,   // SupportsSecureChannels
+    };
+
     SECTION("registering a handler doesn't cause a crash")
     {
         const auto callbacksNoop = std::make_shared<NearObjectSessionEventCallbacksNoop>();
-        NearObjectSession session(callbacksNoop);
+        NearObjectSession session(AllCapabilitiesSupported, callbacksNoop);
     }
 
     SECTION("starting and ending a ranging session cause a crash")
     {
         const auto callbacksNoop = std::make_shared<NearObjectSessionEventCallbacksNoop>();
-        NearObjectSession session(callbacksNoop);
+        NearObjectSession session(AllCapabilitiesSupported, callbacksNoop);
         session.StartRangingSession();
         session.StopRangingSession();
     }
@@ -65,7 +72,7 @@ TEST_CASE("event handlers can be registered", "[basic]")
         };
 
         const auto callbacks = std::make_shared<NearObjectSessionEventCallbacksCheckSessionPointer>();
-        NearObjectSession session(callbacks);
+        NearObjectSession session(AllCapabilitiesSupported, callbacks);
         callbacks->Session = &session;
         session.StartRangingSession();
         session.StopRangingSession();
