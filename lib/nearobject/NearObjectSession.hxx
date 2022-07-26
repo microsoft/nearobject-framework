@@ -16,10 +16,21 @@ struct NearObjectSessionEventCallbacks;
 class NearObjectSession
 {
 public:
+    /**
+     * @brief Construct a new NearObjectSession object
+     * 
+     * @param eventCallbacks 
+     */
     NearObjectSession(std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks);
 
+    /**
+     * @brief Destroy the NearObjectSession object
+     */
     ~NearObjectSession();
 
+    /**
+     * @brief The status of a ranging session. 
+     */
     enum class RangingSessionStatus
     {
         Running,
@@ -28,6 +39,9 @@ public:
         MaximumSessionsReached,
     };
 
+    /**
+     * @brief The result from starting a ranging session. 
+     */
     struct StartRangingSessionResult 
     {
         RangingSessionStatus Status;
@@ -58,8 +72,11 @@ public:
     IsRangingActive() const noexcept;
 
 private:
+    /**
+     * @brief Ends this session.
+     */
     void
-    OnSessionClosed();
+    EndSession();
 
     /**
      * @brief Create a New Ranging Session object

@@ -14,11 +14,11 @@ NearObjectSession::NearObjectSession(std::weak_ptr<NearObjectSessionEventCallbac
 
 NearObjectSession::~NearObjectSession()
 {
-    OnSessionClosed();
+    EndSession();
 }
 
 void
-NearObjectSession::OnSessionClosed()
+NearObjectSession::EndSession()
 {
     // TODO: All callbacks should probably be serialized to ensure that events
     // firing in rapid succession don't get signaled out-of-order. Likely some
