@@ -18,7 +18,7 @@ target_include_directories(smartcard
 target_link_libraries(smartcard
     PUBLIC
         GSL
-        no_tlv
+        tlv
 )
 
 set_target_properties(smartcard PROPERTIES FOLDER lib/smartcard)
