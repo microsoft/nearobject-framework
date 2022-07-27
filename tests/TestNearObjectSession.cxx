@@ -77,11 +77,23 @@ TEST_CASE("session capabilities are accurate", "[basic]")
 {
     using namespace nearobject;
 
+    const auto& capabilities = test::AllCapabilitiesSupported;
+
     SECTION("capabilities match post-creation")
     {
         const auto callbacksNoop = std::make_shared<test::NearObjectSessionEventCallbacksNoop>();
-        NearObjectSession session(test::AllCapabilitiesSupported, {}, callbacksNoop);
-        REQUIRE(session.Capabilities == test::AllCapabilitiesSupported);
+        NearObjectSession session(capabilities, {}, callbacksNoop);
+        REQUIRE(session.Capabilities == capabilities);
+    }
+
+    SECTION("capabilities don't change during a session")
+    {
+        const auto callbacksNoop = std::make_shared<test::NearObjectSessionEventCallbacksNoop>();
+        NearObjectSession session(capabilities, {}, callbacksNoop);
+        session.StartRangingSession();
+        REQUIRE(session.Capabilities == capabilities);
+        session.StopRangingSession();
+        REQUIRE(session.Capabilities == capabilities);
     }
 }
 
