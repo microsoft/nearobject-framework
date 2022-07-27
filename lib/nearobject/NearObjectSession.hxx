@@ -22,9 +22,10 @@ class NearObjectSession
 {
 public:
     /**
-     * @brief Construct a new NearObjectSession object
-     *
+     * @brief Construct a new Near Object Session object
+     * 
      * @param capabilities The capabilities supported by this session.
+     * @param nearObjectPeers The initials peers involved in this session.
      * @param eventCallbacks The callbacks used to signal events from this session.
      */
     NearObjectSession(NearObjectCapabilities capabilities, const std::vector<std::shared_ptr<NearObject>> nearObjectPeers, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks);
