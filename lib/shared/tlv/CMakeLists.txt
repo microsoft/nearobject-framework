@@ -1,21 +1,18 @@
-project(no_tlv)
 
-add_library(no_tlv STATIC "")
+add_library(tlv STATIC "")
 
-target_sources(no_tlv
+target_sources(tlv
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/Tlv.hxx
+        ${CMAKE_CURRENT_SOURCE_DIR}/TlvBer.hxx
     PRIVATE
         Tlv.cxx
         TlvBer.cxx
 )
 
-target_include_directories(no_tlv
+target_link_libraries(tlv
     PRIVATE
-        ${CMAKE_CURRENT_LIST_DIR}
-)
-
-target_link_libraries(no_tlv
-    PUBLIC
         GSL
 )
 
-set_target_properties(no_tlv PROPERTIES FOLDER lib/shared/tlv)
+set_target_properties(tlv PROPERTIES FOLDER lib/shared/tlv)
