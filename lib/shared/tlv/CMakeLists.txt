@@ -5,8 +5,9 @@ target_sources(tlv
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/Tlv.hxx
         ${CMAKE_CURRENT_SOURCE_DIR}/TlvBer.hxx
+        ${CMAKE_CURRENT_SOURCE_DIR}/TlvSimple.hxx
     PRIVATE
-        Tlv.cxx
+        TlvSimple.cxx
         TlvBer.cxx
 )
 
