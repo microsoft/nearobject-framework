@@ -8,8 +8,6 @@
 
 #include <gsl/span>
 
-namespace smartcard
-{
 namespace encoding
 {
 class Tlv
@@ -66,6 +64,5 @@ public:
 using TlvSimple = Tlv;
 
 } // namespace encoding
-} // namespace smartcard
 
 #endif // __TLV_HXX__

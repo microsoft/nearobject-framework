@@ -7,8 +7,6 @@
 #include <cstddef>
 #include <vector>
 
-namespace smartcard
-{
 namespace encoding
 {
 class TlvBer : public Tlv
@@ -19,6 +17,5 @@ public:
 };
 
 } // namespace encoding
-} // namespace smartcard
 
 #endif // __TLV_BER_HXX__

@@ -1,7 +1,7 @@
 
 #include "Tlv.hxx"
 
-using namespace smartcard::encoding;
+using namespace encoding;
 
 /* static */
 Tlv::ParseResult
