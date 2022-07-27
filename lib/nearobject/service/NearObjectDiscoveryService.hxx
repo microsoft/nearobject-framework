@@ -1,6 +1,6 @@
 
-#ifndef __OOB_MANAGER_HXX__
-#define __OOB_MANAGER_HXX__
+#ifndef __NEAR_OBJECT_DISCOVERY_SERVICE_HXX__
+#define __NEAR_OBJECT_DISCOVERY_SERVICE_HXX__
 
 #include "OobChannel.hxx"
 
@@ -11,7 +11,7 @@ namespace nearobject
 {
 namespace service
 {
-class OobManager
+class NearObjectDiscoveryService
 {
 public:
     void
@@ -25,4 +25,4 @@ private:
 } // namespace service
 } // namespace nearobject
 
-#endif // __OOB_MANAGER_HXX__
+#endif // __NEAR_OBJECT_DISCOVERY_SERVICE_HXX__
