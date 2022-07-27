@@ -25,8 +25,8 @@ target_sources(nearobject-service
         SecureDevice.cxx
         SecureDevice.hxx
         SecureDeviceChannel.hxx
-        ServiceRunner.cxx
-        ServiceRunner.hxx
+        ServiceRuntime.cxx
+        ServiceRuntime.hxx
 )
 
 target_include_directories(nearobject-service

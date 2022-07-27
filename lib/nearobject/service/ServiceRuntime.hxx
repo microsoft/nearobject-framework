@@ -1,6 +1,6 @@
 
-#ifndef __SERVICE_HXX__
-#define __SERVICE_HXX__
+#ifndef __SERVICE_RUNTIME_HXX__
+#define __SERVICE_RUNTIME_HXX__
 
 #include <condition_variable>
 #include <memory>
@@ -12,7 +12,7 @@ namespace nearobject
 {
 namespace service
 {
-class Service
+class ServiceRuntime
 {
 public:
     void
@@ -37,4 +37,4 @@ private:
 } // namespace service
 } // namespace nearobject
 
-#endif // __SERVICE_HXX__
+#endif // __SERVICE_RUNTIME_HXX__

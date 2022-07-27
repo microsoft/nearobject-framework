@@ -1,10 +1,10 @@
 
-#include <nearobject/service/ServiceRunner.hxx>
+#include <nearobject/service/ServiceRuntime.hxx>
 
 int
 main(int argc, char *argv[])
 {
-    nearobject::service::Service nearObjectService{};
-    nearObjectService.Start();
+    nearobject::service::ServiceRuntime nearObjectServiceRuntime{};
+    nearObjectServiceRuntime.Start();
     return 0;
 }

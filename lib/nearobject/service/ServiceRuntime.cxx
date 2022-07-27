@@ -1,10 +1,10 @@
 
-#include "ServiceRunner.hxx"
+#include "ServiceRuntime.hxx"
 
 using namespace nearobject::service;
 
 void
-Service::Start()
+ServiceRuntime::Start()
 {
     m_threadMain = std::thread([&]() {
         Run();
@@ -12,17 +12,17 @@ Service::Start()
 }
 
 void
-Service::Stop()
+ServiceRuntime::Stop()
 {
 }
 
 void
-Service::HandleEvent()
+ServiceRuntime::HandleEvent()
 {
 }
 
 void
-Service::Run()
+ServiceRuntime::Run()
 {
     m_running = true;
 
