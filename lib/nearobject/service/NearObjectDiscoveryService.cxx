@@ -4,8 +4,8 @@
 using namespace nearobject::service;
 
 void
-NearObjectDiscoveryService::RegisterOobChannel(std::unique_ptr<NearObjectDiscoverySource> oobChannel)
+NearObjectDiscoveryService::RegisterDiscoverySource(std::unique_ptr<NearObjectDiscoverySource> discoverySource)
 {
-    const auto oobChannelsLock = std::scoped_lock(m_oobChannelsGate);
-    m_oobChannels.push_back(std::move(oobChannel));
+    const auto oobChannelsLock = std::scoped_lock(m_discoverySourcesGate);
+    m_discoverySources.push_back(std::move(discoverySource));
 }

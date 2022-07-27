@@ -17,11 +17,11 @@ target_sources(nearobject-service
         NearObjectDiscoverySource.hxx
         NearObjectDiscoverySourceBluetooth.cxx
         NearObjectDiscoverySourceBluetooth.hxx
+        NearObjectOobConnection.cxx
+        NearObjectOobConnection.hxx
         NearObjectService.cxx
         NearObjectService.hxx
         NearObjectServiceInjector.hxx
-        OobConnection.cxx
-        OobConnection.hxx
         SecureDevice.cxx
         SecureDevice.hxx
         SecureDeviceChannel.hxx

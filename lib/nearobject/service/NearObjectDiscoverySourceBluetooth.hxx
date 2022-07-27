@@ -12,7 +12,7 @@ class NearObjectDiscoverySourceBluetooth :
     public NearObjectDiscoverySource
 {
 public:
-    std::unique_ptr<OobConnection>
+    std::unique_ptr<NearObjectOobConnection>
     EstablishConnectionImpl() override;
 };
 

@@ -2,7 +2,7 @@
 #ifndef __NEAR_OBJECT_DISCOVERY_SOURCE_HXX__
 #define __NEAR_OBJECT_DISCOVERY_SOURCE_HXX__
 
-#include "OobConnection.hxx"
+#include "NearObjectOobConnection.hxx"
 
 #include <memory>
 
@@ -15,11 +15,11 @@ class NearObjectDiscoverySource
 public:
     virtual ~NearObjectDiscoverySource() = default;
 
-    std::unique_ptr<OobConnection>
+    std::unique_ptr<NearObjectOobConnection>
     EstablishConnection();
 
 private:
-    virtual std::unique_ptr<OobConnection>
+    virtual std::unique_ptr<NearObjectOobConnection>
     EstablishConnectionImpl() = 0;
 };
 

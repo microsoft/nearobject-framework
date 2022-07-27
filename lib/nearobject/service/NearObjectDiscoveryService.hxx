@@ -15,11 +15,11 @@ class NearObjectDiscoveryService
 {
 public:
     void
-    RegisterOobChannel(std::unique_ptr<NearObjectDiscoverySource> oobChannel);
+    RegisterDiscoverySource(std::unique_ptr<NearObjectDiscoverySource> discoverySource);
 
 private:
-    std::mutex m_oobChannelsGate;
-    std::vector<std::unique_ptr<NearObjectDiscoverySource>> m_oobChannels{};
+    std::mutex m_discoverySourcesGate;
+    std::vector<std::unique_ptr<NearObjectDiscoverySource>> m_discoverySources{};
 };
 
 } // namespace service
