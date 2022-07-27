@@ -1,11 +1,12 @@
 
+#include "NearObjectConnectionProfileManager.hxx"
 #include "NearObjectService.hxx"
 #include "NearObjectDeviceManager.hxx"
 
 using namespace nearobject::service;
 
-void
-NearObjectService::AddDeviceManager(std::unique_ptr<NearObjectDeviceManager> nearObjectDeviceManager)
+NearObjectService::NearObjectService(NearObjectServiceInjector&& injector) :
+    m_deviceManagers(std::move(injector.DeviceManagers)),
+    m_connectionProfileManager(std::move(injector.ConnectionProfileManager))
 {
-    m_nearObjectDeviceManagers.push_back(std::move(nearObjectDeviceManager));
 }

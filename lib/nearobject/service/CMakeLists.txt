@@ -11,6 +11,7 @@ target_sources(nearobject-service
         NearObjectDeviceManager.hxx
         NearObjectDeviceUwb.cxx
         NearObjectDeviceUwb.hxx
+        NearObjectServiceInjector.hxx
         NearObjectService.cxx
         NearObjectService.hxx
         OobChannel.cxx

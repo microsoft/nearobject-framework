@@ -5,28 +5,28 @@
 #include <memory>
 #include <vector>
 
+#include "NearObjectServiceInjector.hxx"
+
 namespace nearobject
 {
 namespace service
 {
 class NearObjectDeviceManager;
+class NearObjectConnectionProfileManager;
 
 /**
  * @brief Central service object managing all other framework components and
- * lifetimes.
- * 
- * TODO: consider taking in all service dependencies (or a reasonably operative
- * set) at creation time through the constructor. We may not care to add or
- * change these dependencies at runtime.
+ * their lifetime.
  */
 class NearObjectService
 {
 public:
-    void
-    AddDeviceManager(std::unique_ptr<NearObjectDeviceManager> nearObjectDeviceManager);
+    NearObjectService(NearObjectServiceInjector&& injector);
+    virtual ~NearObjectService() = default;
 
 private:
-    std::vector<std::unique_ptr<NearObjectDeviceManager>> m_nearObjectDeviceManagers{};
+    std::unique_ptr<NearObjectConnectionProfileManager> m_connectionProfileManager;
+    std::vector<std::unique_ptr<NearObjectDeviceManager>> m_deviceManagers{};
 };
 } // namespace service
 } // namespace nearobject
