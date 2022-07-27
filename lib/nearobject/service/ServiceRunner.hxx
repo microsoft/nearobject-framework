@@ -8,8 +8,6 @@
 #include <thread>
 #include <vector>
 
-#include "NearObjectDeviceManager.hxx"
-
 namespace nearobject
 {
 namespace service
