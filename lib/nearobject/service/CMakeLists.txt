@@ -3,14 +3,14 @@ add_library(nearobject-service STATIC "")
 
 target_sources(nearobject-service
     PRIVATE
-        ConnectionProfileManager.cxx
-        ConnectionProfileManager.hxx
+        NearObjectConnectionProfileManager.cxx
+        NearObjectConnectionProfileManager.hxx
         NearObjectDevice.cxx
         NearObjectDevice.hxx
-        NearObjectDeviceUwb.cxx
-        NearObjectDeviceUwb.hxx
         NearObjectDeviceManager.cxx
         NearObjectDeviceManager.hxx
+        NearObjectDeviceUwb.cxx
+        NearObjectDeviceUwb.hxx
         NearObjectService.cxx
         NearObjectService.hxx
         OobChannel.cxx

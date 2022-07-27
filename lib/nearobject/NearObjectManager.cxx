@@ -6,7 +6,7 @@ using namespace nearobject;
 std::vector<NearObjectConnectionProfile>
 NearObjectManager::FindAllConnectionProfiles() const
 {
-    // TODO: proxy to service ConnectionProfileManager, or, use it directly
+    // TODO: proxy to service NearObjectConnectionProfileManager, or, use it directly
     // here with an shared instance
     return {};
 }

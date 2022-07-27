@@ -10,7 +10,7 @@ namespace nearobject
 {
 namespace service
 {
-class ConnectionProfileManager
+class NearObjectConnectionProfileManager
 {
 public:
     std::vector<NearObjectConnectionProfile>
