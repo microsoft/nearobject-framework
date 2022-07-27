@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <iterator>
 
 #include "NearObjectDeviceManager.hxx"
 #include "NearObjectDevice.hxx"
