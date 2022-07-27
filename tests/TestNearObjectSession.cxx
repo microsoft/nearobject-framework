@@ -73,7 +73,7 @@ TEST_CASE("near object peers can be added at session creation", "[basic]")
     }
 }
 
-TEST_CASE("session capabilities are accurate", "[basic]")
+TEST_CASE("near object session capabilities are accurate", "[basic]")
 {
     using namespace nearobject;
 
@@ -97,7 +97,7 @@ TEST_CASE("session capabilities are accurate", "[basic]")
     }
 }
 
-TEST_CASE("event handlers can be registered", "[basic]")
+TEST_CASE("near object event handlers can be registered", "[basic]")
 {
     using namespace nearobject;
 
