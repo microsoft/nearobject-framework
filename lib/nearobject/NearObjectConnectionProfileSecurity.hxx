@@ -4,6 +4,10 @@
 
 namespace nearobject
 {
+/**
+ * @brief A collection of configuration that specifies what security is required
+ * when communicating with a near object peer or set of peers.
+ */
 struct NearObjectConnectionProfileSecurity 
 {
     virtual ~NearObjectConnectionProfileSecurity() = default;
