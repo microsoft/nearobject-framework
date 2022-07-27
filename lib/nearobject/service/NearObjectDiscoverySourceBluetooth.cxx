@@ -1,12 +1,12 @@
 
-#include "OobChannelBluetooth.hxx"
+#include "NearObjectDiscoverySourceBluetooth.hxx"
 
 #include <stdexcept>
 
 using namespace nearobject::service;
 
 std::unique_ptr<OobConnection>
-OobChannelBluetooth::EstablishConnectionImpl()
+NearObjectDiscoverySourceBluetooth::EstablishConnectionImpl()
 {
     throw std::logic_error("not implemented");
 }

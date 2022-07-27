@@ -1,6 +1,6 @@
 
-#ifndef __OOB_CHANNEL_HXX__
-#define __OOB_CHANNEL_HXX__
+#ifndef __NEAR_OBJECT_DISCOVERY_SOURCE_HXX__
+#define __NEAR_OBJECT_DISCOVERY_SOURCE_HXX__
 
 #include "OobConnection.hxx"
 
@@ -10,10 +10,10 @@ namespace nearobject
 {
 namespace service
 {
-class OobChannel
+class NearObjectDiscoverySource
 {
 public:
-    virtual ~OobChannel() = default;
+    virtual ~NearObjectDiscoverySource() = default;
 
     std::unique_ptr<OobConnection>
     EstablishConnection();
@@ -26,4 +26,4 @@ private:
 } // namespace service
 } // namespace nearobject
 
-#endif // __OOB_CHANNEL_HXX__
+#endif // __NEAR_OBJECT_DISCOVERY_SOURCE_HXX__
