@@ -1,22 +1,30 @@
 
-#ifndef __TLV_BER_HXX__
-#define __TLV_BER_HXX__
+#ifndef __TLV_SIMPLE_HXX__
+#define __TLV_SIMPLE_HXX__
 
 #include "Tlv.hxx"
 
 #include <cstddef>
+#include <memory>
 #include <vector>
+
+#include <gsl/span>
 
 namespace encoding
 {
-class TlvBer : public Tlv
+class TlvSimple : public Tlv
 {
 public:
+    /**
+     * @brief Convert this Tlv to a vector data blob. 
+     * 
+     * @return std::vector<std::byte> 
+     */
     std::vector<std::byte>
     ToVector() const override;
 
     /**
-     * @brief Decode a Tlv from a blob of BER-TLV data.
+     * @brief Decode a Tlv from a blob of SIMPLE-TLV data.
      *
      * @param tlvOutput The decoded Tlv, if parsing was successful (ParseResult::Succeeded).
      * @param data The data to parse a Tlv from.
@@ -28,4 +36,4 @@ public:
 
 } // namespace encoding
 
-#endif // __TLV_BER_HXX__
+#endif // __TLV_SIMPLE_HXX__
