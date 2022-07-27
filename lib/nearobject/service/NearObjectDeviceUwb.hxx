@@ -15,7 +15,7 @@ struct NearObjectSessionEventCallbacks;
 namespace service
 {
 /**
- * @brief A device providing Near Object services using UWB devices.
+ * @brief A device providing Near Object services using a UWB device.
  */
 class NearObjectDeviceUwb :
     public NearObjectDevice
