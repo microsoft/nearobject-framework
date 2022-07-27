@@ -8,7 +8,7 @@
 namespace nearobject
 {
 /**
- * @brief Decribes the spatial properties of a near object. All property values
+ * @brief Describes the spatial properties of a near object. All property values
  * are relative to the hosting device.
  * 
  * TODO: Select and document coordinate system
