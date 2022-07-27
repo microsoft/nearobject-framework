@@ -1,13 +1,7 @@
 
-#include "Service.hxx"
+#include "ServiceRunner.hxx"
 
 using namespace nearobject::service;
-
-void
-Service::AddDeviceManager(std::unique_ptr<NearObjectDeviceManager> nearObjectDeviceManager)
-{
-    m_nearObjectDeviceManagers.push_back(std::move(nearObjectDeviceManager));
-}
 
 void
 Service::Start()

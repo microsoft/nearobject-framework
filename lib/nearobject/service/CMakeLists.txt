@@ -11,6 +11,8 @@ target_sources(nearobject-service
         NearObjectDeviceUwb.hxx
         NearObjectDeviceManager.cxx
         NearObjectDeviceManager.hxx
+        NearObjectService.cxx
+        NearObjectService.hxx
         OobChannel.cxx
         OobChannel.hxx
         OobChannelBluetooth.cxx
@@ -22,8 +24,8 @@ target_sources(nearobject-service
         SecureDevice.cxx
         SecureDevice.hxx
         SecureDeviceChannel.hxx
-        Service.cxx
-        Service.hxx
+        ServiceRunner.cxx
+        ServiceRunner.hxx
 )
 
 target_include_directories(nearobject-service

@@ -16,13 +16,7 @@ namespace service
 {
 class Service
 {
-private:
-    std::vector<std::unique_ptr<NearObjectDeviceManager>> m_nearObjectDeviceManagers{};
-
 public:
-    void
-    AddDeviceManager(std::unique_ptr<NearObjectDeviceManager> nearObjectDeviceManager);
-
     void
     Start();
 

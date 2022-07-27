@@ -1,5 +1,5 @@
 
-#include <nearobject/service/Service.hxx>
+#include <nearobject/service/ServiceRunner.hxx>
 
 int
 main(int argc, char *argv[])
