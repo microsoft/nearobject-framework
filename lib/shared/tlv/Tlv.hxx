@@ -8,8 +8,6 @@
 
 #include <gsl/span>
 
-namespace smartcard
-{
 namespace encoding
 {
 class Tlv
@@ -24,7 +22,7 @@ public:
     ToVector() const = 0;
 
     /**
-     * @brief Describes the result of parsing a Tlv using the Parse() function. 
+     * @brief Describes the result of parsing a Tlv
      * 
      */
     enum class ParseResult {
@@ -51,21 +49,8 @@ public:
          */
         UnknownError,
     };
-
-    /**
-     * @brief Decode a Tlv from a blob of data.
-     *
-     * @param tlvOutput The decoded Tlv, if parsing was successful (ParseResult::Succeeded).
-     * @param data The data to parse a Tlv from.
-     * @return ParseResult The result of the parsing operation.
-     */
-    static ParseResult
-    Parse(std::unique_ptr<Tlv>* tlvOutput, gsl::span<std::byte> data);
 };
 
-using TlvSimple = Tlv;
-
 } // namespace encoding
-} // namespace smartcard
 
 #endif // __TLV_HXX__
