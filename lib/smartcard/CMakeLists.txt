@@ -7,19 +7,18 @@ target_sources(smartcard
         Apdu.cxx
         Smartcard.cxx
         Smartcard.hxx
-        Tlv.hxx
-        TlvBer.hxx
-        TlvBer.cxx
 )
 
 target_include_directories(smartcard
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
+        ${CMAKE_CURRENT_LIST_DIR}/../shared/tlv
 )
 
 target_link_libraries(smartcard
     PUBLIC
         GSL
+        no_tlv
 )
 
 set_target_properties(smartcard PROPERTIES FOLDER lib/smartcard)
