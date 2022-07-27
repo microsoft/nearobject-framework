@@ -149,7 +149,7 @@ private:
     std::weak_ptr<NearObjectSessionEventCallbacks> m_eventCallbacks;
 
     std::mutex m_nearObjectPeersGate;
-    std::vector<std::shared_ptr<NearObject>> m_nearbyObjectPeers;
+    std::vector<std::shared_ptr<NearObject>> m_nearObjectPeers;
 };
 
 } // namespace nearobject

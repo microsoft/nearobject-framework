@@ -9,7 +9,7 @@ using namespace nearobject;
 
 NearObjectSession::NearObjectSession(NearObjectCapabilities capabilities, const std::vector<std::shared_ptr<NearObject>> nearObjectPeers, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) :
     Capabilities(capabilities),
-    m_nearbyObjectPeers(m_nearbyObjectPeers),
+    m_nearObjectPeers(nearObjectPeers),
     m_eventCallbacks(eventCallbacks)
 { }
 
@@ -37,7 +37,7 @@ bool
 NearObjectSession::AddNearObjectPeer(const std::shared_ptr<NearObject> nearObjectAdded)
 {
     const auto lock = std::scoped_lock{ m_nearObjectPeersGate };
-    const auto nearObjectAlreadyMember = std::any_of(std::cbegin(m_nearbyObjectPeers), std::cend(m_nearbyObjectPeers), [&](const auto nearObject)
+    const auto nearObjectAlreadyMember = std::any_of(std::cbegin(m_nearObjectPeers), std::cend(m_nearObjectPeers), [&](const auto nearObject)
     {
         return (*nearObject == *nearObjectAdded);
     });
@@ -46,7 +46,7 @@ NearObjectSession::AddNearObjectPeer(const std::shared_ptr<NearObject> nearObjec
         return false;
     }
 
-    m_nearbyObjectPeers.push_back(nearObjectAdded);
+    m_nearObjectPeers.push_back(nearObjectAdded);
     InvokeEventCallback([&](auto& eventCallbacks){
         eventCallbacks.OnNearObjectSessionMembershipChanged(this, { nearObjectAdded }, {});
     });
@@ -58,18 +58,18 @@ bool
 NearObjectSession::RemoveNearObjectPeer(const std::shared_ptr<NearObject> nearObjectRemoved)
 {
     const auto lock = std::scoped_lock{ m_nearObjectPeersGate };
-    const auto nearObjectToRemove = std::find_if(std::cbegin(m_nearbyObjectPeers), std::cend(m_nearbyObjectPeers), [&](const auto& nearObject)
+    const auto nearObjectToRemove = std::find_if(std::cbegin(m_nearObjectPeers), std::cend(m_nearObjectPeers), [&](const auto& nearObject)
     {
         return (*nearObject == *nearObjectRemoved);
     });
 
-    if (nearObjectToRemove == std::cend(m_nearbyObjectPeers)) {
+    if (nearObjectToRemove == std::cend(m_nearObjectPeers)) {
         return false;
     }
 
     // No need to take an extra ref since the function argument guarantees
     // its lifetime throughout this function.
-    m_nearbyObjectPeers.erase(nearObjectToRemove);
+    m_nearObjectPeers.erase(nearObjectToRemove);
     InvokeEventCallback([&](auto& eventCallbacks){
         eventCallbacks.OnNearObjectSessionMembershipChanged(this, {}, { nearObjectRemoved });
     });
