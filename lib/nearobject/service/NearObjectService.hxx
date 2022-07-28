@@ -18,11 +18,47 @@ class NearObjectConnectionProfileManager;
  * @brief Central service object managing all other framework components and
  * their lifetime.
  */
-class NearObjectService
+class NearObjectService :
+    public std::enable_shared_from_this<NearObjectService>
 {
 public:
-    NearObjectService(NearObjectServiceInjector&& injector);
+    /**
+     * @brief Safely create an instance of the service.
+     * 
+     * This is the only function where an instance may be created to ensure that
+     * the control block for std::shared_ptr is always created. 
+     * 
+     * @param injector 
+     * @return std::shared_ptr<NearObjectService> 
+     */
+    [[nodiscard]]
+    static std::shared_ptr<NearObjectService>
+    Create(NearObjectServiceInjector&& injector);
+
+    /**
+     * @brief Get an instance of the service.
+     * 
+     * @return std::shared_ptr<NearObjectService> 
+     */
+    std::shared_ptr<NearObjectService>
+    GetInstance();
+
+    /**
+     * @brief Destroy the Near Object Service object
+     */
     virtual ~NearObjectService() = default;
+
+protected:
+    /**
+     * @brief Construct a new NearObjectService object. 
+     * 
+     * This must be hidden to prevent instances from being created without the
+     * std::shared_ptr control block. Without this, shared_from_this() would
+     * produce an invalid/corrupt value.
+     * 
+     * @param injector 
+     */
+    NearObjectService(NearObjectServiceInjector&& injector);
 
 private:
     std::unique_ptr<NearObjectConnectionProfileManager> m_connectionProfileManager;
