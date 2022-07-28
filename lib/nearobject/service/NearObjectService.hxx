@@ -56,12 +56,12 @@ protected:
      * std::shared_ptr control block. Without this, shared_from_this() would
      * produce an invalid/corrupt value.
      * 
-     * @param injector 
+     * @param injector The dependency injector for the service.
      */
     NearObjectService(NearObjectServiceInjector&& injector);
 
 private:
-    std::unique_ptr<NearObjectProfileManager> m_connectionProfileManager;
+    std::unique_ptr<NearObjectProfileManager> m_profileManager;
     std::vector<std::unique_ptr<NearObjectDeviceManager>> m_deviceManagers{};
 };
 } // namespace service
