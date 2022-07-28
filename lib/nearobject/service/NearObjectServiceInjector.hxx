@@ -16,8 +16,8 @@ namespace service
  */
 struct NearObjectServiceInjector
 {
-    std::unique_ptr<NearObjectProfileManager> ProfileManager;
-    std::unique_ptr<NearObjectDeviceManager> DeviceManager;
+    std::shared_ptr<NearObjectProfileManager> ProfileManager;
+    std::shared_ptr<NearObjectDeviceManager> DeviceManager;
 };
 } // namespace service
 } // namespace nearobject

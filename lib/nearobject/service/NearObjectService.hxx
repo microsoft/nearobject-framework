@@ -60,8 +60,8 @@ protected:
     NearObjectService(NearObjectServiceInjector&& injector);
 
 private:
-    std::unique_ptr<NearObjectProfileManager> m_profileManager;
-    std::unique_ptr<NearObjectDeviceManager> m_deviceManager;
+    std::shared_ptr<NearObjectProfileManager> m_profileManager;
+    std::shared_ptr<NearObjectDeviceManager> m_deviceManager;
 };
 } // namespace service
 } // namespace nearobject
