@@ -49,8 +49,8 @@ public:
     static ParseResult
     Parse(TlvSimple **tlvOutput, const gsl::span<std::byte> &data);
 
-    static const int MinLengthWhenLessThanFF = 2;
-    static const int MinLengthWhenMoreThanFF = 4;
+    static constexpr auto OneByteLengthMinimumSize = 2;
+    static constexpr auto ThreeByteLengthMinimumSize = 4;
 };
 
 } // namespace encoding
