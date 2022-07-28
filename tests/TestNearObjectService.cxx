@@ -9,26 +9,56 @@ TEST_CASE("near object service can be created", "[basic][service]")
 {
     using namespace nearobject::service;
 
-    SECTION("service doesn't cause a crash when created with empty injector")
+    SECTION("service doesn't cause a crash when created with default-initialized injector")
     {
-        NearObjectServiceInjector injector{};
-        auto service = NearObjectService::Create(std::move(injector));
+        auto service = NearObjectService::Create({});
     }
 
-    SECTION("service doesn't case a crash when created with missing profile manager")
+    SECTION("service doesn't case a crash when created with missing components")
     {
-        NearObjectServiceInjector injector{
-            nullptr,
-            {}
-        };
-        auto service = NearObjectService::Create(std::move(injector));
+        {   // missing profile manager
+            auto service = NearObjectService::Create({
+                nullptr,
+                std::make_shared<NearObjectDeviceManager>(),
+            });
+        }
+        {
+            // missing device manager
+            auto service = NearObjectService::Create({
+                std::make_shared<NearObjectProfileManager>(),
+                nullptr,
+            });
+        }
+        {
+            // missing both profile manager and device manager
+            // missing device manager
+            auto service = NearObjectService::Create({
+                nullptr,
+                nullptr,
+            });
+        }
     }
 
-    SECTION("service doesn't cause a crash when created with single device manager")
+    SECTION("service exposes same components as provided by the injector")
     {
-        NearObjectServiceInjector injector{};
-        injector.ProfileManager = std::make_shared<NearObjectProfileManager>();
-        injector.DeviceManager = std::make_shared<NearObjectDeviceManager>();
-        auto service = NearObjectService::Create(std::move(injector));
+        std::shared_ptr<NearObjectProfileManager> profileManager;
+        std::shared_ptr<NearObjectDeviceManager> deviceManager;
+
+        {
+            profileManager = nullptr;
+            deviceManager = nullptr;
+
+            auto service = NearObjectService::Create({ profileManager, deviceManager });
+            REQUIRE(service->ProfileManager == profileManager);
+            REQUIRE(service->DeviceManager == deviceManager);
+        }
+        {
+            profileManager = std::make_shared<NearObjectProfileManager>();
+            deviceManager = std::make_shared<NearObjectDeviceManager>();
+
+            auto service = NearObjectService::Create({ profileManager, deviceManager });
+            REQUIRE(service->ProfileManager == profileManager);
+            REQUIRE(service->DeviceManager == deviceManager);
+        }
     }
 }
