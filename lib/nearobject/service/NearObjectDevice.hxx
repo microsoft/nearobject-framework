@@ -7,7 +7,7 @@
 #include <optional>
 #include <vector>
 
-#include <nearobject/NearObjectConnectionProfile.hxx>
+#include <nearobject/NearObjectProfile.hxx>
 
 namespace nearobject
 {
@@ -41,14 +41,14 @@ public:
     };
 
     /**
-     * @brief Attempt to start a session using the specified connection profile.
+     * @brief Attempt to start a session using the specified profile.
      * 
      * @param profile The profile to use to start a session.
      * @param eventCallbacks The callback object to receive event signals.
      * @return StartSessionResult 
      */
     StartSessionResult
-    StartSession(const NearObjectConnectionProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks);
+    StartSession(const NearObjectProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks);
 
 private:
     /**
@@ -59,7 +59,7 @@ private:
      * @return StartSessionResult 
      */
     virtual StartSessionResult
-    StartSessionImpl(const NearObjectConnectionProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) = 0;
+    StartSessionImpl(const NearObjectProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) = 0;
 
 protected:
     std::mutex m_sessionsGate;

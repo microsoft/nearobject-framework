@@ -22,6 +22,7 @@ class NearObjectDevice;
  */
 class NearObjectDeviceManager
 {
+public:
     /**
      * @brief Adds a new device for use by the framework to implement Near
      * Object services.

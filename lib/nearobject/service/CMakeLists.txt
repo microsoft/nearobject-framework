@@ -3,8 +3,8 @@ add_library(nearobject-service STATIC "")
 
 target_sources(nearobject-service
     PRIVATE
-        NearObjectConnectionProfileManager.cxx
-        NearObjectConnectionProfileManager.hxx
+        NearObjectProfileManager.cxx
+        NearObjectProfileManager.hxx
         NearObjectDevice.cxx
         NearObjectDevice.hxx
         NearObjectDeviceManager.cxx
@@ -32,6 +32,7 @@ target_sources(nearobject-service
 target_include_directories(nearobject-service
     PRIVATE
         ${NOF_DIR_LIB}
+        ${NOF_DIR_LIB}/shared
 )
 
 target_link_libraries(nearobject-service

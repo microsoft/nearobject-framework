@@ -30,6 +30,9 @@ target_include_directories(nearobject-test
 target_sources(nearobject-test
     PRIVATE
         Main.cxx
+        TestNearObjectDeviceManager.cxx
+        TestNearObjectManager.cxx
+        TestNearObjectService.cxx
         TestNearObjectSession.cxx
 )
 
