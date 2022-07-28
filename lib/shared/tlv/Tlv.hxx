@@ -14,6 +14,22 @@ class Tlv
 {
 public:
     /**
+     * @brief getters return a void pointer since we don't know anything about the tlv spec
+     * 
+     * @return const void *
+     */
+    virtual const void *
+    get_tag() const = 0;
+
+    /**
+     * @brief getters return a void pointer since we don't know anything about the tlv spec
+     * 
+     * @return const void *
+     */
+    virtual const void *
+    get_value() const = 0;
+
+    /**
      * @brief Convert this Tlv to a vector data blob. 
      * 
      * @return std::vector<std::byte> 

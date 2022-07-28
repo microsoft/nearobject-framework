@@ -16,14 +16,20 @@ class TlvSimple : public Tlv
 {
 private:
     std::byte m_tag;
-    gsl::span<std::byte> m_value;
+    std::vector<std::byte> m_value;
 
 public:
-    TlvSimple(std::byte tag, gsl::span<std::byte> value)
+    TlvSimple(std::byte tag, const std::vector<std::byte> &value) :
+        m_tag(tag),
+        m_value(value)
     {
-        m_tag = tag;
-        m_value = value;
     }
+
+    const void *
+    get_tag() const override;
+
+    const void *
+    get_value() const override;
 
     /**
      * @brief Convert this Tlv to a vector data blob. 
@@ -41,7 +47,10 @@ public:
      * @return ParseResult The result of the parsing operation.
      */
     static ParseResult
-    Parse(TlvSimple** tlvOutput, const gsl::span<std::byte>& data);
+    Parse(TlvSimple **tlvOutput, const gsl::span<std::byte> &data);
+
+    static const int MinLengthWhenLessThanFF = 2;
+    static const int MinLengthWhenMoreThanFF = 4;
 };
 
 } // namespace encoding

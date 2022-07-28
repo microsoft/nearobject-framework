@@ -5,7 +5,7 @@ using namespace encoding;
 
 /* static */
 Tlv::ParseResult
-TlvSimple::Parse(TlvSimple** tlvOutput, const gsl::span<std::byte>& data)
+TlvSimple::Parse(TlvSimple **tlvOutput, const gsl::span<std::byte> &data)
 {
     Tlv::ParseResult parseResult = Tlv::ParseResult::Failed;
     if (!tlvOutput)
@@ -13,27 +13,46 @@ TlvSimple::Parse(TlvSimple** tlvOutput, const gsl::span<std::byte>& data)
     *tlvOutput = nullptr;
 
     std::byte tag;
-    int length;
-    gsl::span<std::byte> value;
+    uint16_t length;
+    std::vector<std::byte> value;
 
     int datasize = data.size();
 
-    if (datasize < 2)
+    if (datasize < TlvSimple::MinLengthWhenLessThanFF)
         return parseResult;
     tag = data[0];
-    length = (int)data[1];
+    length = (uint16_t)data[1];
     if (length == 0xFF) {
-        if (datasize < 4)
+        if (datasize < TlvSimple::MinLengthWhenMoreThanFF)
             return parseResult;
-        length = ((int)data[2]) << 8;
-        length += (int)data[3];
+        length = ((uint16_t)data[2]) << 8;
+        length += (uint16_t)data[3];
     }
-    if (datasize != 4 + length)
+    if (datasize != TlvSimple::MinLengthWhenMoreThanFF + length)
         return parseResult;
-    value = data.last(length);
+    auto tmpspan = data.last(length);
+    value.assign(tmpspan.begin(), tmpspan.end());
 
     parseResult = Tlv::ParseResult::Succeeded;
     *tlvOutput = new TlvSimple(tag, value);
 
     return parseResult;
+}
+
+std::vector<std::byte>
+TlvSimple::ToVector() const
+{
+    return m_value;
+};
+
+const void *
+TlvSimple::get_tag() const
+{
+    return &m_tag;
+}
+
+const void *
+TlvSimple::get_value() const
+{
+    return &m_value;
 }

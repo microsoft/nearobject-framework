@@ -23,7 +23,7 @@ public:
      * @return ParseResult The result of the parsing operation.
      */
     static ParseResult
-    Parse(TlvBer** tlvOutput, const gsl::span<std::byte>& data);
+    Parse(TlvBer **tlvOutput, const gsl::span<std::byte>& data);
 };
 
 } // namespace encoding
