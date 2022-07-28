@@ -31,7 +31,7 @@ TlvSimple::Parse(TlvSimple **tlvOutput, const gsl::span<std::byte> &data)
     if (datasize != TlvSimple::MinLengthWhenMoreThanFF + length)
         return parseResult;
     auto tmpspan = data.last(length);
-    value.assign(tmpspan.begin(), tmpspan.end());
+    value.assign(std::cbegin(tmpspan), std::cend(tmpspan));
 
     parseResult = Tlv::ParseResult::Succeeded;
     *tlvOutput = new TlvSimple(tag, value);
