@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-#include "NearObjectConnectionProfileManager.hxx"
+#include "NearObjectProfileManager.hxx"
 #include "NearObjectDeviceManager.hxx"
 
 namespace nearobject
@@ -17,7 +17,7 @@ namespace service
  */
 struct NearObjectServiceInjector
 {
-    std::unique_ptr<NearObjectConnectionProfileManager> ConnectionProfileManager;
+    std::unique_ptr<NearObjectProfileManager> ConnectionProfileManager;
     std::vector<std::unique_ptr<NearObjectDeviceManager>> DeviceManagers;
 };
 } // namespace service

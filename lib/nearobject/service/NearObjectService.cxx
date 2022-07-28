@@ -1,5 +1,5 @@
 
-#include "NearObjectConnectionProfileManager.hxx"
+#include "NearObjectProfileManager.hxx"
 #include "NearObjectService.hxx"
 #include "NearObjectDeviceManager.hxx"
 

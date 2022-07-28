@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-#include <nearobject/NearObjectConnectionProfile.hxx>
+#include <nearobject/NearObjectProfile.hxx>
 
 namespace nearobject
 {
@@ -35,14 +35,14 @@ public:
      * @return NearObjectConnectionResult 
      */
     NearObjectConnectionResult
-    EstablishConnection(const NearObjectConnectionProfile& connectionProfile);
+    EstablishConnection(const NearObjectProfile& connectionProfile);
 
     /**
-     * @brief Find and enumerate all known connection profiles. 
+     * @brief Find and enumerate all known profiles. 
      * 
-     * @return std::vector<NearObjectConnectionProfile> 
+     * @return std::vector<NearObjectProfile> 
      */
-    std::vector<NearObjectConnectionProfile>
+    std::vector<NearObjectProfile>
     FindAllConnectionProfiles() const;
 
 private:

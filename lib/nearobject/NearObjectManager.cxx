@@ -6,16 +6,16 @@ using namespace nearobject;
 NearObjectManager::NearObjectManager()
 {}
 
-std::vector<NearObjectConnectionProfile>
+std::vector<NearObjectProfile>
 NearObjectManager::FindAllConnectionProfiles() const
 {
-    // TODO: proxy to service NearObjectConnectionProfileManager, or, use it directly
+    // TODO: proxy to service NearObjectProfileManager, or, use it directly
     // here with an shared instance
     return {};
 }
 
 NearObjectManager::NearObjectConnectionResult
-NearObjectManager::EstablishConnection(const NearObjectConnectionProfile& connectionProfile)
+NearObjectManager::EstablishConnection(const NearObjectProfile& connectionProfile)
 {
     // TODO: proxy to valid NearObjectDeviceManager
     return {};

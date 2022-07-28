@@ -12,7 +12,7 @@ namespace nearobject
 namespace service
 {
 class NearObjectDeviceManager;
-class NearObjectConnectionProfileManager;
+class NearObjectProfileManager;
 
 /**
  * @brief Central service object managing all other framework components and
@@ -61,7 +61,7 @@ protected:
     NearObjectService(NearObjectServiceInjector&& injector);
 
 private:
-    std::unique_ptr<NearObjectConnectionProfileManager> m_connectionProfileManager;
+    std::unique_ptr<NearObjectProfileManager> m_connectionProfileManager;
     std::vector<std::unique_ptr<NearObjectDeviceManager>> m_deviceManagers{};
 };
 } // namespace service

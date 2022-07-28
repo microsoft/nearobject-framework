@@ -10,7 +10,7 @@ NearObjectDeviceUwb::NearObjectDeviceUwb(std::unique_ptr<uwb::UwbDevice> uwbDevi
 {}
 
 NearObjectDevice::StartSessionResult
-NearObjectDeviceUwb::StartSessionImpl(const NearObjectConnectionProfile& /* profile */, std::weak_ptr<NearObjectSessionEventCallbacks> /* eventCallbacks */)
+NearObjectDeviceUwb::StartSessionImpl(const NearObjectProfile& /* profile */, std::weak_ptr<NearObjectSessionEventCallbacks> /* eventCallbacks */)
 {
     return { std::nullopt };
 }

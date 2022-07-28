@@ -25,7 +25,7 @@ public:
 
 private:
     StartSessionResult
-    StartSessionImpl(const NearObjectConnectionProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) override;
+    StartSessionImpl(const NearObjectProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) override;
 
 private:
     std::unique_ptr<uwb::UwbDevice> m_uwbDevice{};

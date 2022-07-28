@@ -29,7 +29,7 @@ TEST_CASE("near object manager apis don't cause a crash")
     SECTION("EstablishConnection doesn't cause a crash with unknown profile")
     {
         NearObjectManager manager{};
-        const NearObjectConnectionProfile connectionProfile{};
+        const NearObjectProfile connectionProfile{};
         const auto connectionResult = manager.EstablishConnection(connectionProfile);
     }
 

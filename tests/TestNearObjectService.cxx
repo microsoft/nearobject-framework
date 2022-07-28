@@ -15,7 +15,7 @@ TEST_CASE("near object service can be created", "[basic][service]")
         auto service = NearObjectService::Create(std::move(injector));
     }
 
-    SECTION("service doesn't case a crash when created with missing connection profile manager")
+    SECTION("service doesn't case a crash when created with missing profile manager")
     {
         NearObjectServiceInjector injector{
             nullptr,
@@ -27,7 +27,7 @@ TEST_CASE("near object service can be created", "[basic][service]")
     SECTION("service doesn't cause a crash when created with single device manager")
     {
         NearObjectServiceInjector injector{};
-        injector.ConnectionProfileManager = std::make_unique<NearObjectConnectionProfileManager>();
+        injector.ConnectionProfileManager = std::make_unique<NearObjectProfileManager>();
         injector.DeviceManagers.push_back(std::make_unique<NearObjectDeviceManager>());
         auto service = NearObjectService::Create(std::move(injector));
     }

@@ -1,10 +1,10 @@
 
-#ifndef __NEAR_OBJECT_CONNECTION_PROFILE_HXX__
-#define __NEAR_OBJECT_CONNECTION_PROFILE_HXX__
+#ifndef __NEAR_OBJECT_PROFILE_HXX__
+#define __NEAR_OBJECT_PROFILE_HXX__
 
 #include <optional>
 
-#include "NearObjectConnectionProfileSecurity.hxx"
+#include "NearObjectProfileSecurity.hxx"
 
 namespace nearobject
 {
@@ -21,7 +21,7 @@ enum class NearObjectConnectionScope {
  * @brief A collection of configuration that specifies how to connect to a near
  * object peer or set of peers.
  */
-struct NearObjectConnectionProfile {
+struct NearObjectProfile {
     /**
      * @brief The supported connection scope.
      *
@@ -46,4 +46,4 @@ struct NearObjectConnectionProfile {
 
 } // namespace nearobject
 
-#endif // __NEAR_OBJECT_CONNECTION_PROFILE_HXX__
+#endif // __NEAR_OBJECT_PROFILE_HXX__

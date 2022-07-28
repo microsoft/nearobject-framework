@@ -7,7 +7,7 @@
 using namespace nearobject::service;
 
 NearObjectDevice::StartSessionResult
-NearObjectDevice::StartSession(const NearObjectConnectionProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks)
+NearObjectDevice::StartSession(const NearObjectProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks)
 {
     auto result = StartSessionImpl(profile, eventCallbacks);
 
