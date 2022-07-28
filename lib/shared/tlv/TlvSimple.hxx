@@ -14,7 +14,16 @@ namespace encoding
 {
 class TlvSimple : public Tlv
 {
+private:
+    std::byte m_tag;
+    std::vector<std::byte> m_value;
+
 public:
+    TlvSimple(std::byte tag, std::vector<std::byte> value){
+        m_tag = tag;
+        m_value = value;
+    }
+
     /**
      * @brief Convert this Tlv to a vector data blob. 
      * 
