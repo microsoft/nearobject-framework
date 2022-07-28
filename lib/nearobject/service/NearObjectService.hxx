@@ -3,7 +3,6 @@
 #define __NEAR_OBJECT_SERVICE_HXX__
 
 #include <memory>
-#include <vector>
 
 #include "NearObjectServiceInjector.hxx"
 
@@ -62,7 +61,7 @@ protected:
 
 private:
     std::unique_ptr<NearObjectProfileManager> m_profileManager;
-    std::vector<std::unique_ptr<NearObjectDeviceManager>> m_deviceManagers{};
+    std::unique_ptr<NearObjectDeviceManager> m_deviceManager;
 };
 } // namespace service
 } // namespace nearobject

@@ -3,7 +3,6 @@
 #define __NEAR_OBJECT_SERVICE_INJECTOR_HXX__
 
 #include <memory>
-#include <vector>
 
 #include "NearObjectProfileManager.hxx"
 #include "NearObjectDeviceManager.hxx"
@@ -17,8 +16,8 @@ namespace service
  */
 struct NearObjectServiceInjector
 {
-    std::unique_ptr<NearObjectProfileManager> ConnectionProfileManager;
-    std::vector<std::unique_ptr<NearObjectDeviceManager>> DeviceManagers;
+    std::unique_ptr<NearObjectProfileManager> ProfileManager;
+    std::unique_ptr<NearObjectDeviceManager> DeviceManager;
 };
 } // namespace service
 } // namespace nearobject

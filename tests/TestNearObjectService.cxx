@@ -27,8 +27,8 @@ TEST_CASE("near object service can be created", "[basic][service]")
     SECTION("service doesn't cause a crash when created with single device manager")
     {
         NearObjectServiceInjector injector{};
-        injector.ConnectionProfileManager = std::make_unique<NearObjectProfileManager>();
-        injector.DeviceManagers.push_back(std::make_unique<NearObjectDeviceManager>());
+        injector.ProfileManager = std::make_unique<NearObjectProfileManager>();
+        injector.DeviceManager = std::make_unique<NearObjectDeviceManager>();
         auto service = NearObjectService::Create(std::move(injector));
     }
 }
