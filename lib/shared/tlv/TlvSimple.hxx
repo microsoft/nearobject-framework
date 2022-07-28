@@ -19,7 +19,8 @@ private:
     gsl::span<std::byte> m_value;
 
 public:
-    TlvSimple(std::byte tag, gsl::span<std::byte> value){
+    TlvSimple(std::byte tag, gsl::span<std::byte> value)
+    {
         m_tag = tag;
         m_value = value;
     }
