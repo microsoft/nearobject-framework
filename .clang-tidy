@@ -1,4 +1,4 @@
-Checks:          'clang-diagnostic-*,clang-analyzer-*,-*,cert-*,concurrency-*,cppcoreguidelines-*,hicpp-*,misc-*,modernize-,performance-*,portability-*,readability-'
+Checks:          'clang-diagnostic-*,clang-analyzer-*,-*,cert-*,concurrency-*,cppcoreguidelines-*,hicpp-*,misc-*,modernize-,performance-*,portability-*,readability-,-misc-unused-parameters'
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
