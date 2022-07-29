@@ -101,7 +101,7 @@ NearObjectSession::NearObjectPropertiesChanged(const std::shared_ptr<NearObject>
 NearObjectSession::StartRangingSessionResult
 NearObjectSession::StartRangingSession()
 {
-    StartRangingSessionResult result;
+    StartRangingSessionResult result{};
 
     const auto lock = std::scoped_lock{ m_rangingStateGate };
     if (m_rangingSession.has_value()) {
