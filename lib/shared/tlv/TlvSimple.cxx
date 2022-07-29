@@ -18,17 +18,17 @@ TlvSimple::Parse(TlvSimple **tlvOutput, const gsl::span<std::byte> &data)
 
     int datasize = data.size();
 
-    if (datasize < TlvSimple::MinLengthWhenLessThanFF)
+    if (datasize < TlvSimple::OneByteLengthMinimumSize)
         return parseResult;
     tag = data[0];
     length = (uint16_t)data[1];
     if (length == 0xFF) {
-        if (datasize < TlvSimple::MinLengthWhenMoreThanFF)
+        if (datasize < TlvSimple::ThreeByteLengthMinimumSize)
             return parseResult;
         length = ((uint16_t)data[2]) << 8;
-        length += (uint16_t)data[3];
+        length |= (uint16_t)data[3];
     }
-    if (datasize != TlvSimple::MinLengthWhenMoreThanFF + length)
+    if (datasize != TlvSimple::ThreeByteLengthMinimumSize + length)
         return parseResult;
     auto tmpspan = data.last(length);
     value.assign(std::cbegin(tmpspan), std::cend(tmpspan));
@@ -39,20 +39,8 @@ TlvSimple::Parse(TlvSimple **tlvOutput, const gsl::span<std::byte> &data)
     return parseResult;
 }
 
-std::vector<std::byte>
+const std::vector<std::byte>
 TlvSimple::ToVector() const
 {
-    return m_value;
+    return _m_value;
 };
-
-const void *
-TlvSimple::get_tag() const
-{
-    return &m_tag;
-}
-
-const void *
-TlvSimple::get_value() const
-{
-    return &m_value;
-}

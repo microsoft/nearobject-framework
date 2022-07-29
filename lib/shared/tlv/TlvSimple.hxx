@@ -15,21 +15,22 @@ namespace encoding
 class TlvSimple : public Tlv
 {
 private:
-    std::byte m_tag;
-    std::vector<std::byte> m_value;
+    static const int OneByteLengthMinimumSize = 2;
+    static const int ThreeByteLengthMinimumSize = 4;
+
+    const std::vector<std::byte> _m_tag;
+    const std::vector<std::byte> _m_value;
 
 public:
     TlvSimple(std::byte tag, const std::vector<std::byte> &value) :
-        m_tag(tag),
-        m_value(value)
+        _m_tag(1,tag),
+        _m_value(value)
     {
+        // Tlv::m_tag = gsl::span<std::byte>{std::data(_m_tag),std::size(_m_tag)};
+        Tlv::m_tag = gsl::span<std::byte>(std::data(_m_tag),std::size(_m_tag));
+        // Tlv::m_value = gsl::span<std::byte>{std::data(_m_value),std::size(_m_value)};
+        Tlv::m_value = gsl::span<std::byte>(std::data(_m_value),std::size(_m_value));
     }
-
-    const void *
-    get_tag() const override;
-
-    const void *
-    get_value() const override;
 
     /**
      * @brief Convert this Tlv to a vector data blob. 
@@ -48,9 +49,6 @@ public:
      */
     static ParseResult
     Parse(TlvSimple **tlvOutput, const gsl::span<std::byte> &data);
-
-    static constexpr auto OneByteLengthMinimumSize = 2;
-    static constexpr auto ThreeByteLengthMinimumSize = 4;
 };
 
 } // namespace encoding
