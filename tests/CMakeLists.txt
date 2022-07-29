@@ -32,6 +32,7 @@ target_sources(nearobject-test
         Main.cxx
         TestNearObjectDeviceManager.cxx
         TestNearObjectManager.cxx
+        TestNearObjectProfileManager.cxx
         TestNearObjectService.cxx
         TestNearObjectSession.cxx
 )
