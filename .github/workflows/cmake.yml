@@ -1,4 +1,4 @@
-name: Build Release [CMake] - ${{ matrix.os }}
+name: Build Release [CMake]
 
 on:
   pull_request:
