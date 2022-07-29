@@ -12,15 +12,27 @@ Note that all language feature configuration is constrained by the Windows build
 
 Where possible, we will attempt to use primitives provided by the [C++ Standard Library](https://en.cppreference.com/w/cpp/header) for interoperability between common and OS-dependent code. The use of OS-specific primitives and libraries is reserved for scenarios where they are strictly needed (eg. calling an OS/System API), or where the highest possible performance is required and only the OS implementation can provide this. 
 
-The coding style is dictated by the `.clang-format` file in the root of the project. Please configure your editor to format sources accordingly. Above all, ***the coding style should be kept as consistent as possible***. The exact style used is not overly important.
+The coding style is dictated by both `.clang-format` and `.clang-tidy` files at the root of the project. Please configure your editor to format and lint sources accordingly. Above all, ***the coding style should be kept as consistent as possible***. The exact style used is not overly important.
 
 To help keep the code consistent, please follow these general guidelines:
+
 * **DO** use all lowercase for namespace names.
 * **DO** use PascalCase for class/struct names.
 * **DO** use camelCase for variable names.
 * **DO** use spaces instead of tabs.
 * **DON'T** prefix variable names to describe their type or scope.
 * **DO** use `std::filesystem` for storage and UNIX path separators (`/`) where possible.
+* **DO** use the following table for variable naming:
+
+| Block | Style | Example |
+| ----- | ----- | -------- |
+| Types | PascalCase | `struct` **`NearObject`** `{};` |
+| Functions | PascalCase | `NearObject` **`GetNearObjectPeer()`** |
+| Variables | camelCase | `NearObject` **`nearObject`**`;` |
+| Parameters | camelCase | `void registerEventCallback(NearObjectEventCallback&` **`eventCallback`**`)` |
+| Namespaces | lowercase | `namespace` **`nearobject`** |
+| Public Members | PascalCase | `struct NearObject { NearObjectProperties` **`Properties`**`; }` |
+| Private Members | camelCase with `m_` prefix | `class NearObjectSession { uint64_t` **`m_sessionId`**`; }` |
 
 ## Development Environment Setup
 
