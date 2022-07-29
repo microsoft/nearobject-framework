@@ -12,9 +12,6 @@ namespace encoding
 class TlvBer : public Tlv
 {
 public:
-    std::vector<std::byte>
-    ToVector() const override;
-
     /**
      * @brief Decode a Tlv from a blob of BER-TLV data.
      *

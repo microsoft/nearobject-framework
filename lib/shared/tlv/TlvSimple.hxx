@@ -26,14 +26,6 @@ public:
     TlvSimple(std::byte tag, std::vector<std::byte> value);
 
     /**
-     * @brief Convert this Tlv to a vector data blob. 
-     * 
-     * @return std::vector<std::byte> 
-     */
-    std::vector<std::byte>
-    ToVector() const override;
-
-    /**
      * @brief Decode a Tlv from a blob of SIMPLE-TLV data.
      *
      * @param tlvOutput The decoded Tlv, if parsing was successful (ParseResult::Succeeded). This must be a writeable pointer.

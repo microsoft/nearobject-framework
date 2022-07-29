@@ -17,14 +17,6 @@ public:
     gsl::span<const std::byte> Value;
 
     /**
-     * @brief Convert this Tlv to a vector data blob. 
-     * 
-     * @return std::vector<std::byte> 
-     */
-    virtual std::vector<std::byte>
-    ToVector() const = 0;
-
-    /**
      * @brief Describes the result of parsing a Tlv
      * 
      */

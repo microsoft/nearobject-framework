@@ -47,9 +47,3 @@ TlvSimple::Parse(TlvSimple **tlvOutput, const gsl::span<std::byte> &data)
 
     return parseResult;
 }
-
-std::vector<std::byte>
-TlvSimple::ToVector() const
-{
-    return m_value;
-}
