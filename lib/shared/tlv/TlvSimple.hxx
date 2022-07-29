@@ -18,19 +18,15 @@ private:
     static const int OneByteLengthMinimumSize = 2;
     static const int ThreeByteLengthMinimumSize = 4;
 
-    const std::vector<std::byte> _m_tag;
-    const std::vector<std::byte> _m_value;
+    const std::vector<std::byte> m_tag;
+    const std::vector<std::byte> m_value;
 
 public:
-    TlvSimple(std::byte tag, const std::vector<std::byte> &value) :
-        _m_tag(1,tag),
-        _m_value(value)
-    {
-        // Tlv::m_tag = gsl::span<std::byte>{std::data(_m_tag),std::size(_m_tag)};
-        Tlv::m_tag = gsl::span<std::byte>(std::data(_m_tag),std::size(_m_tag));
-        // Tlv::m_value = gsl::span<std::byte>{std::data(_m_value),std::size(_m_value)};
-        Tlv::m_value = gsl::span<std::byte>(std::data(_m_value),std::size(_m_value));
-    }
+    gsl::span<const std::byte> Tag;
+    gsl::span<const std::byte> Value;
+
+public:
+    TlvSimple(std::byte tag, const std::vector<std::byte> &value);
 
     /**
      * @brief Convert this Tlv to a vector data blob. 

@@ -3,6 +3,14 @@
 
 using namespace encoding;
 
+TlvSimple::TlvSimple(std::byte tag, const std::vector<std::byte> &value) :
+    m_tag(1, tag),
+    m_value(value),
+    Tag{ std::data(m_tag), std::size(m_tag) },
+    Value{ std::data(m_value), std::size(m_value) }
+{
+}
+
 /* static */
 Tlv::ParseResult
 TlvSimple::Parse(TlvSimple **tlvOutput, const gsl::span<std::byte> &data)
@@ -39,8 +47,8 @@ TlvSimple::Parse(TlvSimple **tlvOutput, const gsl::span<std::byte> &data)
     return parseResult;
 }
 
-const std::vector<std::byte>
+std::vector<std::byte>
 TlvSimple::ToVector() const
 {
-    return _m_value;
-};
+    return m_value;
+}
