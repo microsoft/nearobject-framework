@@ -29,12 +29,13 @@ TlvSimple::Parse(TlvSimple **tlvOutput, const gsl::span<std::byte> &data)
     if (datasize < TlvSimple::OneByteLengthMinimumSize)
         return parseResult;
     tag = data[0];
-    length = (uint16_t)data[1];
-    if (length == 0xFF) {
+    length = (uint8_t)data[1];
+    if (length == TlvSimple::ThreeByteLengthIndicatorValue) {
         if (datasize < TlvSimple::ThreeByteLengthMinimumSize)
             return parseResult;
-        length = ((uint16_t)data[2]) << 8;
-        length |= (uint16_t)data[3];
+        length = (uint8_t)data[2];
+        length <<= 8;
+        length |= (uint8_t)data[3];
     }
     if (datasize != TlvSimple::ThreeByteLengthMinimumSize + length)
         return parseResult;

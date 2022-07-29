@@ -17,12 +17,13 @@ class TlvSimple : public Tlv
 private:
     static constexpr auto OneByteLengthMinimumSize = 2;
     static constexpr auto ThreeByteLengthMinimumSize = 4;
+    static constexpr auto ThreeByteLengthIndicatorValue = 0xFF;
 
     const std::vector<std::byte> m_tag;
     const std::vector<std::byte> m_value;
 
 public:
-    TlvSimple(std::byte tag, const std::vector<std::byte> &value);
+    TlvSimple(std::byte tag, std::vector<std::byte> value);
 
     /**
      * @brief Convert this Tlv to a vector data blob. 
