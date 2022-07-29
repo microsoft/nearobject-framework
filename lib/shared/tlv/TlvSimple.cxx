@@ -3,7 +3,7 @@
 
 using namespace encoding;
 
-TlvSimple::TlvSimple(std::byte tag, const std::vector<std::byte> &value) :
+TlvSimple::TlvSimple(std::byte tag, std::vector<std::byte> value) :
     m_tag(1, tag),
     m_value(value)
 {
