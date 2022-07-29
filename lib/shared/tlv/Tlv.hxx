@@ -13,8 +13,8 @@ namespace encoding
 class Tlv
 {
 public:
-    gsl::span<std::byte> m_tag;
-    gsl::span<std::byte> m_value;
+    gsl::span<const std::byte> Tag;
+    gsl::span<const std::byte> Value;
 
     /**
      * @brief Convert this Tlv to a vector data blob. 

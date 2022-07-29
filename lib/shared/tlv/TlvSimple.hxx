@@ -22,10 +22,6 @@ private:
     const std::vector<std::byte> m_value;
 
 public:
-    gsl::span<const std::byte> Tag;
-    gsl::span<const std::byte> Value;
-
-public:
     TlvSimple(std::byte tag, const std::vector<std::byte> &value);
 
     /**

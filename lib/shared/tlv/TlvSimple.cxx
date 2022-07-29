@@ -5,10 +5,10 @@ using namespace encoding;
 
 TlvSimple::TlvSimple(std::byte tag, const std::vector<std::byte> &value) :
     m_tag(1, tag),
-    m_value(value),
-    Tag{ std::data(m_tag), std::size(m_tag) },
-    Value{ std::data(m_value), std::size(m_value) }
+    m_value(value)
 {
+    Tlv::Tag = gsl::span(m_tag);
+    Tlv::Value = gsl::span(m_value);
 }
 
 /* static */
