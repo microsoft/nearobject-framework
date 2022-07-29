@@ -24,7 +24,7 @@ TlvSimple::Parse(TlvSimple **tlvOutput, const gsl::span<std::byte> &data)
     uint16_t length;
     std::vector<std::byte> value;
 
-    int datasize = data.size();
+    auto datasize = data.size();
 
     if (datasize < TlvSimple::OneByteLengthMinimumSize)
         return parseResult;
