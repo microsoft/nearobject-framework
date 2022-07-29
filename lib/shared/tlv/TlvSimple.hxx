@@ -15,8 +15,8 @@ namespace encoding
 class TlvSimple : public Tlv
 {
 private:
-    static const int OneByteLengthMinimumSize = 2;
-    static const int ThreeByteLengthMinimumSize = 4;
+    static constexpr auto OneByteLengthMinimumSize = 2;
+    static constexpr auto ThreeByteLengthMinimumSize = 4;
 
     const std::vector<std::byte> m_tag;
     const std::vector<std::byte> m_value;
