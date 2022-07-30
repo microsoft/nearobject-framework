@@ -13,13 +13,8 @@ namespace encoding
 class Tlv
 {
 public:
-    /**
-     * @brief Convert this Tlv to a vector data blob. 
-     * 
-     * @return std::vector<std::byte> 
-     */
-    virtual std::vector<std::byte>
-    ToVector() const = 0;
+    gsl::span<const std::byte> Tag;
+    gsl::span<const std::byte> Value;
 
     /**
      * @brief Describes the result of parsing a Tlv

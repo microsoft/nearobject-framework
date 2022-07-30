@@ -15,23 +15,15 @@ namespace encoding
 class TlvSimple : public Tlv
 {
 private:
-    std::byte m_tag;
-    gsl::span<std::byte> m_value;
+    static constexpr auto OneByteLengthMinimumSize = 2;
+    static constexpr auto ThreeByteLengthMinimumSize = 4;
+    static constexpr auto ThreeByteLengthIndicatorValue = 0xFF;
+
+    const std::vector<std::byte> m_tag;
+    const std::vector<std::byte> m_value;
 
 public:
-    TlvSimple(std::byte tag, gsl::span<std::byte> value)
-    {
-        m_tag = tag;
-        m_value = value;
-    }
-
-    /**
-     * @brief Convert this Tlv to a vector data blob. 
-     * 
-     * @return std::vector<std::byte> 
-     */
-    std::vector<std::byte>
-    ToVector() const override;
+    TlvSimple(std::byte tag, std::vector<std::byte> value);
 
     /**
      * @brief Decode a Tlv from a blob of SIMPLE-TLV data.
@@ -41,7 +33,7 @@ public:
      * @return ParseResult The result of the parsing operation.
      */
     static ParseResult
-    Parse(TlvSimple** tlvOutput, const gsl::span<std::byte>& data);
+    Parse(TlvSimple **tlvOutput, const gsl::span<std::byte> &data);
 };
 
 } // namespace encoding

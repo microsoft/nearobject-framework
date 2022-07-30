@@ -12,9 +12,6 @@ namespace encoding
 class TlvBer : public Tlv
 {
 public:
-    std::vector<std::byte>
-    ToVector() const override;
-
     /**
      * @brief Decode a Tlv from a blob of BER-TLV data.
      *
@@ -23,7 +20,7 @@ public:
      * @return ParseResult The result of the parsing operation.
      */
     static ParseResult
-    Parse(TlvBer** tlvOutput, const gsl::span<std::byte>& data);
+    Parse(TlvBer **tlvOutput, const gsl::span<std::byte>& data);
 };
 
 } // namespace encoding
