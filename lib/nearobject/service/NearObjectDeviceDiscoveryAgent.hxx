@@ -2,6 +2,7 @@
 #ifndef __NEAR_OBJECT_DEVICE_DISCOVERY_AGENT_HXX__
 #define __NEAR_OBJECT_DEVICE_DISCOVERY_AGENT_HXX__
 
+#include <atomic>
 #include <functional>
 #include <memory>
 #include <shared_mutex>
@@ -47,6 +48,26 @@ class NearObjectDeviceDiscoveryAgent
     void
     RegisterDiscoveryEventCallback(std::function<void(NearObjectDevicePresence presence, std::shared_ptr<NearObjectDevice> deviceChanged)> onDevicePresenceChanged);
 
+    /**
+     * @brief Start actively discovering devices.
+     */
+    void
+    Start();
+
+    /**
+     * @brief Stop actively discovering devices.
+     */
+    void
+    Stop();
+
+    /**
+     * @brief Probe for all active devices.
+     * 
+     * @return std::vector<std::weak_ptr<NearObjectDevice>> 
+     */
+    std::vector<std::weak_ptr<NearObjectDevice>>
+    Probe();
+
 protected:
     /**
      * @brief Wrapper for safely invoking any device presence changed registered callback.
@@ -57,7 +78,30 @@ protected:
     void
     DevicePresenceChanged(NearObjectDevicePresence presence, std::shared_ptr<NearObjectDevice> deviceChanged) const noexcept;
 
+protected:
+    /**
+     * @brief Derived class implementation of discovery start. 
+     */
+    virtual void
+    StartImpl() = 0;
+
+    /**
+     * @brief Derived class implementation of discovery stop.
+     */
+    virtual void
+    StopImpl() = 0;
+
+    /**
+     * @brief Derived class implementation of discovery probe.
+     * 
+     * @return std::vector<std::weak_ptr<NearObjectDevice>> 
+     */
+    virtual std::vector<std::weak_ptr<NearObjectDevice>>
+    ProbeImpl() = 0;
+
 private:
+    std::atomic<bool> m_started{ false };
+
     mutable std::shared_mutex m_onDevicePresenceChangedGate;
     std::function<void(NearObjectDevicePresence presence, std::shared_ptr<NearObjectDevice>& deviceChanged)> m_onDevicePresenceChanged;
 };

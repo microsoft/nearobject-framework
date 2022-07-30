@@ -23,3 +23,27 @@ NearObjectDeviceDiscoveryAgent::DevicePresenceChanged(NearObjectDevicePresence p
         m_onDevicePresenceChanged(presence, std::move(deviceChanged));
     }
 }
+
+void
+NearObjectDeviceDiscoveryAgent::Start()
+{
+    bool expected = false;
+    if (m_started.compare_exchange_weak(expected, true)) {
+        StartImpl();
+    }
+}
+
+void 
+NearObjectDeviceDiscoveryAgent::Stop()
+{
+    bool expected = true;
+    if (m_started.compare_exchange_weak(expected, false)) {
+        StopImpl();
+    }
+}
+
+std::vector<std::weak_ptr<NearObjectDevice>>
+NearObjectDeviceDiscoveryAgent::Probe()
+{
+    return ProbeImpl();
+}
