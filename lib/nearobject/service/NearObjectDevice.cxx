@@ -6,6 +6,16 @@
 
 using namespace nearobject::service;
 
+NearObjectDevice::NearObjectDevice(uint64_t deviceId) :
+    m_deviceId{ deviceId }
+{ }
+
+uint64_t
+NearObjectDevice::Id() const noexcept
+{
+    return m_deviceId;
+}
+
 NearObjectDevice::StartSessionResult
 NearObjectDevice::StartSession(const NearObjectProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks)
 {
@@ -18,6 +28,12 @@ NearObjectDevice::StartSession(const NearObjectProfile& profile, std::weak_ptr<N
     } else {
         // TODO: log error details
     }
-    
+
     return result;
+}
+
+bool
+nearobject::service::operator==(const NearObjectDevice& lhs, const NearObjectDevice& rhs) noexcept
+{
+    return lhs.Id() == rhs.Id();
 }
