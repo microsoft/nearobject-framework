@@ -4,6 +4,7 @@
 
 #include <atomic>
 #include <functional>
+#include <future>
 #include <memory>
 #include <shared_mutex>
 
@@ -71,12 +72,12 @@ public:
     Stop();
 
     /**
-     * @brief Probe for all active devices.
+     * @brief 
      * 
-     * @return std::vector<std::weak_ptr<NearObjectDevice>> 
+     * @return std::future<std::vector<std::weak_ptr<NearObjectDevice>>> 
      */
-    std::vector<std::weak_ptr<NearObjectDevice>>
-    Probe();
+    std::future<std::vector<std::weak_ptr<NearObjectDevice>>>
+    ProbeAsync();
 
 protected:
     /**
@@ -102,12 +103,12 @@ protected:
     StopImpl() = 0;
 
     /**
-     * @brief Derived class implementation of discovery probe.
+     * @brief Derived class implementation of asynchronous discovery probe.
      * 
-     * @return std::vector<std::weak_ptr<NearObjectDevice>> 
+     * @return std::future<std::vector<std::weak_ptr<NearObjectDevice>>> 
      */
-    virtual std::vector<std::weak_ptr<NearObjectDevice>>
-    ProbeImpl() = 0;
+    virtual std::future<std::vector<std::weak_ptr<NearObjectDevice>>>
+    ProbeAsyncImpl() = 0;
 
 private:
     std::atomic<bool> m_started{ false };

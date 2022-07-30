@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <chrono>
 #include <iterator>
 
 #include <notstd/memory.hxx>
@@ -80,6 +81,8 @@ NearObjectDeviceManager::GetAllDevices() const
 void
 NearObjectDeviceManager::AddDiscoveryAgent(std::unique_ptr<NearObjectDeviceDiscoveryAgent> discoveryAgent)
 {
+    using namespace std::chrono_literals;
+
      // Use a weak_ptr below to ensure that the device object manager can
      // be safely destroyed prior to the discovery agent. This allows the
      // callback to be registered indefinitely, safely checking whether this
@@ -92,7 +95,13 @@ NearObjectDeviceManager::AddDiscoveryAgent(std::unique_ptr<NearObjectDeviceDisco
 
     // If this agent has already started, kick off a probe to ensure any devices
     // already found will be added ot this manager.
-    bool isStarted = discoveryAgent->IsStarted();
+    std::future<std::vector<std::weak_ptr<NearObjectDevice>>> existingDevicesProbe;
+    const bool isStarted = discoveryAgent->IsStarted();
+    if (isStarted) {
+        existingDevicesProbe = discoveryAgent->ProbeAsync();
+    } else {
+        discoveryAgent->Start();
+    }
 
     // If the agent hasn't yet been started, start it now, then probe for
     // existing devices in case they've already been discovered.
@@ -101,18 +110,24 @@ NearObjectDeviceManager::AddDiscoveryAgent(std::unique_ptr<NearObjectDeviceDisco
         m_discoveryAgents.push_back(std::move(discoveryAgent));
     }
 
-    if (isStarted) {
-        std::shared_lock<std::shared_mutex> discoveryAgentSharedLock{ m_discoveryAgentsGate };
-        auto existingDevices = m_discoveryAgents.back()->Probe();
+    if (existingDevicesProbe.valid()) {
+        static constexpr auto probeTimeout = 3s;
 
-        // Add any existing devices.
-        for (const auto& existingDeviceWeak : existingDevices) {
-            if (auto existingDevice = existingDeviceWeak.lock()) {
-                AddDevice(existingDevice);
+        // Wait for the operation to complete.
+        const auto waitResult = existingDevicesProbe.wait_for(probeTimeout);
+
+        // If the operation completed, get the results, resolve weak ptrs,
+        // and add any valid devices.
+        if (waitResult == std::future_status::ready) {
+            const auto existingDevices = existingDevicesProbe.get();
+            for (const auto& existingDeviceWeak : existingDevices) {
+                if (auto existingDevice = existingDeviceWeak.lock()) {
+                    AddDevice(std::move(existingDevice));
+                }
             }
+        } else {
+            // TODO: log error
         }
-    } else {
-        m_discoveryAgents.back()->Start();
     }
 }
 
@@ -124,6 +139,7 @@ NearObjectDeviceManager::OnDevicePresenceChanged(NearObjectDeviceDiscoveryAgent 
         AddDevice(std::move(deviceChanged));
         break;
     case NearObjectDevicePresence::Departed:
+        RemoveDevice(deviceChanged);
         break;
     default:
         break;

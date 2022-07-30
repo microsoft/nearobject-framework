@@ -47,8 +47,8 @@ NearObjectDeviceDiscoveryAgent::Stop()
     }
 }
 
-std::vector<std::weak_ptr<NearObjectDevice>>
-NearObjectDeviceDiscoveryAgent::Probe()
+std::future<std::vector<std::weak_ptr<NearObjectDevice>>>
+NearObjectDeviceDiscoveryAgent::ProbeAsync()
 {
-    return ProbeImpl();
+    return ProbeAsyncImpl();
 }
