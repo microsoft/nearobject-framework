@@ -57,7 +57,7 @@ NearObjectSession::AddNearObjectPeer(const std::shared_ptr<NearObject> nearObjec
 bool
 NearObjectSession::RemoveNearObjectPeer(const std::shared_ptr<NearObject> nearObjectRemoved)
 {
-    const auto lock = std::scoped_lock{ m_nearObjectPeersGate };
+    const auto nearObjectPeersLock = std::scoped_lock{ m_nearObjectPeersGate };
     const auto nearObjectToRemove = std::find_if(std::cbegin(m_nearObjectPeers), std::cend(m_nearObjectPeers), [&](const auto& nearObject)
     {
         return (*nearObject == *nearObjectRemoved);
