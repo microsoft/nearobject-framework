@@ -2,6 +2,7 @@
 #ifndef __NEAR_OBJECT_DEVICE_UWB_HXX__
 #define __NEAR_OBJECT_DEVICE_UWB_HXX__
 
+#include <cstdint>
 #include <memory>
 
 #include <uwb/UwbDevice.hxx>
@@ -21,7 +22,7 @@ class NearObjectDeviceUwb :
     public NearObjectDevice
 {
 public:
-    explicit NearObjectDeviceUwb(std::unique_ptr<uwb::UwbDevice> uwbDevice);
+    NearObjectDeviceUwb(uint64_t deviceId, std::unique_ptr<uwb::UwbDevice> uwbDevice);
 
 private:
     StartSessionResult

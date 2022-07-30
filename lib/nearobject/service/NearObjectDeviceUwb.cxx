@@ -5,7 +5,8 @@
 
 using namespace nearobject::service;
 
-NearObjectDeviceUwb::NearObjectDeviceUwb(std::unique_ptr<uwb::UwbDevice> uwbDevice) :
+NearObjectDeviceUwb::NearObjectDeviceUwb(uint64_t deviceId, std::unique_ptr<uwb::UwbDevice> uwbDevice) :
+    NearObjectDevice(deviceId),
     m_uwbDevice(std::move(uwbDevice))
 {}
 
