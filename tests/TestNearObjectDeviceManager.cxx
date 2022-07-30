@@ -11,6 +11,6 @@ TEST_CASE("near object device manager can be created", "[basic][service]")
 
     SECTION("device manager doesn't cause a crash when created")
     {
-        NearObjectDeviceManager deviceManager{};
+        auto deviceManager = NearObjectDeviceManager::Create();
     }
 }
