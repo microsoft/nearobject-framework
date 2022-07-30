@@ -26,6 +26,7 @@ enum class NearObjectDevicePresence {
  */
 class NearObjectDeviceDiscoveryAgent
 {
+public:
     /**
      * @brief Construct a new Near Object Device Discovery Agent object
      */
@@ -47,6 +48,15 @@ class NearObjectDeviceDiscoveryAgent
      */
     void
     RegisterDiscoveryEventCallback(std::function<void(NearObjectDevicePresence presence, std::shared_ptr<NearObjectDevice> deviceChanged)> onDevicePresenceChanged);
+
+    /**
+     * @brief indicates the started/running state. 
+     * 
+     * @return true 
+     * @return false 
+     */
+    bool
+    IsStarted() const noexcept;
 
     /**
      * @brief Start actively discovering devices.

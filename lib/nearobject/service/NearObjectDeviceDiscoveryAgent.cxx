@@ -24,6 +24,12 @@ NearObjectDeviceDiscoveryAgent::DevicePresenceChanged(NearObjectDevicePresence p
     }
 }
 
+bool
+NearObjectDeviceDiscoveryAgent::IsStarted() const noexcept
+{
+    return m_started;
+}
+
 void
 NearObjectDeviceDiscoveryAgent::Start()
 {
