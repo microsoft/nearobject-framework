@@ -3,10 +3,10 @@ add_library(nearobject-service STATIC "")
 
 target_sources(nearobject-service
     PRIVATE
-        NearObjectProfileManager.cxx
-        NearObjectProfileManager.hxx
         NearObjectDevice.cxx
         NearObjectDevice.hxx
+        NearObjectDeviceDiscoveryAgent.cxx
+        NearObjectDeviceDiscoveryAgent.hxx
         NearObjectDeviceManager.cxx
         NearObjectDeviceManager.hxx
         NearObjectDeviceUwb.cxx
@@ -19,6 +19,8 @@ target_sources(nearobject-service
         NearObjectDiscoverySourceBluetooth.hxx
         NearObjectOobConnection.cxx
         NearObjectOobConnection.hxx
+        NearObjectProfileManager.cxx
+        NearObjectProfileManager.hxx
         NearObjectService.cxx
         NearObjectService.hxx
         NearObjectServiceInjector.hxx
