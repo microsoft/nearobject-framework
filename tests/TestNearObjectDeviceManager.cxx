@@ -1,5 +1,4 @@
 
-#include <array>
 #include <memory>
 
 #include <catch2/catch.hpp>

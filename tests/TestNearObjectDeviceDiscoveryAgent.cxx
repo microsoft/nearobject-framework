@@ -69,4 +69,21 @@ TEST_CASE("near object device discovery agent can be created", "[basic][service]
         discoveryAgentTest.Start();
         REQUIRE(discoveryAgentTest.IsStarted());
     }
+
+    SECTION("discovery event callback can be reigstered without causing a crash")
+    {
+        discoveryAgentTest.RegisterDiscoveryEventCallback([](auto&&, auto&&){});
+    }
+
+    SECTION("discovery event callback can be registered in started state")
+    {
+        discoveryAgentTest.Start();
+        discoveryAgentTest.RegisterDiscoveryEventCallback([](auto&&, auto&&){});
+    }
+
+    SECTION("discovery event callback can be registered in stopped state")
+    {
+        discoveryAgentTest.Stop();
+        discoveryAgentTest.RegisterDiscoveryEventCallback([](auto&&, auto&&){});
+    }
 }
