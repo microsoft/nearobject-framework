@@ -37,7 +37,7 @@ public:
      *
      * @param deviceId
      */
-    NearObjectDevice(uint64_t deviceId);
+    explicit NearObjectDevice(uint64_t deviceId);
 
     /**
      * @brief Holds the result of the StartSession() function.
@@ -89,5 +89,17 @@ operator==(const NearObjectDevice&, const NearObjectDevice&) noexcept;
 
 } // namespace service
 } // namespace nearobject
+
+// namespace std
+// {
+// template <>
+// struct equal_to<nearobject::service::NearObjectDevice>
+// {
+//     bool operator()(const nearobject::service::NearObjectDevice& lhs, const nearobject::service::NearObjectDevice& rhs) const
+//     {
+//         return lhs == rhs;
+//     }
+// };
+// } // namespace std
 
 #endif // _NEAR_OBJECT_DEVICE_HXX__
