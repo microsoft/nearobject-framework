@@ -19,6 +19,12 @@ struct NearObjectDeviceDiscoveryAgentTest :
 
     std::promise<std::vector<std::weak_ptr<NearObjectDevice>>> ProbePromise;
 
+    void
+    SignalDiscoveryEvent(NearObjectDevicePresence presence, std::shared_ptr<NearObjectDevice> deviceChanged)
+    {
+        DevicePresenceChanged(presence, std::move(deviceChanged));
+    }
+
 protected:
     void
     StartImpl() override
@@ -37,32 +43,19 @@ protected:
 
 struct NearObjectDeviceTest :
     public NearObjectDevice {
-
     explicit NearObjectDeviceTest(uint64_t deviceId) :
         NearObjectDevice(deviceId)
-    {}
+    { }
 
     StartSessionResult
     StartSessionImpl(const NearObjectProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) override
     {
-        return { std::nullopt };   
+        return { std::nullopt };
     }
 };
 } // namespace test
 } // namespace service
 } // namespace nearobject
-
-namespace std
-{
-template <>
-struct equal_to<std::weak_ptr<nearobject::service::test::NearObjectDeviceTest>>
-{
-    bool operator()(const std::weak_ptr<nearobject::service::test::NearObjectDeviceTest>& lhs, const std::weak_ptr<nearobject::service::test::NearObjectDeviceTest>& rhs) const noexcept
-    {
-        return *(lhs.lock()) == *(rhs.lock());
-    }
-};
-} // namespace std
 
 TEST_CASE("near object device discovery agent can be created", "[basic][service]")
 {
@@ -117,11 +110,31 @@ TEST_CASE("near object device discovery agent can be created", "[basic][service]
         discoveryAgentTest.RegisterDiscoveryEventCallback([](auto&&, auto&&) {});
     }
 
+    SECTION("discovery event callback provides correct presence and device for added device")
+    {
+        const auto deviceToAdd = std::make_shared<test::NearObjectDeviceTest>(0x1);
+        discoveryAgentTest.RegisterDiscoveryEventCallback([&](auto&& presence, auto&& deviceAdded) {
+            REQUIRE(*deviceToAdd == *deviceAdded);
+            REQUIRE(presence == NearObjectDevicePresence::Arrived);
+        });
+        discoveryAgentTest.SignalDiscoveryEvent(NearObjectDevicePresence::Arrived, deviceToAdd);
+    }
+
+    SECTION("discovery event callback provides correct presence and device for removed device")
+    {
+        const auto deviceToRemove = std::make_shared<test::NearObjectDeviceTest>(0x1);
+        discoveryAgentTest.RegisterDiscoveryEventCallback([&](auto&& presence, auto&& deviceRemoved) {
+            REQUIRE(*deviceToRemove == *deviceRemoved);
+            REQUIRE(presence == NearObjectDevicePresence::Departed);
+        });
+        discoveryAgentTest.SignalDiscoveryEvent(NearObjectDevicePresence::Departed, deviceToRemove);
+    }
+
     SECTION("discovery probe promise is eventually completed")
     {
         static constexpr auto probeTimeout = 1ms;
 
-        std::vector<std::shared_ptr<NearObjectDevice>> probeDevices{
+        const std::vector<std::shared_ptr<NearObjectDevice>> probeDevices{
             std::make_shared<test::NearObjectDeviceTest>(0x1),
             std::make_shared<test::NearObjectDeviceTest>(0x2),
             std::make_shared<test::NearObjectDeviceTest>(0x3),
@@ -133,7 +146,9 @@ TEST_CASE("near object device discovery agent can be created", "[basic][service]
 
         // [test] Set the value of the promise, which will update the future shared state.
         discoveryAgentTest.ProbePromise.set_value({
-            probeDevices[0], probeDevices[1], probeDevices[2],    
+            probeDevices[0],
+            probeDevices[1],
+            probeDevices[2],
         });
 
         // Wait for the future to complete and get the result.
@@ -144,8 +159,7 @@ TEST_CASE("near object device discovery agent can be created", "[basic][service]
 
         // Verify the future provided the expected results.
         std::vector<std::shared_ptr<NearObjectDevice>> probeResultsStrong{};
-        std::transform(std::cbegin(probeResults), std::cend(probeResults), std::back_inserter(probeResultsStrong), [](auto& probeDevice)
-        {
+        std::transform(std::cbegin(probeResults), std::cend(probeResults), std::back_inserter(probeResultsStrong), [](auto& probeDevice) {
             return probeDevice.lock();
         });
 
