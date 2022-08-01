@@ -27,5 +27,11 @@ struct NearObjectDeviceDiscoveryAgentUwbTest :
 
 TEST_CASE("near object windows uwb device discovery agent can be created", "[basic][service][windows]")
 {
+    using namespace windows::nearobject::service;
 
+    test::NearObjectDeviceDiscoveryAgentUwbTest discoveryAgentTest{};
+
+    SECTION("creating an agent doesn't cause a crash when created")
+    {
+    }
 }
