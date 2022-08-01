@@ -10,7 +10,7 @@ std::vector<NearObjectProfile>
 NearObjectManager::FindAllConnectionProfiles() const
 {
     // TODO: proxy to service NearObjectProfileManager, or, use it directly
-    // here with an shared instance
+    // here with a shared instance
     return {};
 }
 
