@@ -26,19 +26,19 @@ TEST_CASE("near object manager apis don't cause a crash")
         const auto connectionProfiles = manager.FindAllConnectionProfiles();
     }
 
-    SECTION("EstablishConnection doesn't cause a crash with unknown profile")
+    SECTION("CreateSession doesn't cause a crash with unknown profile")
     {
         NearObjectManager manager{};
         const NearObjectProfile connectionProfile{};
-        const auto connectionResult = manager.EstablishConnection(connectionProfile);
+        const auto connectionResult = manager.CreateSession(connectionProfile);
     }
 
-    SECTION("EstablishConnection doesn't cause a crash with any known profile")
+    SECTION("CreateSession doesn't cause a crash with any known profile")
     {
         NearObjectManager manager{};
         const auto connectionProfiles = manager.FindAllConnectionProfiles();
         for (const auto& connectionProfile : connectionProfiles) {
-            const auto connectionResult = manager.EstablishConnection(connectionProfile);
+            const auto connectionResult = manager.CreateSession(connectionProfile);
         }
     }
 }

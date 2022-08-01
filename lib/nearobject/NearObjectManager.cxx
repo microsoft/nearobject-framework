@@ -1,5 +1,6 @@
 
 #include "NearObjectManager.hxx"
+#include <nearobject/service/NearObjectService.hxx>
 
 using namespace nearobject;
 
@@ -11,8 +12,8 @@ NearObjectManager::FindAllConnectionProfiles() const
     return {};
 }
 
-NearObjectManager::NearObjectConnectionResult
-NearObjectManager::EstablishConnection(const NearObjectProfile& connectionProfile)
+NearObjectManager::NearObjectCreateSessionResult
+NearObjectManager::CreateSession(const NearObjectProfile& connectionProfile)
 {
     // TODO: proxy to valid NearObjectDeviceManager
     return {};

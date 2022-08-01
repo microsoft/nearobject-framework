@@ -11,7 +11,7 @@ namespace nearobject
 {
 namespace service
 {
-class NearObjectService;
+struct NearObjectService;
 } // namespace service
 
 /**
@@ -20,18 +20,18 @@ class NearObjectService;
 class NearObjectManager
 {
 public:
-    struct NearObjectConnectionResult
+    struct NearObjectCreateSessionResult
     {
     };
 
     /**
-     * @brief Attempt to establish a near object connection using the specified profile.
+     * @brief Attempt to establish a near object session using the specified profile.
      *
      * @param connectionProfile
-     * @return NearObjectConnectionResult
+     * @return NearObjectCreateSessionResult
      */
-    NearObjectConnectionResult
-    EstablishConnection(const NearObjectProfile& connectionProfile);
+    NearObjectCreateSessionResult
+    CreateSession(const NearObjectProfile& connectionProfile);
 
     /**
      * @brief Find and enumerate all known profiles.
@@ -46,4 +46,4 @@ private:
 };
 } // namespace nearobject
 
-#endif //NEAR_OBJECT_MANAGER_HXX
+#endif // NEAR_OBJECT_MANAGER_HXX
