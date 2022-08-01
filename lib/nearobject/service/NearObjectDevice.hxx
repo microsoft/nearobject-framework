@@ -30,8 +30,6 @@ public:
     operator=(NearObjectDevice&) = delete;
     NearObjectDevice&
     operator=(NearObjectDevice&&) = delete;
-
-    NearObjectDevice() = default;
     virtual ~NearObjectDevice() = default;
 
     /**
