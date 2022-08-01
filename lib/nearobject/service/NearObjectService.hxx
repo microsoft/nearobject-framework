@@ -18,7 +18,8 @@ class NearObjectProfileManager;
  * their lifetime.
  */
 struct NearObjectService :
-    public std::enable_shared_from_this<NearObjectService> {
+    public std::enable_shared_from_this<NearObjectService>
+{
     /**
      * @brief Safely create an instance of the service.
      *

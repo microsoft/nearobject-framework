@@ -10,12 +10,13 @@ namespace fira
 {
 namespace uci
 {
-struct ControlMessage {
+struct ControlMessage
+{
 };
 
 } // namespace uci
 } // namespace fira
-} // namespace transport
+} // namespace protocol
 } // namespace nearobject
 
 #endif // __CONTROL_MESSAGE_HXX__

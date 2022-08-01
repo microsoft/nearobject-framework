@@ -10,12 +10,13 @@ namespace fira
 {
 namespace uci
 {
-struct ControlPacket {
+struct ControlPacket
+{
 };
 
 } // namespace uci
 } // namespace fira
-} // namespace transport
+} // namespace protocol
 } // namespace nearobject
 
 #endif // __CONTROL_PACKET_HXX__

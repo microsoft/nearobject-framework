@@ -14,7 +14,8 @@ namespace service
 namespace test
 {
 struct NearObjectDeviceDiscoveryAgentTest :
-    public NearObjectDeviceDiscoveryAgent {
+    public NearObjectDeviceDiscoveryAgent
+{
     virtual ~NearObjectDeviceDiscoveryAgentTest() = default;
 
     std::promise<std::vector<std::weak_ptr<NearObjectDevice>>> ProbePromise;
@@ -42,7 +43,8 @@ protected:
 };
 
 struct NearObjectDeviceTest :
-    public NearObjectDevice {
+    public NearObjectDevice
+{
     explicit NearObjectDeviceTest(uint64_t deviceId) :
         NearObjectDevice(deviceId)
     { }

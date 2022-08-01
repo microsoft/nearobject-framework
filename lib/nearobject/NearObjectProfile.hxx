@@ -21,7 +21,8 @@ enum class NearObjectConnectionScope {
  * @brief A collection of configuration that specifies how to connect to a near
  * object peer or set of peers.
  */
-struct NearObjectProfile {
+struct NearObjectProfile
+{
     /**
      * @brief The supported connection scope.
      *

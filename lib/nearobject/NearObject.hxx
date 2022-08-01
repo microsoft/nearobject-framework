@@ -10,11 +10,11 @@ namespace nearobject
 /**
  * @brief Describes the spatial properties of a near object. All property values
  * are relative to the hosting device.
- * 
+ *
  * TODO: Select and document coordinate system
  * TODO: Select and document units
  */
-struct NearObjectSpatialProperties 
+struct NearObjectSpatialProperties
 {
     std::optional<double> Distance;
     std::optional<double> AngleAzimuth;
@@ -33,19 +33,19 @@ class NearObject
 public:
     /**
      * @brief Retrieves the latest spatial properties for these near object.
-     * 
-     * @return NearObjectSpatialProperties 
+     *
+     * @return NearObjectSpatialProperties
      */
     NearObjectSpatialProperties
     GetSpatialProperties() const noexcept;
 
     /**
      * @brief Determines if the specified near object refers to the same entity
-     * as this near object. 
-     * 
+     * as this near object.
+     *
      * @param other
-     * @return true 
-     * @return false 
+     * @return true
+     * @return false
      */
     bool
     IsSame(const NearObject& other) const noexcept;

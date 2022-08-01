@@ -7,8 +7,8 @@
 using namespace nearobject::service;
 
 NearObjectDevice::NearObjectDevice(uint64_t deviceId) :
-    m_deviceId{ deviceId }
-{ }
+    m_deviceId{deviceId}
+{}
 
 uint64_t
 NearObjectDevice::Id() const noexcept
@@ -23,7 +23,7 @@ NearObjectDevice::StartSession(const NearObjectProfile& profile, std::weak_ptr<N
 
     // Store a weak_ptr to each active session for tracking purposes.
     if (result.Session.has_value()) {
-        const auto sessionsLock = std::scoped_lock{ m_sessionsGate };
+        const auto sessionsLock = std::scoped_lock{m_sessionsGate};
         m_sessions.push_back(result.Session.value());
     } else {
         // TODO: log error details

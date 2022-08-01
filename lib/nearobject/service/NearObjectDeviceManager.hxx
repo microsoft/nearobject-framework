@@ -29,16 +29,16 @@ class NearObjectDeviceManager :
 public:
     /**
      * @brief Safely create an instance of the device manager.
-     * 
-     * @return std::shared_ptr<NearObjectDeviceManager> 
+     *
+     * @return std::shared_ptr<NearObjectDeviceManager>
      */
     [[nodiscard]] static std::shared_ptr<NearObjectDeviceManager>
     Create();
 
     /**
      * @brief Get an instance of this device manager.
-     * 
-     * @return std::shared_ptr<NearObjectDeviceManager> 
+     *
+     * @return std::shared_ptr<NearObjectDeviceManager>
      */
     std::shared_ptr<NearObjectDeviceManager>
     GetInstance() noexcept;
@@ -86,11 +86,11 @@ protected:
 
 private:
     /**
-     * @brief Callback function for all device agent presence change events. 
-     * 
-     * @param discoveryAgent 
-     * @param presence 
-     * @param deviceChanged 
+     * @brief Callback function for all device agent presence change events.
+     *
+     * @param discoveryAgent
+     * @param presence
+     * @param deviceChanged
      */
     void
     OnDevicePresenceChanged(NearObjectDeviceDiscoveryAgent *discoveryAgent, NearObjectDevicePresence presence, std::shared_ptr<NearObjectDevice> deviceChanged);
@@ -105,8 +105,8 @@ private:
     AddDevice(std::shared_ptr<NearObjectDevice> nearObjectDevice);
 
     /**
-     * @brief Removes an existing device from use. 
-     * 
+     * @brief Removes an existing device from use.
+     *
      * @param nearObjectDevice The device to remove.
      */
     void

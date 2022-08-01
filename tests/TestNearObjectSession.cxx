@@ -19,7 +19,8 @@ static constexpr NearObjectCapabilities AllCapabilitiesSupported = {
 };
 
 struct NearObjectSessionEventCallbacksNoop :
-    public NearObjectSessionEventCallbacks {
+    public NearObjectSessionEventCallbacks
+{
     void
     OnNearObjectSessionEnded(NearObjectSession *) override
     { }
@@ -77,7 +78,7 @@ TEST_CASE("near object session capabilities are accurate", "[basic]")
 {
     using namespace nearobject;
 
-    const auto& capabilities = test::AllCapabilitiesSupported;
+    const auto &capabilities = test::AllCapabilitiesSupported;
 
     SECTION("capabilities match post-creation")
     {
@@ -127,7 +128,8 @@ TEST_CASE("near object event handlers can be registered", "[basic]")
     SECTION("callbacks provide the session pointer for which it was registered")
     {
         struct NearObjectSessionEventCallbacksCheckSessionPointer :
-            public NearObjectSessionEventCallbacks {
+            public NearObjectSessionEventCallbacks
+        {
             void
             OnNearObjectSessionEnded(NearObjectSession *session) override
             {

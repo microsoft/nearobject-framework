@@ -3,10 +3,11 @@
 #define __WINDOWS_DEVICE_SMARTCARD_HXX__
 
 #include <chrono>
+#include <future>
 #include <mutex>
 #include <optional>
-#include <future>
 #include <vector>
+
 
 #include <smartcard/SmartCard.hxx>
 
@@ -38,20 +39,23 @@ private:
     /**
      * @brief Asynchronously transmits a command apdu and provides a future for
      * the response.
-     * 
+     *
      * @param command The command apdu to send.
      * @param timeout The timeout period after which the tranmission should be canceled.
-     * @return smartcard::Smartcard::TransmitAsyncRequest 
+     * @return smartcard::Smartcard::TransmitAsyncRequest
      */
     smartcard::Smartcard::TransmitAsyncRequest
     TransmitAsyncImpl(const smartcard::ApduCommand& command, std::chrono::milliseconds timeout) override;
 
-    /**
-     * @brief Construct a new Complete Pending Transmission object
+    /**/**
+     * @brief 
      * 
-     * @param response 
      */
-    void CompletePendingTransmission(smartcard::ApduResponse response);
+     *
+     * @param response
+     */
+    void
+    CompletePendingTransmission(smartcard::ApduResponse response);
 
 private:
     // Mutex protecting resources for the pending transmission (tx), if any.

@@ -6,7 +6,8 @@ namespace nearobject
 {
 namespace service
 {
-struct SecureDeviceChannelParameters {
+struct SecureDeviceChannelParameters
+{
 };
 
 class SecureDeviceChannel

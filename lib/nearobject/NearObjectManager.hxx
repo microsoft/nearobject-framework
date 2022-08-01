@@ -20,22 +20,23 @@ class NearObjectService;
 class NearObjectManager
 {
 public:
-    struct NearObjectConnectionResult {
+    struct NearObjectConnectionResult
+    {
     };
 
     /**
-     * @brief Attempt to establish a near object connection using the specified profile. 
-     * 
-     * @param connectionProfile 
-     * @return NearObjectConnectionResult 
+     * @brief Attempt to establish a near object connection using the specified profile.
+     *
+     * @param connectionProfile
+     * @return NearObjectConnectionResult
      */
     NearObjectConnectionResult
     EstablishConnection(const NearObjectProfile& connectionProfile);
 
     /**
-     * @brief Find and enumerate all known profiles. 
-     * 
-     * @return std::vector<NearObjectProfile> 
+     * @brief Find and enumerate all known profiles.
+     *
+     * @return std::vector<NearObjectProfile>
      */
     std::vector<NearObjectProfile>
     FindAllConnectionProfiles() const;

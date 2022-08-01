@@ -15,12 +15,12 @@ class NearObject;
  * @brief Interface for receiving events from a NearObjectSession. This is the
  * primary method to receive information from a NearObject peer.
  */
-struct NearObjectSessionEventCallbacks {
+struct NearObjectSessionEventCallbacks
+{
     /**
      * @brief Destroy the Near Object Session Event Callbacks object
      */
-    virtual 
-    ~NearObjectSessionEventCallbacks() = default;
+    virtual ~NearObjectSessionEventCallbacks() = default;
 
     /**
      * @brief Invoked when the session is ended.

@@ -26,8 +26,10 @@ public:
     // Disable copy and move operations
     NearObjectDevice(NearObjectDevice&) = delete;
     NearObjectDevice(NearObjectDevice&&) = delete;
-    NearObjectDevice& operator=(NearObjectDevice&) = delete;
-    NearObjectDevice& operator=(NearObjectDevice&&) = delete;
+    NearObjectDevice&
+    operator=(NearObjectDevice&) = delete;
+    NearObjectDevice&
+    operator=(NearObjectDevice&&) = delete;
 
     NearObjectDevice() = default;
     virtual ~NearObjectDevice() = default;
@@ -42,7 +44,8 @@ public:
     /**
      * @brief Holds the result of the StartSession() function.
      */
-    struct StartSessionResult {
+    struct StartSessionResult
+    {
         std::optional<std::shared_ptr<NearObjectSession>> Session;
         // TODO: add error details when !Session
     };
@@ -58,9 +61,9 @@ public:
     StartSession(const NearObjectProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks);
 
     /**
-     * @brief Returns a value uniquely identifying this device. 
-     * 
-     * @return uint64_t 
+     * @brief Returns a value uniquely identifying this device.
+     *
+     * @return uint64_t
      */
     uint64_t
     Id() const noexcept;
@@ -89,17 +92,5 @@ operator==(const NearObjectDevice&, const NearObjectDevice&) noexcept;
 
 } // namespace service
 } // namespace nearobject
-
-// namespace std
-// {
-// template <>
-// struct equal_to<nearobject::service::NearObjectDevice>
-// {
-//     bool operator()(const nearobject::service::NearObjectDevice& lhs, const nearobject::service::NearObjectDevice& rhs) const
-//     {
-//         return lhs == rhs;
-//     }
-// };
-// } // namespace std
 
 #endif // _NEAR_OBJECT_DEVICE_HXX__

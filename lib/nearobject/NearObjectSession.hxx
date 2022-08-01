@@ -26,12 +26,14 @@ public:
      */
     NearObjectSession(NearObjectSession&) = delete;
     NearObjectSession(NearObjectSession&&) = delete;
-    NearObjectSession& operator=(NearObjectSession&) = delete;
-    NearObjectSession& operator=(NearObjectSession&&) = delete;
+    NearObjectSession&
+    operator=(NearObjectSession&) = delete;
+    NearObjectSession&
+    operator=(NearObjectSession&&) = delete;
 
     /**
      * @brief Construct a new Near Object Session object
-     * 
+     *
      * @param capabilities The capabilities supported by this session.
      * @param nearObjectPeers The initials peers involved in this session.
      * @param eventCallbacks The callbacks used to signal events from this session.
@@ -56,7 +58,8 @@ public:
     /**
      * @brief The result from starting a ranging session.
      */
-    struct StartRangingSessionResult {
+    struct StartRangingSessionResult
+    {
         RangingSessionStatus Status;
         // TODO: unique id?
     };
@@ -140,7 +143,8 @@ private:
     RangingSessionStatus
     CreateNewRangingSession();
 
-    struct RangingSession {
+    struct RangingSession
+    {
         RangingSession(std::function<void()> rangingDataUpdated) :
             RangingDataUpdated(rangingDataUpdated)
         { }
