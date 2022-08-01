@@ -18,6 +18,7 @@ target_include_directories(nearobject-service-windows
 target_link_libraries(nearobject-service-windows
     PRIVATE
         nearobject-service
+        windevuwb
 )
 
 set_target_properties(nearobject-service-windows PROPERTIES FOLDER windows/service)
