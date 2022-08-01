@@ -43,13 +43,15 @@ set(NOF_DIR_LIB ${CMAKE_CURRENT_LIST_DIR}/lib)
 set(NOF_DIR_LINUX ${CMAKE_CURRENT_LIST_DIR}/linux)
 set(NOF_DIR_WINDOWS ${CMAKE_CURRENT_LIST_DIR}/windows)
 
+# Conditional inclusion of OS-dependent source trees.
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  set(BUILD_FOR_LINUX TRUE)
+  add_subdirectory(linux)
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+  set(BUILD_FOR_WINDOWS TRUE)
+  add_subdirectory(windows)
+endif()
+
 add_subdirectory(lib)
 add_subdirectory(tests)
 add_subdirectory(tools)
-
-# Conditional inclusion of OS-dependent source trees.
-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  add_subdirectory(linux)
-elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  add_subdirectory(windows)
-endif()
