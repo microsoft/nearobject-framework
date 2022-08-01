@@ -1,10 +1,10 @@
 
 add_executable(nearobject-test-windows)
 
-target_link_libraries(nearobject-test-windows
+target_sources(nearobject-test-windows
     PRIVATE
-        Catch2::Catch2
-        nearobject
+        Main.cxx
+        TestNearObjectDeviceDiscoveryAgentUwb.cxx 
 )
 
 target_include_directories(nearobject-test-windows
@@ -12,9 +12,10 @@ target_include_directories(nearobject-test-windows
         ${NOF_DIR_LIB}
 )
 
-target_sources(nearobject-test-windows
+target_link_libraries(nearobject-test-windows
     PRIVATE
-        Main.cxx
+        Catch2::Catch2
+        nearobject-service-windows
 )
 
 catch_discover_tests(nearobject-test-windows)

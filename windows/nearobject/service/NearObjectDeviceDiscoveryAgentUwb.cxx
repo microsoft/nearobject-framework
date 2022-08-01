@@ -1,7 +1,8 @@
 
 #include "NearObjectDeviceDiscoveryAgentUwb.hxx"
-#include "UwbDevice.hxx"
+
 #include <nearobject/service/NearObjectDeviceUwb.hxx>
+#include <UwbDevice.hxx>
 
 using namespace windows::nearobject::service;
 using ::nearobject::service::NearObjectDevicePresence;

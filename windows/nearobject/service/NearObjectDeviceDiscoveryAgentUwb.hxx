@@ -4,8 +4,15 @@
 
 #include <memory>
 
-#include <nearobject/service/NearObjectDeviceUwb.hxx>
 #include <nearobject/service/NearObjectDeviceDiscoveryAgent.hxx>
+
+namespace nearobject
+{
+namespace service
+{
+class NearObjectDeviceUwb;
+} // namespace service
+} // namespace nearobject
 
 namespace windows
 {
