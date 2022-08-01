@@ -6,7 +6,7 @@ target_sources(nearobject-service-windows
         Main.cxx
         NearObjectDeviceDiscoveryAgentUwb.cxx
     PUBLIC
-        NearObjectDeviceDiscoveryAgentUwb.cxx
+        ${CMAKE_CURRENT_SOURCE_DIR}/NearObjectDeviceDiscoveryAgentUwb.cxx
 )
 
 target_include_directories(nearobject-service-windows
