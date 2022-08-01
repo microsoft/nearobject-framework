@@ -64,7 +64,7 @@ protected:
      *
      * @param injector The dependency injector for the service.
      */
-    NearObjectService(NearObjectServiceInjector&& injector);
+    explicit NearObjectService(NearObjectServiceInjector&& injector);
 };
 } // namespace service
 } // namespace nearobject
