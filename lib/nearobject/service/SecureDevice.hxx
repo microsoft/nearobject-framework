@@ -11,6 +11,8 @@ namespace service
 class SecureDevice
 {
 public:
+    virtual ~SecureDevice() = default;
+
     SecureDeviceChannel*
         CreateChannel(SecureDeviceChannelParameters);
 
