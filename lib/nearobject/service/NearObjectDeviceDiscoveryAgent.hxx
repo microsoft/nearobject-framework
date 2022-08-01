@@ -34,6 +34,11 @@ public:
     NearObjectDeviceDiscoveryAgent() = default;
 
     /**
+     * @brief Destroy the Near Object Device Discovery Agent object
+     */
+    virtual ~NearObjectDeviceDiscoveryAgent() = default;
+
+    /**
      * @brief Construct a new Near ObjectDeviceDiscoveryAgent object.
      *
      * @param onDevicePresenceChanged
