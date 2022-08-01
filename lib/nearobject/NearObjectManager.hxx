@@ -16,6 +16,9 @@ struct NearObjectService;
 
 /**
  * @brief Unified interface for interacting with near objects.
+ *
+ * TODO: If this facade really just wraps the NearObjectService class, is it
+ * really necessary?
  */
 class NearObjectManager
 {
