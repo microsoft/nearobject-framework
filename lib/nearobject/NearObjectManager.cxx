@@ -3,9 +3,6 @@
 
 using namespace nearobject;
 
-NearObjectManager::NearObjectManager()
-{}
-
 std::vector<NearObjectProfile>
 NearObjectManager::FindAllConnectionProfiles() const
 {

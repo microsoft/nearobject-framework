@@ -20,8 +20,6 @@ class NearObjectService;
 class NearObjectManager
 {
 public:
-    NearObjectManager();
-
     struct NearObjectConnectionResult {
     };
 
