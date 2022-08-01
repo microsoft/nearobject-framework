@@ -11,7 +11,7 @@ namespace nearobject
 namespace service
 {
 class NearObjectDeviceDiscoveryAgentUwb :
-    public NearObjectDeviceDiscoveryAgent
+    public ::nearobject::service::NearObjectDeviceDiscoveryAgent
 {
 };
 } // namespace service
