@@ -99,13 +99,13 @@ protected:
      * @brief Derived class implementation of discovery start.
      */
     virtual void
-    StartImpl() = 0;
+    StartImpl();
 
     /**
      * @brief Derived class implementation of discovery stop.
      */
     virtual void
-    StopImpl() = 0;
+    StopImpl();
 
     /**
      * @brief Derived class implementation of asynchronous discovery probe.
@@ -113,7 +113,7 @@ protected:
      * @return std::future<std::vector<std::weak_ptr<NearObjectDevice>>>
      */
     virtual std::future<std::vector<std::weak_ptr<NearObjectDevice>>>
-    ProbeAsyncImpl() = 0;
+    ProbeAsyncImpl();
 
 private:
     std::atomic<bool> m_started{ false };

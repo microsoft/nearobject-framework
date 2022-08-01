@@ -52,3 +52,19 @@ NearObjectDeviceDiscoveryAgent::ProbeAsync()
 {
     return ProbeAsyncImpl();
 }
+
+void
+NearObjectDeviceDiscoveryAgent::StartImpl()
+{}
+
+void
+NearObjectDeviceDiscoveryAgent::StopImpl()
+{}
+
+std::future<std::vector<std::weak_ptr<NearObjectDevice>>>
+NearObjectDeviceDiscoveryAgent::ProbeAsyncImpl()
+{
+    std::promise<std::vector<std::weak_ptr<NearObjectDevice>>> probePromise{};
+    probePromise.set_value({});
+    return probePromise.get_future();
+}
