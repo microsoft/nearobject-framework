@@ -114,9 +114,9 @@ private:
     std::atomic<bool> m_started{ false };
 
     mutable std::shared_mutex m_onDevicePresenceChangedGate;
-    std::function<void(NearObjectDevicePresence presence, std::shared_ptr<NearObjectDevice>& deviceChanged)> m_onDevicePresenceChanged;
+    std::function<void(NearObjectDevicePresence presence, std::shared_ptr<NearObjectDevice> deviceChanged)> m_onDevicePresenceChanged;
 };
 } // namespace service
 } // namespace nearobject
 
-#endif NEAR_OBJECT_DEVICE_DISCOVERY_AGENT_HXX
+#endif // NEAR_OBJECT_DEVICE_DISCOVERY_AGENT_HXX
