@@ -42,3 +42,7 @@ target_sources(nearobject-test
 )
 
 catch_discover_tests(nearobject-test)
+
+if (BUILD_FOR_WINDOWS)
+    add_subdirectory(windows)
+endif()

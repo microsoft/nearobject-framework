@@ -20,6 +20,8 @@ target_sources(nearobject
 target_include_directories(nearobject
     PRIVATE
         ${NOF_DIR_LIB}
+    INTERFACE
+        ${CMAKE_CURRENT_LIST_DIR}
 )
 
 target_link_libraries(nearobject

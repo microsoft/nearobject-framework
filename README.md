@@ -16,9 +16,6 @@ The coding style is dictated by both `.clang-format` and `.clang-tidy` files at 
 
 To help keep the code consistent, please follow these general guidelines:
 
-* **DO** use all lowercase for namespace names.
-* **DO** use PascalCase for class/struct names.
-* **DO** use camelCase for variable names.
 * **DO** use spaces instead of tabs.
 * **DON'T** prefix variable names to describe their type or scope.
 * **DO** use `std::filesystem` for storage and UNIX path separators (`/`) where possible.
