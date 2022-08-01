@@ -27,23 +27,24 @@ struct NearObjectCapabilities
     bool SupportsSecureDevice;
 
     /**
-     * @brief Supports creation of secure channels. 
+     * @brief Supports creation of secure channels.
      */
     bool SupportsSecureChannels;
 
     /**
      * @brief Implement equality using member-wise comparison.
-     * 
-     * @param other 
-     * @return true 
-     * @return false 
+     *
+     * @param other
+     * @return true
+     * @return false
      */
-    bool operator==(const NearObjectCapabilities& other) const noexcept
+    bool
+    operator==(const NearObjectCapabilities& other) const noexcept
     {
         return std::tie(this->SupportsRanging, this->SupportsPositioning, this->SupportsSecureDevice, this->SupportsSecureChannels)
             == std::tie(other.SupportsRanging, other.SupportsPositioning, other.SupportsSecureDevice, other.SupportsSecureChannels);
     }
 };
-}
+} // namespace nearobject
 
 #endif // __NEAR_OBJECT_CAPABILITIES_HXX__

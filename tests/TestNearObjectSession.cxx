@@ -23,23 +23,23 @@ struct NearObjectSessionEventCallbacksNoop :
 {
     void
     OnNearObjectSessionEnded(NearObjectSession *) override
-    { }
+    {}
 
     void
     OnNearObjectRangingSessionStarted(NearObjectSession *) override
-    { }
+    {}
 
     void
     OnNearObjectRangingSessionEnded(NearObjectSession *) override
-    { }
+    {}
 
     void
     OnNearObjectSessionNearObjectPropertiesChanged(NearObjectSession *, const std::vector<std::shared_ptr<NearObject>>) override
-    { }
+    {}
 
     void
     OnNearObjectSessionMembershipChanged(NearObjectSession *, const std::vector<std::shared_ptr<NearObject>>, const std::vector<std::shared_ptr<NearObject>>) override
-    { }
+    {}
 };
 
 } // namespace test

@@ -147,7 +147,7 @@ private:
     {
         RangingSession(std::function<void()> rangingDataUpdated) :
             RangingDataUpdated(rangingDataUpdated)
-        { }
+        {}
 
         std::function<void()> RangingDataUpdated;
     };

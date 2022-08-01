@@ -8,7 +8,6 @@
 #include <optional>
 #include <vector>
 
-
 #include <smartcard/SmartCard.hxx>
 
 namespace windows
@@ -47,11 +46,9 @@ private:
     smartcard::Smartcard::TransmitAsyncRequest
     TransmitAsyncImpl(const smartcard::ApduCommand& command, std::chrono::milliseconds timeout) override;
 
-    /**/**
+    /**
      * @brief 
      * 
-     */
-     *
      * @param response
      */
     void

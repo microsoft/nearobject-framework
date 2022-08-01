@@ -29,11 +29,11 @@ struct NearObjectDeviceDiscoveryAgentTest :
 protected:
     void
     StartImpl() override
-    { }
+    {}
 
     void
     StopImpl() override
-    { }
+    {}
 
     std::future<std::vector<std::weak_ptr<NearObjectDevice>>>
     ProbeAsyncImpl() override
@@ -47,7 +47,7 @@ struct NearObjectDeviceTest :
 {
     explicit NearObjectDeviceTest(uint64_t deviceId) :
         NearObjectDevice(deviceId)
-    { }
+    {}
 
     StartSessionResult
     StartSessionImpl(const NearObjectProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) override

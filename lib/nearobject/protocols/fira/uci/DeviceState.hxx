@@ -21,7 +21,7 @@ enum class DeviceState {
 
 } // namespace uci
 } // namespace fira
-} // namespace transport
+} // namespace protocol
 } // namespace nearobject
 
 #endif // __DEVICE_STATE_HXX__

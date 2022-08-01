@@ -22,7 +22,7 @@ enum class SessionState {
 
 } // namespace uci
 } // namespace fira
-} // namespace transport
+} // namespace protocol
 } // namespace nearobject
 
 #endif // __SESSION_STATE_HXX__

@@ -1,7 +1,7 @@
 
-#include "NearObjectProfileManager.hxx"
 #include "NearObjectService.hxx"
 #include "NearObjectDeviceManager.hxx"
+#include "NearObjectProfileManager.hxx"
 
 #include <notstd/memory.hxx>
 

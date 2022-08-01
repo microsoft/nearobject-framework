@@ -56,7 +56,7 @@ enum class StatusCode : uint8_t {
 
 } // namespace uci
 } // namespace fira
-} // namespace transport
+} // namespace protocol
 } // namespace nearobject
 
 #endif // __STATUS_CODES_HXX__

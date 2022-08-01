@@ -5,7 +5,7 @@ using namespace nearobject::service;
 
 NearObjectDeviceDiscoveryAgent::NearObjectDeviceDiscoveryAgent(std::function<void(NearObjectDevicePresence presence, const std::shared_ptr<NearObjectDevice> deviceChanged)> onDevicePresenceChanged) :
     m_onDevicePresenceChanged(std::move(onDevicePresenceChanged))
-{ }
+{}
 
 void
 NearObjectDeviceDiscoveryAgent::RegisterDiscoveryEventCallback(std::function<void(NearObjectDevicePresence presence, const std::shared_ptr<NearObjectDevice> deviceChanged)> onDevicePresenceChanged)

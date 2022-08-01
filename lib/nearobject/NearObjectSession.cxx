@@ -11,7 +11,7 @@ NearObjectSession::NearObjectSession(NearObjectCapabilities capabilities, const 
     Capabilities(capabilities),
     m_nearObjectPeers(nearObjectPeers),
     m_eventCallbacks(std::move(eventCallbacks))
-{ }
+{}
 
 NearObjectSession::~NearObjectSession()
 {
@@ -31,14 +31,13 @@ NearObjectSession::InvokeEventCallback(const std::function<void(NearObjectSessio
 
     executor(*eventCallbacks);
     return true;
-} 
+}
 
 bool
 NearObjectSession::AddNearObjectPeer(const std::shared_ptr<NearObject> nearObjectAdded)
 {
     const auto lock = std::scoped_lock{ m_nearObjectPeersGate };
-    const auto nearObjectAlreadyMember = std::any_of(std::cbegin(m_nearObjectPeers), std::cend(m_nearObjectPeers), [&](const auto nearObject)
-    {
+    const auto nearObjectAlreadyMember = std::any_of(std::cbegin(m_nearObjectPeers), std::cend(m_nearObjectPeers), [&](const auto nearObject) {
         return (*nearObject == *nearObjectAdded);
     });
 
@@ -47,7 +46,7 @@ NearObjectSession::AddNearObjectPeer(const std::shared_ptr<NearObject> nearObjec
     }
 
     m_nearObjectPeers.push_back(nearObjectAdded);
-    InvokeEventCallback([&](auto& eventCallbacks){
+    InvokeEventCallback([&](auto& eventCallbacks) {
         eventCallbacks.OnNearObjectSessionMembershipChanged(this, { nearObjectAdded }, {});
     });
 
@@ -58,8 +57,7 @@ bool
 NearObjectSession::RemoveNearObjectPeer(const std::shared_ptr<NearObject> nearObjectRemoved)
 {
     const auto nearObjectPeersLock = std::scoped_lock{ m_nearObjectPeersGate };
-    const auto nearObjectToRemove = std::find_if(std::cbegin(m_nearObjectPeers), std::cend(m_nearObjectPeers), [&](const auto& nearObject)
-    {
+    const auto nearObjectToRemove = std::find_if(std::cbegin(m_nearObjectPeers), std::cend(m_nearObjectPeers), [&](const auto& nearObject) {
         return (*nearObject == *nearObjectRemoved);
     });
 
@@ -70,7 +68,7 @@ NearObjectSession::RemoveNearObjectPeer(const std::shared_ptr<NearObject> nearOb
     // No need to take an extra ref since the function argument guarantees
     // its lifetime throughout this function.
     m_nearObjectPeers.erase(nearObjectToRemove);
-    InvokeEventCallback([&](auto& eventCallbacks){
+    InvokeEventCallback([&](auto& eventCallbacks) {
         eventCallbacks.OnNearObjectSessionMembershipChanged(this, {}, { nearObjectRemoved });
     });
 
@@ -93,7 +91,7 @@ NearObjectSession::EndSession()
 void
 NearObjectSession::NearObjectPropertiesChanged(const std::shared_ptr<NearObject> nearObjectChanged)
 {
-    InvokeEventCallback([&](auto& eventCallbacks){
+    InvokeEventCallback([&](auto& eventCallbacks) {
         eventCallbacks.OnNearObjectSessionNearObjectPropertiesChanged(this, { nearObjectChanged });
     });
 }
@@ -127,7 +125,7 @@ NearObjectSession::CreateNewRangingSession()
     // TODO: actually create new ranging session
     m_rangingSession = std::move(rangingSession);
 
-    InvokeEventCallback([&](auto& eventCallbacks){
+    InvokeEventCallback([&](auto& eventCallbacks) {
         eventCallbacks.OnNearObjectRangingSessionStarted(this);
     });
 
@@ -145,7 +143,7 @@ NearObjectSession::StopRangingSession()
     // TODO: signal to device to stop ranging
     m_rangingSession.reset();
 
-    InvokeEventCallback([&](auto& eventCallbacks){
+    InvokeEventCallback([&](auto& eventCallbacks) {
         eventCallbacks.OnNearObjectRangingSessionEnded(this);
     });
 }

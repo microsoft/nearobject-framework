@@ -51,10 +51,10 @@ public:
     RegisterDiscoveryEventCallback(std::function<void(NearObjectDevicePresence presence, std::shared_ptr<NearObjectDevice> deviceChanged)> onDevicePresenceChanged);
 
     /**
-     * @brief indicates the started/running state. 
-     * 
-     * @return true 
-     * @return false 
+     * @brief indicates the started/running state.
+     *
+     * @return true
+     * @return false
      */
     bool
     IsStarted() const noexcept;
@@ -72,9 +72,9 @@ public:
     Stop();
 
     /**
-     * @brief 
-     * 
-     * @return std::future<std::vector<std::weak_ptr<NearObjectDevice>>> 
+     * @brief
+     *
+     * @return std::future<std::vector<std::weak_ptr<NearObjectDevice>>>
      */
     std::future<std::vector<std::weak_ptr<NearObjectDevice>>>
     ProbeAsync();
@@ -91,7 +91,7 @@ protected:
 
 protected:
     /**
-     * @brief Derived class implementation of discovery start. 
+     * @brief Derived class implementation of discovery start.
      */
     virtual void
     StartImpl() = 0;
@@ -104,8 +104,8 @@ protected:
 
     /**
      * @brief Derived class implementation of asynchronous discovery probe.
-     * 
-     * @return std::future<std::vector<std::weak_ptr<NearObjectDevice>>> 
+     *
+     * @return std::future<std::vector<std::weak_ptr<NearObjectDevice>>>
      */
     virtual std::future<std::vector<std::weak_ptr<NearObjectDevice>>>
     ProbeAsyncImpl() = 0;

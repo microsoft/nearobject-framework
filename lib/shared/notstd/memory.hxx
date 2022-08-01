@@ -26,7 +26,7 @@ struct enable_make_protected : public T
     template<typename... TArgs>
     enable_make_protected(TArgs&&... args) :
         T(std::forward<TArgs>(args)...)
-    { }
+    {}
 };
 
 } // namespace notstd

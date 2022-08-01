@@ -58,9 +58,9 @@ NearObjectDeviceManager::GetDefaultDevice() const
 {
     const auto nearObjectDevicesLock = std::scoped_lock{ m_nearObjectDeviceGate };
 
-    return m_nearObjectDevices.empty() 
+    return m_nearObjectDevices.empty()
         ? nullptr
-        : m_nearObjectDevices.front(); 
+        : m_nearObjectDevices.front();
 }
 
 std::vector<std::weak_ptr<NearObjectDevice>>
@@ -69,8 +69,7 @@ NearObjectDeviceManager::GetAllDevices() const
     const auto nearObjectDevicesLock = std::scoped_lock{ m_nearObjectDeviceGate };
 
     std::vector<std::weak_ptr<NearObjectDevice>> nearObjectDevices{};
-    std::transform(std::cbegin(m_nearObjectDevices), std::cend(m_nearObjectDevices), std::back_inserter(nearObjectDevices), [](const auto& nearObjectDevice)
-    {
+    std::transform(std::cbegin(m_nearObjectDevices), std::cend(m_nearObjectDevices), std::back_inserter(nearObjectDevices), [](const auto& nearObjectDevice) {
         // Implicit conversion from std::shared_ptr to std::weak_ptr.
         return nearObjectDevice;
     });
@@ -83,10 +82,10 @@ NearObjectDeviceManager::AddDiscoveryAgent(std::unique_ptr<NearObjectDeviceDisco
 {
     using namespace std::chrono_literals;
 
-     // Use a weak_ptr below to ensure that the device object manager can
-     // be safely destroyed prior to the discovery agent. This allows the
-     // callback to be registered indefinitely, safely checking whether this
-     // instance is still valid upon each callback invocation.
+    // Use a weak_ptr below to ensure that the device object manager can
+    // be safely destroyed prior to the discovery agent. This allows the
+    // callback to be registered indefinitely, safely checking whether this
+    // instance is still valid upon each callback invocation.
     discoveryAgent->RegisterDiscoveryEventCallback([discoveryAgentPtr = discoveryAgent.get(), weakThis = std::weak_ptr<NearObjectDeviceManager>(GetInstance())](auto&& presence, auto&& deviceChanged) {
         if (auto strongThis = weakThis.lock()) {
             strongThis->OnDevicePresenceChanged(discoveryAgentPtr, presence, deviceChanged);
@@ -132,16 +131,16 @@ NearObjectDeviceManager::AddDiscoveryAgent(std::unique_ptr<NearObjectDeviceDisco
 }
 
 void
-NearObjectDeviceManager::OnDevicePresenceChanged(NearObjectDeviceDiscoveryAgent *discoveryAgent, NearObjectDevicePresence presence, std::shared_ptr<NearObjectDevice> deviceChanged)
+NearObjectDeviceManager::OnDevicePresenceChanged(NearObjectDeviceDiscoveryAgent* discoveryAgent, NearObjectDevicePresence presence, std::shared_ptr<NearObjectDevice> deviceChanged)
 {
     switch (presence) {
-    case NearObjectDevicePresence::Arrived:
-        AddDevice(std::move(deviceChanged));
-        break;
-    case NearObjectDevicePresence::Departed:
-        RemoveDevice(deviceChanged);
-        break;
-    default:
-        break;
+        case NearObjectDevicePresence::Arrived:
+            AddDevice(std::move(deviceChanged));
+            break;
+        case NearObjectDevicePresence::Departed:
+            RemoveDevice(deviceChanged);
+            break;
+        default:
+            break;
     }
 }
