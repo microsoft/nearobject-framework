@@ -8,7 +8,7 @@
 
 namespace nearobject
 {
-namespace service
+namespace discovery
 {
 class NearObjectDiscoverySource
 {
@@ -23,7 +23,7 @@ private:
     EstablishConnectionImpl() = 0;
 };
 
-} // namespace service
+} // namespace discovery
 } // namespace nearobject
 
 #endif // NEAR_OBJECT_DISCOVERY_SOURCE_HXX

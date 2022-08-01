@@ -1,7 +1,7 @@
 
 #include "NearObjectDiscoverySource.hxx"
 
-using namespace nearobject::service;
+using namespace nearobject::discovery;
 
 std::unique_ptr<NearObjectOobConnection>
 NearObjectDiscoverySource::EstablishConnection()

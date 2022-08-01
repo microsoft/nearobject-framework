@@ -1,7 +1,7 @@
 
 #include "NearObjectDiscoveryService.hxx"
 
-using namespace nearobject::service;
+using namespace nearobject::discovery;
 
 void
 NearObjectDiscoveryService::RegisterDiscoverySource(std::unique_ptr<NearObjectDiscoverySource> discoverySource)

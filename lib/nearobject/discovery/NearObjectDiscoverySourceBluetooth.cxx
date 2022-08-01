@@ -3,7 +3,7 @@
 
 #include <stdexcept>
 
-using namespace nearobject::service;
+using namespace nearobject::discovery;
 
 std::unique_ptr<NearObjectOobConnection>
 NearObjectDiscoverySourceBluetooth::EstablishConnectionImpl()

@@ -4,13 +4,13 @@
 
 namespace nearobject
 {
-namespace service
+namespace discovery
 {
 class NearObjectOobConnection
 {
 };
 
-} // namespace service
+} // namespace discovery
 } // namespace nearobject
 
 #endif // NEAR_OBJECT_OOB_CONNECTION_HXX

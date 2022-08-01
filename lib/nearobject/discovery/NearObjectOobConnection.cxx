@@ -1,4 +1,4 @@
 
 #include "NearObjectOobConnection.hxx"
 
-using namespace nearobject::service;
+using namespace nearobject::discovery;

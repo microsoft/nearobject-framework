@@ -6,7 +6,7 @@
 
 namespace nearobject
 {
-namespace service
+namespace discovery
 {
 class NearObjectDiscoverySourceBluetooth :
     public NearObjectDiscoverySource
@@ -16,7 +16,7 @@ public:
     EstablishConnectionImpl() override;
 };
 
-} // namespace service
+} // namespace discovery
 } // namespace nearobject
 
 #endif // NEAR_OBJECT_DISCOVERY_SOURCE_BLUETOOTH_HXX

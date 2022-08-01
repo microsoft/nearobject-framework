@@ -11,14 +11,6 @@ target_sources(nearobject-service
         NearObjectDeviceManager.hxx
         NearObjectDeviceUwb.cxx
         NearObjectDeviceUwb.hxx
-        NearObjectDiscoveryService.cxx
-        NearObjectDiscoveryService.hxx
-        NearObjectDiscoverySource.cxx
-        NearObjectDiscoverySource.hxx
-        NearObjectDiscoverySourceBluetooth.cxx
-        NearObjectDiscoverySourceBluetooth.hxx
-        NearObjectOobConnection.cxx
-        NearObjectOobConnection.hxx
         NearObjectProfileManager.cxx
         NearObjectProfileManager.hxx
         NearObjectService.cxx
