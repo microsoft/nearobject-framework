@@ -20,6 +20,8 @@ target_link_libraries(nearobject-test
     PRIVATE
         Catch2::Catch2
         nearobject
+        tlv
+        GSL
 )
 
 target_include_directories(nearobject-test
@@ -36,6 +38,7 @@ target_sources(nearobject-test
         TestNearObjectProfileManager.cxx
         TestNearObjectService.cxx
         TestNearObjectSession.cxx
+        TestTlvSimple.cxx
 )
 
 catch_discover_tests(nearobject-test)
