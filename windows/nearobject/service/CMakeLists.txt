@@ -1,5 +1,5 @@
 
-add_executable(nearobject-service-windows "")
+add_library(nearobject-service-windows STATIC "")
 
 target_sources(nearobject-service-windows
     PRIVATE
