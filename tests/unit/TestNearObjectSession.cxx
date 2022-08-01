@@ -18,7 +18,7 @@ static constexpr NearObjectCapabilities AllCapabilitiesSupported = {
     true, // SupportsSecureChannels
 };
 
-struct NearObjectSessionEventCallbacksNoop :
+struct NearObjectSessionEventCallbacksNoop final :
     public NearObjectSessionEventCallbacks
 {
     void
@@ -127,7 +127,7 @@ TEST_CASE("near object event handlers can be registered", "[basic]")
 
     SECTION("callbacks provide the session pointer for which it was registered")
     {
-        struct NearObjectSessionEventCallbacksCheckSessionPointer :
+        struct NearObjectSessionEventCallbacksCheckSessionPointer final :
             public NearObjectSessionEventCallbacks
         {
             void

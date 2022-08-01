@@ -18,7 +18,7 @@ namespace test
 struct NearObjectDeviceDiscoveryAgentUwbTest :
     public NearObjectDeviceDiscoveryAgentUwb
 {
-    virtual ~NearObjectDeviceDiscoveryAgentUwbTest() = default;
+    ~NearObjectDeviceDiscoveryAgentUwbTest() final = default;
 };
 } // namespace test
 } // namespace service

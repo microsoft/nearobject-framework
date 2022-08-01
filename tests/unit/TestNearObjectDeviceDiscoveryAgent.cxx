@@ -16,7 +16,7 @@ namespace test
 struct NearObjectDeviceDiscoveryAgentTest :
     public NearObjectDeviceDiscoveryAgent
 {
-    virtual ~NearObjectDeviceDiscoveryAgentTest() = default;
+    ~NearObjectDeviceDiscoveryAgentTest() final = default;
 
     std::promise<std::vector<std::weak_ptr<NearObjectDevice>>> ProbePromise;
 
