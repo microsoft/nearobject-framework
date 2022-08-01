@@ -4,6 +4,7 @@
 
 #include <memory>
 
+#include <nearobject/service/NearObjectDeviceUwb.hxx>
 #include <nearobject/service/NearObjectDeviceDiscoveryAgent.hxx>
 
 namespace windows
@@ -20,8 +21,11 @@ class NearObjectDeviceDiscoveryAgentUwb :
     public ::nearobject::service::NearObjectDeviceDiscoveryAgent
 {
 private:
+    std::shared_ptr<::nearobject::service::NearObjectDeviceUwb>
+    SignalDeviceAdded(std::unique_ptr<windows::devices::UwbDevice> uwbDevice) const noexcept;
+
     void
-    SignalDiscoveryEvent(::nearobject::service::NearObjectDevicePresence presence, std::unique_ptr<windows::devices::UwbDevice> uwbDevice) const noexcept;
+    SignalDeviceRemoved(std::shared_ptr<::nearobject::service::NearObjectDeviceUwb> nearObjectDeviceUwb) const noexcept;
 };
 } // namespace service
 } // namespace nearobject
