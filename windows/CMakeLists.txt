@@ -1,2 +1,2 @@
 add_subdirectory(devices)
-add_subdirectory(service)
+add_subdirectory(nearobject)
