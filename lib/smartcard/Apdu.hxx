@@ -1,6 +1,6 @@
 
-#ifndef __APDU_HXX__
-#define __APDU_HXX__
+#ifndef APDU_HXX
+#define APDU_HXX
 
 #include <cstddef>
 #include <cstdint>
@@ -48,4 +48,4 @@ public:
 
 } // namespace smartcard
 
-#endif // __APDU_HXX__
+#endif // APDU_HXX

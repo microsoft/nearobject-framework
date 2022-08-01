@@ -1,6 +1,6 @@
 
-#ifndef __STATUS_CODES_HXX__
-#define __STATUS_CODES_HXX__
+#ifndef STATUS_CODES_HXX
+#define STATUS_CODES_HXX
 
 #include <cstdint>
 
@@ -59,4 +59,4 @@ enum class StatusCode : uint8_t {
 } // namespace protocol
 } // namespace nearobject
 
-#endif // __STATUS_CODES_HXX__
+#endif // STATUS_CODES_HXX

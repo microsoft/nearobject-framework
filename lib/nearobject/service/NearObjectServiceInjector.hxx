@@ -1,6 +1,6 @@
 
-#ifndef __NEAR_OBJECT_SERVICE_INJECTOR_HXX__
-#define __NEAR_OBJECT_SERVICE_INJECTOR_HXX__
+#ifndef NEAR_OBJECT_SERVICE_INJECTOR_HXX
+#define NEAR_OBJECT_SERVICE_INJECTOR_HXX
 
 #include <memory>
 
@@ -22,4 +22,4 @@ struct NearObjectServiceInjector
 } // namespace service
 } // namespace nearobject
 
-#endif // __NEAR_OBJECT_SERVICE_INJECTOR_HXX__
+#endif // NEAR_OBJECT_SERVICE_INJECTOR_HXX

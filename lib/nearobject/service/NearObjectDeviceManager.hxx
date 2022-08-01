@@ -1,6 +1,6 @@
 
-#ifndef __DEVICE_MANAGER_HXX__
-#define __DEVICE_MANAGER_HXX__
+#ifndef DEVICE_MANAGER_HXX
+#define DEVICE_MANAGER_HXX
 
 #include <memory>
 #include <mutex>
@@ -123,4 +123,4 @@ private:
 } // namespace service
 } // namespace nearobject
 
-#endif // __DEVICE_MANAGER_HXX__
+#endif // DEVICE_MANAGER_HXX

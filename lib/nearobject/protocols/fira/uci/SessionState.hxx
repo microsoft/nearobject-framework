@@ -1,6 +1,6 @@
 
-#ifndef __SESSION_STATE_HXX__
-#define __SESSION_STATE_HXX__
+#ifndef SESSION_STATE_HXX
+#define SESSION_STATE_HXX
 
 namespace nearobject
 {
@@ -25,4 +25,4 @@ enum class SessionState {
 } // namespace protocol
 } // namespace nearobject
 
-#endif // __SESSION_STATE_HXX__
+#endif // SESSION_STATE_HXX

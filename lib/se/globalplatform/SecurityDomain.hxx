@@ -1,6 +1,6 @@
 
-#ifndef __SECURITY_DOMAIN_HXX__
-#define __SECURITY_DOMAIN_HXX__
+#ifndef SECURITY_DOMAIN_HXX
+#define SECURITY_DOMAIN_HXX
 
 namespace se
 {
@@ -13,4 +13,4 @@ class SecurityDomain
 } // namespace globalplatform
 } // namespace se
 
-#endif // __SECURITY_DOMAIN_HXX__
+#endif // SECURITY_DOMAIN_HXX

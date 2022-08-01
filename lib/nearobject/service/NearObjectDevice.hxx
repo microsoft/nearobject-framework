@@ -1,6 +1,6 @@
 
-#ifndef __NEAR_OBJECT_DEVICE_HXX__
-#define __NEAR_OBJECT_DEVICE_HXX__
+#ifndef NEAR_OBJECT_DEVICE_HXX
+#define NEAR_OBJECT_DEVICE_HXX
 
 #include <cstdint>
 #include <memory>
@@ -93,4 +93,4 @@ operator==(const NearObjectDevice&, const NearObjectDevice&) noexcept;
 } // namespace service
 } // namespace nearobject
 
-#endif // _NEAR_OBJECT_DEVICE_HXX__
+#endif // _NEAR_OBJECT_DEVICE_HXX

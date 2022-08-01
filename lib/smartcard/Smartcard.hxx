@@ -1,6 +1,6 @@
 
-#ifndef __SMARTCARD_HXX__
-#define __SMARTCARD_HXX__
+#ifndef SMARTCARD_HXX
+#define SMARTCARD_HXX
 
 #include <chrono>
 #include <future>
@@ -58,4 +58,4 @@ private:
 
 } // namespace smartcard
 
-#endif // __SMARTCARD_HXX__
+#endif // SMARTCARD_HXX

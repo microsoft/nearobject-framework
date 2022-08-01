@@ -1,6 +1,6 @@
 
-#ifndef __SERVICE_RUNTIME_HXX__
-#define __SERVICE_RUNTIME_HXX__
+#ifndef SERVICE_RUNTIME_HXX
+#define SERVICE_RUNTIME_HXX
 
 #include <condition_variable>
 #include <memory>
@@ -37,4 +37,4 @@ private:
 } // namespace service
 } // namespace nearobject
 
-#endif // __SERVICE_RUNTIME_HXX__
+#endif // SERVICE_RUNTIME_HXX

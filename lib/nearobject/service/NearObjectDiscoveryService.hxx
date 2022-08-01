@@ -1,6 +1,6 @@
 
-#ifndef __NEAR_OBJECT_DISCOVERY_SERVICE_HXX__
-#define __NEAR_OBJECT_DISCOVERY_SERVICE_HXX__
+#ifndef NEAR_OBJECT_DISCOVERY_SERVICE_HXX
+#define NEAR_OBJECT_DISCOVERY_SERVICE_HXX
 
 #include "NearObjectDiscoverySource.hxx"
 
@@ -25,4 +25,4 @@ private:
 } // namespace service
 } // namespace nearobject
 
-#endif // __NEAR_OBJECT_DISCOVERY_SERVICE_HXX__
+#endif // NEAR_OBJECT_DISCOVERY_SERVICE_HXX

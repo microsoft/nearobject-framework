@@ -1,6 +1,6 @@
 
-#ifndef __WINDOWS_DEVICE_UWB_HXX__
-#define __WINDOWS_DEVICE_UWB_HXX__
+#ifndef WINDOWS_DEVICE_UWB_HXX
+#define WINDOWS_DEVICE_UWB_HXX
 
 #include <uwb/UwbDevice.hxx>
 
@@ -21,4 +21,4 @@ class UwbDevice :
 } // namespace devices
 } // namespace windows
 
-#endif // __WINDOWS_DEVICE_UWB_HXX__
+#endif // WINDOWS_DEVICE_UWB_HXX

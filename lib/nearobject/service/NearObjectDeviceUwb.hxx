@@ -1,6 +1,6 @@
 
-#ifndef __NEAR_OBJECT_DEVICE_UWB_HXX__
-#define __NEAR_OBJECT_DEVICE_UWB_HXX__
+#ifndef NEAR_OBJECT_DEVICE_UWB_HXX
+#define NEAR_OBJECT_DEVICE_UWB_HXX
 
 #include <cstdint>
 #include <memory>
@@ -35,4 +35,4 @@ private:
 } // namespace service
 } // namespace nearobject
 
-#endif // _NEAR_OBJECT_DEVICE_UWB_HXX__
+#endif // _NEAR_OBJECT_DEVICE_UWB_HXX

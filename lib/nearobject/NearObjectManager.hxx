@@ -1,6 +1,6 @@
 
-#ifndef __NEAR_OBJECT_MANAGER_HXX__
-#define __NEAR_OBJECT_MANAGER_HXX__
+#ifndef NEAR_OBJECT_MANAGER_HXX
+#define NEAR_OBJECT_MANAGER_HXX
 
 #include <memory>
 #include <vector>
@@ -46,4 +46,4 @@ private:
 };
 } // namespace nearobject
 
-#endif //__NEAR_OBJECT_MANAGER_HXX__
+#endif //NEAR_OBJECT_MANAGER_HXX

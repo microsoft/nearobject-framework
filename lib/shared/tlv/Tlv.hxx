@@ -1,6 +1,6 @@
 
-#ifndef __TLV_HXX__
-#define __TLV_HXX__
+#ifndef TLV_HXX
+#define TLV_HXX
 
 #include <cstddef>
 #include <memory>
@@ -47,4 +47,4 @@ public:
 
 } // namespace encoding
 
-#endif // __TLV_HXX__
+#endif // TLV_HXX

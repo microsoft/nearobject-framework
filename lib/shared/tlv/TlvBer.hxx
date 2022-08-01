@@ -1,6 +1,6 @@
 
-#ifndef __TLV_BER_HXX__
-#define __TLV_BER_HXX__
+#ifndef TLV_BER_HXX
+#define TLV_BER_HXX
 
 #include "Tlv.hxx"
 
@@ -25,4 +25,4 @@ public:
 
 } // namespace encoding
 
-#endif // __TLV_BER_HXX__
+#endif // TLV_BER_HXX

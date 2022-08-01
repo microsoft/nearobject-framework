@@ -1,6 +1,6 @@
 
-#ifndef __SECURE_ELEMENT_CHANNEL_HXX__
-#define __SECURE_ELEMENT_CHANNEL_HXX__
+#ifndef SECURE_ELEMENT_CHANNEL_HXX
+#define SECURE_ELEMENT_CHANNEL_HXX
 
 #include <cstdint>
 
@@ -19,4 +19,4 @@ struct SecureElementChannel
 
 } // namespace se
 
-#endif // __SECURE_ELEMENT_CHANNEL_HXX__
+#endif // SECURE_ELEMENT_CHANNEL_HXX

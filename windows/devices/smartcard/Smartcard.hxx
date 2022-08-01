@@ -1,6 +1,6 @@
 
-#ifndef __WINDOWS_DEVICE_SMARTCARD_HXX__
-#define __WINDOWS_DEVICE_SMARTCARD_HXX__
+#ifndef WINDOWS_DEVICE_SMARTCARD_HXX
+#define WINDOWS_DEVICE_SMARTCARD_HXX
 
 #include <chrono>
 #include <future>
@@ -64,4 +64,4 @@ private:
 } // namespace devices
 } // namespace windows
 
-#endif // __WINDOWS_DEVICE_SMARTCARD_HXX__
+#endif // WINDOWS_DEVICE_SMARTCARD_HXX

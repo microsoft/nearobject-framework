@@ -1,6 +1,6 @@
 
-#ifndef __NOT_STD_MEMORY_HXX__
-#define __NOT_STD_MEMORY_HXX__
+#ifndef NOT_STD_MEMORY_HXX
+#define NOT_STD_MEMORY_HXX
 
 namespace notstd
 {
@@ -31,4 +31,4 @@ struct enable_make_protected : public T
 
 } // namespace notstd
 
-#endif //__NOT_STD_MEMORY_HXX__
+#endif //NOT_STD_MEMORY_HXX

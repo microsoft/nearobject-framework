@@ -1,6 +1,6 @@
 
-#ifndef __UWB_SESSION_HXX__
-#define __UWB_SESSION_HXX__
+#ifndef UWB_SESSION_HXX
+#define UWB_SESSION_HXX
 
 namespace uwb
 {
@@ -10,4 +10,4 @@ class UwbSession
 
 } // namespace uwb
 
-#endif // __UWB_SESSION_HXX__
+#endif // UWB_SESSION_HXX

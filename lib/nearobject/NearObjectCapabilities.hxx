@@ -1,6 +1,6 @@
 
-#ifndef __NEAR_OBJECT_CAPABILITIES_HXX__
-#define __NEAR_OBJECT_CAPABILITIES_HXX__
+#ifndef NEAR_OBJECT_CAPABILITIES_HXX
+#define NEAR_OBJECT_CAPABILITIES_HXX
 
 #include <tuple>
 
@@ -47,4 +47,4 @@ struct NearObjectCapabilities
 };
 } // namespace nearobject
 
-#endif // __NEAR_OBJECT_CAPABILITIES_HXX__
+#endif // NEAR_OBJECT_CAPABILITIES_HXX

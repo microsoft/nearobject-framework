@@ -1,6 +1,6 @@
 
-#ifndef __DEVICE_STATE_HXX__
-#define __DEVICE_STATE_HXX__
+#ifndef DEVICE_STATE_HXX
+#define DEVICE_STATE_HXX
 
 namespace nearobject
 {
@@ -24,4 +24,4 @@ enum class DeviceState {
 } // namespace protocol
 } // namespace nearobject
 
-#endif // __DEVICE_STATE_HXX__
+#endif // DEVICE_STATE_HXX

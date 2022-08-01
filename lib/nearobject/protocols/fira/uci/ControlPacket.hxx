@@ -1,6 +1,6 @@
 
-#ifndef __CONTROL_PACKET_HXX__
-#define __CONTROL_PACKET_HXX__
+#ifndef CONTROL_PACKET_HXX
+#define CONTROL_PACKET_HXX
 
 namespace nearobject
 {
@@ -19,4 +19,4 @@ struct ControlPacket
 } // namespace protocol
 } // namespace nearobject
 
-#endif // __CONTROL_PACKET_HXX__
+#endif // CONTROL_PACKET_HXX

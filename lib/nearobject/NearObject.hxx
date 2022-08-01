@@ -1,6 +1,6 @@
 
-#ifndef __NEAR_OBJECT_HXX__
-#define __NEAR_OBJECT_HXX__
+#ifndef NEAR_OBJECT_HXX
+#define NEAR_OBJECT_HXX
 
 #include <mutex>
 #include <optional>
@@ -60,4 +60,4 @@ operator==(const NearObject&, const NearObject&) noexcept;
 
 } // namespace nearobject
 
-#endif // __NEAR_OBJECT_HXX__
+#endif // NEAR_OBJECT_HXX

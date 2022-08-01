@@ -1,6 +1,6 @@
 
-#ifndef __NEAR_OBJECT_PROFILE_HXX__
-#define __NEAR_OBJECT_PROFILE_HXX__
+#ifndef NEAR_OBJECT_PROFILE_HXX
+#define NEAR_OBJECT_PROFILE_HXX
 
 #include <optional>
 
@@ -47,4 +47,4 @@ struct NearObjectProfile
 
 } // namespace nearobject
 
-#endif // __NEAR_OBJECT_PROFILE_HXX__
+#endif // NEAR_OBJECT_PROFILE_HXX

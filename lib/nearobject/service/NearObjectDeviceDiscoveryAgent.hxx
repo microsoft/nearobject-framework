@@ -1,6 +1,6 @@
 
-#ifndef __NEAR_OBJECT_DEVICE_DISCOVERY_AGENT_HXX__
-#define __NEAR_OBJECT_DEVICE_DISCOVERY_AGENT_HXX__
+#ifndef NEAR_OBJECT_DEVICE_DISCOVERY_AGENT_HXX
+#define NEAR_OBJECT_DEVICE_DISCOVERY_AGENT_HXX
 
 #include <atomic>
 #include <functional>
@@ -119,4 +119,4 @@ private:
 } // namespace service
 } // namespace nearobject
 
-#endif __NEAR_OBJECT_DEVICE_DISCOVERY_AGENT_HXX__
+#endif NEAR_OBJECT_DEVICE_DISCOVERY_AGENT_HXX

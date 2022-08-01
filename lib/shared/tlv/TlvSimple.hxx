@@ -1,6 +1,6 @@
 
-#ifndef __TLV_SIMPLE_HXX__
-#define __TLV_SIMPLE_HXX__
+#ifndef TLV_SIMPLE_HXX
+#define TLV_SIMPLE_HXX
 
 #include "Tlv.hxx"
 
@@ -38,4 +38,4 @@ public:
 
 } // namespace encoding
 
-#endif // __TLV_SIMPLE_HXX__
+#endif // TLV_SIMPLE_HXX

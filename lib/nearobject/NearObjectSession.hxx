@@ -1,6 +1,6 @@
 
-#ifndef __NEAR_OBJECT_SESSION_HXX__
-#define __NEAR_OBJECT_SESSION_HXX__
+#ifndef NEAR_OBJECT_SESSION_HXX
+#define NEAR_OBJECT_SESSION_HXX
 
 #include <functional>
 #include <memory>
@@ -167,4 +167,4 @@ private:
 
 } // namespace nearobject
 
-#endif // __NEAR_OBJECT_SESSION_HXX__
+#endif // NEAR_OBJECT_SESSION_HXX

@@ -1,6 +1,6 @@
 
-#ifndef __SECURE_DEVICE_CHANNEL_HXX__
-#define __SECURE_DEVICE_CHANNEL_HXX__
+#ifndef SECURE_DEVICE_CHANNEL_HXX
+#define SECURE_DEVICE_CHANNEL_HXX
 
 namespace nearobject
 {
@@ -17,4 +17,4 @@ class SecureDeviceChannel
 } // namespace service
 } // namespace nearobject
 
-#endif //__SECURE_DEVICE_CHANNEL_HXX__
+#endif //SECURE_DEVICE_CHANNEL_HXX

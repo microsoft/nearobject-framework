@@ -1,6 +1,6 @@
 
-#ifndef __NEAR_OBJECT_OOB_CONNECTION_HXX__
-#define __NEAR_OBJECT_OOB_CONNECTION_HXX__
+#ifndef NEAR_OBJECT_OOB_CONNECTION_HXX
+#define NEAR_OBJECT_OOB_CONNECTION_HXX
 
 namespace nearobject
 {
@@ -13,4 +13,4 @@ class NearObjectOobConnection
 } // namespace service
 } // namespace nearobject
 
-#endif // __NEAR_OBJECT_OOB_CONNECTION_HXX__
+#endif // NEAR_OBJECT_OOB_CONNECTION_HXX

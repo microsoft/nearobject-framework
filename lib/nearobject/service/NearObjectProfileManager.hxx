@@ -1,6 +1,6 @@
 
-#ifndef __NEAR_OBJECT_PROFILE_MANAGER_HXX__
-#define __NEAR_OBJECT_PROFILE_MANAGER_HXX__
+#ifndef NEAR_OBJECT_PROFILE_MANAGER_HXX
+#define NEAR_OBJECT_PROFILE_MANAGER_HXX
 
 #include <shared_mutex>
 #include <vector>
@@ -78,4 +78,4 @@ private:
 } // namespace service
 } // namespace nearobject
 
-#endif // __NEAR_OBJECT_PROFILE_MANAGER_HXX__
+#endif // NEAR_OBJECT_PROFILE_MANAGER_HXX

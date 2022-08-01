@@ -1,6 +1,6 @@
 
-#ifndef __SECURE_DEVICE_HXX__
-#define __SECURE_DEVICE_HXX__
+#ifndef SECURE_DEVICE_HXX
+#define SECURE_DEVICE_HXX
 
 #include "SecureDeviceChannel.hxx"
 
@@ -24,4 +24,4 @@ private:
 } // namespace service
 } // namespace nearobject
 
-#endif //__SECURE_DEVICE_HXX__
+#endif //SECURE_DEVICE_HXX

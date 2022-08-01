@@ -1,6 +1,6 @@
 
-#ifndef __CONTROL_MESSAGE_HXX__
-#define __CONTROL_MESSAGE_HXX__
+#ifndef CONTROL_MESSAGE_HXX
+#define CONTROL_MESSAGE_HXX
 
 namespace nearobject
 {
@@ -19,4 +19,4 @@ struct ControlMessage
 } // namespace protocol
 } // namespace nearobject
 
-#endif // __CONTROL_MESSAGE_HXX__
+#endif // CONTROL_MESSAGE_HXX

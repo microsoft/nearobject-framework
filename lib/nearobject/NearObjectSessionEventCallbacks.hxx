@@ -1,6 +1,6 @@
 
-#ifndef __NEAR_OBJECT_SESSION_EVENT_CALLBACKS_HXX__
-#define __NEAR_OBJECT_SESSION_EVENT_CALLBACKS_HXX__
+#ifndef NEAR_OBJECT_SESSION_EVENT_CALLBACKS_HXX
+#define NEAR_OBJECT_SESSION_EVENT_CALLBACKS_HXX
 
 #include <memory>
 #include <vector>
@@ -70,4 +70,4 @@ struct NearObjectSessionEventCallbacks
 };
 } // namespace nearobject
 
-#endif //  __NEAR_OBJECT_SESSION_EVENT_CALLBACKS_HXX__
+#endif //  NEAR_OBJECT_SESSION_EVENT_CALLBACKS_HXX

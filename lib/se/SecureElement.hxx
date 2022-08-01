@@ -1,6 +1,6 @@
 
-#ifndef __SECURE_ELEMENT_HXX__
-#define __SECURE_ELEMENT_HXX__
+#ifndef SECURE_ELEMENT_HXX
+#define SECURE_ELEMENT_HXX
 
 #include "SecureElementChannel.hxx"
 
@@ -16,4 +16,4 @@ class SecureElement
 
 } // namespace se
 
-#endif // __SECURE_ELEMENT_HXX__
+#endif // SECURE_ELEMENT_HXX

@@ -1,6 +1,6 @@
 
-#ifndef __FIRA_DEVICE_HXX__
-#define __FIRA_DEVICE_HXX__
+#ifndef FIRA_DEVICE_HXX
+#define FIRA_DEVICE_HXX
 
 namespace nearobject
 {
@@ -85,4 +85,4 @@ enum class BlockBasedMode {
 } // namespace protocol
 } // namespace nearobject
 
-#endif // __FIRA_DEVICE_HXX__
+#endif // FIRA_DEVICE_HXX

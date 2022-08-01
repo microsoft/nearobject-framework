@@ -1,6 +1,6 @@
 
-#ifndef __UWB_RANGING_SESSION_HXX__
-#define __UWB_RANGING_SESSION_HXX__
+#ifndef UWB_RANGING_SESSION_HXX
+#define UWB_RANGING_SESSION_HXX
 
 namespace uwb
 {
@@ -10,4 +10,4 @@ class UwbRangingSession
 
 } // namespace uwb
 
-#endif // __UWB_RANGING_SESSION_HXX__
+#endif // UWB_RANGING_SESSION_HXX
