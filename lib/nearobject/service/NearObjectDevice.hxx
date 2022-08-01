@@ -80,7 +80,6 @@ private:
 private:
     const uint64_t m_deviceId;
 
-protected:
     std::mutex m_sessionsGate;
     std::vector<std::weak_ptr<NearObjectSession>> m_sessions{};
 };
