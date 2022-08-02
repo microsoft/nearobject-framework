@@ -4,15 +4,29 @@
 #include <string>
 #include <vector>
 
+/**
+* @brief Convert a string to a byte vector
+*
+* @param str 
+* @return std::vector<std::byte>
+*/
+std::vector<std::byte>
+StringToByteVector(const std::string &str) noexcept
+{
+    std::vector<std::byte> vec(str.size());
+    std::transform(std::cbegin(str), std::cend(str), std::begin(vec), [](auto &&element) {
+        return std::byte(element);
+    });
+
+    return vec;
+}
+
 TEST_CASE("TlvSimple object can be created properly from the Parse function", "[basic][infra]")
 {
     SECTION("creating a TlvSimple from no data works as expected")
     {
         std::string mystr("");
-        std::vector<std::byte> mydataSmall(mystr.size());
-        for (std::size_t i = 0; i < mystr.size(); i++) {
-            mydataSmall[i] = std::byte{ (unsigned char)mystr[i] };
-        }
+        std::vector<std::byte> mydataSmall = StringToByteVector(mystr);
 
         // create the vector for the packet
         std::byte tag{ 0x3 };
@@ -33,17 +47,13 @@ TEST_CASE("TlvSimple object can be created properly from the Parse function", "[
         REQUIRE(tlvparsed->Tag.size() == 1);
         REQUIRE(tlvparsed->Tag[0] == tag);
         REQUIRE(tlvparsed->Value.size() == std::size_t(length));
-        for (std::size_t i = 0; i < std::size_t(length); i++)
-            REQUIRE((tlvparsed->Value[i] == mydataSmall[i]));
+        REQUIRE(std::equal(std::cbegin(tlvparsed->Value), std::cend(tlvparsed->Value), std::cbegin(mydataSmall)));
     }
 
     SECTION("creating a TlvSimple from a small amount of data works as expected")
     {
         std::string mystr("hellothisisbob");
-        std::vector<std::byte> mydataSmall(mystr.size());
-        for (std::size_t i = 0; i < mystr.size(); i++) {
-            mydataSmall[i] = std::byte{ (unsigned char)mystr[i] };
-        }
+        std::vector<std::byte> mydataSmall = StringToByteVector(mystr);
 
         // create the vector for the packet
         std::byte tag{ 0x3 };
@@ -64,17 +74,13 @@ TEST_CASE("TlvSimple object can be created properly from the Parse function", "[
         REQUIRE(tlvparsed->Tag.size() == 1);
         REQUIRE(tlvparsed->Tag[0] == tag);
         REQUIRE(tlvparsed->Value.size() == std::size_t(length));
-        for (std::size_t i = 0; i < std::size_t(length); i++)
-            REQUIRE((tlvparsed->Value[i] == mydataSmall[i]));
+        REQUIRE(std::equal(std::cbegin(tlvparsed->Value), std::cend(tlvparsed->Value), std::cbegin(mydataSmall)));
     }
 
     SECTION("creating a TlvSimple from a incorrect small amount of data fails as expected")
     {
         std::string mystr("hellothisisbob");
-        std::vector<std::byte> mydataSmall(mystr.size());
-        for (std::size_t i = 0; i < mystr.size(); i++) {
-            mydataSmall[i] = std::byte{ (unsigned char)mystr[i] };
-        }
+        std::vector<std::byte> mydataSmall = StringToByteVector(mystr);
 
         // create the vector for the packet
         std::byte tag{ 0x3 };
@@ -116,8 +122,7 @@ TEST_CASE("TlvSimple object can be created properly from the Parse function", "[
         REQUIRE(tlvparsed->Tag.size() == 1);
         REQUIRE(tlvparsed->Tag[0] == tag);
         REQUIRE(tlvparsed->Value.size() == length);
-        for (std::size_t i = 0; i < length; i++)
-            REQUIRE((tlvparsed->Value[i] == mydata[i]));
+        REQUIRE(std::equal(std::cbegin(tlvparsed->Value), std::cend(tlvparsed->Value), std::cbegin(mydata)));
     }
 
     SECTION("creating a TlvSimple from a incorrect large amount of data fails as expected")
