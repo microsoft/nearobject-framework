@@ -7,7 +7,7 @@ TEST_CASE("TlvSimple object can be created properly from the Parse function", "[
 {
     SECTION("creating a TlvSimple from no data works as expected")
     {
-        std::string mystr("hellothisisbob");
+        std::string mystr("");
         std::vector<std::byte> mydata_small(mystr.size());
         for (std::size_t i = 0; i < mystr.size(); i++) {
             mydata_small[i] = std::byte{ (unsigned char)mystr[i] };

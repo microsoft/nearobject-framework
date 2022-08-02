@@ -36,8 +36,9 @@ TlvSimple::Parse(TlvSimple **tlvOutput, const gsl::span<std::byte> &data)
         length = (uint8_t)data[2];
         length <<= 8;
         length |= (uint8_t)data[3];
-    }
-    if (datasize != TlvSimple::ThreeByteLengthMinimumSize + length)
+        if (datasize != TlvSimple::ThreeByteLengthMinimumSize + length)
+            return parseResult;
+    } else if (datasize != TlvSimple::OneByteLengthMinimumSize + length)
         return parseResult;
     auto tmpspan = data.last(length);
     value.assign(std::cbegin(tmpspan), std::cend(tmpspan));
