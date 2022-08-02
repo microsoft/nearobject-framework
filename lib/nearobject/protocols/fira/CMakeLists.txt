@@ -4,7 +4,7 @@ target_sources(nearobject-proto-fira
     PRIVATE
         FiraDevice.cxx
     PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/FiraDevice.hxx
+        ${CMAKE_CURRENT_LIST_DIR}/FiraDevice.hxx
 )
 
 target_link_libraries(nearobject-proto-fira
