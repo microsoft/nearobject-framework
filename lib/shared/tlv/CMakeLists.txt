@@ -3,8 +3,8 @@ add_library(tlv STATIC "")
 
 target_sources(tlv
     PRIVATE
-        TlvSimple.cxx
         TlvBer.cxx
+        TlvSimple.cxx
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/Tlv.hxx
         ${CMAKE_CURRENT_LIST_DIR}/TlvBer.hxx

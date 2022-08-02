@@ -1,5 +1,5 @@
 add_subdirectory(nearobject)
 add_subdirectory(se)
+add_subdirectory(shared)
 add_subdirectory(smartcard)
 add_subdirectory(uwb)
-add_subdirectory(shared)
