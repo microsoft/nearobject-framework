@@ -77,12 +77,61 @@ TEST_CASE("TlvSimple object can be created properly from the Parse function", "[
 
         // create the vector for the packet
         std::byte tag{ 0x3 };
-        std::byte length{ uint8_t(mydata_small.size()+1)};
+        std::byte length{ uint8_t(mydata_small.size() + 1) };
         std::vector<std::byte> packet;
 
         packet.insert(packet.end(), tag);
         packet.insert(packet.end(), length);
         packet.insert(packet.end(), mydata_small.begin(), mydata_small.end());
+
+        // try to parse
+        encoding::TlvSimple *tlvparsed = nullptr;
+        auto result = encoding::TlvSimple::Parse(&tlvparsed, packet);
+        REQUIRE(result == encoding::Tlv::ParseResult::Failed);
+    }
+
+    SECTION("creating a TlvSimple from a large amount of data succeeds as expected")
+    {
+        std::size_t length(0x100);
+        std::vector<std::byte> mydata(length);
+
+        // create the vector for the packet
+        std::byte tag{ 0x3 };
+        std::vector<std::byte> packet;
+
+        packet.insert(packet.end(), tag);
+        packet.insert(packet.end(), std::byte{ encoding::TlvSimple::ThreeByteLengthIndicatorValue });
+        packet.insert(packet.end(), std::byte{ 0x01 });
+        packet.insert(packet.end(), std::byte{ 0x00 });
+        packet.insert(packet.end(), mydata.begin(), mydata.end());
+
+        // try to parse
+        encoding::TlvSimple *tlvparsed = nullptr;
+        auto result = encoding::TlvSimple::Parse(&tlvparsed, packet);
+        REQUIRE(result == encoding::Tlv::ParseResult::Succeeded);
+
+        // check that it parsed correctly
+        REQUIRE(tlvparsed != nullptr);
+        REQUIRE(tlvparsed->Tag.size() == 1);
+        REQUIRE(tlvparsed->Tag[0] == tag);
+        REQUIRE(tlvparsed->Value.size() == length);
+        for (std::size_t i = 0; i < length; i++)
+            REQUIRE((tlvparsed->Value[i] == mydata[i]));
+    }
+
+    SECTION("creating a TlvSimple from a incorrect large amount of data fails as expected")
+    {
+        std::size_t length(0x100);
+        std::vector<std::byte> mydata(length);
+
+        // create the vector for the packet
+        std::byte tag{ 0x3 };
+        std::vector<std::byte> packet;
+
+        packet.insert(packet.end(), tag);
+        packet.insert(packet.end(), std::byte{ encoding::TlvSimple::ThreeByteLengthIndicatorValue });
+        packet.insert(packet.end(), std::byte{ 0x01 });
+        packet.insert(packet.end(), mydata.begin(), mydata.end());
 
         // try to parse
         encoding::TlvSimple *tlvparsed = nullptr;
