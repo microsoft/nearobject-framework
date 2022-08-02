@@ -23,13 +23,13 @@ To help keep the code consistent, please follow these general guidelines:
 
 | Block | Style | Example |
 | ----- | ----- | -------- |
-| Types | PascalCase | `struct` **`NearObject`** `{};` |
-| Functions | PascalCase | `NearObject` **`GetNearObjectPeer()`** |
-| Variables | camelCase | `NearObject` **`nearObject`**`;` |
-| Parameters | camelCase | `void registerEventCallback(NearObjectEventCallback&` **`eventCallback`**`)` |
-| Namespaces | lowercase | `namespace` **`nearobject`** |
-| Public Members | PascalCase | `struct NearObject { NearObjectProperties` **`Properties`**`; }` |
-| Private Members | camelCase with `m_` prefix | `class NearObjectSession { uint64_t` **`m_sessionId`**`; }` |
+| Types | PascalCase | `struct NearObject {};` |
+| Functions | PascalCase | `NearObject GetNearObjectPeer()` |
+| Variables | camelCase | `NearObject nearObject;` |
+| Parameters | camelCase | `void registerEventCallback(NearObjectEventCallback& eventCallback)` |
+| Namespaces | lowercase | `namespace nearobject` |
+| Public Members | PascalCase | `struct NearObject { NearObjectProperties Properties; }` |
+| Private Members | camelCase with `m_` prefix | `class NearObjectSession { uint64_t m_sessionId; }` |
 
 ## Development Environment Setup
 
