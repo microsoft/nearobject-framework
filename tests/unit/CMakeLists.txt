@@ -21,7 +21,6 @@ target_link_libraries(nearobject-test
         Catch2::Catch2
         nearobject
         tlv
-        GSL
 )
 
 target_include_directories(nearobject-test
