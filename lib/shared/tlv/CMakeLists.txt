@@ -2,13 +2,13 @@
 add_library(tlv STATIC "")
 
 target_sources(tlv
-    PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/Tlv.hxx
-        ${CMAKE_CURRENT_SOURCE_DIR}/TlvBer.hxx
-        ${CMAKE_CURRENT_SOURCE_DIR}/TlvSimple.hxx
     PRIVATE
         TlvSimple.cxx
         TlvBer.cxx
+    PUBLIC
+        ${CMAKE_CURRENT_LIST_DIR}/Tlv.hxx
+        ${CMAKE_CURRENT_LIST_DIR}/TlvBer.hxx
+        ${CMAKE_CURRENT_LIST_DIR}/TlvSimple.hxx
 )
 
 target_link_libraries(tlv
