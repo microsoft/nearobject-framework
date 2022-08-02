@@ -31,8 +31,8 @@ target_include_directories(nearobject-service
 
 target_link_libraries(nearobject-service
     PRIVATE
-        Threads::Threads
         nearobject
+        Threads::Threads
         uwb
 )
 

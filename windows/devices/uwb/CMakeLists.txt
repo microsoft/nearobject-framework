@@ -5,7 +5,7 @@ target_sources(windevuwb
     PRIVATE
         UwbDevice.cxx
     PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/UwbDevice.hxx
+        ${CMAKE_CURRENT_LIST_DIR}/UwbDevice.hxx
 )
 
 target_include_directories(windevuwb
