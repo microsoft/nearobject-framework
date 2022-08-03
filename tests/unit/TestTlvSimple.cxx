@@ -33,8 +33,8 @@ TEST_CASE("TlvSimple object can be created properly from the Parse function", "[
         std::byte length{ 0 };
         std::vector<std::byte> packet;
 
-        packet.insert(packet.end(), tag);
-        packet.insert(packet.end(), length);
+        packet.insert(std::cend(packet), tag);
+        packet.insert(std::cend(packet), length);
         packet.insert(std::cend(packet), std::cbegin(mydataSmall), std::cend(mydataSmall));
 
         // try to parse
@@ -60,8 +60,8 @@ TEST_CASE("TlvSimple object can be created properly from the Parse function", "[
         std::byte length{ uint8_t(mydataSmall.size()) };
         std::vector<std::byte> packet;
 
-        packet.insert(packet.end(), tag);
-        packet.insert(packet.end(), length);
+        packet.insert(std::cend(packet), tag);
+        packet.insert(std::cend(packet), length);
         packet.insert(std::cend(packet), std::cbegin(mydataSmall), std::cend(mydataSmall));
 
         // try to parse
@@ -87,8 +87,8 @@ TEST_CASE("TlvSimple object can be created properly from the Parse function", "[
         std::byte length{ uint8_t(mydataSmall.size() + 1) };
         std::vector<std::byte> packet;
 
-        packet.insert(packet.end(), tag);
-        packet.insert(packet.end(), length);
+        packet.insert(std::cend(packet), tag);
+        packet.insert(std::cend(packet), length);
         packet.insert(std::cend(packet), std::cbegin(mydataSmall), std::cend(mydataSmall));
 
         // try to parse
@@ -106,11 +106,11 @@ TEST_CASE("TlvSimple object can be created properly from the Parse function", "[
         std::byte tag{ 0x3 };
         std::vector<std::byte> packet;
 
-        packet.insert(packet.end(), tag);
-        packet.insert(packet.end(), std::byte{ encoding::TlvSimple::ThreeByteLengthIndicatorValue });
-        packet.insert(packet.end(), std::byte{ 0x01 });
-        packet.insert(packet.end(), std::byte{ 0x00 });
-        packet.insert(packet.end(), mydata.begin(), mydata.end());
+        packet.insert(std::cend(packet), tag);
+        packet.insert(std::cend(packet), std::byte{ encoding::TlvSimple::ThreeByteLengthIndicatorValue });
+        packet.insert(std::cend(packet), std::byte{ 0x01 });
+        packet.insert(std::cend(packet), std::byte{ 0x00 });
+        packet.insert(std::cend(packet), std::cbegin(mydata), std::cend(mydata));
 
         // try to parse
         encoding::TlvSimple *tlvparsed = nullptr;
@@ -134,10 +134,10 @@ TEST_CASE("TlvSimple object can be created properly from the Parse function", "[
         std::byte tag{ 0x3 };
         std::vector<std::byte> packet;
 
-        packet.insert(packet.end(), tag);
-        packet.insert(packet.end(), std::byte{ encoding::TlvSimple::ThreeByteLengthIndicatorValue });
-        packet.insert(packet.end(), std::byte{ 0x01 });
-        packet.insert(packet.end(), mydata.begin(), mydata.end());
+        packet.insert(std::cend(packet), tag);
+        packet.insert(std::cend(packet), std::byte{ encoding::TlvSimple::ThreeByteLengthIndicatorValue });
+        packet.insert(std::cend(packet), std::byte{ 0x01 });
+        packet.insert(std::cend(packet), std::cbegin(mydata), std::cend(mydata));
 
         // try to parse
         encoding::TlvSimple *tlvparsed = nullptr;
