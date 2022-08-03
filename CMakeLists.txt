@@ -48,6 +48,24 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
   set(BUILD_FOR_LINUX TRUE)
   add_subdirectory(linux)
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+  # Make public version of wil available.
+  set(WIL_BUILD_TESTS OFF CACHE INTERNAL "Turn off wil tests")
+  set(WIL_BUILD_PACKAGING OFF CACHE INTERNAL "Turn off wil packaging")
+
+  FetchContent_Declare(WIL
+      GIT_REPOSITORY "https://github.com/microsoft/wil"
+      GIT_TAG "5eb59d60e167482639cc47ffb40442158da7fd04"
+      GIT_SHALLOW OFF
+  )
+  FetchContent_MakeAvailable(WIL)
+
+  # Add Windows-specific global compile definitions.
+  add_compile_definitions(
+      UNICODE
+      NOMINMAX
+      WIN32_LEAN_AND_MEAN
+  )
+
   set(BUILD_FOR_WINDOWS TRUE)
   add_subdirectory(windows)
 endif()
