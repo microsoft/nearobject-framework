@@ -18,7 +18,7 @@ struct NearObjectDeviceDiscoveryAgentTest :
 {
     ~NearObjectDeviceDiscoveryAgentTest() final = default;
 
-    std::promise<std::vector<std::weak_ptr<NearObjectDevice>>> ProbePromise;
+    std::promise<std::vector<std::shared_ptr<NearObjectDevice>>> ProbePromise;
 
     void
     SignalDiscoveryEvent(NearObjectDevicePresence presence, std::shared_ptr<NearObjectDevice> deviceChanged)
@@ -35,7 +35,7 @@ protected:
     StopImpl() override
     {}
 
-    std::future<std::vector<std::weak_ptr<NearObjectDevice>>>
+    std::future<std::vector<std::shared_ptr<NearObjectDevice>>>
     ProbeAsyncImpl() override
     {
         return ProbePromise.get_future();
@@ -158,14 +158,6 @@ TEST_CASE("near object device discovery agent can be created", "[basic][service]
         REQUIRE(probeCompletion == std::future_status::ready);
         const auto probeResults = probeFuture.get();
         REQUIRE(!probeFuture.valid());
-
-        // Verify the future provided the expected results.
-        std::vector<std::shared_ptr<NearObjectDevice>> probeResultsStrong{};
-        std::transform(std::cbegin(probeResults), std::cend(probeResults), std::back_inserter(probeResultsStrong), [](auto& probeDevice) {
-            return probeDevice.lock();
-        });
-
         REQUIRE(probeResults.size() == probeDevices.size());
-        REQUIRE(probeResultsStrong == probeDevices);
     }
 }

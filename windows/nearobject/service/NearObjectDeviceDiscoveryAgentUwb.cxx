@@ -100,10 +100,10 @@ NearObjectDeviceDiscoveryAgentUwb::OnDeviceInterfaceNotificationCallback(HCMNOTI
     return S_OK;
 }
 
-std::future<std::vector<std::weak_ptr<NearObjectDevice>>>
+std::future<std::vector<std::shared_ptr<NearObjectDevice>>>
 NearObjectDeviceDiscoveryAgentUwb::ProbeAsyncImpl()
 {
-    std::promise<std::vector<std::weak_ptr<NearObjectDevice>>> probePromise{};
+    std::promise<std::vector<std::shared_ptr<NearObjectDevice>>> probePromise{};
     // TODO: save promise somewhere
     // TODO: start async operation
     // TODO: call CM_Get_Device_InterfaceList.

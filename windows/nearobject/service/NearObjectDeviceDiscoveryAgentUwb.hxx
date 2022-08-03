@@ -38,7 +38,7 @@ class NearObjectDeviceDiscoveryAgentUwb :
     public ::nearobject::service::NearObjectDeviceDiscoveryAgent
 {
 protected:
-    std::future<std::vector<std::weak_ptr<::nearobject::service::NearObjectDevice>>>
+    std::future<std::vector<std::shared_ptr<::nearobject::service::NearObjectDevice>>>
     ProbeAsyncImpl() override;
 
 private:

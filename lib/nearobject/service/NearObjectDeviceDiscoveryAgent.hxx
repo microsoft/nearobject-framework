@@ -77,11 +77,11 @@ public:
     Stop();
 
     /**
-     * @brief
-     *
-     * @return std::future<std::vector<std::weak_ptr<NearObjectDevice>>>
+     * @brief Probe for all existing devices.
+     * 
+     * @return std::future<std::vector<std::shared_ptr<NearObjectDevice>>> 
      */
-    std::future<std::vector<std::weak_ptr<NearObjectDevice>>>
+    std::future<std::vector<std::shared_ptr<NearObjectDevice>>>
     ProbeAsync();
 
 protected:
@@ -110,9 +110,9 @@ protected:
     /**
      * @brief Derived class implementation of asynchronous discovery probe.
      *
-     * @return std::future<std::vector<std::weak_ptr<NearObjectDevice>>>
+     * @return std::future<std::vector<std::shared_ptr<NearObjectDevice>>>
      */
-    virtual std::future<std::vector<std::weak_ptr<NearObjectDevice>>>
+    virtual std::future<std::vector<std::shared_ptr<NearObjectDevice>>>
     ProbeAsyncImpl();
 
 private:

@@ -47,7 +47,7 @@ NearObjectDeviceDiscoveryAgent::Stop()
     }
 }
 
-std::future<std::vector<std::weak_ptr<NearObjectDevice>>>
+std::future<std::vector<std::shared_ptr<NearObjectDevice>>>
 NearObjectDeviceDiscoveryAgent::ProbeAsync()
 {
     return ProbeAsyncImpl();
@@ -61,10 +61,10 @@ void
 NearObjectDeviceDiscoveryAgent::StopImpl()
 {}
 
-std::future<std::vector<std::weak_ptr<NearObjectDevice>>>
+std::future<std::vector<std::shared_ptr<NearObjectDevice>>>
 NearObjectDeviceDiscoveryAgent::ProbeAsyncImpl()
 {
-    std::promise<std::vector<std::weak_ptr<NearObjectDevice>>> probePromise{};
+    std::promise<std::vector<std::shared_ptr<NearObjectDevice>>> probePromise{};
     probePromise.set_value({});
     return probePromise.get_future();
 }

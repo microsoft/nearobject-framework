@@ -94,7 +94,7 @@ NearObjectDeviceManager::AddDiscoveryAgent(std::unique_ptr<NearObjectDeviceDisco
 
     // If this agent has already started, kick off a probe to ensure any devices
     // already found will be added ot this manager.
-    std::future<std::vector<std::weak_ptr<NearObjectDevice>>> existingDevicesProbe;
+    std::future<std::vector<std::shared_ptr<NearObjectDevice>>> existingDevicesProbe;
     const bool isStarted = discoveryAgent->IsStarted();
     if (isStarted) {
         existingDevicesProbe = discoveryAgent->ProbeAsync();
@@ -115,14 +115,11 @@ NearObjectDeviceManager::AddDiscoveryAgent(std::unique_ptr<NearObjectDeviceDisco
         // Wait for the operation to complete.
         const auto waitResult = existingDevicesProbe.wait_for(probeTimeout);
 
-        // If the operation completed, get the results, resolve weak ptrs,
-        // and add any valid devices.
+        // If the operation completed, get the results and add those devices.
         if (waitResult == std::future_status::ready) {
             const auto existingDevices = existingDevicesProbe.get();
-            for (const auto& existingDeviceWeak : existingDevices) {
-                if (auto existingDevice = existingDeviceWeak.lock()) {
-                    AddDevice(std::move(existingDevice));
-                }
+            for (const auto& existingDevice : existingDevices) {
+                AddDevice(std::move(existingDevice));
             }
         } else {
             // TODO: log error
