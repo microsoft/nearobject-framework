@@ -6,6 +6,7 @@ target_sources(windevuwb
         UwbDevice.cxx
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/UwbDevice.hxx
+        ${CMAKE_CURRENT_LIST_DIR}/UwbDeviceDriver.hxx
 )
 
 target_include_directories(windevuwb
