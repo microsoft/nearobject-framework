@@ -14,7 +14,7 @@ std::vector<std::byte>
 StringToByteVector(const std::string &str) noexcept
 {
     std::vector<std::byte> vec(str.size());
-    std::transform(std::cbegin(str), std::cend(str), std::begin(vec), [](auto &&element) {
+    std::transform(std::cbegin(str), std::cend(str), std::begin(vec), [](const auto &element) {
         return std::byte(element);
     });
 
