@@ -112,12 +112,11 @@ NearObjectDeviceDiscoveryAgentUwb::OnDeviceInterfaceNotificationCallback(HCMNOTI
 std::vector<std::shared_ptr<::nearobject::service::NearObjectDevice>>
 NearObjectDeviceDiscoveryAgentUwb::Probe()
 {
-    CONFIGRET configRet;
     ULONG deviceInterfaceNamesBufferSize = 0;
     GUID interfaceClassGuid = windows::devices::uwb::InterfaceClassUwb;
 
     // Determine the size of the list needed.
-    configRet = CM_Get_Device_Interface_List_Size(
+    CONFIGRET configRet = CM_Get_Device_Interface_List_Size(
         &deviceInterfaceNamesBufferSize, 
         &interfaceClassGuid,
         nullptr, 
