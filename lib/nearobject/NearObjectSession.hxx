@@ -70,13 +70,13 @@ public:
      * @return StartRangingSessionResult
      */
     StartRangingSessionResult
-    StartRangingSession();
+    StartRanging();
 
     /**
      * @brief Stops the active ranging session, if applicable.
      */
     void
-    StopRangingSession();
+    StopRanging();
 
     /**
      * @brief Determines if there is an active ranging session.

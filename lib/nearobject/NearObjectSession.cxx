@@ -81,7 +81,7 @@ NearObjectSession::EndSession()
     // TODO: All callbacks should probably be serialized to ensure that events
     // firing in rapid succession don't get signaled out-of-order. Likely some
     // form of a queue is needed.
-    StopRangingSession();
+    StopRanging();
 
     InvokeEventCallback([&](auto& eventCallbacks) {
         eventCallbacks.OnNearObjectSessionEnded(this);
@@ -97,7 +97,7 @@ NearObjectSession::NearObjectPropertiesChanged(const std::shared_ptr<NearObject>
 }
 
 NearObjectSession::StartRangingSessionResult
-NearObjectSession::StartRangingSession()
+NearObjectSession::StartRanging()
 {
     StartRangingSessionResult result{};
 
@@ -133,7 +133,7 @@ NearObjectSession::CreateNewRangingSession()
 }
 
 void
-NearObjectSession::StopRangingSession()
+NearObjectSession::StopRanging()
 {
     const auto lock = std::scoped_lock{ m_rangingStateGate };
     if (!m_rangingSession.has_value()) {

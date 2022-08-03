@@ -91,9 +91,9 @@ TEST_CASE("near object session capabilities are accurate", "[basic]")
     {
         const auto callbacksNoop = std::make_shared<test::NearObjectSessionEventCallbacksNoop>();
         NearObjectSession session(capabilities, {}, callbacksNoop);
-        session.StartRangingSession();
+        session.StartRanging();
         REQUIRE(session.Capabilities == capabilities);
-        session.StopRangingSession();
+        session.StopRanging();
         REQUIRE(session.Capabilities == capabilities);
     }
 }
@@ -112,17 +112,17 @@ TEST_CASE("near object event handlers can be registered", "[basic]")
     {
         const auto callbacksNoop = std::make_shared<test::NearObjectSessionEventCallbacksNoop>();
         NearObjectSession session(test::AllCapabilitiesSupported, {}, callbacksNoop);
-        session.StartRangingSession();
-        session.StopRangingSession();
+        session.StartRanging();
+        session.StopRanging();
     }
 
     SECTION("handler being deleted doesn't cause a crash")
     {
         auto callbacksNoop = std::make_shared<test::NearObjectSessionEventCallbacksNoop>();
         NearObjectSession session(test::AllCapabilitiesSupported, {}, callbacksNoop);
-        session.StartRangingSession();
+        session.StartRanging();
         callbacksNoop.reset();
-        session.StopRangingSession();
+        session.StopRanging();
     }
 
     SECTION("callbacks provide the session pointer for which it was registered")
@@ -166,8 +166,8 @@ TEST_CASE("near object event handlers can be registered", "[basic]")
         const auto callbacks = std::make_shared<NearObjectSessionEventCallbacksCheckSessionPointer>();
         NearObjectSession session(test::AllCapabilitiesSupported, {}, callbacks);
         callbacks->Session = &session;
-        session.StartRangingSession();
-        session.StopRangingSession();
+        session.StartRanging();
+        session.StopRanging();
         // TODO: trigger NO property changes
         // TODO: trigger NO membership changes
     }
