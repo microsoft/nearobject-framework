@@ -6,6 +6,7 @@
 #include <UwbDevice.hxx>
 #include <UwbDeviceDriver.hxx>
 #include <nearobject/service/NearObjectDeviceUwb.hxx>
+#include <DeviceEnumerator.hxx>
 
 using namespace windows::nearobject::service;
 using ::nearobject::service::NearObjectDevice;
@@ -112,41 +113,7 @@ NearObjectDeviceDiscoveryAgentUwb::OnDeviceInterfaceNotificationCallback(HCMNOTI
 std::vector<std::shared_ptr<::nearobject::service::NearObjectDevice>>
 NearObjectDeviceDiscoveryAgentUwb::Probe()
 {
-    ULONG deviceInterfaceNamesBufferSize = 0;
-    GUID interfaceClassGuid = windows::devices::uwb::InterfaceClassUwb;
-
-    // Determine the size of the list needed.
-    CONFIGRET configRet = CM_Get_Device_Interface_List_Size(
-        &deviceInterfaceNamesBufferSize, 
-        &interfaceClassGuid,
-        nullptr, 
-        CM_GET_DEVICE_INTERFACE_LIST_PRESENT);
-    if (configRet != CR_SUCCESS) {
-        // TODO: ???
-        return {};
-    } else if (deviceInterfaceNamesBufferSize == 0) {
-        return {};
-    }
-
-    std::vector<wchar_t> deviceInterfaceNamesBuffer(deviceInterfaceNamesBufferSize);
-    
-    // Query for the actual list.
-    configRet = CM_Get_Device_Interface_List(
-        &interfaceClassGuid, 
-        nullptr, 
-        std::data(deviceInterfaceNamesBuffer),
-        deviceInterfaceNamesBufferSize,
-        CM_GET_DEVICE_INTERFACE_LIST_PRESENT);
-    if (configRet != CR_SUCCESS) {
-        // TODO: ???
-        return {};
-    }
-
-    std::vector<std::wstring> deviceInterfaceNames{};
-    for (auto deviceInterface = std::data(deviceInterfaceNamesBuffer); *deviceInterface != L'\0'; ) {
-        deviceInterfaceNames.emplace_back(deviceInterface);
-        deviceInterface += deviceInterfaceNames.back().size() + 1;
-    }
+    const auto deviceInterfaceNames = windows::devices::DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(windows::devices::uwb::InterfaceClassUwb);
 
     std::vector<std::shared_ptr<::nearobject::service::NearObjectDevice>> nearObjectDevices;
     for (const auto& deviceInterfaceName : deviceInterfaceNames) {
