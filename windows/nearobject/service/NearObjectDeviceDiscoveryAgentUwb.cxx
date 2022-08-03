@@ -115,7 +115,7 @@ NearObjectDeviceDiscoveryAgentUwb::Probe()
 {
     const auto deviceInterfaceNames = windows::devices::DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(windows::devices::uwb::InterfaceClassUwb);
 
-    std::vector<std::shared_ptr<::nearobject::service::NearObjectDevice>> nearObjectDevices;
+    std::vector<std::shared_ptr<::nearobject::service::NearObjectDevice>> nearObjectDevices{};
     for (const auto& deviceInterfaceName : deviceInterfaceNames) {
         auto nearObjectDevice = AddCachedUwbNearObjectDevice(deviceInterfaceName);
         if (nearObjectDevice) {
