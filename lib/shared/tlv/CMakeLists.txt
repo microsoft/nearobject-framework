@@ -12,7 +12,7 @@ target_sources(tlv
 )
 
 target_link_libraries(tlv
-    PRIVATE
+    PUBLIC 
         GSL
 )
 
