@@ -21,6 +21,9 @@ target_link_libraries(nearobject-service-windows
     PRIVATE
         nearobject-service
         windevuwb
+    PUBLIC
+        WIL
+        cfgmgr32.lib
 )
 
 set_target_properties(nearobject-service-windows PROPERTIES FOLDER windows/service)
