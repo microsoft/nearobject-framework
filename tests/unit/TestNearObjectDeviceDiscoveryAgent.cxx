@@ -13,7 +13,7 @@ namespace service
 {
 namespace test
 {
-struct NearObjectDeviceDiscoveryAgentTest :
+struct NearObjectDeviceDiscoveryAgentTest final :
     public NearObjectDeviceDiscoveryAgent
 {
     ~NearObjectDeviceDiscoveryAgentTest() final = default;
