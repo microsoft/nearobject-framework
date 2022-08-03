@@ -6,10 +6,10 @@
 
 #include <windows.h>
 #include <cfgmgr32.h>
-#include <devpkey.h>
 #include <wil/resource.h>
 
 #include <uwb/UwbDevice.hxx>
+#include <WindowsDeviceResource.hxx>
 
 namespace windows
 {
@@ -49,7 +49,6 @@ public:
 private:
     const std::wstring m_deviceName;
 
-    using unique_hcmnotification = wil::unique_any<HCMNOTIFICATION, decltype(&::CM_Unregister_Notification), ::CM_Unregister_Notification>;
     unique_hcmnotification m_hcmNotificationHandle;
     wil::unique_hfile m_handleDriver;
 };

@@ -17,6 +17,8 @@ target_include_directories(windevuwb
 )
 
 target_link_libraries(windevuwb
+    PRIVATE
+        windevutil
     PUBLIC
         WIL
         cfgmgr32.lib

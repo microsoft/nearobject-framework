@@ -14,6 +14,7 @@
 #include <wil/resource.h>
 
 #include <nearobject/service/NearObjectDeviceDiscoveryAgent.hxx>
+#include <WindowsDeviceResource.hxx>
 
 namespace nearobject
 {
@@ -93,7 +94,6 @@ private:
     ExtractCachedNearObjectDevice(const std::wstring &deviceName);
 
 private:
-    using unique_hcmnotification = wil::unique_any<HCMNOTIFICATION, decltype(&::CM_Unregister_Notification), ::CM_Unregister_Notification>;
     unique_hcmnotification m_uwbHcmNotificationHandle;
 
     std::mutex m_nearObjectDeviceCacheGate;
