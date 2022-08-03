@@ -2,6 +2,7 @@
 #ifndef WINDOWS_DEVICE_UWB_HXX
 #define WINDOWS_DEVICE_UWB_HXX
 
+#include <string>
 #include <uwb/UwbDevice.hxx>
 
 namespace windows
@@ -16,6 +17,31 @@ namespace devices
 class UwbDevice :
     public uwb::UwbDevice
 {
+public:
+    /**
+     * @brief Construct a new Uwb Device object.
+     *
+     * @param deviceName The interface path name.
+     */
+    explicit UwbDevice(std::wstring deviceName);
+
+    /**
+     * @brief Get the name of this device.
+     *
+     * @return const std::wstring&
+     */
+    const std::wstring&
+    DeviceName() const noexcept;
+
+    /**
+     * @brief Initialize the device. 
+     *  TODO: return type needs to convey whether this worked.
+     */
+    void
+    Initialize();
+
+private:
+    const std::wstring m_deviceName;
 };
 
 } // namespace devices
