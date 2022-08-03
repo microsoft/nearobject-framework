@@ -8,10 +8,10 @@
 #include <unordered_map>
 #include <vector>
 
+#include <windows.h>
 #include <cfgmgr32.h>
 #include <devpkey.h>
 #include <wil/resource.h>
-#include <windows.h>
 
 #include <nearobject/service/NearObjectDeviceDiscoveryAgent.hxx>
 
