@@ -19,7 +19,7 @@ NearObjectDevice::Id() const noexcept
 NearObjectDevice::StartSessionResult
 NearObjectDevice::StartSession(const NearObjectProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks)
 {
-    auto result = StartSessionImpl(profile, eventCallbacks);
+    auto result = StartSessionImpl(profile, std::move(eventCallbacks));
 
     // Store a weak_ptr to each active session for tracking purposes.
     if (result.Session.has_value()) {
