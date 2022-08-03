@@ -22,7 +22,7 @@ class NearObjectDeviceUwb :
     public NearObjectDevice
 {
 public:
-    NearObjectDeviceUwb(uint64_t deviceId, std::unique_ptr<uwb::UwbDevice> uwbDevice);
+    NearObjectDeviceUwb(std::unique_ptr<uwb::UwbDevice> uwbDevice);
 
 private:
     StartSessionResult
