@@ -16,8 +16,19 @@ UwbDevice::DeviceName() const noexcept
 void
 UwbDevice::Initialize()
 {
+    wil::unique_hfile handleDriver(CreateFile(
+        m_deviceName.c_str(),
+        GENERIC_READ | GENERIC_WRITE,
+        FILE_SHARE_READ | FILE_SHARE_WRITE,
+        nullptr,
+        OPEN_EXISTING,
+        FILE_FLAG_OVERLAPPED,
+        nullptr));
+
     // TODO: wil::unique_hfile handleDriver(CreateFile(m_deviceName))
     // TODO: call CM_Register_Notification(handleDriver, filterType=CM_NOTIFY_FILTER_TYPE_DEVICEHANDLE)
     //   - handle CM_NOTIFY_ACTION_DEVICEQUERYREMOVE -> close handleDriver since device removal is requested
     //   - handle CM_NOTIFY_ACTION_DEVICEQUERYREMOVEFAILED -> query removal failed
+
+    m_handleDriver = std::move(handleDriver);
 }
