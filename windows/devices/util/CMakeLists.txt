@@ -3,10 +3,10 @@ add_library(windevutil STATIC "")
 
 target_sources(windevutil
     PRIVATE
-        WindowsDeviceEnumerator.cxx
+        DeviceEnumerator.cxx
     PUBLIC
-        ${CMAKE_CURRENT_LIST_DIR}/WindowsDeviceEnumerator.hxx
-        ${CMAKE_CURRENT_LIST_DIR}/WindowsDeviceResource.hxx
+        ${CMAKE_CURRENT_LIST_DIR}/DeviceEnumerator.hxx
+        ${CMAKE_CURRENT_LIST_DIR}/DeviceResource.hxx
 )
 
 target_include_directories(windevutil

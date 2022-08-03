@@ -15,7 +15,7 @@
 #include <wil/resource.h>
 
 #include <nearobject/service/NearObjectDeviceDiscoveryAgent.hxx>
-#include <WindowsDeviceResource.hxx>
+#include <DeviceResource.hxx>
 
 namespace nearobject
 {

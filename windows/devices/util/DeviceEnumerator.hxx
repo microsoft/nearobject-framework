@@ -6,7 +6,6 @@ namespace windows
 {
 namespace devices
 {
-
 } // namespace devices
 } // namespace windows
 
