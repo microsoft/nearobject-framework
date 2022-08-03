@@ -8,9 +8,10 @@
 #include <unordered_map>
 #include <vector>
 
+// NB: This must come before any other Windows include
 #include <windows.h>
+
 #include <cfgmgr32.h>
-#include <devpkey.h>
 #include <wil/resource.h>
 
 #include <nearobject/service/NearObjectDeviceDiscoveryAgent.hxx>
@@ -43,6 +44,9 @@ protected:
     ProbeAsyncImpl() override;
 
 private:
+    std::vector<std::shared_ptr<::nearobject::service::NearObjectDevice>>
+    Probe();
+
     /**
      * @brief Register for notifications of UWB device driver events.
      */
@@ -50,25 +54,25 @@ private:
     RegisterForUwbDeviceClassNotifications();
 
     /**
-     * @brief Bound callback function for when a UWB class driver event occurs. 
-     * 
-     * @param hcmNotificationHandle 
-     * @param action 
-     * @param eventData 
-     * @param eventDataSize 
+     * @brief Bound callback function for when a UWB class driver event occurs.
+     *
+     * @param hcmNotificationHandle
+     * @param action
+     * @param eventData
+     * @param eventDataSize
      */
     void
     OnDeviceInterfaceNotification(HCMNOTIFICATION hcmNotificationHandle, CM_NOTIFY_ACTION action, CM_NOTIFY_EVENT_DATA *eventData, DWORD eventDataSize);
 
     /**
-     * @brief Unbound callback function for when a UWB class driver event occurs. 
-     * 
-     * @param hcmNotificationHandle 
-     * @param context 
-     * @param action 
-     * @param eventData 
-     * @param eventDataSize 
-     * @return DWORD 
+     * @brief Unbound callback function for when a UWB class driver event occurs.
+     *
+     * @param hcmNotificationHandle
+     * @param context
+     * @param action
+     * @param eventData
+     * @param eventDataSize
+     * @return DWORD
      */
     static DWORD CALLBACK
     OnDeviceInterfaceNotificationCallback(HCMNOTIFICATION hcmNotificationHandle, void *context, CM_NOTIFY_ACTION action, CM_NOTIFY_EVENT_DATA *eventData, DWORD eventDataSize);
@@ -76,9 +80,9 @@ private:
     /**
      * @brief Create (if necessary) and add NearObjectDeviceUwb wrapper instance
      * to the device cache.
-     * 
+     *
      * @param deviceName The device driver name to add/create.
-     * @return std::shared_ptr<::nearobject::service::NearObjectDeviceUwb> 
+     * @return std::shared_ptr<::nearobject::service::NearObjectDeviceUwb>
      */
     std::shared_ptr<::nearobject::service::NearObjectDeviceUwb>
     AddCachedUwbNearObjectDevice(const std::wstring &deviceName);
@@ -86,9 +90,9 @@ private:
     /**
      * @brief Remove and return a NearObjectDeviceUwb device driver instance
      * from the device cache.
-     * 
+     *
      * @param deviceName The device driver name to remove.
-     * @return std::shared_ptr<::nearobject::service::NearObjectDeviceUwb> 
+     * @return std::shared_ptr<::nearobject::service::NearObjectDeviceUwb>
      */
     std::shared_ptr<::nearobject::service::NearObjectDeviceUwb>
     ExtractCachedNearObjectDevice(const std::wstring &deviceName);
