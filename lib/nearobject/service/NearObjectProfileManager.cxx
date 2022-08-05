@@ -32,10 +32,19 @@ NearObjectProfileManager::AddProfile(const NearObjectProfile& profile, ProfileLi
     }
 }
 
+using namespace rapidjson;
+using namespace std;
+
 void
 NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
 {
-    // TODO
+    // persistence is achieved via a file (what are the perms on the file?)
+    // after you determine the file to persist to, read the entire file, 
+
+    std::string location;
+    // get json from the file at location
+    
+
 }
 
 std::vector<NearObjectProfile>

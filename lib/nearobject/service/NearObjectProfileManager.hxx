@@ -6,6 +6,9 @@
 #include <vector>
 
 #include <nearobject/NearObjectProfile.hxx>
+#include <shared/jsonify/jsonify.hxx>
+#include <iostream>
+#include <fstream>
 
 namespace nearobject
 {

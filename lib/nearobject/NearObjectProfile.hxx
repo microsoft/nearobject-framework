@@ -5,6 +5,7 @@
 #include <optional>
 
 #include "NearObjectProfileSecurity.hxx"
+#include <shared/jsonify/jsonify.hxx>
 
 namespace nearobject
 {
@@ -17,11 +18,19 @@ enum class NearObjectConnectionScope {
     Multicast,
 };
 
+std::string NearObjectConnectionScope_ToString(NearObjectConnectionScope s){
+    switch(s){
+        case NearObjectConnectionScope::Unicast: return "Unicast";
+        case NearObjectConnectionScope::Multicast: return "Multicast";
+        default: return "Unknown";
+    }
+}
+
 /**
  * @brief A collection of configuration that specifies how to connect to a near
  * object peer or set of peers.
  */
-struct NearObjectProfile
+struct NearObjectProfile : public persist::Serializable
 {
     /**
      * @brief The supported connection scope.
@@ -43,6 +52,8 @@ struct NearObjectProfile
      * associated with it.
      */
     std::optional<NearObjectConnectionProfileSecurity> Security{ std::nullopt };
+
+    Value to_serial() override;
 };
 
 } // namespace nearobject
