@@ -35,6 +35,12 @@ NearObjectProfileManager::AddProfile(const NearObjectProfile& profile, ProfileLi
 using namespace rapidjson;
 using namespace std;
 
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <cstdio>
+#include <shared/jsonify/rapidjson/prettywriter.h>
+
 void
 NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
 {
@@ -43,8 +49,33 @@ NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
 
     std::string location;
     // get json from the file at location
+    fstream newfile;
+    newfile.open(location, ios::in);  
+    if(!newfile.is_open()) return;    
     
+    std::stringstream stringStream;
+    stringStream << newfile.rdbuf();
+    std::string copyOfStr = stringStream.str();
 
+    rapidjson::Document document;
+    if (document.Parse(copyOfStr.c_str()).HasParseError()) return ; // TODO do error handling
+    if(!document.IsArray()) return;
+
+    auto& allocator = document.GetAllocator();
+    auto value = profile.to_serial(allocator);
+    document.PushBack(value,allocator);
+
+    newfile.close(); 
+    
+    newfile.open("location",ios::out); 
+    if (!newfile.is_open()) return; 
+    StringBuffer sb;
+    PrettyWriter<StringBuffer> writer(sb);
+    document.Accept(writer);    // Accept() traverses the DOM and generates Handler events.
+    puts(sb.GetString());
+
+    newfile.close(); 
+    
 }
 
 std::vector<NearObjectProfile>

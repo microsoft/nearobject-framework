@@ -47,7 +47,7 @@ struct NearObjectProfile : public persist::Serializable
      */
     std::optional<NearObjectConnectionProfileSecurity> Security{ std::nullopt };
 
-    rapidjson::Value to_serial(rapidjson::Document::AllocatorType&) override;
+    rapidjson::Value to_serial(rapidjson::Document::AllocatorType&) const override;
 };
 
 } // namespace nearobject

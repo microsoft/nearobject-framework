@@ -9,7 +9,7 @@ namespace persist {
 
 class Serializable {
 public:
-    virtual Value to_serial(rapidjson::Document::AllocatorType&) = 0;
+    virtual rapidjson::Value to_serial(rapidjson::Document::AllocatorType&) const = 0;
 };
 
 /**

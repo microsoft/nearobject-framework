@@ -10,7 +10,7 @@ std::string nearobject::NearObjectConnectionScope_ToString(NearObjectConnectionS
 }
 
 rapidjson::Value
-nearobject::NearObjectProfile::to_serial(rapidjson::Document::AllocatorType& allocator) {
+nearobject::NearObjectProfile::to_serial(rapidjson::Document::AllocatorType& allocator) const {
     Value v(rapidjson::kObjectType);
     auto ScopeString = nearobject::NearObjectConnectionScope_ToString(Scope);
     v.AddMember("Scope",rapidjson::Value().SetString(ScopeString.c_str(),ScopeString.size(),allocator),allocator);
