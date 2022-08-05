@@ -6,6 +6,7 @@ target_sources(nearobject
         ${CMAKE_CURRENT_LIST_DIR}/NearObject.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectManager.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectProfile.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/NearObjectProfileSecurity.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectSession.cxx
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/NearObject.hxx
@@ -20,6 +21,7 @@ target_sources(nearobject
 target_include_directories(nearobject
     PRIVATE
         ${NOF_DIR_LIB}
+        ${NOF_DIR_LIB}/shared
     INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}
 )

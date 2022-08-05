@@ -13,14 +13,10 @@ namespace nearobject
 struct NearObjectConnectionProfileSecurity : public persist::Serializable
 {
     virtual ~NearObjectConnectionProfileSecurity() = default;
-    Value to_serial() override;
+    rapidjson::Value to_serial(rapidjson::Document::AllocatorType&) override;
 };
 } // namespace nearobject
 
-Value
-NearObjectConnectionProfileSecurity::to_serial(Document::AllocatorType& allocator) {
-    Value v(kObject);
-    return v;
-}
+
 
 #endif // NEAR_OBJECT_CONNECTION_PROFILE_SECURITY_HXX

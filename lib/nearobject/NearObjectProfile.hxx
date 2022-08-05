@@ -18,13 +18,7 @@ enum class NearObjectConnectionScope {
     Multicast,
 };
 
-std::string NearObjectConnectionScope_ToString(NearObjectConnectionScope s){
-    switch(s){
-        case NearObjectConnectionScope::Unicast: return "Unicast";
-        case NearObjectConnectionScope::Multicast: return "Multicast";
-        default: return "Unknown";
-    }
-}
+std::string NearObjectConnectionScope_ToString(NearObjectConnectionScope s);
 
 /**
  * @brief A collection of configuration that specifies how to connect to a near
@@ -53,7 +47,7 @@ struct NearObjectProfile : public persist::Serializable
      */
     std::optional<NearObjectConnectionProfileSecurity> Security{ std::nullopt };
 
-    Value to_serial() override;
+    rapidjson::Value to_serial(rapidjson::Document::AllocatorType&) override;
 };
 
 } // namespace nearobject

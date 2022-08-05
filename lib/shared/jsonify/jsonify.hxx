@@ -1,9 +1,6 @@
-// Hello World example
-// This example shows basic usage of DOM-style API.
-
+#ifndef JSONIFY_HXX
+#define JSONIFY_HXX
 #include "rapidjson/document.h"     // rapidjson's DOM-style API
-#include "rapidjson/prettywriter.h" // for stringify JSON
-#include <cstdio>
 
 using namespace rapidjson;
 using namespace std;
@@ -12,7 +9,7 @@ namespace persist {
 
 class Serializable {
 public:
-    virtual Value to_serial() = 0;
+    virtual Value to_serial(rapidjson::Document::AllocatorType&) = 0;
 };
 
 /**
@@ -37,3 +34,5 @@ enum class ParseResult {
 };
 
 };
+
+#endif // JSONIFY_HXX
