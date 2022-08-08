@@ -10,3 +10,7 @@ persist::ParseResult
 nearobject::NearObjectConnectionProfileSecurity::parse_and_set(const rapidjson::Value& value) {
     return persist::ParseResult::Succeeded;
 }
+
+bool nearobject::NearObjectConnectionProfileSecurity::profiles_match(const NearObjectConnectionProfileSecurity& p1, const NearObjectConnectionProfileSecurity& p2){
+    return true;
+}

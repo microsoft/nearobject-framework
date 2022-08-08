@@ -17,6 +17,7 @@ namespace service
 class NearObjectProfileManager
 {
 public:
+    constexpr static char persist_location[] = "profiles";
     /**
      * @brief Describes the lifetime of the profile.
      */

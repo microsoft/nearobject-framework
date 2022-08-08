@@ -27,6 +27,8 @@ NearObjectConnectionScope NearObjectConnectionScope_FromString(std::string s);
  */
 struct NearObjectProfile : public persist::Serializable
 {
+    static bool profiles_match(const NearObjectProfile& p1, const NearObjectProfile& p2);
+
     /**
      * @brief The supported connection scope.
      *

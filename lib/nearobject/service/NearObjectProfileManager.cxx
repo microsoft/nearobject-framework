@@ -44,6 +44,7 @@ using namespace std;
 void
 NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
 {
+    const std::shared_lock profilesLockShared{ m_profilesGate };
     std::string location;
     // TODO get json from the file at location
     fstream newfile;
@@ -64,7 +65,7 @@ NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
 
     newfile.close(); 
     
-    newfile.open("location",ios::out); 
+    newfile.open(NearObjectProfileManager::persist_location,ios::out); 
     if (!newfile.is_open()) return; 
     StringBuffer sb;
     PrettyWriter<StringBuffer> writer(sb);
@@ -78,7 +79,7 @@ NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
 std::vector<NearObjectProfile>
 NearObjectProfileManager::ReadPersistedProfiles() const
 {
-    std::string location;
+    std::string location = NearObjectProfileManager::persist_location;
     // TODO get json from the file at location
     fstream newfile;
     newfile.open(location, ios::in);  

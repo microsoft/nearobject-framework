@@ -43,3 +43,12 @@ nearobject::NearObjectProfile::parse_and_set(const rapidjson::Value& value) {
     }
     return persist::ParseResult::Succeeded;
 }
+
+bool nearobject::NearObjectProfile::profiles_match(const NearObjectProfile& p1, const NearObjectProfile& p2){
+    if (p1.Scope != p2.Scope) return false;
+    if ((p1.Security==std::nullopt) != (p2.Security==std::nullopt)) return false;
+    if (p1.Security) {
+        return nearobject::NearObjectConnectionProfileSecurity::profiles_match(*p1.Security,*p2.Security);
+    }
+    return true;
+}
