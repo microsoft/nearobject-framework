@@ -27,6 +27,8 @@ TEST_CASE("near object profiles can be enumerated")
     }
 }
 
+#include <filesystem>
+
 TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
 {
     SECTION("NearObjectProfileSecurity can be serialized and parsed")
@@ -55,16 +57,65 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
         REQUIRE(nearobject::NearObjectProfile::profiles_match(profile,profile2));
     }
     
-    SECTION("NearObjectProfileSecurity can be serialized and parsed")
+    SECTION("NearObjectProfile (with Security) can be serialized and parsed")
     {
-        nearobject::NearObjectConnectionProfileSecurity Sec;
         rapidjson::Document doc;
+        
+        nearobject::NearObjectProfile profile, profile2;
+        nearobject::NearObjectConnectionProfileSecurity Sec;
+
+        *profile.Security = Sec;
 
         auto& allocator = doc.GetAllocator();
 
-        auto v = Sec.to_serial(allocator); // TOOD verify that to_serial succeeded
-        auto presult = Sec.parse_and_set(v);
+        auto v = profile.to_serial(allocator); // TOOD verify that to_serial succeeded
+        auto presult = profile2.parse_and_set(v);
         REQUIRE(presult == persist::ParseResult::Succeeded);
+        REQUIRE(nearobject::NearObjectProfile::profiles_match(profile,profile2));
+    }
+
+    SECTION("NearObjectProfileManager::PersistProfile matches the read profiles")
+    {
+        rapidjson::Document doc;
+        
+        nearobject::NearObjectProfile profile, profile2;
+        nearobject::NearObjectConnectionProfileSecurity Sec;
+
+        *profile.Security = Sec;
+
+        auto& allocator = doc.GetAllocator();
+
+        auto persist_location = "testprofiles";
+
+        // remove the file
+        try {
+            std::filesystem::remove(persist_location);
+        }
+        catch(const std::filesystem::filesystem_error& err) {
+        }
+
+        nearobject::service::NearObjectProfileManager profileManager{};
+        profileManager.SetPersistLocation(persist_location);
+        
+        // persist the profiles
+        profileManager.PersistProfile(profile);
+        profileManager.PersistProfile(profile2);
+
+        // read the profiles
+        auto profiles = profileManager.ReadPersistedProfiles();
+
+        REQUIRE(profiles.size()==2);
+        REQUIRE((nearobject::NearObjectProfile::profiles_match(profile,profiles[0]) || 
+                nearobject::NearObjectProfile::profiles_match(profile,profiles[1])));
+        REQUIRE((nearobject::NearObjectProfile::profiles_match(profile2,profiles[0]) || 
+                nearobject::NearObjectProfile::profiles_match(profile2,profiles[1])));
+
+        // remove the file
+        try {
+            std::filesystem::remove(persist_location);
+        }
+        catch(const std::filesystem::filesystem_error& err) {
+        }
     }
     
 }

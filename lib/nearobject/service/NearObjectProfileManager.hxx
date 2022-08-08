@@ -17,7 +17,6 @@ namespace service
 class NearObjectProfileManager
 {
 public:
-    constexpr static char persist_location[] = "profiles";
     /**
      * @brief Describes the lifetime of the profile.
      */
@@ -57,6 +56,8 @@ public:
     std::vector<NearObjectProfile>
     GetAllProfiles() const;
 
+    void SetPersistLocation(std::string loc);
+
 protected:
     /**
      * @brief Persist the profile.
@@ -77,6 +78,7 @@ protected:
 private:
     mutable std::shared_mutex m_profilesGate{};
     std::vector<NearObjectProfile> m_profiles{};
+    std::string persist_location{"profiles"};
 };
 
 } // namespace service

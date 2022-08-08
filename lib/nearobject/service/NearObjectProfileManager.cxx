@@ -45,8 +45,7 @@ void
 NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
 {
     const std::shared_lock profilesLockShared{ m_profilesGate };
-    std::string location;
-    // TODO get json from the file at location
+    std::string location = NearObjectProfileManager::persist_location;
     fstream newfile;
     newfile.open(location, ios::in);  
     if(!newfile.is_open()) return;    
@@ -54,15 +53,19 @@ NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
     std::stringstream stringStream;
     stringStream << newfile.rdbuf();
     std::string copyOfStr = stringStream.str();
-
+    
     rapidjson::Document document;
-    if (document.Parse(copyOfStr.c_str()).HasParseError()) return ; // TODO do error handling
-    if(!document.IsArray()) return;
+
+    if(copyOfStr.size()!=0) {
+        if (document.Parse(copyOfStr.c_str()).HasParseError()) return ; // TODO do error handling
+        if(!document.IsArray()) return;
+    } else {
+        document.SetArray();
+    }
 
     auto& allocator = document.GetAllocator();
     auto value = profile.to_serial(allocator);
     document.PushBack(value,allocator);
-
     newfile.close(); 
     
     newfile.open(NearObjectProfileManager::persist_location,ios::out); 
@@ -71,16 +74,18 @@ NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
     PrettyWriter<StringBuffer> writer(sb);
     document.Accept(writer);
     newfile << sb.GetString();
-    // puts(sb.GetString());
     newfile.close(); 
-    
 }
+
+void NearObjectProfileManager::SetPersistLocation(std::string loc){
+    persist_location = loc;
+}
+
 
 std::vector<NearObjectProfile>
 NearObjectProfileManager::ReadPersistedProfiles() const
 {
     std::string location = NearObjectProfileManager::persist_location;
-    // TODO get json from the file at location
     fstream newfile;
     newfile.open(location, ios::in);  
     if(!newfile.is_open()) return {};    
