@@ -6,12 +6,6 @@ using namespace rapidjson;
 using namespace std;
 
 namespace persist {
-
-class Serializable {
-public:
-    virtual rapidjson::Value to_serial(rapidjson::Document::AllocatorType&) const = 0;
-};
-
 /**
 * @brief Describes the result of parsing a Serializable object
 */
@@ -32,6 +26,13 @@ enum class ParseResult {
     */
     UnknownError,
 };
+
+class Serializable {
+public:
+    virtual rapidjson::Value to_serial(rapidjson::Document::AllocatorType&) const = 0;
+    virtual ParseResult parse_and_set(const rapidjson::Value&) = 0;
+};
+
 
 };
 

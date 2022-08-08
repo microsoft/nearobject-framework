@@ -19,6 +19,7 @@ enum class NearObjectConnectionScope {
 };
 
 std::string NearObjectConnectionScope_ToString(NearObjectConnectionScope s);
+NearObjectConnectionScope NearObjectConnectionScope_FromString(std::string s);
 
 /**
  * @brief A collection of configuration that specifies how to connect to a near
@@ -48,6 +49,7 @@ struct NearObjectProfile : public persist::Serializable
     std::optional<NearObjectConnectionProfileSecurity> Security{ std::nullopt };
 
     rapidjson::Value to_serial(rapidjson::Document::AllocatorType&) const override;
+    persist::ParseResult parse_and_set(const rapidjson::Value &) override;
 };
 
 } // namespace nearobject

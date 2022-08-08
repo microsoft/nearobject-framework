@@ -14,6 +14,7 @@ struct NearObjectConnectionProfileSecurity : public persist::Serializable
 {
     virtual ~NearObjectConnectionProfileSecurity() = default;
     rapidjson::Value to_serial(rapidjson::Document::AllocatorType&) const override;
+    persist::ParseResult parse_and_set(const rapidjson::Value &) override;
 };
 } // namespace nearobject
 

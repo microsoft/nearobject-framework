@@ -44,11 +44,8 @@ using namespace std;
 void
 NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
 {
-    // persistence is achieved via a file (what are the perms on the file?)
-    // after you determine the file to persist to, read the entire file, 
-
     std::string location;
-    // get json from the file at location
+    // TODO get json from the file at location
     fstream newfile;
     newfile.open(location, ios::in);  
     if(!newfile.is_open()) return;    
@@ -71,9 +68,9 @@ NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
     if (!newfile.is_open()) return; 
     StringBuffer sb;
     PrettyWriter<StringBuffer> writer(sb);
-    document.Accept(writer);    // Accept() traverses the DOM and generates Handler events.
-    puts(sb.GetString());
-
+    document.Accept(writer);
+    newfile << sb.GetString();
+    // puts(sb.GetString());
     newfile.close(); 
     
 }
@@ -81,6 +78,33 @@ NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
 std::vector<NearObjectProfile>
 NearObjectProfileManager::ReadPersistedProfiles() const
 {
-    // TODO
-    return {};
+    std::string location;
+    // TODO get json from the file at location
+    fstream newfile;
+    newfile.open(location, ios::in);  
+    if(!newfile.is_open()) return {};    
+    
+    std::stringstream stringStream;
+    stringStream << newfile.rdbuf();
+    std::string copyOfStr = stringStream.str();
+
+    rapidjson::Document document;
+    if (document.Parse(copyOfStr.c_str()).HasParseError()) return {}; // TODO do error handling
+    if(!document.IsArray()) return {};
+
+    std::vector<NearObjectProfile> profiles;
+
+    // read the document object
+    for (auto& obj : document.GetArray()){
+        // for each object, try to parse a profile from it
+        NearObjectProfile profile;
+        auto res = profile.parse_and_set(obj);
+        if (res != persist::ParseResult::Succeeded) {
+            return {}; // TODO do error handling
+        }
+        profiles.push_back(std::move(profile));
+    }
+
+    newfile.close(); 
+    return profiles;
 }

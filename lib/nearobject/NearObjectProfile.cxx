@@ -9,6 +9,11 @@ std::string nearobject::NearObjectConnectionScope_ToString(NearObjectConnectionS
     }
 }
 
+nearobject::NearObjectConnectionScope nearobject::NearObjectConnectionScope_FromString(std::string s){
+    if(s==std::string("Unicast")) return NearObjectConnectionScope::Unicast;
+    return NearObjectConnectionScope::Multicast; // TODO this means that the default is multicast
+}
+
 rapidjson::Value
 nearobject::NearObjectProfile::to_serial(rapidjson::Document::AllocatorType& allocator) const {
     Value v(rapidjson::kObjectType);
@@ -21,3 +26,20 @@ nearobject::NearObjectProfile::to_serial(rapidjson::Document::AllocatorType& all
     return std::move(v);
 }
 
+persist::ParseResult 
+nearobject::NearObjectProfile::parse_and_set(const rapidjson::Value& value) {
+    {
+        rapidjson::Value::ConstMemberIterator itr = value.FindMember("Scope");
+        if (itr == value.MemberEnd()) return persist::ParseResult::Failed;
+        NearObjectProfile::Scope = nearobject::NearObjectConnectionScope_FromString(itr->value.GetString());
+    }
+    {
+        rapidjson::Value::ConstMemberIterator itr = value.FindMember("Security");
+        if (itr == value.MemberEnd()) return persist::ParseResult::Succeeded;
+        nearobject::NearObjectConnectionProfileSecurity sec;
+        auto result = sec.parse_and_set(itr->value);
+        if (result != persist::ParseResult::Succeeded) return result;
+        *NearObjectProfile::Security = std::move(sec);
+    }
+    return persist::ParseResult::Succeeded;
+}
