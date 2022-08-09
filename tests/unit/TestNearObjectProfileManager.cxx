@@ -1,8 +1,25 @@
+#include <filesystem>
 
 #include <catch2/catch.hpp>
 
 #include <nearobject/NearObjectProfile.hxx>
 #include <nearobject/service/NearObjectProfileManager.hxx>
+
+namespace nearobject {
+namespace service {
+class TestNearObjectProfileManager: public NearObjectProfileManager{
+public:
+    void
+    TestPersistProfile(const NearObjectProfile& profile) {
+        NearObjectProfileManager::PersistProfile(profile);
+    };
+    std::vector<NearObjectProfile>
+    TestReadPersistedProfiles() const{
+        return NearObjectProfileManager::ReadPersistedProfiles();
+    };
+};
+}
+}
 
 TEST_CASE("near object profile manager can be created", "[basic][service]")
 {
@@ -26,8 +43,6 @@ TEST_CASE("near object profiles can be enumerated")
         const auto matchingProfiles = profileManager.FindMatchingProfiles(profile);
     }
 }
-
-#include <filesystem>
 
 TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
 {
@@ -94,15 +109,15 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
         catch(const std::filesystem::filesystem_error& err) {
         }
 
-        nearobject::service::NearObjectProfileManager profileManager{};
+        nearobject::service::TestNearObjectProfileManager profileManager{};
         profileManager.SetPersistLocation(persist_location);
         
         // persist the profiles
-        profileManager.PersistProfile(profile);
-        profileManager.PersistProfile(profile2);
+        profileManager.TestPersistProfile(profile);
+        profileManager.TestPersistProfile(profile2);
 
         // read the profiles
-        auto profiles = profileManager.ReadPersistedProfiles();
+        auto profiles = profileManager.TestReadPersistedProfiles();
 
         // remove the file
         try {

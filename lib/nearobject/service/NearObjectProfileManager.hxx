@@ -58,7 +58,7 @@ public:
 
     void SetPersistLocation(std::string loc);
 
-public:
+protected:
     /**
      * @brief Persist the profile.
      *
