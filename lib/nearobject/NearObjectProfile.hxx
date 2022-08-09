@@ -18,8 +18,10 @@ enum class NearObjectConnectionScope {
     Multicast,
 };
 
-std::string NearObjectConnectionScope_ToString(NearObjectConnectionScope s);
-NearObjectConnectionScope NearObjectConnectionScope_FromString(std::string s);
+std::string
+NearObjectConnectionScope_ToString(NearObjectConnectionScope s);
+NearObjectConnectionScope
+NearObjectConnectionScope_FromString(std::string s);
 
 /**
  * @brief A collection of configuration that specifies how to connect to a near
@@ -27,7 +29,8 @@ NearObjectConnectionScope NearObjectConnectionScope_FromString(std::string s);
  */
 struct NearObjectProfile : public persist::Serializable
 {
-    static bool profiles_match(const NearObjectProfile& p1, const NearObjectProfile& p2);
+    static bool
+    profiles_match(const NearObjectProfile& p1, const NearObjectProfile& p2);
 
     /**
      * @brief The supported connection scope.
@@ -50,8 +53,10 @@ struct NearObjectProfile : public persist::Serializable
      */
     std::optional<NearObjectConnectionProfileSecurity> Security{ std::nullopt };
 
-    rapidjson::Value to_serial(rapidjson::Document::AllocatorType&) const override;
-    persist::ParseResult parse_and_set(const rapidjson::Value &) override;
+    rapidjson::Value
+    to_serial(rapidjson::Document::AllocatorType&) const override;
+    persist::ParseResult
+    parse_and_set(const rapidjson::Value&) override;
 };
 
 } // namespace nearobject

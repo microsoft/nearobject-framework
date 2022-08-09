@@ -5,21 +5,26 @@
 #include <nearobject/NearObjectProfile.hxx>
 #include <nearobject/service/NearObjectProfileManager.hxx>
 
-namespace nearobject {
-namespace service {
-class TestNearObjectProfileManager: public NearObjectProfileManager{
+namespace nearobject
+{
+namespace service
+{
+class TestNearObjectProfileManager : public NearObjectProfileManager
+{
 public:
     void
-    TestPersistProfile(const NearObjectProfile& profile) {
+    TestPersistProfile(const NearObjectProfile& profile)
+    {
         NearObjectProfileManager::PersistProfile(profile);
     };
     std::vector<NearObjectProfile>
-    TestReadPersistedProfiles() const{
+    TestReadPersistedProfiles() const
+    {
         return NearObjectProfileManager::ReadPersistedProfiles();
     };
 };
-}
-}
+} // namespace service
+} // namespace nearobject
 
 TEST_CASE("near object profile manager can be created", "[basic][service]")
 {
@@ -55,10 +60,10 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
 
         auto v = Sec1.to_serial(allocator); // TOOD verify that to_serial succeeded
         auto presult = Sec2.parse_and_set(v);
-        REQUIRE(nearobject::NearObjectConnectionProfileSecurity::profiles_match(Sec1,Sec2));
+        REQUIRE(nearobject::NearObjectConnectionProfileSecurity::profiles_match(Sec1, Sec2));
         REQUIRE(presult == persist::ParseResult::Succeeded);
     }
-    
+
     SECTION("NearObjectProfile (with no Security) can be serialized and parsed")
     {
         nearobject::NearObjectProfile profile, profile2;
@@ -69,13 +74,13 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
         auto v = profile.to_serial(allocator); // TOOD verify that to_serial succeeded
         auto presult = profile2.parse_and_set(v);
         REQUIRE(presult == persist::ParseResult::Succeeded);
-        REQUIRE(nearobject::NearObjectProfile::profiles_match(profile,profile2));
+        REQUIRE(nearobject::NearObjectProfile::profiles_match(profile, profile2));
     }
-    
+
     SECTION("NearObjectProfile (with Security) can be serialized and parsed")
     {
         rapidjson::Document doc;
-        
+
         nearobject::NearObjectProfile profile, profile2;
         nearobject::NearObjectConnectionProfileSecurity Sec;
 
@@ -86,13 +91,13 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
         auto v = profile.to_serial(allocator); // TOOD verify that to_serial succeeded
         auto presult = profile2.parse_and_set(v);
         REQUIRE(presult == persist::ParseResult::Succeeded);
-        REQUIRE(nearobject::NearObjectProfile::profiles_match(profile,profile2));
+        REQUIRE(nearobject::NearObjectProfile::profiles_match(profile, profile2));
     }
 
     SECTION("NearObjectProfileManager::PersistProfile matches the read profiles")
     {
         rapidjson::Document doc;
-        
+
         nearobject::NearObjectProfile profile, profile2;
         nearobject::NearObjectConnectionProfileSecurity Sec;
 
@@ -105,13 +110,12 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
         // remove the file
         try {
             std::filesystem::remove(persist_location);
-        }
-        catch(const std::filesystem::filesystem_error& err) {
+        } catch (const std::filesystem::filesystem_error& err) {
         }
 
         nearobject::service::TestNearObjectProfileManager profileManager{};
         profileManager.SetPersistLocation(persist_location);
-        
+
         // persist the profiles
         profileManager.TestPersistProfile(profile);
         profileManager.TestPersistProfile(profile2);
@@ -122,16 +126,13 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
         // remove the file
         try {
             std::filesystem::remove(persist_location);
+        } catch (const std::filesystem::filesystem_error& err) {
         }
-        catch(const std::filesystem::filesystem_error& err) {
-        }
-        
-        REQUIRE(profiles.size()==2);
-        REQUIRE((nearobject::NearObjectProfile::profiles_match(profile,profiles[0]) || 
-                nearobject::NearObjectProfile::profiles_match(profile,profiles[1])));
-        REQUIRE((nearobject::NearObjectProfile::profiles_match(profile2,profiles[0]) || 
-                nearobject::NearObjectProfile::profiles_match(profile2,profiles[1])));
-    }
-    
-}
 
+        REQUIRE(profiles.size() == 2);
+        REQUIRE((nearobject::NearObjectProfile::profiles_match(profile, profiles[0]) ||
+            nearobject::NearObjectProfile::profiles_match(profile, profiles[1])));
+        REQUIRE((nearobject::NearObjectProfile::profiles_match(profile2, profiles[0]) ||
+            nearobject::NearObjectProfile::profiles_match(profile2, profiles[1])));
+    }
+}

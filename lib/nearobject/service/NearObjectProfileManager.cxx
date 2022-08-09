@@ -35,11 +35,11 @@ NearObjectProfileManager::AddProfile(const NearObjectProfile& profile, ProfileLi
 using namespace rapidjson;
 using namespace std;
 
-#include <iostream>
-#include <sstream>
-#include <fstream>
 #include <cstdio>
+#include <fstream>
+#include <iostream>
 #include <shared/jsonify/rapidjson/prettywriter.h>
+#include <sstream>
 
 void
 NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
@@ -51,58 +51,65 @@ NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
     fstream readfilehandle, writefilehandle;
     std::string copyOfFileStr;
 
-    readfilehandle.open(location, ios::in);  
-    if(readfilehandle.is_open()) {
+    readfilehandle.open(location, ios::in);
+    if (readfilehandle.is_open()) {
         std::stringstream stringStream;
         stringStream << readfilehandle.rdbuf();
         copyOfFileStr = stringStream.str();
-        readfilehandle.close(); 
+        readfilehandle.close();
     }
-    if(copyOfFileStr.size()!=0) {
-        if (document.Parse(copyOfFileStr.c_str()).HasParseError()) return ; // TODO do error handling
-        if(!document.IsArray()) return;
+    if (copyOfFileStr.size() != 0) {
+        if (document.Parse(copyOfFileStr.c_str()).HasParseError())
+            return; // TODO do error handling
+        if (!document.IsArray())
+            return;
     } else {
         document.SetArray();
     }
 
     auto& allocator = document.GetAllocator();
     auto value = profile.to_serial(allocator);
-    document.PushBack(value,allocator);
-    
-    writefilehandle.open(NearObjectProfileManager::persist_location,ios::out); 
-    if (!writefilehandle.is_open()) return; 
+    document.PushBack(value, allocator);
+
+    writefilehandle.open(NearObjectProfileManager::persist_location, ios::out);
+    if (!writefilehandle.is_open())
+        return;
     StringBuffer sb;
     PrettyWriter<StringBuffer> writer(sb);
     document.Accept(writer);
     writefilehandle << sb.GetString();
-    writefilehandle.close(); 
+    writefilehandle.close();
 }
 
-void NearObjectProfileManager::SetPersistLocation(std::string loc){
+void
+NearObjectProfileManager::SetPersistLocation(std::string loc)
+{
     persist_location = loc;
 }
-
 
 std::vector<NearObjectProfile>
 NearObjectProfileManager::ReadPersistedProfiles() const
 {
     std::string location = NearObjectProfileManager::persist_location;
     fstream readfilehandle;
-    readfilehandle.open(location, ios::in);  
-    if(!readfilehandle.is_open()) return {};    
-    
+    readfilehandle.open(location, ios::in);
+    if (!readfilehandle.is_open())
+        return {};
+
     std::stringstream stringStream;
     stringStream << readfilehandle.rdbuf();
     std::string copyOfFileStr = stringStream.str();
 
     rapidjson::Document document;
-    if (document.Parse(copyOfFileStr.c_str()).HasParseError()) return {}; // TODO do error handling
-    if(!document.IsArray()) return {};
+    if (document.Parse(copyOfFileStr.c_str()).HasParseError())
+        return {}; // TODO do error handling
+    if (!document.IsArray())
+        return {};
 
     std::vector<NearObjectProfile> profiles;
 
     // read the document object
-    for (auto& obj : document.GetArray()){
+    for (auto& obj : document.GetArray()) {
         // for each object, try to parse a profile from it
         NearObjectProfile profile;
         auto res = profile.parse_and_set(obj);
@@ -112,6 +119,6 @@ NearObjectProfileManager::ReadPersistedProfiles() const
         profiles.push_back(std::move(profile));
     }
 
-    readfilehandle.close(); 
+    readfilehandle.close();
     return profiles;
 }

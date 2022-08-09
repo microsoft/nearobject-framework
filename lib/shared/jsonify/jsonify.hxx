@@ -1,11 +1,12 @@
 #ifndef JSONIFY_HXX
 #define JSONIFY_HXX
-#include "rapidjson/document.h"     // rapidjson's DOM-style API
+#include "rapidjson/document.h" // rapidjson's DOM-style API
 
 using namespace rapidjson;
 using namespace std;
 
-namespace persist {
+namespace persist
+{
 /**
 * @brief Describes the result of parsing a Serializable object
 */
@@ -27,13 +28,15 @@ enum class ParseResult {
     UnknownError,
 };
 
-class Serializable {
+class Serializable
+{
 public:
-    virtual rapidjson::Value to_serial(rapidjson::Document::AllocatorType&) const = 0;
-    virtual ParseResult parse_and_set(const rapidjson::Value&) = 0;
+    virtual rapidjson::Value
+    to_serial(rapidjson::Document::AllocatorType&) const = 0;
+    virtual ParseResult
+    parse_and_set(const rapidjson::Value&) = 0;
 };
 
-
-};
+}; // namespace persist
 
 #endif // JSONIFY_HXX

@@ -5,10 +5,10 @@
 #include <shared_mutex>
 #include <vector>
 
+#include <fstream>
+#include <iostream>
 #include <nearobject/NearObjectProfile.hxx>
 #include <shared/jsonify/jsonify.hxx>
-#include <iostream>
-#include <fstream>
 
 namespace nearobject
 {
@@ -56,7 +56,8 @@ public:
     std::vector<NearObjectProfile>
     GetAllProfiles() const;
 
-    void SetPersistLocation(std::string loc);
+    void
+    SetPersistLocation(std::string loc);
 
 protected:
     /**
@@ -78,7 +79,7 @@ protected:
 private:
     mutable std::shared_mutex m_profilesGate{};
     std::vector<NearObjectProfile> m_profiles{};
-    std::string persist_location{"profiles"};
+    std::string persist_location{ "profiles" };
 };
 
 } // namespace service
