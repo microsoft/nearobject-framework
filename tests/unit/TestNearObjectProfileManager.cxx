@@ -85,7 +85,7 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
 
         auto& allocator = doc.GetAllocator();
 
-        auto persist_location = "testprofiles";
+        auto persist_location = "/home/shaneguan/nearobject-framework/build/testprofiles";
 
         // remove the file
         try {
@@ -104,18 +104,18 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
         // read the profiles
         auto profiles = profileManager.ReadPersistedProfiles();
 
-        REQUIRE(profiles.size()==2);
-        REQUIRE((nearobject::NearObjectProfile::profiles_match(profile,profiles[0]) || 
-                nearobject::NearObjectProfile::profiles_match(profile,profiles[1])));
-        REQUIRE((nearobject::NearObjectProfile::profiles_match(profile2,profiles[0]) || 
-                nearobject::NearObjectProfile::profiles_match(profile2,profiles[1])));
-
         // remove the file
         try {
             std::filesystem::remove(persist_location);
         }
         catch(const std::filesystem::filesystem_error& err) {
         }
+        
+        REQUIRE(profiles.size()==2);
+        REQUIRE((nearobject::NearObjectProfile::profiles_match(profile,profiles[0]) || 
+                nearobject::NearObjectProfile::profiles_match(profile,profiles[1])));
+        REQUIRE((nearobject::NearObjectProfile::profiles_match(profile2,profiles[0]) || 
+                nearobject::NearObjectProfile::profiles_match(profile2,profiles[1])));
     }
     
 }
