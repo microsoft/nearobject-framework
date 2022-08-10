@@ -56,6 +56,10 @@ public:
     std::vector<NearObjectProfile>
     GetAllProfiles() const;
 
+
+    /**
+    * @brief Sets the location to persist files to. 
+    */
     void
     SetPersistLocation(std::string loc);
 

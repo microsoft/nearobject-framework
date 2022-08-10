@@ -18,8 +18,21 @@ enum class NearObjectConnectionScope {
     Multicast,
 };
 
+/**
+* @brief Turns the enum NearObjectConnectionScope into the right string
+*
+* @param NearObjectConnectionScope The scope to convert to string
+* @return the string 
+*/
 std::string
 NearObjectConnectionScope_ToString(NearObjectConnectionScope s);
+
+/**
+* @brief Turns a string into the corresponding enum
+*
+* @param s the string 
+* @return NearObjectConnectionScope The matching enum
+*/
 NearObjectConnectionScope
 NearObjectConnectionScope_FromString(std::string s);
 
@@ -29,6 +42,9 @@ NearObjectConnectionScope_FromString(std::string s);
  */
 struct NearObjectProfile : public persist::Serializable
 {
+    /**
+    * @brief checks if the two profiles are the same
+    */
     static bool
     profiles_match(const NearObjectProfile& p1, const NearObjectProfile& p2);
 

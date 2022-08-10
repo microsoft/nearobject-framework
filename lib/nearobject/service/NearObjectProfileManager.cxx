@@ -1,8 +1,14 @@
 
+#include <fstream>
+#include <shared/jsonify/rapidjson/prettywriter.h>
 #include "NearObjectProfileManager.hxx"
+
+#include <sstream>
 
 using namespace nearobject;
 using namespace nearobject::service;
+
+using namespace rapidjson;
 
 std::vector<NearObjectProfile>
 NearObjectProfileManager::FindMatchingProfiles(const NearObjectProfile& connectionProfile) const
@@ -32,15 +38,6 @@ NearObjectProfileManager::AddProfile(const NearObjectProfile& profile, ProfileLi
     }
 }
 
-using namespace rapidjson;
-using namespace std;
-
-#include <cstdio>
-#include <fstream>
-#include <iostream>
-#include <shared/jsonify/rapidjson/prettywriter.h>
-#include <sstream>
-
 void
 NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
 {
@@ -48,10 +45,10 @@ NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
 
     rapidjson::Document document;
 
-    fstream readfilehandle, writefilehandle;
+    std::fstream readfilehandle, writefilehandle;
     std::string copyOfFileStr;
 
-    readfilehandle.open(location, ios::in);
+    readfilehandle.open(location, std::ios::in);
     if (readfilehandle.is_open()) {
         std::stringstream stringStream;
         stringStream << readfilehandle.rdbuf();
@@ -71,7 +68,7 @@ NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
     auto value = profile.to_serial(allocator);
     document.PushBack(value, allocator);
 
-    writefilehandle.open(NearObjectProfileManager::persist_location, ios::out);
+    writefilehandle.open(NearObjectProfileManager::persist_location, std::ios::out);
     if (!writefilehandle.is_open())
         return;
     StringBuffer sb;
@@ -91,8 +88,8 @@ std::vector<NearObjectProfile>
 NearObjectProfileManager::ReadPersistedProfiles() const
 {
     std::string location = NearObjectProfileManager::persist_location;
-    fstream readfilehandle;
-    readfilehandle.open(location, ios::in);
+    std::fstream readfilehandle;
+    readfilehandle.open(location, std::ios::in);
     if (!readfilehandle.is_open())
         return {};
 
