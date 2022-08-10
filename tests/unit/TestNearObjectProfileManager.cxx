@@ -105,7 +105,7 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
 
         auto& allocator = doc.GetAllocator();
 
-        auto persist_location = "/home/shaneguan/nearobject-framework/build/testprofiles";
+        auto persist_location = "testprofiles";
 
         // remove the file
         try {
