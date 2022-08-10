@@ -1,7 +1,7 @@
 
+#include "NearObjectProfileManager.hxx"
 #include <fstream>
 #include <shared/jsonify/rapidjson/prettywriter.h>
-#include "NearObjectProfileManager.hxx"
 
 #include <sstream>
 
@@ -69,8 +69,9 @@ NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
     document.PushBack(value, allocator);
 
     writefilehandle.open(NearObjectProfileManager::persist_location, std::ios::out);
-    if (!writefilehandle.is_open())
+    if (!writefilehandle.is_open()) {
         return;
+    }
     StringBuffer sb;
     PrettyWriter<StringBuffer> writer(sb);
     document.Accept(writer);
@@ -90,18 +91,21 @@ NearObjectProfileManager::ReadPersistedProfiles() const
     std::string location = NearObjectProfileManager::persist_location;
     std::fstream readfilehandle;
     readfilehandle.open(location, std::ios::in);
-    if (!readfilehandle.is_open())
+    if (!readfilehandle.is_open()) {
         return {};
+    }
 
     std::stringstream stringStream;
     stringStream << readfilehandle.rdbuf();
     std::string copyOfFileStr = stringStream.str();
 
     rapidjson::Document document;
-    if (document.Parse(copyOfFileStr.c_str()).HasParseError())
-        return {}; // TODO do error handling
-    if (!document.IsArray())
+    if (document.Parse(copyOfFileStr.c_str()).HasParseError()) {
         return {};
+    } // TODO do error handling
+    if (!document.IsArray()) {
+        return {};
+    }
 
     std::vector<NearObjectProfile> profiles;
 
