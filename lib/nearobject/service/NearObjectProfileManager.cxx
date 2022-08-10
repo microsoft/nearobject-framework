@@ -65,7 +65,7 @@ NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
     }
 
     auto& allocator = document.GetAllocator();
-    auto value = profile.to_serial(allocator);
+    auto value = profile.to_json(allocator);
     document.PushBack(value, allocator);
 
     writefilehandle.open(NearObjectProfileManager::persist_location, std::ios::out);

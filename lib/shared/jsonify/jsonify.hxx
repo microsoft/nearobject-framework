@@ -37,7 +37,7 @@ public:
      * @param allocator this is the allocator corresponding to the document for which the lifespan of this object will be bound by
      */
     virtual rapidjson::Value
-    to_serial(rapidjson::Document::AllocatorType&) const = 0;
+    to_json(rapidjson::Document::AllocatorType&) const = 0;
 
     /**
      * @brief Parse a json value and try to set the members of this object
