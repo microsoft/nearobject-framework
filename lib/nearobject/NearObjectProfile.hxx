@@ -75,7 +75,7 @@ struct NearObjectProfile :
     to_json(rapidjson::Document::AllocatorType&) const override;
 
     persist::ParseResult
-    parse_and_set(const rapidjson::Value&) override;
+    ParseAndSet(const rapidjson::Value&) override;
 };
 
 bool

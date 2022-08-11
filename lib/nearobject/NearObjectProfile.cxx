@@ -40,7 +40,7 @@ nearobject::NearObjectProfile::to_json(rapidjson::Document::AllocatorType& alloc
 }
 
 persist::ParseResult
-nearobject::NearObjectProfile::parse_and_set(const rapidjson::Value& value)
+nearobject::NearObjectProfile::ParseAndSet(const rapidjson::Value& value)
 {
     {
         rapidjson::Value::ConstMemberIterator itr = value.FindMember("Scope");
@@ -58,7 +58,7 @@ nearobject::NearObjectProfile::parse_and_set(const rapidjson::Value& value)
             return persist::ParseResult::Succeeded;
         }
         nearobject::NearObjectConnectionProfileSecurity sec;
-        auto result = sec.parse_and_set(itr->value);
+        auto result = sec.ParseAndSet(itr->value);
         if (result != persist::ParseResult::Succeeded) {
             return result;
         }

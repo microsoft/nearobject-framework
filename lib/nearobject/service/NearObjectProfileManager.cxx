@@ -118,7 +118,7 @@ NearObjectProfileManager::ReadPersistedProfiles(persist::PersistResult& rcode) c
     for (auto& obj : document.GetArray()) {
         // for each object, try to parse a profile from it
         NearObjectProfile profile;
-        auto res = profile.parse_and_set(obj);
+        auto res = profile.ParseAndSet(obj);
         if (res != persist::ParseResult::Succeeded) {
             rcode = persist::PersistResult::FailedToParseFile;
             return {}; 

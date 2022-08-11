@@ -77,7 +77,7 @@ public:
      * @return the status of the parsing. If anything other than Succeeded is returned, this object doesn't have its members set properly by the json value
      */
     virtual ParseResult
-    parse_and_set(const rapidjson::Value&) = 0;
+    ParseAndSet(const rapidjson::Value&) = 0;
 };
 
 }; // namespace persist

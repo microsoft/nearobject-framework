@@ -8,7 +8,7 @@ nearobject::NearObjectConnectionProfileSecurity::to_json(rapidjson::Document::Al
 }
 
 persist::ParseResult
-nearobject::NearObjectConnectionProfileSecurity::parse_and_set(const rapidjson::Value& value)
+nearobject::NearObjectConnectionProfileSecurity::ParseAndSet(const rapidjson::Value& value)
 {
     return persist::ParseResult::Succeeded;
 }
