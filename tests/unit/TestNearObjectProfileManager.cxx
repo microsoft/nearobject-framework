@@ -135,6 +135,10 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
         REQUIRE(rcode == persist::PersistResult::Succeeded);
         REQUIRE(profiles.size() == 2);
         REQUIRE((profile == profiles[0] || profile == profiles[1]));
-        REQUIRE((profile2 == profiles[0] || profile2 == profiles[1]));
+        if (profile == profiles[0]) {
+            REQUIRE(profile2 == profiles[1]);
+        } else {
+            REQUIRE(profile2 == profiles[0]);
+        }
     }
 }
