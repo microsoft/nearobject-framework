@@ -40,44 +40,41 @@ NearObjectProfileManager::AddProfile(const NearObjectProfile& profile, ProfileLi
 persist::PersistResult
 NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
 {
-    std::string location = NearObjectProfileManager::persist_location;
-
     rapidjson::Document document;
 
-    std::fstream readfilehandle;
+    std::ifstream readfilehandle;
     std::string copyOfFileStr;
 
-    readfilehandle.open(location, std::ios::in);
-    if (readfilehandle.is_open()) {
-        std::stringstream stringStream;
-        stringStream << readfilehandle.rdbuf();
-        copyOfFileStr = stringStream.str();
-        readfilehandle.close();
-    }
-    if (copyOfFileStr.size() != 0) {
-        if (document.Parse(copyOfFileStr.c_str()).HasParseError()) {
-            return persist::PersistResult::FailedToParseFile;
-        }
-        if (!document.IsArray()) {
-            return persist::PersistResult::FailedToParseFile;
-        }
-    } else {
+    readfilehandle.open(NearObjectProfileManager::persist_location, std::ios::in);
+    if (!readfilehandle.is_open()) {
+        // there's no file, so we just prepare the document object as an array
         document.SetArray();
+    } else {
+        rapidjson::IStreamWrapper isw(readfilehandle);
+        if (document.ParseStream(isw).HasParseError()) {
+            return persist::PersistResult::FailedToParseFile;
+        }
+        readfilehandle.close();
+        if (document.IsNull()) {
+            // the file was empty so we just prepare the document object as an array
+            document.SetArray();
+        } else if (!document.IsArray()) {
+            return persist::PersistResult::FailedToParseFile;
+        }
     }
 
     auto& allocator = document.GetAllocator();
     auto value = profile.to_json(allocator);
     document.PushBack(value, allocator);
 
-    std::fstream writefilehandle;
+    std::ofstream writefilehandle;
     writefilehandle.open(NearObjectProfileManager::persist_location, std::ios::out);
     if (!writefilehandle.is_open()) {
         return persist::PersistResult::FailedToOpenFile;
     }
-    StringBuffer sb;
-    PrettyWriter<StringBuffer> writer(sb);
+    rapidjson::OStreamWrapper osw(writefilehandle);
+    PrettyWriter<rapidjson::OStreamWrapper> writer(osw);
     document.Accept(writer);
-    writefilehandle << sb.GetString();
     writefilehandle.close();
     return persist::PersistResult::Succeeded;
 }
@@ -91,22 +88,22 @@ NearObjectProfileManager::SetPersistLocation(std::filesystem::path loc)
 std::vector<NearObjectProfile>
 NearObjectProfileManager::ReadPersistedProfiles(persist::PersistResult& rcode) const
 {
-    std::fstream readfilehandle;
+    std::ifstream readfilehandle;
     readfilehandle.open(NearObjectProfileManager::persist_location, std::ios::in);
     if (!readfilehandle.is_open()) {
         rcode = persist::PersistResult::FailedToOpenFile;
         return {};
     }
 
-    std::stringstream stringStream;
-    stringStream << readfilehandle.rdbuf();
-    std::string copyOfFileStr = stringStream.str();
-
     rapidjson::Document document;
-    if (document.Parse(copyOfFileStr.c_str()).HasParseError()) {
+
+    rapidjson::IStreamWrapper isw(readfilehandle);
+    if (document.ParseStream(isw).HasParseError()) {
         rcode = persist::PersistResult::FailedToParseFile;
         return {};
     }
+    readfilehandle.close();
+
     if (!document.IsArray()) {
         rcode = persist::PersistResult::FailedToParseFile;
         return {};
@@ -126,7 +123,6 @@ NearObjectProfileManager::ReadPersistedProfiles(persist::PersistResult& rcode) c
         profiles.push_back(std::move(profile));
     }
 
-    readfilehandle.close();
     rcode = persist::PersistResult::Succeeded;
     return profiles;
 }

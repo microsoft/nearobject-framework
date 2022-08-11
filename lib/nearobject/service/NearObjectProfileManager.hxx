@@ -10,6 +10,9 @@
 #include <filesystem>
 #include <nearobject/NearObjectProfile.hxx>
 #include <shared/jsonify/jsonify.hxx>
+#include <shared/jsonify/rapidjson/ostreamwrapper.h>
+#include <shared/jsonify/rapidjson/istreamwrapper.h>
+#include <shared/jsonify/rapidjson/writer.h>
 
 namespace nearobject
 {
