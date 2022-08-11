@@ -68,7 +68,7 @@ NearObjectDeviceManager::GetAllDevices() const
 {
     const auto nearObjectDevicesLock = std::scoped_lock{ m_nearObjectDeviceGate };
 
-    std::vector<std::weak_ptr<NearObjectDevice>> nearObjectDevices{};
+    std::vector<std::weak_ptr<NearObjectDevice>> nearObjectDevices;
     std::transform(std::cbegin(m_nearObjectDevices), std::cend(m_nearObjectDevices), std::back_inserter(nearObjectDevices), [](const auto& nearObjectDevice) {
         // Implicit conversion from std::shared_ptr to std::weak_ptr.
         return nearObjectDevice;
@@ -117,8 +117,8 @@ NearObjectDeviceManager::AddDiscoveryAgent(std::unique_ptr<NearObjectDeviceDisco
 
         // If the operation completed, get the results and add those devices.
         if (waitResult == std::future_status::ready) {
-            const auto existingDevices = existingDevicesProbe.get();
-            for (const auto& existingDevice : existingDevices) {
+            auto existingDevices = existingDevicesProbe.get();
+            for (auto& existingDevice : existingDevices) {
                 AddDevice(std::move(existingDevice));
             }
         } else {
