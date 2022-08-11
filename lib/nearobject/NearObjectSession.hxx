@@ -47,12 +47,12 @@ public:
 
     /**
      * @brief Get the Capabilities object
-     * 
-     * @return NearObjectCapabilities 
+     *
+     * @return NearObjectCapabilities
      */
-    NearObjectCapabilities 
+    NearObjectCapabilities
     GetCapabilities() const noexcept;
-    
+
     /**
      * @brief The status of a ranging session.
      */
@@ -154,10 +154,10 @@ private:
     struct RangingSession
     {
         explicit RangingSession(std::function<void()> rangingDataUpdated) :
-            RangingDataUpdated(rangingDataUpdated)
+            RangingDataUpdated(std::move(rangingDataUpdated))
         {}
 
-        std::function<void()> RangingDataUpdated;
+        const std::function<void()> RangingDataUpdated;
     };
 
 private:

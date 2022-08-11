@@ -18,7 +18,7 @@ NearObjectSession::~NearObjectSession()
     EndSession();
 }
 
-NearObjectCapabilities 
+NearObjectCapabilities
 NearObjectSession::GetCapabilities() const noexcept
 {
     return m_capabilities;
@@ -129,7 +129,7 @@ NearObjectSession::CreateNewRangingSession()
     } };
 
     // TODO: actually create new ranging session
-    m_rangingSession = std::move(rangingSession);
+    m_rangingSession.emplace(std::move(rangingSession));
 
     InvokeEventCallback([&](auto& eventCallbacks) {
         eventCallbacks.OnRangingStarted(this);
