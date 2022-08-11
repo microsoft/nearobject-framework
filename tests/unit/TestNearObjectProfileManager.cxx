@@ -12,15 +12,15 @@ namespace service
 class TestNearObjectProfileManager : public NearObjectProfileManager
 {
 public:
-    void
+    persist::PersistResult
     TestPersistProfile(const NearObjectProfile& profile)
     {
-        NearObjectProfileManager::PersistProfile(profile);
+        return NearObjectProfileManager::PersistProfile(profile);
     };
     std::vector<NearObjectProfile>
-    TestReadPersistedProfiles() const
+    TestReadPersistedProfiles(persist::PersistResult& rcode) const
     {
-        return NearObjectProfileManager::ReadPersistedProfiles();
+        return NearObjectProfileManager::ReadPersistedProfiles(rcode);
     };
 };
 } // namespace service
@@ -117,11 +117,14 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
         profileManager.SetPersistLocation(persist_location);
 
         // persist the profiles
-        profileManager.TestPersistProfile(profile);
-        profileManager.TestPersistProfile(profile2);
+        auto result = profileManager.TestPersistProfile(profile);
+        REQUIRE(result == persist::PersistResult::Succeeded);
+        result = profileManager.TestPersistProfile(profile2);
+        REQUIRE(result == persist::PersistResult::Succeeded);
 
         // read the profiles
-        auto profiles = profileManager.TestReadPersistedProfiles();
+        persist::PersistResult rcode;
+        auto profiles = profileManager.TestReadPersistedProfiles(rcode);
 
         // remove the file
         try {
@@ -129,6 +132,7 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
         } catch (const std::filesystem::filesystem_error& err) {
         }
 
+        REQUIRE(rcode == persist::PersistResult::Succeeded);
         REQUIRE(profiles.size() == 2);
         REQUIRE((nearobject::NearObjectProfile::profiles_match(profile, profiles[0]) ||
             nearobject::NearObjectProfile::profiles_match(profile, profiles[1])));

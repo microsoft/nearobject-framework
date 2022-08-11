@@ -68,17 +68,19 @@ protected:
      * @brief Persist the profile.
      *
      * @param profile The profile to persist.
+     * @return the PersistResult
      */
-    void
+    persist::PersistResult
     PersistProfile(const NearObjectProfile& profile);
 
     /**
      * @brief Obtain all persisted profiles.
      *
+     * @param rcode the return code
      * @return std::vector<NearObjectProfile>
      */
     std::vector<NearObjectProfile>
-    ReadPersistedProfiles() const;
+    ReadPersistedProfiles(persist::PersistResult& rcode) const;
 
 private:
     mutable std::shared_mutex m_profilesGate{};

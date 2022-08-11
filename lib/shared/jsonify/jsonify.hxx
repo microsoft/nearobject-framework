@@ -28,6 +28,37 @@ enum class ParseResult {
     UnknownError,
 };
 
+/**
+* @brief Describes the result of persisting a Serializable object
+*/
+enum class PersistResult {
+    /**
+    * @brief Persisting succeeded and a valid object produced.
+    */
+    Succeeded,
+
+    /**
+    * @brief Persisting failed and no valid object was produced.
+    */
+    Failed,
+
+    /**
+    * @brief Could not open the file for writing or reading
+    */
+    FailedToOpenFile,
+
+    /**
+    * @brief The saved profiles were not saved in the proper format
+    */
+    FailedToParseFile,
+
+    /**
+    * @brief An unknown error occurred. Nothing may be assumed about the
+    * content of the input data.
+    */
+    UnknownError,
+};
+
 class Serializable
 {
 public:

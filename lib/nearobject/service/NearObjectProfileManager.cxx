@@ -38,7 +38,7 @@ NearObjectProfileManager::AddProfile(const NearObjectProfile& profile, ProfileLi
     }
 }
 
-void
+persist::PersistResult
 NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
 {
     std::string location = NearObjectProfileManager::persist_location;
@@ -56,10 +56,12 @@ NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
         readfilehandle.close();
     }
     if (copyOfFileStr.size() != 0) {
-        if (document.Parse(copyOfFileStr.c_str()).HasParseError())
-            return; // TODO do error handling
-        if (!document.IsArray())
-            return;
+        if (document.Parse(copyOfFileStr.c_str()).HasParseError()) {
+            return persist::PersistResult::FailedToParseFile;
+        }
+        if (!document.IsArray()) {
+            return persist::PersistResult::FailedToParseFile;
+        }
     } else {
         document.SetArray();
     }
@@ -70,13 +72,14 @@ NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
 
     writefilehandle.open(NearObjectProfileManager::persist_location, std::ios::out);
     if (!writefilehandle.is_open()) {
-        return;
+        return persist::PersistResult::FailedToOpenFile;
     }
     StringBuffer sb;
     PrettyWriter<StringBuffer> writer(sb);
     document.Accept(writer);
     writefilehandle << sb.GetString();
     writefilehandle.close();
+    return persist::PersistResult::Succeeded;
 }
 
 void
@@ -86,12 +89,13 @@ NearObjectProfileManager::SetPersistLocation(std::string loc)
 }
 
 std::vector<NearObjectProfile>
-NearObjectProfileManager::ReadPersistedProfiles() const
+NearObjectProfileManager::ReadPersistedProfiles(persist::PersistResult& rcode) const
 {
     std::string location = NearObjectProfileManager::persist_location;
     std::fstream readfilehandle;
     readfilehandle.open(location, std::ios::in);
     if (!readfilehandle.is_open()) {
+        rcode = persist::PersistResult::FailedToOpenFile;
         return {};
     }
 
@@ -101,9 +105,11 @@ NearObjectProfileManager::ReadPersistedProfiles() const
 
     rapidjson::Document document;
     if (document.Parse(copyOfFileStr.c_str()).HasParseError()) {
+        rcode = persist::PersistResult::FailedToParseFile;
         return {};
-    } // TODO do error handling
+    }
     if (!document.IsArray()) {
+        rcode = persist::PersistResult::FailedToParseFile;
         return {};
     }
 
@@ -115,11 +121,13 @@ NearObjectProfileManager::ReadPersistedProfiles() const
         NearObjectProfile profile;
         auto res = profile.parse_and_set(obj);
         if (res != persist::ParseResult::Succeeded) {
-            return {}; // TODO do error handling
+            rcode = persist::PersistResult::FailedToParseFile;
+            return {}; 
         }
         profiles.push_back(std::move(profile));
     }
 
     readfilehandle.close();
+    rcode = persist::PersistResult::Succeeded;
     return profiles;
 }
