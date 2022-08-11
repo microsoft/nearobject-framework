@@ -15,11 +15,11 @@ nearobject::NearObjectConnectionScope_ToString(NearObjectConnectionScope s)
 }
 
 nearobject::NearObjectConnectionScope
-nearobject::NearObjectConnectionScope_FromString(std::string s)
+nearobject::NearObjectConnectionScope_FromString(const std::string& s)
 {
-    if (s == std::string("Unicast")) {
+    if (s == "Unicast") {
         return NearObjectConnectionScope::Unicast;
-    } else if (s == std::string("Multicast")) {
+    } else if (s == "Multicast") {
         return NearObjectConnectionScope::Multicast;
     } else {
         return NearObjectConnectionScope::Unknown;

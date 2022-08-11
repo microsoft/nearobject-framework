@@ -85,7 +85,7 @@ NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
 void
 NearObjectProfileManager::SetPersistLocation(std::filesystem::path loc)
 {
-    persist_location = loc;
+    persist_location = std::move(loc);
 }
 
 std::vector<NearObjectProfile>

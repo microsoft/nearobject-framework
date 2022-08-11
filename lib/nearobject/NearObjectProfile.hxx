@@ -3,7 +3,7 @@
 #define NEAR_OBJECT_PROFILE_HXX
 
 #include <optional>
-
+#include <string>
 #include "NearObjectProfileSecurity.hxx"
 #include <shared/jsonify/jsonify.hxx>
 
@@ -35,7 +35,7 @@ NearObjectConnectionScope_ToString(NearObjectConnectionScope s);
 * @return NearObjectConnectionScope The matching enum
 */
 NearObjectConnectionScope
-NearObjectConnectionScope_FromString(std::string s);
+NearObjectConnectionScope_FromString(const std::string& s);
 
 /**
  * @brief A collection of configuration that specifies how to connect to a near
