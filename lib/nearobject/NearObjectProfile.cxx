@@ -21,8 +21,7 @@ nearobject::NearObjectConnectionScope_FromString(std::string s)
         return NearObjectConnectionScope::Unicast;
     } else if (s == std::string("Multicast")) {
         return NearObjectConnectionScope::Multicast;
-    }
-    else {
+    } else {
         return NearObjectConnectionScope::Unknown;
     }
 }
@@ -34,7 +33,7 @@ nearobject::NearObjectProfile::to_json(rapidjson::Document::AllocatorType& alloc
     auto ScopeString = nearobject::NearObjectConnectionScope_ToString(Scope);
     v.AddMember("Scope", rapidjson::Value().SetString(ScopeString.c_str(), ScopeString.size(), allocator), allocator);
     if (Security) {
-        auto v_security = (*Security).to_json(allocator);
+        auto v_security = Security->to_json(allocator);
         v.AddMember("Security", v_security, allocator);
     }
     return std::move(v);
@@ -71,10 +70,12 @@ nearobject::NearObjectProfile::parse_and_set(const rapidjson::Value& value)
 bool
 nearobject::NearObjectProfile::profiles_match(const NearObjectProfile& p1, const NearObjectProfile& p2)
 {
-    if (p1.Scope != p2.Scope)
+    if (p1.Scope != p2.Scope) {
         return false;
-    if ((p1.Security == std::nullopt) != (p2.Security == std::nullopt))
+    }
+    if ((p1.Security == std::nullopt) != (p2.Security == std::nullopt)) {
         return false;
+    }
     if (p1.Security) {
         return nearobject::NearObjectConnectionProfileSecurity::profiles_match(*p1.Security, *p2.Security);
     }

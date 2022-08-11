@@ -7,7 +7,6 @@
 
 using namespace nearobject;
 using namespace nearobject::service;
-
 using namespace rapidjson;
 
 std::vector<NearObjectProfile>
@@ -45,7 +44,7 @@ NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
 
     rapidjson::Document document;
 
-    std::fstream readfilehandle, writefilehandle;
+    std::fstream readfilehandle;
     std::string copyOfFileStr;
 
     readfilehandle.open(location, std::ios::in);
@@ -70,6 +69,7 @@ NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
     auto value = profile.to_json(allocator);
     document.PushBack(value, allocator);
 
+    std::fstream writefilehandle;
     writefilehandle.open(NearObjectProfileManager::persist_location, std::ios::out);
     if (!writefilehandle.is_open()) {
         return persist::PersistResult::FailedToOpenFile;

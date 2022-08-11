@@ -110,7 +110,7 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
         // remove the file
         try {
             std::filesystem::remove(persist_location);
-        } catch (const std::filesystem::filesystem_error& err) {
+        } catch (const std::filesystem::filesystem_error&) {
         }
 
         nearobject::service::TestNearObjectProfileManager profileManager{};
@@ -129,7 +129,7 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
         // remove the file
         try {
             std::filesystem::remove(persist_location);
-        } catch (const std::filesystem::filesystem_error& err) {
+        } catch (const std::filesystem::filesystem_error&) {
         }
 
         REQUIRE(rcode == persist::PersistResult::Succeeded);

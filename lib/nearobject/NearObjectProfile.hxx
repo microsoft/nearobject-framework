@@ -41,7 +41,8 @@ NearObjectConnectionScope_FromString(std::string s);
  * @brief A collection of configuration that specifies how to connect to a near
  * object peer or set of peers.
  */
-struct NearObjectProfile : public persist::Serializable
+struct NearObjectProfile : 
+    public persist::Serializable
 {
     /**
     * @brief checks if the two profiles are the same
