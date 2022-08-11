@@ -19,6 +19,7 @@ To help keep the code consistent, please follow these general guidelines:
 * **DO** use spaces instead of tabs.
 * **DON'T** prefix variable names to describe their type or scope.
 * **DO** use `std::filesystem` for storage and UNIX path separators (`/`) where possible.
+* **DO** use complete words for variable and function names.
 * **DO** use the following table for variable naming:
 
 | Block | Style | Example |
