@@ -59,8 +59,8 @@ public:
 
 
     /**
-    * @brief Sets the location to persist files to. 
-    */
+     * @brief Sets the location to persist files to. 
+     */
     void
     SetPersistLocation(std::filesystem::path loc);
 
