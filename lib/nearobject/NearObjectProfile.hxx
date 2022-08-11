@@ -16,6 +16,7 @@ namespace nearobject
 enum class NearObjectConnectionScope {
     Unicast,
     Multicast,
+    Unknown
 };
 
 /**

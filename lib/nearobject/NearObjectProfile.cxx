@@ -19,8 +19,12 @@ nearobject::NearObjectConnectionScope_FromString(std::string s)
 {
     if (s == std::string("Unicast")) {
         return NearObjectConnectionScope::Unicast;
+    } else if (s == std::string("Multicast")) {
+        return NearObjectConnectionScope::Multicast;
     }
-    return NearObjectConnectionScope::Multicast; // TODO this means that the default is multicast
+    else {
+        return NearObjectConnectionScope::Unknown;
+    }
 }
 
 rapidjson::Value
@@ -45,6 +49,9 @@ nearobject::NearObjectProfile::parse_and_set(const rapidjson::Value& value)
             return persist::ParseResult::Failed;
         }
         NearObjectProfile::Scope = nearobject::NearObjectConnectionScope_FromString(itr->value.GetString());
+        if (NearObjectProfile::Scope == NearObjectConnectionScope::Unknown) {
+            return persist::ParseResult::Failed;
+        }
     }
     {
         rapidjson::Value::ConstMemberIterator itr = value.FindMember("Security");
