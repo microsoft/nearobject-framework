@@ -58,7 +58,7 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
 
         auto& allocator = doc.GetAllocator();
 
-        auto v = Sec1.to_json(allocator); // TOOD verify that to_json succeeded
+        auto v = Sec1.to_json(allocator);
         auto presult = Sec2.parse_and_set(v);
         REQUIRE(nearobject::NearObjectConnectionProfileSecurity::profiles_match(Sec1, Sec2));
         REQUIRE(presult == persist::ParseResult::Succeeded);
@@ -71,7 +71,7 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
 
         auto& allocator = doc.GetAllocator();
 
-        auto v = profile.to_json(allocator); // TOOD verify that to_json succeeded
+        auto v = profile.to_json(allocator);
         auto presult = profile2.parse_and_set(v);
         REQUIRE(presult == persist::ParseResult::Succeeded);
         REQUIRE(nearobject::NearObjectProfile::profiles_match(profile, profile2));
@@ -88,7 +88,7 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
 
         auto& allocator = doc.GetAllocator();
 
-        auto v = profile.to_json(allocator); // TOOD verify that to_json succeeded
+        auto v = profile.to_json(allocator);
         auto presult = profile2.parse_and_set(v);
         REQUIRE(presult == persist::ParseResult::Succeeded);
         REQUIRE(nearobject::NearObjectProfile::profiles_match(profile, profile2));
