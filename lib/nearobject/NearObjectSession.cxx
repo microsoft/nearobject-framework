@@ -126,7 +126,7 @@ NearObjectSession::CreateNewRangingSession()
     m_rangingSession = std::move(rangingSession);
 
     InvokeEventCallback([&](auto& eventCallbacks) {
-        eventCallbacks.OnNearObjectRangingSessionStarted(this);
+        eventCallbacks.OnNearObjectRangingStarted(this);
     });
 
     return RangingSessionStatus::Running;
@@ -144,7 +144,7 @@ NearObjectSession::StopRanging()
     m_rangingSession.reset();
 
     InvokeEventCallback([&](auto& eventCallbacks) {
-        eventCallbacks.OnNearObjectRangingSessionEnded(this);
+        eventCallbacks.OnNearObjectRangingStopped(this);
     });
 }
 

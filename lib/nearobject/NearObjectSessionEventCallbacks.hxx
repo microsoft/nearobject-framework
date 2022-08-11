@@ -32,20 +32,20 @@ struct NearObjectSessionEventCallbacks
     OnNearObjectSessionEnded(NearObjectSession *session) = 0;
 
     /**
-     * @brief Invoked when an active ranging session is started.
+     * @brief Invoked when active ranging starts.
      *
      * @param session
      */
     virtual void
-    OnNearObjectRangingSessionStarted(NearObjectSession *session) = 0;
+    OnNearObjectRangingStarted(NearObjectSession *session) = 0;
 
     /**
-     * @brief Invoked when an active ranging session is ended.
+     * @brief Invoked when active ranging stops.
      *
      * @param session
      */
     virtual void
-    OnNearObjectRangingSessionEnded(NearObjectSession *session) = 0;
+    OnNearObjectRangingStopped(NearObjectSession *session) = 0;
 
     /**
      * @brief Invoked when the properties of a near object involved in the session changes.

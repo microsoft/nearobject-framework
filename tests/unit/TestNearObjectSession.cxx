@@ -26,11 +26,11 @@ struct NearObjectSessionEventCallbacksNoop final :
     {}
 
     void
-    OnNearObjectRangingSessionStarted(NearObjectSession *) override
+    OnNearObjectRangingStarted(NearObjectSession *) override
     {}
 
     void
-    OnNearObjectRangingSessionEnded(NearObjectSession *) override
+    OnNearObjectRangingStopped(NearObjectSession *) override
     {}
 
     void
@@ -137,13 +137,13 @@ TEST_CASE("near object event handlers can be registered", "[basic]")
             }
 
             void
-            OnNearObjectRangingSessionStarted(NearObjectSession *session) override
+            OnNearObjectRangingStarted(NearObjectSession *session) override
             {
                 CHECK(Session == session);
             }
 
             void
-            OnNearObjectRangingSessionEnded(NearObjectSession *session) override
+            OnNearObjectRangingStopped(NearObjectSession *session) override
             {
                 CHECK(Session == session);
             }
