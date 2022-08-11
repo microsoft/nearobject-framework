@@ -60,7 +60,7 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
 
         auto v = Sec1.to_json(allocator);
         auto presult = Sec2.parse_and_set(v);
-        REQUIRE(nearobject::NearObjectConnectionProfileSecurity::profiles_match(Sec1, Sec2));
+        REQUIRE(Sec1 == Sec2);
         REQUIRE(presult == persist::ParseResult::Succeeded);
     }
 
@@ -74,7 +74,7 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
         auto v = profile.to_json(allocator);
         auto presult = profile2.parse_and_set(v);
         REQUIRE(presult == persist::ParseResult::Succeeded);
-        REQUIRE(nearobject::NearObjectProfile::profiles_match(profile, profile2));
+        REQUIRE(profile == profile2);
     }
 
     SECTION("NearObjectProfile (with Security) can be serialized and parsed")
@@ -91,7 +91,7 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
         auto v = profile.to_json(allocator);
         auto presult = profile2.parse_and_set(v);
         REQUIRE(presult == persist::ParseResult::Succeeded);
-        REQUIRE(nearobject::NearObjectProfile::profiles_match(profile, profile2));
+        REQUIRE(profile == profile2);
     }
 
     SECTION("NearObjectProfileManager::PersistProfile matches the read profiles")
@@ -134,9 +134,7 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
 
         REQUIRE(rcode == persist::PersistResult::Succeeded);
         REQUIRE(profiles.size() == 2);
-        REQUIRE((nearobject::NearObjectProfile::profiles_match(profile, profiles[0]) ||
-            nearobject::NearObjectProfile::profiles_match(profile, profiles[1])));
-        REQUIRE((nearobject::NearObjectProfile::profiles_match(profile2, profiles[0]) ||
-            nearobject::NearObjectProfile::profiles_match(profile2, profiles[1])));
+        REQUIRE((profile == profiles[0] || profile == profiles[1]));
+        REQUIRE((profile2 == profiles[0] || profile2 == profiles[1]));
     }
 }

@@ -12,17 +12,25 @@ namespace nearobject
  */
 struct NearObjectConnectionProfileSecurity : public persist::Serializable
 {
-    static bool
-    profiles_match(const NearObjectConnectionProfileSecurity& p1, const NearObjectConnectionProfileSecurity& p2);
-
     virtual ~NearObjectConnectionProfileSecurity() = default;
+
+    /**
+     * @brief checks if the two profiles are the same
+     */
+    bool
+    IsSame(const NearObjectConnectionProfileSecurity& other) const noexcept;
 
     rapidjson::Value
     to_json(rapidjson::Document::AllocatorType&) const override;
-    
+
     persist::ParseResult
     parse_and_set(const rapidjson::Value&) override;
 };
+
+bool
+operator==(const NearObjectConnectionProfileSecurity&, const NearObjectConnectionProfileSecurity&) noexcept;
+bool
+operator!=(const NearObjectConnectionProfileSecurity&, const NearObjectConnectionProfileSecurity&) noexcept;
 } // namespace nearobject
 
 #endif // NEAR_OBJECT_CONNECTION_PROFILE_SECURITY_HXX

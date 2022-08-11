@@ -2,10 +2,10 @@
 #ifndef NEAR_OBJECT_PROFILE_HXX
 #define NEAR_OBJECT_PROFILE_HXX
 
-#include <optional>
-#include <string>
 #include "NearObjectProfileSecurity.hxx"
+#include <optional>
 #include <shared/jsonify/jsonify.hxx>
+#include <string>
 
 namespace nearobject
 {
@@ -41,15 +41,9 @@ NearObjectConnectionScope_FromString(const std::string& s);
  * @brief A collection of configuration that specifies how to connect to a near
  * object peer or set of peers.
  */
-struct NearObjectProfile : 
+struct NearObjectProfile :
     public persist::Serializable
 {
-    /**
-    * @brief checks if the two profiles are the same
-    */
-    static bool
-    profiles_match(const NearObjectProfile& p1, const NearObjectProfile& p2);
-
     /**
      * @brief The supported connection scope.
      *
@@ -71,12 +65,23 @@ struct NearObjectProfile :
      */
     std::optional<NearObjectConnectionProfileSecurity> Security{ std::nullopt };
 
+    /**
+    * @brief checks if the two profiles are the same
+    */
+    bool
+    IsSame(const NearObjectProfile& other) const noexcept;
+
     rapidjson::Value
     to_json(rapidjson::Document::AllocatorType&) const override;
+
     persist::ParseResult
     parse_and_set(const rapidjson::Value&) override;
 };
 
+bool
+operator==(const NearObjectProfile&, const NearObjectProfile&) noexcept;
+bool
+operator!=(const NearObjectProfile&, const NearObjectProfile&) noexcept;
 } // namespace nearobject
 
 #endif // NEAR_OBJECT_PROFILE_HXX

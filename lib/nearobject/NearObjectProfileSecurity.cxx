@@ -14,7 +14,19 @@ nearobject::NearObjectConnectionProfileSecurity::parse_and_set(const rapidjson::
 }
 
 bool
-nearobject::NearObjectConnectionProfileSecurity::profiles_match(const NearObjectConnectionProfileSecurity& p1, const NearObjectConnectionProfileSecurity& p2)
+nearobject::NearObjectConnectionProfileSecurity::IsSame(const NearObjectConnectionProfileSecurity& other) const noexcept
 {
     return true;
+}
+
+bool
+nearobject::operator==(const NearObjectConnectionProfileSecurity& lhs, const NearObjectConnectionProfileSecurity& rhs) noexcept
+{
+    return lhs.IsSame(rhs);
+}
+
+bool
+nearobject::operator!=(const NearObjectConnectionProfileSecurity& lhs, const NearObjectConnectionProfileSecurity& rhs) noexcept
+{
+    return !(lhs == rhs);
 }

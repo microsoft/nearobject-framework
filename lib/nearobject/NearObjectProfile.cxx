@@ -68,16 +68,25 @@ nearobject::NearObjectProfile::parse_and_set(const rapidjson::Value& value)
 }
 
 bool
-nearobject::NearObjectProfile::profiles_match(const NearObjectProfile& p1, const NearObjectProfile& p2)
+nearobject::NearObjectProfile::IsSame(const NearObjectProfile& other) const noexcept
 {
-    if (p1.Scope != p2.Scope) {
+    if (Scope != other.Scope) {
         return false;
     }
-    if ((p1.Security == std::nullopt) != (p2.Security == std::nullopt)) {
+    if (Security != other.Security) {
         return false;
-    }
-    if (p1.Security) {
-        return nearobject::NearObjectConnectionProfileSecurity::profiles_match(*p1.Security, *p2.Security);
     }
     return true;
+}
+
+bool
+nearobject::operator==(const NearObjectProfile& lhs, const NearObjectProfile& rhs) noexcept
+{
+    return lhs.IsSame(rhs);
+}
+
+bool
+nearobject::operator!=(const NearObjectProfile& lhs, const NearObjectProfile& rhs) noexcept
+{
+    return !(lhs == rhs);
 }
