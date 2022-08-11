@@ -22,23 +22,23 @@ struct NearObjectSessionEventCallbacksNoop final :
     public NearObjectSessionEventCallbacks
 {
     void
-    OnNearObjectSessionEnded(NearObjectSession *) override
+    OnSessionEnded(NearObjectSession *) override
     {}
 
     void
-    OnNearObjectRangingStarted(NearObjectSession *) override
+    OnRangingStarted(NearObjectSession *) override
     {}
 
     void
-    OnNearObjectRangingStopped(NearObjectSession *) override
+    OnRangingStopped(NearObjectSession *) override
     {}
 
     void
-    OnNearObjectSessionNearObjectPropertiesChanged(NearObjectSession *, const std::vector<std::shared_ptr<NearObject>>) override
+    OnNearObjectPropertiesChanged(NearObjectSession *, const std::vector<std::shared_ptr<NearObject>>) override
     {}
 
     void
-    OnNearObjectSessionMembershipChanged(NearObjectSession *, const std::vector<std::shared_ptr<NearObject>>, const std::vector<std::shared_ptr<NearObject>>) override
+    OnSessionMembershipChanged(NearObjectSession *, const std::vector<std::shared_ptr<NearObject>>, const std::vector<std::shared_ptr<NearObject>>) override
     {}
 };
 
@@ -131,31 +131,31 @@ TEST_CASE("near object event handlers can be registered", "[basic]")
             public NearObjectSessionEventCallbacks
         {
             void
-            OnNearObjectSessionEnded(NearObjectSession *session) override
+            OnSessionEnded(NearObjectSession *session) override
             {
                 CHECK(Session == session);
             }
 
             void
-            OnNearObjectRangingStarted(NearObjectSession *session) override
+            OnRangingStarted(NearObjectSession *session) override
             {
                 CHECK(Session == session);
             }
 
             void
-            OnNearObjectRangingStopped(NearObjectSession *session) override
+            OnRangingStopped(NearObjectSession *session) override
             {
                 CHECK(Session == session);
             }
 
             void
-            OnNearObjectSessionNearObjectPropertiesChanged(NearObjectSession *session, const std::vector<std::shared_ptr<NearObject>> /* nearObjectsChanged */) override
+            OnNearObjectPropertiesChanged(NearObjectSession *session, const std::vector<std::shared_ptr<NearObject>> /* nearObjectsChanged */) override
             {
                 CHECK(Session == session);
             }
 
             void
-            OnNearObjectSessionMembershipChanged(NearObjectSession *session, const std::vector<std::shared_ptr<NearObject>> nearObjectsAdded, const std::vector<std::shared_ptr<NearObject>> nearObjectsRemoved) override
+            OnSessionMembershipChanged(NearObjectSession *session, const std::vector<std::shared_ptr<NearObject>> nearObjectsAdded, const std::vector<std::shared_ptr<NearObject>> nearObjectsRemoved) override
             {
                 CHECK(Session == session);
             }

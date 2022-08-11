@@ -29,7 +29,7 @@ struct NearObjectSessionEventCallbacks
      * TODO: This should probably indicate why it ended.
      */
     virtual void
-    OnNearObjectSessionEnded(NearObjectSession *session) = 0;
+    OnSessionEnded(NearObjectSession *session) = 0;
 
     /**
      * @brief Invoked when active ranging starts.
@@ -37,7 +37,7 @@ struct NearObjectSessionEventCallbacks
      * @param session
      */
     virtual void
-    OnNearObjectRangingStarted(NearObjectSession *session) = 0;
+    OnRangingStarted(NearObjectSession *session) = 0;
 
     /**
      * @brief Invoked when active ranging stops.
@@ -45,7 +45,7 @@ struct NearObjectSessionEventCallbacks
      * @param session
      */
     virtual void
-    OnNearObjectRangingStopped(NearObjectSession *session) = 0;
+    OnRangingStopped(NearObjectSession *session) = 0;
 
     /**
      * @brief Invoked when the properties of a near object involved in the session changes.
@@ -54,7 +54,7 @@ struct NearObjectSessionEventCallbacks
      * @param nearObjectsChanged
      */
     virtual void
-    OnNearObjectSessionNearObjectPropertiesChanged(NearObjectSession *session, const std::vector<std::shared_ptr<NearObject>> nearObjectsChanged) = 0;
+    OnNearObjectPropertiesChanged(NearObjectSession *session, const std::vector<std::shared_ptr<NearObject>> nearObjectsChanged) = 0;
 
     /**
      * @brief Invoked when membership of one or more NearObject's involved in
@@ -66,7 +66,7 @@ struct NearObjectSessionEventCallbacks
      * @param nearObjectsRemoved
      */
     virtual void
-    OnNearObjectSessionMembershipChanged(NearObjectSession *session, const std::vector<std::shared_ptr<NearObject>> nearObjectsAdded, const std::vector<std::shared_ptr<NearObject>> nearObjectsRemoved) = 0;
+    OnSessionMembershipChanged(NearObjectSession *session, const std::vector<std::shared_ptr<NearObject>> nearObjectsAdded, const std::vector<std::shared_ptr<NearObject>> nearObjectsRemoved) = 0;
 };
 } // namespace nearobject
 

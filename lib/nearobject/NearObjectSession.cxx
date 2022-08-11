@@ -47,7 +47,7 @@ NearObjectSession::AddNearObjectPeer(const std::shared_ptr<NearObject> nearObjec
 
     m_nearObjectPeers.push_back(nearObjectAdded);
     InvokeEventCallback([&](auto& eventCallbacks) {
-        eventCallbacks.OnNearObjectSessionMembershipChanged(this, { nearObjectAdded }, {});
+        eventCallbacks.OnSessionMembershipChanged(this, { nearObjectAdded }, {});
     });
 
     return true;
@@ -69,7 +69,7 @@ NearObjectSession::RemoveNearObjectPeer(const std::shared_ptr<NearObject> nearOb
     // its lifetime throughout this function.
     m_nearObjectPeers.erase(nearObjectToRemove);
     InvokeEventCallback([&](auto& eventCallbacks) {
-        eventCallbacks.OnNearObjectSessionMembershipChanged(this, {}, { nearObjectRemoved });
+        eventCallbacks.OnSessionMembershipChanged(this, {}, { nearObjectRemoved });
     });
 
     return true;
@@ -84,7 +84,7 @@ NearObjectSession::EndSession()
     StopRanging();
 
     InvokeEventCallback([&](auto& eventCallbacks) {
-        eventCallbacks.OnNearObjectSessionEnded(this);
+        eventCallbacks.OnSessionEnded(this);
     });
 }
 
@@ -92,7 +92,7 @@ void
 NearObjectSession::NearObjectPropertiesChanged(const std::shared_ptr<NearObject> nearObjectChanged)
 {
     InvokeEventCallback([&](auto& eventCallbacks) {
-        eventCallbacks.OnNearObjectSessionNearObjectPropertiesChanged(this, { nearObjectChanged });
+        eventCallbacks.OnNearObjectPropertiesChanged(this, { nearObjectChanged });
     });
 }
 
@@ -126,7 +126,7 @@ NearObjectSession::CreateNewRangingSession()
     m_rangingSession = std::move(rangingSession);
 
     InvokeEventCallback([&](auto& eventCallbacks) {
-        eventCallbacks.OnNearObjectRangingStarted(this);
+        eventCallbacks.OnRangingStarted(this);
     });
 
     return RangingSessionStatus::Running;
@@ -144,7 +144,7 @@ NearObjectSession::StopRanging()
     m_rangingSession.reset();
 
     InvokeEventCallback([&](auto& eventCallbacks) {
-        eventCallbacks.OnNearObjectRangingStopped(this);
+        eventCallbacks.OnRangingStopped(this);
     });
 }
 
