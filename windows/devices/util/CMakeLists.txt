@@ -21,4 +21,3 @@ target_link_libraries(windevutil
 )
 
 set_target_properties(windevutil PROPERTIES FOLDER windows/devices)
-

@@ -3,7 +3,6 @@
 #define UWB_DEVICE_DRIVER_HXX
 
 #include <initguid.h>
-#include <guiddef.h>
 
 namespace windows
 {
