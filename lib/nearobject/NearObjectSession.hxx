@@ -46,6 +46,14 @@ public:
     ~NearObjectSession();
 
     /**
+     * @brief Get the Capabilities object
+     * 
+     * @return NearObjectCapabilities 
+     */
+    NearObjectCapabilities 
+    GetCapabilities() const noexcept;
+    
+    /**
      * @brief The status of a ranging session.
      */
     enum class RangingSessionStatus {
@@ -145,20 +153,18 @@ private:
 
     struct RangingSession
     {
-        RangingSession(std::function<void()> rangingDataUpdated) :
+        explicit RangingSession(std::function<void()> rangingDataUpdated) :
             RangingDataUpdated(rangingDataUpdated)
         {}
 
         std::function<void()> RangingDataUpdated;
     };
 
-public:
-    const NearObjectCapabilities Capabilities;
-
 private:
     mutable std::mutex m_rangingStateGate;
     std::optional<RangingSession> m_rangingSession;
 
+    const NearObjectCapabilities m_capabilities;
     std::weak_ptr<NearObjectSessionEventCallbacks> m_eventCallbacks;
 
     std::mutex m_nearObjectPeersGate;
