@@ -51,6 +51,11 @@ TEST_CASE("near object profiles can be enumerated")
 
 TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
 {
+    auto testTempDirectory = std::filesystem::path("NearObjectTestTemp");
+    if (!std::filesystem::create_directories(testTempDirectory)) {
+        throw std::filesystem::filesystem_error("could not create test directory", std::error_code());
+    }
+
     SECTION("NearObjectProfileSecurity can be serialized and parsed")
     {
         nearobject::NearObjectConnectionProfileSecurity Sec1, Sec2;
@@ -105,7 +110,7 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
 
         auto& allocator = doc.GetAllocator();
 
-        auto persist_location = "testprofiles";
+        auto persist_location = testTempDirectory / std::filesystem::path("profiles");
 
         // remove the file
         try {
@@ -141,4 +146,5 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
             REQUIRE(profile2 == profiles[0]);
         }
     }
+    std::filesystem::remove(testTempDirectory);
 }
