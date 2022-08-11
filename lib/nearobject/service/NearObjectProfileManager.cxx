@@ -83,7 +83,7 @@ NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
 }
 
 void
-NearObjectProfileManager::SetPersistLocation(std::string loc)
+NearObjectProfileManager::SetPersistLocation(std::filesystem::path loc)
 {
     persist_location = loc;
 }
@@ -91,9 +91,8 @@ NearObjectProfileManager::SetPersistLocation(std::string loc)
 std::vector<NearObjectProfile>
 NearObjectProfileManager::ReadPersistedProfiles(persist::PersistResult& rcode) const
 {
-    std::string location = NearObjectProfileManager::persist_location;
     std::fstream readfilehandle;
-    readfilehandle.open(location, std::ios::in);
+    readfilehandle.open(NearObjectProfileManager::persist_location, std::ios::in);
     if (!readfilehandle.is_open()) {
         rcode = persist::PersistResult::FailedToOpenFile;
         return {};

@@ -7,6 +7,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <filesystem>
 #include <nearobject/NearObjectProfile.hxx>
 #include <shared/jsonify/jsonify.hxx>
 
@@ -61,7 +62,7 @@ public:
     * @brief Sets the location to persist files to. 
     */
     void
-    SetPersistLocation(std::string loc);
+    SetPersistLocation(std::filesystem::path loc);
 
 protected:
     /**
@@ -85,7 +86,7 @@ protected:
 private:
     mutable std::shared_mutex m_profilesGate{};
     std::vector<NearObjectProfile> m_profiles{};
-    std::string persist_location{ "profiles" };
+    std::filesystem::path persist_location{ "profiles" };
 };
 
 } // namespace service
