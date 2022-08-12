@@ -62,7 +62,7 @@ nearobject::NearObjectProfile::ParseAndSet(const rapidjson::Value& value)
         if (result != persist::ParseResult::Succeeded) {
             return result;
         }
-        *NearObjectProfile::Security = std::move(sec);
+        NearObjectProfile::Security.emplace(std::move(sec));
     }
     return persist::ParseResult::Succeeded;
 }
