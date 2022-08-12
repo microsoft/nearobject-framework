@@ -19,12 +19,13 @@ namespace notstd
 {
 namespace test
 {
-// 2fa25f41-e17f-41b9-b0fe-6581aef56ba8
-DEFINE_GUID(GuidOne,   0x2fa25f41, 0xe17f, 0x41b9, 0xb0, 0xfe, 0x65, 0x81, 0xae, 0xf5, 0x6b, 0xa8);
-// 3cf11b32-feef-4225-9b36-46331951befc
-DEFINE_GUID(GuidTwo,   0x3cf11b32, 0xfeef, 0x4225, 0x9b, 0x36, 0x46, 0x33, 0x19, 0x51, 0xbe, 0xfc);
-// 17fb06a9-1480-415c-883f-be4249e30043
-DEFINE_GUID(GuidThree, 0x17fb06a9, 0x1480, 0x415c, 0x88, 0x3f, 0xbe, 0x42, 0x49, 0xe3, 0x00, 0x43);
+DEFINE_GUID(GuidOne, 0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01);
+DEFINE_GUID(GuidTwo, 0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02);
+DEFINE_GUID(GuidThree, 0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03);
+
+// Declare built-in array.
+const GUID Guids[3] = { GuidOne, GuidTwo, GuidThree };
+
 } // namespace test
 } // namespace notstd
 
@@ -34,36 +35,43 @@ TEST_CASE("GUID type can be used with STL containers", "[basic][shared][windows]
 
     constexpr std::hash<GUID> guidHash{};
     constexpr std::equal_to<GUID> isGuidEqual{};
+    constexpr std::less<GUID> isGuidLess{};
+
+    // Array of GUIDs with manually (lexicographically) ordered items.
+    const std::array<GUID, 3> arrayOfOrderedGuids{ test::Guids[0], test::Guids[1], test::Guids[2] };
+
+    SECTION("std::less<GUID> orders items correctly")
+    {
+        REQUIRE(isGuidLess(arrayOfOrderedGuids[0], arrayOfOrderedGuids[1]));
+        REQUIRE(isGuidLess(arrayOfOrderedGuids[1], arrayOfOrderedGuids[2]));
+    }
 
     SECTION("GUID can be compared for equality")
     {
-        REQUIRE( isGuidEqual(test::GuidOne, test::GuidOne));
-        REQUIRE(!isGuidEqual(test::GuidOne, test::GuidTwo));
+        REQUIRE(isGuidEqual(test::Guids[0], test::Guids[0]));
+        REQUIRE(!isGuidEqual(test::Guids[0], test::Guids[1]));
     }
 
     SECTION("GUID can be used with std::hash")
     {
-        REQUIRE(guidHash(test::GuidOne) == guidHash(test::GuidOne));
-        REQUIRE(guidHash(test::GuidOne) != guidHash(test::GuidTwo));
+        REQUIRE(guidHash(test::Guids[0]) == guidHash(test::Guids[0]));
+        REQUIRE(guidHash(test::Guids[0]) != guidHash(test::Guids[1]));
     }
 
     SECTION("GUID can be used in sequence containers")
     {
-        // declare built-in array
-        const GUID builtInArrayOfGuids[3] = { test::GuidOne, test::GuidTwo, test::GuidThree };
-
         // array
-        std::array<GUID, 2> arrayOfGuidsOne{ test::GuidOne, test::GuidTwo };
-        std::array<GUID, 3> arrayOfGuidsTwo{ test::GuidOne, test::GuidTwo, test::GuidThree };
-        REQUIRE( std::equal(std::cbegin(arrayOfGuidsOne), std::cend(arrayOfGuidsOne), std::cbegin(arrayOfGuidsOne)));
+        std::array<GUID, 2> arrayOfGuidsOne{ test::Guids[0], test::Guids[1] };
+        std::array<GUID, 3> arrayOfGuidsTwo{ test::Guids[0], test::Guids[1], test::Guids[2] };
+        REQUIRE(std::equal(std::cbegin(arrayOfGuidsOne), std::cend(arrayOfGuidsOne), std::cbegin(arrayOfGuidsOne)));
         REQUIRE(!std::equal(std::cbegin(arrayOfGuidsOne), std::cend(arrayOfGuidsOne), std::cbegin(arrayOfGuidsTwo), std::cend(arrayOfGuidsTwo)));
 
         // vector
-        std::vector<GUID> vectorOfGuidsOne{ test::GuidOne, test::GuidTwo };
-        std::vector<GUID> vectorOfGuidsTwo{ test::GuidOne, test::GuidTwo, test::GuidThree };
+        std::vector<GUID> vectorOfGuidsOne{ test::Guids[0], test::Guids[1] };
+        std::vector<GUID> vectorOfGuidsTwo{ test::Guids[0], test::Guids[1], test::Guids[2] };
         REQUIRE(std::equal(std::cbegin(vectorOfGuidsOne), std::cend(vectorOfGuidsOne), std::cbegin(vectorOfGuidsOne)));
         REQUIRE(!std::equal(std::cbegin(vectorOfGuidsOne), std::cend(vectorOfGuidsOne), std::cbegin(vectorOfGuidsTwo), std::cend(vectorOfGuidsTwo)));
-        vectorOfGuidsOne.push_back(test::GuidThree);
+        vectorOfGuidsOne.push_back(test::Guids[2]);
         REQUIRE(std::equal(std::cbegin(vectorOfGuidsOne), std::cend(vectorOfGuidsOne), std::cbegin(vectorOfGuidsTwo)));
         vectorOfGuidsOne.pop_back();
         REQUIRE(!std::equal(std::cbegin(vectorOfGuidsOne), std::cend(vectorOfGuidsOne), std::cbegin(vectorOfGuidsTwo), std::cend(vectorOfGuidsTwo)));
@@ -72,67 +80,109 @@ TEST_CASE("GUID type can be used with STL containers", "[basic][shared][windows]
     SECTION("GUID can be used in associative containers")
     {
         {   // set
-            std::set<GUID> setOfGuidsOne{ test::GuidOne, test::GuidTwo };
-            std::set<GUID> setOfGuidsTwo{ test::GuidOne, test::GuidTwo };
-            REQUIRE(setOfGuidsOne == setOfGuidsTwo);
+            std::array<std::set<GUID>, 2> setsOfGuids = {
+                std::set<GUID>{ test::Guids[0], test::Guids[1] },
+                std::set<GUID>{ test::Guids[1], test::Guids[0] },
+            };
+            REQUIRE(setsOfGuids[0] == setsOfGuids[1]);
 
-            // add element to make equal to setOfGuidsOne
-            const auto [iterator, inserted] = setOfGuidsTwo.insert(test::GuidThree);
+            // verify correct ordering
+            REQUIRE(std::equal(std::cbegin(setsOfGuids[0]), std::cend(setsOfGuids[0]), std::cbegin(arrayOfOrderedGuids)));
+            REQUIRE(std::equal(std::cbegin(setsOfGuids[1]), std::cend(setsOfGuids[1]), std::cbegin(arrayOfOrderedGuids)));
+
+            // add element to make sets unequal
+            const auto [iterator, inserted] = setsOfGuids[1].insert(test::Guids[2]);
             REQUIRE(inserted == true);
-            REQUIRE(*iterator == test::GuidThree);
-            REQUIRE(setOfGuidsOne != setOfGuidsTwo);
+            REQUIRE(*iterator == test::Guids[2]);
+            REQUIRE(setsOfGuids[0] != setsOfGuids[1]);
 
             // remove added element
-            const auto guidNodeOne = setOfGuidsTwo.extract(test::GuidThree);
+            const auto guidNodeOne = setsOfGuids[1].extract(test::Guids[2]);
             REQUIRE(!guidNodeOne.empty());
-            REQUIRE(guidNodeOne.value() == test::GuidThree);
-            REQUIRE(setOfGuidsOne == setOfGuidsTwo);
+            REQUIRE(guidNodeOne.value() == test::Guids[2]);
+            REQUIRE(setsOfGuids[0] == setsOfGuids[1]);
 
             // remove non-existent element
-            const auto guidNodeTwo = setOfGuidsOne.extract(test::GuidThree);
+            const auto guidNodeTwo = setsOfGuids[0].extract(test::Guids[2]);
             REQUIRE(guidNodeTwo.empty());
 
             // swap and verify equality
-            setOfGuidsOne.swap(setOfGuidsTwo);
-            REQUIRE(setOfGuidsOne == setOfGuidsTwo);
+            setsOfGuids[0].swap(setsOfGuids[1]);
+            REQUIRE(setsOfGuids[0] == setsOfGuids[1]);
         }
 
         {   // map
-            std::map<int, GUID> mapOfGuidsOne{ {1, test::GuidOne }, {2, test::GuidTwo } };
-            std::map<int, GUID> mapOfGuidsTwo{ {1, test::GuidOne }, {2, test::GuidTwo } };
-            REQUIRE(mapOfGuidsOne == mapOfGuidsTwo);
+            std::array<std::map<int, GUID>, 2> mapsOfGuids = {
+                std::map<int, GUID>{ { 1, test::Guids[0] }, { 2, test::Guids[1] } },
+                std::map<int, GUID>{ { 1, test::Guids[0] }, { 2, test::Guids[1] } },
+            };
+            
+            REQUIRE(mapsOfGuids[0] == mapsOfGuids[1]);
 
-            // add element to make equal to mapOfGuidsOne
-            const auto [iterator, inserted] = mapOfGuidsTwo.insert({3, test::GuidThree});
+            // add element to make maps unequal
+            const auto [iterator, inserted] = mapsOfGuids[1].insert({ 3, test::Guids[2] });
             REQUIRE(inserted == true);
             const auto [key, value] = *iterator;
             REQUIRE(key == 3);
-            REQUIRE(value == test::GuidThree);
-            REQUIRE(mapOfGuidsOne != mapOfGuidsTwo);
+            REQUIRE(value == test::Guids[2]);
+            REQUIRE(mapsOfGuids[0] != mapsOfGuids[1]);
 
             // remove added element
-            const auto guidNodeOne = mapOfGuidsTwo.extract(3);
+            const auto guidNodeOne = mapsOfGuids[1].extract(3);
             REQUIRE(!guidNodeOne.empty());
             REQUIRE(guidNodeOne.key() == 3);
-            REQUIRE(guidNodeOne.mapped() == test::GuidThree);
-            REQUIRE(mapOfGuidsOne == mapOfGuidsTwo);
+            REQUIRE(guidNodeOne.mapped() == test::Guids[2]);
+            REQUIRE(mapsOfGuids[0] == mapsOfGuids[1]);
         }
 
-        // map, multi{set|map}
+        {   // multiset
+        }
     }
 
     SECTION("GUID can be used in unordered associative containers")
     {
-        // unordered_{set|map}, unordered_multi{set|map}
+        {   // unordered_set
+            std::array<std::unordered_set<GUID>,2> usetsOfGuids = {
+                std::unordered_set<GUID>{ test::Guids[0], test::Guids[1] },
+                std::unordered_set<GUID>{ test::Guids[0], test::Guids[1] },
+            };
+            REQUIRE(usetsOfGuids[0] == usetsOfGuids[1]);
+
+            // add element to make sets unequal
+            const auto [iterator, inserted] = usetsOfGuids[1].insert(test::Guids[2]);
+            REQUIRE(inserted == true);
+            REQUIRE(*iterator == test::Guids[2]);
+            REQUIRE(usetsOfGuids[0] != usetsOfGuids[1]);
+
+            // remove added element
+            const auto guidNodeOne = usetsOfGuids[1].extract(test::Guids[2]);
+            REQUIRE(!guidNodeOne.empty());
+            REQUIRE(guidNodeOne.value() == test::Guids[2]);
+            REQUIRE(usetsOfGuids[0] == usetsOfGuids[1]);
+
+            // remove non-existent element
+            const auto guidNodeTwo = usetsOfGuids[0].extract(test::Guids[2]);
+            REQUIRE(guidNodeTwo.empty());
+
+            // swap and verify equality
+            usetsOfGuids[0].swap(usetsOfGuids[1]);
+            REQUIRE(usetsOfGuids[0] == usetsOfGuids[1]);
+        }
+
+        {   // unordered_map
+        }
+
+        {   // unordered_multiset
+        }
     }
 
     SECTION("GUID can be used in container adaptors")
     {
-        // stack, queue, priority_queue
+        // priority_queue
     }
 
     SECTION("GUID can be used with algorithms")
     {
-        // std::transform, find_first_of, unordered_map?
+        // std::transform, find_first_of
     }
 }
