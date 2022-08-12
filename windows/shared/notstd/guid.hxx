@@ -5,8 +5,6 @@
 #include <rpc.h>
 #include <guiddef.h>
 
-// Note: This is Windows-specific and requires linking to rpcrt4.lib
-
 namespace std
 {
     template <>
