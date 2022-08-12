@@ -24,7 +24,7 @@ DEFINE_GUID(GuidTwo, 0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0
 DEFINE_GUID(GuidThree, 0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03);
 
 // Declare built-in array.
-const GUID Guids[3] = { GuidOne, GuidTwo, GuidThree };
+std::array<GUID, 3> Guids = { GuidOne, GuidTwo, GuidThree };
 
 } // namespace test
 } // namespace notstd
