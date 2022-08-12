@@ -1,25 +1,27 @@
 
 #include "NearObjectProfile.hxx"
 
-std::string
-nearobject::NearObjectConnectionScope_ToString(NearObjectConnectionScope s)
+using namespace nearobject;
+
+auto
+nearobject::NearObjectConnectionScope_ToString(NearObjectConnectionScope scope)
 {
-    switch (s) {
-        case NearObjectConnectionScope::Unicast:
-            return "Unicast";
-        case NearObjectConnectionScope::Multicast:
-            return "Multicast";
-        default:
-            return "Unknown";
+    switch (scope) {
+    case NearObjectConnectionScope::Unicast:
+        return "Unicast";
+    case NearObjectConnectionScope::Multicast:
+        return "Multicast";
+    default:
+        return "Unknown";
     }
 }
 
 nearobject::NearObjectConnectionScope
-nearobject::NearObjectConnectionScope_FromString(const std::string& s)
+nearobject::NearObjectConnectionScope_FromString(const std::string& scope)
 {
-    if (s == "Unicast") {
+    if (scope == "Unicast") {
         return NearObjectConnectionScope::Unicast;
-    } else if (s == "Multicast") {
+    } else if (scope == "Multicast") {
         return NearObjectConnectionScope::Multicast;
     } else {
         return NearObjectConnectionScope::Unknown;
@@ -27,27 +29,27 @@ nearobject::NearObjectConnectionScope_FromString(const std::string& s)
 }
 
 rapidjson::Value
-nearobject::NearObjectProfile::to_json(rapidjson::Document::AllocatorType& allocator) const
+NearObjectProfile::ToJson(rapidjson::Document::AllocatorType& allocator) const
 {
-    Value v(rapidjson::kObjectType);
-    auto ScopeString = nearobject::NearObjectConnectionScope_ToString(Scope);
-    v.AddMember("Scope", rapidjson::Value().SetString(ScopeString.c_str(), ScopeString.size(), allocator), allocator);
+    Value jsonValue(rapidjson::kObjectType);
+    std::string scopeString = NearObjectConnectionScope_ToString(Scope);
+    jsonValue.AddMember("Scope", rapidjson::Value().SetString(scopeString.c_str(), static_cast<rapidjson::SizeType>(scopeString.size()), allocator), allocator);
     if (Security) {
-        auto v_security = Security->to_json(allocator);
-        v.AddMember("Security", v_security, allocator);
+        auto jsonValueSecurity = Security->ToJson(allocator);
+        jsonValue.AddMember("Security", jsonValueSecurity, allocator);
     }
-    return std::move(v);
+    return std::move(jsonValue);
 }
 
 persist::ParseResult
-nearobject::NearObjectProfile::ParseAndSet(const rapidjson::Value& value)
+NearObjectProfile::ParseAndSet(const rapidjson::Value& value)
 {
     {
         rapidjson::Value::ConstMemberIterator itr = value.FindMember("Scope");
         if (itr == value.MemberEnd()) {
             return persist::ParseResult::Failed;
         }
-        NearObjectProfile::Scope = nearobject::NearObjectConnectionScope_FromString(itr->value.GetString());
+        NearObjectProfile::Scope = NearObjectConnectionScope_FromString(itr->value.GetString());
         if (NearObjectProfile::Scope == NearObjectConnectionScope::Unknown) {
             return persist::ParseResult::Failed;
         }
@@ -57,18 +59,18 @@ nearobject::NearObjectProfile::ParseAndSet(const rapidjson::Value& value)
         if (itr == value.MemberEnd()) {
             return persist::ParseResult::Succeeded;
         }
-        nearobject::NearObjectConnectionProfileSecurity sec;
-        auto result = sec.ParseAndSet(itr->value);
+        NearObjectConnectionProfileSecurity security;
+        auto result = security.ParseAndSet(itr->value);
         if (result != persist::ParseResult::Succeeded) {
             return result;
         }
-        NearObjectProfile::Security.emplace(std::move(sec));
+        NearObjectProfile::Security.emplace(std::move(security));
     }
     return persist::ParseResult::Succeeded;
 }
 
 bool
-nearobject::NearObjectProfile::IsSame(const NearObjectProfile& other) const noexcept
+NearObjectProfile::IsSame(const NearObjectProfile& other) const noexcept
 {
     if (Scope != other.Scope) {
         return false;

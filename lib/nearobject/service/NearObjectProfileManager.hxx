@@ -2,17 +2,16 @@
 #ifndef NEAR_OBJECT_PROFILE_MANAGER_HXX
 #define NEAR_OBJECT_PROFILE_MANAGER_HXX
 
+#include <filesystem>
 #include <shared_mutex>
 #include <vector>
 
-#include <fstream>
-#include <iostream>
-#include <filesystem>
-#include <nearobject/NearObjectProfile.hxx>
 #include <shared/jsonify/jsonify.hxx>
-#include <shared/jsonify/rapidjson/ostreamwrapper.h>
 #include <shared/jsonify/rapidjson/istreamwrapper.h>
+#include <shared/jsonify/rapidjson/ostreamwrapper.h>
 #include <shared/jsonify/rapidjson/writer.h>
+
+#include <nearobject/NearObjectProfile.hxx>
 
 namespace nearobject
 {
@@ -60,12 +59,13 @@ public:
     std::vector<NearObjectProfile>
     GetAllProfiles() const;
 
-
     /**
      * @brief Sets the location to persist files to. 
+     * 
+     * @param location The full path of the filesystem location to persist files.
      */
     void
-    SetPersistLocation(std::filesystem::path loc);
+    SetPersistLocation(std::filesystem::path location);
 
 protected:
     /**
@@ -80,16 +80,16 @@ protected:
     /**
      * @brief Obtain all persisted profiles.
      *
-     * @param rcode the return code
+     * @param persistResult the return code
      * @return std::vector<NearObjectProfile>
      */
     std::vector<NearObjectProfile>
-    ReadPersistedProfiles(persist::PersistResult& rcode) const;
+    ReadPersistedProfiles(persist::PersistResult& persistResult) const;
 
 private:
     mutable std::shared_mutex m_profilesGate{};
     std::vector<NearObjectProfile> m_profiles{};
-    std::filesystem::path persist_location{ "profiles" };
+    std::filesystem::path m_persistLocation{ "profiles" };
 };
 
 } // namespace service
