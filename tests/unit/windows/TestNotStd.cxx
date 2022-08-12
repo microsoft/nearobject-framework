@@ -236,6 +236,28 @@ TEST_CASE("GUID type can be used with STL containers", "[basic][shared][windows]
 
     SECTION("GUID can be used with algorithms")
     {
-        // std::transform, find_first_of
+        // find and find_if
+        for (const auto& guidToFind : test::Guids) {
+            const auto findResult = std::find(std::cbegin(test::Guids), std::cend(test::Guids), guidToFind);
+            REQUIRE(findResult != std::cend(test::Guids));
+            REQUIRE(*findResult == guidToFind);
+
+            const auto findIfResult = std::find_if(std::cbegin(test::Guids), std::cend(test::Guids), [&](const auto& guidToCheck) {
+                return (guidToCheck == guidToFind);
+            });
+            REQUIRE(findIfResult != std::cend(test::Guids));
+            REQUIRE(*findIfResult == guidToFind);
+        }
+
+        // remove and erase
+        std::vector<GUID> vectorOfGuids{ std::cbegin(test::Guids), std::cend(test::Guids) };
+        for (const auto& guidToRemove : test::Guids) {
+            const auto size = vectorOfGuids.size();
+            vectorOfGuids.erase(std::remove_if(std::begin(vectorOfGuids), std::end(vectorOfGuids), [&](const auto& guidToCheck) {
+                return (guidToCheck == guidToRemove);
+            }), std::end(vectorOfGuids));
+            REQUIRE(vectorOfGuids.size() == size - 1);
+        }
+        REQUIRE(vectorOfGuids.empty());
     }
 }
