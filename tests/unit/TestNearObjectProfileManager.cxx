@@ -1,4 +1,6 @@
+
 #include <filesystem>
+#include <vector>
 
 #include <catch2/catch.hpp>
 
@@ -8,6 +10,8 @@
 namespace nearobject
 {
 namespace service
+{
+namespace test
 {
 class TestNearObjectProfileManager 
     : public NearObjectProfileManager
@@ -20,11 +24,12 @@ public:
     }
 
     std::vector<NearObjectProfile>
-    TestReadPersistedProfiles(persist::PersistResult& rcode) const
+    TestReadPersistedProfiles(persist::PersistResult& persistResult) const
     {
-        return NearObjectProfileManager::ReadPersistedProfiles(rcode);
+        return NearObjectProfileManager::ReadPersistedProfiles(persistResult);
     }
 };
+} // namespace test
 } // namespace service
 } // namespace nearobject
 
@@ -64,25 +69,29 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
 
     SECTION("NearObjectProfileSecurity can be serialized and parsed")
     {
-        nearobject::NearObjectConnectionProfileSecurity Sec1;
-        nearobject::NearObjectConnectionProfileSecurity Sec2;
+        using namespace nearobject;
 
-        rapidjson::Document doc;
-        auto& allocator = doc.GetAllocator();
+        NearObjectConnectionProfileSecurity security1;
+        NearObjectConnectionProfileSecurity security2;
 
-        const auto jsonValue = Sec1.ToJson(allocator);
-        const auto parseResult = Sec2.ParseAndSet(jsonValue);
-        REQUIRE(Sec1 == Sec2);
+        rapidjson::Document document;
+        auto& allocator = document.GetAllocator();
+
+        const auto jsonValue = security1.ToJson(allocator);
+        const auto parseResult = security2.ParseAndSet(jsonValue);
+        REQUIRE(security1 == security2);
         REQUIRE(parseResult == persist::ParseResult::Succeeded);
     }
 
     SECTION("NearObjectProfile (with no Security) can be serialized and parsed")
     {
-        nearobject::NearObjectProfile profile1;
-        nearobject::NearObjectProfile profile2;
+        using namespace nearobject;
 
-        rapidjson::Document doc;
-        auto& allocator = doc.GetAllocator();
+        NearObjectProfile profile1;
+        NearObjectProfile profile2;
+
+        rapidjson::Document document;
+        auto& allocator = document.GetAllocator();
 
         auto jsonValue = profile1.ToJson(allocator);
         auto parseResult = profile2.ParseAndSet(jsonValue);
@@ -92,14 +101,17 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
 
     SECTION("NearObjectProfile (with Security) can be serialized and parsed")
     {
-        nearobject::NearObjectProfile profile1;
-        nearobject::NearObjectProfile profile2;
-        nearobject::NearObjectConnectionProfileSecurity Sec;
+        using namespace nearobject;
+        using namespace nearobject::service;
 
-        profile1.Security.emplace(std::move(Sec));
+        NearObjectProfile profile1;
+        NearObjectProfile profile2;
+        NearObjectConnectionProfileSecurity security;
 
-        rapidjson::Document doc;
-        auto& allocator = doc.GetAllocator();
+        profile1.Security.emplace(std::move(security));
+
+        rapidjson::Document document;
+        auto& allocator = document.GetAllocator();
 
         auto jsonValue = profile1.ToJson(allocator);
         auto parseResult = profile2.ParseAndSet(jsonValue);
@@ -109,14 +121,17 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
 
     SECTION("NearObjectProfileManager::PersistProfile matches the read profiles")
     {
-        nearobject::NearObjectProfile profile1;
-        nearobject::NearObjectProfile profile2;
-        nearobject::NearObjectConnectionProfileSecurity Sec;
+        using namespace nearobject;
+        using namespace nearobject::service;
 
-        profile1.Security.emplace(std::move(Sec));
+        NearObjectProfile profile1;
+        NearObjectProfile profile2;
+        NearObjectConnectionProfileSecurity security;
 
-        rapidjson::Document doc;
-        auto& allocator = doc.GetAllocator();
+        profile1.Security.emplace(std::move(security));
+
+        rapidjson::Document document;
+        auto& allocator = document.GetAllocator();
 
         const auto persistLocation = testTempDirectory / std::filesystem::path("profiles");
 
@@ -126,7 +141,7 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
         } catch (const std::filesystem::filesystem_error&) {
         }
 
-        nearobject::service::TestNearObjectProfileManager profileManager{};
+        test::TestNearObjectProfileManager profileManager{};
         profileManager.SetPersistLocation(persistLocation);
 
         // persist the profiles
