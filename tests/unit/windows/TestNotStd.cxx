@@ -42,8 +42,12 @@ TEST_CASE("GUID type can be used with STL containers", "[basic][shared][windows]
 
     SECTION("std::less<GUID> orders items correctly")
     {
-        REQUIRE(isGuidLess(arrayOfOrderedGuids[0], arrayOfOrderedGuids[1]));
-        REQUIRE(isGuidLess(arrayOfOrderedGuids[1], arrayOfOrderedGuids[2]));
+        REQUIRE(!isGuidLess(arrayOfOrderedGuids[1], arrayOfOrderedGuids[0]));
+        REQUIRE(!isGuidLess(arrayOfOrderedGuids[2], arrayOfOrderedGuids[0]));
+        REQUIRE(!isGuidLess(arrayOfOrderedGuids[2], arrayOfOrderedGuids[1]));
+        REQUIRE(!isGuidLess(arrayOfOrderedGuids[0], arrayOfOrderedGuids[0]));
+        REQUIRE(!isGuidLess(arrayOfOrderedGuids[1], arrayOfOrderedGuids[1]));
+        REQUIRE(!isGuidLess(arrayOfOrderedGuids[2], arrayOfOrderedGuids[2]));
     }
 
     SECTION("GUID can be compared for equality")
