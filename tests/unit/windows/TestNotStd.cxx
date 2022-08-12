@@ -60,6 +60,8 @@ TEST_CASE("GUID type can be used with STL containers", "[basic][shared][windows]
     {
         REQUIRE(guidHash(test::Guids[0]) == guidHash(test::Guids[0]));
         REQUIRE(guidHash(test::Guids[0]) != guidHash(test::Guids[1]));
+        REQUIRE(guidHash(test::Guids[0]) != guidHash(test::Guids[2]));
+        REQUIRE(guidHash(test::Guids[1]) != guidHash(test::Guids[2]));
     }
 
     SECTION("GUID can be used in sequence containers")
