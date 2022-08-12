@@ -23,14 +23,11 @@ namespace service
 class NearObjectDevice
 {
 public:
-    // Disable copy and move operations
+    virtual ~NearObjectDevice() = default;
     NearObjectDevice(NearObjectDevice&) = delete;
     NearObjectDevice(NearObjectDevice&&) = delete;
-    NearObjectDevice&
-    operator=(NearObjectDevice&) = delete;
-    NearObjectDevice&
-    operator=(NearObjectDevice&&) = delete;
-    virtual ~NearObjectDevice() = default;
+    NearObjectDevice& operator=(NearObjectDevice&) = delete;
+    NearObjectDevice& operator=(NearObjectDevice&&) = delete;
 
     /**
      * @brief Construct a new Near Object Device object

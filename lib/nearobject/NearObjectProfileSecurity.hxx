@@ -10,9 +10,15 @@ namespace nearobject
  * @brief A collection of configuration that specifies what security is required
  * when communicating with a near object peer or set of peers.
  */
-struct NearObjectConnectionProfileSecurity : public persist::Serializable
+struct NearObjectConnectionProfileSecurity 
+    : public persist::Serializable
 {
     virtual ~NearObjectConnectionProfileSecurity() = default;
+    NearObjectConnectionProfileSecurity() = default;
+    NearObjectConnectionProfileSecurity(const NearObjectConnectionProfileSecurity&) = default;
+    NearObjectConnectionProfileSecurity(NearObjectConnectionProfileSecurity&&) = default;
+    NearObjectConnectionProfileSecurity& operator=(const NearObjectConnectionProfileSecurity&) = default;
+    NearObjectConnectionProfileSecurity& operator=(NearObjectConnectionProfileSecurity&&) = default;
 
     /**
      * @brief checks if the two profiles are the same

@@ -64,6 +64,11 @@ class Serializable
 {
 public:
     virtual ~Serializable() = default;
+    Serializable() = default;
+    Serializable(const Serializable&) = default;
+    Serializable(Serializable&&) = default;
+    Serializable& operator=(const Serializable&) = default;
+    Serializable& operator=(Serializable&&) = default;
 
     /**
      * @brief Turns this object into a json value

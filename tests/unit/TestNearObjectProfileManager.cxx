@@ -96,7 +96,7 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
         nearobject::NearObjectProfile profile2;
         nearobject::NearObjectConnectionProfileSecurity Sec;
 
-        *profile1.Security = Sec;
+        profile1.Security.emplace(std::move(Sec));
 
         rapidjson::Document doc;
         auto& allocator = doc.GetAllocator();
@@ -113,7 +113,7 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
         nearobject::NearObjectProfile profile2;
         nearobject::NearObjectConnectionProfileSecurity Sec;
 
-        *profile1.Security = Sec;
+        profile1.Security.emplace(std::move(Sec));
 
         rapidjson::Document doc;
         auto& allocator = doc.GetAllocator();
@@ -136,7 +136,7 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
         REQUIRE(result == persist::PersistResult::Succeeded);
 
         // read the profiles
-        persist::PersistResult persistResult;
+        persist::PersistResult persistResult = persist::PersistResult::UnknownError;
         auto profiles = profileManager.TestReadPersistedProfiles(persistResult);
 
         // remove the file

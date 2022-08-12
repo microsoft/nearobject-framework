@@ -2,10 +2,11 @@
 #ifndef NEAR_OBJECT_PROFILE_HXX
 #define NEAR_OBJECT_PROFILE_HXX
 
-#include "NearObjectProfileSecurity.hxx"
 #include <optional>
 #include <shared/jsonify/jsonify.hxx>
 #include <string>
+
+#include "NearObjectProfileSecurity.hxx"
 
 namespace nearobject
 {
@@ -20,22 +21,22 @@ enum class NearObjectConnectionScope {
 };
 
 /**
-* @brief Turns the enum NearObjectConnectionScope into the right string
-*
-* @param NearObjectConnectionScope The scope to convert to string
-* @return the string 
-*/
+ * @brief Turns the enum NearObjectConnectionScope into the right string
+ * 
+ * @param scope The scope to convert to string
+ * @return std::string 
+ */
 std::string
-NearObjectConnectionScope_ToString(NearObjectConnectionScope s);
+NearObjectConnectionScope_ToString(NearObjectConnectionScope scope);
 
 /**
-* @brief Turns a string into the corresponding enum
-*
-* @param s the string 
-* @return NearObjectConnectionScope The matching enum
-*/
+ * @brief Turns a string into the corresponding enum
+ *
+ * @param scope the string 
+ * @return NearObjectConnectionScope The matching enum
+ */
 NearObjectConnectionScope
-NearObjectConnectionScope_FromString(const std::string& s);
+NearObjectConnectionScope_FromString(const std::string& scope);
 
 /**
  * @brief A collection of configuration that specifies how to connect to a near
@@ -71,17 +72,29 @@ struct NearObjectProfile :
     bool
     IsSame(const NearObjectProfile& other) const noexcept;
 
+    /**
+     * @brief 
+     * 
+     * @return rapidjson::Value 
+     */
     rapidjson::Value
     ToJson(rapidjson::Document::AllocatorType&) const override;
 
+    /**
+     * @brief 
+     * 
+     * @return persist::ParseResult 
+     */
     persist::ParseResult
     ParseAndSet(const rapidjson::Value&) override;
 };
 
 bool
 operator==(const NearObjectProfile&, const NearObjectProfile&) noexcept;
+
 bool
 operator!=(const NearObjectProfile&, const NearObjectProfile&) noexcept;
+
 } // namespace nearobject
 
 #endif // NEAR_OBJECT_PROFILE_HXX

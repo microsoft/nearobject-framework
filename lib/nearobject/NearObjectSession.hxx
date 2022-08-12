@@ -26,10 +26,8 @@ public:
      */
     NearObjectSession(NearObjectSession&) = delete;
     NearObjectSession(NearObjectSession&&) = delete;
-    NearObjectSession&
-    operator=(NearObjectSession&) = delete;
-    NearObjectSession&
-    operator=(NearObjectSession&&) = delete;
+    NearObjectSession& operator=(NearObjectSession&) = delete;
+    NearObjectSession& operator=(NearObjectSession&&) = delete;
 
     /**
      * @brief Construct a new Near Object Session object
