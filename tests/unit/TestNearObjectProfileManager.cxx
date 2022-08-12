@@ -93,7 +93,7 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
         nearobject::NearObjectProfile profile, profile2;
         nearobject::NearObjectConnectionProfileSecurity Sec;
 
-        *profile.Security = Sec;
+        profile.Security.emplace(std::move(Sec));
 
         auto& allocator = doc.GetAllocator();
 
@@ -110,7 +110,7 @@ TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
         nearobject::NearObjectProfile profile, profile2;
         nearobject::NearObjectConnectionProfileSecurity Sec;
 
-        *profile.Security = Sec;
+        profile.Security.emplace(std::move(Sec));
 
         auto& allocator = doc.GetAllocator();
 
