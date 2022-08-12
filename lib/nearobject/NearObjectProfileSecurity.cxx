@@ -16,7 +16,7 @@ nearobject::NearObjectConnectionProfileSecurity::ParseAndSet(const rapidjson::Va
 bool
 nearobject::NearObjectConnectionProfileSecurity::IsSame(const NearObjectConnectionProfileSecurity& other) const noexcept
 {
-    return (this == &other);
+    return true;
 }
 
 bool
