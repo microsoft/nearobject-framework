@@ -146,7 +146,7 @@ TEST_CASE("GUID type can be used with STL containers", "[basic][shared][windows]
     SECTION("GUID can be used in unordered associative containers")
     {
         {   // unordered_set
-            std::array<std::unordered_set<GUID>,2> usetsOfGuids = {
+            std::array<std::unordered_set<GUID>, 2> usetsOfGuids = {
                 std::unordered_set<GUID>{ test::Guids[0], test::Guids[1] },
                 std::unordered_set<GUID>{ test::Guids[0], test::Guids[1] },
             };
