@@ -27,13 +27,13 @@ nearobject::NearObjectConnectionScope_FromString(const std::string& s)
 }
 
 rapidjson::Value
-nearobject::NearObjectProfile::to_json(rapidjson::Document::AllocatorType& allocator) const
+nearobject::NearObjectProfile::ToJson(rapidjson::Document::AllocatorType& allocator) const
 {
     Value v(rapidjson::kObjectType);
     auto ScopeString = nearobject::NearObjectConnectionScope_ToString(Scope);
     v.AddMember("Scope", rapidjson::Value().SetString(ScopeString.c_str(), ScopeString.size(), allocator), allocator);
     if (Security) {
-        auto v_security = Security->to_json(allocator);
+        auto v_security = Security->ToJson(allocator);
         v.AddMember("Security", v_security, allocator);
     }
     return std::move(v);

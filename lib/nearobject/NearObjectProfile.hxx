@@ -72,7 +72,7 @@ struct NearObjectProfile :
     IsSame(const NearObjectProfile& other) const noexcept;
 
     rapidjson::Value
-    to_json(rapidjson::Document::AllocatorType&) const override;
+    ToJson(rapidjson::Document::AllocatorType&) const override;
 
     persist::ParseResult
     ParseAndSet(const rapidjson::Value&) override;

@@ -1,7 +1,7 @@
 #include "NearObjectProfileSecurity.hxx"
 
 rapidjson::Value
-nearobject::NearObjectConnectionProfileSecurity::to_json(rapidjson::Document::AllocatorType& allocator) const
+nearobject::NearObjectConnectionProfileSecurity::ToJson(rapidjson::Document::AllocatorType& allocator) const
 {
     rapidjson::Value v(rapidjson::kObjectType);
     return v;

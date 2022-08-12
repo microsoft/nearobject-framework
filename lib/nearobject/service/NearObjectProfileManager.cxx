@@ -64,7 +64,7 @@ NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
     }
 
     auto& allocator = document.GetAllocator();
-    auto value = profile.to_json(allocator);
+    auto value = profile.ToJson(allocator);
     document.PushBack(value, allocator);
 
     std::ofstream writefilehandle;
