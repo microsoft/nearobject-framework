@@ -174,6 +174,26 @@ TEST_CASE("GUID type can be used with STL containers", "[basic][shared][windows]
         }
 
         {   // unordered_map
+            std::array<std::unordered_map<int, GUID>, 2> umapsOfGuids = {
+                std::unordered_map<int, GUID>{ { 1, test::Guids[0] }, { 2, test::Guids[1] } },
+                std::unordered_map<int, GUID>{ { 1, test::Guids[0] }, { 2, test::Guids[1] } },
+            };
+            REQUIRE(umapsOfGuids[0] == umapsOfGuids[1]);
+
+            // add element to make maps unequal
+            const auto [iterator, inserted] = umapsOfGuids[1].insert({ 3, test::Guids[2] });
+            REQUIRE(inserted == true);
+            const auto [key, value] = *iterator;
+            REQUIRE(key == 3);
+            REQUIRE(value == test::Guids[2]);
+            REQUIRE(umapsOfGuids[0] != umapsOfGuids[1]);
+
+            // remove added element
+            const auto guidNodeOne = umapsOfGuids[1].extract(3);
+            REQUIRE(!guidNodeOne.empty());
+            REQUIRE(guidNodeOne.key() == 3);
+            REQUIRE(guidNodeOne.mapped() == test::Guids[2]);
+            REQUIRE(umapsOfGuids[0] == umapsOfGuids[1]);
         }
 
         {   // unordered_multiset
