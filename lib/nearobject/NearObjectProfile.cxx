@@ -1,7 +1,9 @@
 
 #include "NearObjectProfile.hxx"
 
-std::string
+using namespace nearobject;
+
+auto
 nearobject::NearObjectConnectionScope_ToString(NearObjectConnectionScope scope)
 {
     switch (scope) {
@@ -27,10 +29,10 @@ nearobject::NearObjectConnectionScope_FromString(const std::string& scope)
 }
 
 rapidjson::Value
-nearobject::NearObjectProfile::ToJson(rapidjson::Document::AllocatorType& allocator) const
+NearObjectProfile::ToJson(rapidjson::Document::AllocatorType& allocator) const
 {
     Value jsonValue(rapidjson::kObjectType);
-    auto scopeString = nearobject::NearObjectConnectionScope_ToString(Scope);
+    std::string scopeString = NearObjectConnectionScope_ToString(Scope);
     jsonValue.AddMember("Scope", rapidjson::Value().SetString(scopeString.c_str(), static_cast<rapidjson::SizeType>(scopeString.size()), allocator), allocator);
     if (Security) {
         auto jsonValueSecurity = Security->ToJson(allocator);
@@ -40,14 +42,14 @@ nearobject::NearObjectProfile::ToJson(rapidjson::Document::AllocatorType& alloca
 }
 
 persist::ParseResult
-nearobject::NearObjectProfile::ParseAndSet(const rapidjson::Value& value)
+NearObjectProfile::ParseAndSet(const rapidjson::Value& value)
 {
     {
         rapidjson::Value::ConstMemberIterator itr = value.FindMember("Scope");
         if (itr == value.MemberEnd()) {
             return persist::ParseResult::Failed;
         }
-        NearObjectProfile::Scope = nearobject::NearObjectConnectionScope_FromString(itr->value.GetString());
+        NearObjectProfile::Scope = NearObjectConnectionScope_FromString(itr->value.GetString());
         if (NearObjectProfile::Scope == NearObjectConnectionScope::Unknown) {
             return persist::ParseResult::Failed;
         }
@@ -57,7 +59,7 @@ nearobject::NearObjectProfile::ParseAndSet(const rapidjson::Value& value)
         if (itr == value.MemberEnd()) {
             return persist::ParseResult::Succeeded;
         }
-        nearobject::NearObjectConnectionProfileSecurity security;
+        NearObjectConnectionProfileSecurity security;
         auto result = security.ParseAndSet(itr->value);
         if (result != persist::ParseResult::Succeeded) {
             return result;
@@ -68,7 +70,7 @@ nearobject::NearObjectProfile::ParseAndSet(const rapidjson::Value& value)
 }
 
 bool
-nearobject::NearObjectProfile::IsSame(const NearObjectProfile& other) const noexcept
+NearObjectProfile::IsSame(const NearObjectProfile& other) const noexcept
 {
     if (Scope != other.Scope) {
         return false;

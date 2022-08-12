@@ -24,9 +24,9 @@ enum class NearObjectConnectionScope {
  * @brief Turns the enum NearObjectConnectionScope into the right string
  * 
  * @param scope The scope to convert to string
- * @return std::string 
+ * @return auto 
  */
-std::string
+auto
 NearObjectConnectionScope_ToString(NearObjectConnectionScope scope);
 
 /**
