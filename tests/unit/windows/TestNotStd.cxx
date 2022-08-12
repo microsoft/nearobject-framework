@@ -205,6 +205,33 @@ TEST_CASE("GUID type can be used with STL containers", "[basic][shared][windows]
     SECTION("GUID can be used in container adaptors")
     {
         // priority_queue
+        std::array<std::priority_queue<GUID>, 2> priorityQueuesOfGuids = {
+            std::priority_queue<GUID>(std::cbegin(arrayOfOrderedGuids), std::cend(arrayOfOrderedGuids)),
+            std::priority_queue<GUID>{ isGuidLess, { test::Guids[2], test::Guids[1] } },
+        };
+
+        REQUIRE(priorityQueuesOfGuids[0].size() == 3);
+        REQUIRE(priorityQueuesOfGuids[0].top() == test::Guids[2]);
+        priorityQueuesOfGuids[0].pop();
+        REQUIRE(priorityQueuesOfGuids[0].top() == test::Guids[1]);
+        priorityQueuesOfGuids[0].pop();
+        priorityQueuesOfGuids[0].pop();
+        REQUIRE(priorityQueuesOfGuids[0].empty());
+        priorityQueuesOfGuids[0].push(test::Guids[2]);
+        priorityQueuesOfGuids[0].push(test::Guids[0]);
+        priorityQueuesOfGuids[0].push(test::Guids[1]);
+        REQUIRE(priorityQueuesOfGuids[0].top() == test::Guids[2]);
+
+        REQUIRE(priorityQueuesOfGuids[1].size() == 2);
+        REQUIRE(priorityQueuesOfGuids[1].top() == test::Guids[2]);
+        priorityQueuesOfGuids[1].push(test::Guids[0]);
+        REQUIRE(priorityQueuesOfGuids[1].size() == 3);
+        REQUIRE(priorityQueuesOfGuids[1].top() == test::Guids[2]);
+        priorityQueuesOfGuids[1].pop();
+        priorityQueuesOfGuids[1].pop();
+        REQUIRE(priorityQueuesOfGuids[1].top() == test::Guids[0]);
+        priorityQueuesOfGuids[1].push(test::Guids[1]);
+        REQUIRE(priorityQueuesOfGuids[1].top() == test::Guids[1]);
     }
 
     SECTION("GUID can be used with algorithms")
