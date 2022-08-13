@@ -3,8 +3,8 @@
 
 #include "NearObjectDeviceDiscoveryAgentUwb.hxx"
 
-#include <UwbDevice.hxx>
-#include <UwbDeviceDriver.hxx>
+#include <windows/uwb/UwbDevice.hxx>
+#include <windows/uwb/UwbDeviceDriver.hxx>
 #include <nearobject/service/NearObjectDeviceUwb.hxx>
 #include <DeviceEnumerator.hxx>
 
