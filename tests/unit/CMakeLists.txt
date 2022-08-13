@@ -23,10 +23,10 @@ target_link_libraries(nearobject-test
         tlv
 )
 
-target_include_directories(nearobject-test
-    PRIVATE
-        ${NOF_DIR_LIB}
-)
+# target_include_directories(nearobject-test
+#     PRIVATE
+#         ${NOF_DIR_LIB}
+# )
 
 target_sources(nearobject-test
     PRIVATE

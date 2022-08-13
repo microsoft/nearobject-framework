@@ -1,0 +1,14 @@
+
+add_library(jsonify INTERFACE)
+
+target_sources(jsonify
+    INTERFACE
+        ${CMAKE_CURRENT_LIST_DIR}/include/jsonify.hxx
+)
+
+target_include_directories(jsonify
+    INTERFACE 
+        ${CMAKE_CURRENT_LIST_DIR}/include
+)
+
+set_target_properties(jsonify PROPERTIES FOLDER lib/shared/jsonify)

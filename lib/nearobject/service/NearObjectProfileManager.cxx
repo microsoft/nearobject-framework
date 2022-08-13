@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 
-#include <shared/jsonify/rapidjson/prettywriter.h>
+#include <rapidjson/prettywriter.h>
 
 #include <nearobject/service/NearObjectProfileManager.hxx>
 

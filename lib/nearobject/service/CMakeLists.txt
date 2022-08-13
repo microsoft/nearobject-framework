@@ -26,17 +26,13 @@ target_sources(nearobject-service
         ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/ServiceRuntime.hxx
 )
 
-target_include_directories(nearobject-service
-    PRIVATE
-        ${NOF_DIR_LIB}
-)
-
 target_link_libraries(nearobject-service
     PRIVATE
         notstd
         Threads::Threads
         uwb
     PUBLIC
+        jsonify
         nearobject
 )
 

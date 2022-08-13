@@ -2,7 +2,7 @@
 #ifndef NEAR_OBJECT_CONNECTION_PROFILE_SECURITY_HXX
 #define NEAR_OBJECT_CONNECTION_PROFILE_SECURITY_HXX
 
-#include <shared/jsonify/jsonify.hxx>
+#include <jsonify.hxx>
 
 namespace nearobject
 {

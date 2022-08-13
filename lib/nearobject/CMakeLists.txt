@@ -22,8 +22,6 @@ target_sources(nearobject
 )
 
 target_include_directories(nearobject
-    PRIVATE
-        ${NOF_DIR_LIB}
     PUBLIC
         ${NO_DIR_PUBLIC_INCLUDE}
 )
@@ -31,6 +29,8 @@ target_include_directories(nearobject
 target_link_libraries(nearobject
     PRIVATE
         nearobject-service
+    PUBLIC
+        jsonify
 )
 
 set_target_properties(nearobject PROPERTIES FOLDER lib/nearobject)

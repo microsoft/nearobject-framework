@@ -8,10 +8,10 @@ target_sources(nearobject-test-windows
         TestNotStd.cxx
 )
 
-target_include_directories(nearobject-test-windows
-    PRIVATE
-        ${NOF_DIR_LIB}
-)
+# target_include_directories(nearobject-test-windows
+#     PRIVATE
+#         ${NOF_DIR_LIB}
+# )
 
 target_link_libraries(nearobject-test-windows
     PRIVATE

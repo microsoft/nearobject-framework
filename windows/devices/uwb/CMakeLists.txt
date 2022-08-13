@@ -10,8 +10,8 @@ target_sources(windevuwb
 )
 
 target_include_directories(windevuwb
-    PRIVATE
-        ${NOF_DIR_LIB}
+    # PRIVATE
+    #     ${NOF_DIR_LIB}
     INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}
 )
