@@ -7,11 +7,6 @@ target_sources(windevsmartcard
         Smartcard.hxx
 )
 
-# target_include_directories(windevsmartcard
-#     PRIVATE
-#         ${NOF_DIR_LIB}
-# )
-
 target_link_libraries(windevsmartcard
     PRIVATE
         smartcard

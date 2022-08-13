@@ -10,9 +10,6 @@ target_sources(nearobject-service-windows
 )
 
 target_include_directories(nearobject-service-windows
-    # PRIVATE
-    #     ${NOF_DIR_LIB}
-    #     ${NOF_DIR_LIB}/shared
     INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}
 )

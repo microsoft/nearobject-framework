@@ -6,11 +6,6 @@ target_sources(nocli
         Main.cxx
 )
 
-# target_include_directories(nocli
-#     PRIVATE
-#         ${NOF_DIR_LIB}
-# )
-
 target_link_libraries(nocli
     PRIVATE
         nearobject
