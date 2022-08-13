@@ -68,7 +68,7 @@ NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
         return persist::PersistResult::FailedToOpenFile;
     }
     rapidjson::OStreamWrapper osw(writeFileHandle);
-    PrettyWriter<rapidjson::OStreamWrapper> writer(osw);
+    rapidjson::PrettyWriter<rapidjson::OStreamWrapper> writer(osw);
     document.Accept(writer);
     writeFileHandle.close();
     return persist::PersistResult::Succeeded;

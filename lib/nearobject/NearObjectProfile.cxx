@@ -31,7 +31,7 @@ nearobject::NearObjectConnectionScope_FromString(const std::string& scope)
 rapidjson::Value
 NearObjectProfile::ToJson(rapidjson::Document::AllocatorType& allocator) const
 {
-    Value jsonValue(rapidjson::kObjectType);
+    rapidjson::Value jsonValue(rapidjson::kObjectType);
     std::string scopeString = NearObjectConnectionScope_ToString(Scope);
     jsonValue.AddMember("Scope", rapidjson::Value().SetString(scopeString.c_str(), static_cast<rapidjson::SizeType>(scopeString.size()), allocator), allocator);
     if (Security) {

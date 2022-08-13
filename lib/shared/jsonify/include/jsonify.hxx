@@ -2,10 +2,7 @@
 #ifndef JSONIFY_HXX
 #define JSONIFY_HXX
 
-#include "rapidjson/document.h" // rapidjson's DOM-style API
-
-using namespace rapidjson;
-using namespace std;
+#include <rapidjson/document.h> // rapidjson's DOM-style API
 
 namespace persist
 {
