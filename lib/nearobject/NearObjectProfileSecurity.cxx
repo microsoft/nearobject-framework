@@ -1,5 +1,5 @@
 
-#include "NearObjectProfileSecurity.hxx"
+#include <nearobject/NearObjectProfileSecurity.hxx>
 
 rapidjson::Value
 nearobject::NearObjectConnectionProfileSecurity::ToJson(rapidjson::Document::AllocatorType& allocator) const

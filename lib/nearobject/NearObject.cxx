@@ -1,7 +1,7 @@
 
 #include <tuple>
 
-#include "NearObject.hxx"
+#include <nearobject/NearObject.hxx>
 
 using namespace nearobject;
 

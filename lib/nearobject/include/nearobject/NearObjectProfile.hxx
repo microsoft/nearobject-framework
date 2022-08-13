@@ -6,7 +6,7 @@
 #include <shared/jsonify/jsonify.hxx>
 #include <string>
 
-#include "NearObjectProfileSecurity.hxx"
+#include <nearobject/NearObjectProfileSecurity.hxx>
 
 namespace nearobject
 {

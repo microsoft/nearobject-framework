@@ -2,8 +2,8 @@
 #include <algorithm>
 #include <iterator>
 
-#include "NearObjectSession.hxx"
-#include "NearObjectSessionEventCallbacks.hxx"
+#include <nearobject/NearObjectSession.hxx>
+#include <nearobject/NearObjectSessionEventCallbacks.hxx>
 
 using namespace nearobject;
 

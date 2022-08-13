@@ -31,9 +31,10 @@ target_include_directories(nearobject-service
 
 target_link_libraries(nearobject-service
     PRIVATE
-        nearobject
         Threads::Threads
         uwb
+    PUBLIC
+        nearobject
 )
 
 set_target_properties(nearobject-service PROPERTIES FOLDER lib/nearobject/service)

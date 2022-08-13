@@ -1,5 +1,5 @@
 
-#include "NearObjectManager.hxx"
+#include <nearobject/NearObjectManager.hxx>
 #include <nearobject/service/NearObjectService.hxx>
 
 using namespace nearobject;

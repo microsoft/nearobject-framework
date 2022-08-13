@@ -1,5 +1,5 @@
 
-#include "NearObjectProfile.hxx"
+#include <nearobject/NearObjectProfile.hxx>
 
 using namespace nearobject;
 
