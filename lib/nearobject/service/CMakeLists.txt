@@ -29,11 +29,11 @@ target_sources(nearobject-service
 target_include_directories(nearobject-service
     PRIVATE
         ${NOF_DIR_LIB}
-        ${NOF_DIR_LIB}/shared
 )
 
 target_link_libraries(nearobject-service
     PRIVATE
+        notstd
         Threads::Threads
         uwb
     PUBLIC
