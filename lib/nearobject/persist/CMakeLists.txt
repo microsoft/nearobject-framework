@@ -14,6 +14,7 @@ target_link_libraries(nearobject-persist
     PRIVATE
         nearobject-service
         jsonify
+        nlohmann_json::nlohmann_json
 )
 
 set_target_properties(nearobject-persist PROPERTIES FOLDER lib/nearobject/service)
