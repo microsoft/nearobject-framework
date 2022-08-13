@@ -24,9 +24,6 @@ target_sources(nearobject
 target_include_directories(nearobject
     PRIVATE
         ${NOF_DIR_LIB}
-        ${NOF_DIR_LIB}/shared
-    INTERFACE
-        ${CMAKE_CURRENT_LIST_DIR}
     PUBLIC
         ${NO_DIR_PUBLIC_INCLUDE}
 )
