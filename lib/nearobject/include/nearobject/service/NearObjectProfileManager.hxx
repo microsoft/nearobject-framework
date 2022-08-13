@@ -7,9 +7,6 @@
 #include <vector>
 
 #include <jsonify.hxx>
-#include <rapidjson/istreamwrapper.h>
-#include <rapidjson/ostreamwrapper.h>
-#include <rapidjson/writer.h>
 
 #include <nearobject/NearObjectProfile.hxx>
 

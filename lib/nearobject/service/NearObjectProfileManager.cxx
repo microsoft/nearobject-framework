@@ -2,7 +2,10 @@
 #include <fstream>
 #include <sstream>
 
+#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/ostreamwrapper.h>
 #include <rapidjson/prettywriter.h>
+#include <rapidjson/writer.h>
 
 #include <nearobject/service/NearObjectProfileManager.hxx>
 
