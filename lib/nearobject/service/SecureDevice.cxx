@@ -1,5 +1,5 @@
 
-#include "SecureDevice.hxx"
+#include <nearobject/service/SecureDevice.hxx>
 
 using namespace nearobject::service;
 

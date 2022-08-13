@@ -1,5 +1,5 @@
 
-#include "ServiceRuntime.hxx"
+#include <nearobject/service/ServiceRuntime.hxx>
 
 using namespace nearobject::service;
 

@@ -4,7 +4,7 @@
 
 #include <shared/jsonify/rapidjson/prettywriter.h>
 
-#include "NearObjectProfileManager.hxx"
+#include <nearobject/service/NearObjectProfileManager.hxx>
 
 using namespace nearobject;
 using namespace nearobject::service;

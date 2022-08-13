@@ -1,5 +1,5 @@
 
-#include "NearObjectDeviceDiscoveryAgent.hxx"
+#include <nearobject/service/NearObjectDeviceDiscoveryAgent.hxx>
 
 using namespace nearobject::service;
 

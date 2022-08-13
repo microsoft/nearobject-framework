@@ -4,7 +4,7 @@
 
 #include <memory>
 
-#include "NearObjectServiceInjector.hxx"
+#include <nearobject/service/NearObjectServiceInjector.hxx>
 
 namespace nearobject
 {

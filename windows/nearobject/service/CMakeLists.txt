@@ -3,8 +3,8 @@ add_library(nearobject-service-windows STATIC "")
 
 target_sources(nearobject-service-windows
     PRIVATE
-        Main.cxx
-        NearObjectDeviceDiscoveryAgentUwb.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/Main.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/NearObjectDeviceDiscoveryAgentUwb.cxx
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectDeviceDiscoveryAgentUwb.hxx
 )
@@ -19,12 +19,12 @@ target_include_directories(nearobject-service-windows
 
 target_link_libraries(nearobject-service-windows
     PRIVATE
-        nearobject-service
         windevuwb
     PUBLIC
-        windevutil
-        WIL
         cfgmgr32.lib
+        nearobject-service
+        WIL
+        windevutil
 )
 
 set_target_properties(nearobject-service-windows PROPERTIES FOLDER windows/service)

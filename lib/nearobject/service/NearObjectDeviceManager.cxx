@@ -5,9 +5,9 @@
 
 #include <notstd/memory.hxx>
 
-#include "NearObjectDevice.hxx"
-#include "NearObjectDeviceDiscoveryAgent.hxx"
-#include "NearObjectDeviceManager.hxx"
+#include <nearobject/service/NearObjectDevice.hxx>
+#include <nearobject/service/NearObjectDeviceDiscoveryAgent.hxx>
+#include <nearobject/service/NearObjectDeviceManager.hxx>
 
 using namespace nearobject::service;
 
