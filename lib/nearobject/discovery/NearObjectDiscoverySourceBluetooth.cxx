@@ -1,5 +1,5 @@
 
-#include "NearObjectDiscoverySourceBluetooth.hxx"
+#include <nearobject/discovery/NearObjectDiscoverySourceBluetooth.hxx>
 
 #include <stdexcept>
 
