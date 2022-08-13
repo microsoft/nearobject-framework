@@ -4,44 +4,50 @@
 
 using namespace nearobject;
 using namespace nearobject::persistence;
-
-std::string
-NearObjectProfilePersister::ToJson(const NearObjectProfile& profile) const
-{
-    return {};
-}
-
-NearObjectProfile
-NearObjectProfilePersister::FromJson(const std::string& json) const
-{
-    return {};
-}
-
 using json = nlohmann::json;
 
 namespace nearobject
 {
-void to_json(json& j, const NearObjectConnectionProfileSecurity& security) 
+// Implementations of required functions for use with nlohmann json conversion.
+void
+to_json(json& asJson, const NearObjectConnectionProfileSecurity& security) 
 {
-    j = json{};
+    asJson = json{};
 }
 
-void from_json(const json& j, NearObjectConnectionProfileSecurity& security) 
+void
+from_json(const json& asJson, NearObjectConnectionProfileSecurity& security) 
 {
 }
 
-void to_json(json& j, const NearObjectProfile& profile) 
+void
+to_json(json& asJson, const NearObjectProfile& profile) 
 {
-    j = json {
+    asJson = json {
         { "Scope", profile.Scope },
         { "Security", profile.Security.value_or(NearObjectConnectionProfileSecurity{}) },
     };
 }
 
-void from_json(const json& j, NearObjectProfile& profile) 
+void
+from_json(const json& asJson, NearObjectProfile& profile) 
 {
     profile.Security.emplace();
-    j.at("Scope").get_to(profile.Scope);
-    j.at("Security").get_to(profile.Security.value());
+    asJson.at("Scope").get_to(profile.Scope);
+    asJson.at("Security").get_to(profile.Security.value());
 }
 } // namespace nearobject
+
+std::string
+NearObjectProfilePersister::ToJson(const NearObjectProfile& profile) const
+{
+    json asJson = profile;
+    return asJson.dump();
+}
+
+NearObjectProfile
+NearObjectProfilePersister::FromJson(const std::string& jsonString) const
+{
+    json asJson = json::parse(jsonString);
+    return asJson.get<NearObjectProfile>();
+}
