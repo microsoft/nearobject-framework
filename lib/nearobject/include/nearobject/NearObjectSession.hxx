@@ -8,8 +8,8 @@
 #include <optional>
 #include <vector>
 
-#include "NearObject.hxx"
-#include "NearObjectCapabilities.hxx"
+#include <nearobject/NearObject.hxx>
+#include <nearobject/NearObjectCapabilities.hxx>
 
 namespace nearobject
 {

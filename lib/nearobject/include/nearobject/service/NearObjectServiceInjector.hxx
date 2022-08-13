@@ -4,8 +4,8 @@
 
 #include <memory>
 
-#include "NearObjectDeviceManager.hxx"
-#include "NearObjectProfileManager.hxx"
+#include <nearobject/service/NearObjectDeviceManager.hxx>
+#include <nearobject/service/NearObjectProfileManager.hxx>
 
 namespace nearobject
 {

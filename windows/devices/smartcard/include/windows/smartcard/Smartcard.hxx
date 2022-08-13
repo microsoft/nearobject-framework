@@ -8,7 +8,7 @@
 #include <optional>
 #include <vector>
 
-#include <smartcard/SmartCard.hxx>
+#include <smartcard/Smartcard.hxx>
 
 namespace windows
 {

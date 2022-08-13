@@ -3,10 +3,11 @@
 #define NEAR_OBJECT_PROFILE_HXX
 
 #include <optional>
-#include <shared/jsonify/jsonify.hxx>
 #include <string>
 
-#include "NearObjectProfileSecurity.hxx"
+#include <jsonify.hxx>
+
+#include <nearobject/NearObjectProfileSecurity.hxx>
 
 namespace nearobject
 {

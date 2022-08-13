@@ -3,12 +3,7 @@ add_executable(nocli "")
 
 target_sources(nocli
     PRIVATE
-        Main.cxx
-)
-
-target_include_directories(nocli
-    PRIVATE
-        ${NOF_DIR_LIB}
+        ${CMAKE_CURRENT_LIST_DIR}/Main.cxx
 )
 
 target_link_libraries(nocli

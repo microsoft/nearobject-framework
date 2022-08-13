@@ -1,5 +1,5 @@
 
-#include "Smartcard.hxx"
+#include <smartcard/Smartcard.hxx>
 
 using namespace smartcard;
 

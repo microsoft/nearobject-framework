@@ -1,5 +1,5 @@
 
-#include "NearObjectDeviceUwb.hxx"
+#include <nearobject/service/NearObjectDeviceUwb.hxx>
 
 #include <nearobject/NearObjectSessionEventCallbacks.hxx>
 

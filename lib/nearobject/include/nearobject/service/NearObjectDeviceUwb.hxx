@@ -7,7 +7,7 @@
 
 #include <uwb/UwbDevice.hxx>
 
-#include "NearObjectDevice.hxx"
+#include <nearobject/service/NearObjectDevice.hxx>
 
 namespace nearobject
 {

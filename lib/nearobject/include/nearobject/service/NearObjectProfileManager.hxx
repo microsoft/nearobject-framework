@@ -6,10 +6,10 @@
 #include <shared_mutex>
 #include <vector>
 
-#include <shared/jsonify/jsonify.hxx>
-#include <shared/jsonify/rapidjson/istreamwrapper.h>
-#include <shared/jsonify/rapidjson/ostreamwrapper.h>
-#include <shared/jsonify/rapidjson/writer.h>
+#include <jsonify.hxx>
+#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/ostreamwrapper.h>
+#include <rapidjson/writer.h>
 
 #include <nearobject/NearObjectProfile.hxx>
 

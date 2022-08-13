@@ -1,22 +1,19 @@
 
 add_library(nearobject-discovery STATIC "")
 
+set(NO_DISCOVERY_DIR_PUBLIC_INCLUDE_PREFIX ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/discovery)
+
 target_sources(nearobject-discovery
     PRIVATE
-        NearObjectDiscoveryService.cxx
-        NearObjectDiscoveryService.hxx
-        NearObjectDiscoverySource.cxx
-        NearObjectDiscoverySource.hxx
-        NearObjectDiscoverySourceBluetooth.cxx
-        NearObjectDiscoverySourceBluetooth.hxx
-        NearObjectOobConnection.cxx
-        NearObjectOobConnection.hxx
-)
-
-target_include_directories(nearobject-discovery
-    PRIVATE
-        ${NOF_DIR_LIB}
-        ${NOF_DIR_LIB}/shared
+        ${CMAKE_CURRENT_LIST_DIR}/NearObjectDiscoveryService.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/NearObjectDiscoverySource.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/NearObjectDiscoverySourceBluetooth.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/NearObjectOobConnection.cxx
+    PUBLIC
+        ${NO_DISCOVERY_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectDiscoveryService.hxx
+        ${NO_DISCOVERY_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectDiscoverySource.hxx
+        ${NO_DISCOVERY_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectDiscoverySourceBluetooth.hxx
+        ${NO_DISCOVERY_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectOobConnection.hxx
 )
 
 target_link_libraries(nearobject-discovery

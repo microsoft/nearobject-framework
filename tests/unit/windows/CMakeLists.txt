@@ -3,14 +3,9 @@ add_executable(nearobject-test-windows)
 
 target_sources(nearobject-test-windows
     PRIVATE
-        Main.cxx
-        TestNearObjectDeviceDiscoveryAgentUwb.cxx 
-        TestNotStd.cxx
-)
-
-target_include_directories(nearobject-test-windows
-    PRIVATE
-        ${NOF_DIR_LIB}
+        ${CMAKE_CURRENT_LIST_DIR}/Main.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectDeviceDiscoveryAgentUwb.cxx 
+        ${CMAKE_CURRENT_LIST_DIR}/TestNotStd.cxx
 )
 
 target_link_libraries(nearobject-test-windows

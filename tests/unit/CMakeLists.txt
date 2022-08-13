@@ -16,28 +16,23 @@ include(Catch)
 
 add_executable(nearobject-test)
 
+target_sources(nearobject-test
+    PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/Main.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectDeviceDiscoveryAgent.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectDeviceManager.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectManager.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectProfileManager.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectService.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectSession.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/TestTlvSimple.cxx
+)
+
 target_link_libraries(nearobject-test
     PRIVATE
         Catch2::Catch2
         nearobject
         tlv
-)
-
-target_include_directories(nearobject-test
-    PRIVATE
-        ${NOF_DIR_LIB}
-)
-
-target_sources(nearobject-test
-    PRIVATE
-        Main.cxx
-        TestNearObjectDeviceDiscoveryAgent.cxx
-        TestNearObjectDeviceManager.cxx
-        TestNearObjectManager.cxx
-        TestNearObjectProfileManager.cxx
-        TestNearObjectService.cxx
-        TestNearObjectSession.cxx
-        TestTlvSimple.cxx
 )
 
 catch_discover_tests(nearobject-test)

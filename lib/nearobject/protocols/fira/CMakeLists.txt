@@ -2,7 +2,7 @@ add_library(nearobject-proto-fira)
 
 target_sources(nearobject-proto-fira
     PRIVATE
-        FiraDevice.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/FiraDevice.cxx
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/FiraDevice.hxx
 )

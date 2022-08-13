@@ -2,7 +2,7 @@
 #ifndef SECURE_DEVICE_HXX
 #define SECURE_DEVICE_HXX
 
-#include "SecureDeviceChannel.hxx"
+#include <nearobject/service/SecureDeviceChannel.hxx>
 
 namespace nearobject
 {

@@ -1,5 +1,5 @@
 
-#include "NearObjectDiscoverySource.hxx"
+#include <nearobject/discovery/NearObjectDiscoverySource.hxx>
 
 using namespace nearobject::discovery;
 
