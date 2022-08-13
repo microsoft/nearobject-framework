@@ -1,6 +1,6 @@
 #include <algorithm>
 #include <catch2/catch.hpp>
-#include <shared/tlv/TlvSimple.hxx>
+#include <TlvSimple.hxx>
 #include <string>
 #include <vector>
 
