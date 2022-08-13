@@ -5,8 +5,8 @@ set(TLV_DIR_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
 
 target_sources(tlv
     PRIVATE
-        TlvBer.cxx
-        TlvSimple.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/TlvBer.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/TlvSimple.cxx
     PUBLIC
         ${TLV_DIR_PUBLIC_INCLUDE}/Tlv.hxx
         ${TLV_DIR_PUBLIC_INCLUDE}/TlvBer.hxx

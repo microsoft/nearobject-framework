@@ -3,7 +3,7 @@ add_library(windevutil STATIC "")
 
 target_sources(windevutil
     PRIVATE
-        DeviceEnumerator.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/DeviceEnumerator.cxx
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/DeviceEnumerator.hxx
         ${CMAKE_CURRENT_LIST_DIR}/DeviceResource.hxx
@@ -16,8 +16,8 @@ target_include_directories(windevutil
 
 target_link_libraries(windevutil
     PUBLIC
-        WIL
         cfgmgr32.lib
+        WIL
 )
 
 set_target_properties(windevutil PROPERTIES FOLDER windows/devices)
