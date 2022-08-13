@@ -26,6 +26,9 @@ FetchContent_Declare(GSL
 
 FetchContent_MakeAvailable(GSL)
 
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
+FetchContent_MakeAvailable(json)
+
 find_package(Threads REQUIRED)
 
 # Uncomment for verbose build information
