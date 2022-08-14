@@ -39,14 +39,14 @@ from_json(const json& asJson, NearObjectProfile& profile)
 } // namespace nearobject
 
 std::string
-NearObjectProfilePersister::ToJson(const NearObjectProfile& profile) const
+NearObjectProfileJsonSerializer::ToJson(const NearObjectProfile& profile) const
 {
     json asJson = profile;
     return asJson.dump();
 }
 
 NearObjectProfile
-NearObjectProfilePersister::FromJson(const std::string& jsonString) const
+NearObjectProfileJsonSerializer::FromJson(const std::string& jsonString) const
 {
     json asJson = json::parse(jsonString);
     return asJson.get<NearObjectProfile>();

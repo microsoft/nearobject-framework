@@ -11,7 +11,7 @@ namespace nearobject
 {
 namespace persistence
 {
-struct NearObjectProfilePersister :
+struct NearObjectProfileJsonSerializer :
     public persist::JsonSerializer<nearobject::NearObjectProfile>
 {
     std::string
