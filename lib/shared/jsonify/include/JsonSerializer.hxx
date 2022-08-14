@@ -4,6 +4,8 @@
 
 #include <string>
 
+#include <nlohmann/json.hpp>
+
 namespace persist
 {
 template <typename T>
@@ -17,10 +19,18 @@ struct JsonSerializer
     JsonSerializer& operator=(JsonSerializer&&) = default;
 
     virtual std::string
-    ToJson(const T& object) const = 0;
+    ToJson(const T& object) const
+    {
+        nlohmann::json json = object;
+        return json.dump();
+    }
 
     virtual T 
-    FromJson(const std::string& json) const = 0;
+    FromJson(const std::string& jsonString) const
+    {
+        nlohmann::json json = nlohmann::json::parse(jsonString);
+        return json.get<T>();
+    }
 };
 } // namespace persist
 
