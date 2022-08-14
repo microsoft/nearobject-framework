@@ -3,36 +3,35 @@
 
 using namespace nearobject;
 using namespace nearobject::persistence;
-using json = nlohmann::json;
 
 namespace nearobject
 {
 // Implementations of required functions for use with nlohmann json conversion.
 void
-to_json(json& asJson, const NearObjectConnectionProfileSecurity& security) 
+to_json(nlohmann::json& json, const NearObjectConnectionProfileSecurity& security) 
 {
-    asJson = json{};
+    json = nlohmann::json{};
 }
 
 void
-from_json(const json& asJson, NearObjectConnectionProfileSecurity& security) 
+from_json(const nlohmann::json& json, NearObjectConnectionProfileSecurity& security) 
 {
 }
 
 void
-to_json(json& asJson, const NearObjectProfile& profile) 
+to_json(nlohmann::json& json, const NearObjectProfile& profile) 
 {
-    asJson = json {
+    json = nlohmann::json {
         { "Scope", profile.Scope },
         { "Security", profile.Security.value_or(NearObjectConnectionProfileSecurity{}) },
     };
 }
 
 void
-from_json(const json& asJson, NearObjectProfile& profile) 
+from_json(const nlohmann::json& json, NearObjectProfile& profile) 
 {
     profile.Security.emplace();
-    asJson.at("Scope").get_to(profile.Scope);
-    asJson.at("Security").get_to(profile.Security.value());
+    json.at("Scope").get_to(profile.Scope);
+    json.at("Security").get_to(profile.Security.value());
 }
 } // namespace nearobject
