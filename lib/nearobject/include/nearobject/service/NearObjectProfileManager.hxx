@@ -3,12 +3,14 @@
 #define NEAR_OBJECT_PROFILE_MANAGER_HXX
 
 #include <filesystem>
+#include <memory>
 #include <shared_mutex>
 #include <vector>
 
 #include <jsonify.hxx>
 
 #include <nearobject/NearObjectProfile.hxx>
+#include <nearobject/service/NearObjectProfilePersister.hxx>
 
 namespace nearobject
 {
@@ -17,6 +19,20 @@ namespace service
 class NearObjectProfileManager
 {
 public:
+    /**
+     * @brief Construct a new Near Object Profile Manager object. A default
+     * persister will be used.
+     */
+    NearObjectProfileManager();
+
+    /**
+     * @brief Construct a new Near Object Profile Manager object with a specific
+     * profile persister.
+     * 
+     * @param persister The object to use to persist profiles.
+     */
+    NearObjectProfileManager(std::unique_ptr<persistence::NearObjectProfilePersister> persister);
+
     /**
      * @brief Describes the lifetime of the profile.
      */
@@ -87,6 +103,7 @@ private:
     mutable std::shared_mutex m_profilesGate{};
     std::vector<NearObjectProfile> m_profiles{};
     std::filesystem::path m_persistLocation{ "profiles" };
+    std::unique_ptr<persistence::NearObjectProfilePersister> m_persister;
 };
 
 } // namespace service

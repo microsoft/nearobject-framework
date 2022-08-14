@@ -8,9 +8,18 @@
 #include <rapidjson/writer.h>
 
 #include <nearobject/service/NearObjectProfileManager.hxx>
+#include "NearObjectProfilePersisterFilesystem.hxx"
 
 using namespace nearobject;
 using namespace nearobject::service;
+
+NearObjectProfileManager::NearObjectProfileManager() :
+    NearObjectProfileManager(std::make_unique<persistence::NearObjectProfilePersisterFilesystem>())
+{}
+
+NearObjectProfileManager::NearObjectProfileManager(std::unique_ptr<persistence::NearObjectProfilePersister> persister) :
+    m_persister(std::move(persister))
+{}
 
 std::vector<NearObjectProfile>
 NearObjectProfileManager::FindMatchingProfiles(const NearObjectProfile& connectionProfile) const
