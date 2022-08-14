@@ -10,7 +10,7 @@
 #include <jsonify.hxx>
 
 #include <nearobject/NearObjectProfile.hxx>
-#include <nearobject/service/NearObjectProfilePersister.hxx>
+#include <nearobject/persist/NearObjectProfilePersister.hxx>
 
 namespace nearobject
 {

@@ -7,11 +7,9 @@
 
 #include <jsonify.hxx>
 #include <nearobject/NearObjectProfile.hxx>
-#include <nearobject/service/NearObjectProfilePersister.hxx>
+#include <nearobject/persist/NearObjectProfilePersister.hxx>
 
 namespace nearobject
-{
-namespace service
 {
 namespace persistence
 {
@@ -31,7 +29,6 @@ private:
     const std::filesystem::path m_persistLocation;
 };
 } // namespace persistence
-} // namespace service
 } // namespace nearobject
 
 #endif // NEAR_OBJECT_PROFILE_PERSISTER_FILESYSTEM

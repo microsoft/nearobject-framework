@@ -1,8 +1,8 @@
 
-#include "NearObjectProfilePersisterFilesystem.hxx"
+#include <nearobject/persist/NearObjectProfilePersisterFilesystem.hxx>
 
 using namespace nearobject;
-using namespace nearobject::service::persistence;
+using namespace nearobject::persistence;
 
 NearObjectProfilePersisterFilesystem::NearObjectProfilePersisterFilesystem() :
     NearObjectProfilePersisterFilesystem(std::filesystem::temp_directory_path() / "NearObject/Profiles")

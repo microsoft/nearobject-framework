@@ -1,6 +1,6 @@
 
-#ifndef NEAR_OBJECT_PROFILE_PERSISTENCE
-#define NEAR_OBJECT_PROFILE_PERSISTENCE
+#ifndef NEAR_OBJECT_PROFILE_PERSISTER
+#define NEAR_OBJECT_PROFILE_PERSISTER
 
 #include <vector>
 
@@ -8,8 +8,6 @@
 #include <nearobject/NearObjectProfile.hxx>
 
 namespace nearobject
-{
-namespace service
 {
 namespace persistence
 {
@@ -36,7 +34,6 @@ struct NearObjectProfilePersister
     ReadPersistedProfiles(persist::PersistResult& persistResult) = 0;
 };
 } // namespace persistence
-} // namespace service
 } // namespace nearobject
 
-#endif // NEAR_OBJECT_PROFILE_PERSISTENCE
+#endif // NEAR_OBJECT_PROFILE_PERSISTER
