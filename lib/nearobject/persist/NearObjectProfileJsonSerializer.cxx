@@ -1,5 +1,4 @@
 
-#include <nlohmann/json.hpp>
 #include <nearobject/persist/NearObjectProfileJsonSerializer.hxx>
 
 using namespace nearobject;
@@ -37,17 +36,3 @@ from_json(const json& asJson, NearObjectProfile& profile)
     asJson.at("Security").get_to(profile.Security.value());
 }
 } // namespace nearobject
-
-std::string
-NearObjectProfileJsonSerializer::ToJson(const NearObjectProfile& profile) const
-{
-    json asJson = profile;
-    return asJson.dump();
-}
-
-NearObjectProfile
-NearObjectProfileJsonSerializer::FromJson(const std::string& jsonString) const
-{
-    json asJson = json::parse(jsonString);
-    return asJson.get<NearObjectProfile>();
-}

@@ -14,11 +14,6 @@ namespace persistence
 struct NearObjectProfileJsonSerializer :
     public persist::JsonSerializer<nearobject::NearObjectProfile>
 {
-    std::string
-    ToJson(const NearObjectProfile& profile) const override;
-
-    NearObjectProfile
-    FromJson(const std::string& json) const override;
 };
 } // namespace persistence
 } // namespace nearobject
