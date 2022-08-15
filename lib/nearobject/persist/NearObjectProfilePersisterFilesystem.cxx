@@ -10,17 +10,24 @@ using namespace nearobject;
 using namespace nearobject::persistence;
 
 NearObjectProfilePersisterFilesystem::NearObjectProfilePersisterFilesystem() :
-    NearObjectProfilePersisterFilesystem(std::filesystem::temp_directory_path() / "NearObject/Profiles")
+    NearObjectProfilePersisterFilesystem(std::filesystem::temp_directory_path())
 {}
 
-NearObjectProfilePersisterFilesystem::NearObjectProfilePersisterFilesystem(std::filesystem::path persistLocation) :
-    m_persistLocation(std::move(persistLocation))
-{}
+NearObjectProfilePersisterFilesystem::NearObjectProfilePersisterFilesystem(const std::filesystem::path& persistLocation) :
+    m_persistFilepath(persistLocation / "NearObject/Profiles")
+{
+    if (!std::filesystem::exists(m_persistFilepath.parent_path())) {
+        bool persistLocationCreated = std::filesystem::create_directories(m_persistFilepath.parent_path());
+        if (!persistLocationCreated) {
+            // TODO: throw ..
+        }
+    }
+}
 
 std::filesystem::path
-NearObjectProfilePersisterFilesystem::GetPersistencePath() const noexcept
+NearObjectProfilePersisterFilesystem::GetPersistenceFilepath() const noexcept
 {
-    return m_persistLocation;
+    return m_persistFilepath;
 }
 
 persist::PersistResult
@@ -38,7 +45,7 @@ NearObjectProfilePersisterFilesystem::PersistProfile(const NearObjectProfile& pr
     auto json = nlohmann::json{ profiles };
 
     // Write updated list to disk.
-    std::ofstream profilesFile{ m_persistLocation };
+    std::ofstream profilesFile{ m_persistFilepath };
     profilesFile << json;
     profilesFile.close();
 
@@ -52,19 +59,23 @@ NearObjectProfilePersisterFilesystem::PersistProfile(const NearObjectProfile& pr
 std::vector<NearObjectProfile>
 NearObjectProfilePersisterFilesystem::ReadPersistedProfiles(persist::PersistResult& persistResult)
 {
-    if (!std::filesystem::exists(m_persistLocation)) {
+    if (!std::filesystem::exists(m_persistFilepath)) {
         persistResult = persist::PersistResult::Succeeded;
         return {};
     }
 
-    std::ifstream profilesFile{ m_persistLocation };
+    std::ifstream profilesFile{ m_persistFilepath };
     if (profilesFile.fail()) {
         persistResult = persist::PersistResult::FailedToOpenFile;
         return {};
     }
 
     const auto json = nlohmann::json::parse(profilesFile);
-    auto profiles = json.get<std::vector<NearObjectProfile>>();
+    persistResult = persist::PersistResult::Succeeded;
+    if (json.empty()) {
+        return {};
+    }
 
+    auto profiles = json.get<std::vector<NearObjectProfile>>();
     return profiles;
 }

@@ -17,7 +17,7 @@ struct NearObjectProfilePersisterFilesystem
     : public NearObjectProfilePersister
 {
     NearObjectProfilePersisterFilesystem();
-    NearObjectProfilePersisterFilesystem(std::filesystem::path persistLocation);
+    NearObjectProfilePersisterFilesystem(const std::filesystem::path& persistLocation);
 
     persist::PersistResult
     PersistProfile(const nearobject::NearObjectProfile& profile) override;
@@ -31,10 +31,10 @@ struct NearObjectProfilePersisterFilesystem
      * @return std::filesystem::path 
      */
     std::filesystem::path
-    GetPersistencePath() const noexcept;
+    GetPersistenceFilepath() const noexcept;
 
 private:
-    const std::filesystem::path m_persistLocation;
+    const std::filesystem::path m_persistFilepath;
 };
 } // namespace persistence
 } // namespace nearobject
