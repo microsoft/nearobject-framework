@@ -25,6 +25,14 @@ struct NearObjectProfilePersisterFilesystem
     std::vector<nearobject::NearObjectProfile>
     ReadPersistedProfiles(persist::PersistResult& persistResult) override;
 
+    /**
+     * @brief Get the path of the file where profiles are persisted.
+     * 
+     * @return std::filesystem::path 
+     */
+    std::filesystem::path
+    GetPersistencePath() const noexcept;
+
 private:
     const std::filesystem::path m_persistLocation;
 };
@@ -32,5 +40,3 @@ private:
 } // namespace nearobject
 
 #endif // NEAR_OBJECT_PROFILE_PERSISTER_FILESYSTEM
-
-

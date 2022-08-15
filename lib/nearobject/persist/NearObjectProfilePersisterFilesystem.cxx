@@ -2,9 +2,9 @@
 #include <algorithm>
 #include <fstream>
 
-#include <nearobject/persist/NearObjectProfilePersisterFilesystem.hxx>
-#include <nearobject/persist/NearObjectProfileJsonSerializer.hxx>
 #include <JsonSerializer.hxx>
+#include <nearobject/persist/NearObjectProfileJsonSerializer.hxx>
+#include <nearobject/persist/NearObjectProfilePersisterFilesystem.hxx>
 
 using namespace nearobject;
 using namespace nearobject::persistence;
@@ -17,8 +17,14 @@ NearObjectProfilePersisterFilesystem::NearObjectProfilePersisterFilesystem(std::
     m_persistLocation(std::move(persistLocation))
 {}
 
+std::filesystem::path
+NearObjectProfilePersisterFilesystem::GetPersistencePath() const noexcept
+{
+    return m_persistLocation;
+}
+
 persist::PersistResult
-NearObjectProfilePersisterFilesystem::PersistProfile(const NearObjectProfile& profile) 
+NearObjectProfilePersisterFilesystem::PersistProfile(const NearObjectProfile& profile)
 {
     // Read existing profiles from disk.
     persist::PersistResult persistResult = persist::PersistResult::UnknownError;
