@@ -56,7 +56,7 @@ TEST_CASE("near object profiles can be enumerated")
     }
 }
 
-TEST_CASE("NearObjectProfile persistence", "[basic][infra]")
+TEST_CASE("near object profiles can be persisted", "[basic][infra]")
 {
     auto testTempDirectory = std::filesystem::path("NearObjectTestTemp");
     try {
