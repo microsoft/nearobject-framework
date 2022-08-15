@@ -47,6 +47,19 @@ struct NearObjectProfile :
     public persist::Serializable
 {
     /**
+     * @brief Construct a new Near Object Profile object with default scope and
+     * no security configuration.
+     */
+    NearObjectProfile() = default;
+
+    /**
+     * @brief Construct a new Near Object Profile object with explicit scope.
+     * 
+     * @param scope The scope to create the profile with.
+     */
+    NearObjectProfile(NearObjectConnectionScope scope);
+
+    /**
      * @brief The supported connection scope.
      *
      * Note that this designates support and not an absolute requirement. Thus,

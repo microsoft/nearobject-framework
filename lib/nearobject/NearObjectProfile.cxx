@@ -28,6 +28,10 @@ nearobject::NearObjectConnectionScope_FromString(const std::string& scope)
     }
 }
 
+NearObjectProfile::NearObjectProfile(NearObjectConnectionScope scope) :
+    Scope(scope)
+{}
+
 rapidjson::Value
 NearObjectProfile::ToJson(rapidjson::Document::AllocatorType& allocator) const
 {
