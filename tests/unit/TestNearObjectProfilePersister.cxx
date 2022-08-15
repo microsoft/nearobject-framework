@@ -234,21 +234,21 @@ TEST_CASE("near object filesystem persister persists profiles")
             NearObjectProfile profile{};
             NearObjectProfilePersisterFilesystem persisterFs{ test::GenerateUniqueTestTempPath() };
             test::DeletePersisterPathOnScopeExit persisterPathDeleter{ persisterFs };
-            test::PersistProfileAndValidate(persisterFs, profile, 1);
+            test::PersistProfileAndValidate(persisterFs, profile);
         }
 
         // Persist profiles with all possible scopes.
         for (const auto& profile : ProfilesWithVariedScopes) {
             NearObjectProfilePersisterFilesystem persisterFs{ test::GenerateUniqueTestTempPath() };
             test::DeletePersisterPathOnScopeExit persisterPathDeleter{ persisterFs };
-            test::PersistProfileAndValidate(persisterFs, profile, 1);
+            test::PersistProfileAndValidate(persisterFs, profile);
         }
 
         // Persist profiles with instantiated security settings.
         for (const auto& profileWithSecurity : ProfilesWithVariedScopesAndSecurity) {
             NearObjectProfilePersisterFilesystem persisterFs{ test::GenerateUniqueTestTempPath() };
             test::DeletePersisterPathOnScopeExit persisterPathDeleter{ persisterFs };
-            test::PersistProfileAndValidate(persisterFs, profileWithSecurity, 1);
+            test::PersistProfileAndValidate(persisterFs, profileWithSecurity);
         }
     }
 
@@ -256,16 +256,15 @@ TEST_CASE("near object filesystem persister persists profiles")
     {
         NearObjectProfilePersisterFilesystem persisterFs{ test::GenerateUniqueTestTempPath() };
         test::DeletePersisterPathOnScopeExit persisterPathDeleter{ persisterFs };
-        std::size_t persisted = 0;
 
         // Persist profiles with all possible scopes.
         for (const auto& profile : ProfilesWithVariedScopes) {
-            test::PersistProfileAndValidate(persisterFs, profile, persisted++);
+            test::PersistProfileAndValidate(persisterFs, profile);
         }
 
         // Persist profiles with instantiated security settings.
         for (const auto& profileWithSecurity : ProfilesWithVariedScopesAndSecurity) {
-            test::PersistProfileAndValidate(persisterFs, profileWithSecurity, persisted++);
+            test::PersistProfileAndValidate(persisterFs, profileWithSecurity);
         }
     }
 
@@ -273,11 +272,10 @@ TEST_CASE("near object filesystem persister persists profiles")
     {
         const std::filesystem::path persistLocation = std::filesystem::temp_directory_path() / "NoStateTest";
 
-        std::size_t persisted = 0;
         for (const auto& profile : ProfilesWithVariedScopes) {
             // Use a distinct persister instance for each operation.
             NearObjectProfilePersisterFilesystem persisterFs{ persistLocation };
-            test::PersistProfileAndValidate(persisterFs, profile, persisted++);
+            test::PersistProfileAndValidate(persisterFs, profile);
         }
 
         // Read the profiles with a different persister instance than was used to persist the profiles.
