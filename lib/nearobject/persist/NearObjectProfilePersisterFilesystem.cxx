@@ -42,7 +42,7 @@ NearObjectProfilePersisterFilesystem::PersistProfile(const NearObjectProfile& pr
 
     // Add new profile and serialize updated list.
     profiles.push_back(profile);
-    auto json = nlohmann::json{ profiles };
+    auto json = nlohmann::json(profiles);
 
     // Write updated list to disk.
     std::ofstream profilesFile{ m_persistFilepath };
