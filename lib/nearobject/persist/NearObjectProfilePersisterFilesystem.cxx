@@ -2,7 +2,6 @@
 #include <algorithm>
 #include <fstream>
 
-#include <JsonSerializer.hxx>
 #include <nearobject/persist/NearObjectProfileJsonSerializer.hxx>
 #include <nearobject/persist/NearObjectProfilePersisterFilesystem.hxx>
 
