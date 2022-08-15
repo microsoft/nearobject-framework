@@ -53,6 +53,7 @@ std::vector<NearObjectProfile>
 NearObjectProfilePersisterFilesystem::ReadPersistedProfiles(persist::PersistResult& persistResult)
 {
     if (!std::filesystem::exists(m_persistLocation)) {
+        persistResult = persist::PersistResult::Succeeded;
         return {};
     }
 
