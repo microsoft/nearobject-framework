@@ -13,10 +13,27 @@ namespace nearobject
 {
 namespace persistence
 {
+/**
+ * @brief Object to persist files to/from a local filesystem.
+ * 
+ * Note that this class is NOT thread-safe. The caller must ensure that access
+ * to the file is synchronized to avoid corruption.
+ */
 struct NearObjectProfilePersisterFilesystem
     : public NearObjectProfilePersister
 {
+    /**
+     * @brief Construct a new Near Object Profile Persister Filesystem object
+     * with a default persistence location.
+     */
     NearObjectProfilePersisterFilesystem();
+
+    /**
+     * @brief Construct a new Near Object Profile Persister Filesystem object
+     * with a custom persistence location.
+     * 
+     * @param persistLocation The parent directory to create the persistence file.
+     */
     NearObjectProfilePersisterFilesystem(const std::filesystem::path& persistLocation);
 
     persist::PersistResult
