@@ -45,7 +45,7 @@ NearObjectProfilePersisterFilesystem::PersistProfile(const NearObjectProfile& pr
 
     // Write updated list to disk.
     std::ofstream profilesFile{ m_persistFilepath };
-    profilesFile << json;
+    profilesFile << std::setw(4) << json;
     profilesFile.close();
 
     persistResult = profilesFile.fail()
