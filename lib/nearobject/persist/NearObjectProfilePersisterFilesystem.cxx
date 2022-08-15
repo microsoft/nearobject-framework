@@ -14,7 +14,7 @@ NearObjectProfilePersisterFilesystem::NearObjectProfilePersisterFilesystem() :
 {}
 
 NearObjectProfilePersisterFilesystem::NearObjectProfilePersisterFilesystem(const std::filesystem::path& persistLocation) :
-    m_persistFilepath(persistLocation / "NearObject/Profiles")
+    m_persistFilepath(persistLocation / "Profiles")
 {
     if (!std::filesystem::exists(m_persistFilepath.parent_path())) {
         bool persistLocationCreated = std::filesystem::create_directories(m_persistFilepath.parent_path());
