@@ -1,5 +1,10 @@
 
+#include <algorithm>
+#include <fstream>
+
 #include <nearobject/persist/NearObjectProfilePersisterFilesystem.hxx>
+#include <nearobject/persist/NearObjectProfileJsonSerializer.hxx>
+#include <JsonSerializer.hxx>
 
 using namespace nearobject;
 using namespace nearobject::persistence;
@@ -15,13 +20,35 @@ NearObjectProfilePersisterFilesystem::NearObjectProfilePersisterFilesystem(std::
 persist::PersistResult
 NearObjectProfilePersisterFilesystem::PersistProfile(const NearObjectProfile& profile) 
 {
-    // TODO
-    return persist::PersistResult::UnknownError;
+    // Read existing profiles from disk.
+    persist::PersistResult persistResult = persist::PersistResult::UnknownError;
+    auto profiles = ReadPersistedProfiles(persistResult);
+    if (persistResult != persist::PersistResult::Succeeded) {
+        return persistResult;
+    }
+
+    // Add new profile and serialize updated list.
+    profiles.push_back(profile);
+    auto json = nlohmann::json{ profiles };
+
+    // Write updated list to disk.
+    std::ofstream profilesFile{ m_persistLocation };
+    profilesFile << json;
+    profilesFile.close();
+
+    persistResult = profilesFile.fail()
+        ? persist::PersistResult::Failed
+        : persist::PersistResult::Succeeded;
+
+    return persistResult;
 }
 
 std::vector<NearObjectProfile>
 NearObjectProfilePersisterFilesystem::ReadPersistedProfiles(persist::PersistResult& persistResult)
 {
-    // TODO
-    return {};
+    std::ifstream profilesFile{ m_persistLocation };
+    const auto json = nlohmann::json::parse(profilesFile);
+    auto profiles = json.get<std::vector<NearObjectProfile>>();
+
+    return profiles; 
 }
