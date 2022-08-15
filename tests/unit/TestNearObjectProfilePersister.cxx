@@ -125,7 +125,6 @@ TEST_CASE("near object filesystem persister uses custom persistence path")
         NearObjectProfilePersisterFilesystem persisterFs{ persistencePath };
 
         const auto persistenceFile = persisterFs.GetPersistenceFilepath();
-        REQUIRE(std::filesystem::is_regular_file(persistenceFile));
         REQUIRE(persistenceFile.parent_path() == persistencePath);
         REQUIRE(std::filesystem::exists(persistenceFile.parent_path()));
     }
@@ -141,6 +140,7 @@ TEST_CASE("near object filesystem persister uses custom persistence path")
         persisterFs.PersistProfile(NearObjectProfile{});
         REQUIRE(persistenceFile.parent_path() == persistencePath);
         REQUIRE(std::filesystem::exists(persistenceFile));
+        REQUIRE(std::filesystem::is_regular_file(persistenceFile));
         REQUIRE(std::filesystem::file_size(persistenceFile) > 0);
     }
 }
