@@ -32,7 +32,7 @@ struct DeletePersisterPathOnScopeExit
 
     ~DeletePersisterPathOnScopeExit()
     {
-        std::filesystem::remove(PathToDelete);
+        std::filesystem::remove_all(PathToDelete);
     }
 
     std::filesystem::path PathToDelete;
