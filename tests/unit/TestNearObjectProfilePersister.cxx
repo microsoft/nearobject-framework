@@ -93,7 +93,6 @@ GetTestPersistenceDirectorySuffix()
         static const std::filesystem::path suffix = "Test/TestNearObjectProfilePersister";
         return suffix;
     } catch (const std::filesystem::filesystem_error filesystemError) {
-        // TODO: log
         throw std::runtime_error("failed to create test path suffix");
     }
 }
