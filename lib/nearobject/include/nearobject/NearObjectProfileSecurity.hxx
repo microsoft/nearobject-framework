@@ -35,6 +35,7 @@ struct NearObjectConnectionProfileSecurity
 
 bool
 operator==(const NearObjectConnectionProfileSecurity&, const NearObjectConnectionProfileSecurity&) noexcept;
+
 bool
 operator!=(const NearObjectConnectionProfileSecurity&, const NearObjectConnectionProfileSecurity&) noexcept;
 } // namespace nearobject
