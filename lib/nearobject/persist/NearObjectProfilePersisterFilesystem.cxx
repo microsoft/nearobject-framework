@@ -46,9 +46,18 @@ NearObjectProfilePersisterFilesystem::PersistProfile(const NearObjectProfile& pr
 std::vector<NearObjectProfile>
 NearObjectProfilePersisterFilesystem::ReadPersistedProfiles(persist::PersistResult& persistResult)
 {
+    if (!std::filesystem::exists(m_persistLocation)) {
+        return {};
+    }
+
     std::ifstream profilesFile{ m_persistLocation };
+    if (profilesFile.fail()) {
+        persistResult = persist::PersistResult::FailedToOpenFile;
+        return {};
+    }
+
     const auto json = nlohmann::json::parse(profilesFile);
     auto profiles = json.get<std::vector<NearObjectProfile>>();
 
-    return profiles; 
+    return profiles;
 }
