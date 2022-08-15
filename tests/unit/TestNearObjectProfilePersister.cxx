@@ -1,7 +1,9 @@
 
+#include <chrono>
 #include <filesystem>
 #include <iterator>
 #include <stdexcept>
+#include <sstream>
 #include <system_error>
 #include <vector>
 
@@ -79,11 +81,16 @@ ValidateProfilesOnDisk(NearObjectProfilePersister& persister, const std::vector<
     REQUIRE(profilesExpected == profilesActual);
 }
 
+/**
+ * @brief Get the test directory path suffix.
+ * 
+ * @return const std::filesystem::path& 
+ */
 const std::filesystem::path&
 GetTestPersistenceDirectorySuffix()
 {
     try {
-        static std::filesystem::path suffix = "NearObject/Test/TestNearObjectProfilePersister";
+        static const std::filesystem::path suffix = "Test/TestNearObjectProfilePersister";
         return suffix;
     } catch (const std::filesystem::filesystem_error filesystemError) {
         // TODO: log
@@ -91,10 +98,40 @@ GetTestPersistenceDirectorySuffix()
     }
 }
 
+/**
+ * @brief Generate a utc timestamp string in the iso8601('ish) format. 
+ * 
+ * One such example is '20220815T223819+0000Z'.
+ * 
+ * @return std::string 
+ */
+std::string
+GetIso8601Timestamp()
+{
+    const auto nowUtc = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
+    const auto timestampAsTimeT = std::chrono::system_clock::to_time_t(nowUtc);
+    const auto timestampAsTm = *(std::gmtime(&timestampAsTimeT));
+
+    std::ostringstream timestampBuilder{};
+    timestampBuilder << std::put_time(&timestampAsTm, "%Y%m%dT%H%M%S%zZ");
+
+    return timestampBuilder.str();
+}
+
+/**
+ * @brief Generates a pseudo-unique path that uses the system temporary
+ * directory, a common base directory, a timestamp, and a common test directory
+ * suffix. 
+ * 
+ * One such example on a Linux system is:
+ *  /tmp/NearObject/20220815T223724+0000Z/Test/TestNearObjectProfilePersister
+ * 
+ * @return std::filesystem::path 
+ */
 std::filesystem::path
 GenerateUniqueTestTempPath()
 {
-    return std::filesystem::temp_directory_path() / GetTestPersistenceDirectorySuffix();
+    return std::filesystem::temp_directory_path() / "NearObject" / GetIso8601Timestamp() / GetTestPersistenceDirectorySuffix();
 }
 } // namespace test
 } // namespace persistence
