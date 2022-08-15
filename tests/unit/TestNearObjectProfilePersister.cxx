@@ -50,18 +50,23 @@ struct DeletePersisterPathOnScopeExit
  * @param expectedSize The number of profiles expected to be read back.
  */
 void
-PersistProfileAndValidate(NearObjectProfilePersister& persister, const NearObjectProfile& profileToPersist, std::size_t expectedSize)
+PersistProfileAndValidate(NearObjectProfilePersister& persister, const NearObjectProfile& profileToPersist)
 {
-    // Persist
-    PersistResult persistResult = persister.PersistProfile(profileToPersist);
+    // Read current vector of profiles.
+    PersistResult persistResult = PersistResult::UnknownError;
+    const auto profilesPersistedBefore = persister.ReadPersistedProfiles(persistResult);
     REQUIRE(persistResult == PersistResult::Succeeded);
 
-    // Read back
-    persistResult = PersistResult::UnknownError;
-    const auto profilesPersisted = persister.ReadPersistedProfiles(persistResult);
+    // Persist new profile.
+    persistResult = persister.PersistProfile(profileToPersist);
     REQUIRE(persistResult == PersistResult::Succeeded);
-    REQUIRE(profilesPersisted.size() == expectedSize);
-    REQUIRE(profilesPersisted[0] == profileToPersist);
+
+    // Read back updated profiles.
+    persistResult = PersistResult::UnknownError;
+    const auto profilesPersistedAfter = persister.ReadPersistedProfiles(persistResult);
+    REQUIRE(persistResult == PersistResult::Succeeded);
+    REQUIRE(profilesPersistedAfter.size() == profilesPersistedBefore.size() + 1);
+    REQUIRE(profilesPersistedAfter.back() == profileToPersist);
 }
 
 /**
