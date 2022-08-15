@@ -10,8 +10,7 @@ namespace nearobject
  * @brief A collection of configuration that specifies what security is required
  * when communicating with a near object peer or set of peers.
  */
-struct NearObjectConnectionProfileSecurity 
-    : public persist::Serializable
+struct NearObjectConnectionProfileSecurity
 {
     virtual ~NearObjectConnectionProfileSecurity() = default;
     NearObjectConnectionProfileSecurity() = default;
@@ -25,12 +24,6 @@ struct NearObjectConnectionProfileSecurity
      */
     bool
     IsSame(const NearObjectConnectionProfileSecurity& other) const noexcept;
-
-    rapidjson::Value
-    ToJson(rapidjson::Document::AllocatorType&) const override;
-
-    persist::ParseResult
-    ParseAndSet(const rapidjson::Value&) override;
 };
 
 bool

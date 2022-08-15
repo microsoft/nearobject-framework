@@ -32,47 +32,6 @@ NearObjectProfile::NearObjectProfile(NearObjectConnectionScope scope) :
     Scope(scope)
 {}
 
-rapidjson::Value
-NearObjectProfile::ToJson(rapidjson::Document::AllocatorType& allocator) const
-{
-    rapidjson::Value jsonValue(rapidjson::kObjectType);
-    std::string scopeString = NearObjectConnectionScope_ToString(Scope);
-    jsonValue.AddMember("Scope", rapidjson::Value().SetString(scopeString.c_str(), static_cast<rapidjson::SizeType>(scopeString.size()), allocator), allocator);
-    if (Security) {
-        auto jsonValueSecurity = Security->ToJson(allocator);
-        jsonValue.AddMember("Security", jsonValueSecurity, allocator);
-    }
-    return std::move(jsonValue);
-}
-
-persist::ParseResult
-NearObjectProfile::ParseAndSet(const rapidjson::Value& value)
-{
-    {
-        rapidjson::Value::ConstMemberIterator itr = value.FindMember("Scope");
-        if (itr == value.MemberEnd()) {
-            return persist::ParseResult::Failed;
-        }
-        NearObjectProfile::Scope = NearObjectConnectionScope_FromString(itr->value.GetString());
-        if (NearObjectProfile::Scope == NearObjectConnectionScope::Unknown) {
-            return persist::ParseResult::Failed;
-        }
-    }
-    {
-        rapidjson::Value::ConstMemberIterator itr = value.FindMember("Security");
-        if (itr == value.MemberEnd()) {
-            return persist::ParseResult::Succeeded;
-        }
-        NearObjectConnectionProfileSecurity security;
-        auto result = security.ParseAndSet(itr->value);
-        if (result != persist::ParseResult::Succeeded) {
-            return result;
-        }
-        NearObjectProfile::Security.emplace(std::move(security));
-    }
-    return persist::ParseResult::Succeeded;
-}
-
 bool
 NearObjectProfile::IsSame(const NearObjectProfile& other) const noexcept
 {

@@ -1,19 +1,6 @@
 
 #include <nearobject/NearObjectProfileSecurity.hxx>
 
-rapidjson::Value
-nearobject::NearObjectConnectionProfileSecurity::ToJson(rapidjson::Document::AllocatorType& allocator) const
-{
-    rapidjson::Value v(rapidjson::kObjectType);
-    return v;
-}
-
-persist::ParseResult
-nearobject::NearObjectConnectionProfileSecurity::ParseAndSet(const rapidjson::Value& value)
-{
-    return persist::ParseResult::Succeeded;
-}
-
 bool
 nearobject::NearObjectConnectionProfileSecurity::IsSame(const NearObjectConnectionProfileSecurity& other) const noexcept
 {

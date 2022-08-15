@@ -43,8 +43,7 @@ NearObjectConnectionScope_FromString(const std::string& scope);
  * @brief A collection of configuration that specifies how to connect to a near
  * object peer or set of peers.
  */
-struct NearObjectProfile :
-    public persist::Serializable
+struct NearObjectProfile
 {
     /**
      * @brief Construct a new Near Object Profile object with default scope and
@@ -85,22 +84,6 @@ struct NearObjectProfile :
     */
     bool
     IsSame(const NearObjectProfile& other) const noexcept;
-
-    /**
-     * @brief 
-     * 
-     * @return rapidjson::Value 
-     */
-    rapidjson::Value
-    ToJson(rapidjson::Document::AllocatorType&) const override;
-
-    /**
-     * @brief 
-     * 
-     * @return persist::ParseResult 
-     */
-    persist::ParseResult
-    ParseAndSet(const rapidjson::Value&) override;
 };
 
 bool
