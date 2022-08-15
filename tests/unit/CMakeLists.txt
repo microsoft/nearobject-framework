@@ -23,6 +23,7 @@ target_sources(nearobject-test
         ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectDeviceManager.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectManager.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectProfileManager.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectProfilePersister.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectService.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectSession.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestTlvSimple.cxx

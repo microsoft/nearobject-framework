@@ -1,0 +1,252 @@
+
+#include <filesystem>
+#include <iterator>
+#include <stdexcept>
+#include <system_error>
+#include <vector>
+
+#include <catch2/catch.hpp>
+
+#include <nearobject/NearObjectProfile.hxx>
+#include <nearobject/persist/NearObjectProfilePersister.hxx>
+#include <nearobject/persist/NearObjectProfilePersisterFilesystem.hxx>
+
+namespace nearobject
+{
+namespace persistence
+{
+namespace test
+{
+using persist::PersistResult;
+
+/**
+ * @brief RAII helper to delete the path associated with a
+ * NearObjectProfilePersisterFilesystem object. The parent path is deleted when
+ * this object goes out of scope.
+ */
+struct DeletePersisterPathOnScopeExit
+{
+    explicit DeletePersisterPathOnScopeExit(const NearObjectProfilePersisterFilesystem& persisterFs) :
+        PathToDelete(persisterFs.GetPersistenceFilepath().parent_path())
+    {}
+
+    ~DeletePersisterPathOnScopeExit()
+    {
+        std::filesystem::remove(PathToDelete);
+    }
+
+    std::filesystem::path PathToDelete;
+};
+
+/**
+ * @brief Persists a profile using a generic persister, validates the interface
+ * returned the expected result, then reads back the persisted profile and
+ * verifies it matches the one in memory that was persisted.
+ * 
+ * @param persister The persister to use.
+ * @param profileToPersist The profile to persist.
+ * @param expectedSize The number of profiles expected to be read back.
+ */
+void
+PersistProfileAndValidate(NearObjectProfilePersister& persister, const NearObjectProfile& profileToPersist, std::size_t expectedSize)
+{
+    // Persist
+    PersistResult persistResult = persister.PersistProfile(profileToPersist);
+    REQUIRE(persistResult == PersistResult::Succeeded);
+
+    // Read back
+    persistResult = PersistResult::UnknownError;
+    const auto profilesPersisted = persister.ReadPersistedProfiles(persistResult);
+    REQUIRE(persistResult == PersistResult::Succeeded);
+    REQUIRE(profilesPersisted.size() == expectedSize);
+    REQUIRE(profilesPersisted[0] == profileToPersist);
+}
+
+/**
+ * @brief Read profiles from persistence store and validate they match the ones
+ * provided. Note that the profilesExpected vector must be in the same order
+ * that the persister will provide them.
+ * 
+ * @param persister The persister to read profiles from.
+ * @param profilesExpected The expected profiles to be read from the persister.
+ */
+void
+ValidateProfilesOnDisk(NearObjectProfilePersister& persister, const std::vector<NearObjectProfile>& profilesExpected)
+{
+    PersistResult persistResult = PersistResult::UnknownError;
+    const auto profilesActual = persister.ReadPersistedProfiles(persistResult);
+    REQUIRE(persistResult == PersistResult::Succeeded);
+    REQUIRE(profilesExpected == profilesActual);
+}
+
+const std::filesystem::path&
+GetTestPersistenceDirectorySuffix()
+{
+    try {
+        static std::filesystem::path suffix = "NearObject/Test/TestNearObjectProfilePersister";
+        return suffix;
+    } catch (const std::filesystem::filesystem_error filesystemError) {
+        // TODO: log
+        throw std::runtime_error("failed to create test path suffix");
+    }
+}
+
+std::filesystem::path
+GenerateUniqueTestTempPath()
+{
+    return std::filesystem::temp_directory_path() / GetTestPersistenceDirectorySuffix();
+}
+} // namespace test
+} // namespace persistence
+} // namespace nearobject
+
+TEST_CASE("near object filesystem profile persister can be created", "[basic][persist]")
+{
+    using namespace nearobject::persistence;
+
+    SECTION("creation doesn't cause a crash")
+    {
+        NearObjectProfilePersisterFilesystem persisterFs{};
+    }
+
+    SECTION("creation with custom path doesn't cause a crash")
+    {
+        NearObjectProfilePersisterFilesystem persisterFs{ test::GenerateUniqueTestTempPath() };
+    }
+}
+
+TEST_CASE("near object filesystem persister uses custom persistence path")
+{
+    using namespace nearobject::persistence;
+
+    SECTION("custom persistence path is stored")
+    {
+        const std::filesystem::path persistencePath = test::GenerateUniqueTestTempPath();
+        NearObjectProfilePersisterFilesystem persisterFs{ persistencePath };
+
+        const auto persistenceFile = persisterFs.GetPersistenceFilepath();
+        REQUIRE(std::filesystem::is_regular_file(persistenceFile));
+        REQUIRE(persistenceFile.parent_path() == persistencePath);
+        REQUIRE(std::filesystem::exists(persistenceFile.parent_path()));
+    }
+
+    SECTION("persisted files are actually stored in specified persistence path")
+    {
+        using namespace nearobject;
+
+        const std::filesystem::path persistencePath = test::GenerateUniqueTestTempPath();
+        NearObjectProfilePersisterFilesystem persisterFs{ persistencePath };
+        const auto persistenceFile = persisterFs.GetPersistenceFilepath();
+
+        persisterFs.PersistProfile(NearObjectProfile{});
+        REQUIRE(persistenceFile.parent_path() == persistencePath);
+        REQUIRE(std::filesystem::exists(persistenceFile));
+        REQUIRE(std::filesystem::file_size(persistenceFile) > 0);
+    }
+}
+
+TEST_CASE("near object filesystem persister cannot be modified by non-framework users")
+{
+    SECTION("persistence file cannot be written by non-framework user accounts")
+    {
+        // TODO
+    }
+
+    SECTION("persistence file cannot be deleted by non-framework user accounts")
+    {
+        // TODO
+    }
+
+    SECTION("persistence file cannot be overwrriten/truncated by non-frametwork user accounts")
+    {
+        // TODO
+    }
+}
+
+TEST_CASE("near object filesystem persister persists profiles")
+{
+    using namespace nearobject;
+    using namespace nearobject::persistence;
+
+    constexpr std::array<NearObjectConnectionScope, 3> AllScopes = {
+        NearObjectConnectionScope::Unicast,
+        NearObjectConnectionScope::Multicast,
+        NearObjectConnectionScope::Unknown,
+    };
+
+    std::vector<NearObjectProfile> ProfilesWithVariedScopes{};
+    std::transform(std::cbegin(AllScopes), std::cend(AllScopes), std::back_inserter(ProfilesWithVariedScopes), [&](const auto& scope) {
+        return NearObjectProfile{ scope };
+    });
+
+    std::vector<NearObjectProfile> ProfilesWithVariedScopesAndSecurity{};
+    std::transform(std::cbegin(AllScopes), std::cend(AllScopes), std::back_inserter(ProfilesWithVariedScopes), [&](const auto& scope) {
+        NearObjectProfile profile{ scope };
+        profile.Security.emplace();
+        return std::move(profile);
+    });
+
+    SECTION("single profile can be persisted")
+    {
+        // Persist default-constructed profile.
+        {
+            NearObjectProfile profile{};
+            NearObjectProfilePersisterFilesystem persisterFs{ test::GenerateUniqueTestTempPath() };
+            test::DeletePersisterPathOnScopeExit persisterPathDeleter{ persisterFs };
+            test::PersistProfileAndValidate(persisterFs, profile, 1);
+        }
+
+        // Persist profiles with all possible scopes.
+        for (const auto& profile : ProfilesWithVariedScopes) {
+            NearObjectProfilePersisterFilesystem persisterFs{ test::GenerateUniqueTestTempPath() };
+            test::DeletePersisterPathOnScopeExit persisterPathDeleter{ persisterFs };
+            test::PersistProfileAndValidate(persisterFs, profile, 1);
+        }
+
+        // Persist profiles with instantiated security settings.
+        for (const auto& profileWithSecurity : ProfilesWithVariedScopesAndSecurity) {
+            NearObjectProfilePersisterFilesystem persisterFs{ test::GenerateUniqueTestTempPath() };
+            test::DeletePersisterPathOnScopeExit persisterPathDeleter{ persisterFs };
+            test::PersistProfileAndValidate(persisterFs, profileWithSecurity, 1);
+        }
+    }
+
+    SECTION("multiple profiles can be persisted")
+    {
+        NearObjectProfilePersisterFilesystem persisterFs{ test::GenerateUniqueTestTempPath() };
+        test::DeletePersisterPathOnScopeExit persisterPathDeleter{ persisterFs };
+        std::size_t persisted = 0;
+
+        // Persist profiles with all possible scopes.
+        for (const auto& profile : ProfilesWithVariedScopes) {
+            test::PersistProfileAndValidate(persisterFs, profile, persisted++);
+        }
+
+        // Persist profiles with instantiated security settings.
+        for (const auto& profileWithSecurity : ProfilesWithVariedScopesAndSecurity) {
+            test::PersistProfileAndValidate(persisterFs, profileWithSecurity, persisted++);
+        }
+    }
+
+    SECTION("persister state is not required to persist profiles")
+    {
+        const std::filesystem::path persistLocation = std::filesystem::temp_directory_path() / "NoStateTest";
+
+        std::size_t persisted = 0;
+        for (const auto& profile : ProfilesWithVariedScopes) {
+            // Use a distinct persister instance for each operation.
+            NearObjectProfilePersisterFilesystem persisterFs{ persistLocation };
+            test::PersistProfileAndValidate(persisterFs, profile, persisted++);
+        }
+
+        // Read the profiles with a different persister instance than was used to persist the profiles.
+        NearObjectProfilePersisterFilesystem persisterFsForValidation{ persistLocation };
+        test::DeletePersisterPathOnScopeExit persisterPathDeleter{ persisterFsForValidation };
+        test::ValidateProfilesOnDisk(persisterFsForValidation, ProfilesWithVariedScopes);
+    }
+
+    SECTION("existing profiles are retained upon persisting new profiles")
+    {
+        // TODO
+    }
+}
