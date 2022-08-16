@@ -29,6 +29,7 @@ target_include_directories(nearobject
 target_link_libraries(nearobject
     PRIVATE
         nearobject-service
+        strings
     PUBLIC
         jsonify
 )

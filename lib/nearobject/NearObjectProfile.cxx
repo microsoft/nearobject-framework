@@ -1,6 +1,8 @@
 
 #include <sstream>
 
+#include <strings/ToString.hxx>
+
 #include <nearobject/NearObjectProfile.hxx>
 
 using namespace nearobject;
@@ -51,7 +53,7 @@ NearObjectProfile::ToString() const noexcept
 {
     std::ostringstream profileString;
     profileString << "Scope: " << NearObjectConnectionScope_ToString(Scope);
-    profileString << ", Security: " << ((Security.has_value()) ? Security->ToString() : "None");
+    profileString << ", Security: " << Security;
 
     return profileString.str();
 }
