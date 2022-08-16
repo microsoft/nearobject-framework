@@ -1,7 +1,7 @@
 
 #include <sstream>
 
-#include <strings/ToString.hxx>
+#include <strings/tostring.hxx>
 
 #include <nearobject/NearObjectProfile.hxx>
 
