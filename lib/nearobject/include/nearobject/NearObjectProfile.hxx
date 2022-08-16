@@ -6,6 +6,7 @@
 #include <string>
 
 #include <jsonify.hxx>
+#include <nlohmann/json.hpp>
 
 #include <nearobject/NearObjectProfileSecurity.hxx>
 
@@ -20,24 +21,6 @@ enum class NearObjectConnectionScope {
     Multicast,
     Unknown
 };
-
-/**
- * @brief Turns the enum NearObjectConnectionScope into the right string
- * 
- * @param scope The scope to convert to string
- * @return auto 
- */
-auto
-NearObjectConnectionScope_ToString(NearObjectConnectionScope scope);
-
-/**
- * @brief Turns a string into the corresponding enum
- *
- * @param scope the string 
- * @return NearObjectConnectionScope The matching enum
- */
-NearObjectConnectionScope
-NearObjectConnectionScope_FromString(const std::string& scope);
 
 /**
  * @brief A collection of configuration that specifies how to connect to a near
@@ -71,8 +54,11 @@ struct NearObjectProfile
      *
      * Note that this designates support and not an absolute requirement. Thus,
      * when 'Multicast' is specified, Unicast connections are still permitted.
+     * 
+     * @return NearObjectConnectionScope 
      */
-    NearObjectConnectionScope Scope{ NearObjectConnectionScope::Unicast };
+    NearObjectConnectionScope
+    GetScope() const noexcept;
 
     /**
      * @brief The security configuration of the connection.
@@ -84,8 +70,11 @@ struct NearObjectProfile
      * If not specified, no security is required and the use of this profile
      * will ignore all security features of the NearObjectDevice and all peers
      * associated with it.
+     * 
+     * @return std::optional<NearObjectProfileSecurity> 
      */
-    std::optional<NearObjectProfileSecurity> Security{ std::nullopt };
+    const std::optional<NearObjectProfileSecurity>
+    GetSecurity() const noexcept;
 
     /**
      * @brief Returns a string representation of this profile.
@@ -100,6 +89,20 @@ struct NearObjectProfile
     */
     bool
     IsSame(const NearObjectProfile& other) const noexcept;
+
+private:
+    NearObjectConnectionScope m_scope{ NearObjectConnectionScope::Unicast };
+    std::optional<NearObjectProfileSecurity> m_security{ std::nullopt };
+
+    /**
+     * @brief Declare friendship with nlohmann::json ADL serialization functions
+     * in order to access private m_security member. 
+     */
+    friend void
+    to_json(nlohmann::json& json, const NearObjectProfile& profile);
+
+    friend void
+    from_json(const nlohmann::json& json, NearObjectProfile& profile);
 };
 
 bool

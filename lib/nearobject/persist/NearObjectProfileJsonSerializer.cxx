@@ -20,14 +20,14 @@ void
 nearobject::to_json(nlohmann::json& json, const NearObjectProfile& profile) 
 {
     json = nlohmann::json {
-        { "Scope", profile.Scope },
-        { "Security", profile.Security },
+        { "Scope", profile.GetScope() },
+        { "Security", profile.GetSecurity()},
     };
 }
 
 void
 nearobject::from_json(const nlohmann::json& json, NearObjectProfile& profile) 
 {
-    json.at("Scope").get_to(profile.Scope);
-    json.at("Security").get_to(profile.Security);
+    json.at("Scope").get_to(profile.m_scope);
+    json.at("Security").get_to(profile.m_security);
 }

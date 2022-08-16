@@ -6,6 +6,7 @@
 
 #include <nearobject/NearObjectProfile.hxx>
 #include <nearobject/service/NearObjectProfileManager.hxx>
+#include <nearobject/persist/NearObjectProfilePersisterFilesystem.hxx>
 
 namespace nearobject
 {
@@ -35,11 +36,23 @@ public:
 
 TEST_CASE("near object profile manager can be created", "[basic][service]")
 {
+    using namespace nearobject::persistence;
     using namespace nearobject::service;
 
     SECTION("creation doesn't cause a crash")
     {
         NearObjectProfileManager profileManager{};
+    }
+
+    SECTION("creation with custom persister doesn't cause a crash")
+    {
+        auto persisterFs = std::make_unique<NearObjectProfilePersisterFilesystem>();
+        REQUIRE_NOTHROW(std::make_unique<NearObjectProfileManager>(std::move(persisterFs))); 
+    }
+
+    SECTION("creation with invalid persister causes a crash")
+    {
+        REQUIRE_THROWS_AS(std::make_unique<NearObjectProfileManager>(nullptr), std::runtime_error);
     }
 }
 
@@ -67,68 +80,14 @@ TEST_CASE("near object profiles can be persisted", "[basic][infra]")
         throw std::filesystem::filesystem_error("could not create test directory", std::error_code());
     }
 
-    SECTION("NearObjectProfileSecurity can be serialized and parsed")
-    {
-        using namespace nearobject;
-
-        NearObjectProfileSecurity security1;
-        NearObjectProfileSecurity security2;
-
-        // rapidjson::Document document;
-        // auto& allocator = document.GetAllocator();
-
-        // const auto jsonValue = security1.ToJson(allocator);
-        // const auto parseResult = security2.ParseAndSet(jsonValue);
-        // REQUIRE(security1 == security2);
-        // REQUIRE(parseResult == persist::ParseResult::Succeeded);
-    }
-
-    SECTION("NearObjectProfile (with no Security) can be serialized and parsed")
-    {
-        using namespace nearobject;
-
-        NearObjectProfile profile1;
-        NearObjectProfile profile2;
-
-        // rapidjson::Document document;
-        // auto& allocator = document.GetAllocator();
-
-        // auto jsonValue = profile1.ToJson(allocator);
-        // auto parseResult = profile2.ParseAndSet(jsonValue);
-        // REQUIRE(parseResult == persist::ParseResult::Succeeded);
-        // REQUIRE(profile1 == profile2);
-    }
-
-    SECTION("NearObjectProfile (with Security) can be serialized and parsed")
-    {
-        using namespace nearobject;
-        using namespace nearobject::service;
-
-        NearObjectProfile profile1;
-        NearObjectProfile profile2;
-        NearObjectProfileSecurity security;
-
-        profile1.Security.emplace(std::move(security));
-
-        // rapidjson::Document document;
-        // auto& allocator = document.GetAllocator();
-
-        // auto jsonValue = profile1.ToJson(allocator);
-        // auto parseResult = profile2.ParseAndSet(jsonValue);
-        // REQUIRE(parseResult == persist::ParseResult::Succeeded);
-        // REQUIRE(profile1 == profile2);
-    }
-
     SECTION("NearObjectProfileManager::PersistProfile matches the read profiles")
     {
         using namespace nearobject;
         using namespace nearobject::service;
 
-        NearObjectProfile profile1;
-        NearObjectProfile profile2;
         NearObjectProfileSecurity security;
-
-        profile1.Security.emplace(std::move(security));
+        NearObjectProfile profile1{ NearObjectConnectionScope::Unicast, std::move(security) };
+        NearObjectProfile profile2;
 
         // rapidjson::Document document;
         // auto& allocator = document.GetAllocator();
@@ -142,7 +101,6 @@ TEST_CASE("near object profiles can be persisted", "[basic][infra]")
         // }
 
         // test::TestNearObjectProfileManager profileManager{};
-        // profileManager.SetPersistLocation(persistLocation);
 
         // // persist the profiles
         // auto result = profileManager.TestPersistProfile(profile1);

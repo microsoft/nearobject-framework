@@ -9,10 +9,12 @@
 #include <vector>
 
 #include <catch2/catch.hpp>
-
 #include <nearobject/NearObjectProfile.hxx>
 #include <nearobject/persist/NearObjectProfilePersister.hxx>
 #include <nearobject/persist/NearObjectProfilePersisterFilesystem.hxx>
+#include <notstd/tostring.hxx>
+
+using namespace strings::ostream_operators;
 
 namespace nearobject
 {
@@ -99,7 +101,7 @@ GetTestPersistenceDirectorySuffix()
     try {
         static const std::filesystem::path suffix = "Test/TestNearObjectProfilePersister";
         return suffix;
-    } catch (const std::filesystem::filesystem_error& filesystemError) {
+    } catch (const std::filesystem::filesystem_error& /* filesystemError */) {
         throw std::runtime_error("failed to create test path suffix");
     }
 }
@@ -156,9 +158,14 @@ TEST_CASE("near object filesystem profile persister can be created", "[basic][pe
     {
         NearObjectProfilePersisterFilesystem persisterFs{ test::GenerateUniqueTestTempPath() };
     }
+
+    SECTION("creation with invalid path is disallowed")
+    {
+        REQUIRE_THROWS_AS(NearObjectProfilePersisterFilesystem{ "/random" }, std::filesystem::filesystem_error);
+    }
 }
 
-TEST_CASE("near object filesystem persister uses custom persistence path")
+TEST_CASE("near object filesystem persister uses custom persistence path", "[basic][persist]")
 {
     using namespace nearobject::persistence;
 
@@ -188,7 +195,7 @@ TEST_CASE("near object filesystem persister uses custom persistence path")
     }
 }
 
-TEST_CASE("near object filesystem persister cannot be modified by non-framework users")
+TEST_CASE("near object filesystem persister cannot be modified by non-framework users", "[basic][persist][security]")
 {
     SECTION("persistence file cannot be written by non-framework user accounts")
     {
@@ -206,7 +213,7 @@ TEST_CASE("near object filesystem persister cannot be modified by non-framework 
     }
 }
 
-TEST_CASE("near object filesystem persister persists profiles")
+TEST_CASE("near object filesystem persister persists profiles", "[basic][persist]")
 {
     using namespace nearobject;
     using namespace nearobject::persistence;
@@ -224,9 +231,7 @@ TEST_CASE("near object filesystem persister persists profiles")
 
     std::vector<NearObjectProfile> ProfilesWithVariedScopesAndSecurity{};
     std::transform(std::cbegin(AllScopes), std::cend(AllScopes), std::back_inserter(ProfilesWithVariedScopesAndSecurity), [&](const auto& scope) {
-        NearObjectProfile profile{ scope };
-        profile.Security.emplace();
-        return std::move(profile);
+        return NearObjectProfile{ scope, NearObjectProfileSecurity{} };
     });
 
     SECTION("single profile can be persisted")

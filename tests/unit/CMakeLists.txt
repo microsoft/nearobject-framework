@@ -34,6 +34,7 @@ target_link_libraries(nearobject-test
     PRIVATE
         Catch2::Catch2
         nearobject
+        notstd
         tlv
 )
 

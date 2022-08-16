@@ -1,6 +1,8 @@
 
 #include <algorithm>
 #include <fstream>
+#include <stdexcept>
+#include <system_error>
 
 #include <nearobject/persist/NearObjectProfileJsonSerializer.hxx>
 #include <nearobject/persist/NearObjectProfilePersisterFilesystem.hxx>
@@ -16,9 +18,10 @@ NearObjectProfilePersisterFilesystem::NearObjectProfilePersisterFilesystem(const
     m_persistFilepath(persistLocation / "Profiles")
 {
     if (!std::filesystem::exists(m_persistFilepath.parent_path())) {
-        bool persistLocationCreated = std::filesystem::create_directories(m_persistFilepath.parent_path());
+        std::error_code errorCode;
+        bool persistLocationCreated = std::filesystem::create_directories(m_persistFilepath.parent_path(), errorCode);
         if (!persistLocationCreated) {
-            // TODO: throw ..
+            throw std::filesystem::filesystem_error("failed to create profile persistence directory", m_persistFilepath, errorCode);
         }
     }
 }
