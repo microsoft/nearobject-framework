@@ -270,7 +270,7 @@ TEST_CASE("near object filesystem persister persists profiles")
 
     SECTION("persister state is not required to persist profiles")
     {
-        const std::filesystem::path persistLocation = std::filesystem::temp_directory_path() / "NoStateTest";
+        const std::filesystem::path persistLocation = test::GenerateUniqueTestTempPath();
 
         for (const auto& profile : ProfilesWithVariedScopes) {
             // Use a distinct persister instance for each operation.
