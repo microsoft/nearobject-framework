@@ -7,14 +7,14 @@
 namespace nearobject
 {
 struct NearObjectProfile;
-struct NearObjectConnectionProfileSecurity;
+struct NearObjectProfileSecurity;
 
 // Implementations of required functions for use with nlohmann json conversion.
 void
-to_json(nlohmann::json& json, const NearObjectConnectionProfileSecurity& security);
+to_json(nlohmann::json& json, const NearObjectProfileSecurity& security);
 
 void
-from_json(const nlohmann::json& json, NearObjectConnectionProfileSecurity& security);
+from_json(const nlohmann::json& json, NearObjectProfileSecurity& security);
 
 void
 to_json(nlohmann::json& json, const NearObjectProfile& profile); 

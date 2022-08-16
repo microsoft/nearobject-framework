@@ -71,8 +71,8 @@ TEST_CASE("near object profiles can be persisted", "[basic][infra]")
     {
         using namespace nearobject;
 
-        NearObjectConnectionProfileSecurity security1;
-        NearObjectConnectionProfileSecurity security2;
+        NearObjectProfileSecurity security1;
+        NearObjectProfileSecurity security2;
 
         // rapidjson::Document document;
         // auto& allocator = document.GetAllocator();
@@ -106,7 +106,7 @@ TEST_CASE("near object profiles can be persisted", "[basic][infra]")
 
         NearObjectProfile profile1;
         NearObjectProfile profile2;
-        NearObjectConnectionProfileSecurity security;
+        NearObjectProfileSecurity security;
 
         profile1.Security.emplace(std::move(security));
 
@@ -126,7 +126,7 @@ TEST_CASE("near object profiles can be persisted", "[basic][infra]")
 
         NearObjectProfile profile1;
         NearObjectProfile profile2;
-        NearObjectConnectionProfileSecurity security;
+        NearObjectProfileSecurity security;
 
         profile1.Security.emplace(std::move(security));
 

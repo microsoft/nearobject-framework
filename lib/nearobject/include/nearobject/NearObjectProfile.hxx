@@ -77,7 +77,7 @@ struct NearObjectProfile
      * will ignore all security features of the NearObjectDevice and all peers
      * associated with it.
      */
-    std::optional<NearObjectConnectionProfileSecurity> Security{ std::nullopt };
+    std::optional<NearObjectProfileSecurity> Security{ std::nullopt };
 
     /**
     * @brief checks if the two profiles are the same
