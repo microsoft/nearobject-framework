@@ -35,24 +35,24 @@ TEST_CASE("near object profiles can be enumerated")
     using namespace nearobject;
     using namespace nearobject::service;
 
-    SECTION("FindMatchingProfiles doesn't cause a crash")
+    SECTION("enumerating all profiles doesn't cause a crash")
+    {
+        NearObjectProfileManager profileManager{};
+        REQUIRE_NOTHROW(profileManager.GetAllProfiles());
+    }
+
+    SECTION("attempting to find a non-existent profile doesn't cause a crash")
     {
         NearObjectProfile profile{};
         NearObjectProfileManager profileManager{};
-        const auto matchingProfiles = profileManager.FindMatchingProfiles(profile);
+        std::vector<NearObjectProfile> profilesMatching{};
+
+        REQUIRE_NOTHROW([&]() {
+            profilesMatching = profileManager.FindMatchingProfiles(profile);
+        }());
+        REQUIRE(profilesMatching.empty());
     }
 }
-
-TEST_CASE("near object profiles can be persisted", "[basic][infra]")
-{
-    auto testTempDirectory = std::filesystem::path("NearObjectTestTemp");
-    try {
-        std::filesystem::remove(testTempDirectory);
-    } catch (const std::filesystem::filesystem_error&) {
-    }
-    if (!std::filesystem::create_directories(testTempDirectory)) {
-        throw std::filesystem::filesystem_error("could not create test directory", std::error_code());
-    }
 
 TEST_CASE("near object profiles can be persisted", "[basic][infra]")
 {
