@@ -7,6 +7,7 @@
 #include <nearobject/NearObjectProfile.hxx>
 
 using namespace nearobject;
+using namespace strings::ostream_operators;
 
 auto
 nearobject::ToString(NearObjectConnectionScope scope) noexcept

@@ -7,6 +7,12 @@
 #include <string>
 #include <type_traits>
 
+namespace strings
+{
+namespace ostream_operators
+{
+namespace detail
+{
 struct EmptyValueProvider
 {
     std::string operator()() const noexcept
@@ -14,6 +20,7 @@ struct EmptyValueProvider
         return "(empty)";
     }
 };
+} // namespace details
 
 /**
  * @brief Helper implementing global operator << which passes the result of
@@ -49,7 +56,7 @@ std::ostream& operator<<(std::ostream& stream, const HasToStringT& ref)
 template <
     typename HasToStringT,
     typename = typename std::enable_if<std::is_member_function_pointer<decltype(&HasToStringT::ToString)>::value>::type,
-    typename EmptyValueProviderT = EmptyValueProvider
+    typename EmptyValueProviderT = detail::EmptyValueProvider
 >
 std::ostream& operator<<(std::ostream& stream, const std::optional<HasToStringT>& ref)
 {
@@ -58,5 +65,8 @@ std::ostream& operator<<(std::ostream& stream, const std::optional<HasToStringT>
         : stream << EmptyValueProviderT{}();
     return stream;
 }
+
+} // namespace ostream_operators
+} // namespace strings
 
 #endif // TO_STRING_HXX
