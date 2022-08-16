@@ -9,10 +9,12 @@
 #include <vector>
 
 #include <catch2/catch.hpp>
-
 #include <nearobject/NearObjectProfile.hxx>
 #include <nearobject/persist/NearObjectProfilePersister.hxx>
 #include <nearobject/persist/NearObjectProfilePersisterFilesystem.hxx>
+#include <notstd/tostring.hxx>
+
+using namespace strings::ostream_operators;
 
 namespace nearobject
 {

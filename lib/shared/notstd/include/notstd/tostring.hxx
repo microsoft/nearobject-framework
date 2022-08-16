@@ -35,10 +35,12 @@ struct EmptyValueProvider
  * @return std::ostream& 
  */
 template<
+    typename CharT,
+    typename Traits,
     typename HasToStringT,
     typename = typename std::enable_if<std::is_member_function_pointer<decltype(&HasToStringT::ToString)>::value>::type>
 std::ostream&
-operator<<(std::ostream& stream, const HasToStringT& ref)
+operator<<(std::basic_ostream<CharT, Traits>& stream, const HasToStringT& ref)
 {
     stream << ref.ToString();
     return stream;
@@ -57,11 +59,13 @@ operator<<(std::ostream& stream, const HasToStringT& ref)
  * @return std::ostream& 
  */
 template<
+    typename CharT,
+    typename Traits,
     typename HasToStringT,
     typename = typename std::enable_if<std::is_member_function_pointer<decltype(&HasToStringT::ToString)>::value>::type,
     typename EmptyValueProviderT = detail::EmptyValueProvider>
 std::ostream&
-operator<<(std::ostream& stream, const std::optional<HasToStringT>& ref)
+operator<<(std::basic_ostream<CharT, Traits>& stream, const std::optional<HasToStringT>& ref)
 {
     ref.has_value()
         ? stream << ref.value()

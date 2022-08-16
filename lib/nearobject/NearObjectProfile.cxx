@@ -2,7 +2,7 @@
 #include <sstream>
 #include <tuple>
 
-#include <strings/tostring.hxx>
+#include <notstd/tostring.hxx>
 
 #include <nearobject/NearObjectProfile.hxx>
 
