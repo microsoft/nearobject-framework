@@ -207,7 +207,7 @@ TEST_CASE("near object filesystem persister cannot be modified by non-framework 
         // TODO
     }
 
-    SECTION("persistence file cannot be overwrriten/truncated by non-frametwork user accounts")
+    SECTION("persistence file cannot be overwrriten/truncated by non-framework user accounts")
     {
         // TODO
     }
