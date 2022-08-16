@@ -9,7 +9,7 @@
 using namespace nearobject;
 
 auto
-nearobject::NearObjectConnectionScope_ToString(NearObjectConnectionScope scope)
+nearobject::ToString(NearObjectConnectionScope scope) noexcept
 {
     switch (scope) {
     case NearObjectConnectionScope::Unicast:
@@ -22,7 +22,7 @@ nearobject::NearObjectConnectionScope_ToString(NearObjectConnectionScope scope)
 }
 
 nearobject::NearObjectConnectionScope
-nearobject::NearObjectConnectionScope_FromString(const std::string& scope)
+nearobject::NearObjectConnectionScope_FromString(const std::string& scope) noexcept
 {
     if (scope == "Unicast") {
         return NearObjectConnectionScope::Unicast;
@@ -53,7 +53,7 @@ std::string
 NearObjectProfile::ToString() const noexcept
 {
     std::ostringstream profileString;
-    profileString << "Scope: " << NearObjectConnectionScope_ToString(Scope);
+    profileString << "Scope: " << ::ToString(Scope);
     profileString << ", Security: " << Security;
 
     return profileString.str();

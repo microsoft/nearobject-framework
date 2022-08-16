@@ -28,7 +28,7 @@ enum class NearObjectConnectionScope {
  * @return auto 
  */
 auto
-NearObjectConnectionScope_ToString(NearObjectConnectionScope scope);
+ToString(NearObjectConnectionScope scope) noexcept;
 
 /**
  * @brief Turns a string into the corresponding enum
@@ -37,7 +37,7 @@ NearObjectConnectionScope_ToString(NearObjectConnectionScope scope);
  * @return NearObjectConnectionScope The matching enum
  */
 NearObjectConnectionScope
-NearObjectConnectionScope_FromString(const std::string& scope);
+NearObjectConnectionScope_FromString(const std::string& scope) noexcept;
 
 /**
  * @brief A collection of configuration that specifies how to connect to a near
