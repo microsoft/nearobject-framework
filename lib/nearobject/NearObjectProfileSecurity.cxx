@@ -1,33 +1,28 @@
 
 #include <nearobject/NearObjectProfileSecurity.hxx>
 
-rapidjson::Value
-nearobject::NearObjectConnectionProfileSecurity::ToJson(rapidjson::Document::AllocatorType& allocator) const
-{
-    rapidjson::Value v(rapidjson::kObjectType);
-    return v;
-}
+using namespace nearobject;
 
-persist::ParseResult
-nearobject::NearObjectConnectionProfileSecurity::ParseAndSet(const rapidjson::Value& value)
+std::string
+NearObjectProfileSecurity::ToString() const noexcept
 {
-    return persist::ParseResult::Succeeded;
+    return "";
 }
 
 bool
-nearobject::NearObjectConnectionProfileSecurity::IsSame(const NearObjectConnectionProfileSecurity& other) const noexcept
+NearObjectProfileSecurity::IsSame(const NearObjectProfileSecurity& other) const noexcept
 {
     return true;
 }
 
 bool
-nearobject::operator==(const NearObjectConnectionProfileSecurity& lhs, const NearObjectConnectionProfileSecurity& rhs) noexcept
+nearobject::operator==(const NearObjectProfileSecurity& lhs, const NearObjectProfileSecurity& rhs) noexcept
 {
     return lhs.IsSame(rhs);
 }
 
 bool
-nearobject::operator!=(const NearObjectConnectionProfileSecurity& lhs, const NearObjectConnectionProfileSecurity& rhs) noexcept
+nearobject::operator!=(const NearObjectProfileSecurity& lhs, const NearObjectProfileSecurity& rhs) noexcept
 {
     return !(lhs == rhs);
 }

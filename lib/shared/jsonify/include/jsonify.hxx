@@ -2,12 +2,10 @@
 #ifndef JSONIFY_HXX
 #define JSONIFY_HXX
 
-#include <rapidjson/document.h> // rapidjson's DOM-style API
-
 namespace persist
 {
 /**
- * @brief Describes the result of parsing a Serializable object
+ * @brief Describes the result of parsing a serializable object
  */
 enum class ParseResult {
     /**
@@ -28,7 +26,7 @@ enum class ParseResult {
 };
 
 /**
- * @brief Describes the result of persisting a Serializable object
+ * @brief Describes the result of persisting a serializable object
  */
 enum class PersistResult {
     /**
@@ -56,34 +54,6 @@ enum class PersistResult {
      * content of the input data.
      */
     UnknownError,
-};
-
-class Serializable
-{
-public:
-    virtual ~Serializable() = default;
-    Serializable() = default;
-    Serializable(const Serializable&) = default;
-    Serializable(Serializable&&) = default;
-    Serializable& operator=(const Serializable&) = default;
-    Serializable& operator=(Serializable&&) = default;
-
-    /**
-     * @brief Turns this object into a json value
-     *
-     * @param allocator this is the allocator corresponding to the document for which the lifespan of this object will be bound by
-     */
-    virtual rapidjson::Value
-    ToJson(rapidjson::Document::AllocatorType&) const = 0;
-
-    /**
-     * @brief Parse a json value and try to set the members of this object
-     *
-     * @param value the json value to parse
-     * @return the status of the parsing. If anything other than Succeeded is returned, this object doesn't have its members set properly by the json value
-     */
-    virtual ParseResult
-    ParseAndSet(const rapidjson::Value&) = 0;
 };
 
 }; // namespace persist

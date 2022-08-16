@@ -34,6 +34,7 @@ target_link_libraries(nearobject-service
     PUBLIC
         jsonify
         nearobject
+        nearobject-persist
 )
 
 set_target_properties(nearobject-service PROPERTIES FOLDER lib/nearobject/service)

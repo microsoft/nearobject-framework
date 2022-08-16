@@ -28,7 +28,9 @@ target_include_directories(nearobject
 
 target_link_libraries(nearobject
     PRIVATE
+        magic_enum::magic_enum
         nearobject-service
+        notstd
     PUBLIC
         jsonify
 )

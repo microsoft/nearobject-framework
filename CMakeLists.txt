@@ -26,8 +26,12 @@ FetchContent_Declare(GSL
 
 FetchContent_MakeAvailable(GSL)
 
+set(JSON_ImplicitConversions OFF)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
 FetchContent_MakeAvailable(json)
+
+FetchContent_Declare(magic_enum URL https://github.com/Neargye/magic_enum/archive/refs/tags/v0.8.1.tar.gz)
+FetchContent_MakeAvailable(magic_enum)
 
 find_package(Threads REQUIRED)
 
