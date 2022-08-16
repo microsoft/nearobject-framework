@@ -142,7 +142,6 @@ TEST_CASE("near object profiles can be persisted", "[basic][infra]")
         // }
 
         // test::TestNearObjectProfileManager profileManager{};
-        // profileManager.SetPersistLocation(persistLocation);
 
         // // persist the profiles
         // auto result = profileManager.TestPersistProfile(profile1);

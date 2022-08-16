@@ -47,17 +47,11 @@ NearObjectProfileManager::AddProfile(const NearObjectProfile& profile, ProfileLi
 persist::PersistResult
 NearObjectProfileManager::PersistProfile(const NearObjectProfile& profile)
 {
-    return persist::PersistResult::Failed;
-}
-
-void
-NearObjectProfileManager::SetPersistLocation(std::filesystem::path persistLocation)
-{
-    m_persistLocation = std::move(persistLocation);
+    return m_persister->PersistProfile(profile);
 }
 
 std::vector<NearObjectProfile>
 NearObjectProfileManager::ReadPersistedProfiles(persist::PersistResult& parseResult) const
 {
-    return {};
+    return m_persister->ReadPersistedProfiles(parseResult);
 }

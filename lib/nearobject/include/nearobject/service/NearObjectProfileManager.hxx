@@ -72,14 +72,6 @@ public:
     std::vector<NearObjectProfile>
     GetAllProfiles() const;
 
-    /**
-     * @brief Sets the location to persist files to. 
-     * 
-     * @param location The full path of the filesystem location to persist files.
-     */
-    void
-    SetPersistLocation(std::filesystem::path location);
-
 protected:
     /**
      * @brief Persist the profile.
