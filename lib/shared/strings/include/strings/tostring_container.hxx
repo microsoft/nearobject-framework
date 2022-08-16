@@ -6,6 +6,12 @@
 #include <sstream>
 #include <string>
 
+namespace strings
+{
+namespace ostream_operators
+{
+namespace containers
+{
 /**
  * @brief Helper to stringify a container of items, using a comman for a delimeter.
  * 
@@ -35,5 +41,9 @@ auto ToString(const ContainerT& items, const char* itemName, const char* emptyNa
 
     return output.str();
 }
+
+} // namespace containers
+} // namespace ostream_operators
+} // namespace strings
 
 #endif // TO_STRING_CONTAINER_HXX
