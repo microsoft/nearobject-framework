@@ -37,6 +37,11 @@ NearObjectProfile::NearObjectProfile(NearObjectConnectionScope scope) :
     Scope(scope)
 {}
 
+NearObjectProfile::NearObjectProfile(NearObjectConnectionScope scope, NearObjectProfileSecurity security) :
+    Scope(scope),
+    Security(std::move(security))
+{}
+
 bool
 NearObjectProfile::IsSame(const NearObjectProfile& other) const noexcept
 {

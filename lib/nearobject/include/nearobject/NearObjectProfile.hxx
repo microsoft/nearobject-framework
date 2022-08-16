@@ -59,6 +59,14 @@ struct NearObjectProfile
     NearObjectProfile(NearObjectConnectionScope scope);
 
     /**
+     * @brief Construct a new Near Object Profile object with explicit scope and security settings.
+     * 
+     * @param scope The scope to create the profile with.
+     * @param security The security settings to create the profile with.
+     */
+    NearObjectProfile(NearObjectConnectionScope scope, NearObjectProfileSecurity security);
+
+    /**
      * @brief The supported connection scope.
      *
      * Note that this designates support and not an absolute requirement. Thus,
