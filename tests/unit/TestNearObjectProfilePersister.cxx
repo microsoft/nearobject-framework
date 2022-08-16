@@ -151,12 +151,12 @@ TEST_CASE("near object filesystem profile persister can be created", "[basic][pe
 
     SECTION("creation doesn't cause a crash")
     {
-        NearObjectProfilePersisterFilesystem persisterFs{};
+        REQUIRE_NOTHROW(std::make_unique<NearObjectProfilePersisterFilesystem>());
     }
 
     SECTION("creation with custom path doesn't cause a crash")
     {
-        NearObjectProfilePersisterFilesystem persisterFs{ test::GenerateUniqueTestTempPath() };
+        REQUIRE_NOTHROW(std::make_unique<NearObjectProfilePersisterFilesystem>(test::GenerateUniqueTestTempPath()));
     }
 
     SECTION("creation with invalid path is disallowed")
