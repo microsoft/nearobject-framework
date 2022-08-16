@@ -3,12 +3,10 @@
 #include <chrono>
 #include <filesystem>
 #include <iterator>
-#include <stdexcept>
 #include <sstream>
+#include <stdexcept>
 #include <system_error>
 #include <vector>
-
-#include <strings/tostring.hxx>
 
 #include <catch2/catch.hpp>
 
@@ -69,7 +67,8 @@ PersistProfileAndValidate(NearObjectProfilePersister& persister, const NearObjec
     const auto profilesPersistedAfter = persister.ReadPersistedProfiles(persistResult);
     REQUIRE(persistResult == PersistResult::Succeeded);
     REQUIRE(profilesPersistedAfter.size() == profilesPersistedBefore.size() + 1);
-    REQUIRE(profilesPersistedAfter.back() == profileToPersist);
+    const auto& profileToCompare = profilesPersistedAfter.back();
+    REQUIRE(profileToCompare == profileToPersist);
 }
 
 /**
@@ -100,7 +99,7 @@ GetTestPersistenceDirectorySuffix()
     try {
         static const std::filesystem::path suffix = "Test/TestNearObjectProfilePersister";
         return suffix;
-    } catch (const std::filesystem::filesystem_error& filesystemError) {
+    } catch (const std::filesystem::filesystem_error& /* filesystemError */) {
         throw std::runtime_error("failed to create test path suffix");
     }
 }
@@ -246,7 +245,7 @@ TEST_CASE("near object filesystem persister persists profiles")
             test::DeletePersisterPathOnScopeExit persisterPathDeleter{ persisterFs };
             test::PersistProfileAndValidate(persisterFs, profile);
         }
-
+        
         // Persist profiles with instantiated security settings.
         for (const auto& profileWithSecurity : ProfilesWithVariedScopesAndSecurity) {
             NearObjectProfilePersisterFilesystem persisterFs{ test::GenerateUniqueTestTempPath() };
