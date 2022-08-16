@@ -224,7 +224,7 @@ TEST_CASE("near object filesystem persister persists profiles")
     });
 
     std::vector<NearObjectProfile> ProfilesWithVariedScopesAndSecurity{};
-    std::transform(std::cbegin(AllScopes), std::cend(AllScopes), std::back_inserter(ProfilesWithVariedScopes), [&](const auto& scope) {
+    std::transform(std::cbegin(AllScopes), std::cend(AllScopes), std::back_inserter(ProfilesWithVariedScopesAndSecurity), [&](const auto& scope) {
         NearObjectProfile profile{ scope };
         profile.Security.emplace();
         return std::move(profile);
