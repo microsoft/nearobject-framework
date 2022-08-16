@@ -1,6 +1,6 @@
 
-#ifndef NEAR_OBJECT_CONNECTION_PROFILE_SECURITY_HXX
-#define NEAR_OBJECT_CONNECTION_PROFILE_SECURITY_HXX
+#ifndef NEAR_OBJECT_PROFILE_SECURITY_HXX
+#define NEAR_OBJECT_PROFILE_SECURITY_HXX
 
 #include <jsonify.hxx>
 
@@ -33,4 +33,4 @@ bool
 operator!=(const NearObjectProfileSecurity&, const NearObjectProfileSecurity&) noexcept;
 } // namespace nearobject
 
-#endif // NEAR_OBJECT_CONNECTION_PROFILE_SECURITY_HXX
+#endif // NEAR_OBJECT_PROFILE_SECURITY_HXX
