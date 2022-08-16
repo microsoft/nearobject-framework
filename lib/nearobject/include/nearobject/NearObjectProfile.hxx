@@ -22,24 +22,6 @@ enum class NearObjectConnectionScope {
 };
 
 /**
- * @brief Turns the enum NearObjectConnectionScope into the right string
- * 
- * @param scope The scope to convert to string
- * @return auto 
- */
-auto
-ToString(NearObjectConnectionScope scope) noexcept;
-
-/**
- * @brief Turns a string into the corresponding enum
- *
- * @param scope the string 
- * @return NearObjectConnectionScope The matching enum
- */
-NearObjectConnectionScope
-NearObjectConnectionScope_FromString(const std::string& scope) noexcept;
-
-/**
  * @brief A collection of configuration that specifies how to connect to a near
  * object peer or set of peers.
  */
