@@ -1,4 +1,5 @@
 
+#include <algorithm>
 #include <fstream>
 #include <stdexcept>
 #include <sstream>
@@ -23,10 +24,15 @@ NearObjectProfileManager::NearObjectProfileManager(std::unique_ptr<NearObjectPro
 }
 
 std::vector<NearObjectProfile>
-NearObjectProfileManager::FindMatchingProfiles(const NearObjectProfile& connectionProfile) const
+NearObjectProfileManager::FindMatchingProfiles(const NearObjectProfile& profileToMatch) const
 {
+    std::vector<NearObjectProfile> profilesMatching{};
     const std::shared_lock profilesLockShared(m_profilesGate);
-    return {};
+    std::copy_if(std::cbegin(m_profiles), std::cend(m_profiles), std::back_inserter(profilesMatching), [&](const auto profileToCheck) {
+        return (profileToCheck == profileToMatch);
+    });
+
+    return profilesMatching;
 }
 
 std::vector<NearObjectProfile>

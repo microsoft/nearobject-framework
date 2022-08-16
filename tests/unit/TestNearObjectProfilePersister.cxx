@@ -161,7 +161,7 @@ TEST_CASE("near object filesystem profile persister can be created", "[basic][pe
 
     SECTION("creation with invalid path is disallowed")
     {
-        REQUIRE_THROWS_AS(NearObjectProfilePersisterFilesystem{ "/random" }, std::filesystem::filesystem_error);
+        REQUIRE_THROWS_AS(NearObjectProfilePersisterFilesystem{ "\0" }, std::filesystem::filesystem_error);
     }
 }
 
