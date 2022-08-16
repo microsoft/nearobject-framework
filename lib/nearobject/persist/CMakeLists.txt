@@ -15,8 +15,8 @@ target_sources(nearobject-persist
 
 target_link_libraries(nearobject-persist
     PRIVATE
-        nearobject-service
         jsonify
+        nearobject-service
         nlohmann_json::nlohmann_json
 )
 
