@@ -1,4 +1,6 @@
 
+#include <sstream>
+
 #include <nearobject/NearObjectProfile.hxx>
 
 using namespace nearobject;
@@ -42,6 +44,16 @@ NearObjectProfile::IsSame(const NearObjectProfile& other) const noexcept
         return false;
     }
     return true;
+}
+
+std::string
+NearObjectProfile::ToString() const noexcept
+{
+    std::ostringstream profileString;
+    profileString << "Scope: " << NearObjectConnectionScope_ToString(Scope);
+    profileString << ", Security: " << ((Security.has_value()) ? Security->ToString() : "None");
+
+    return profileString.str();
 }
 
 bool

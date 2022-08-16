@@ -1,8 +1,16 @@
 
 #include <nearobject/NearObjectProfileSecurity.hxx>
 
+using namespace nearobject;
+
+std::string
+NearObjectProfileSecurity::ToString() const noexcept
+{
+    return "";
+}
+
 bool
-nearobject::NearObjectProfileSecurity::IsSame(const NearObjectProfileSecurity& other) const noexcept
+NearObjectProfileSecurity::IsSame(const NearObjectProfileSecurity& other) const noexcept
 {
     return true;
 }

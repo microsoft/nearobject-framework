@@ -80,6 +80,14 @@ struct NearObjectProfile
     std::optional<NearObjectProfileSecurity> Security{ std::nullopt };
 
     /**
+     * @brief Returns a string representation of this profile.
+     * 
+     * @return std::string 
+     */
+    std::string
+    ToString() const noexcept;
+
+    /**
     * @brief checks if the two profiles are the same
     */
     bool
