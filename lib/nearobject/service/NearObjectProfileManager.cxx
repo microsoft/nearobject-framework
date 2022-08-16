@@ -1,5 +1,6 @@
 
 #include <fstream>
+#include <stdexcept>
 #include <sstream>
 
 #include <nearobject/service/NearObjectProfileManager.hxx>
@@ -15,7 +16,11 @@ NearObjectProfileManager::NearObjectProfileManager() :
 
 NearObjectProfileManager::NearObjectProfileManager(std::unique_ptr<NearObjectProfilePersister> persister) :
     m_persister(std::move(persister))
-{}
+{
+    if (m_persister == nullptr) {
+        throw std::runtime_error("NearObjectProfilePersister must not be null");
+    }
+}
 
 std::vector<NearObjectProfile>
 NearObjectProfileManager::FindMatchingProfiles(const NearObjectProfile& connectionProfile) const
