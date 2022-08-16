@@ -11,27 +11,38 @@ using namespace nearobject;
 using namespace strings::ostream_operators;
 
 NearObjectProfile::NearObjectProfile(NearObjectConnectionScope scope) :
-    Scope(scope)
+    m_scope(scope)
 {}
 
 NearObjectProfile::NearObjectProfile(NearObjectConnectionScope scope, NearObjectProfileSecurity security) :
-    Scope(scope),
-    Security(std::move(security))
+    m_scope(scope),
+    m_security(std::move(security))
 {}
+
+NearObjectConnectionScope
+NearObjectProfile::GetScope() const noexcept
+{
+    return m_scope;
+}
+
+const std::optional<NearObjectProfileSecurity>
+NearObjectProfile::GetSecurity() const noexcept
+{
+    return m_security;
+}
 
 bool
 NearObjectProfile::IsSame(const NearObjectProfile& other) const noexcept
 {
-    return std::tie(this->Scope, this->Security)
-        == std::tie(other.Scope, other.Security);
+    return std::tie(this->m_scope, this->m_security) == std::tie(other.m_scope, other.m_security);
 }
 
 std::string
 NearObjectProfile::ToString() const noexcept
 {
     std::ostringstream profileString;
-    profileString << "Scope: " << magic_enum::enum_name(Scope);
-    profileString << ", Security: " << Security;
+    profileString << "Scope: " << magic_enum::enum_name(m_scope);
+    profileString << ", Security: " << m_security;
 
     return profileString.str();
 }

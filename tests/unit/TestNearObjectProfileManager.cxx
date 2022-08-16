@@ -85,11 +85,9 @@ TEST_CASE("near object profiles can be persisted", "[basic][infra]")
         using namespace nearobject;
         using namespace nearobject::service;
 
-        NearObjectProfile profile1;
-        NearObjectProfile profile2;
         NearObjectProfileSecurity security;
-
-        profile1.Security.emplace(std::move(security));
+        NearObjectProfile profile1{ NearObjectConnectionScope::Unicast, std::move(security) };
+        NearObjectProfile profile2;
 
         // rapidjson::Document document;
         // auto& allocator = document.GetAllocator();

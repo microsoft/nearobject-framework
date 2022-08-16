@@ -231,9 +231,7 @@ TEST_CASE("near object filesystem persister persists profiles", "[basic][persist
 
     std::vector<NearObjectProfile> ProfilesWithVariedScopesAndSecurity{};
     std::transform(std::cbegin(AllScopes), std::cend(AllScopes), std::back_inserter(ProfilesWithVariedScopesAndSecurity), [&](const auto& scope) {
-        NearObjectProfile profile{ scope };
-        profile.Security.emplace();
-        return std::move(profile);
+        return NearObjectProfile{ scope, NearObjectProfileSecurity{} };
     });
 
     SECTION("single profile can be persisted")
