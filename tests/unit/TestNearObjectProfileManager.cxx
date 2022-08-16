@@ -67,58 +67,6 @@ TEST_CASE("near object profiles can be persisted", "[basic][infra]")
         throw std::filesystem::filesystem_error("could not create test directory", std::error_code());
     }
 
-    SECTION("NearObjectProfileSecurity can be serialized and parsed")
-    {
-        using namespace nearobject;
-
-        NearObjectProfileSecurity security1;
-        NearObjectProfileSecurity security2;
-
-        // rapidjson::Document document;
-        // auto& allocator = document.GetAllocator();
-
-        // const auto jsonValue = security1.ToJson(allocator);
-        // const auto parseResult = security2.ParseAndSet(jsonValue);
-        // REQUIRE(security1 == security2);
-        // REQUIRE(parseResult == persist::ParseResult::Succeeded);
-    }
-
-    SECTION("NearObjectProfile (with no Security) can be serialized and parsed")
-    {
-        using namespace nearobject;
-
-        NearObjectProfile profile1;
-        NearObjectProfile profile2;
-
-        // rapidjson::Document document;
-        // auto& allocator = document.GetAllocator();
-
-        // auto jsonValue = profile1.ToJson(allocator);
-        // auto parseResult = profile2.ParseAndSet(jsonValue);
-        // REQUIRE(parseResult == persist::ParseResult::Succeeded);
-        // REQUIRE(profile1 == profile2);
-    }
-
-    SECTION("NearObjectProfile (with Security) can be serialized and parsed")
-    {
-        using namespace nearobject;
-        using namespace nearobject::service;
-
-        NearObjectProfile profile1;
-        NearObjectProfile profile2;
-        NearObjectProfileSecurity security;
-
-        profile1.Security.emplace(std::move(security));
-
-        // rapidjson::Document document;
-        // auto& allocator = document.GetAllocator();
-
-        // auto jsonValue = profile1.ToJson(allocator);
-        // auto parseResult = profile2.ParseAndSet(jsonValue);
-        // REQUIRE(parseResult == persist::ParseResult::Succeeded);
-        // REQUIRE(profile1 == profile2);
-    }
-
     SECTION("NearObjectProfileManager::PersistProfile matches the read profiles")
     {
         using namespace nearobject;
