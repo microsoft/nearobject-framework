@@ -6,6 +6,7 @@
 
 #include <nearobject/NearObjectProfile.hxx>
 #include <nearobject/service/NearObjectProfileManager.hxx>
+#include <nearobject/persist/NearObjectProfilePersisterFilesystem.hxx>
 
 namespace nearobject
 {
@@ -35,11 +36,23 @@ public:
 
 TEST_CASE("near object profile manager can be created", "[basic][service]")
 {
+    using namespace nearobject::persistence;
     using namespace nearobject::service;
 
     SECTION("creation doesn't cause a crash")
     {
         NearObjectProfileManager profileManager{};
+    }
+
+    SECTION("creation with custom persister doesn't cause a crash")
+    {
+        auto persisterFs = std::make_unique<NearObjectProfilePersisterFilesystem>();
+        REQUIRE_NOTHROW(std::make_unique<NearObjectProfileManager>(std::move(persisterFs))); 
+    }
+
+    SECTION("creation with invalid persister causes a crash")
+    {
+        REQUIRE_THROWS_AS(std::make_unique<NearObjectProfileManager>(nullptr), std::runtime_error);
     }
 }
 
