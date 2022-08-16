@@ -94,8 +94,7 @@ protected:
 private:
     mutable std::shared_mutex m_profilesGate{};
     std::vector<NearObjectProfile> m_profiles{};
-    std::filesystem::path m_persistLocation{ "profiles" };
-    std::unique_ptr<persistence::NearObjectProfilePersister> m_persister;
+    const std::unique_ptr<persistence::NearObjectProfilePersister> m_persister;
 };
 
 } // namespace service
