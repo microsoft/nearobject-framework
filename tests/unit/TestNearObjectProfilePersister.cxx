@@ -165,7 +165,7 @@ TEST_CASE("near object filesystem profile persister can be created", "[basic][pe
     }
 }
 
-TEST_CASE("near object filesystem persister uses custom persistence path")
+TEST_CASE("near object filesystem persister uses custom persistence path", "[basic][persist]")
 {
     using namespace nearobject::persistence;
 
@@ -195,7 +195,7 @@ TEST_CASE("near object filesystem persister uses custom persistence path")
     }
 }
 
-TEST_CASE("near object filesystem persister cannot be modified by non-framework users")
+TEST_CASE("near object filesystem persister cannot be modified by non-framework users", "[basic][persist][security]")
 {
     SECTION("persistence file cannot be written by non-framework user accounts")
     {
@@ -213,7 +213,7 @@ TEST_CASE("near object filesystem persister cannot be modified by non-framework 
     }
 }
 
-TEST_CASE("near object filesystem persister persists profiles")
+TEST_CASE("near object filesystem persister persists profiles", "[basic][persist]")
 {
     using namespace nearobject;
     using namespace nearobject::persistence;
