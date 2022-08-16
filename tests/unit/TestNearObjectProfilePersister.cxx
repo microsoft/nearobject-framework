@@ -8,6 +8,8 @@
 #include <system_error>
 #include <vector>
 
+#include <strings/tostring.hxx>
+
 #include <catch2/catch.hpp>
 
 #include <nearobject/NearObjectProfile.hxx>
