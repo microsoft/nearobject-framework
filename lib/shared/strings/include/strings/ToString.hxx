@@ -28,7 +28,7 @@ struct EmptyValueProvider
  */
 template <
     typename HasToStringT,
-    typename std::enable_if<std::is_member_function_pointer<decltype(&HasToStringT::ToString)>::value>::type
+    typename = typename std::enable_if<std::is_member_function_pointer<decltype(&HasToStringT::ToString)>::value>::type
 >
 std::ostream& operator<<(std::ostream& stream, const HasToStringT& ref)
 {
@@ -50,7 +50,7 @@ std::ostream& operator<<(std::ostream& stream, const HasToStringT& ref)
  */
 template <
     typename HasToStringT,
-    typename W = std::enable_if<std::is_member_function_pointer<decltype(&HasToStringT::ToString)>::value>::type,
+    typename = typename std::enable_if<std::is_member_function_pointer<decltype(&HasToStringT::ToString)>::value>::type,
     typename EmptyValueProviderT = EmptyValueProvider
 >
 std::ostream& operator<<(std::ostream& stream, const std::optional<HasToStringT>& ref)
