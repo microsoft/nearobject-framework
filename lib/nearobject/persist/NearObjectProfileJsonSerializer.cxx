@@ -8,7 +8,7 @@ using namespace nearobject;
 void
 nearobject::to_json(nlohmann::json& json, const NearObjectProfileSecurity& security) 
 {
-    json = nlohmann::json{};
+    json = nlohmann::json({});
 }
 
 void
