@@ -1,5 +1,6 @@
 
 #include <sstream>
+#include <tuple>
 
 #include <strings/tostring.hxx>
 
@@ -39,13 +40,8 @@ NearObjectProfile::NearObjectProfile(NearObjectConnectionScope scope) :
 bool
 NearObjectProfile::IsSame(const NearObjectProfile& other) const noexcept
 {
-    if (Scope != other.Scope) {
-        return false;
-    }
-    if (Security != other.Security) {
-        return false;
-    }
-    return true;
+    return std::tie(this->Scope, this->Security)
+        == std::tie(other.Scope, other.Security);
 }
 
 std::string
