@@ -7,8 +7,6 @@
 #include <string>
 #include <type_traits>
 
-// namespace strings
-// {
 struct EmptyValueProvider
 {
     std::string operator()() const noexcept
@@ -60,7 +58,5 @@ std::ostream& operator<<(std::ostream& stream, const std::optional<HasToStringT>
         : stream << EmptyValueProviderT{}();
     return stream;
 }
-
-// } // namespace strings
 
 #endif // TO_STRING_HXX
