@@ -43,5 +43,5 @@ Describe any future work that is required as a result of this change. Eg.
 ### Checklist
 
 - [ ] Build target `all` compiles cleanly.
-- [ ] clang-format delta produced no new output.
+- [ ] clang-format and clang-tidy deltas produced no new output.
 - [ ] Newly added functions include doxygen-style comment block.
