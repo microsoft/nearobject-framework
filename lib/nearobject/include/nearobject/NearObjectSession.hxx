@@ -115,16 +115,32 @@ protected:
      *
      * @param nearObjectAdded The near object peer to add.
      */
-    bool
-    AddNearObjectPeer(const std::shared_ptr<NearObject> nearObjectAdded);
+    void
+    AddNearObjectPeer(std::shared_ptr<NearObject> nearObjectAdded);
 
+    /**
+     * @brief Adds a collection of near object peers to this session.
+     * 
+     * @param nearObjectsAdded The collection of peers to add. 
+     */
+    void
+    AddNearObjectPeers(std::vector<std::shared_ptr<NearObject>> nearObjectsAdded);
+    
     /**
      * @brief Remove a near object peer from this session.
      *
      * @param nearObjectRemoved The near object peer to remove.
      */
-    bool
-    RemoveNearObjectPeer(const std::shared_ptr<NearObject> nearObjectRemoved);
+    void 
+    RemoveNearObjectPeer(std::shared_ptr<NearObject> nearObjectRemoved);
+
+    /**
+     * @brief Removes a collection of near object peers from this session.
+     * 
+     * @param nearObjectsRemoved The collection of peers to remove. 
+     */
+    void
+    RemoveNearObjectPeers(std::vector<std::shared_ptr<NearObject>> nearObjectsRemoved);
 
     /**
      * @brief Ends this session.

@@ -25,6 +25,9 @@ struct NearObjectSpatialProperties
 bool
 operator==(const NearObjectSpatialProperties&, const NearObjectSpatialProperties&) noexcept;
 
+bool
+operator!=(const NearObjectSpatialProperties&, const NearObjectSpatialProperties&) noexcept;
+
 /**
  * @brief Represents a near object.
  */
@@ -40,15 +43,13 @@ public:
     GetSpatialProperties() const noexcept;
 
     /**
-     * @brief Determines if the specified near object refers to the same entity
-     * as this near object.
-     *
-     * @param other
-     * @return true
-     * @return false
+     * @brief Allow global equality function to access private members.
+     * 
+     * @return true 
+     * @return false 
      */
-    bool
-    IsSame(const NearObject& other) const noexcept;
+    friend bool
+    operator==(const NearObject&, const NearObject&) noexcept;
 
 private:
     mutable std::mutex m_spatialPropertiesGate;
@@ -57,6 +58,9 @@ private:
 
 bool
 operator==(const NearObject&, const NearObject&) noexcept;
+
+bool
+operator!=(const NearObject&, const NearObject&) noexcept;
 
 } // namespace nearobject
 

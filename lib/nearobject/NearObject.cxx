@@ -13,16 +13,16 @@ NearObject::GetSpatialProperties() const noexcept
 }
 
 bool
-NearObject::IsSame(const NearObject& other) const noexcept
+nearobject::operator==(const NearObject& lhs, const NearObject& rhs) noexcept
 {
-    // TODO: update this once this class has data members.
-    return (this == &other);
+    return std::tie(lhs.m_spatialProperties) 
+        == std::tie(rhs.m_spatialProperties); 
 }
 
 bool
-nearobject::operator==(const NearObject& lhs, const NearObject& rhs) noexcept
+nearobject::operator!=(const NearObject& lhs, const NearObject& rhs) noexcept
 {
-    return lhs.IsSame(rhs);
+    return !(lhs == rhs);
 }
 
 bool
@@ -30,4 +30,10 @@ nearobject::operator==(const NearObjectSpatialProperties& lhs, const NearObjectS
 {
     return std::tie(lhs.Distance, lhs.AngleAzimuth, lhs.AngleElevation, lhs.Elevation)
         == std::tie(rhs.Distance, rhs.AngleAzimuth, rhs.AngleElevation, rhs.Elevation);
+}
+
+bool
+nearobject::operator!=(const NearObjectSpatialProperties& lhs, const NearObjectSpatialProperties& rhs) noexcept
+{
+    return !(lhs == rhs);
 }
