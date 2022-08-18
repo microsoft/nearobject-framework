@@ -50,7 +50,7 @@ NearObjectSession::AddNearObjectPeers(std::vector<std::shared_ptr<NearObject>> n
 {
     const auto lock = std::scoped_lock{ m_nearObjectPeersGate };
 
-    // Prune the list of objects to add of those already in the peer set.
+    // Remove objects already in the peer set from the list of objects to add.
     // The original vector 'nearObjectsToAdd' is maintained such that it can be
     // passed to the membership changed callback later, alleviating making a
     // copy of these elements.
