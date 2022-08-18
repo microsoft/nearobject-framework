@@ -91,7 +91,7 @@ TEST_CASE("near object peers can be added at session creation", "[basic]")
 
     SECTION("creation with 1 peer doesn't cause a crash")
     {
-        REQUIRE_NOTHROW(std::make_unique<NearObjectSession>(test::AllCapabilitiesSupported, test::NearObjectsContainerMultiple, callbacksNoop));
+        REQUIRE_NOTHROW(std::make_unique<NearObjectSession>(test::AllCapabilitiesSupported, test::NearObjectsContainerSingle, callbacksNoop));
     }
 
     SECTION("creation with 1+ peers doesn't cause a crash")
