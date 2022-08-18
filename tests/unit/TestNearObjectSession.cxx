@@ -18,26 +18,26 @@ static constexpr NearObjectCapabilities AllCapabilitiesSupported = {
     true, // SupportsSecureChannels
 };
 
-struct NearObjectSessionEventCallbacksNoop final :
+struct NearObjectSessionEventCallbacksNoop :
     public NearObjectSessionEventCallbacks
 {
-    void
+    virtual void
     OnSessionEnded(NearObjectSession *) override
     {}
 
-    void
+    virtual void
     OnRangingStarted(NearObjectSession *) override
     {}
 
-    void
+    virtual void
     OnRangingStopped(NearObjectSession *) override
     {}
 
-    void
+    virtual void
     OnNearObjectPropertiesChanged(NearObjectSession *, const std::vector<std::shared_ptr<NearObject>>) override
     {}
 
-    void
+    virtual void
     OnSessionMembershipChanged(NearObjectSession *, const std::vector<std::shared_ptr<NearObject>>, const std::vector<std::shared_ptr<NearObject>>) override
     {}
 };
@@ -53,13 +53,13 @@ TEST_CASE("near object peers can be added at session creation", "[basic]")
 
     SECTION("creation with 0 peers doesn't cause a crash")
     {
-        NearObjectSession session(test::AllCapabilitiesSupported, {}, callbacksNoop);
+        REQUIRE_NOTHROW(std::make_unique<NearObjectSession>(test::AllCapabilitiesSupported, std::vector<std::shared_ptr<NearObject>>{}, callbacksNoop));
     }
 
     SECTION("creation with 1 peer doesn't cause a crash")
     {
         auto nearObject = std::make_shared<NearObject>();
-        NearObjectSession session(test::AllCapabilitiesSupported, { nearObject }, callbacksNoop);
+        REQUIRE_NOTHROW(std::make_unique<NearObjectSession>(test::AllCapabilitiesSupported, std::vector<std::shared_ptr<NearObject>>{ nearObject }, callbacksNoop));
     }
 
     SECTION("creation with 1+ peers doesn't cause a crash")
@@ -70,7 +70,7 @@ TEST_CASE("near object peers can be added at session creation", "[basic]")
             std::make_shared<NearObject>(),
         };
 
-        NearObjectSession session(test::AllCapabilitiesSupported, nearObjects, callbacksNoop);
+        REQUIRE_NOTHROW(std::make_unique<NearObjectSession>(test::AllCapabilitiesSupported, nearObjects, callbacksNoop));
     }
 }
 
@@ -98,6 +98,87 @@ TEST_CASE("near object session capabilities are accurate", "[basic]")
     }
 }
 
+TEST_CASE("near object session ranging state is correctly reflected", "[basic]")
+{
+    using namespace nearobject;
+
+    const auto &capabilities = test::AllCapabilitiesSupported;
+
+    SECTION("session indicates ranging is inactive upon construction")
+    {
+        const auto callbacksNoop = std::make_shared<test::NearObjectSessionEventCallbacksNoop>();
+        NearObjectSession session(capabilities, {}, callbacksNoop);
+        REQUIRE(!session.IsRangingActive());
+    }
+
+    SECTION("session indicates ranging is active after ranging is started")
+    {
+        const auto callbacksNoop = std::make_shared<test::NearObjectSessionEventCallbacksNoop>();
+        NearObjectSession session(capabilities, {}, callbacksNoop);
+        session.StartRanging();
+        REQUIRE(session.IsRangingActive());
+    }
+
+    SECTION("session indicates ranging is active after ranging is started repeatedly")
+    {
+        const auto callbacksNoop = std::make_shared<test::NearObjectSessionEventCallbacksNoop>();
+        NearObjectSession session(capabilities, {}, callbacksNoop);
+        session.StartRanging();
+        REQUIRE(session.IsRangingActive());
+        session.StartRanging();
+        REQUIRE(session.IsRangingActive());
+    }
+
+    SECTION("session indicates ranging is inactive after ranging is stopped")
+    {
+        const auto callbacksNoop = std::make_shared<test::NearObjectSessionEventCallbacksNoop>();
+        NearObjectSession session(capabilities, {}, callbacksNoop);
+        session.StartRanging();
+        session.StopRanging();
+        REQUIRE(!session.IsRangingActive());
+    }
+
+    SECTION("session indicates ranging is active after ranging is stopped repeatedly")
+    {
+        const auto callbacksNoop = std::make_shared<test::NearObjectSessionEventCallbacksNoop>();
+        NearObjectSession session(capabilities, {}, callbacksNoop);
+        session.StartRanging();
+        session.StopRanging();
+        REQUIRE(!session.IsRangingActive());
+        session.StopRanging();
+        REQUIRE(!session.IsRangingActive());
+    }
+
+    SECTION("session indicates ranging is active after starting subsequent ranging is started")
+    {
+        const auto callbacksNoop = std::make_shared<test::NearObjectSessionEventCallbacksNoop>();
+        NearObjectSession session(capabilities, {}, callbacksNoop);
+        session.StartRanging();
+        session.StopRanging();
+        session.StartRanging();
+        REQUIRE(session.IsRangingActive());
+    }
+
+    SECTION("session indicates consistent ranging state after ranging is started")
+    {
+        const auto callbacksNoop = std::make_shared<test::NearObjectSessionEventCallbacksNoop>();
+        NearObjectSession session(capabilities, {}, callbacksNoop);
+        session.StartRanging();
+        REQUIRE(session.IsRangingActive());
+        REQUIRE(session.IsRangingActive());
+    }
+
+    SECTION("session indicates consistent ranging state after ranging is stoppted")
+    {
+        const auto callbacksNoop = std::make_shared<test::NearObjectSessionEventCallbacksNoop>();
+        NearObjectSession session(capabilities, {}, callbacksNoop);
+        session.StartRanging();
+        session.StopRanging();
+        REQUIRE(!session.IsRangingActive());
+        REQUIRE(!session.IsRangingActive());
+    }
+}
+
 TEST_CASE("near object event handlers can be registered", "[basic]")
 {
     using namespace nearobject;
@@ -105,24 +186,26 @@ TEST_CASE("near object event handlers can be registered", "[basic]")
     SECTION("registering a handler doesn't cause a crash")
     {
         const auto callbacksNoop = std::make_shared<test::NearObjectSessionEventCallbacksNoop>();
-        NearObjectSession session(test::AllCapabilitiesSupported, {}, callbacksNoop);
+        REQUIRE_NOTHROW(std::make_unique<NearObjectSession>(test::AllCapabilitiesSupported, std::vector<std::shared_ptr<NearObject>>{}, callbacksNoop));
     }
 
     SECTION("starting and ending a ranging session doesn't cause a crash")
     {
         const auto callbacksNoop = std::make_shared<test::NearObjectSessionEventCallbacksNoop>();
-        NearObjectSession session(test::AllCapabilitiesSupported, {}, callbacksNoop);
-        session.StartRanging();
-        session.StopRanging();
+        NearObjectSession session(test::AllCapabilitiesSupported, std::vector<std::shared_ptr<NearObject>>{}, callbacksNoop);
+        REQUIRE_NOTHROW([&]() {
+            session.StartRanging();
+            session.StopRanging();
+        }());
     }
 
     SECTION("handler being deleted doesn't cause a crash")
     {
         auto callbacksNoop = std::make_shared<test::NearObjectSessionEventCallbacksNoop>();
-        NearObjectSession session(test::AllCapabilitiesSupported, {}, callbacksNoop);
+        NearObjectSession session(test::AllCapabilitiesSupported, std::vector<std::shared_ptr<NearObject>>{}, callbacksNoop);
         session.StartRanging();
         callbacksNoop.reset();
-        session.StopRanging();
+        REQUIRE_NOTHROW(session.StopRanging());
     }
 
     SECTION("callbacks provide the session pointer for which it was registered")
@@ -133,38 +216,38 @@ TEST_CASE("near object event handlers can be registered", "[basic]")
             void
             OnSessionEnded(NearObjectSession *session) override
             {
-                CHECK(Session == session);
+                REQUIRE(Session == session);
             }
 
             void
             OnRangingStarted(NearObjectSession *session) override
             {
-                CHECK(Session == session);
+                REQUIRE(Session == session);
             }
 
             void
             OnRangingStopped(NearObjectSession *session) override
             {
-                CHECK(Session == session);
+                REQUIRE(Session == session);
             }
 
             void
             OnNearObjectPropertiesChanged(NearObjectSession *session, const std::vector<std::shared_ptr<NearObject>> /* nearObjectsChanged */) override
             {
-                CHECK(Session == session);
+                REQUIRE(Session == session);
             }
 
             void
             OnSessionMembershipChanged(NearObjectSession *session, const std::vector<std::shared_ptr<NearObject>> nearObjectsAdded, const std::vector<std::shared_ptr<NearObject>> nearObjectsRemoved) override
             {
-                CHECK(Session == session);
+                REQUIRE(Session == session);
             }
 
             NearObjectSession *Session{ nullptr };
         };
 
         const auto callbacks = std::make_shared<NearObjectSessionEventCallbacksCheckSessionPointer>();
-        NearObjectSession session(test::AllCapabilitiesSupported, {}, callbacks);
+        NearObjectSession session(test::AllCapabilitiesSupported, std::vector<std::shared_ptr<NearObject>>{}, callbacks);
         callbacks->Session = &session;
         session.StartRanging();
         session.StopRanging();

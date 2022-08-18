@@ -93,7 +93,7 @@ public:
     bool
     IsRangingActive() const noexcept;
 
-private:
+protected:
     /**
      * @brief Resolves the event callback weak_ptr and executes the provided
      * executor function if the pointer was valid.
@@ -141,6 +141,14 @@ private:
     NearObjectPropertiesChanged(const std::shared_ptr<NearObject> nearObjectChanged);
 
     /**
+     * @brief Get the current set of peers in the session.
+     * 
+     * @return std::vector<std::shared_ptr<NearObject>> 
+     */
+    std::vector<std::shared_ptr<NearObject>> 
+    GetPeers() const noexcept;
+
+    /**
      * @brief Create a New Ranging Session object
      * TODO: this probably needs to return a tracking object of some kind.
      *
@@ -165,7 +173,7 @@ private:
     const NearObjectCapabilities m_capabilities;
     std::weak_ptr<NearObjectSessionEventCallbacks> m_eventCallbacks;
 
-    std::mutex m_nearObjectPeersGate;
+    mutable std::mutex m_nearObjectPeersGate;
     std::vector<std::shared_ptr<NearObject>> m_nearObjectPeers;
 };
 

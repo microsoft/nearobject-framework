@@ -102,6 +102,13 @@ NearObjectSession::NearObjectPropertiesChanged(const std::shared_ptr<NearObject>
     });
 }
 
+std::vector<std::shared_ptr<NearObject>> 
+NearObjectSession::GetPeers() const noexcept
+{
+    const auto nearObjectPeersLock = std::scoped_lock{ m_nearObjectPeersGate };
+    return m_nearObjectPeers;
+}
+
 NearObjectSession::StartRangingSessionResult
 NearObjectSession::StartRanging()
 {
