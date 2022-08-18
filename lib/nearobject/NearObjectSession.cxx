@@ -54,8 +54,7 @@ NearObjectSession::AddNearObjectPeers(std::vector<std::shared_ptr<NearObject>> n
     // The original vector 'nearObjectsToAdd' is maintained such that it can be
     // passed to the membership changed callback later, alleviating making a
     // copy of these elements.
-    nearObjectsToAdd.erase(std::remove_if(std::begin(nearObjectsToAdd),
-    std::end(nearObjectsToAdd), [&](const auto& nearObjectPeerToAdd) {
+    nearObjectsToAdd.erase(std::remove_if(std::begin(nearObjectsToAdd), std::end(nearObjectsToAdd), [&](const auto& nearObjectPeerToAdd) {
         return std::any_of(std::cbegin(m_nearObjectPeers), std::cend(m_nearObjectPeers), [&](const auto& nearObjectPeer) {
             return (*nearObjectPeer == *nearObjectPeerToAdd);
         });
