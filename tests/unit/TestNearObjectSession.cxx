@@ -352,6 +352,7 @@ TEST_CASE("near object event handlers reflect peer changes", "[basic]")
         callbacks->ValidateAdded = true;
         callbacks->NearObjectsAdded = test::NearObjectsContainerSingle;
         session.AddNearObjectPeer(test::NearObjectsContainerSingle[0]);
+        REQUIRE(session.GetPeers().size() == callbacks->NearObjectsAdded.size());
         callbacks->WaitForValidationComplete();
     }
 
@@ -363,6 +364,7 @@ TEST_CASE("near object event handlers reflect peer changes", "[basic]")
         callbacks->ValidateAdded = true;
         callbacks->NearObjectsAdded = test::NearObjectsContainerMultiple;
         session.AddNearObjectPeers(test::NearObjectsContainerMultiple);
+        REQUIRE(session.GetPeers().size() == callbacks->NearObjectsAdded.size());
         callbacks->WaitForValidationComplete();
     }
 
@@ -374,6 +376,7 @@ TEST_CASE("near object event handlers reflect peer changes", "[basic]")
         callbacks->NearObjectsRemoved = test::NearObjectsContainerSingle;
         callbacks->ValidateRemoved = true;
         session.RemoveNearObjectPeer(test::NearObjectsContainerSingle[0]);
+        REQUIRE(session.GetPeers().size() == test::NearObjectsContainerSingle.size() - callbacks->NearObjectsRemoved.size());
         callbacks->WaitForValidationComplete();
     }
 
@@ -385,53 +388,59 @@ TEST_CASE("near object event handlers reflect peer changes", "[basic]")
         callbacks->ValidateRemoved = true;
         callbacks->NearObjectsRemoved = test::NearObjectsContainerMultiple;
         session.RemoveNearObjectPeers(test::NearObjectsContainerMultiple);
+        REQUIRE(session.GetPeers().size() == test::NearObjectsContainerMultiple.size() - callbacks->NearObjectsRemoved.size());
         callbacks->WaitForValidationComplete();
     }
 
     SECTION("membership changed event callback invoked with subset of peers removed")
     {
+        const std::array<std::vector<std::shared_ptr<NearObject>>, 3> NearObjectsToRemove {
+            // Subset overlaps start of peer membership.
+            std::vector<std::shared_ptr<NearObject>>{ 
+                std::cbegin(test::NearObjectsContainerMultiple), 
+                std::next(std::cbegin(test::NearObjectsContainerMultiple), 2) 
+            },
+            // Subset is in middle of peer membership.
+            std::vector<std::shared_ptr<NearObject>>{ 
+                std::next(std::cbegin(test::NearObjectsContainerMultiple)), 
+                std::prev(std::end(test::NearObjectsContainerMultiple), 2)
+            },
+            // Subset overlaps end of peer membership.
+            std::vector<std::shared_ptr<NearObject>>{ 
+                std::prev(std::cend(test::NearObjectsContainerMultiple), 3), 
+                std::cend(test::NearObjectsContainerMultiple)
+            }
+        };
+
         auto callbacks = std::make_shared<NearObjectSessionEventCallbacksTestMembershipChanged>();
         callbacks->ValidateRemoved = true;
 
-        // Subset overlaps start of peer membership.
-        {
+        for (const auto& nearObjectsToRemove : NearObjectsToRemove) {
             test::NearObjectSessionTest session(test::AllCapabilitiesSupported, test::NearObjectsContainerMultiple, callbacks);
-            std::vector<std::shared_ptr<NearObject>> nearObjectsToRemove{ 
-                std::cbegin(test::NearObjectsContainerMultiple), 
-                std::next(std::cbegin(test::NearObjectsContainerMultiple), 2) 
-            };
-
             callbacks->NearObjectsRemoved = nearObjectsToRemove;
             session.RemoveNearObjectPeers(nearObjectsToRemove);
+            REQUIRE(session.GetPeers().size() == test::NearObjectsContainerMultiple.size() - callbacks->NearObjectsRemoved.size());
             callbacks->WaitForValidationComplete();
             callbacks->ValidationDone = false;
         }
+    }
 
-        // Subset is in middle of peer membership.
-        {
-            test::NearObjectSessionTest session(test::AllCapabilitiesSupported, test::NearObjectsContainerMultiple, callbacks);
-            std::vector<std::shared_ptr<NearObject>> nearObjectsToRemove{ 
-                std::next(std::cbegin(test::NearObjectsContainerMultiple)), 
-                std::prev(std::end(test::NearObjectsContainerMultiple), 2)
-            };
+    SECTION("removing non-existent peers doesn't change membership")
+    {
+        auto callbacks = std::make_shared<test::NearObjectSessionEventCallbacksNoop>();
 
-            callbacks->NearObjectsRemoved = nearObjectsToRemove;
-            session.RemoveNearObjectPeers(nearObjectsToRemove);
-            callbacks->WaitForValidationComplete();
-            callbacks->ValidationDone = false;
-        }
+        std::array<test::NearObjectSessionTest, 3> Sessions {
+            test::NearObjectSessionTest(test::AllCapabilitiesSupported, {}, callbacks),
+            test::NearObjectSessionTest(test::AllCapabilitiesSupported, test::NearObjectsContainerSingle, callbacks),
+            test::NearObjectSessionTest(test::AllCapabilitiesSupported, test::NearObjectsContainerMultiple, callbacks),
+        };
 
-        // Subset overlaps end of peer membership.
-        {
-            test::NearObjectSessionTest session(test::AllCapabilitiesSupported, test::NearObjectsContainerMultiple, callbacks);
-            std::vector<std::shared_ptr<NearObject>> nearObjectsToRemove{ 
-                std::prev(std::cend(test::NearObjectsContainerMultiple), 3), 
-                std::cend(test::NearObjectsContainerMultiple)
-            };
-
-            callbacks->NearObjectsRemoved = nearObjectsToRemove;
-            session.RemoveNearObjectPeers(nearObjectsToRemove);
-            callbacks->WaitForValidationComplete();
+        for (auto& session : Sessions) {
+            const auto currentPeers = session.GetPeers();
+            session.RemoveNearObjectPeers({ std::make_shared<NearObject>() });
+            REQUIRE(currentPeers == session.GetPeers());
+            session.RemoveNearObjectPeers({ std::make_shared<NearObject>(), std::make_shared<NearObject>(), std::make_shared<NearObject>() });
+            REQUIRE(currentPeers == session.GetPeers());
         }
     }
 }
