@@ -17,13 +17,8 @@ set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED 1)
 include(CTest)
 include(FetchContent)
 
-# Configure GSL dependency
-FetchContent_Declare(GSL
-  GIT_REPOSITORY "https://github.com/microsoft/GSL"
-  GIT_TAG "v4.0.0"
-  GIT_SHALLOW ON
-)
-
+# Pull in external dependencies.
+FetchContent_Declare(GSL URL https://github.com/microsoft/GSL/archive/refs/tags/v4.0.0.tar.gz)
 FetchContent_MakeAvailable(GSL)
 
 set(JSON_ImplicitConversions OFF)
