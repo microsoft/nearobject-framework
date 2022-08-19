@@ -3,7 +3,6 @@ add_library(nearobject-service-windows STATIC "")
 
 target_sources(nearobject-service-windows
     PRIVATE
-        ${CMAKE_CURRENT_LIST_DIR}/Main.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectDeviceDiscoveryAgentUwb.cxx
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectDeviceDiscoveryAgentUwb.hxx
