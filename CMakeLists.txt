@@ -28,6 +28,9 @@ FetchContent_MakeAvailable(json)
 FetchContent_Declare(magic_enum URL https://github.com/Neargye/magic_enum/archive/refs/tags/v0.8.1.tar.gz)
 FetchContent_MakeAvailable(magic_enum)
 
+FetchContent_Declare(cli11 URL https://github.com/CLIUtils/CLI11/archive/refs/tags/v2.2.0.tar.gz)
+FetchContent_MakeAvailable(cli11)
+
 find_package(Threads REQUIRED)
 
 # Uncomment for verbose build information
