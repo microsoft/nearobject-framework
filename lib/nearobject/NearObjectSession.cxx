@@ -93,8 +93,7 @@ NearObjectSession::AddNearObjectPeers(std::vector<std::shared_ptr<NearObject>> n
         return std::any_of(std::cbegin(m_nearObjectPeers), std::cend(m_nearObjectPeers), [&](const auto& nearObjectPeer) {
             return (*nearObjectPeer == *nearObjectPeerToAdd);
         });
-    }),
-        std::end(nearObjectsToAdd));
+    }), std::end(nearObjectsToAdd));
 
     // Add each peer from the pruned list to the existing peers.
     m_nearObjectPeers.insert(std::end(m_nearObjectPeers), std::cbegin(nearObjectsToAdd), std::cend(nearObjectsToAdd));
@@ -120,8 +119,8 @@ NearObjectSession::RemoveNearObjectPeers(std::vector<std::shared_ptr<NearObject>
     // partition) and ones that should be removed (second partition), keeping
     // their relative order (stable). std::stable_partition returns an iterator
     // to the beginning of the second partition.
-    const auto nearObjectsRemoved = std::stable_partition(std::begin(m_nearObjectPeers), std::end(m_nearObjectPeers), [&](const auto nearObjectToCheck) {
-        return std::none_of(std::cbegin(nearObjectsToRemove), std::cend(nearObjectsToRemove), [&](const auto& nearObjectToRemove) {
+    const auto nearObjectsRemoved = std::stable_partition(std::begin(m_nearObjectPeers), std::end(m_nearObjectPeers), [&](const auto nearObjectToCheck) { 
+        return std::none_of(std::cbegin(nearObjectsToRemove), std::cend(nearObjectsToRemove), [&](const auto& nearObjectToRemove){
             return (nearObjectToCheck == nearObjectToRemove);
         });
     });
