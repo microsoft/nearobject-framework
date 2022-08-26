@@ -1,10 +1,7 @@
 
-#include <nearobject/service/ServiceRuntime.hxx>
-
 int
 main(int argc, char *argv[])
 {
-    nearobject::service::ServiceRuntime nearObjectServiceRuntime{};
-    nearObjectServiceRuntime.Start();
+    // TODO: add CLI11 command line parser
     return 0;
 }

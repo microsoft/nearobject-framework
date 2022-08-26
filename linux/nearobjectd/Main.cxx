@@ -6,6 +6,8 @@
 #include <unistd.h>
 
 #include <nearobject/service/ServiceRuntime.hxx>
+#include <nearobject/service/NearObjectService.hxx>
+#include <nearobject/service/NearObjectServiceInjector.hxx>
 #include <nearobject/service/NearObjectServiceConfiguration.hxx>
 
 int
@@ -24,7 +26,11 @@ main(int argc, char *argv[])
         }
     }
 
+    // TODO: create and fill injector components
+    nearobject::service::NearObjectServiceInjector injector{};
+    auto service = nearobject::service::NearObjectService::Create(injector);
+
     nearobject::service::ServiceRuntime nearObjectServiceRuntime{};
-    nearObjectServiceRuntime.Start();
+    nearObjectServiceRuntime.SetServiceInstance(service).Start();
     return 0;
 }

@@ -9,7 +9,7 @@
 #include <wil/resource.h>
 
 #include <uwb/UwbDevice.hxx>
-#include <DeviceResource.hxx>
+#include <windows/devices/DeviceResource.hxx>
 
 namespace windows
 {

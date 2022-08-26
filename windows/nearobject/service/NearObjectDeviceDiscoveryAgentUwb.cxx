@@ -1,12 +1,11 @@
 
 #include <string>
 
-#include "NearObjectDeviceDiscoveryAgentUwb.hxx"
-
+#include <nearobject/service/NearObjectDeviceUwb.hxx>
 #include <windows/uwb/UwbDevice.hxx>
 #include <windows/uwb/UwbDeviceDriver.hxx>
-#include <nearobject/service/NearObjectDeviceUwb.hxx>
-#include <DeviceEnumerator.hxx>
+#include <windows/devices/DeviceEnumerator.hxx>
+#include <windows/nearobject/service/NearObjectDeviceDiscoveryAgentUwb.hxx>
 
 using namespace windows::nearobject::service;
 using ::nearobject::service::NearObjectDevice;
@@ -76,6 +75,13 @@ NearObjectDeviceDiscoveryAgentUwb::RegisterForUwbDeviceClassNotifications()
 }
 
 void
+NearObjectDeviceDiscoveryAgentUwb::UnregisterForUwbDeviceClassNotifications()
+{
+    m_uwbHcmNotificationHandle.reset();
+    // TODO: anything else needed here?
+}
+
+void
 NearObjectDeviceDiscoveryAgentUwb::OnDeviceInterfaceNotification(HCMNOTIFICATION hcmNotificationHandle, CM_NOTIFY_ACTION action, CM_NOTIFY_EVENT_DATA *eventData, DWORD eventDataSize)
 {
     std::wstring deviceName;
@@ -124,6 +130,18 @@ NearObjectDeviceDiscoveryAgentUwb::Probe()
     }
 
     return nearObjectDevices;
+}
+
+void
+NearObjectDeviceDiscoveryAgentUwb::StartImpl()
+{
+    RegisterForUwbDeviceClassNotifications();
+}
+
+void
+NearObjectDeviceDiscoveryAgentUwb::StopImpl()
+{
+    UnregisterForUwbDeviceClassNotifications();
 }
 
 std::future<std::vector<std::shared_ptr<NearObjectDevice>>>

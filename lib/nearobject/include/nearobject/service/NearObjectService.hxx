@@ -30,7 +30,7 @@ struct NearObjectService :
      * @return std::shared_ptr<NearObjectService>
      */
     [[nodiscard]] static std::shared_ptr<NearObjectService>
-    Create(NearObjectServiceInjector&& injector);
+    Create(NearObjectServiceInjector injector);
 
     /**
      * @brief Get an instance of the service.
@@ -65,7 +65,7 @@ protected:
      *
      * @param injector The dependency injector for the service.
      */
-    explicit NearObjectService(NearObjectServiceInjector&& injector);
+    explicit NearObjectService(NearObjectServiceInjector injector);
 };
 } // namespace service
 } // namespace nearobject

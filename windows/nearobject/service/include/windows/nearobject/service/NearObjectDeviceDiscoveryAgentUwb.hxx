@@ -15,7 +15,7 @@
 #include <wil/resource.h>
 
 #include <nearobject/service/NearObjectDeviceDiscoveryAgent.hxx>
-#include <DeviceResource.hxx>
+#include <windows/devices/DeviceResource.hxx>
 
 namespace nearobject
 {
@@ -40,6 +40,12 @@ class NearObjectDeviceDiscoveryAgentUwb :
     public ::nearobject::service::NearObjectDeviceDiscoveryAgent
 {
 protected:
+    void
+    StartImpl() override;
+
+    void
+    StopImpl() override;
+
     std::future<std::vector<std::shared_ptr<::nearobject::service::NearObjectDevice>>>
     ProbeAsyncImpl() override;
 
@@ -52,6 +58,12 @@ private:
      */
     void
     RegisterForUwbDeviceClassNotifications();
+
+    /**
+     * @brief Unregister from notifications of UWB device driver events.
+     */
+    void
+    UnregisterForUwbDeviceClassNotifications();
 
     /**
      * @brief Bound callback function for when a UWB class driver event occurs.
