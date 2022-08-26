@@ -10,12 +10,16 @@ using namespace nearobject;
 NearObjectSession::NearObjectSession(NearObjectCapabilities capabilities, const std::vector<std::shared_ptr<NearObject>>& nearObjectPeers, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) :
     m_capabilities(capabilities),
     m_nearObjectPeers(nearObjectPeers),
-    m_eventCallbacks(std::move(eventCallbacks))
-{}
+    m_eventCallbacks(std::move(eventCallbacks)),
+    m_taskQueue()
+{
+    m_taskQueue.run();
+}
 
 NearObjectSession::~NearObjectSession()
 {
     EndSession();
+    m_taskQueue.stop();
 }
 
 NearObjectCapabilities
@@ -24,19 +28,50 @@ NearObjectSession::GetCapabilities() const noexcept
     return m_capabilities;
 }
 
-bool
+void
 NearObjectSession::InvokeEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)>& executor)
 {
-    // TODO: serialize all requests
-    // TODO: make this async (caller should not have to wait)
+    auto dispatcher = m_taskQueue.getDispatcher();
 
-    const auto eventCallbacks = m_eventCallbacks.lock();
-    if (!eventCallbacks) {
-        return false;
-    }
+    auto const task = [&executor, this]() {
+        std::cout << "hello!\n";
+        const auto eventCallbacks = m_eventCallbacks.lock();
+        if (!eventCallbacks) {
+            return;
+        }
+        executor(*eventCallbacks);
+        std::cout << "bye!\n";
+    };
 
-    executor(*eventCallbacks);
-    return true;
+    // auto const task = [&executor, this]() {
+    //     std::cout << "hello!\n";
+    //     const auto eventCallbacks = m_eventCallbacks.lock();
+    //     if (!eventCallbacks) {
+    //         return;
+    //     }
+    // };
+
+    // auto const task = [](){
+    //     std::cout << "hello!\n";
+    // };
+
+    dispatcher->post(std::move(task));
+}
+
+void
+NearObjectSession::InvokeBlockingEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)>& executor)
+{
+    auto dispatcher = m_taskQueue.getDispatcher();
+
+    auto const task = [&executor, this]() {
+        const auto eventCallbacks = m_eventCallbacks.lock();
+        if (!eventCallbacks) {
+            return;
+        }
+        executor(*eventCallbacks);
+    };
+
+    dispatcher->post_blocking(std::move(task));
 }
 
 void
@@ -58,7 +93,8 @@ NearObjectSession::AddNearObjectPeers(std::vector<std::shared_ptr<NearObject>> n
         return std::any_of(std::cbegin(m_nearObjectPeers), std::cend(m_nearObjectPeers), [&](const auto& nearObjectPeer) {
             return (*nearObjectPeer == *nearObjectPeerToAdd);
         });
-    }), std::end(nearObjectsToAdd));
+    }),
+        std::end(nearObjectsToAdd));
 
     // Add each peer from the pruned list to the existing peers.
     m_nearObjectPeers.insert(std::end(m_nearObjectPeers), std::cbegin(nearObjectsToAdd), std::cend(nearObjectsToAdd));
@@ -84,8 +120,8 @@ NearObjectSession::RemoveNearObjectPeers(std::vector<std::shared_ptr<NearObject>
     // partition) and ones that should be removed (second partition), keeping
     // their relative order (stable). std::stable_partition returns an iterator
     // to the beginning of the second partition.
-    const auto nearObjectsRemoved = std::stable_partition(std::begin(m_nearObjectPeers), std::end(m_nearObjectPeers), [&](const auto nearObjectToCheck) { 
-        return std::none_of(std::cbegin(nearObjectsToRemove), std::cend(nearObjectsToRemove), [&](const auto& nearObjectToRemove){
+    const auto nearObjectsRemoved = std::stable_partition(std::begin(m_nearObjectPeers), std::end(m_nearObjectPeers), [&](const auto nearObjectToCheck) {
+        return std::none_of(std::cbegin(nearObjectsToRemove), std::cend(nearObjectsToRemove), [&](const auto& nearObjectToRemove) {
             return (nearObjectToCheck == nearObjectToRemove);
         });
     });
@@ -113,7 +149,8 @@ NearObjectSession::EndSession()
     // form of a queue is needed.
     StopRanging();
 
-    InvokeEventCallback([&](auto& eventCallbacks) {
+    InvokeBlockingEventCallback([&](auto& eventCallbacks) {
+        std::cout << "endsession\n";
         eventCallbacks.OnSessionEnded(this);
     });
 }
@@ -126,7 +163,7 @@ NearObjectSession::NearObjectPropertiesChanged(const std::shared_ptr<NearObject>
     });
 }
 
-std::vector<std::shared_ptr<NearObject>> 
+std::vector<std::shared_ptr<NearObject>>
 NearObjectSession::GetPeers() const noexcept
 {
     const auto nearObjectPeersLock = std::scoped_lock{ m_nearObjectPeersGate };
@@ -163,6 +200,7 @@ NearObjectSession::CreateNewRangingSession()
     m_rangingSession.emplace(std::move(rangingSession));
 
     InvokeEventCallback([&](auto& eventCallbacks) {
+        std::cout << "onrangingstarted\n";
         eventCallbacks.OnRangingStarted(this);
     });
 
@@ -177,10 +215,13 @@ NearObjectSession::StopRanging()
         return;
     }
 
+    std::cout << "request to stop ranging\n";
+
     // TODO: signal to device to stop ranging
     m_rangingSession.reset();
 
-    InvokeEventCallback([&](auto& eventCallbacks) {
+    InvokeBlockingEventCallback([&](auto& eventCallbacks) {
+        std::cout << "rangingstop\n";
         eventCallbacks.OnRangingStopped(this);
     });
 }

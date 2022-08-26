@@ -11,6 +11,8 @@
 #include <nearobject/NearObject.hxx>
 #include <nearobject/NearObjectCapabilities.hxx>
 
+#include <notstd/task_queue.hxx>
+
 namespace nearobject
 {
 struct NearObjectSessionEventCallbacks;
@@ -104,11 +106,12 @@ protected:
      * @param executor The function to execute if the callback pointer was
      * successfully resolved.
      *
-     * @return true If the executor was executed.
-     * @return false If the executor was not executed.
      */
-    bool
+    void
     InvokeEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)>& executor);
+
+    void
+    InvokeBlockingEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)>& executor);
 
     /**
      * @brief Add a near object peer to this session.
@@ -191,6 +194,8 @@ private:
 
     mutable std::mutex m_nearObjectPeersGate;
     std::vector<std::shared_ptr<NearObject>> m_nearObjectPeers;
+
+    threading::CLooper m_taskQueue;
 };
 
 } // namespace nearobject
