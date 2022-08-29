@@ -48,14 +48,12 @@ public:
     CLooper() :
         m_running(false), m_abortRequested(false), m_blockingTaskRequested(false), m_blockingTask(), m_runnables(), m_runnablesMutex(), m_dispatcher(std::shared_ptr<CDispatcher>(new CDispatcher(*this)))
     {
-        std::cout << "CLooper constructed\n";
     }
     // Copy denied, Move to be implemented
 
     ~CLooper()
     {
         abortAndJoin();
-        std::cout << "CLooper destructed\n";
     }
 
     bool
@@ -72,9 +70,6 @@ public:
         } catch (...) {
             return false;
         }
-        std::cout << "CLooper running\n";
-        // while (not running())
-        //     ;
 
         return true;
     }
@@ -82,7 +77,6 @@ public:
     void
     stop()
     {
-        std::cout << "stopping\n";
         abortAndJoin();
     }
 
@@ -135,8 +129,6 @@ private:
     Runnable
     next()
     {
-        // std::lock_guard guard(m_runnablesMutex);
-
         if (m_runnables.empty()) {
             return nullptr;
         }
