@@ -125,7 +125,7 @@ NearObjectSession::RemoveNearObjectPeers(std::vector<std::shared_ptr<NearObject>
     m_nearObjectPeers.erase(nearObjectsRemoved, std::end(m_nearObjectPeers));
 
     // Signal the membership changed event with the removed peers.
-    InvokeEventCallback([&](auto& eventCallbacks) {
+    InvokeEventCallback([this,nearObjectsToRemove](auto& eventCallbacks) {
         eventCallbacks.OnSessionMembershipChanged(this, {}, std::move(nearObjectsToRemove));
     });
 }
@@ -147,7 +147,7 @@ NearObjectSession::EndSession()
 void
 NearObjectSession::NearObjectPropertiesChanged(const std::shared_ptr<NearObject> nearObjectChanged)
 {
-    InvokeEventCallback([&](auto& eventCallbacks) {
+    InvokeEventCallback([this,nearObjectChanged](auto& eventCallbacks) {
         eventCallbacks.OnNearObjectPropertiesChanged(this, { nearObjectChanged });
     });
 }
