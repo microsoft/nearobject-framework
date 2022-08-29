@@ -29,37 +29,26 @@ NearObjectSession::GetCapabilities() const noexcept
 }
 
 void
-NearObjectSession::InvokeEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)>& executor)
+NearObjectSession::InvokeEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor)
 {
     auto dispatcher = m_taskQueue.getDispatcher();
 
-    auto const task = [&executor, this]() {
+    auto const task = [executor, this]() {
         std::cout << "hello!\n";
         const auto eventCallbacks = m_eventCallbacks.lock();
         if (!eventCallbacks) {
+            std::cout << "returned null pointer\n";
             return;
         }
         executor(*eventCallbacks);
         std::cout << "bye!\n";
     };
 
-    // auto const task = [&executor, this]() {
-    //     std::cout << "hello!\n";
-    //     const auto eventCallbacks = m_eventCallbacks.lock();
-    //     if (!eventCallbacks) {
-    //         return;
-    //     }
-    // };
-
-    // auto const task = [](){
-    //     std::cout << "hello!\n";
-    // };
-
     dispatcher->post(std::move(task));
 }
 
 void
-NearObjectSession::InvokeBlockingEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)>& executor)
+NearObjectSession::InvokeBlockingEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor)
 {
     auto dispatcher = m_taskQueue.getDispatcher();
 
@@ -99,8 +88,9 @@ NearObjectSession::AddNearObjectPeers(std::vector<std::shared_ptr<NearObject>> n
     m_nearObjectPeers.insert(std::end(m_nearObjectPeers), std::cbegin(nearObjectsToAdd), std::cend(nearObjectsToAdd));
 
     // Signal the membership changed event with the added peers.
-    InvokeEventCallback([&](auto& eventCallbacks) {
-        eventCallbacks.OnSessionMembershipChanged(this, std::move(nearObjectsToAdd), {});
+    InvokeEventCallback([this,nearObjectsToAdd](auto& eventCallbacks) {
+        std::cout << "onsessionmemershipchanged\n";
+        eventCallbacks.OnSessionMembershipChanged(this, (nearObjectsToAdd), {});
     });
 }
 

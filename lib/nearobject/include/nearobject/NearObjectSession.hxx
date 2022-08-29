@@ -108,10 +108,10 @@ protected:
      *
      */
     void
-    InvokeEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)>& executor);
+    InvokeEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor);
 
     void
-    InvokeBlockingEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)>& executor);
+    InvokeBlockingEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor);
 
     /**
      * @brief Add a near object peer to this session.
