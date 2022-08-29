@@ -19,7 +19,6 @@ NearObjectSession::NearObjectSession(NearObjectCapabilities capabilities, const 
 NearObjectSession::~NearObjectSession()
 {
     EndSession();
-    m_taskQueue.stop();
 }
 
 NearObjectCapabilities
@@ -88,9 +87,9 @@ NearObjectSession::AddNearObjectPeers(std::vector<std::shared_ptr<NearObject>> n
     m_nearObjectPeers.insert(std::end(m_nearObjectPeers), std::cbegin(nearObjectsToAdd), std::cend(nearObjectsToAdd));
 
     // Signal the membership changed event with the added peers.
-    InvokeEventCallback([this,nearObjectsToAdd](auto& eventCallbacks) {
+    InvokeEventCallback([this,nearObjectsToAdd=std::move(nearObjectsToAdd)](auto& eventCallbacks) {
         std::cout << "onsessionmemershipchanged\n";
-        eventCallbacks.OnSessionMembershipChanged(this, (nearObjectsToAdd), {});
+        eventCallbacks.OnSessionMembershipChanged(this, std::move(nearObjectsToAdd), {});
     });
 }
 
