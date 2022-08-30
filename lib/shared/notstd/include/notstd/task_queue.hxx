@@ -11,6 +11,7 @@
 #include <queue>
 #include <stdexcept>
 #include <thread>
+#include <future>
 #include <notstd/memory.hxx>
 
 namespace threading
@@ -19,6 +20,7 @@ class TaskQueue
 {
 public:
     using Runnable = std::function<void()>;
+    using PackagedRunnable = std::packaged_task<void()>;
 
     class Dispatcher
     {
@@ -26,29 +28,27 @@ public:
 
     public:
         /**
-         * @brief posts a non blocking task onto the queue
+         * @brief posts a task to the back of the queue
          *
          * @param aRunnable The Runnable to be posted onto the queue
          *
          */
-        bool
-        post(TaskQueue::Runnable aRunnable)
+        std::future<void>
+        postBack(TaskQueue::Runnable aRunnable)
         {
-            return m_assignedLooper.post(std::move(aRunnable));
+            return m_assignedLooper.postBack(std::move(aRunnable));
         }
 
         /**
-         * @brief posts a blocking task onto the queue. When any thread posts
-         *        a blocking task using this function, they will block until
-         *        the task completes
+         * @brief posts a task to the front of the queue
          *
-         * @param aRunnable The Runnable to be posted onto the queue
+         * @param aRunnable The Runnable to be run immediately
          *
          */
-        bool
-        postBlocking(TaskQueue::Runnable aRunnable)
+        std::future<void>
+        postFront(TaskQueue::Runnable aRunnable)
         {
-            return m_assignedLooper.postBlocking(std::move(aRunnable));
+            return m_assignedLooper.postFront(std::move(aRunnable));
         }
 
     protected: 
@@ -64,7 +64,6 @@ public:
     TaskQueue() :
         m_running(false), 
         m_abortRequested(false), 
-        m_blockingTaskRequested(false), 
         m_dispatcher(std::make_shared<notstd::enable_make_protected<Dispatcher>>(*this))
     {
         try {
@@ -114,23 +113,15 @@ private:
         m_running = true;
 
         while (not m_abortRequested) {
-            Runnable taskToRun = nullptr;
+            PackagedRunnable taskToRun;
             {
                 std::lock_guard guard(m_runnablesMutex);
-                if (m_blockingTaskRequested) {
-                    std::swap(taskToRun,m_blockingTask);
-                } else {
-                    taskToRun = next();
-                }
+                taskToRun = next();
             }
 
-            try {
-                taskToRun();
-            } catch (...) {
+            if (taskToRun.valid()) {
+                taskToRun();    
             }
-
-            m_blockingTaskRequested = false;
-            
         }
 
         m_running = false;
@@ -154,64 +145,55 @@ private:
      *        the mutex m_runnablesMutex MUST be acquired prior to calling this function
      *
      */
-    Runnable
+    PackagedRunnable
     next()
     {
         if (m_runnables.empty()) {
-            return nullptr;
+            return PackagedRunnable();
         }
-        Runnable runnable = m_runnables.front();
-        m_runnables.pop();
-
+        PackagedRunnable runnable = std::move(m_runnables.front());
+        m_runnables.pop_front();
         return runnable;
     }
 
     /**
-     * @brief the Dispatcher calls this function to post a runnable onto the queue
+     * @brief the Dispatcher calls this function to post a runnable onto the back of the queue
      *
      */
-    bool
-    post(Runnable aRunnable)
+    std::future<void>
+    postBack(Runnable aRunnable)
     {
+        PackagedRunnable task(aRunnable);
         try {
             std::lock_guard guard(m_runnablesMutex);
-            m_runnables.push(std::move(aRunnable));
-        } catch (...) {
-            return false;
-        }
+            m_runnables.push_back(std::move(task));
+        } catch (...){}
 
-        return true;
+        return task.get_future();
     }
 
     /**
-     * @brief the Dispatcher calls this function to post a blocking task
+     * @brief the Dispatcher calls this function to post a runnable onto the front of the queue
      *
      */
-    bool
-    postBlocking(Runnable aRunnable)
+    std::future<void>
+    postFront(Runnable aRunnable)
     {
+        PackagedRunnable task(aRunnable);
         try {
             std::lock_guard guard(m_runnablesMutex);
-            m_blockingTask = aRunnable;
-            m_blockingTaskRequested = true;
+            m_runnables.push_front(std::move(task));
         } catch (...) {
-            return false;
         }
-
-        while (m_blockingTaskRequested)
-            ;
-
-        return true;
+        return task.get_future();
     }
 
 private:
     std::thread m_thread;
     std::atomic_bool m_running;
     std::atomic_bool m_abortRequested;
-    std::atomic_bool m_blockingTaskRequested;
 
-    std::queue<Runnable> m_runnables;
-    Runnable m_blockingTask;
+    std::deque<PackagedRunnable> m_runnables;
     std::mutex m_runnablesMutex;
 
     std::shared_ptr<Dispatcher> m_dispatcher;
