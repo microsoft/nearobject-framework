@@ -13,14 +13,14 @@
 
 namespace threading
 {
-class Looper
+class TaskQueue
 {
 public:
     using Runnable = std::function<void()>;
 
     class Dispatcher
     {
-        friend class Looper; // Allow the looper to access the private constructor.
+        friend class TaskQueue; // Allow the looper to access the private constructor.
 
     public:
         /**
@@ -30,7 +30,7 @@ public:
          *
          */
         bool
-        post(const Looper::Runnable &&aRunnable)
+        post(const TaskQueue::Runnable &&aRunnable)
         {
             return m_assignedLooper.post(std::move(aRunnable));
         }
@@ -44,27 +44,27 @@ public:
          *
          */
         bool
-        postBlocking(const Looper::Runnable &&aRunnable)
+        postBlocking(const TaskQueue::Runnable &&aRunnable)
         {
             return m_assignedLooper.postBlocking(std::move(aRunnable));
         }
 
     private: // construction, since we want the looper to expose it's dispatcher exclusively!
-        Dispatcher(Looper &aLooper) :
+        Dispatcher(TaskQueue &aLooper) :
             m_assignedLooper(aLooper)
         {}
 
     private:
-        Looper &m_assignedLooper;
+        TaskQueue &m_assignedLooper;
     };
 
 public:
-    Looper() :
+    TaskQueue() :
         m_running(false), m_abortRequested(false), m_blockingTaskRequested(false), m_blockingTask(), m_runnables(), m_runnablesMutex(), m_dispatcher(std::shared_ptr<Dispatcher>(new Dispatcher(*this)))
     {
     }
 
-    ~Looper()
+    ~TaskQueue()
     {
         abortAndJoin();
     }
@@ -86,7 +86,7 @@ public:
     run()
     {
         try {
-            m_thread = std::thread(&Looper::runFunc, this);
+            m_thread = std::thread(&TaskQueue::runFunc, this);
         } catch (...) {
             return false;
         }
