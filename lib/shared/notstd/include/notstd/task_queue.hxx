@@ -113,23 +113,23 @@ private:
         m_running = true;
 
         while (not m_abortRequested) {
-            std::lock_guard guard(m_runnablesMutex);
-
-            if (m_blockingTaskRequested) {
-                try {
-                    m_blockingTask();
-                } catch (...) {
-                }
-                m_blockingTaskRequested = false;
-            } else {
-                try {
-                    Runnable r = next();
-                    if (nullptr != r) {
-                        r();
-                    }
-                } catch (...) {
+            Runnable taskToRun = nullptr;
+            {
+                std::lock_guard guard(m_runnablesMutex);
+                if (m_blockingTaskRequested) {
+                    std::swap(taskToRun,m_blockingTask);
+                } else {
+                    taskToRun = next();
                 }
             }
+
+            try {
+                taskToRun();
+            } catch (...) {
+            }
+
+            m_blockingTaskRequested = false;
+            
         }
 
         m_running = false;
@@ -211,7 +211,7 @@ private:
 
     std::queue<Runnable> m_runnables;
     Runnable m_blockingTask;
-    std::recursive_mutex m_runnablesMutex;
+    std::mutex m_runnablesMutex;
 
     std::shared_ptr<Dispatcher> m_dispatcher;
 };
