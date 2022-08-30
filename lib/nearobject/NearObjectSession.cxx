@@ -11,7 +11,8 @@ NearObjectSession::NearObjectSession(NearObjectCapabilities capabilities, const 
     m_capabilities(capabilities),
     m_nearObjectPeers(nearObjectPeers),
     m_eventCallbacks(std::move(eventCallbacks))
-{}
+{
+}
 
 NearObjectSession::~NearObjectSession()
 {
@@ -24,19 +25,36 @@ NearObjectSession::GetCapabilities() const noexcept
     return m_capabilities;
 }
 
-bool
-NearObjectSession::InvokeEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)>& executor)
+void
+NearObjectSession::InvokeEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor)
 {
-    // TODO: serialize all requests
-    // TODO: make this async (caller should not have to wait)
+    auto dispatcher = m_taskQueue.getDispatcher();
 
-    const auto eventCallbacks = m_eventCallbacks.lock();
-    if (!eventCallbacks) {
-        return false;
-    }
+    auto const task = [this, executor]() {
+        const auto eventCallbacks = m_eventCallbacks.lock();
+        if (!eventCallbacks) {
+            return;
+        }
+        executor(*eventCallbacks);
+    };
 
-    executor(*eventCallbacks);
-    return true;
+    dispatcher->post(std::move(task));
+}
+
+void
+NearObjectSession::InvokeBlockingEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor)
+{
+    auto dispatcher = m_taskQueue.getDispatcher();
+
+    auto const task = [this, &executor]() {
+        const auto eventCallbacks = m_eventCallbacks.lock();
+        if (!eventCallbacks) {
+            return;
+        }
+        executor(*eventCallbacks);
+    };
+
+    dispatcher->postBlocking(std::move(task));
 }
 
 void
@@ -64,7 +82,7 @@ NearObjectSession::AddNearObjectPeers(std::vector<std::shared_ptr<NearObject>> n
     m_nearObjectPeers.insert(std::end(m_nearObjectPeers), std::cbegin(nearObjectsToAdd), std::cend(nearObjectsToAdd));
 
     // Signal the membership changed event with the added peers.
-    InvokeEventCallback([&](auto& eventCallbacks) {
+    InvokeEventCallback([this, nearObjectsToAdd = std::move(nearObjectsToAdd)](auto& eventCallbacks) {
         eventCallbacks.OnSessionMembershipChanged(this, std::move(nearObjectsToAdd), {});
     });
 }
@@ -100,7 +118,7 @@ NearObjectSession::RemoveNearObjectPeers(std::vector<std::shared_ptr<NearObject>
     m_nearObjectPeers.erase(nearObjectsRemoved, std::end(m_nearObjectPeers));
 
     // Signal the membership changed event with the removed peers.
-    InvokeEventCallback([&](auto& eventCallbacks) {
+    InvokeEventCallback([this, nearObjectsToRemove = std::move(nearObjectsToRemove)](auto& eventCallbacks) {
         eventCallbacks.OnSessionMembershipChanged(this, {}, std::move(nearObjectsToRemove));
     });
 }
@@ -108,12 +126,10 @@ NearObjectSession::RemoveNearObjectPeers(std::vector<std::shared_ptr<NearObject>
 void
 NearObjectSession::EndSession()
 {
-    // TODO: All callbacks should probably be serialized to ensure that events
-    // firing in rapid succession don't get signaled out-of-order. Likely some
-    // form of a queue is needed.
     StopRanging();
 
-    InvokeEventCallback([&](auto& eventCallbacks) {
+    // the blocking version is called so that the task queue can execute the task before *this is destructed
+    InvokeBlockingEventCallback([&](auto& eventCallbacks) {
         eventCallbacks.OnSessionEnded(this);
     });
 }
@@ -121,12 +137,12 @@ NearObjectSession::EndSession()
 void
 NearObjectSession::NearObjectPropertiesChanged(const std::shared_ptr<NearObject> nearObjectChanged)
 {
-    InvokeEventCallback([&](auto& eventCallbacks) {
+    InvokeEventCallback([this, nearObjectChanged](auto& eventCallbacks) {
         eventCallbacks.OnNearObjectPropertiesChanged(this, { nearObjectChanged });
     });
 }
 
-std::vector<std::shared_ptr<NearObject>> 
+std::vector<std::shared_ptr<NearObject>>
 NearObjectSession::GetPeers() const noexcept
 {
     const auto nearObjectPeersLock = std::scoped_lock{ m_nearObjectPeersGate };
@@ -180,7 +196,8 @@ NearObjectSession::StopRanging()
     // TODO: signal to device to stop ranging
     m_rangingSession.reset();
 
-    InvokeEventCallback([&](auto& eventCallbacks) {
+    // the blocking version is called so that the task queue can execute the task before *this is destructed
+    InvokeBlockingEventCallback([&](auto& eventCallbacks) {
         eventCallbacks.OnRangingStopped(this);
     });
 }
