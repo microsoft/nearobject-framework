@@ -40,20 +40,6 @@ target_link_libraries(nearobject-test
 
 catch_discover_tests(nearobject-test)
 
-add_executable(tq)
-
-target_sources(tq
-    PRIVATE
-        ${CMAKE_CURRENT_LIST_DIR}/task_queue.cxx
-)
-
-target_link_libraries(tq
-    PRIVATE
-    Threads::Threads
-    notstd
-    nearobject
-)
-
 if (BUILD_FOR_WINDOWS)
     add_subdirectory(windows)
 endif()
