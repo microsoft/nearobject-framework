@@ -128,11 +128,9 @@ NearObjectSession::RemoveNearObjectPeers(std::vector<std::shared_ptr<NearObject>
 void
 NearObjectSession::EndSession()
 {
-    // TODO: All callbacks should probably be serialized to ensure that events
-    // firing in rapid succession don't get signaled out-of-order. Likely some
-    // form of a queue is needed.
     StopRanging();
 
+    // the blocking version is called so that the task queue can execute the task before *this is destructed
     InvokeBlockingEventCallback([&](auto& eventCallbacks) {
         eventCallbacks.OnSessionEnded(this);
     });
@@ -200,6 +198,7 @@ NearObjectSession::StopRanging()
     // TODO: signal to device to stop ranging
     m_rangingSession.reset();
 
+    // the blocking version is called so that the task queue can execute the task before *this is destructed
     InvokeBlockingEventCallback([&](auto& eventCallbacks) {
         eventCallbacks.OnRangingStopped(this);
     });
