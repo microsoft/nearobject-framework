@@ -10,8 +10,7 @@ using namespace nearobject;
 NearObjectSession::NearObjectSession(NearObjectCapabilities capabilities, const std::vector<std::shared_ptr<NearObject>>& nearObjectPeers, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) :
     m_capabilities(capabilities),
     m_nearObjectPeers(nearObjectPeers),
-    m_eventCallbacks(std::move(eventCallbacks)),
-    m_taskQueue()
+    m_eventCallbacks(std::move(eventCallbacks))
 {
 }
 
