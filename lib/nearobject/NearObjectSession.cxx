@@ -13,7 +13,6 @@ NearObjectSession::NearObjectSession(NearObjectCapabilities capabilities, const 
     m_eventCallbacks(std::move(eventCallbacks)),
     m_taskQueue()
 {
-    m_taskQueue.run();
 }
 
 NearObjectSession::~NearObjectSession()

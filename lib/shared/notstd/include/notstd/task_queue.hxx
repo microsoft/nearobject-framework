@@ -66,6 +66,10 @@ public:
         m_blockingTaskRequested(false), 
         m_dispatcher(std::make_shared<notstd::enable_make_protected<Dispatcher>>(*this))
     {
+        try {
+            m_thread = std::thread(&TaskQueue::runFunc, this);
+        } catch (...) {
+        }
     }
 
     ~TaskQueue()
@@ -80,22 +84,6 @@ public:
     isRunning() const noexcept
     {
         return m_running;
-    }
-
-    /**
-     * @brief starts the worker thread running the tasks on the queue
-     *
-     */
-    bool
-    run()
-    {
-        try {
-            m_thread = std::thread(&TaskQueue::runFunc, this);
-        } catch (...) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
