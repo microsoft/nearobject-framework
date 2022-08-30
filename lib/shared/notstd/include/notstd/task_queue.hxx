@@ -3,6 +3,7 @@
 #define TASK_QUEUE_HXX
 
 #include <atomic>
+#include <ciso646>
 #include <functional>
 #include <iostream>
 #include <memory>
