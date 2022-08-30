@@ -49,7 +49,7 @@ public:
             return m_assignedLooper.postBlocking(std::move(aRunnable));
         }
 
-    private: // construction, since we want the looper to expose it's dispatcher exclusively!
+    private: 
         Dispatcher(TaskQueue &aLooper) :
             m_assignedLooper(aLooper)
         {}
@@ -60,22 +60,25 @@ public:
 
 public:
     TaskQueue() :
-        m_running(false), m_abortRequested(false), m_blockingTaskRequested(false), m_blockingTask(), m_runnables(), m_runnablesMutex(), m_dispatcher(std::shared_ptr<Dispatcher>(new Dispatcher(*this)))
+        m_running(false), 
+        m_abortRequested(false), 
+        m_blockingTaskRequested(false), 
+        m_dispatcher(std::shared_ptr<Dispatcher>(new Dispatcher(*this)))
     {
     }
 
     ~TaskQueue()
     {
-        abortAndJoin();
+        stop();
     }
 
     /**
      * @brief returns if the queue is running
      */
     bool
-    running() const
+    isRunning() const noexcept
     {
-        return m_running.load();
+        return m_running;
     }
 
     /**
@@ -118,17 +121,17 @@ private:
     void
     runFunc()
     {
-        m_running.store(true);
+        m_running = true;
 
-        while (false == m_abortRequested.load()) {
+        while (not m_abortRequested) {
             std::lock_guard guard(m_runnablesMutex);
 
-            if (true == m_blockingTaskRequested.load()) {
+            if (m_blockingTaskRequested) {
                 try {
                     m_blockingTask();
                 } catch (...) {
                 }
-                m_blockingTaskRequested.store(false);
+                m_blockingTaskRequested = false;
             } else {
                 try {
                     Runnable r = next();
@@ -140,7 +143,7 @@ private:
             }
         }
 
-        m_running.store(false);
+        m_running = false;
     }
 
     /**
@@ -150,7 +153,7 @@ private:
     void
     abortAndJoin()
     {
-        m_abortRequested.store(true);
+        m_abortRequested = true;
         if (m_thread.joinable()) {
             m_thread.join();
         }
@@ -200,12 +203,12 @@ private:
         try {
             std::lock_guard guard(m_runnablesMutex);
             m_blockingTask = aRunnable;
-            m_blockingTaskRequested.store(true);
+            m_blockingTaskRequested = true;
         } catch (...) {
             return false;
         }
 
-        while (true == m_blockingTaskRequested.load())
+        while (m_blockingTaskRequested)
             ;
 
         return true;
