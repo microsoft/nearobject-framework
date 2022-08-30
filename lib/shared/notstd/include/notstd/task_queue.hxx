@@ -13,45 +13,45 @@
 
 namespace threading
 {
-class CLooper
+class Looper
 {
 public:
     using Runnable = std::function<void()>;
 
-    class CDispatcher
+    class Dispatcher
     {
-        friend class CLooper; // Allow the looper to access the private constructor.
+        friend class Looper; // Allow the looper to access the private constructor.
 
     public:
         bool
-        post(const CLooper::Runnable &&aRunnable)
+        post(const Looper::Runnable &&aRunnable)
         {
             return m_assignedLooper.post(std::move(aRunnable));
         }
 
         bool
-        post_blocking(const CLooper::Runnable &&aRunnable)
+        postBlocking(const Looper::Runnable &&aRunnable)
         {
-            return m_assignedLooper.post_blocking(std::move(aRunnable));
+            return m_assignedLooper.postBlocking(std::move(aRunnable));
         }
 
     private: // construction, since we want the looper to expose it's dispatcher exclusively!
-        CDispatcher(CLooper &aLooper) :
+        Dispatcher(Looper &aLooper) :
             m_assignedLooper(aLooper)
         {}
 
     private:
-        CLooper &m_assignedLooper;
+        Looper &m_assignedLooper;
     };
 
 public:
-    CLooper() :
-        m_running(false), m_abortRequested(false), m_blockingTaskRequested(false), m_blockingTask(), m_runnables(), m_runnablesMutex(), m_dispatcher(std::shared_ptr<CDispatcher>(new CDispatcher(*this)))
+    Looper() :
+        m_running(false), m_abortRequested(false), m_blockingTaskRequested(false), m_blockingTask(), m_runnables(), m_runnablesMutex(), m_dispatcher(std::shared_ptr<Dispatcher>(new Dispatcher(*this)))
     {
     }
     // Copy denied, Move to be implemented
 
-    ~CLooper()
+    ~Looper()
     {
         abortAndJoin();
     }
@@ -66,7 +66,7 @@ public:
     run()
     {
         try {
-            m_thread = std::thread(&CLooper::runFunc, this);
+            m_thread = std::thread(&Looper::runFunc, this);
         } catch (...) {
             return false;
         }
@@ -80,7 +80,7 @@ public:
         abortAndJoin();
     }
 
-    std::shared_ptr<CDispatcher>
+    std::shared_ptr<Dispatcher>
     getDispatcher()
     {
         return m_dispatcher;
@@ -93,9 +93,8 @@ private:
         m_running.store(true);
 
         while (false == m_abortRequested.load()) {
-
             std::lock_guard guard(m_runnablesMutex);
-            
+
             if (true == m_blockingTaskRequested.load()) {
                 try {
                     m_blockingTask();
@@ -153,16 +152,18 @@ private:
     }
 
     bool
-    post_blocking(const Runnable &&aRunnable){
-        try{
+    postBlocking(const Runnable &&aRunnable)
+    {
+        try {
             std::lock_guard guard(m_runnablesMutex);
-            m_blockingTask = aRunnable; 
+            m_blockingTask = aRunnable;
             m_blockingTaskRequested.store(true);
 
-        } catch(...){
+        } catch (...) {
             return false;
         }
-        while(true == m_blockingTaskRequested.load()) ;
+        while (true == m_blockingTaskRequested.load())
+            ;
 
         return true;
     }
@@ -177,7 +178,7 @@ private:
     Runnable m_blockingTask;
     std::recursive_mutex m_runnablesMutex;
 
-    std::shared_ptr<CDispatcher> m_dispatcher;
+    std::shared_ptr<Dispatcher> m_dispatcher;
 };
 
 } // namespace threading

@@ -56,7 +56,7 @@ NearObjectSession::InvokeBlockingEventCallback(const std::function<void(NearObje
         executor(*eventCallbacks);
     };
 
-    dispatcher->post_blocking(std::move(task));
+    dispatcher->postBlocking(std::move(task));
 }
 
 void
