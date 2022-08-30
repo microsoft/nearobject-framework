@@ -23,12 +23,26 @@ public:
         friend class Looper; // Allow the looper to access the private constructor.
 
     public:
+        /**
+         * @brief posts a non blocking task onto the queue
+         *
+         * @param aRunnable The Runnable to be posted onto the queue
+         *
+         */
         bool
         post(const Looper::Runnable &&aRunnable)
         {
             return m_assignedLooper.post(std::move(aRunnable));
         }
 
+        /**
+         * @brief posts a blocking task onto the queue. When any thread posts
+         *        a blocking task using this function, they will block until
+         *        the task completes
+         *
+         * @param aRunnable The Runnable to be posted onto the queue
+         *
+         */
         bool
         postBlocking(const Looper::Runnable &&aRunnable)
         {
@@ -56,12 +70,20 @@ public:
         abortAndJoin();
     }
 
+
+    /**
+     * @brief returns if the queue is running
+     */
     bool
     running() const
     {
         return m_running.load();
     }
 
+    /**
+     * @brief starts the worker thread running the tasks on the queue
+     *
+     */
     bool
     run()
     {
@@ -74,6 +96,10 @@ public:
         return true;
     }
 
+    /**
+     * @brief stops the worker thread
+     *
+     */
     void
     stop()
     {
@@ -87,6 +113,10 @@ public:
     }
 
 private:
+    /**
+     * @brief the worker thread pulling the runnables from the queue and running them
+     *
+     */
     void
     runFunc()
     {
@@ -98,7 +128,8 @@ private:
             if (true == m_blockingTaskRequested.load()) {
                 try {
                     m_blockingTask();
-                } catch (...) {}
+                } catch (...) {
+                }
                 m_blockingTaskRequested.store(false);
             } else {
                 try {
@@ -114,6 +145,10 @@ private:
         m_running.store(false);
     }
 
+    /**
+     * @brief tells the worker thread to stop and join
+     *
+     */
     void
     abortAndJoin()
     {
@@ -123,8 +158,11 @@ private:
         }
     }
 
-    // Runnables
-    // this function is NOT thread safe
+    /**
+     * @brief the worker thread calls this function to get the next task.
+     *        the mutex m_runnablesMutex MUST be acquired prior to calling this function
+     *
+     */
     Runnable
     next()
     {
@@ -137,12 +175,15 @@ private:
         return runnable;
     }
 
+    /**
+     * @brief the Dispatcher calls this function to post a runnable onto the queue
+     *
+     */
     bool
     post(const Runnable &&aRunnable)
     {
         try {
             std::lock_guard guard(m_runnablesMutex);
-
             m_runnables.push(std::move(aRunnable));
         } catch (...) {
             return false;
@@ -151,6 +192,10 @@ private:
         return true;
     }
 
+    /**
+     * @brief the Dispatcher calls this function to post a blocking task
+     *
+     */
     bool
     postBlocking(const Runnable &&aRunnable)
     {
@@ -158,10 +203,10 @@ private:
             std::lock_guard guard(m_runnablesMutex);
             m_blockingTask = aRunnable;
             m_blockingTaskRequested.store(true);
-
         } catch (...) {
             return false;
         }
+
         while (true == m_blockingTaskRequested.load())
             ;
 
