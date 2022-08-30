@@ -32,7 +32,7 @@ NearObjectSession::InvokeEventCallback(const std::function<void(NearObjectSessio
 {
     auto dispatcher = m_taskQueue.getDispatcher();
 
-    auto const task = [executor, this]() {
+    auto const task = [this, executor]() {
         const auto eventCallbacks = m_eventCallbacks.lock();
         if (!eventCallbacks) {
             return;
@@ -48,7 +48,7 @@ NearObjectSession::InvokeBlockingEventCallback(const std::function<void(NearObje
 {
     auto dispatcher = m_taskQueue.getDispatcher();
 
-    auto const task = [&executor, this]() {
+    auto const task = [this, &executor]() {
         const auto eventCallbacks = m_eventCallbacks.lock();
         if (!eventCallbacks) {
             return;
