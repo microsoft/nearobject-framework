@@ -69,7 +69,6 @@ public:
         abortAndJoin();
     }
 
-
     /**
      * @brief returns if the queue is running
      */
