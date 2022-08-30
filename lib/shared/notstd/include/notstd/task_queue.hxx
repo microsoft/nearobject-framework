@@ -30,7 +30,7 @@ public:
          *
          */
         bool
-        post(const TaskQueue::Runnable &&aRunnable)
+        post(TaskQueue::Runnable aRunnable)
         {
             return m_assignedLooper.post(std::move(aRunnable));
         }
@@ -44,7 +44,7 @@ public:
          *
          */
         bool
-        postBlocking(const TaskQueue::Runnable &&aRunnable)
+        postBlocking(TaskQueue::Runnable aRunnable)
         {
             return m_assignedLooper.postBlocking(std::move(aRunnable));
         }
@@ -181,7 +181,7 @@ private:
      *
      */
     bool
-    post(const Runnable &&aRunnable)
+    post(Runnable aRunnable)
     {
         try {
             std::lock_guard guard(m_runnablesMutex);
@@ -198,7 +198,7 @@ private:
      *
      */
     bool
-    postBlocking(const Runnable &&aRunnable)
+    postBlocking(Runnable aRunnable)
     {
         try {
             std::lock_guard guard(m_runnablesMutex);
