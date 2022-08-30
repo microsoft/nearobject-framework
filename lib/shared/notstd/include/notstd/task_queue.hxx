@@ -10,6 +10,7 @@
 #include <queue>
 #include <stdexcept>
 #include <thread>
+#include <notstd/memory.hxx>
 
 namespace threading
 {
@@ -49,7 +50,7 @@ public:
             return m_assignedLooper.postBlocking(std::move(aRunnable));
         }
 
-    private: 
+    protected: 
         Dispatcher(TaskQueue &aLooper) :
             m_assignedLooper(aLooper)
         {}
@@ -63,7 +64,7 @@ public:
         m_running(false), 
         m_abortRequested(false), 
         m_blockingTaskRequested(false), 
-        m_dispatcher(std::shared_ptr<Dispatcher>(new Dispatcher(*this)))
+        m_dispatcher(std::make_shared<notstd::enable_make_protected<Dispatcher>>(*this))
     {
     }
 
