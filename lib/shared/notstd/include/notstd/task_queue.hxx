@@ -63,7 +63,6 @@ public:
         m_running(false), m_abortRequested(false), m_blockingTaskRequested(false), m_blockingTask(), m_runnables(), m_runnablesMutex(), m_dispatcher(std::shared_ptr<Dispatcher>(new Dispatcher(*this)))
     {
     }
-    // Copy denied, Move to be implemented
 
     ~Looper()
     {
