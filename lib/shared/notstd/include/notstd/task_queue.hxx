@@ -164,12 +164,14 @@ private:
     postBack(Runnable aRunnable)
     {
         PackagedRunnable task(aRunnable);
+        auto fut = task.get_future();
         try {
             std::lock_guard guard(m_runnablesMutex);
             m_runnables.push_back(std::move(task));
-        } catch (...){}
+        } catch (...){
+        }
 
-        return task.get_future();
+        return fut;
     }
 
     /**
@@ -180,12 +182,13 @@ private:
     postFront(Runnable aRunnable)
     {
         PackagedRunnable task(aRunnable);
+        auto fut = task.get_future();
         try {
             std::lock_guard guard(m_runnablesMutex);
             m_runnables.push_front(std::move(task));
         } catch (...) {
         }
-        return task.get_future();
+        return fut;
     }
 
 private:

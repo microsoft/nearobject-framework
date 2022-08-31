@@ -38,11 +38,11 @@ NearObjectSession::InvokeEventCallback(const std::function<void(NearObjectSessio
         executor(*eventCallbacks);
     };
 
-    dispatcher->post(std::move(task));
+    dispatcher->postBack(std::move(task));
 }
 
 void
-NearObjectSession::InvokeBlockingEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor)
+NearObjectSession::runImmediateBlockingCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor)
 {
     auto dispatcher = m_taskQueue.getDispatcher();
 
@@ -54,7 +54,8 @@ NearObjectSession::InvokeBlockingEventCallback(const std::function<void(NearObje
         executor(*eventCallbacks);
     };
 
-    dispatcher->postBlocking(std::move(task));
+    auto fut = dispatcher->postFront(std::move(task));
+    fut.wait();
 }
 
 void
@@ -129,7 +130,7 @@ NearObjectSession::EndSession()
     StopRanging();
 
     // the blocking version is called so that the task queue can execute the task before *this is destructed
-    InvokeBlockingEventCallback([&](auto& eventCallbacks) {
+    runImmediateBlockingCallback([&](auto& eventCallbacks) {
         eventCallbacks.OnSessionEnded(this);
     });
 }
@@ -197,7 +198,7 @@ NearObjectSession::StopRanging()
     m_rangingSession.reset();
 
     // the blocking version is called so that the task queue can execute the task before *this is destructed
-    InvokeBlockingEventCallback([&](auto& eventCallbacks) {
+    runImmediateBlockingCallback([&](auto& eventCallbacks) {
         eventCallbacks.OnRangingStopped(this);
     });
 }
