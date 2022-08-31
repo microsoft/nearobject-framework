@@ -5,14 +5,14 @@
 #include <atomic>
 #include <ciso646>
 #include <functional>
+#include <future>
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <notstd/memory.hxx>
 #include <queue>
 #include <stdexcept>
 #include <thread>
-#include <future>
-#include <notstd/memory.hxx>
 
 namespace threading
 {
@@ -51,7 +51,7 @@ public:
             return m_assignedLooper.postFront(std::move(aRunnable));
         }
 
-    protected: 
+    protected:
         Dispatcher(TaskQueue &aLooper) :
             m_assignedLooper(aLooper)
         {}
@@ -62,8 +62,8 @@ public:
 
 public:
     TaskQueue() :
-        m_running(false), 
-        m_abortRequested(false), 
+        m_running(false),
+        m_abortRequested(false),
         m_dispatcher(std::make_shared<notstd::enable_make_protected<Dispatcher>>(*this))
     {
         try {
@@ -120,7 +120,7 @@ private:
             }
 
             if (taskToRun.valid()) {
-                taskToRun();    
+                taskToRun();
             }
         }
 
@@ -168,7 +168,7 @@ private:
         try {
             std::lock_guard guard(m_runnablesMutex);
             m_runnables.push_back(std::move(task));
-        } catch (...){
+        } catch (...) {
         }
 
         return fut;
