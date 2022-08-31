@@ -18,6 +18,8 @@ struct NearObjectService;
 class ServiceRuntime
 {
 public:
+    ~ServiceRuntime();
+
     ServiceRuntime&
     SetServiceInstance(std::shared_ptr<NearObjectService> service);
 
