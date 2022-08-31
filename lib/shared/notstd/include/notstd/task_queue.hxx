@@ -34,10 +34,7 @@ public:
          *
          */
         std::future<void>
-        postBack(TaskQueue::Runnable aRunnable)
-        {
-            return m_assignedLooper.postBack(std::move(aRunnable));
-        }
+        postBack(TaskQueue::Runnable aRunnable);
 
         /**
          * @brief posts a task to the front of the queue
@@ -46,61 +43,35 @@ public:
          *
          */
         std::future<void>
-        postFront(TaskQueue::Runnable aRunnable)
-        {
-            return m_assignedLooper.postFront(std::move(aRunnable));
-        }
+        postFront(TaskQueue::Runnable aRunnable);
 
     protected:
-        Dispatcher(TaskQueue &aLooper) :
-            m_assignedLooper(aLooper)
-        {}
+        Dispatcher(TaskQueue &aLooper);
 
     private:
         TaskQueue &m_assignedLooper;
     };
 
 public:
-    TaskQueue() :
-        m_running(false),
-        m_abortRequested(false),
-        m_dispatcher(std::make_shared<notstd::enable_make_protected<Dispatcher>>(*this))
-    {
-        try {
-            m_thread = std::thread(&TaskQueue::runFunc, this);
-        } catch (...) {
-        }
-    }
+    TaskQueue();
 
-    ~TaskQueue()
-    {
-        stop();
-    }
+    ~TaskQueue();
 
     /**
      * @brief returns if the queue is running
      */
     bool
-    isRunning() const noexcept
-    {
-        return m_running;
-    }
+    isRunning() const noexcept;
 
     /**
      * @brief stops the worker thread
      *
      */
     void
-    stop()
-    {
-        abortAndJoin();
-    }
+    stop();
 
     std::shared_ptr<Dispatcher>
-    getDispatcher()
-    {
-        return m_dispatcher;
-    }
+    getDispatcher();
 
 private:
     /**
@@ -108,37 +79,14 @@ private:
      *
      */
     void
-    runFunc()
-    {
-        m_running = true;
-
-        while (not m_abortRequested) {
-            PackagedRunnable taskToRun;
-            {
-                std::lock_guard guard(m_runnablesMutex);
-                taskToRun = next();
-            }
-
-            if (taskToRun.valid()) {
-                taskToRun();
-            }
-        }
-
-        m_running = false;
-    }
+    runFunc();
 
     /**
      * @brief tells the worker thread to stop and join
      *
      */
     void
-    abortAndJoin()
-    {
-        m_abortRequested = true;
-        if (m_thread.joinable()) {
-            m_thread.join();
-        }
-    }
+    abortAndJoin();
 
     /**
      * @brief the worker thread calls this function to get the next task.
@@ -146,50 +94,20 @@ private:
      *
      */
     PackagedRunnable
-    next()
-    {
-        if (m_runnables.empty()) {
-            return PackagedRunnable();
-        }
-        PackagedRunnable runnable = std::move(m_runnables.front());
-        m_runnables.pop_front();
-        return runnable;
-    }
+    next();
 
     /**
      * @brief the Dispatcher calls this function to post a runnable onto the back of the queue
      *
      */
     std::future<void>
-    postBack(Runnable aRunnable)
-    {
-        PackagedRunnable task(aRunnable);
-        auto fut = task.get_future();
-        try {
-            std::lock_guard guard(m_runnablesMutex);
-            m_runnables.push_back(std::move(task));
-        } catch (...) {
-        }
-
-        return fut;
-    }
-
+    postBack(Runnable aRunnable);
     /**
      * @brief the Dispatcher calls this function to post a runnable onto the front of the queue
      *
      */
     std::future<void>
-    postFront(Runnable aRunnable)
-    {
-        PackagedRunnable task(aRunnable);
-        auto fut = task.get_future();
-        try {
-            std::lock_guard guard(m_runnablesMutex);
-            m_runnables.push_front(std::move(task));
-        } catch (...) {
-        }
-        return fut;
-    }
+    postFront(Runnable aRunnable);
 
 private:
     std::thread m_thread;

@@ -54,8 +54,8 @@ NearObjectSession::RunImmediateBlockingCallback(const std::function<void(NearObj
         executor(*eventCallbacks);
     };
 
-    auto fut = dispatcher->postFront(std::move(task));
-    fut.wait();
+    auto future = dispatcher->postFront(std::move(task));
+    future.wait();
 }
 
 void
