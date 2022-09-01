@@ -4,7 +4,9 @@
 
 #include <nearobject/NearObjectSession.hxx>
 #include <nearobject/NearObjectSessionEventCallbacks.hxx>
+#include <chrono>
 
+using namespace std::chrono_literals;
 using namespace nearobject;
 
 NearObjectSession::NearObjectSession(NearObjectCapabilities capabilities, const std::vector<std::shared_ptr<NearObject>>& nearObjectPeers, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) :
@@ -56,7 +58,7 @@ NearObjectSession::RunImmediateBlockingCallback(const std::function<void(NearObj
     };
 
     auto future = dispatcher->postFront(std::move(task));
-    future.wait();
+    future.wait_for(3s);
 }
 
 void
