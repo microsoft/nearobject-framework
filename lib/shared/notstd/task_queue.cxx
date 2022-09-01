@@ -1,4 +1,5 @@
 #include <notstd/task_queue.hxx>
+#include <ciso646>
 
 using namespace threading;
 
