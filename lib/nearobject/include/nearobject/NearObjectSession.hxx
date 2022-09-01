@@ -123,6 +123,9 @@ protected:
     void
     RunImmediateBlockingCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor);
 
+    void
+    RunCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor);
+
     /**
      * @brief Add a near object peer to this session.
      *
