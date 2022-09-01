@@ -1,5 +1,5 @@
-#include <notstd/task_queue.hxx>
 #include <ciso646>
+#include <notstd/task_queue.hxx>
 
 using namespace threading;
 
@@ -27,6 +27,7 @@ TaskQueue::TaskQueue() :
     try {
         m_thread = std::thread(&TaskQueue::runFunc, this);
     } catch (...) {
+        throw TaskQueue::TaskQueueCreationException();
     }
 }
 
@@ -60,9 +61,11 @@ TaskQueue::runFunc()
 
     while (not m_abortRequested) {
         TaskQueue::PackagedRunnable taskToRun;
-        {
+        try {
             std::lock_guard guard(m_runnablesMutex);
             taskToRun = next();
+        } catch (...) {
+            throw TaskQueue::TaskQueueGetNextTaskException();
         }
 
         if (taskToRun.valid()) {
@@ -102,6 +105,7 @@ TaskQueue::postBack(TaskQueue::Runnable aRunnable)
         std::lock_guard guard(m_runnablesMutex);
         m_runnables.push_back(std::move(task));
     } catch (...) {
+        throw TaskQueue::TaskQueuePushTaskException();
     }
 
     return future;
@@ -116,6 +120,7 @@ TaskQueue::postFront(TaskQueue::Runnable aRunnable)
         std::lock_guard guard(m_runnablesMutex);
         m_runnables.push_front(std::move(task));
     } catch (...) {
+        throw TaskQueue::TaskQueuePushTaskException();
     }
     return future;
 }

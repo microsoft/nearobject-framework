@@ -22,7 +22,12 @@ private:
     using PackagedRunnable = std::packaged_task<void()>;
 public:
     using Runnable = std::function<void()>;
+    
+    struct TaskQueueCreationException : public std::exception {};
+    struct TaskQueueGetNextTaskException : public std::exception {};
+    struct TaskQueuePushTaskException : public std::exception {};
 
+    
     class Dispatcher
     {
         friend class TaskQueue; // Allow the looper to access the private constructor.
