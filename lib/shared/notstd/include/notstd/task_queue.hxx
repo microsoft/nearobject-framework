@@ -23,10 +23,9 @@ private:
 public:
     using Runnable = std::function<void()>;
     
-    struct TaskQueueCreationException : public std::exception {};
-    struct TaskQueueGetNextTaskException : public std::exception {};
-    struct TaskQueuePushTaskException : public std::exception {};
-
+    struct CreationException : public std::exception {}; // signifies that the worker thread could not be started
+    struct GetNextTaskException : public std::exception {}; // signifies that the worker thread could not get the next task to run
+    struct PushTaskException : public std::exception {}; // signifies that the Dispatcher could not push a task onto the queue
     
     class Dispatcher
     {
@@ -35,7 +34,7 @@ public:
     public:
         /**
          * @brief posts a task to the back of the queue
-         *
+         *        throws PushTaskException if the task couldn't be pushed properly
          * @param aRunnable The Runnable to be posted onto the queue
          *
          */
@@ -44,6 +43,7 @@ public:
 
         /**
          * @brief posts a task to the front of the queue
+         *        throws PushTaskException if the task couldn't be pushed properly
          *
          * @param aRunnable The Runnable to be run immediately
          *
@@ -59,6 +59,11 @@ public:
     };
 
 public:
+    /**
+     * @brief constructs the task queue and starts the worker thread. 
+     *        throws a CreationException if the thread couldn't be started
+     *
+     */
     TaskQueue();
 
     ~TaskQueue();
@@ -97,7 +102,7 @@ private:
     /**
      * @brief the worker thread calls this function to get the next task.
      *        the mutex m_runnablesMutex MUST be acquired prior to calling this function
-     *
+     *        throws GetNextTaskException if the next task couldn't be obtained
      */
     PackagedRunnable
     next();

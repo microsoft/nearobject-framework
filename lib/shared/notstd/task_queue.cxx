@@ -27,7 +27,7 @@ TaskQueue::TaskQueue() :
     try {
         m_thread = std::thread(&TaskQueue::runFunc, this);
     } catch (...) {
-        throw TaskQueue::TaskQueueCreationException();
+        throw TaskQueue::CreationException();
     }
 }
 
@@ -65,7 +65,7 @@ TaskQueue::runFunc()
             std::lock_guard guard(m_runnablesMutex);
             taskToRun = next();
         } catch (...) {
-            throw TaskQueue::TaskQueueGetNextTaskException();
+            throw TaskQueue::GetNextTaskException();
         }
 
         if (taskToRun.valid()) {
@@ -105,7 +105,7 @@ TaskQueue::postBack(TaskQueue::Runnable aRunnable)
         std::lock_guard guard(m_runnablesMutex);
         m_runnables.push_back(std::move(task));
     } catch (...) {
-        throw TaskQueue::TaskQueuePushTaskException();
+        throw TaskQueue::PushTaskException();
     }
 
     return future;
@@ -120,7 +120,7 @@ TaskQueue::postFront(TaskQueue::Runnable aRunnable)
         std::lock_guard guard(m_runnablesMutex);
         m_runnables.push_front(std::move(task));
     } catch (...) {
-        throw TaskQueue::TaskQueuePushTaskException();
+        throw TaskQueue::PushTaskException();
     }
     return future;
 }
