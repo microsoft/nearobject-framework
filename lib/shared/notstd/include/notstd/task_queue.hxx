@@ -18,9 +18,10 @@ namespace threading
 {
 class TaskQueue
 {
+private:
+    using PackagedRunnable = std::packaged_task<void()>;
 public:
     using Runnable = std::function<void()>;
-    using PackagedRunnable = std::packaged_task<void()>;
 
     class Dispatcher
     {
