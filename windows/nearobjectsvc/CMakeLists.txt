@@ -9,6 +9,7 @@ target_sources(nearobjectsvc
 target_link_libraries(nearobjectsvc
     PRIVATE
         nearobject-service-windows
+        notstd
 )
 
 set_target_properties(nearobjectsvc PROPERTIES FOLDER linux/service/nearobjectd)

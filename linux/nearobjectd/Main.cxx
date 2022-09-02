@@ -5,15 +5,65 @@
 
 #include <unistd.h>
 
-#include <nearobject/service/ServiceRuntime.hxx>
+#include <nearobject/persist/NearObjectProfilePersisterFilesystem.hxx>
+#include <nearobject/service/NearObjectDeviceManager.hxx>
 #include <nearobject/service/NearObjectService.hxx>
-#include <nearobject/service/NearObjectServiceInjector.hxx>
 #include <nearobject/service/NearObjectServiceConfiguration.hxx>
+#include <nearobject/service/NearObjectServiceInjector.hxx>
+#include <nearobject/service/ServiceRuntime.hxx>
+
+/**
+ * @brief Get the user's home path.
+ * 
+ * @return std::filesystem::path Returns a valid path if it could be resolved,
+ * otherwise an empty path is returned indicating it could not be resolved.
+ */
+std::filesystem::path
+GetUserHomePath() noexcept
+{
+    static constexpr auto LinuxHomePathEnvironmentValueName = "HOME";
+
+    char *value = std::getenv(LinuxHomePathEnvironmentValueName);
+    if (!value) {
+        return {};
+    }
+
+    return value;
+}
+
+using namespace nearobject::persistence;
+using namespace nearobject::service;
 
 int
 main(int argc, char *argv[])
 {
     auto configuration = nearobject::service::NearObjectServiceConfiguration::FromCommandLineArguments(argc, argv);
+
+    // Resolve user home directory.
+    const std::filesystem::path homePath{ GetUserHomePath() };
+    if (homePath.empty()) {
+        throw std::runtime_error("unable to determine user home path");
+    }
+
+    const std::filesystem::path persistencePath = homePath / nearobject::persistence::PathSuffix;
+
+    // Create profile manager.
+    auto profilePersisterFs = std::make_unique<nearobject::persistence::NearObjectProfilePersisterFilesystem>(persistencePath);
+    auto profileManager = std::make_shared<NearObjectProfileManager>(std::move(profilePersisterFs));
+
+    // Create device manager.
+    auto deviceManager = NearObjectDeviceManager::Create();
+    // TODO: add discovery agent(s)
+
+    // Create service.
+    auto service = NearObjectService::Create({
+        std::move(profileManager),
+        std::move(deviceManager)
+    });
+
+    // Start service runtime.
+    ServiceRuntime nearObjectServiceRuntime{};
+    nearObjectServiceRuntime.SetServiceInstance(service).Start();
 
     // Daemonize, if requested.
     if (configuration.RunInBackground) {
@@ -26,11 +76,5 @@ main(int argc, char *argv[])
         }
     }
 
-    // TODO: create and fill injector components
-    nearobject::service::NearObjectServiceInjector injector{};
-    auto service = nearobject::service::NearObjectService::Create(injector);
-
-    nearobject::service::ServiceRuntime nearObjectServiceRuntime{};
-    nearObjectServiceRuntime.SetServiceInstance(service).Start();
     return 0;
 }

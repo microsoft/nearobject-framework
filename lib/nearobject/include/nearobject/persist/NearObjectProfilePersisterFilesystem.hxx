@@ -14,6 +14,11 @@ namespace nearobject
 namespace persistence
 {
 /**
+ * @brief Common persistence path suffix to use across platforms.
+ */
+const std::filesystem::path PathSuffix = ".nearobject";
+
+/**
  * @brief Object to persist files to/from a local filesystem.
  * 
  * Note that this class is NOT thread-safe. The caller must ensure that access

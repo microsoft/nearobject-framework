@@ -1,14 +1,19 @@
 
-add_library(notstd INTERFACE)
+add_library(notstd STATIC "")
+
+set(NOTSTD_DIR_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
+set(NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX ${NOTSTD_DIR_PUBLIC_INCLUDE}/notstd)
 
 target_sources(notstd
-    INTERFACE
-        ${CMAKE_CURRENT_LIST_DIR}/include/notstd/memory.hxx
-        ${CMAKE_CURRENT_LIST_DIR}/include/notstd/tostring.hxx
-        ${CMAKE_CURRENT_LIST_DIR}/include/notstd/task_queue.hxx
+    PUBLIC
+        ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/memory.hxx
+        ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/tostring.hxx
+        ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/task_queue.hxx
+    PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/placeholder.cxx
 )
 
 target_include_directories(notstd
-    INTERFACE 
-        ${CMAKE_CURRENT_LIST_DIR}/include
+    PUBLIC
+        ${NOTSTD_DIR_PUBLIC_INCLUDE}
 )
