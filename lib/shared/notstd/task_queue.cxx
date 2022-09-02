@@ -9,12 +9,6 @@ TaskQueue::Dispatcher::postBack(TaskQueue::Runnable aRunnable)
     return m_assignedLooper.postBack(std::move(aRunnable));
 }
 
-std::future<void>
-TaskQueue::Dispatcher::postFront(TaskQueue::Runnable aRunnable)
-{
-    return m_assignedLooper.postFront(std::move(aRunnable));
-}
-
 TaskQueue::Dispatcher::Dispatcher(TaskQueue &aLooper) :
     m_assignedLooper(aLooper)
 {}
@@ -33,7 +27,7 @@ TaskQueue::TaskQueue() :
 
 TaskQueue::~TaskQueue()
 {
-    stop();
+    stopWorkerAndCompleteTasks();
 }
 
 bool
@@ -43,9 +37,13 @@ TaskQueue::isRunning() const noexcept
 }
 
 void
-TaskQueue::stop()
+TaskQueue::stopWorkerAndCompleteTasks()
 {
     abortAndJoin();
+    std::lock_guard guard(m_runnablesMutex); // grab the lock to prevent the queue from increasing while we are draining it.
+    for (TaskQueue::PackagedRunnable taskToRun = next(); taskToRun.valid(); taskToRun = next()) {
+        taskToRun();
+    }
 }
 
 std::shared_ptr<TaskQueue::Dispatcher>
@@ -92,7 +90,7 @@ TaskQueue::next()
         return PackagedRunnable();
     }
     TaskQueue::PackagedRunnable runnable = std::move(m_runnables.front());
-    m_runnables.pop_front();
+    m_runnables.pop();
     return runnable;
 }
 
@@ -103,24 +101,10 @@ TaskQueue::postBack(TaskQueue::Runnable aRunnable)
     auto future = task.get_future();
     try {
         std::lock_guard guard(m_runnablesMutex);
-        m_runnables.push_back(std::move(task));
-    } catch (...) {
+        m_runnables.push(std::move(task));
+    }catch (...) {
         throw TaskQueue::PushTaskException();
     }
 
-    return future;
-}
-
-std::future<void>
-TaskQueue::postFront(TaskQueue::Runnable aRunnable)
-{
-    TaskQueue::PackagedRunnable task(aRunnable);
-    auto future = task.get_future();
-    try {
-        std::lock_guard guard(m_runnablesMutex);
-        m_runnables.push_front(std::move(task));
-    } catch (...) {
-        throw TaskQueue::PushTaskException();
-    }
     return future;
 }

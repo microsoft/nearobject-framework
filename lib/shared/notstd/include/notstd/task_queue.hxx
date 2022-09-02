@@ -34,22 +34,15 @@ public:
     public:
         /**
          * @brief posts a task to the back of the queue
+         *        If the queue is being destroyed and this function is called there is NO guarantee that the requested task will be ran
+         *        But if this function returns before the queue has been requested to be destroyed then the requested task will run.
          *        throws PushTaskException if the task couldn't be pushed properly
+         *        
          * @param aRunnable The Runnable to be posted onto the queue
          *
          */
         std::future<void>
         postBack(TaskQueue::Runnable aRunnable);
-
-        /**
-         * @brief posts a task to the front of the queue
-         *        throws PushTaskException if the task couldn't be pushed properly
-         *
-         * @param aRunnable The Runnable to be run immediately
-         *
-         */
-        std::future<void>
-        postFront(TaskQueue::Runnable aRunnable);
 
     protected:
         Dispatcher(TaskQueue &aLooper);
@@ -75,11 +68,11 @@ public:
     isRunning() const noexcept;
 
     /**
-     * @brief stops the worker thread
+     * @brief stops the worker thread and completes the task queue
      *
      */
     void
-    stop();
+    stopWorkerAndCompleteTasks();
 
     std::shared_ptr<Dispatcher>
     getDispatcher();
@@ -87,6 +80,7 @@ public:
 private:
     /**
      * @brief the worker thread pulling the runnables from the queue and running them
+     *        throws GetNextTaskException if the next task couldn't be obtained
      *
      */
     void
@@ -102,7 +96,6 @@ private:
     /**
      * @brief the worker thread calls this function to get the next task.
      *        the mutex m_runnablesMutex MUST be acquired prior to calling this function
-     *        throws GetNextTaskException if the next task couldn't be obtained
      */
     PackagedRunnable
     next();
@@ -113,19 +106,13 @@ private:
      */
     std::future<void>
     postBack(Runnable aRunnable);
-    /**
-     * @brief the Dispatcher calls this function to post a runnable onto the front of the queue
-     *
-     */
-    std::future<void>
-    postFront(Runnable aRunnable);
 
 private:
     std::thread m_thread;
     std::atomic_bool m_running;
     std::atomic_bool m_abortRequested;
 
-    std::deque<PackagedRunnable> m_runnables;
+    std::queue<PackagedRunnable> m_runnables;
     std::mutex m_runnablesMutex;
 
     std::shared_ptr<Dispatcher> m_dispatcher;
