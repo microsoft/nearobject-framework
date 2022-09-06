@@ -4,7 +4,9 @@
 
 #include <nearobject/NearObjectSession.hxx>
 #include <nearobject/NearObjectSessionEventCallbacks.hxx>
+#include <chrono>
 
+using namespace std::chrono_literals;
 using namespace nearobject;
 
 NearObjectSession::NearObjectSession(NearObjectCapabilities capabilities, const std::vector<std::shared_ptr<NearObject>>& nearObjectPeers, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) :
@@ -38,23 +40,7 @@ NearObjectSession::InvokeEventCallback(const std::function<void(NearObjectSessio
         executor(*eventCallbacks);
     };
 
-    dispatcher->post(std::move(task));
-}
-
-void
-NearObjectSession::InvokeBlockingEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor)
-{
-    auto dispatcher = m_taskQueue.getDispatcher();
-
-    auto const task = [this, &executor]() {
-        const auto eventCallbacks = m_eventCallbacks.lock();
-        if (!eventCallbacks) {
-            return;
-        }
-        executor(*eventCallbacks);
-    };
-
-    dispatcher->postBlocking(std::move(task));
+    dispatcher->postBack(std::move(task));
 }
 
 void
@@ -129,7 +115,7 @@ NearObjectSession::EndSession()
     StopRanging();
 
     // the blocking version is called so that the task queue can execute the task before *this is destructed
-    InvokeBlockingEventCallback([&](auto& eventCallbacks) {
+    InvokeEventCallback([&](auto& eventCallbacks) {
         eventCallbacks.OnSessionEnded(this);
     });
 }
@@ -196,8 +182,7 @@ NearObjectSession::StopRanging()
     // TODO: signal to device to stop ranging
     m_rangingSession.reset();
 
-    // the blocking version is called so that the task queue can execute the task before *this is destructed
-    InvokeBlockingEventCallback([&](auto& eventCallbacks) {
+    InvokeEventCallback([&](auto& eventCallbacks) {
         eventCallbacks.OnRangingStopped(this);
     });
 }

@@ -110,18 +110,8 @@ protected:
     void
     InvokeEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor);
 
-    /**
-     * @brief Resolves the event callback weak_ptr and executes the provided
-     * executor function if the pointer was valid.
-     *
-     * This function blocks until the executor has returned.
-     * 
-     * @param executor The function to execute if the callback pointer was
-     * successfully resolved.
-     *
-     */
     void
-    InvokeBlockingEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor);
+    RunCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor);
 
     /**
      * @brief Add a near object peer to this session.
