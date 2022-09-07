@@ -2,11 +2,10 @@
 #ifndef TASK_QUEUE_HXX
 #define TASK_QUEUE_HXX
 
-#include <atomic>
 #include <ciso646>
+#include <condition_variable>
 #include <functional>
 #include <future>
-#include <iostream>
 #include <memory>
 #include <mutex>
 #include <notstd/memory.hxx>
@@ -14,110 +13,167 @@
 #include <stdexcept>
 #include <thread>
 
-namespace threading
+namespace notstd 
 {
+/**
+ * @brief A thread-safe, serialized task queue supporting cancelation.
+ */
 class TaskQueue
 {
-private:
-    using PackagedRunnable = std::packaged_task<void()>;
 public:
-    using Runnable = std::function<void()>;
-    
-    struct CreationException : public std::exception {}; // signifies that the worker thread could not be started
-    struct GetNextTaskException : public std::exception {}; // signifies that the worker thread could not get the next task to run
-    struct PushTaskException : public std::exception {}; // signifies that the Dispatcher could not push a task onto the queue
-    
+    /**
+     * @brief Class which handles the details of dispatching tasks to a
+     * TaskQueue.
+     * 
+     * This default implementation submits tasks to the attached queue in
+     * first-in-first-out (FIFO) order.
+     */
     class Dispatcher
     {
-        friend class TaskQueue; // Allow the looper to access the private constructor.
+        /**
+         * @brief Allow the task queue to access the private constructor.
+         */
+        friend class TaskQueue;
 
     public:
         /**
-         * @brief posts a task to the back of the queue
-         *        If the queue is being destroyed and this function is called there is NO guarantee that the requested task will be ran
-         *        But if this function returns before the queue has been requested to be destroyed then the requested task will run.
-         *        throws PushTaskException if the task couldn't be pushed properly
-         *        
-         * @param aRunnable The Runnable to be posted onto the queue
+         * @brief Posts a task onto the queue.
          *
+         * If the queue is being destroyed and this function is called there is
+         * NO guarantee that the requested task will be ran. However, if this
+         * function returns before the queue has been requested to be destroyed
+         * then the requested task will run.
+         *        
+         * @param runnable The runnable task to be posted onto the queue.
          */
         std::future<void>
-        postBack(TaskQueue::Runnable aRunnable);
+        Post(std::function<void()> runnable);
 
     protected:
-        Dispatcher(TaskQueue &aLooper);
+        /**
+         * @brief Construct a new Dispatcher object.
+         * 
+         * @param taskQueue 
+         */
+        Dispatcher(TaskQueue &taskQueue);
 
     private:
-        TaskQueue &m_assignedLooper;
+        TaskQueue &m_taskQueue;
     };
 
 public:
     /**
-     * @brief constructs the task queue and starts the worker thread. 
-     *        throws a CreationException if the thread couldn't be started
-     *
+     * @brief Signifies that the worker thread could not be started.
+     */
+    struct CreationException : public std::exception {};
+
+    /**
+     * @brief Constructs the task queue and starts the worker thread. 
+     * Throws a CreationException if the thread couldn't be started.
      */
     TaskQueue();
 
+    /**
+     * @brief Destroy the Task Queue object.
+     */
     ~TaskQueue();
 
     /**
-     * @brief returns if the queue is running
+     * @brief The action to apply to pending tasks.
      */
-    bool
-    isRunning() const noexcept;
+    enum class PendingTaskAction {
+        Run,
+        Cancel,
+    };
 
     /**
-     * @brief stops the worker thread and completes the task queue
-     *
+     * @brief Halts operation of the queue.
+     * 
+     * @param pendingTaskAction The desired action to take for pending tasks.
+     * Prior to destruction, all pending tasks will by run by default ('Run'),
+     * or will be canceled ('Cancel').
      */
     void
-    stopWorkerAndCompleteTasks();
+    Stop(PendingTaskAction pendingTaskAction = PendingTaskAction::Run) noexcept;
 
+    /**
+     * @brief Stops the worker thread and waits for completion of all pending
+     * queue tasks.
+     */
+    void
+    StopAndWaitForTaskCompletion();
+
+    /**
+     * @brief Get the Dispatcher object.
+     * 
+     * @return std::shared_ptr<Dispatcher> 
+     */
     std::shared_ptr<Dispatcher>
-    getDispatcher();
+    GetDispatcher() const noexcept;
 
 private:
     /**
-     * @brief the worker thread pulling the runnables from the queue and running them
-     *        throws GetNextTaskException if the next task couldn't be obtained
-     *
+     * @brief Handler function run by the queue processing thread.
      */
     void
-    runFunc();
+    ProcessQueue();
 
     /**
-     * @brief tells the worker thread to stop and join
-     *
+     * @brief Indicates whether the queue processing thread should exit.
+     * 
+     * The m_runnablesChangedGate mutex must be held when calling this function.
+     * 
+     * @return true 
+     * @return false 
      */
-    void
-    abortAndJoin();
+    bool
+    ShouldQueueExit() const noexcept;
 
     /**
-     * @brief the worker thread calls this function to get the next task.
-     *        the mutex m_runnablesMutex MUST be acquired prior to calling this function
+     * @brief Indicates if stopping the queue is pending.
+     * 
+     * This does *not* indicate whether the worker thread should stop. For that,
+     * call @ref ShouldQueueExit().
+     * 
+     * The m_runnablesChangedGate mutex must be held when calling this function.
+     * 
+     * @return true 
+     * @return false 
      */
-    PackagedRunnable
-    next();
+    bool
+    IsStopPending() const noexcept;
 
     /**
-     * @brief the Dispatcher calls this function to post a runnable onto the back of the queue
-     *
+     * @brief The Dispatcher calls this function to post a std::function<void()>
+     * onto the back of the queue.
+     * 
+     * @param runnable
+     * @return std::future<void> 
      */
     std::future<void>
-    postBack(Runnable aRunnable);
+    Post(std::function<void()> runnable);
+
+    /**
+     * @brief Helper to track state of the queue.
+     */
+    enum class State {
+        Running,
+        Stopping,
+        Canceling,
+        Stopped,
+    };
 
 private:
     std::thread m_thread;
-    std::atomic_bool m_running;
-    std::atomic_bool m_abortRequested;
-
-    std::queue<PackagedRunnable> m_runnables;
-    std::mutex m_runnablesMutex;
-
     std::shared_ptr<Dispatcher> m_dispatcher;
+
+    std::mutex m_runnablesChangedGate;
+    // Access to the below variables must be synchronized with m_runnablesChangedGate.
+    std::queue<std::packaged_task<void()>> m_runnables;
+    std::condition_variable m_runnablesChanged;
+    State m_state{ State::Stopped };
 };
 
-} // namespace threading
+} // namespace notstd
 
 #endif // TASK_QUEUE_HXX

@@ -17,3 +17,8 @@ target_include_directories(notstd
     PUBLIC 
         ${NOTSTD_DIR_PUBLIC_INCLUDE}
 )
+
+target_link_libraries(notstd
+    PUBLIC
+        Threads::Threads
+)

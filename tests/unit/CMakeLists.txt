@@ -40,6 +40,8 @@ target_link_libraries(nearobject-test
 
 catch_discover_tests(nearobject-test)
 
+add_subdirectory(notstd)
+
 if (BUILD_FOR_WINDOWS)
     add_subdirectory(windows)
 endif()

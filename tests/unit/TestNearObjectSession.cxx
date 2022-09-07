@@ -332,7 +332,7 @@ TEST_CASE("near object event handlers reflect peer changes", "[basic]")
         {
             auto validationIsDone = [&](){ return ValidationDone; };
             auto validationDoneLock = std::unique_lock{ m_validationDoneGate };
-            REQUIRE(m_validationDone.wait_for(validationDoneLock, 50ms, validationIsDone));
+            REQUIRE(m_validationDone.wait_for(validationDoneLock, 100ms, validationIsDone));
         }
 
         bool ValidateAdded{ false };
