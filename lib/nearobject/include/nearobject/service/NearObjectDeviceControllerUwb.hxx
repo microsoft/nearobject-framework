@@ -1,6 +1,6 @@
 
-#ifndef NEAR_OBJECT_DEVICE_UWB_HXX
-#define NEAR_OBJECT_DEVICE_UWB_HXX
+#ifndef NEAR_OBJECT_DEVICE_CONTROLLER_UWB_HXX
+#define NEAR_OBJECT_DEVICE_CONTROLLER_UWB_HXX
 
 #include <cstdint>
 #include <memory>
@@ -18,11 +18,11 @@ namespace service
 /**
  * @brief A device providing Near Object services using a UWB device.
  */
-class NearObjectDeviceUwb :
+class NearObjectDeviceControllerUwb :
     public NearObjectDeviceController
 {
 public:
-    NearObjectDeviceUwb(std::unique_ptr<uwb::UwbDevice> uwbDevice);
+    NearObjectDeviceControllerUwb(std::unique_ptr<uwb::UwbDevice> uwbDevice);
 
 private:
     StartSessionResult
@@ -35,4 +35,4 @@ private:
 } // namespace service
 } // namespace nearobject
 
-#endif // _NEAR_OBJECT_DEVICE_UWB_HXX
+#endif // NEAR_OBJECT_DEVICE_CONTROLLER_UWB_HXX

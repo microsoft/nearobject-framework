@@ -13,7 +13,7 @@ namespace nearobject
 namespace service
 {
 class NearObjectDeviceController;
-class NearObjectDeviceUwb;
+class NearObjectDeviceControllerUwb;
 } // namespace service
 } // namespace nearobject
 

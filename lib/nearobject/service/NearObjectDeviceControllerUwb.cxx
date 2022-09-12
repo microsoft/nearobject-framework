@@ -1,5 +1,5 @@
 
-#include <nearobject/service/NearObjectDeviceUwb.hxx>
+#include <nearobject/service/NearObjectDeviceControllerUwb.hxx>
 
 #include <nearobject/NearObjectSessionEventCallbacks.hxx>
 
@@ -10,7 +10,7 @@ namespace
 static constexpr auto deviceIdFallback = 0x1234;
 } // namespace detail
 
-NearObjectDeviceUwb::NearObjectDeviceUwb(std::unique_ptr<uwb::UwbDevice> uwbDevice) :
+NearObjectDeviceControllerUwb::NearObjectDeviceControllerUwb(std::unique_ptr<uwb::UwbDevice> uwbDevice) :
     NearObjectDeviceController(deviceIdFallback),
     m_uwbDevice(std::move(uwbDevice))
 {
@@ -18,7 +18,7 @@ NearObjectDeviceUwb::NearObjectDeviceUwb(std::unique_ptr<uwb::UwbDevice> uwbDevi
 }
 
 NearObjectDeviceController::StartSessionResult
-NearObjectDeviceUwb::StartSessionImpl(const NearObjectProfile& /* profile */, std::weak_ptr<NearObjectSessionEventCallbacks> /* eventCallbacks */)
+NearObjectDeviceControllerUwb::StartSessionImpl(const NearObjectProfile& /* profile */, std::weak_ptr<NearObjectSessionEventCallbacks> /* eventCallbacks */)
 {
     return { std::nullopt };
 }

@@ -22,7 +22,7 @@ namespace nearobject
 namespace service
 {
 class NearObjectDeviceController;
-class NearObjectDeviceUwb;
+class NearObjectDeviceControllerUwb;
 } // namespace service
 } // namespace nearobject
 
@@ -90,30 +90,30 @@ private:
     OnDeviceInterfaceNotificationCallback(HCMNOTIFICATION hcmNotificationHandle, void *context, CM_NOTIFY_ACTION action, CM_NOTIFY_EVENT_DATA *eventData, DWORD eventDataSize);
 
     /**
-     * @brief Create (if necessary) and add NearObjectDeviceUwb wrapper instance
+     * @brief Create (if necessary) and add NearObjectDeviceControllerUwb wrapper instance
      * to the device cache.
      *
      * @param deviceName The device driver name to add/create.
-     * @return std::shared_ptr<::nearobject::service::NearObjectDeviceUwb>
+     * @return std::shared_ptr<::nearobject::service::NearObjectDeviceControllerUwb>
      */
-    std::shared_ptr<::nearobject::service::NearObjectDeviceUwb>
+    std::shared_ptr<::nearobject::service::NearObjectDeviceControllerUwb>
     AddCachedUwbNearObjectDevice(const std::wstring &deviceName);
 
     /**
-     * @brief Remove and return a NearObjectDeviceUwb device driver instance
+     * @brief Remove and return a NearObjectDeviceControllerUwb device driver instance
      * from the device cache.
      *
      * @param deviceName The device driver name to remove.
-     * @return std::shared_ptr<::nearobject::service::NearObjectDeviceUwb>
+     * @return std::shared_ptr<::nearobject::service::NearObjectDeviceControllerUwb>
      */
-    std::shared_ptr<::nearobject::service::NearObjectDeviceUwb>
+    std::shared_ptr<::nearobject::service::NearObjectDeviceControllerUwb>
     ExtractCachedNearObjectDevice(const std::wstring &deviceName);
 
 private:
     unique_hcmnotification m_uwbHcmNotificationHandle;
 
     std::mutex m_nearObjectDeviceCacheGate;
-    std::unordered_map<std::wstring, std::weak_ptr<::nearobject::service::NearObjectDeviceUwb>> m_nearObjectDeviceCache;
+    std::unordered_map<std::wstring, std::weak_ptr<::nearobject::service::NearObjectDeviceControllerUwb>> m_nearObjectDeviceCache;
 };
 } // namespace service
 } // namespace nearobject

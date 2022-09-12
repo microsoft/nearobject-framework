@@ -1,6 +1,6 @@
 
-#ifndef DEVICE_MANAGER_HXX
-#define DEVICE_MANAGER_HXX
+#ifndef NEAR_OBJECT_DEVICE_CONTROLLER_MANAGER_HXX
+#define NEAR_OBJECT_DEVICE_CONTROLLER_MANAGER_HXX
 
 #include <memory>
 #include <mutex>
@@ -23,24 +23,24 @@ enum class NearObjectDevicePresence;
  * when new devices ae discovered and when existing devices are removed or
  * become otherwise unavailable.
  */
-class NearObjectDeviceManager :
-    public std::enable_shared_from_this<NearObjectDeviceManager>
+class NearObjectDeviceControllerManager :
+    public std::enable_shared_from_this<NearObjectDeviceControllerManager>
 {
 public:
     /**
      * @brief Safely create an instance of the device manager.
      *
-     * @return std::shared_ptr<NearObjectDeviceManager>
+     * @return std::shared_ptr<NearObjectDeviceControllerManager>
      */
-    [[nodiscard]] static std::shared_ptr<NearObjectDeviceManager>
+    [[nodiscard]] static std::shared_ptr<NearObjectDeviceControllerManager>
     Create();
 
     /**
      * @brief Get an instance of this device manager.
      *
-     * @return std::shared_ptr<NearObjectDeviceManager>
+     * @return std::shared_ptr<NearObjectDeviceControllerManager>
      */
-    std::shared_ptr<NearObjectDeviceManager>
+    std::shared_ptr<NearObjectDeviceControllerManager>
     GetInstance() noexcept;
 
     /**
@@ -80,9 +80,9 @@ public:
 
 protected:
     /**
-     * @brief Construct a new NearObjectDeviceManager object.
+     * @brief Construct a new NearObjectDeviceControllerManager object.
      */
-    NearObjectDeviceManager() = default;
+    NearObjectDeviceControllerManager() = default;
 
 private:
     /**
@@ -123,4 +123,4 @@ private:
 } // namespace service
 } // namespace nearobject
 
-#endif // DEVICE_MANAGER_HXX
+#endif // NEAR_OBJECT_DEVICE_CONTROLLER_MANAGER_HXX

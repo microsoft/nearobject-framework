@@ -7,8 +7,8 @@ target_sources(nearobject-service
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectDeviceController.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectDeviceControllerDiscoveryAgent.cxx
-        ${CMAKE_CURRENT_LIST_DIR}/NearObjectDeviceManager.cxx
-        ${CMAKE_CURRENT_LIST_DIR}/NearObjectDeviceUwb.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/NearObjectDeviceControllerManager.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/NearObjectDeviceControllerUwb.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectProfileManager.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectService.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectServiceConfiguration.cxx
@@ -17,8 +17,8 @@ target_sources(nearobject-service
     PUBLIC
         ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectDeviceController.hxx
         ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectDeviceControllerDiscoveryAgent.hxx
-        ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectDeviceManager.hxx
-        ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectDeviceUwb.hxx
+        ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectDeviceControllerManager.hxx
+        ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectDeviceControllerUwb.hxx
         ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectProfileManager.hxx
         ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectService.hxx
         ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectServiceConfiguration.hxx

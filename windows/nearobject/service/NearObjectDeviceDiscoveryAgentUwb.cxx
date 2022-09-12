@@ -1,7 +1,7 @@
 
 #include <string>
 
-#include <nearobject/service/NearObjectDeviceUwb.hxx>
+#include <nearobject/service/NearObjectDeviceControllerUwb.hxx>
 #include <windows/uwb/UwbDevice.hxx>
 #include <windows/uwb/UwbDeviceDriver.hxx>
 #include <windows/devices/DeviceEnumerator.hxx>

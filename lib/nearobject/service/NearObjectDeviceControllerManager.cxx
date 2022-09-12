@@ -7,24 +7,24 @@
 
 #include <nearobject/service/NearObjectDeviceController.hxx>
 #include <nearobject/service/NearObjectDeviceControllerDiscoveryAgent.hxx>
-#include <nearobject/service/NearObjectDeviceManager.hxx>
+#include <nearobject/service/NearObjectDeviceControllerManager.hxx>
 
 using namespace nearobject::service;
 
-std::shared_ptr<NearObjectDeviceManager>
-NearObjectDeviceManager::Create()
+std::shared_ptr<NearObjectDeviceControllerManager>
+NearObjectDeviceControllerManager::Create()
 {
-    return std::make_shared<notstd::enable_make_protected<NearObjectDeviceManager>>();
+    return std::make_shared<notstd::enable_make_protected<NearObjectDeviceControllerManager>>();
 }
 
-std::shared_ptr<NearObjectDeviceManager>
-NearObjectDeviceManager::GetInstance() noexcept
+std::shared_ptr<NearObjectDeviceControllerManager>
+NearObjectDeviceControllerManager::GetInstance() noexcept
 {
     return shared_from_this();
 }
 
 void
-NearObjectDeviceManager::AddDevice(std::shared_ptr<NearObjectDeviceController> nearObjectDevice)
+NearObjectDeviceControllerManager::AddDevice(std::shared_ptr<NearObjectDeviceController> nearObjectDevice)
 {
     const auto nearObjectDevicesLock = std::scoped_lock{ m_nearObjectDeviceGate };
     const auto nearObjectDeviceExists = std::any_of(std::cbegin(m_nearObjectDevices), std::cend(m_nearObjectDevices), [&](const auto& nearObjectDeviceExisting) {
@@ -39,7 +39,7 @@ NearObjectDeviceManager::AddDevice(std::shared_ptr<NearObjectDeviceController> n
 }
 
 void
-NearObjectDeviceManager::RemoveDevice(std::shared_ptr<NearObjectDeviceController> nearObjectDevice)
+NearObjectDeviceControllerManager::RemoveDevice(std::shared_ptr<NearObjectDeviceController> nearObjectDevice)
 {
     const auto nearObjectDevicesLock = std::scoped_lock{ m_nearObjectDeviceGate };
     const auto nearObjectDeviceToRemove = std::find_if(std::cbegin(m_nearObjectDevices), std::cend(m_nearObjectDevices), [&](const auto& nearObjectDeviceExisting) {
@@ -54,7 +54,7 @@ NearObjectDeviceManager::RemoveDevice(std::shared_ptr<NearObjectDeviceController
 }
 
 std::shared_ptr<NearObjectDeviceController>
-NearObjectDeviceManager::GetDefaultDevice() const
+NearObjectDeviceControllerManager::GetDefaultDevice() const
 {
     const auto nearObjectDevicesLock = std::scoped_lock{ m_nearObjectDeviceGate };
 
@@ -64,7 +64,7 @@ NearObjectDeviceManager::GetDefaultDevice() const
 }
 
 std::vector<std::weak_ptr<NearObjectDeviceController>>
-NearObjectDeviceManager::GetAllDevices() const
+NearObjectDeviceControllerManager::GetAllDevices() const
 {
     const auto nearObjectDevicesLock = std::scoped_lock{ m_nearObjectDeviceGate };
 
@@ -78,7 +78,7 @@ NearObjectDeviceManager::GetAllDevices() const
 }
 
 void
-NearObjectDeviceManager::AddDiscoveryAgent(std::unique_ptr<NearObjectDeviceControllerDiscoveryAgent> discoveryAgent)
+NearObjectDeviceControllerManager::AddDiscoveryAgent(std::unique_ptr<NearObjectDeviceControllerDiscoveryAgent> discoveryAgent)
 {
     using namespace std::chrono_literals;
 
@@ -86,7 +86,7 @@ NearObjectDeviceManager::AddDiscoveryAgent(std::unique_ptr<NearObjectDeviceContr
     // be safely destroyed prior to the discovery agent. This allows the
     // callback to be registered indefinitely, safely checking whether this
     // instance is still valid upon each callback invocation.
-    discoveryAgent->RegisterDiscoveryEventCallback([discoveryAgentPtr = discoveryAgent.get(), weakThis = std::weak_ptr<NearObjectDeviceManager>(GetInstance())](auto&& presence, auto&& deviceChanged) {
+    discoveryAgent->RegisterDiscoveryEventCallback([discoveryAgentPtr = discoveryAgent.get(), weakThis = std::weak_ptr<NearObjectDeviceControllerManager>(GetInstance())](auto&& presence, auto&& deviceChanged) {
         if (auto strongThis = weakThis.lock()) {
             strongThis->OnDevicePresenceChanged(discoveryAgentPtr, presence, deviceChanged);
         }
@@ -128,7 +128,7 @@ NearObjectDeviceManager::AddDiscoveryAgent(std::unique_ptr<NearObjectDeviceContr
 }
 
 void
-NearObjectDeviceManager::OnDevicePresenceChanged(NearObjectDeviceControllerDiscoveryAgent* discoveryAgent, NearObjectDevicePresence presence, std::shared_ptr<NearObjectDeviceController> deviceChanged)
+NearObjectDeviceControllerManager::OnDevicePresenceChanged(NearObjectDeviceControllerDiscoveryAgent* discoveryAgent, NearObjectDevicePresence presence, std::shared_ptr<NearObjectDeviceController> deviceChanged)
 {
     switch (presence) {
         case NearObjectDevicePresence::Arrived:

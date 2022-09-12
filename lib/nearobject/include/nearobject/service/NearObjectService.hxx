@@ -10,7 +10,7 @@ namespace nearobject
 {
 namespace service
 {
-class NearObjectDeviceManager;
+class NearObjectDeviceControllerManager;
 class NearObjectProfileManager;
 
 /**
@@ -48,7 +48,7 @@ struct NearObjectService :
     /**
      * @brief Device manager.
      */
-    std::shared_ptr<NearObjectDeviceManager> DeviceManager;
+    std::shared_ptr<NearObjectDeviceControllerManager> DeviceManager;
 
     /**
      * @brief Destroy the Near Object Service object
@@ -70,4 +70,4 @@ protected:
 } // namespace service
 } // namespace nearobject
 
-#endif //NEAR_OBJECT_SERVICE_HXX
+#endif // NEAR_OBJECT_SERVICE_HXX
