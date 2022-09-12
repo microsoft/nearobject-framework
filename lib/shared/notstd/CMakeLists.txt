@@ -7,6 +7,7 @@ set(NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX ${NOTSTD_DIR_PUBLIC_INCLUDE}/notstd)
 target_sources(notstd
     PUBLIC
         ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/memory.hxx
+        ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/range.hxx
         ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/tostring.hxx
         ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/task_queue.hxx
     PRIVATE

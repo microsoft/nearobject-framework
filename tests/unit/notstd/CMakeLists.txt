@@ -4,6 +4,7 @@ add_executable(notstd-test)
 target_sources(notstd-test
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/Main.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/TestNotStdRange.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNotStdTaskQueue.cxx
 )
 
