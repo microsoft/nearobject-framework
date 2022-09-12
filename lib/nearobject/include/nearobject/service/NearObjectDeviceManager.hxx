@@ -11,12 +11,12 @@ namespace nearobject
 {
 namespace service
 {
-class NearObjectDevice;
-class NearObjectDeviceDiscoveryAgent;
+class NearObjectDeviceController;
+class NearObjectDeviceControllerDiscoveryAgent;
 enum class NearObjectDevicePresence;
 
 /**
- * @brief Manages devices which implement the NearObjectDevice interface,
+ * @brief Manages devices which implement the NearObjectDeviceController interface,
  * thereby providing Near Object services.
  *
  * This class is responsible for tracking the presence of such devices, both
@@ -49,7 +49,7 @@ public:
      * @param discoveryAgent The discovery agent to add.
      */
     void
-    AddDiscoveryAgent(std::unique_ptr<NearObjectDeviceDiscoveryAgent> discoveryAgent);
+    AddDiscoveryAgent(std::unique_ptr<NearObjectDeviceControllerDiscoveryAgent> discoveryAgent);
 
     /**
      * @brief Get the default near object device.
@@ -59,9 +59,9 @@ public:
      * GetAllDevices() function can be used to obtain the complete collection of
      * known devices and filter them appropriately.
      *
-     * @return std::shared_ptr<NearObjectDevice>
+     * @return std::shared_ptr<NearObjectDeviceController>
      */
-    std::shared_ptr<NearObjectDevice>
+    std::shared_ptr<NearObjectDeviceController>
     GetDefaultDevice() const;
 
     /**
@@ -73,9 +73,9 @@ public:
      * the collection and select a subset for use, thereby promoting the
      * weak pointers to shared pointers.
      *
-     * @return std::vector<std::weak_ptr<NearObjectDevice>>
+     * @return std::vector<std::weak_ptr<NearObjectDeviceController>>
      */
-    std::vector<std::weak_ptr<NearObjectDevice>>
+    std::vector<std::weak_ptr<NearObjectDeviceController>>
     GetAllDevices() const;
 
 protected:
@@ -93,7 +93,7 @@ private:
      * @param deviceChanged
      */
     void
-    OnDevicePresenceChanged(NearObjectDeviceDiscoveryAgent *discoveryAgent, NearObjectDevicePresence presence, std::shared_ptr<NearObjectDevice> deviceChanged);
+    OnDevicePresenceChanged(NearObjectDeviceControllerDiscoveryAgent *discoveryAgent, NearObjectDevicePresence presence, std::shared_ptr<NearObjectDeviceController> deviceChanged);
 
     /**
      * @brief Adds a new device for use by the framework to implement Near
@@ -102,7 +102,7 @@ private:
      * @param nearObjectDevice The device to add.
      */
     void
-    AddDevice(std::shared_ptr<NearObjectDevice> nearObjectDevice);
+    AddDevice(std::shared_ptr<NearObjectDeviceController> nearObjectDevice);
 
     /**
      * @brief Removes an existing device from use.
@@ -110,14 +110,14 @@ private:
      * @param nearObjectDevice The device to remove.
      */
     void
-    RemoveDevice(std::shared_ptr<NearObjectDevice> nearObjectDevice);
+    RemoveDevice(std::shared_ptr<NearObjectDeviceController> nearObjectDevice);
 
 private:
     mutable std::mutex m_nearObjectDeviceGate;
-    std::vector<std::shared_ptr<NearObjectDevice>> m_nearObjectDevices{};
+    std::vector<std::shared_ptr<NearObjectDeviceController>> m_nearObjectDevices{};
 
     mutable std::shared_mutex m_discoveryAgentsGate;
-    std::vector<std::unique_ptr<NearObjectDeviceDiscoveryAgent>> m_discoveryAgents{};
+    std::vector<std::unique_ptr<NearObjectDeviceControllerDiscoveryAgent>> m_discoveryAgents{};
 };
 
 } // namespace service

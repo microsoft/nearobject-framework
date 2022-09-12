@@ -8,7 +8,7 @@
 #include <windows/nearobject/service/NearObjectDeviceDiscoveryAgentUwb.hxx>
 
 using namespace windows::nearobject::service;
-using ::nearobject::service::NearObjectDevice;
+using ::nearobject::service::NearObjectDeviceController;
 using ::nearobject::service::NearObjectDevicePresence;
 using ::nearobject::service::NearObjectDeviceUwb;
 
@@ -116,12 +116,12 @@ NearObjectDeviceDiscoveryAgentUwb::OnDeviceInterfaceNotificationCallback(HCMNOTI
 }
 
 /* static */
-std::vector<std::shared_ptr<::nearobject::service::NearObjectDevice>>
+std::vector<std::shared_ptr<::nearobject::service::NearObjectDeviceController>>
 NearObjectDeviceDiscoveryAgentUwb::Probe()
 {
     const auto deviceInterfaceNames = windows::devices::DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(windows::devices::uwb::InterfaceClassUwb);
 
-    std::vector<std::shared_ptr<::nearobject::service::NearObjectDevice>> nearObjectDevices;
+    std::vector<std::shared_ptr<::nearobject::service::NearObjectDeviceController>> nearObjectDevices;
     for (const auto& deviceInterfaceName : deviceInterfaceNames) {
         auto nearObjectDevice = AddCachedUwbNearObjectDevice(deviceInterfaceName);
         if (nearObjectDevice) {
@@ -144,7 +144,7 @@ NearObjectDeviceDiscoveryAgentUwb::StopImpl()
     UnregisterForUwbDeviceClassNotifications();
 }
 
-std::future<std::vector<std::shared_ptr<NearObjectDevice>>>
+std::future<std::vector<std::shared_ptr<NearObjectDeviceController>>>
 NearObjectDeviceDiscoveryAgentUwb::ProbeAsyncImpl()
 {
     // TODO: this instance must be kept alive/valid until the async operation is

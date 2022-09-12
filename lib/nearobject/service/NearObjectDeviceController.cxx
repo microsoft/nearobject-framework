@@ -1,23 +1,23 @@
 
-#include <nearobject/service/NearObjectDevice.hxx>
+#include <nearobject/service/NearObjectDeviceController.hxx>
 
 #include <nearobject/NearObjectSession.hxx>
 #include <nearobject/NearObjectSessionEventCallbacks.hxx>
 
 using namespace nearobject::service;
 
-NearObjectDevice::NearObjectDevice(uint64_t deviceId) :
+NearObjectDeviceController::NearObjectDeviceController(uint64_t deviceId) :
     m_deviceId{ deviceId }
 {}
 
 uint64_t
-NearObjectDevice::Id() const noexcept
+NearObjectDeviceController::Id() const noexcept
 {
     return m_deviceId;
 }
 
-NearObjectDevice::StartSessionResult
-NearObjectDevice::StartSession(const NearObjectProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks)
+NearObjectDeviceController::StartSessionResult
+NearObjectDeviceController::StartSession(const NearObjectProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks)
 {
     auto result = StartSessionImpl(profile, std::move(eventCallbacks));
 
@@ -33,7 +33,7 @@ NearObjectDevice::StartSession(const NearObjectProfile& profile, std::weak_ptr<N
 }
 
 bool
-nearobject::service::operator==(const NearObjectDevice& lhs, const NearObjectDevice& rhs) noexcept
+nearobject::service::operator==(const NearObjectDeviceController& lhs, const NearObjectDeviceController& rhs) noexcept
 {
     return lhs.Id() == rhs.Id();
 }

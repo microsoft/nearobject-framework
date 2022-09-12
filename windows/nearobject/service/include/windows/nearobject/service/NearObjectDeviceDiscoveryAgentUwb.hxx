@@ -14,14 +14,14 @@
 #include <cfgmgr32.h>
 #include <wil/resource.h>
 
-#include <nearobject/service/NearObjectDeviceDiscoveryAgent.hxx>
+#include <nearobject/service/NearObjectDeviceControllerDiscoveryAgent.hxx>
 #include <windows/devices/DeviceResource.hxx>
 
 namespace nearobject
 {
 namespace service
 {
-class NearObjectDevice;
+class NearObjectDeviceController;
 class NearObjectDeviceUwb;
 } // namespace service
 } // namespace nearobject
@@ -37,7 +37,7 @@ namespace nearobject
 namespace service
 {
 class NearObjectDeviceDiscoveryAgentUwb :
-    public ::nearobject::service::NearObjectDeviceDiscoveryAgent
+    public ::nearobject::service::NearObjectDeviceControllerDiscoveryAgent
 {
 protected:
     void
@@ -46,11 +46,11 @@ protected:
     void
     StopImpl() override;
 
-    std::future<std::vector<std::shared_ptr<::nearobject::service::NearObjectDevice>>>
+    std::future<std::vector<std::shared_ptr<::nearobject::service::NearObjectDeviceController>>>
     ProbeAsyncImpl() override;
 
 private:
-    std::vector<std::shared_ptr<::nearobject::service::NearObjectDevice>>
+    std::vector<std::shared_ptr<::nearobject::service::NearObjectDeviceController>>
     Probe();
 
     /**

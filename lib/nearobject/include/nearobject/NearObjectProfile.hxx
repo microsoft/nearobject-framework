@@ -68,7 +68,7 @@ struct NearObjectProfile
      * requirements.
      *
      * If not specified, no security is required and the use of this profile
-     * will ignore all security features of the NearObjectDevice and all peers
+     * will ignore all security features of the NearObjectDeviceController and all peers
      * associated with it.
      * 
      * @return std::optional<NearObjectProfileSecurity> 

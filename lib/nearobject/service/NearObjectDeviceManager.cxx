@@ -5,8 +5,8 @@
 
 #include <notstd/memory.hxx>
 
-#include <nearobject/service/NearObjectDevice.hxx>
-#include <nearobject/service/NearObjectDeviceDiscoveryAgent.hxx>
+#include <nearobject/service/NearObjectDeviceController.hxx>
+#include <nearobject/service/NearObjectDeviceControllerDiscoveryAgent.hxx>
 #include <nearobject/service/NearObjectDeviceManager.hxx>
 
 using namespace nearobject::service;
@@ -24,7 +24,7 @@ NearObjectDeviceManager::GetInstance() noexcept
 }
 
 void
-NearObjectDeviceManager::AddDevice(std::shared_ptr<NearObjectDevice> nearObjectDevice)
+NearObjectDeviceManager::AddDevice(std::shared_ptr<NearObjectDeviceController> nearObjectDevice)
 {
     const auto nearObjectDevicesLock = std::scoped_lock{ m_nearObjectDeviceGate };
     const auto nearObjectDeviceExists = std::any_of(std::cbegin(m_nearObjectDevices), std::cend(m_nearObjectDevices), [&](const auto& nearObjectDeviceExisting) {
@@ -39,7 +39,7 @@ NearObjectDeviceManager::AddDevice(std::shared_ptr<NearObjectDevice> nearObjectD
 }
 
 void
-NearObjectDeviceManager::RemoveDevice(std::shared_ptr<NearObjectDevice> nearObjectDevice)
+NearObjectDeviceManager::RemoveDevice(std::shared_ptr<NearObjectDeviceController> nearObjectDevice)
 {
     const auto nearObjectDevicesLock = std::scoped_lock{ m_nearObjectDeviceGate };
     const auto nearObjectDeviceToRemove = std::find_if(std::cbegin(m_nearObjectDevices), std::cend(m_nearObjectDevices), [&](const auto& nearObjectDeviceExisting) {
@@ -53,7 +53,7 @@ NearObjectDeviceManager::RemoveDevice(std::shared_ptr<NearObjectDevice> nearObje
     m_nearObjectDevices.erase(nearObjectDeviceToRemove);
 }
 
-std::shared_ptr<NearObjectDevice>
+std::shared_ptr<NearObjectDeviceController>
 NearObjectDeviceManager::GetDefaultDevice() const
 {
     const auto nearObjectDevicesLock = std::scoped_lock{ m_nearObjectDeviceGate };
@@ -63,12 +63,12 @@ NearObjectDeviceManager::GetDefaultDevice() const
         : m_nearObjectDevices.front();
 }
 
-std::vector<std::weak_ptr<NearObjectDevice>>
+std::vector<std::weak_ptr<NearObjectDeviceController>>
 NearObjectDeviceManager::GetAllDevices() const
 {
     const auto nearObjectDevicesLock = std::scoped_lock{ m_nearObjectDeviceGate };
 
-    std::vector<std::weak_ptr<NearObjectDevice>> nearObjectDevices;
+    std::vector<std::weak_ptr<NearObjectDeviceController>> nearObjectDevices;
     std::transform(std::cbegin(m_nearObjectDevices), std::cend(m_nearObjectDevices), std::back_inserter(nearObjectDevices), [](const auto& nearObjectDevice) {
         // Implicit conversion from std::shared_ptr to std::weak_ptr.
         return nearObjectDevice;
@@ -78,7 +78,7 @@ NearObjectDeviceManager::GetAllDevices() const
 }
 
 void
-NearObjectDeviceManager::AddDiscoveryAgent(std::unique_ptr<NearObjectDeviceDiscoveryAgent> discoveryAgent)
+NearObjectDeviceManager::AddDiscoveryAgent(std::unique_ptr<NearObjectDeviceControllerDiscoveryAgent> discoveryAgent)
 {
     using namespace std::chrono_literals;
 
@@ -94,7 +94,7 @@ NearObjectDeviceManager::AddDiscoveryAgent(std::unique_ptr<NearObjectDeviceDisco
 
     // If this agent has already started, kick off a probe to ensure any devices
     // already found will be added ot this manager.
-    std::future<std::vector<std::shared_ptr<NearObjectDevice>>> existingDevicesProbe;
+    std::future<std::vector<std::shared_ptr<NearObjectDeviceController>>> existingDevicesProbe;
     const bool isStarted = discoveryAgent->IsStarted();
     if (isStarted) {
         existingDevicesProbe = discoveryAgent->ProbeAsync();
@@ -128,7 +128,7 @@ NearObjectDeviceManager::AddDiscoveryAgent(std::unique_ptr<NearObjectDeviceDisco
 }
 
 void
-NearObjectDeviceManager::OnDevicePresenceChanged(NearObjectDeviceDiscoveryAgent* discoveryAgent, NearObjectDevicePresence presence, std::shared_ptr<NearObjectDevice> deviceChanged)
+NearObjectDeviceManager::OnDevicePresenceChanged(NearObjectDeviceControllerDiscoveryAgent* discoveryAgent, NearObjectDevicePresence presence, std::shared_ptr<NearObjectDeviceController> deviceChanged)
 {
     switch (presence) {
         case NearObjectDevicePresence::Arrived:

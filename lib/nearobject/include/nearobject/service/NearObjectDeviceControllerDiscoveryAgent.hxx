@@ -12,7 +12,7 @@ namespace nearobject
 {
 namespace service
 {
-class NearObjectDevice;
+class NearObjectDeviceController;
 
 /**
  * @brief The presence of a near object device.
@@ -23,27 +23,27 @@ enum class NearObjectDevicePresence {
 };
 
 /**
- * @brief Discovers and monitors NearObjectDevices.
+ * @brief Discovers and monitors NearObjectDeviceControllers.
  */
-class NearObjectDeviceDiscoveryAgent
+class NearObjectDeviceControllerDiscoveryAgent
 {
 public:
     /**
      * @brief Construct a new Near Object Device Discovery Agent object
      */
-    NearObjectDeviceDiscoveryAgent() = default;
+    NearObjectDeviceControllerDiscoveryAgent() = default;
 
     /**
      * @brief Destroy the Near Object Device Discovery Agent object
      */
-    virtual ~NearObjectDeviceDiscoveryAgent() = default;
+    virtual ~NearObjectDeviceControllerDiscoveryAgent() = default;
 
     /**
      * @brief Construct a new Near ObjectDeviceDiscoveryAgent object.
      *
      * @param onDevicePresenceChanged
      */
-    explicit NearObjectDeviceDiscoveryAgent(std::function<void(NearObjectDevicePresence presence, std::shared_ptr<NearObjectDevice> deviceChanged)> onDevicePresenceChanged);
+    explicit NearObjectDeviceControllerDiscoveryAgent(std::function<void(NearObjectDevicePresence presence, std::shared_ptr<NearObjectDeviceController> deviceChanged)> onDevicePresenceChanged);
 
     /**
      * @brief Register a callback for device presence change events.
@@ -53,7 +53,7 @@ public:
      * @param onDevicePresenceChanged The callback to register.
      */
     void
-    RegisterDiscoveryEventCallback(std::function<void(NearObjectDevicePresence presence, std::shared_ptr<NearObjectDevice> deviceChanged)> onDevicePresenceChanged);
+    RegisterDiscoveryEventCallback(std::function<void(NearObjectDevicePresence presence, std::shared_ptr<NearObjectDeviceController> deviceChanged)> onDevicePresenceChanged);
 
     /**
      * @brief indicates the started/running state.
@@ -79,9 +79,9 @@ public:
     /**
      * @brief Probe for all existing devices.
      * 
-     * @return std::future<std::vector<std::shared_ptr<NearObjectDevice>>> 
+     * @return std::future<std::vector<std::shared_ptr<NearObjectDeviceController>>> 
      */
-    std::future<std::vector<std::shared_ptr<NearObjectDevice>>>
+    std::future<std::vector<std::shared_ptr<NearObjectDeviceController>>>
     ProbeAsync();
 
 protected:
@@ -92,7 +92,7 @@ protected:
      * @param deviceChanged The device the change occurred for.
      */
     void
-    DevicePresenceChanged(NearObjectDevicePresence presence, std::shared_ptr<NearObjectDevice> deviceChanged) const noexcept;
+    DevicePresenceChanged(NearObjectDevicePresence presence, std::shared_ptr<NearObjectDeviceController> deviceChanged) const noexcept;
 
 protected:
     /**
@@ -110,16 +110,16 @@ protected:
     /**
      * @brief Derived class implementation of asynchronous discovery probe.
      *
-     * @return std::future<std::vector<std::shared_ptr<NearObjectDevice>>>
+     * @return std::future<std::vector<std::shared_ptr<NearObjectDeviceController>>>
      */
-    virtual std::future<std::vector<std::shared_ptr<NearObjectDevice>>>
+    virtual std::future<std::vector<std::shared_ptr<NearObjectDeviceController>>>
     ProbeAsyncImpl();
 
 private:
     std::atomic<bool> m_started{ false };
 
     mutable std::shared_mutex m_onDevicePresenceChangedGate;
-    std::function<void(NearObjectDevicePresence presence, std::shared_ptr<NearObjectDevice> deviceChanged)> m_onDevicePresenceChanged;
+    std::function<void(NearObjectDevicePresence presence, std::shared_ptr<NearObjectDeviceController> deviceChanged)> m_onDevicePresenceChanged;
 };
 } // namespace service
 } // namespace nearobject

@@ -7,7 +7,7 @@
 
 #include <uwb/UwbDevice.hxx>
 
-#include <nearobject/service/NearObjectDevice.hxx>
+#include <nearobject/service/NearObjectDeviceController.hxx>
 
 namespace nearobject
 {
@@ -19,7 +19,7 @@ namespace service
  * @brief A device providing Near Object services using a UWB device.
  */
 class NearObjectDeviceUwb :
-    public NearObjectDevice
+    public NearObjectDeviceController
 {
 public:
     NearObjectDeviceUwb(std::unique_ptr<uwb::UwbDevice> uwbDevice);

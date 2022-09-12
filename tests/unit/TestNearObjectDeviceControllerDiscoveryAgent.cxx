@@ -4,8 +4,8 @@
 #include <memory>
 
 #include <catch2/catch.hpp>
-#include <nearobject/service/NearObjectDevice.hxx>
-#include <nearobject/service/NearObjectDeviceDiscoveryAgent.hxx>
+#include <nearobject/service/NearObjectDeviceController.hxx>
+#include <nearobject/service/NearObjectDeviceControllerDiscoveryAgent.hxx>
 
 namespace nearobject
 {
@@ -14,14 +14,14 @@ namespace service
 namespace test
 {
 struct NearObjectDeviceDiscoveryAgentTest final :
-    public NearObjectDeviceDiscoveryAgent
+    public NearObjectDeviceControllerDiscoveryAgent
 {
     ~NearObjectDeviceDiscoveryAgentTest() final = default;
 
-    std::promise<std::vector<std::shared_ptr<NearObjectDevice>>> ProbePromise;
+    std::promise<std::vector<std::shared_ptr<NearObjectDeviceController>>> ProbePromise;
 
     void
-    SignalDiscoveryEvent(NearObjectDevicePresence presence, std::shared_ptr<NearObjectDevice> deviceChanged)
+    SignalDiscoveryEvent(NearObjectDevicePresence presence, std::shared_ptr<NearObjectDeviceController> deviceChanged)
     {
         DevicePresenceChanged(presence, std::move(deviceChanged));
     }
@@ -35,7 +35,7 @@ protected:
     StopImpl() override
     {}
 
-    std::future<std::vector<std::shared_ptr<NearObjectDevice>>>
+    std::future<std::vector<std::shared_ptr<NearObjectDeviceController>>>
     ProbeAsyncImpl() override
     {
         return ProbePromise.get_future();
@@ -43,10 +43,10 @@ protected:
 };
 
 struct NearObjectDeviceTest :
-    public NearObjectDevice
+    public NearObjectDeviceController
 {
     explicit NearObjectDeviceTest(uint64_t deviceId) :
-        NearObjectDevice(deviceId)
+        NearObjectDeviceController(deviceId)
     {}
 
     StartSessionResult
@@ -136,7 +136,7 @@ TEST_CASE("near object device discovery agent can be created", "[basic][service]
     {
         static constexpr auto probeTimeout = 1ms;
 
-        const std::vector<std::shared_ptr<NearObjectDevice>> probeDevices{
+        const std::vector<std::shared_ptr<NearObjectDeviceController>> probeDevices{
             std::make_shared<test::NearObjectDeviceTest>(0x1),
             std::make_shared<test::NearObjectDeviceTest>(0x2),
             std::make_shared<test::NearObjectDeviceTest>(0x3),

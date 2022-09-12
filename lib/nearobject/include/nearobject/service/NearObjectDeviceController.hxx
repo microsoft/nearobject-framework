@@ -20,21 +20,21 @@ namespace service
 /**
  * @brief A device providing Near Object services.
  */
-class NearObjectDevice
+class NearObjectDeviceController
 {
 public:
-    virtual ~NearObjectDevice() = default;
-    NearObjectDevice(NearObjectDevice&) = delete;
-    NearObjectDevice(NearObjectDevice&&) = delete;
-    NearObjectDevice& operator=(NearObjectDevice&) = delete;
-    NearObjectDevice& operator=(NearObjectDevice&&) = delete;
+    virtual ~NearObjectDeviceController() = default;
+    NearObjectDeviceController(NearObjectDeviceController&) = delete;
+    NearObjectDeviceController(NearObjectDeviceController&&) = delete;
+    NearObjectDeviceController& operator=(NearObjectDeviceController&) = delete;
+    NearObjectDeviceController& operator=(NearObjectDeviceController&&) = delete;
 
     /**
      * @brief Construct a new Near Object Device object
      *
      * @param deviceId
      */
-    explicit NearObjectDevice(uint64_t deviceId);
+    explicit NearObjectDeviceController(uint64_t deviceId);
 
     /**
      * @brief Holds the result of the StartSession() function.
@@ -82,7 +82,7 @@ private:
 };
 
 bool
-operator==(const NearObjectDevice&, const NearObjectDevice&) noexcept;
+operator==(const NearObjectDeviceController&, const NearObjectDeviceController&) noexcept;
 
 } // namespace service
 } // namespace nearobject
