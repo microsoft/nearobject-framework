@@ -78,4 +78,4 @@ constexpr auto make_range(IteratorT begin, std::size_t count) noexcept
 
 } // namespace notstd
 
-#endif //NOT_STD_RANGE_HXX
+#endif // NOT_STD_RANGE_HXX

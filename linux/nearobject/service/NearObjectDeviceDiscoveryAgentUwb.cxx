@@ -1,12 +1,11 @@
 
-#include "NearObjectDeviceDiscoveryAgentUwb.hxx"
-
-#include <nearobject/service/NearObjectDeviceUwb.hxx>
+#include <linux/nearobject/service/NearObjectDeviceDiscoveryAgentUwb.hxx>
+#include <nearobject/service/NearObjectDeviceControllerUwb.hxx>
 
 using namespace linux::nearobject::service;
 using ::nearobject::service::NearObjectDeviceController;
 using ::nearobject::service::NearObjectDevicePresence;
-using ::nearobject::service::NearObjectDeviceUwb;
+using ::nearobject::service::NearObjectDeviceControllerUwb;
 
 std::vector<std::shared_ptr<::nearobject::service::NearObjectDeviceController>>
 NearObjectDeviceDiscoveryAgentUwb::Probe()

@@ -4,7 +4,7 @@
 
 #include <memory>
 
-#include <nearobject/service/NearObjectDeviceManager.hxx>
+#include <nearobject/service/NearObjectDeviceControllerManager.hxx>
 #include <nearobject/service/NearObjectProfileManager.hxx>
 
 namespace nearobject
@@ -17,7 +17,7 @@ namespace service
 struct NearObjectServiceInjector
 {
     std::shared_ptr<NearObjectProfileManager> ProfileManager;
-    std::shared_ptr<NearObjectDeviceManager> DeviceManager;
+    std::shared_ptr<NearObjectDeviceControllerManager> DeviceManager;
 };
 } // namespace service
 } // namespace nearobject

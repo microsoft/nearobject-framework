@@ -31,4 +31,4 @@ struct enable_make_protected : public T
 
 } // namespace notstd
 
-#endif //NOT_STD_MEMORY_HXX
+#endif // NOT_STD_MEMORY_HXX

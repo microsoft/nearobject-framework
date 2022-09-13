@@ -2,7 +2,7 @@
 #include <memory>
 
 #include <catch2/catch.hpp>
-#include <nearobject/service/NearObjectDeviceManager.hxx>
+#include <nearobject/service/NearObjectDeviceControllerManager.hxx>
 
 TEST_CASE("near object device manager can be created", "[basic][service]")
 {
@@ -10,6 +10,6 @@ TEST_CASE("near object device manager can be created", "[basic][service]")
 
     SECTION("device manager doesn't cause a crash when created")
     {
-        auto deviceManager = NearObjectDeviceManager::Create();
+        auto deviceManager = NearObjectDeviceControllerManager::Create();
     }
 }

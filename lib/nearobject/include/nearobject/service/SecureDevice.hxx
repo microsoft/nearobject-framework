@@ -24,4 +24,4 @@ private:
 } // namespace service
 } // namespace nearobject
 
-#endif //SECURE_DEVICE_HXX
+#endif // SECURE_DEVICE_HXX

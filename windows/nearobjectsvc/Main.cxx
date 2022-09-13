@@ -5,7 +5,7 @@
 #include <stdexcept>
 
 #include <nearobject/persist/NearObjectProfilePersisterFilesystem.hxx>
-#include <nearobject/service/NearObjectDeviceManager.hxx>
+#include <nearobject/service/NearObjectDeviceControllerManager.hxx>
 #include <nearobject/service/NearObjectService.hxx>
 #include <nearobject/service/ServiceRuntime.hxx>
 #include <windows/nearobject/service/NearObjectDeviceDiscoveryAgentUwb.hxx>
@@ -54,7 +54,7 @@ main(int argc, char *argv[])
 
     // Create device manager.
     auto uwbDeviceAgent = std::make_unique<NearObjectDeviceDiscoveryAgentUwb>();
-    auto deviceManager = NearObjectDeviceManager::Create();
+    auto deviceManager = NearObjectDeviceControllerManager::Create();
     deviceManager->AddDiscoveryAgent(std::move(uwbDeviceAgent));
 
     // Create service.

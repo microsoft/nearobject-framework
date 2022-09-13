@@ -17,4 +17,4 @@ class SecureDeviceChannel
 } // namespace service
 } // namespace nearobject
 
-#endif //SECURE_DEVICE_CHANNEL_HXX
+#endif // SECURE_DEVICE_CHANNEL_HXX

@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 #include <nearobject/persist/NearObjectProfilePersisterFilesystem.hxx>
-#include <nearobject/service/NearObjectDeviceManager.hxx>
+#include <nearobject/service/NearObjectDeviceControllerManager.hxx>
 #include <nearobject/service/NearObjectService.hxx>
 #include <nearobject/service/NearObjectServiceConfiguration.hxx>
 #include <nearobject/service/NearObjectServiceInjector.hxx>
@@ -52,7 +52,7 @@ main(int argc, char *argv[])
     auto profileManager = std::make_shared<NearObjectProfileManager>(std::move(profilePersisterFs));
 
     // Create device manager.
-    auto deviceManager = NearObjectDeviceManager::Create();
+    auto deviceManager = NearObjectDeviceControllerManager::Create();
     // TODO: add discovery agent(s)
 
     // Create service.
