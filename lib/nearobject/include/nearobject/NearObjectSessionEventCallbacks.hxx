@@ -13,7 +13,7 @@ class NearObject;
 
 /**
  * @brief Interface for receiving events from a NearObjectSession. This is the
- * primary method to receive information from a NearObject peer.
+ * primary method to receive information from a NearObject.
  */
 struct NearObjectSessionEventCallbacks
 {

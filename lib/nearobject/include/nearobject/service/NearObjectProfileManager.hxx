@@ -56,7 +56,7 @@ public:
      * TODO: Matching by another profile might not make sense. Consider what
      * input argument(s) are more sensible, and update this prototype with them.
      * This will likely come from an out-of-band connection, and may identify
-     * this device as a peer in some way.
+     * this device in some way.
      *
      * @param profile
      * @return std::vector<NearObjectProfile>

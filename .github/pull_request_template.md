@@ -4,6 +4,7 @@
 - [ ] Feature addition
 - [ ] Feature update
 - [ ] Breaking change
+- [ ] Non-functional change
 - [ ] Documentation
 - [ ] Infrastructure
 
@@ -22,8 +23,8 @@ Describe how the goals of the PR were achieved. Eg.
 Describe which tests were carried out and a summary of their results. Eg.
 > Verified Near Object session completed successfully with the following configurations:
 >
-> - [X] host controlee, peer controller
-> - [X] host controller, peer controlee
+> - [X] host as controlee
+> - [X] host as controller
 
 ### Reviewer Focus
 
