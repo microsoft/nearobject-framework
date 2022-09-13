@@ -25,7 +25,7 @@ To help keep the code consistent, please follow these general guidelines:
 | Block | Style | Example |
 | ----- | ----- | -------- |
 | Types | PascalCase | `struct NearObject {};` |
-| Functions | PascalCase | `NearObject GetNearObjectPeer()` |
+| Functions | PascalCase | `NearObject GetNearObject()` |
 | Variables | camelCase | `NearObject nearObject;` |
 | Parameters | camelCase | `void registerEventCallback(NearObjectEventCallback& eventCallback)` |
 | Namespaces | lowercase | `namespace nearobject` |

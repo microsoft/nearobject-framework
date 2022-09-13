@@ -62,11 +62,11 @@ struct NearObjectSessionTest final :
     using NearObjectSession::NearObjectSession;
 
     // Make some protected members public for testing purposes.
-    using NearObjectSession::GetPeers;
-    using NearObjectSession::AddNearObjectPeer;
-    using NearObjectSession::AddNearObjectPeers;
-    using NearObjectSession::RemoveNearObjectPeer;
-    using NearObjectSession::RemoveNearObjectPeers;
+    using NearObjectSession::GetNearObjects;
+    using NearObjectSession::AddNearObject;
+    using NearObjectSession::AddNearObjects;
+    using NearObjectSession::RemoveNearObject;
+    using NearObjectSession::RemoveNearObjects;
     using NearObjectSession::NearObjectPropertiesChanged;
     using NearObjectSession::EndSession;
 };
@@ -74,44 +74,44 @@ struct NearObjectSessionTest final :
 } // namespace test
 } // namespace nearobject
 
-TEST_CASE("near object peers can be added at session creation", "[basic]")
+TEST_CASE("near objects  can be added at session creation", "[basic]")
 {
     using namespace nearobject;
 
     const auto callbacksNoop = std::make_shared<test::NearObjectSessionEventCallbacksNoop>();
-    const auto ValidateInitialPeerList = [&](const std::vector<std::shared_ptr<NearObject>>& peersInitial) {
-        test::NearObjectSessionTest session(test::AllCapabilitiesSupported, peersInitial, callbacksNoop);
-        REQUIRE(session.GetPeers() == peersInitial);
+    const auto ValidateInitialList = [&](const std::vector<std::shared_ptr<NearObject>>& nearObjectsInitial) {
+        test::NearObjectSessionTest session(test::AllCapabilitiesSupported, nearObjectsInitial, callbacksNoop);
+        REQUIRE(session.GetNearObjects() == nearObjectsInitial);
     };
 
-    SECTION("creation with 0 peers doesn't cause a crash")
+    SECTION("creation with 0 near objects doesn't cause a crash")
     {
         REQUIRE_NOTHROW(std::make_unique<NearObjectSession>(test::AllCapabilitiesSupported, test::NearObjectsContainerEmpty, callbacksNoop));
     }
 
-    SECTION("creation with 1 peer doesn't cause a crash")
+    SECTION("creation with 1 near object doesn't cause a crash")
     {
         REQUIRE_NOTHROW(std::make_unique<NearObjectSession>(test::AllCapabilitiesSupported, test::NearObjectsContainerSingle, callbacksNoop));
     }
 
-    SECTION("creation with 1+ peers doesn't cause a crash")
+    SECTION("creation with 1+ near objects doesn't cause a crash")
     {
         REQUIRE_NOTHROW(std::make_unique<NearObjectSession>(test::AllCapabilitiesSupported, test::NearObjectsContainerMultiple, callbacksNoop));
     }
 
-    SECTION("membership reflects 0 peers specified upon construction")
+    SECTION("membership reflects 0 near objects specified upon construction")
     {
-        ValidateInitialPeerList({});
+        ValidateInitialList({});
     }
 
-    SECTION("membership reflects 1 peer specified upon construction")
+    SECTION("membership reflects 1 near object specified upon construction")
     {
-        ValidateInitialPeerList(test::NearObjectsContainerSingle);
+        ValidateInitialList(test::NearObjectsContainerSingle);
     }
 
-    SECTION("membership reflects 1+ peers specified upon construction")
+    SECTION("membership reflects 1+ near objects specified upon construction")
     {
-        ValidateInitialPeerList(test::NearObjectsContainerMultiple);
+        ValidateInitialList(test::NearObjectsContainerMultiple);
     }
 }
 
@@ -297,7 +297,7 @@ TEST_CASE("near object event handlers can be registered", "[basic]")
     }
 }
 
-TEST_CASE("near object event handlers reflect peer changes", "[basic]")
+TEST_CASE("near object event handlers reflect near object changes", "[basic]")
 {
     using namespace nearobject;
     using namespace std::chrono_literals;
@@ -344,68 +344,68 @@ TEST_CASE("near object event handlers reflect peer changes", "[basic]")
         std::condition_variable m_validationDone;
     };
 
-    SECTION("membership changed event callback invoked with single peer added")
+    SECTION("membership changed event callback invoked with single near object added")
     {
         auto callbacks = std::make_shared<NearObjectSessionEventCallbacksTestMembershipChanged>();
         test::NearObjectSessionTest session(test::AllCapabilitiesSupported, std::vector<std::shared_ptr<NearObject>>{}, callbacks);
 
         callbacks->ValidateAdded = true;
         callbacks->NearObjectsAdded = test::NearObjectsContainerSingle;
-        session.AddNearObjectPeer(test::NearObjectsContainerSingle[0]);
-        REQUIRE(session.GetPeers().size() == callbacks->NearObjectsAdded.size());
+        session.AddNearObject(test::NearObjectsContainerSingle[0]);
+        REQUIRE(session.GetNearObjects().size() == callbacks->NearObjectsAdded.size());
         callbacks->WaitForValidationComplete();
     }
 
-    SECTION("membership changed event callback invoked with multiple peers added")
+    SECTION("membership changed event callback invoked with multiple near object added")
     {
         auto callbacks = std::make_shared<NearObjectSessionEventCallbacksTestMembershipChanged>();
         test::NearObjectSessionTest session(test::AllCapabilitiesSupported, std::vector<std::shared_ptr<NearObject>>{}, callbacks);
 
         callbacks->ValidateAdded = true;
         callbacks->NearObjectsAdded = test::NearObjectsContainerMultiple;
-        session.AddNearObjectPeers(test::NearObjectsContainerMultiple);
-        REQUIRE(session.GetPeers().size() == callbacks->NearObjectsAdded.size());
+        session.AddNearObjects(test::NearObjectsContainerMultiple);
+        REQUIRE(session.GetNearObjects().size() == callbacks->NearObjectsAdded.size());
         callbacks->WaitForValidationComplete();
     }
 
-    SECTION("membership changed event callback invoked with single peer removed")
+    SECTION("membership changed event callback invoked with single near object removed")
     {
         auto callbacks = std::make_shared<NearObjectSessionEventCallbacksTestMembershipChanged>();
         test::NearObjectSessionTest session(test::AllCapabilitiesSupported, test::NearObjectsContainerSingle, callbacks);
 
         callbacks->NearObjectsRemoved = test::NearObjectsContainerSingle;
         callbacks->ValidateRemoved = true;
-        session.RemoveNearObjectPeer(test::NearObjectsContainerSingle[0]);
-        REQUIRE(session.GetPeers().size() == test::NearObjectsContainerSingle.size() - callbacks->NearObjectsRemoved.size());
+        session.RemoveNearObject(test::NearObjectsContainerSingle[0]);
+        REQUIRE(session.GetNearObjects().size() == test::NearObjectsContainerSingle.size() - callbacks->NearObjectsRemoved.size());
         callbacks->WaitForValidationComplete();
     }
 
-    SECTION("membership changed event callback invoked with multiple peers removed")
+    SECTION("membership changed event callback invoked with multiple near objects removed")
     {
         auto callbacks = std::make_shared<NearObjectSessionEventCallbacksTestMembershipChanged>();
         test::NearObjectSessionTest session(test::AllCapabilitiesSupported, test::NearObjectsContainerMultiple, callbacks);
 
         callbacks->ValidateRemoved = true;
         callbacks->NearObjectsRemoved = test::NearObjectsContainerMultiple;
-        session.RemoveNearObjectPeers(test::NearObjectsContainerMultiple);
-        REQUIRE(session.GetPeers().size() == test::NearObjectsContainerMultiple.size() - callbacks->NearObjectsRemoved.size());
+        session.RemoveNearObjects(test::NearObjectsContainerMultiple);
+        REQUIRE(session.GetNearObjects().size() == test::NearObjectsContainerMultiple.size() - callbacks->NearObjectsRemoved.size());
         callbacks->WaitForValidationComplete();
     }
 
-    SECTION("membership changed event callback invoked with subset of peers removed")
+    SECTION("membership changed event callback invoked with subset of near objects removed")
     {
         const std::array<std::vector<std::shared_ptr<NearObject>>, 3> NearObjectsToRemove {
-            // Subset overlaps start of peer membership.
+            // Subset overlaps start of near object membership.
             std::vector<std::shared_ptr<NearObject>>{ 
                 std::cbegin(test::NearObjectsContainerMultiple), 
                 std::next(std::cbegin(test::NearObjectsContainerMultiple), 2) 
             },
-            // Subset is in middle of peer membership.
+            // Subset is in middle of near object membership.
             std::vector<std::shared_ptr<NearObject>>{ 
                 std::next(std::cbegin(test::NearObjectsContainerMultiple)), 
                 std::prev(std::end(test::NearObjectsContainerMultiple), 2)
             },
-            // Subset overlaps end of peer membership.
+            // Subset overlaps end of near object membership.
             std::vector<std::shared_ptr<NearObject>>{ 
                 std::prev(std::cend(test::NearObjectsContainerMultiple), 3), 
                 std::cend(test::NearObjectsContainerMultiple)
@@ -418,14 +418,14 @@ TEST_CASE("near object event handlers reflect peer changes", "[basic]")
         for (const auto& nearObjectsToRemove : NearObjectsToRemove) {
             test::NearObjectSessionTest session(test::AllCapabilitiesSupported, test::NearObjectsContainerMultiple, callbacks);
             callbacks->NearObjectsRemoved = nearObjectsToRemove;
-            session.RemoveNearObjectPeers(nearObjectsToRemove);
-            REQUIRE(session.GetPeers().size() == test::NearObjectsContainerMultiple.size() - callbacks->NearObjectsRemoved.size());
+            session.RemoveNearObjects(nearObjectsToRemove);
+            REQUIRE(session.GetNearObjects().size() == test::NearObjectsContainerMultiple.size() - callbacks->NearObjectsRemoved.size());
             callbacks->WaitForValidationComplete();
             callbacks->ValidationDone = false;
         }
     }
 
-    SECTION("removing non-existent peers doesn't change membership")
+    SECTION("removing non-existent near objects doesn't change membership")
     {
         auto callbacks = std::make_shared<test::NearObjectSessionEventCallbacksNoop>();
 
@@ -436,11 +436,11 @@ TEST_CASE("near object event handlers reflect peer changes", "[basic]")
         };
 
         for (auto& session : Sessions) {
-            const auto currentPeers = session.GetPeers();
-            session.RemoveNearObjectPeers({ std::make_shared<NearObject>() });
-            REQUIRE(currentPeers == session.GetPeers());
-            session.RemoveNearObjectPeers({ std::make_shared<NearObject>(), std::make_shared<NearObject>(), std::make_shared<NearObject>() });
-            REQUIRE(currentPeers == session.GetPeers());
+            const auto currentNearObjects = session.GetNearObjects();
+            session.RemoveNearObjects({ std::make_shared<NearObject>() });
+            REQUIRE(currentNearObjects == session.GetNearObjects());
+            session.RemoveNearObjects({ std::make_shared<NearObject>(), std::make_shared<NearObject>(), std::make_shared<NearObject>() });
+            REQUIRE(currentNearObjects == session.GetNearObjects());
         }
     }
 }

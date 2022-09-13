@@ -9,19 +9,19 @@
 
 using namespace windows::nearobject::service;
 using ::nearobject::service::NearObjectDeviceController;
+using ::nearobject::service::NearObjectDeviceControllerUwb;
 using ::nearobject::service::NearObjectDevicePresence;
-using ::nearobject::service::NearObjectDeviceUwb;
 
 namespace
 {
-std::shared_ptr<NearObjectDeviceUwb> CreateNearObjectUwbDevice(std::wstring deviceName)
+std::shared_ptr<NearObjectDeviceControllerUwb> CreateNearObjectUwbDevice(std::wstring deviceName)
 {
     auto uwbDevice = std::make_unique<windows::devices::UwbDevice>(std::move(deviceName));
-    return std::make_shared<NearObjectDeviceUwb>(std::move(uwbDevice));
+    return std::make_shared<NearObjectDeviceControllerUwb>(std::move(uwbDevice));
 }
 }
 
-std::shared_ptr<NearObjectDeviceUwb>
+std::shared_ptr<NearObjectDeviceControllerUwb>
 NearObjectDeviceDiscoveryAgentUwb::AddCachedUwbNearObjectDevice(const std::wstring &deviceName)
 {
     // Note: the exclusive lock must be held for the duration, even during the
@@ -50,7 +50,7 @@ NearObjectDeviceDiscoveryAgentUwb::AddCachedUwbNearObjectDevice(const std::wstri
     return nearObjectDevice;
 }
 
-std::shared_ptr<NearObjectDeviceUwb>
+std::shared_ptr<NearObjectDeviceControllerUwb>
 NearObjectDeviceDiscoveryAgentUwb::ExtractCachedNearObjectDevice(const std::wstring &deviceName)
 {
     auto nearObjectDeviceLock = std::scoped_lock{ m_nearObjectDeviceCacheGate };
@@ -89,15 +89,15 @@ NearObjectDeviceDiscoveryAgentUwb::OnDeviceInterfaceNotification(HCMNOTIFICATION
     switch (action) {
         case CM_NOTIFY_ACTION_DEVICEINTERFACEARRIVAL: {
             deviceName = eventData->u.DeviceInterface.SymbolicLink;
-            auto nearObjectDeviceUwb = AddCachedUwbNearObjectDevice(deviceName);
-            DevicePresenceChanged(NearObjectDevicePresence::Arrived, std::move(nearObjectDeviceUwb));
+            auto nearObjectDeviceControllerUwb = AddCachedUwbNearObjectDevice(deviceName);
+            DevicePresenceChanged(NearObjectDevicePresence::Arrived, std::move(nearObjectDeviceControllerUwb));
             break;
         }
         case CM_NOTIFY_ACTION_DEVICEINTERFACEREMOVAL: {
             deviceName = eventData->u.DeviceInterface.SymbolicLink;
-            auto nearObjectDeviceUwb = ExtractCachedNearObjectDevice(deviceName);
-            if (nearObjectDeviceUwb) {
-                DevicePresenceChanged(NearObjectDevicePresence::Departed, std::move(nearObjectDeviceUwb));
+            auto nearObjectDeviceControllerUwb = ExtractCachedNearObjectDevice(deviceName);
+            if (nearObjectDeviceControllerUwb) {
+                DevicePresenceChanged(NearObjectDevicePresence::Departed, std::move(nearObjectDeviceControllerUwb));
             }
             break;
         }

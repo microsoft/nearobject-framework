@@ -10,7 +10,7 @@ namespace nearobject
 {
 /**
  * @brief A collection of configuration that specifies what security is required
- * when communicating with a near object peer or set of peers.
+ * when communicating with a near object or set of near objects.
  */
 struct NearObjectProfileSecurity
 {

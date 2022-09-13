@@ -9,9 +9,9 @@
 using namespace std::chrono_literals;
 using namespace nearobject;
 
-NearObjectSession::NearObjectSession(NearObjectCapabilities capabilities, const std::vector<std::shared_ptr<NearObject>>& nearObjectPeers, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) :
+NearObjectSession::NearObjectSession(NearObjectCapabilities capabilities, const std::vector<std::shared_ptr<NearObject>>& nearObjects, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) :
     m_capabilities(capabilities),
-    m_nearObjectPeers(nearObjectPeers),
+    m_nearObjects(nearObjects),
     m_eventCallbacks(std::move(eventCallbacks))
 {
 }
@@ -44,66 +44,66 @@ NearObjectSession::InvokeEventCallback(const std::function<void(NearObjectSessio
 }
 
 void
-NearObjectSession::AddNearObjectPeer(std::shared_ptr<NearObject> nearObjectAdded)
+NearObjectSession::AddNearObject(std::shared_ptr<NearObject> nearObjectAdded)
 {
-    AddNearObjectPeers({ std::move(nearObjectAdded) });
+    AddNearObjects({ std::move(nearObjectAdded) });
 }
 
 void
-NearObjectSession::AddNearObjectPeers(std::vector<std::shared_ptr<NearObject>> nearObjectsToAdd)
+NearObjectSession::AddNearObjects(std::vector<std::shared_ptr<NearObject>> nearObjectsToAdd)
 {
-    const auto lock = std::scoped_lock{ m_nearObjectPeersGate };
+    const auto lock = std::scoped_lock{ m_nearObjectsGate };
 
-    // Remove objects already in the peer set from the list of objects to add.
+    // Remove objects already in the member set from the list of objects to add.
     // The original vector 'nearObjectsToAdd' is maintained such that it can be
     // passed to the membership changed callback later, alleviating making a
     // copy of these elements.
-    nearObjectsToAdd.erase(std::remove_if(std::begin(nearObjectsToAdd), std::end(nearObjectsToAdd), [&](const auto& nearObjectPeerToAdd) {
-        return std::any_of(std::cbegin(m_nearObjectPeers), std::cend(m_nearObjectPeers), [&](const auto& nearObjectPeer) {
-            return (*nearObjectPeer == *nearObjectPeerToAdd);
+    nearObjectsToAdd.erase(std::remove_if(std::begin(nearObjectsToAdd), std::end(nearObjectsToAdd), [&](const auto& nearObjectToAdd) {
+        return std::any_of(std::cbegin(m_nearObjects), std::cend(m_nearObjects), [&](const auto& nearObject) {
+            return (*nearObject == *nearObjectToAdd);
         });
     }), std::end(nearObjectsToAdd));
 
-    // Add each peer from the pruned list to the existing peers.
-    m_nearObjectPeers.insert(std::end(m_nearObjectPeers), std::cbegin(nearObjectsToAdd), std::cend(nearObjectsToAdd));
+    // Add each near object from the pruned list to the existing near objects.
+    m_nearObjects.insert(std::end(m_nearObjects), std::cbegin(nearObjectsToAdd), std::cend(nearObjectsToAdd));
 
-    // Signal the membership changed event with the added peers.
+    // Signal the membership changed event with the added near objects.
     InvokeEventCallback([this, nearObjectsToAdd = std::move(nearObjectsToAdd)](auto& eventCallbacks) {
         eventCallbacks.OnSessionMembershipChanged(this, std::move(nearObjectsToAdd), {});
     });
 }
 
 void
-NearObjectSession::RemoveNearObjectPeer(std::shared_ptr<NearObject> nearObjectRemoved)
+NearObjectSession::RemoveNearObject(std::shared_ptr<NearObject> nearObjectRemoved)
 {
-    RemoveNearObjectPeers({ std::move(nearObjectRemoved) });
+    RemoveNearObjects({ std::move(nearObjectRemoved) });
 }
 
 void
-NearObjectSession::RemoveNearObjectPeers(std::vector<std::shared_ptr<NearObject>> nearObjectsToRemove)
+NearObjectSession::RemoveNearObjects(std::vector<std::shared_ptr<NearObject>> nearObjectsToRemove)
 {
-    const auto nearObjectPeersLock = std::scoped_lock{ m_nearObjectPeersGate };
+    const auto nearObjectsLock = std::scoped_lock{ m_nearObjectsGate };
 
-    // Partition the existing peers into ones that should be kept (first
+    // Partition the existing near objects into ones that should be kept (first
     // partition) and ones that should be removed (second partition), keeping
     // their relative order (stable). std::stable_partition returns an iterator
     // to the beginning of the second partition.
-    const auto nearObjectsRemoved = std::stable_partition(std::begin(m_nearObjectPeers), std::end(m_nearObjectPeers), [&](const auto nearObjectToCheck) { 
+    const auto nearObjectsRemoved = std::stable_partition(std::begin(m_nearObjects), std::end(m_nearObjects), [&](const auto nearObjectToCheck) { 
         return std::none_of(std::cbegin(nearObjectsToRemove), std::cend(nearObjectsToRemove), [&](const auto& nearObjectToRemove){
             return (nearObjectToCheck == nearObjectToRemove);
         });
     });
 
-    // Move the peers that should be removed into the nearObjectsToRemove vector to preserve them.
+    // Move the near objects that should be removed into the nearObjectsToRemove vector to preserve them.
     nearObjectsToRemove = {
         std::make_move_iterator(nearObjectsRemoved),
-        std::make_move_iterator(std::end(m_nearObjectPeers))
+        std::make_move_iterator(std::end(m_nearObjects))
     };
 
-    // Erase the moved-from peers from the existing peer list.
-    m_nearObjectPeers.erase(nearObjectsRemoved, std::end(m_nearObjectPeers));
+    // Erase the moved-from near objects from the existing membership list.
+    m_nearObjects.erase(nearObjectsRemoved, std::end(m_nearObjects));
 
-    // Signal the membership changed event with the removed peers.
+    // Signal the membership changed event with the removed near objects.
     InvokeEventCallback([this, nearObjectsToRemove = std::move(nearObjectsToRemove)](auto& eventCallbacks) {
         eventCallbacks.OnSessionMembershipChanged(this, {}, std::move(nearObjectsToRemove));
     });
@@ -129,10 +129,10 @@ NearObjectSession::NearObjectPropertiesChanged(const std::shared_ptr<NearObject>
 }
 
 std::vector<std::shared_ptr<NearObject>>
-NearObjectSession::GetPeers() const noexcept
+NearObjectSession::GetNearObjects() const noexcept
 {
-    const auto nearObjectPeersLock = std::scoped_lock{ m_nearObjectPeersGate };
-    return m_nearObjectPeers;
+    const auto nearObjectsLock = std::scoped_lock{ m_nearObjectsGate };
+    return m_nearObjects;
 }
 
 NearObjectSession::StartRangingSessionResult

@@ -13,8 +13,8 @@
 namespace nearobject
 {
 /**
- * @brief The connection scope, whether a single peer (unicast) or
- * multiple peers (multicast) are supported.
+ * @brief The connection scope, whether a single near object (unicast) or
+ * multiple near objects (multicast) are supported.
  */
 enum class NearObjectConnectionScope {
     Unicast,
@@ -24,7 +24,7 @@ enum class NearObjectConnectionScope {
 
 /**
  * @brief A collection of configuration that specifies how to connect to a near
- * object peer or set of peers.
+ * object or set of near objects.
  */
 struct NearObjectProfile
 {
@@ -68,8 +68,8 @@ struct NearObjectProfile
      * requirements.
      *
      * If not specified, no security is required and the use of this profile
-     * will ignore all security features of the NearObjectDeviceController and all peers
-     * associated with it.
+     * will ignore all security features of the NearObjectDeviceController and
+     * all near objects associated with it.
      * 
      * @return std::optional<NearObjectProfileSecurity> 
      */
