@@ -18,22 +18,22 @@ namespace notstd
 /**
  * @brief A thread-safe, serialized task queue supporting cancelation.
  */
-class TaskQueue
+class task_queue
 {
 public:
     /**
      * @brief Class which handles the details of dispatching tasks to a
-     * TaskQueue.
+     * task_queue.
      * 
      * This default implementation submits tasks to the attached queue in
      * first-in-first-out (FIFO) order.
      */
-    class Dispatcher
+    class dispatcher
     {
         /**
          * @brief Allow the task queue to access the private constructor.
          */
-        friend class TaskQueue;
+        friend class task_queue;
 
     public:
         /**
@@ -47,131 +47,131 @@ public:
          * @param runnable The runnable task to be posted onto the queue.
          */
         std::future<void>
-        Post(std::function<void()> runnable);
+        post(std::function<void()> runnable);
 
     protected:
         /**
-         * @brief Construct a new Dispatcher object.
+         * @brief Construct a new dispatcher object.
          * 
          * @param taskQueue 
          */
-        Dispatcher(TaskQueue &taskQueue);
+        dispatcher(task_queue &taskQueue);
 
     private:
-        TaskQueue &m_taskQueue;
+        task_queue &m_task_queue;
     };
 
 public:
     /**
      * @brief Signifies that the worker thread could not be started.
      */
-    struct CreationException : public std::exception {};
+    struct creation_exception : public std::exception {};
 
     /**
      * @brief Constructs the task queue and starts the worker thread. 
-     * Throws a CreationException if the thread couldn't be started.
+     * Throws a creation_exception if the thread couldn't be started.
      */
-    TaskQueue();
+    task_queue();
 
     /**
      * @brief Destroy the Task Queue object.
      */
-    ~TaskQueue();
+    ~task_queue();
 
     /**
      * @brief The action to apply to pending tasks.
      */
-    enum class PendingTaskAction {
-        Run,
-        Cancel,
+    enum class pending_task_action {
+        run,
+        cancel,
     };
 
     /**
      * @brief Halts operation of the queue.
      * 
-     * @param pendingTaskAction The desired action to take for pending tasks.
+     * @param pending_task_action The desired action to take for pending tasks.
      * Prior to destruction, all pending tasks will by run by default ('Run'),
      * or will be canceled ('Cancel').
      */
     void
-    Stop(PendingTaskAction pendingTaskAction = PendingTaskAction::Run) noexcept;
+    stop(pending_task_action pending_task_action = pending_task_action::run) noexcept;
 
     /**
      * @brief Stops the worker thread and waits for completion of all pending
      * queue tasks.
      */
     void
-    StopAndWaitForTaskCompletion();
+    stop_and_wait_for_task_completion();
 
     /**
-     * @brief Get the Dispatcher object.
+     * @brief Get the dispatcher object.
      * 
-     * @return std::shared_ptr<Dispatcher> 
+     * @return std::shared_ptr<dispatcher> 
      */
-    std::shared_ptr<Dispatcher>
-    GetDispatcher() const noexcept;
+    std::shared_ptr<dispatcher>
+    get_dispatcher() const noexcept;
 
 private:
     /**
      * @brief Handler function run by the queue processing thread.
      */
     void
-    ProcessQueue();
+    process_queue();
 
     /**
      * @brief Indicates whether the queue processing thread should exit.
      * 
-     * The m_runnablesChangedGate mutex must be held when calling this function.
+     * The m_runnables_changed_gate mutex must be held when calling this function.
      * 
      * @return true 
      * @return false 
      */
     bool
-    ShouldQueueExit() const noexcept;
+    should_queue_exit() const noexcept;
 
     /**
      * @brief Indicates if stopping the queue is pending.
      * 
      * This does *not* indicate whether the worker thread should stop. For that,
-     * call @ref ShouldQueueExit().
+     * call @ref should_queue_exit().
      * 
-     * The m_runnablesChangedGate mutex must be held when calling this function.
+     * The m_runnables_changed_gate mutex must be held when calling this function.
      * 
      * @return true 
      * @return false 
      */
     bool
-    IsStopPending() const noexcept;
+    is_stop_pending() const noexcept;
 
     /**
-     * @brief The Dispatcher calls this function to post a std::function<void()>
+     * @brief The dispatcher calls this function to post a std::function<void()>
      * onto the back of the queue.
      * 
      * @param runnable
      * @return std::future<void> 
      */
     std::future<void>
-    Post(std::function<void()> runnable);
+    post(std::function<void()> runnable);
 
     /**
      * @brief Helper to track state of the queue.
      */
-    enum class State {
-        Running,
-        Stopping,
-        Canceling,
-        Stopped,
+    enum class state {
+        running,
+        stopping,
+        canceling,
+        stopped,
     };
 
 private:
     std::thread m_thread;
-    std::shared_ptr<Dispatcher> m_dispatcher;
+    std::shared_ptr<dispatcher> m_dispatcher;
 
-    std::mutex m_runnablesChangedGate;
-    // Access to the below variables must be synchronized with m_runnablesChangedGate.
+    std::mutex m_runnables_changed_gate;
+    // Access to the below variables must be synchronized with m_runnables_changed_gate.
     std::queue<std::packaged_task<void()>> m_runnables;
-    std::condition_variable m_runnablesChanged;
-    State m_state{ State::Stopped };
+    std::condition_variable m_runnables_changed;
+    state m_state{ state::stopped };
 };
 
 } // namespace notstd

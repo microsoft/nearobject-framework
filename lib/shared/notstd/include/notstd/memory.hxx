@@ -8,7 +8,7 @@ namespace notstd
  * @brief Enables use of std::make_unique and std::make_shared for types with
  * protected constructors.
  *
- * This is achieved by sub-classing from the base type (T). Since this type
+ * This is achieved by sub-classing from the base type (BaseT). Since this type
  * derives from the base, it can access all protected members, including the
  * constructor. Thus, the internals of std::make_<unique|shared> can invoke
  * the protected constructor.
@@ -20,12 +20,12 @@ namespace notstd
  * @tparam T The type to allow std::make_unique or std::make_shared access to
  * the protected constructor.
  */
-template<typename T>
-struct enable_make_protected : public T
+template<typename BaseT>
+struct enable_make_protected : public BaseT
 {
     template<typename... TArgs>
     explicit enable_make_protected(TArgs&&... args) :
-        T(std::forward<TArgs>(args)...)
+        BaseT(std::forward<TArgs>(args)...)
     {}
 };
 

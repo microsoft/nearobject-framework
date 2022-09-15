@@ -195,7 +195,7 @@ private:
     mutable std::mutex m_nearObjectsGate;
     std::vector<std::shared_ptr<NearObject>> m_nearObjects;
 
-    notstd::TaskQueue m_taskQueue;
+    notstd::task_queue m_taskQueue;
 };
 
 } // namespace nearobject

@@ -25,7 +25,7 @@ enum class TaskState {
 
 /**
  * @brief Helper class to verify correct execution of runnable tasks from a
- * TaskQueue.
+ * task_queue.
  */
 struct RunnableTask {
     explicit RunnableTask(int valueExpected) : 
@@ -42,49 +42,49 @@ struct RunnableTask {
 
 TEST_CASE("task queue can be created", "[notstd][shared][utility]")
 {
-    using notstd::TaskQueue;
+    using notstd::task_queue;
 
     SECTION("creation doesn't cause a crash")
     {
-        REQUIRE_NOTHROW(std::make_unique<TaskQueue>());
+        REQUIRE_NOTHROW(std::make_unique<task_queue>());
     }
 }
 
 TEST_CASE("task queue can be destroyed", "[notstd][shared][utility]")
 {
-    using notstd::TaskQueue;
+    using notstd::task_queue;
 
     SECTION("destruction doesn't cause a crash")
     {
-        auto taskQueue = std::make_unique<TaskQueue>();
-        REQUIRE_NOTHROW(taskQueue->~TaskQueue());
+        auto taskQueue = std::make_unique<task_queue>();
+        REQUIRE_NOTHROW(taskQueue->~task_queue());
         taskQueue.release();
     }
 }
 
 TEST_CASE("task queue dispatcher posts tasks without causing a crash", "[notstd][shared][utility]")
 {
-    using notstd::TaskQueue;
+    using notstd::task_queue;
 
     SECTION("dispatcher can be obtained after creation and is valid")
     {
-        TaskQueue taskQueue{};
-        std::shared_ptr<TaskQueue::Dispatcher> dispatcher = nullptr;;
-        REQUIRE_NOTHROW(dispatcher = taskQueue.GetDispatcher());
+        task_queue taskQueue{};
+        std::shared_ptr<task_queue::dispatcher> dispatcher = nullptr;;
+        REQUIRE_NOTHROW(dispatcher = taskQueue.get_dispatcher());
         REQUIRE(dispatcher != nullptr);
     }
 
     SECTION("dispatcher can be obtained after posting one (1) task")
     {
-        TaskQueue taskQueue{};
-        TaskQueue::Dispatcher *dispatcherPointer = nullptr;
+        task_queue taskQueue{};
+        task_queue::dispatcher *dispatcherPointer = nullptr;
 
         {   // Obtain dispatcher, post a task, then allow the dispatcher to be
             // destroyed at end-of-scope.
-            auto dispatcher = taskQueue.GetDispatcher();
+            auto dispatcher = taskQueue.get_dispatcher();
             REQUIRE(dispatcher != nullptr);
             dispatcherPointer = dispatcher.get();
-            dispatcher->Post([]{});
+            dispatcher->post([]{});
         }
 
         {   // Obtain the dispatcher and ensure it is the same as the original
@@ -92,10 +92,10 @@ TEST_CASE("task queue dispatcher posts tasks without causing a crash", "[notstd]
             // that the dispatcher object lives indefinitely within the task
             // queue, which doesn't have to be the case (eg. the queue could
             // create the dispatcher on-demand).
-            auto dispatcher = taskQueue.GetDispatcher();
+            auto dispatcher = taskQueue.get_dispatcher();
             REQUIRE(dispatcher != nullptr);
             REQUIRE(dispatcherPointer == dispatcher.get());
-            dispatcher->Post([]{});
+            dispatcher->post([]{});
         }
     }
 
@@ -103,12 +103,12 @@ TEST_CASE("task queue dispatcher posts tasks without causing a crash", "[notstd]
     {
         static constexpr std::size_t numPosts = 10;
 
-        TaskQueue taskQueue{};
-        std::shared_ptr<TaskQueue::Dispatcher> dispatcher{};
+        task_queue taskQueue{};
+        std::shared_ptr<task_queue::dispatcher> dispatcher{};
 
         for (std::size_t i = 0; i < numPosts; i++) {
-            REQUIRE_NOTHROW(dispatcher = taskQueue.GetDispatcher());
-            REQUIRE_NOTHROW(dispatcher->Post([]{}));
+            REQUIRE_NOTHROW(dispatcher = taskQueue.get_dispatcher());
+            REQUIRE_NOTHROW(dispatcher->post([]{}));
         }
     }
 
@@ -116,43 +116,43 @@ TEST_CASE("task queue dispatcher posts tasks without causing a crash", "[notstd]
     {
         static constexpr std::size_t numPosts = 10;
 
-        TaskQueue taskQueue{};
-        auto dispatcher = taskQueue.GetDispatcher();
+        task_queue taskQueue{};
+        auto dispatcher = taskQueue.get_dispatcher();
 
         for (std::size_t i = 0; i < numPosts; i++) {
-            REQUIRE_NOTHROW(dispatcher->Post([]{}));
+            REQUIRE_NOTHROW(dispatcher->post([]{}));
         }
     }
 }
 
 TEST_CASE("task queue dispatcher posts tasks correctly", "[notstd][shared][utility]")
 {
-    using notstd::TaskQueue;
+    using notstd::task_queue;
 
     SECTION("dispatcher can post single task without causing a crash")
     {
-        REQUIRE_NOTHROW(TaskQueue{}.GetDispatcher()->Post([]{}));
+        REQUIRE_NOTHROW(task_queue{}.get_dispatcher()->post([]{}));
     }
 
     SECTION("post result returns a valid future")
     {
-        TaskQueue taskQueue{};
-        auto taskFuture = taskQueue.GetDispatcher()->Post([]{});
+        task_queue taskQueue{};
+        auto taskFuture = taskQueue.get_dispatcher()->post([]{});
         REQUIRE(taskFuture.valid());
     }
 
     SECTION("post result can be waited on without causing a crash")
     {
-        TaskQueue taskQueue{};
-        auto taskFuture = taskQueue.GetDispatcher()->Post([]{});
+        task_queue taskQueue{};
+        auto taskFuture = taskQueue.get_dispatcher()->post([]{});
         REQUIRE(taskFuture.valid());
         REQUIRE_NOTHROW(taskFuture.wait_for(100ms));
     }
 
     SECTION("posted task is completed without causing a crash")
     {
-        TaskQueue taskQueue{};
-        auto taskFuture = taskQueue.GetDispatcher()->Post([]{});
+        task_queue taskQueue{};
+        auto taskFuture = taskQueue.get_dispatcher()->post([]{});
         REQUIRE(taskFuture.wait_for(100ms) == std::future_status::ready);
         REQUIRE_NOTHROW(taskFuture.get());
     }
@@ -162,9 +162,9 @@ TEST_CASE("task queue dispatcher posts tasks correctly", "[notstd][shared][utili
         static constexpr auto ValueInitial  = 50;
         static constexpr auto ValueExpected = 100;
 
-        TaskQueue taskQueue{};
+        task_queue taskQueue{};
         auto value = ValueInitial;
-        auto taskFuture = taskQueue.GetDispatcher()->Post([&value]{
+        auto taskFuture = taskQueue.get_dispatcher()->post([&value]{
             value = ValueExpected;
         });
 
@@ -175,11 +175,11 @@ TEST_CASE("task queue dispatcher posts tasks correctly", "[notstd][shared][utili
 
 TEST_CASE("task queue executes tasks serially", "[notstd][shared][utility][serial]")
 {
-    using notstd::TaskQueue;
+    using notstd::task_queue;
 
     const std::vector<int> TaskValuesExpected{ 1, 2, 3, 4, 5 };
 
-    TaskQueue taskQueue{};
+    task_queue taskQueue{};
     std::mutex valuesGate{};
     std::vector<int> taskValuesActual{};
     std::vector<std::future<void>> taskFutures{};
@@ -189,7 +189,7 @@ TEST_CASE("task queue executes tasks serially", "[notstd][shared][utility][seria
 
     // Push one task onto the queue for each value in the expected vector.
     for (const auto& value : TaskValuesExpected) {
-        taskFutures.emplace_back(taskQueue.GetDispatcher()->Post([&]{
+        taskFutures.emplace_back(taskQueue.get_dispatcher()->post([&]{
             std::unique_lock valuesLock{ valuesGate };
             taskValuesActual.push_back(value);
         }));
@@ -206,7 +206,7 @@ TEST_CASE("task queue executes tasks serially", "[notstd][shared][utility][seria
 
 TEST_CASE("task queue executes tasks in first-in-first-out (FIFO) order", "[notstd][shared][utility][order]")
 {
-    using notstd::TaskQueue;
+    using notstd::task_queue;
     using notstd::test::TaskState;
     using notstd::test::RunnableTask;
 
@@ -221,12 +221,12 @@ TEST_CASE("task queue executes tasks in first-in-first-out (FIFO) order", "[nots
     std::mutex taskCompletionGate;
     std::condition_variable taskCompletion;
 
-    TaskQueue taskQueue{};
-    auto dispatcher = taskQueue.GetDispatcher();
+    task_queue taskQueue{};
+    auto dispatcher = taskQueue.get_dispatcher();
 
     // Submit tasks to the queue, saving their futures.
     for (auto& taskVerifier : taskVerifiers) {
-        taskVerifier.Future = dispatcher->Post([&] {
+        taskVerifier.Future = dispatcher->post([&] {
             // Notify task has started.
             std::unique_lock taskCompletionLock{ taskCompletionGate };
             taskVerifier.State = TaskState::Started;
@@ -282,7 +282,7 @@ TEST_CASE("task queue executes tasks in first-in-first-out (FIFO) order", "[nots
 
 TEST_CASE("task queue can be explicitly stopped", "[notstd][shared][utility]")
 {
-    using notstd::TaskQueue;
+    using notstd::task_queue;
 
     static constexpr std::size_t NumTasksToRun = 5; 
 
@@ -292,25 +292,25 @@ TEST_CASE("task queue can be explicitly stopped", "[notstd][shared][utility]")
 
     SECTION("stopping queue prevents additional tasks from being enqueued")
     {
-        for (auto pendingTaskAction : { TaskQueue::PendingTaskAction::Run, TaskQueue::PendingTaskAction::Cancel }) {
-            TaskQueue taskQueue{};
-            taskQueue.Stop(pendingTaskAction);
-            REQUIRE_THROWS(taskQueue.GetDispatcher()->Post([]{}));
+        for (auto pendingTaskAction : { task_queue::pending_task_action::run, task_queue::pending_task_action::cancel }) {
+            task_queue taskQueue{};
+            taskQueue.stop(pendingTaskAction);
+            REQUIRE_THROWS(taskQueue.get_dispatcher()->post([]{}));
         }
     }
 
     SECTION("stopping queue executes all pending tasks by default")
     {
-        TaskQueue taskQueue{};
+        task_queue taskQueue{};
 
         // Push one task onto the queue for each value in the expected vector.
         for (std::size_t i = 0; i < NumTasksToRun; i++) {
-            taskFutures.emplace_back(taskQueue.GetDispatcher()->Post([&numTasksRan]{
+            taskFutures.emplace_back(taskQueue.get_dispatcher()->post([&numTasksRan]{
                 numTasksRan++;
             }));
         }
 
-        taskQueue.Stop();
+        taskQueue.stop();
 
         // Ensure each task has completed.
         for (auto& taskFuture : taskFutures) {
@@ -324,10 +324,10 @@ TEST_CASE("task queue can be explicitly stopped", "[notstd][shared][utility]")
     SECTION("stopping queue cancels all pending tasks when requested")
     {
         {
-            TaskQueue taskQueue{};
-            auto dispatcher = taskQueue.GetDispatcher();
+            task_queue taskQueue{};
+            auto dispatcher = taskQueue.get_dispatcher();
 
-            taskFutures.emplace_back(dispatcher->Post([&]{
+            taskFutures.emplace_back(dispatcher->post([&]{
                 numTasksRan++;
 
                 // Recursively enqueue a bunch of new tasks. Since this is
@@ -339,14 +339,14 @@ TEST_CASE("task queue can be explicitly stopped", "[notstd][shared][utility]")
                 // however, it is currently the best method available to test
                 // this functionality.
                 for (const auto i : {1,2,3,4,5,6,7,8,9}) {
-                    taskFutures.emplace_back(dispatcher->Post([&]{
+                    taskFutures.emplace_back(dispatcher->post([&]{
                         numTasksRan++;
                     }));
                 }
 
                 // Now that a bunch of tasks have been enqueued, call Stop() to
                 // cancel those pending tasks.
-                taskQueue.Stop(TaskQueue::PendingTaskAction::Cancel);
+                taskQueue.stop(task_queue::pending_task_action::cancel);
             }));
 
             // Give the queue a small amount of time to execute the first task.

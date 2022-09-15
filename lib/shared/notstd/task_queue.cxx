@@ -6,30 +6,30 @@
 using namespace notstd;
 
 std::future<void>
-TaskQueue::Dispatcher::Post(std::function<void()> runnable)
+task_queue::dispatcher::post(std::function<void()> runnable)
 {
-    return m_taskQueue.Post(std::move(runnable));
+    return m_task_queue.post(std::move(runnable));
 }
 
-TaskQueue::Dispatcher::Dispatcher(TaskQueue &taskQueue) :
-    m_taskQueue(taskQueue)
+task_queue::dispatcher::dispatcher(task_queue &task_queue) :
+    m_task_queue(task_queue)
 {}
 
-TaskQueue::TaskQueue() :
-    m_dispatcher(std::make_shared<notstd::enable_make_protected<Dispatcher>>(*this))
+task_queue::task_queue() :
+    m_dispatcher(std::make_shared<notstd::enable_make_protected<dispatcher>>(*this))
 {
     try {
-        m_thread = std::thread(&TaskQueue::ProcessQueue, this);
-        m_state = State::Running;
+        m_thread = std::thread(&task_queue::process_queue, this);
+        m_state = state::running;
     } catch (...) {
-        throw TaskQueue::CreationException();
+        throw task_queue::creation_exception();
     }
 }
 
-TaskQueue::~TaskQueue()
+task_queue::~task_queue()
 {
     try {
-        StopAndWaitForTaskCompletion();
+        stop_and_wait_for_task_completion();
     } catch (...) {
         // TODO: this object is being destroyed, but an exception could have
         // propagated from the worker thread. The caller may want to know about
@@ -38,35 +38,35 @@ TaskQueue::~TaskQueue()
     }
 }
 
-std::shared_ptr<TaskQueue::Dispatcher>
-TaskQueue::GetDispatcher() const noexcept
+std::shared_ptr<task_queue::dispatcher>
+task_queue::get_dispatcher() const noexcept
 {
     return m_dispatcher;
 }
 
 void
-TaskQueue::Stop(PendingTaskAction pendingTaskAction) noexcept
+task_queue::stop(pending_task_action pending_task_action) noexcept
 {
     {
-        std::scoped_lock runnablesChangedLock{ m_runnablesChangedGate };
+        std::scoped_lock runnables_changed_lock{ m_runnables_changed_gate };
 
-        switch (pendingTaskAction) {
-        case PendingTaskAction::Cancel:
-            m_state = State::Canceling;
+        switch (pending_task_action) {
+        case pending_task_action::cancel:
+            m_state = state::canceling;
             break;
         default:
-            m_state = State::Stopping;
+            m_state = state::stopping;
             break;
         }
     }
 
-    m_runnablesChanged.notify_all();
+    m_runnables_changed.notify_all();
 }
 
 void
-TaskQueue::StopAndWaitForTaskCompletion()
+task_queue::stop_and_wait_for_task_completion()
 {
-    Stop();
+    stop();
 
     if (m_thread.joinable()) {
         try {
@@ -79,57 +79,57 @@ TaskQueue::StopAndWaitForTaskCompletion()
 }
 
 bool
-TaskQueue::ShouldQueueExit() const noexcept
+task_queue::should_queue_exit() const noexcept
 {
-    bool shouldExit = false;
+    bool should_exit = false;
 
     // Exit if abort is requested, or if stopping and the queue has been drained.
     switch (m_state) {
-    case State::Stopping:
-        shouldExit = m_runnables.empty();
+    case state::stopping:
+        should_exit = m_runnables.empty();
         break;
-    case State::Canceling:
-        shouldExit = true;
+    case state::canceling:
+        should_exit = true;
         break;
     default:
-        shouldExit = false;
+        should_exit = false;
         break;
     }
 
-    return shouldExit;
+    return should_exit;
 }
 
 bool
-TaskQueue::IsStopPending() const noexcept
+task_queue::is_stop_pending() const noexcept
 {
-    bool isStopPending = false;
+    bool is_stop_pending = false;
 
     switch (m_state) {
-    case State::Stopping:
-    case State::Canceling:
-        isStopPending = true;
+    case state::stopping:
+    case state::canceling:
+        is_stop_pending = true;
         break;
     default:
-        isStopPending = false;
+        is_stop_pending = false;
         break;
     }
 
-    return isStopPending;
+    return is_stop_pending;
 }
  
 void
-TaskQueue::ProcessQueue()
+task_queue::process_queue()
 {
     for (;;) {
-        std::unique_lock runnablesChangedLock{ m_runnablesChangedGate };
+        std::unique_lock runnables_changed_lock{ m_runnables_changed_gate };
 
         // Wait for non-empty queue or if exit requested.
-        m_runnablesChanged.wait(runnablesChangedLock, [&]() {
-            return !m_runnables.empty() || ShouldQueueExit();
+        m_runnables_changed.wait(runnables_changed_lock, [&]() {
+            return !m_runnables.empty() || should_queue_exit();
         });
 
         // Check exit condition in case requested while waiting.
-        if (ShouldQueueExit()) {
+        if (should_queue_exit()) {
             break;
         }
 
@@ -144,10 +144,10 @@ TaskQueue::ProcessQueue()
         // acquire the lock once for each task. This sacrifices latency in
         // aborting the queue, which is assumed to be a rare scenario that can
         // sustain the performance penalty.
-        runnablesChangedLock.unlock();
+        runnables_changed_lock.unlock();
 
         // Notify waiters since the queue has been modified (now empty).
-        m_runnablesChanged.notify_all();
+        m_runnables_changed.notify_all();
 
         // Run all the pending tasks.
         while (!tasks.empty()) {
@@ -161,24 +161,24 @@ TaskQueue::ProcessQueue()
 }
 
 std::future<void>
-TaskQueue::Post(std::function<void()> runnable)
+task_queue::post(std::function<void()> runnable)
 {
     auto task = std::packaged_task<void()>(std::move(runnable));
     auto future = task.get_future();
-    bool wasEmpty = false;
+    bool was_empty = false;
 
     {
-        std::lock_guard runnablesChangedLock{ m_runnablesChangedGate };
-        if (IsStopPending()) {
+        std::lock_guard runnables_changed_lock{ m_runnables_changed_gate };
+        if (is_stop_pending()) {
             throw std::runtime_error("attempt to post to queue in stopping state, this is a bug!");
         }
 
-        wasEmpty = m_runnables.empty();
+        was_empty = m_runnables.empty();
         m_runnables.push(std::move(task));
     }
 
-    if (wasEmpty) {
-        m_runnablesChanged.notify_all();
+    if (was_empty) {
+        m_runnables_changed.notify_all();
     }
 
     return future;

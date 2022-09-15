@@ -30,7 +30,7 @@ NearObjectSession::GetCapabilities() const noexcept
 void
 NearObjectSession::InvokeEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor)
 {
-    auto dispatcher = m_taskQueue.GetDispatcher();
+    auto dispatcher = m_taskQueue.get_dispatcher();
 
     auto const task = [this, executor]() {
         const auto eventCallbacks = m_eventCallbacks.lock();
@@ -40,7 +40,7 @@ NearObjectSession::InvokeEventCallback(const std::function<void(NearObjectSessio
         executor(*eventCallbacks);
     };
 
-    dispatcher->Post(std::move(task));
+    dispatcher->post(std::move(task));
 }
 
 void
