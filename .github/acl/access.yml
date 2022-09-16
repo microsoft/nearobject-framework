@@ -9,3 +9,9 @@ configuration:
   manageAccess:
   - team: nofmaintainers
     role: Maintain
+  - team: noftriage
+    role: Triage
+  - team: nofcontributors
+    role: Push
+  - team: nofreaders
+    role: Pull
