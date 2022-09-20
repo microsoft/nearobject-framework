@@ -6,9 +6,8 @@
 
 #include <cstddef>
 #include <memory>
+#include <span>
 #include <vector>
-
-#include <gsl/span>
 
 namespace encoding
 {
@@ -34,7 +33,7 @@ public:
      * @return ParseResult The result of the parsing operation.
      */
     static ParseResult
-    Parse(TlvSimple **tlvOutput, const gsl::span<std::byte> &data);
+    Parse(TlvSimple **tlvOutput, const std::span<std::byte> &data);
 };
 
 } // namespace encoding

@@ -7,13 +7,13 @@ TlvSimple::TlvSimple(std::byte tag, std::vector<std::byte> value) :
     m_tag(1, tag),
     m_value(std::move(value))
 {
-    Tlv::Tag = gsl::span(m_tag);
-    Tlv::Value = gsl::span(m_value);
+    Tlv::Tag = std::span(m_tag);
+    Tlv::Value = std::span(m_value);
 }
 
 /* static */
 Tlv::ParseResult
-TlvSimple::Parse(TlvSimple **tlvOutput, const gsl::span<std::byte> &data)
+TlvSimple::Parse(TlvSimple **tlvOutput, const std::span<std::byte> &data)
 {
     Tlv::ParseResult parseResult = Tlv::ParseResult::Failed;
     if (!tlvOutput) {

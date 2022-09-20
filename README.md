@@ -6,7 +6,7 @@ This project is a framework for interacting with short-range devices, providing 
 
 This project is organized to allow development both in the internal Windows build environment (razzle) and outside of it, for example, using other build systems and/or on alternate operating systems. Hence, build configuration is included for both NTBuild (`build.exe`) and [CMake](https://cmake.org/). Consequently, there is an OS-independent source tree `lib`, and OS-dependent source trees `windows`, `linux`, etc..
 
-Note that all language feature configuration is constrained by the Windows build system since it is the most limiting factor. As such, the current C++ language version being used is C++ 20. To fill in the gaps to newer C++ standards, the [Microsoft C++ Guidelines Support Library (GSL)](https://github.com/microsoft/GSL) is available to all CMake-based projects using the `GSL` link target, then including the headers as appropriate (eg. `#include <gsl/gsl.h>`). This provides implementations of post-C++17 features such as `std::span`, `narrow_cast`, etc..
+Note that all language feature configuration is constrained by the Windows build system since it is the most limiting factor. As such, the current C++ language version being used is C++ 20.
 
 ## Coding Guidelines
 

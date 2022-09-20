@@ -4,9 +4,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <span>
 #include <vector>
-
-#include <gsl/span>
 
 namespace smartcard
 {
@@ -24,9 +23,9 @@ public:
     P1() const;
     const std::byte
     P2() const;
-    gsl::span<std::byte>
+    std::span<std::byte>
     Data() const;
-    gsl::span<std::byte>
+    std::span<std::byte>
     Payload() const;
 
 public:
@@ -34,8 +33,8 @@ public:
     FromVector(const std::vector<std::byte>& buffer);
 
 private:
-    gsl::span<std::byte> m_dataView;
-    gsl::span<std::byte> m_payloadView;
+    std::span<std::byte> m_dataView;
+    std::span<std::byte> m_payloadView;
     std::vector<std::byte> m_payload;
 };
 

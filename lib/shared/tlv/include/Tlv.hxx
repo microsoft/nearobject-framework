@@ -4,17 +4,16 @@
 
 #include <cstddef>
 #include <memory>
+#include <span>
 #include <vector>
-
-#include <gsl/span>
 
 namespace encoding
 {
 class Tlv
 {
 public:
-    gsl::span<const std::byte> Tag;
-    gsl::span<const std::byte> Value;
+    std::span<const std::byte> Tag;
+    std::span<const std::byte> Value;
 
     /**
      * @brief Describes the result of parsing a Tlv
