@@ -18,9 +18,6 @@ include(CTest)
 include(FetchContent)
 
 # Pull in external dependencies.
-FetchContent_Declare(GSL URL https://github.com/microsoft/GSL/archive/refs/tags/v4.0.0.tar.gz)
-FetchContent_MakeAvailable(GSL)
-
 set(JSON_ImplicitConversions OFF)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
 FetchContent_MakeAvailable(json)
