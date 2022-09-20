@@ -6,7 +6,7 @@ This project is a framework for interacting with short-range devices, providing 
 
 This project is organized to allow development both in the internal Windows build environment (razzle) and outside of it, for example, using other build systems and/or on alternate operating systems. Hence, build configuration is included for both NTBuild (`build.exe`) and [CMake](https://cmake.org/). Consequently, there is an OS-independent source tree `lib`, and OS-dependent source trees `windows`, `linux`, etc..
 
-Note that all language feature configuration is constrained by the Windows build system since it is the most limiting factor. As such, the current C++ language version being used is C++ 17. To fill in the gaps to newer C++ standards, the [Microsoft C++ Guidelines Support Library (GSL)](https://github.com/microsoft/GSL) is available to all CMake-based projects using the `GSL` link target, then including the headers as appropriate (eg. `#include <gsl/gsl.h>`). This provides implementations of post-C++17 features such as `std::span`, `narrow_cast`, etc..
+Note that all language feature configuration is constrained by the Windows build system since it is the most limiting factor. As such, the current C++ language version being used is C++ 20.
 
 ## Coding Guidelines
 
@@ -39,11 +39,11 @@ To help keep the code consistent, please follow these general guidelines:
 Pre-requisites:
 
 * CMake version >= 3.11
-* C++ 17 Compiler
+* C++ 20 Compiler
 
 CMake may be installed in any form, as long as the version meets the minimum. One popular way of installing it on windows is to use [Chocolately](https://chocolatey.org/install) with `choco install -y cmake`. On Linux, all standard package managers provide a cmake package (eg. `apt-get install -y cmake`, `yum install -y cmake`, etc.).
 
-A C++ compiler supporting C++17 is needed. On Windows, [Visual Studio 2022](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Enterprise&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false) generally provides this, however, the full development environment is not needed. A much leaner alternative for those using other editors such as Visual Studio Code can instead install [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022). On Linux, g++ or llvm/clang are suitable.
+A C++ compiler supporting C++20 is needed. On Windows, [Visual Studio 2022](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Enterprise&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false) generally provides this, however, the full development environment is not needed. A much leaner alternative for those using other editors such as Visual Studio Code can instead install [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022). On Linux, g++ or llvm/clang are suitable.
 
 To bootstrap the build environment, instruct CMake to generate the build files. It is strongly recommended to do this in a directory that is separate from the source; this allows one to easily destroy and recreate the build environment without affecting the checked-out source and changes in progress. Typically, a new directory called `build` at the top-level project tree is used for this purpose:
 
