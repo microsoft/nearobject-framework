@@ -38,7 +38,7 @@ To help keep the code consistent, please follow these general guidelines:
 
 Pre-requisites:
 
-* CMake version >= 3.11
+* CMake version >= 3.12
 * C++ 20 Compiler
 
 CMake may be installed in any form, as long as the version meets the minimum. One popular way of installing it on windows is to use [Chocolately](https://chocolatey.org/install) with `choco install -y cmake`. On Linux, all standard package managers provide a cmake package (eg. `apt-get install -y cmake`, `yum install -y cmake`, etc.).
