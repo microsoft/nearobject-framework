@@ -9,9 +9,7 @@
 #include <nearobject/NearObjectProfile.hxx>
 #include <nearobject/persist/NearObjectProfilePersister.hxx>
 
-namespace nearobject
-{
-namespace persistence
+namespace nearobject::persistence
 {
 /**
  * @brief Common persistence path suffix to use across platforms.
@@ -58,7 +56,6 @@ struct NearObjectProfilePersisterFilesystem
 private:
     const std::filesystem::path m_persistFilepath;
 };
-} // namespace persistence
-} // namespace nearobject
+} // namespace nearobject::persistence
 
 #endif // NEAR_OBJECT_PROFILE_PERSISTER_FILESYSTEM

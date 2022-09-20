@@ -7,9 +7,7 @@
 #include <shared_mutex>
 #include <vector>
 
-namespace nearobject
-{
-namespace service
+namespace nearobject::service
 {
 class NearObjectDeviceController;
 class NearObjectDeviceControllerDiscoveryAgent;
@@ -137,7 +135,6 @@ private:
     std::vector<std::unique_ptr<NearObjectDeviceControllerDiscoveryAgent>> m_discoveryAgents;
 };
 
-} // namespace service
-} // namespace nearobject
+} // namespace nearobject::service
 
 #endif // NEAR_OBJECT_DEVICE_CONTROLLER_MANAGER_HXX

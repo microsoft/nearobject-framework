@@ -7,9 +7,7 @@
 #include <jsonify.hxx>
 #include <nearobject/NearObjectProfile.hxx>
 
-namespace nearobject
-{
-namespace persistence
+namespace nearobject::persistence
 {
 struct NearObjectProfilePersister
 {
@@ -33,7 +31,6 @@ struct NearObjectProfilePersister
     virtual std::vector<nearobject::NearObjectProfile>
     ReadPersistedProfiles(persist::PersistResult& persistResult) = 0;
 };
-} // namespace persistence
-} // namespace nearobject
+} // namespace nearobject::persistence
 
 #endif // NEAR_OBJECT_PROFILE_PERSISTER

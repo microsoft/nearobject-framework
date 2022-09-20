@@ -6,9 +6,7 @@
 
 #include <nearobject/service/NearObjectServiceInjector.hxx>
 
-namespace nearobject
-{
-namespace service
+namespace nearobject::service
 {
 class NearObjectDeviceControllerManager;
 class NearObjectProfileManager;
@@ -67,7 +65,6 @@ protected:
      */
     explicit NearObjectService(NearObjectServiceInjector injector);
 };
-} // namespace service
-} // namespace nearobject
+} // namespace nearobject::service
 
 #endif // NEAR_OBJECT_SERVICE_HXX

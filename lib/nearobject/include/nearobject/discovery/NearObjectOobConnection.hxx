@@ -2,15 +2,12 @@
 #ifndef NEAR_OBJECT_OOB_CONNECTION_HXX
 #define NEAR_OBJECT_OOB_CONNECTION_HXX
 
-namespace nearobject
-{
-namespace discovery
+namespace nearobject::discovery
 {
 class NearObjectOobConnection
 {
 };
 
-} // namespace discovery
-} // namespace nearobject
+} // namespace nearobject::discovery
 
 #endif // NEAR_OBJECT_OOB_CONNECTION_HXX

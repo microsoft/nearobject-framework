@@ -12,9 +12,7 @@
 #include <nearobject/NearObjectProfile.hxx>
 #include <nearobject/persist/NearObjectProfilePersister.hxx>
 
-namespace nearobject
-{
-namespace service
+namespace nearobject::service
 {
 class NearObjectProfileManager
 {
@@ -97,7 +95,6 @@ private:
     const std::unique_ptr<persistence::NearObjectProfilePersister> m_persister;
 };
 
-} // namespace service
-} // namespace nearobject
+} // namespace nearobject::service
 
 #endif // NEAR_OBJECT_PROFILE_MANAGER_HXX

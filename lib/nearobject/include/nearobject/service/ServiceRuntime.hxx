@@ -9,9 +9,7 @@
 #include <thread>
 #include <vector>
 
-namespace nearobject
-{
-namespace service
+namespace nearobject::service
 {
 struct NearObjectService;
 
@@ -43,7 +41,6 @@ private:
     std::shared_ptr<NearObjectService> m_service;
 };
 
-} // namespace service
-} // namespace nearobject
+} // namespace nearobject::service
 
 #endif // SERVICE_RUNTIME_HXX

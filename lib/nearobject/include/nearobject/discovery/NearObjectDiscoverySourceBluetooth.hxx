@@ -4,9 +4,7 @@
 
 #include "NearObjectDiscoverySource.hxx"
 
-namespace nearobject
-{
-namespace discovery
+namespace nearobject::discovery
 {
 class NearObjectDiscoverySourceBluetooth :
     public NearObjectDiscoverySource
@@ -16,7 +14,6 @@ public:
     EstablishConnectionImpl() override;
 };
 
-} // namespace discovery
-} // namespace nearobject
+} // namespace nearobject::discovery
 
 #endif // NEAR_OBJECT_DISCOVERY_SOURCE_BLUETOOTH_HXX
