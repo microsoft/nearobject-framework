@@ -7,9 +7,7 @@
 #include <mutex>
 #include <vector>
 
-namespace nearobject
-{
-namespace discovery
+namespace nearobject::discovery
 {
 class NearObjectDiscoveryService
 {
@@ -22,7 +20,6 @@ private:
     std::vector<std::unique_ptr<NearObjectDiscoverySource>> m_discoverySources{};
 };
 
-} // namespace discovery
-} // namespace nearobject
+} // namespace nearobject::discovery
 
 #endif // NEAR_OBJECT_DISCOVERY_SERVICE_HXX

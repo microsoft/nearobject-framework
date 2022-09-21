@@ -11,6 +11,8 @@
 
 using namespace nearobject::service;
 
+NearObjectDeviceControllerManager::NearObjectDeviceControllerManager() = default;
+
 std::shared_ptr<NearObjectDeviceControllerManager>
 NearObjectDeviceControllerManager::Create()
 {

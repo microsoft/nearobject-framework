@@ -1,6 +1,7 @@
 
 add_library(nearobject-service STATIC "")
 
+set(NO_SERVICE_DIR_PUBLIC_INCLUDE ${NO_DIR_PUBLIC_INCLUDE})
 set(NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/service)
 
 target_sources(nearobject-service
@@ -26,6 +27,11 @@ target_sources(nearobject-service
         ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/SecureDevice.hxx
         ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/SecureDeviceChannel.hxx
         ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/ServiceRuntime.hxx
+)
+
+target_include_directories(nearobject-service
+    PUBLIC
+        ${NO_SERVICE_DIR_PUBLIC_INCLUDE}
 )
 
 target_link_libraries(nearobject-service

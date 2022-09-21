@@ -6,9 +6,7 @@
 
 #include <memory>
 
-namespace nearobject
-{
-namespace discovery
+namespace nearobject::discovery
 {
 class NearObjectDiscoverySource
 {
@@ -23,7 +21,6 @@ private:
     EstablishConnectionImpl() = 0;
 };
 
-} // namespace discovery
-} // namespace nearobject
+} // namespace nearobject::discovery
 
 #endif // NEAR_OBJECT_DISCOVERY_SOURCE_HXX

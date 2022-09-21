@@ -2,13 +2,7 @@
 #ifndef DEVICE_STATE_HXX
 #define DEVICE_STATE_HXX
 
-namespace nearobject
-{
-namespace protocol
-{
-namespace fira
-{
-namespace uci
+namespace nearobject::protocol::fira::uci
 {
 /**
  * @brief See FiRa Consortium - UCI Generic Specification v1.1.0, Section 5.
@@ -19,9 +13,6 @@ enum class DeviceState {
     Error,
 };
 
-} // namespace uci
-} // namespace fira
-} // namespace protocol
-} // namespace nearobject
+} // namespace nearobject::protocol::fira::uci
 
 #endif // DEVICE_STATE_HXX

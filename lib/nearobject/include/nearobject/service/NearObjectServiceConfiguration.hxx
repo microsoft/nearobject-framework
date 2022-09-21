@@ -5,9 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace nearobject
-{
-namespace service
+namespace nearobject::service
 {
 /**
  * @brief Class to collect common service configuration.
@@ -48,7 +46,6 @@ struct NearObjectServiceConfiguration
      */
     bool VerboseLogging{ false };
 };
-} // namespace service
-} // namespace nearobject
+} // namespace nearobject::service
 
 #endif // NEAR_OBJECT_SERVICE_CONFIGURATION

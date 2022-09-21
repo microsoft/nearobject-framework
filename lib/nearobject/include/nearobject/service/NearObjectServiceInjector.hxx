@@ -7,9 +7,7 @@
 #include <nearobject/service/NearObjectDeviceControllerManager.hxx>
 #include <nearobject/service/NearObjectProfileManager.hxx>
 
-namespace nearobject
-{
-namespace service
+namespace nearobject::service
 {
 /**
  * @brief NearObjectService dependency injector.
@@ -19,7 +17,6 @@ struct NearObjectServiceInjector
     std::shared_ptr<NearObjectProfileManager> ProfileManager;
     std::shared_ptr<NearObjectDeviceControllerManager> DeviceManager;
 };
-} // namespace service
-} // namespace nearobject
+} // namespace nearobject::service
 
 #endif // NEAR_OBJECT_SERVICE_INJECTOR_HXX

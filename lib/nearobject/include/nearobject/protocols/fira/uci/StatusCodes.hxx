@@ -4,13 +4,7 @@
 
 #include <cstdint>
 
-namespace nearobject
-{
-namespace protocol
-{
-namespace fira
-{
-namespace uci
+namespace nearobject::protocol::fira::uci
 {
 enum class StatusCode : uint8_t {
     // Generic Status Codes
@@ -54,9 +48,6 @@ enum class StatusCode : uint8_t {
     // Vendor Specific = 0x50-0xFF
 };
 
-} // namespace uci
-} // namespace fira
-} // namespace protocol
-} // namespace nearobject
+} // namespace nearobject::protocol::fira::uci
 
 #endif // STATUS_CODES_HXX

@@ -2,9 +2,7 @@
 #ifndef SECURE_DEVICE_CHANNEL_HXX
 #define SECURE_DEVICE_CHANNEL_HXX
 
-namespace nearobject
-{
-namespace service
+namespace nearobject::service
 {
 struct SecureDeviceChannelParameters
 {
@@ -14,7 +12,6 @@ class SecureDeviceChannel
 {
 };
 
-} // namespace service
-} // namespace nearobject
+} // namespace nearobject::service
 
 #endif // SECURE_DEVICE_CHANNEL_HXX

@@ -20,7 +20,6 @@ target_include_directories(smartcard
 
 target_link_libraries(smartcard
     PUBLIC
-        GSL
         tlv
 )
 

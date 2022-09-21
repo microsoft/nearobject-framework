@@ -18,9 +18,4 @@ target_include_directories(tlv
         ${TLV_DIR_PUBLIC_INCLUDE}
 )
 
-target_link_libraries(tlv
-    PUBLIC 
-        GSL
-)
-
 set_target_properties(tlv PROPERTIES FOLDER lib/shared/tlv)

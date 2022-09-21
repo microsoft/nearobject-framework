@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.12)
 
 project(nearobject-framework LANGUAGES CXX)
 
@@ -6,7 +6,7 @@ project(nearobject-framework LANGUAGES CXX)
 # common denominator for all the OS-dependent projects. In practice, since this
 # project must build under the Windows build system (build.exe), its toolchain
 # is typically the limiting factor.
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -18,9 +18,6 @@ include(CTest)
 include(FetchContent)
 
 # Pull in external dependencies.
-FetchContent_Declare(GSL URL https://github.com/microsoft/GSL/archive/refs/tags/v4.0.0.tar.gz)
-FetchContent_MakeAvailable(GSL)
-
 set(JSON_ImplicitConversions OFF)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
 FetchContent_MakeAvailable(json)

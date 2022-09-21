@@ -8,9 +8,7 @@
 #include <memory>
 #include <shared_mutex>
 
-namespace nearobject
-{
-namespace service
+namespace nearobject::service
 {
 class NearObjectDeviceController;
 
@@ -121,7 +119,7 @@ private:
     mutable std::shared_mutex m_onDevicePresenceChangedGate;
     std::function<void(NearObjectDevicePresence presence, std::shared_ptr<NearObjectDeviceController> deviceChanged)> m_onDevicePresenceChanged;
 };
-} // namespace service
-} // namespace nearobject
+
+} // namespace nearobject::service
 
 #endif // NEAR_OBJECT_DEVICE_CONTROLLER_DISCOVERY_AGENT_HXX

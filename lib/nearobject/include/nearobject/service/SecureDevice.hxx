@@ -4,9 +4,7 @@
 
 #include <nearobject/service/SecureDeviceChannel.hxx>
 
-namespace nearobject
-{
-namespace service
+namespace nearobject::service
 {
 class SecureDevice
 {
@@ -21,7 +19,6 @@ private:
         CreateChannelImpl(SecureDeviceChannelParameters) = 0;
 };
 
-} // namespace service
-} // namespace nearobject
+} // namespace nearobject::service
 
 #endif // SECURE_DEVICE_HXX

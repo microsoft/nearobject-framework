@@ -7,9 +7,7 @@
 #include <shared_mutex>
 #include <vector>
 
-namespace nearobject
-{
-namespace service
+namespace nearobject::service
 {
 class NearObjectDeviceController;
 class NearObjectDeviceControllerDiscoveryAgent;
@@ -78,11 +76,28 @@ public:
     std::vector<std::weak_ptr<NearObjectDeviceController>>
     GetAllDevices() const;
 
+    ~NearObjectDeviceControllerManager() = default;
+    NearObjectDeviceControllerManager(const NearObjectDeviceControllerManager&) = delete;
+    NearObjectDeviceControllerManager(NearObjectDeviceControllerManager&&) = delete;
+    NearObjectDeviceControllerManager& operator=(NearObjectDeviceControllerManager&) = delete;
+    NearObjectDeviceControllerManager& operator=(NearObjectDeviceControllerManager&&) = delete;
+
 protected:
     /**
-     * @brief Construct a new NearObjectDeviceControllerManager object.
+     * @brief Default constructor.
+     * 
+     * It's intentional that this is *declared* here and default-implemented
+     * in the source file. This is required because NearObjectDeviceController
+     * and NearObjectDeviceControllerDiscoveryAgent are used as incomplete
+     * types with std::unique_ptr and std::shared_ptr. In case an exception is
+     * thrown in the constructor, their destructors may be called, and the
+     * wrapped type must be complete at that time. As such, defining the
+     * constructor implementation as default here would require the type to be
+     * complete, which is impossible due to the forward declaration.
+     * Consequently, the = default implementation is done in the source file
+     * instead.
      */
-    NearObjectDeviceControllerManager() = default;
+    NearObjectDeviceControllerManager();
 
 private:
     /**
@@ -117,10 +132,9 @@ private:
     std::vector<std::shared_ptr<NearObjectDeviceController>> m_nearObjectDevices{};
 
     mutable std::shared_mutex m_discoveryAgentsGate;
-    std::vector<std::unique_ptr<NearObjectDeviceControllerDiscoveryAgent>> m_discoveryAgents{};
+    std::vector<std::unique_ptr<NearObjectDeviceControllerDiscoveryAgent>> m_discoveryAgents;
 };
 
-} // namespace service
-} // namespace nearobject
+} // namespace nearobject::service
 
 #endif // NEAR_OBJECT_DEVICE_CONTROLLER_MANAGER_HXX
