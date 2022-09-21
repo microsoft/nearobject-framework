@@ -16,8 +16,6 @@ target_sources(nearobject-proto-fira-uci
 )
 
 target_include_directories(nearobject-proto-fira-uci
-    PRIVATE
-        ${NO_PROT_FIRA_UCI_DIR_PUBLIC_INCLUDE_PREFIX}
     PUBLIC
         ${NO_PROT_FIRA_UCI_DIR_PUBLIC_INCLUDE}
 )

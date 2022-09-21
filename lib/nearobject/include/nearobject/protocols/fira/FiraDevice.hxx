@@ -2,11 +2,7 @@
 #ifndef FIRA_DEVICE_HXX
 #define FIRA_DEVICE_HXX
 
-namespace nearobject
-{
-namespace protocol
-{
-namespace fira
+namespace nearobject::protocol::fira
 {
 /**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
@@ -81,8 +77,6 @@ enum class BlockBasedMode {
     BlockStriding,
 };
 
-} // namespace fira
-} // namespace protocol
-} // namespace nearobject
+} // namespace nearobject::protocol::fira
 
 #endif // FIRA_DEVICE_HXX

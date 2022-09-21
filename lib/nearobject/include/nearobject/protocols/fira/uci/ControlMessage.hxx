@@ -2,21 +2,12 @@
 #ifndef CONTROL_MESSAGE_HXX
 #define CONTROL_MESSAGE_HXX
 
-namespace nearobject
-{
-namespace protocol
-{
-namespace fira
-{
-namespace uci
+namespace nearobject::protocol::fira::uci
 {
 struct ControlMessage
 {
 };
 
-} // namespace uci
-} // namespace fira
-} // namespace protocol
-} // namespace nearobject
+} // namespace nearobject::protocol::fira::uci
 
 #endif // CONTROL_MESSAGE_HXX
