@@ -261,9 +261,9 @@ TEST_CASE("GUID type can be used with STL containers", "[basic][shared][windows]
         std::vector<GUID> vectorOfGuids{ std::cbegin(test::Guids), std::cend(test::Guids) };
         for (const auto& guidToRemove : test::Guids) {
             const auto size = vectorOfGuids.size();
-            vectorOfGuids.erase(std::remove_if(std::begin(vectorOfGuids), std::end(vectorOfGuids), [&](const auto& guidToCheck) {
+            std::erase_if(vectorOfGuids, [&](const auto& guidToCheck) {
                 return (guidToCheck == guidToRemove);
-            }), std::end(vectorOfGuids));
+            });
             REQUIRE(vectorOfGuids.size() == size - 1);
         }
         REQUIRE(vectorOfGuids.empty());

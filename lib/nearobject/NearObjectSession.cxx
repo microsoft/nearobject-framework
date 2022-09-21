@@ -58,11 +58,11 @@ NearObjectSession::AddNearObjects(std::vector<std::shared_ptr<NearObject>> nearO
     // The original vector 'nearObjectsToAdd' is maintained such that it can be
     // passed to the membership changed callback later, alleviating making a
     // copy of these elements.
-    nearObjectsToAdd.erase(std::remove_if(std::begin(nearObjectsToAdd), std::end(nearObjectsToAdd), [&](const auto& nearObjectToAdd) {
-        return std::any_of(std::cbegin(m_nearObjects), std::cend(m_nearObjects), [&](const auto& nearObject) {
+    std::erase_if(nearObjectsToAdd, [&](const auto& nearObject) {
+        return std::any_of(std::cbegin(m_nearObjects), std::cend(m_nearObjects), [&](const auto& nearObjectToAdd) {
             return (*nearObject == *nearObjectToAdd);
         });
-    }), std::end(nearObjectsToAdd));
+    });
 
     // Add each near object from the pruned list to the existing near objects.
     m_nearObjects.insert(std::end(m_nearObjects), std::cbegin(nearObjectsToAdd), std::cend(nearObjectsToAdd));
