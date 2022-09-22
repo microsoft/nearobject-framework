@@ -12,6 +12,6 @@ configuration:
       requiresConversationResolution: true
       requiresStrictStatusChecks: true
       requiredStatusChecks: 
+      - build
+      - dependency-review
       - 'CodeQL'
-      # - 'Dependency Review'
-      # - 'Build Release [CMake]'
