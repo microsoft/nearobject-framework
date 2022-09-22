@@ -8,10 +8,10 @@ configuration:
   branchProtectionRules:
     - branchNamePattern: "main"
       requiredApprovingReviewsCount: 1
-  requireCodeOwnersReview: true
-  requiresConversationResolution: true
-  requiresStrictStatusChecks: true
-  requiredStatusChecks: 
-  - 'CodeQL'
-  - 'Dependency Review'
-  - 'Build Release [CMake]'
+      requireCodeOwnersReview: true
+      requiresConversationResolution: true
+      requiresStrictStatusChecks: true
+      requiredStatusChecks: 
+      - 'CodeQL'
+      - 'Dependency Review'
+      - 'Build Release [CMake]'
