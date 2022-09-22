@@ -22,7 +22,7 @@ jobs:
       shell: bash
       run: |
         if [ "$RUNNER_OS" == "Linux" ]; then
-          apt install -y g++-10
+          sudo apt install -y g++-10
         fi
 
     - name: Configure CMake
