@@ -34,16 +34,26 @@ To help keep the code consistent, please follow these general guidelines:
 
 ## Development Environment Setup
 
-### CMake
-
 Pre-requisites:
 
-* CMake version >= 3.12
 * C++ 20 Compiler
+* CMake version >= 3.12
 
-CMake may be installed in any form, as long as the version meets the minimum. One popular way of installing it on windows is to use [Chocolately](https://chocolatey.org/install) with `choco install -y cmake`. On Linux, all standard package managers provide a cmake package (eg. `apt-get install -y cmake`, `yum install -y cmake`, etc.).
+### Compiler
 
-A C++ compiler supporting C++20 is needed. On Windows, [Visual Studio 2022](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Enterprise&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false) generally provides this, however, the full development environment is not needed. A much leaner alternative for those using other editors such as Visual Studio Code can instead install [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022). On Linux, g++ or llvm/clang are suitable.
+Both a compiler and standard C++ library supporting C++20 are required. The C++ reference pages for [C++20 core language features](https://en.cppreference.com/w/cpp/compiler_support#cpp20) and [C++20 library features](https://en.cppreference.com/w/cpp/compiler_support#C.2B.2B20_library_features) provide complete details about current compiler and library support.
+
+#### Windows
+
+[Visual Studio 2022](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Enterprise&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false) generally satisfies the requirements, however, the full integrated development environment (IDE) is not needed. A much leaner alternative for those using other editors such as Visual Studio Code can instead install [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022). The build tools come with a C++ compatible compiler and standard library.
+
+#### Linux
+
+g++ or llvm/clang are suitable, however, some care must be taken to obtain a compatible standard library. A known, working environment is ubuntu 20.04 (focal) with LLVM 15.0.1 and the `libstdc++-10-dev` package. LLVM 15.0.1 can be installed using the [automatic installation script](https://apt.llvm.org/#llvmsh) and `libstdc++-10-dev` can be installed with `sudo apt-get install -y libstdc++-10-dev`.
+
+### CMake
+
+CMake may be installed in any form, as long as the version meets the minimum. One popular way of installing it on Windows is to use [Chocolately](https://chocolatey.org/install) with `choco install -y cmake`. On Linux, all standard package managers provide a cmake package (eg. `apt-get install -y cmake`, `yum install -y cmake`, etc.).
 
 To bootstrap the build environment, instruct CMake to generate the build files. It is strongly recommended to do this in a directory that is separate from the source; this allows one to easily destroy and recreate the build environment without affecting the checked-out source and changes in progress. Typically, a new directory called `build` at the top-level project tree is used for this purpose:
 
