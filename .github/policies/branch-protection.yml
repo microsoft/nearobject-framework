@@ -13,5 +13,5 @@ configuration:
       requiresStrictStatusChecks: true
       requiredStatusChecks: 
       - 'CodeQL'
-      - 'Dependency Review'
-      - 'Build Release [CMake]'
+      # - 'Dependency Review'
+      # - 'Build Release [CMake]'
