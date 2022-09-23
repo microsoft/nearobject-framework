@@ -8,7 +8,7 @@ configuration:
   branchProtectionRules:
     - branchNamePattern: "main"
       requiredApprovingReviewsCount: 0
-      # requireCodeOwnersReview: true
+      requireCodeOwnersReview: true
       requiresConversationResolution: true
       requiresStrictStatusChecks: true
       requiredStatusChecks: 
@@ -17,3 +17,6 @@ configuration:
       - Analyze (cpp)
       - CodeQL
       - dependency-review
+      restrictsReviewDismissals: true
+      whoCanDismissReviews:
+      - aep-microsoft/nofcontributors
