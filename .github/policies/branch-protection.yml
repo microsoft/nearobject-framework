@@ -7,11 +7,11 @@ where:
 configuration:
   branchProtectionRules:
     - branchNamePattern: "main"
-      requiredApprovingReviewsCount: 1
-      requireCodeOwnersReview: true
+      requiredApprovingReviewsCount: 0
+      # requireCodeOwnersReview: true
       requiresConversationResolution: true
       requiresStrictStatusChecks: true
       requiredStatusChecks: 
+      - build
+      - dependency-review
       - 'CodeQL'
-      - 'Dependency Review'
-      - 'Build Release [CMake]'
