@@ -14,5 +14,5 @@ configuration:
       requiredStatusChecks: 
       - build (windows-latest)
       - build (ubuntu-22.04)
-      - Analyze (cpp)
+      - CodeQL
       - dependency-review
