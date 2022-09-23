@@ -1,6 +1,7 @@
 
 #include <cassert>
-#include <ciso646>
+#include <version>
+
 #include <notstd/task_queue.hxx>
 
 using namespace notstd;

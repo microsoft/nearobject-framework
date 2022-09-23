@@ -2,7 +2,6 @@
 #ifndef TASK_QUEUE_HXX
 #define TASK_QUEUE_HXX
 
-#include <ciso646>
 #include <condition_variable>
 #include <functional>
 #include <future>
@@ -12,6 +11,7 @@
 #include <queue>
 #include <stdexcept>
 #include <thread>
+#include <version>
 
 namespace notstd 
 {
