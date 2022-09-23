@@ -12,6 +12,7 @@ configuration:
       requiresConversationResolution: true
       requiresStrictStatusChecks: true
       requiredStatusChecks: 
-      - build
+      - build (windows-latest)
+      - build (ubuntu-22.04)
+      - Analyze (cpp)
       - dependency-review
-      - 'CodeQL'
