@@ -7,7 +7,7 @@ where:
 configuration:
   branchProtectionRules:
     - branchNamePattern: "main"
-      requiredApprovingReviewsCount: 0
+      requiredApprovingReviewsCount: 1
       requireCodeOwnersReview: true
       requiresConversationResolution: true
       requiresStrictStatusChecks: true
