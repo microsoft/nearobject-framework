@@ -19,6 +19,7 @@ add_executable(nearobject-test)
 target_sources(nearobject-test
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/Main.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/NearObjectIdentityTokenTest.hxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectDeviceControllerDiscoveryAgent.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectDeviceManager.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectManager.cxx

@@ -13,6 +13,7 @@ target_sources(nearobject
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectSession.cxx
     PUBLIC
         ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/NearObject.hxx
+        ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectIdentityToken.hxx
         ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectCapabilities.hxx
         ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectManager.hxx
         ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectProfile.hxx

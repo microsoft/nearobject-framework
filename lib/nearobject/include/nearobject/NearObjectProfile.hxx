@@ -23,6 +23,16 @@ enum class NearObjectConnectionScope {
 };
 
 /**
+ * @brief 
+ */
+enum class DeviceRole {
+    Initiator,
+    Responder,
+    Any,
+    Unknown,
+};
+
+/**
  * @brief A collection of configuration that specifies how to connect to a near
  * object or set of near objects.
  */

@@ -57,7 +57,7 @@ TEST_CASE("task queue can be destroyed", "[notstd][shared][utility]")
     SECTION("destruction doesn't cause a crash")
     {
         auto taskQueue = std::make_unique<task_queue>();
-        REQUIRE_NOTHROW(taskQueue->~task_queue());
+        REQUIRE_NOTHROW(std::destroy_at(taskQueue.get()));
         taskQueue.release();
     }
 }
