@@ -19,7 +19,7 @@ configuration:
       - dependency-review
       restrictsReviewDismissals: true
       whoCanDismissReviews:
-      - aep-microsoft/nofcontributors
+      - nofcontributors
     - branchNamePattern: "develop"
       requiredApprovingReviewsCount: 0
       requireCodeOwnersReview: true
