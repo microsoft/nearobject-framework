@@ -2,7 +2,7 @@ name: Build Release [CMake]
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "active" ]
 
 env:
   BUILD_TYPE: Release
