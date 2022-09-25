@@ -19,8 +19,8 @@ configuration:
       - dependency-review
       restrictsReviewDismissals: true
       whoCanDismissReviews:
-      - nofcontributors
-    - branchNamePattern: "develop"
+      - nofmaintainers
+    - branchNamePattern: "active"
       requiredApprovingReviewsCount: 0
       requireCodeOwnersReview: true
       requiresConversationResolution: true
