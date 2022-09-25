@@ -20,3 +20,17 @@ configuration:
       restrictsReviewDismissals: true
       whoCanDismissReviews:
       - aep-microsoft/nofcontributors
+    - branchNamePattern: "develop"
+      requiredApprovingReviewsCount: 0
+      requireCodeOwnersReview: true
+      requiresConversationResolution: true
+      requiresStrictStatusChecks: true
+      requiredStatusChecks: 
+      - build (windows-latest)
+      - build (ubuntu-22.04)
+      - Analyze (cpp)
+      - CodeQL
+      - dependency-review
+      restrictsReviewDismissals: true
+      whoCanDismissReviews:
+      - nofmaintainers
