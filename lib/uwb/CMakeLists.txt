@@ -7,11 +7,11 @@ set(UWB_DIR_PUBLIC_INCLUDE_PREFIX ${UWB_DIR_PUBLIC_INCLUDE}/uwb)
 target_sources(uwb
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/UwbDevice.cxx
-        ${CMAKE_CURRENT_LIST_DIR}/UwbRangingSession.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/UwbMacAddress.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbSession.cxx
     PUBLIC
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDevice.hxx
-        ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbRangingSession.hxx
+        ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbMacAddress.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSession.hxx
 )
 
