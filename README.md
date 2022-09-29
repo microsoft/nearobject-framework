@@ -1,4 +1,4 @@
-# Near Object (NO) Framework
+# Near Object (NO) Framework 
 
 [![Build Release [CMake]](https://github.com/aep-microsoft/nearobject-framework/actions/workflows/cmake.yml/badge.svg)](https://github.com/aep-microsoft/nearobject-framework/actions/workflows/cmake.yml)
 [![CodeQL](https://github.com/aep-microsoft/nearobject-framework/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/aep-microsoft/nearobject-framework/actions/workflows/codeql.yml)
