@@ -31,6 +31,3 @@ configuration:
       - Analyze (cpp)
       - CodeQL
       - dependency-review
-      restrictsReviewDismissals: true
-      whoCanDismissReviews:
-      - nofmaintainers
