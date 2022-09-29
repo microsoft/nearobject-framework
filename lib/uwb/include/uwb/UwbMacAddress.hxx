@@ -5,8 +5,8 @@
 #include <array>
 #include <cstdint>
 #include <span>
+#include <string>
 #include <variant>
-
 #include <type_traits>
 
 namespace uwb
@@ -24,37 +24,94 @@ enum class UwbMacAddressType {
  */
 struct UwbMacAddressLength final
 {
-    /**
-     * @brief Prevent instantiation since this is for constants only.
-     */
     UwbMacAddressLength() = delete;
-
-    /**
-     * @brief The length of a short-type address.
-     */
     static constexpr auto Short = 2;
-
-    /**
-     * @brief The length of an extended-type address.
-     */
     static constexpr auto Extended = 8;
 };
 
+/**
+ * @brief Concept to encode valid address lengths.
+ * 
+ * @tparam UwbMacAddessLength
+ */
+template <size_t UwbMacAddessLength>
+concept ValidUwbMacAddressLength = 
+    (UwbMacAddessLength == UwbMacAddressLength::Short) ||
+    (UwbMacAddessLength == UwbMacAddressLength::Extended);
+
 namespace detail
 {
-using enum UwbMacAddressType;
+    template <size_t Length>
+    struct UwbMacAddressTypeImpl {};
 
-/**
- * @brief Concept to encode valid address properties.
- * 
- * @tparam AddressType The type of address.
- * @tparam AddressLength The length of the address, in bytes.
- */
-template <UwbMacAddressType AddressType, std::size_t AddressLength>
-concept ValidAddressProperties = 
-    (AddressType == Short    && AddressLength == UwbMacAddressLength::Short) ||
-    (AddressType == Extended && AddressLength == UwbMacAddressLength::Extended);
-}
+    /**
+     * @brief Address type lookup full specialization for short addresses. 
+     * 
+     * @tparam  
+     */
+    template <>
+    struct UwbMacAddressTypeImpl<UwbMacAddressLength::Short> 
+    {
+        static constexpr UwbMacAddressType value = UwbMacAddressType::Short;
+    };
+
+    /**
+     * @brief Address type lookup full specialization for extended addresses. 
+     * 
+     * @tparam  
+     */
+    template <>
+    struct UwbMacAddressTypeImpl<UwbMacAddressLength::Extended> 
+    {
+        static constexpr UwbMacAddressType value = UwbMacAddressType::Extended;
+    };
+
+    /**
+     * @brief Helper providing compile-time lookup of UwbMacAddressType for the
+     * supported address lengths. 
+     * 
+     * @tparam Length The compile-time address length, typically from an array extent. 
+     */
+    template <size_t Length>
+    inline constexpr UwbMacAddressType UwbMacAddressTypeV = UwbMacAddressTypeImpl<Length>::value;
+
+    /**
+     * @brief Type traits for uwb mac addresses.
+     * 
+     * This collects traits of uwb mac addresses for compile-time usage, based
+     * on the address length. This maps from address length to mac address type,
+     * value type (eg. std::array<> with correct extent), and their
+     * corresponding types. 
+     * 
+     * @tparam Length 
+     */
+    template <std::size_t Length>
+    struct UwbMacAddressTraits
+    {
+        using value_type = std::array<uint8_t, Length>;
+        using length_type = std::integral_constant<std::size_t, Length>;
+
+        static constexpr std::size_t length = length_type::value;
+        static constexpr UwbMacAddressType address_type = detail::UwbMacAddressTypeV<Length>;
+    };
+
+    /**
+     * @brief Helper which generically wraps a uwb mac address value.
+     * 
+     * This is used later in a templated constructor to allow a single declaration.
+     * 
+     * @tparam Length The length of the address.
+     */
+    template <std::size_t Length>
+    struct UwbMacAddressValueWrapper : public UwbMacAddressTraits<Length>
+    {
+        explicit UwbMacAddressValueWrapper(typename UwbMacAddressTraits<Length>::value_type addressIn) : 
+            address(std::move(addressIn)) 
+        {}
+
+        typename UwbMacAddressTraits<Length>::value_type address;
+    };
+} // namespace detail
 
 /**
  * @brief Represents the address of a near object.
@@ -73,25 +130,110 @@ public:
     static constexpr auto ExtendedLength = UwbMacAddressLength::Extended;
 
     /**
-     * @brief C++ types for each address type.
+     * @brief C++ types for each address type and aggregate value type.
      */
     using ShortType = std::array<uint8_t, ShortLength>;
     using ExtendedType = std::array<uint8_t, ExtendedLength>;
+    using ValueType = std::variant<ShortType, ExtendedType>;
 
     /**
-     * @brief The address type.
+     * @brief Get the address type.
+     * 
+     * @return UwbMacAddressType 
      */
-    const UwbMacAddressType Type;
+    UwbMacAddressType 
+    GetType() const noexcept;
 
     /**
-     * @brief View of the underlying value.
+     * @brief Get the length of the address, in bytes.
+     * 
+     * @return std::size_t 
      */
-    std::span<uint8_t> Value;
+    std::size_t
+    GetLength() const noexcept;
 
     /**
-     * @brief The length of the address, in bytes.
+     * @brief Get a view of the underlying value.
+     * 
+     * @return std::span<const uint8_t> 
      */
-    const std::size_t Length;
+    std::span<const uint8_t> 
+    GetValue() const noexcept;
+
+    /**
+     * @brief Return a string representation of the address.
+     * 
+     * The address is output as hexadecimal values, separated by colons, eg.
+     *  
+     *     ab (short address)
+     *     1a2f3e4d (extended address)
+     * 
+     * @return std::string 
+     */
+    std::string
+    ToString() const;
+
+private:
+    /**
+     * @brief Compile-time helper to retrieve a reference to the active value of
+     * the variant holding the mac address.
+     * 
+     * @tparam Length 
+     * @param uwbMacAddress 
+     * @return std::array<uint8_t, Length>& 
+     */
+    template <size_t Length>
+    std::array<uint8_t, Length>& 
+    UwbMacAddressValue(UwbMacAddress& uwbMacAddress)
+    {
+        return std::get<std::array<uint8_t, Length>>(uwbMacAddress.m_value);
+    }
+
+    /**
+     * @brief Compile-time helper to generate a view of the address based on the
+     * selected type.
+     * 
+     * @tparam Length 
+     * @param uwbMacAddress 
+     * @return std::span<const uint8_t> 
+     */
+    template <size_t Length>
+    std::span<const uint8_t> 
+    UwbMacAddressView(UwbMacAddress& uwbMacAddress)
+    {
+        auto& value = UwbMacAddressValue<Length>(uwbMacAddress);
+        return { std::begin(value), std::end(value) };
+    }
+
+    /**
+     * @brief Construct a new UwbMacAddress object based on compile-time deduced
+     * arguments from a value wrapper.
+     * 
+     * @tparam Length The length of the address.
+     * @param value The address value.
+     */
+    template <size_t Length>
+    UwbMacAddress(detail::UwbMacAddressValueWrapper<Length> value) :
+        m_type{ value.address_type },
+        m_length{ value.length },
+        m_value{ value.address },
+        m_view{ UwbMacAddressView<Length>(*this) }
+    {}
+
+public:
+    /**
+     * @brief Construct a new UwbMacAddress object based on compile-time deduced
+     * arguments.
+     * 
+     * This constructor should be preferred when possible.
+     * 
+     * @tparam Length The length of the address.
+     * @param address The address value.
+     */
+    template <size_t Length>
+    UwbMacAddress(std::array<uint8_t, Length> address) :
+        UwbMacAddress(detail::UwbMacAddressValueWrapper<Length>{ address })
+    {}
 
     /**
      * @brief Construct a default UwbMacAddress.
@@ -99,51 +241,44 @@ public:
     UwbMacAddress();
 
     /**
-     * @brief Creates a short UwbMacAddress.
+     * @brief Copy constructor.
      * 
-     * @param address The address to initialize.
+     * @param other 
      */
-    explicit UwbMacAddress(ShortType address);
+    UwbMacAddress(const UwbMacAddress& other);
 
     /**
-     * @brief Creates an extended UwbMacAddress.
+     * @brief Copy assignment operator.
      * 
-     * @param address The address to initialize.
-     */
-    explicit UwbMacAddress(ExtendedType address);
+     * @param other
+     * @return UwbMacAddress& 
+      */
+    UwbMacAddress& 
+    operator=(UwbMacAddress other);
 
 private:
     /**
-     * @brief Initializes the value span based on the underlying type.
+     * @brief Swap the data members of this instance with another one.
      * 
-     * @tparam ActiveType 
+     * @param other The other instance to swap with.
      */
-    template <typename ActiveType> 
-        requires (std::is_same_v<ActiveType, UwbMacAddress::ShortType> || std::is_same_v<ActiveType, UwbMacAddress::ExtendedType>)
-    void 
-    InitializeValue();
+    void
+    Swap(UwbMacAddress& other) noexcept;
 
     /**
-     * @brief Syntactic sugar for directly retrieving the short address.
+     * @brief Initialize the address view.
      * 
-     * This will throw std::bad_variant_access if called when the type is
-     * actually an extended address.
+     * This is the runtime version that must be used for the copy-constructor,
+     * since the other object being copied does not have compile-time address
+     * length information available.
      * 
-     * @return std::array<uint8_t, ShortLength> 
+     * Note that the assigned view will reflect whatever is in the m_value
+     * variant at the time of the call. Thus, m_value must be appropriately
+     * initialized prior to invoking this function for the view to be assigned
+     * coherently.
      */
-    std::array<uint8_t, ShortLength>
-    GetShort() const;
-
-    /**
-     * @brief Syntactic sugar for directly retrieving the short address.
-     * 
-     * This will throw std::bad_variant_access if called when the type is
-     * actually an short.
-     * 
-     * @return std::array<uint8_t, ExtendedLength> 
-     */
-    std::array<uint8_t, ExtendedLength>
-    GetExtended() const;
+    void
+    InitializeView();
 
     /**
      * @brief Allow global equality function to access private members.
@@ -156,13 +291,26 @@ private:
 
 private:
     /**
-     * @brief The address value, which depends on the 'Type' field.
+     * @brief Note: the order of variable declarations here is critical. The
+     * m_view member must be declared after m_value since it is a read-only view
+     * of its contents. 
+     */
+    std::size_t m_length{ UwbMacAddressLength::Short };
+    UwbMacAddressType m_type{ UwbMacAddressType::Short };
+
+    /**
+     * @brief The address value, which depends on the 'm_type' field.
      * 
-     * Despite the 'Type' field driving this value, the std::variant is the
+     * Despite the 'm_type' field driving this value, the std::variant is the
      * ultimate ground-truth for the value, and the appropriate methods from
      * that class should be used to obtain it.
      */
-    std::variant<ShortType, ExtendedType> m_value{ ShortType{ 0x00, 0x00 } };
+    std::variant<ShortType, ExtendedType> m_value{ ShortType{ 0xBE, 0xEF } };
+
+    /**
+     * @brief Read-only view of the address data. 
+     */
+    std::span<const uint8_t> m_view;
 };
 
 bool

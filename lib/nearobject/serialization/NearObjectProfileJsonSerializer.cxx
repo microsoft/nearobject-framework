@@ -1,6 +1,7 @@
 
-#include <nearobject/persist/NearObjectProfileJsonSerializer.hxx>
 #include <nearobject/NearObjectProfile.hxx>
+#include <nearobject/serialization/NearObjectProfileJsonSerializer.hxx>
+
 #include <nlohmann/std_optional_serializer.hxx>
 
 using namespace nearobject;

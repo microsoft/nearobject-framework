@@ -1,5 +1,9 @@
 
+#include <ios>
+#include <sstream>
 #include <stdexcept>
+
+#include <magic_enum.hpp>
 
 #include <uwb/UwbMacAddress.hxx>
 
@@ -9,41 +13,76 @@ UwbMacAddress::UwbMacAddress() :
     UwbMacAddress(ShortType{ 0x00, 0x00 })
 {}
 
-UwbMacAddress::UwbMacAddress(UwbMacAddress::ShortType addressShort) :
-    m_value(addressShort),
-    Type(UwbMacAddressType::Short),
-    Length(ShortLength)
+UwbMacAddress::UwbMacAddress(const UwbMacAddress& other) :
+    m_type(other.m_type),
+    m_length(other.m_length),
+    m_value(other.m_value)
 {
-    InitializeValue<ShortType>();
+    // Note that the view span (m_view) cannot be directly copied from the other
+    // instance because that view refers to its own address storage. Hence, the
+    // view is explicitly initialized here.
+    InitializeView();
 }
 
-UwbMacAddress::UwbMacAddress(UwbMacAddress::ExtendedType addressExtended) :
-    m_value(addressExtended),
-    Type(UwbMacAddressType::Extended),
-    Length(ExtendedLength)
+UwbMacAddress&
+UwbMacAddress::operator=(UwbMacAddress other)
 {
-    InitializeValue<ExtendedType>();
+    // Note that this implementation of operator= uses a copy of another
+    // instance, whereas the typical implementation takes a const reference.
+    // This value-based version is used to ensure copy-elision occurs, avoiding
+    // the need to create a temporary when using the standard copy-and-swap
+    // idiom.
+    Swap(other);
+    return *this;
 }
 
-template <typename ActiveType> 
-    requires (std::is_same_v<ActiveType, UwbMacAddress::ShortType> || std::is_same_v<ActiveType, UwbMacAddress::ExtendedType>)
-void 
-UwbMacAddress::InitializeValue()
+void
+UwbMacAddress::InitializeView()
 {
-    auto& value = std::get<ActiveType>(m_value);
-    Value = { std::begin(value), std::end(value) };
+    std::visit([&](auto&& value) {
+        m_view = { std::begin(value), std::end(value) };
+    }, m_value);
 }
 
-std::array<uint8_t, UwbMacAddress::ShortLength>
-UwbMacAddress::GetShort() const
+void
+UwbMacAddress::Swap(UwbMacAddress& other) noexcept
 {
-    return std::get<decltype(GetShort())>(m_value);
+    std::swap(this->m_type, other.m_type);
+    std::swap(this->m_length, other.m_length);
+    std::swap(this->m_value, other.m_value);
+    std::swap(this->m_view, other.m_view);
 }
 
-std::array<uint8_t, UwbMacAddress::ExtendedLength>
-UwbMacAddress::GetExtended() const
+UwbMacAddressType
+UwbMacAddress::GetType() const noexcept
 {
-    return std::get<decltype(GetExtended())>(m_value);
+    return m_type;
+}
+
+std::size_t
+UwbMacAddress::GetLength() const noexcept
+{
+    return m_length;
+}
+
+std::span<const uint8_t>
+UwbMacAddress::GetValue() const noexcept
+{
+    return m_view;
+}
+
+std::string
+UwbMacAddress::ToString() const
+{
+    std::ostringstream macString{};
+
+    macString << magic_enum::enum_name(m_type) << ' ' << std::hex;
+    for (const auto& b : m_view.first(m_view.size()-1)) { 
+        macString << +b << ':'; 
+    }
+    macString << +m_view[m_view.size()-1];
+
+    return macString.str();
 }
 
 bool

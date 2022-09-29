@@ -20,4 +20,11 @@ target_include_directories(uwb
         ${UWB_DIR_PUBLIC_INCLUDE}
 )
 
+target_link_libraries(uwb
+    PRIVATE
+        magic_enum::magic_enum
+    PUBLIC
+        notstd
+)
+
 set_target_properties(uwb PROPERTIES FOLDER lib/uwb)

@@ -4,8 +4,8 @@
 #include <stdexcept>
 #include <system_error>
 
-#include <nearobject/persist/NearObjectProfileJsonSerializer.hxx>
 #include <nearobject/persist/NearObjectProfilePersisterFilesystem.hxx>
+#include <nearobject/serialization/NearObjectProfileJsonSerializer.hxx>
 
 using namespace nearobject;
 using namespace nearobject::persistence;

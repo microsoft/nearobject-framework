@@ -43,8 +43,8 @@ static constexpr std::array<std::array<uint8_t, 8>, 2> AddressExtendedValues {
 void 
 ValidateLength(const UwbMacAddress& uwbMacAddress, std::size_t lengthExpected) noexcept
 {
-    REQUIRE(uwbMacAddress.Length == lengthExpected);
-    REQUIRE(std::size(uwbMacAddress.Value) == lengthExpected);
+    REQUIRE(uwbMacAddress.GetLength() == lengthExpected);
+    REQUIRE(std::size(uwbMacAddress.GetValue()) == lengthExpected);
 }
 } // namespace uwb::test
 
@@ -97,12 +97,12 @@ TEST_CASE("uwb address type is accurate")
 
     SECTION("short type is accurate")
     {
-        REQUIRE(UwbMacAddress{AddressShortValueZero}.Type == UwbMacAddressType::Short);
+        REQUIRE(UwbMacAddress{AddressShortValueZero}.GetType() == UwbMacAddressType::Short);
     }
 
     SECTION("extended type is accurate")
     {
-        REQUIRE(UwbMacAddress{AddressExtendedValueZero}.Type == UwbMacAddressType::Extended);
+        REQUIRE(UwbMacAddress{AddressExtendedValueZero}.GetType() == UwbMacAddressType::Extended);
     }
 }
 
@@ -133,7 +133,7 @@ TEST_CASE("uwb address value is accurate")
     {
         for (const auto& addressShortValue : AddressShortValues) {
             const UwbMacAddress addressShort{addressShortValue};
-            const auto& value = addressShort.Value;
+            const auto& value = addressShort.GetValue();
             REQUIRE(std::equal(std::cbegin(value), std::cend(value), std::cbegin(addressShortValue)));
         }
     }
@@ -142,7 +142,7 @@ TEST_CASE("uwb address value is accurate")
     {
         for (const auto& addressExtendedValue : AddressExtendedValues) {
             const UwbMacAddress addressExtended{addressExtendedValue};
-            const auto& value = addressExtended.Value;
+            const auto& value = addressExtended.GetValue();
             REQUIRE(std::equal(std::cbegin(value), std::cend(value), std::cbegin(addressExtendedValue)));
         }
     }

@@ -2,6 +2,8 @@
 #ifndef NOT_STD_MEMORY_HXX
 #define NOT_STD_MEMORY_HXX
 
+#include <utility>
+
 namespace notstd
 {
 /**

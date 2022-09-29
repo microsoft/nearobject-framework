@@ -22,6 +22,7 @@ target_sources(nearobject-test
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectIdentityTokenTest.hxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectDeviceControllerDiscoveryAgent.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectDeviceManager.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectIdentityTokenUwb.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectManager.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectProfile.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectProfileManager.cxx
@@ -37,6 +38,7 @@ target_link_libraries(nearobject-test
         nearobject
         notstd
         tlv
+        uwb
 )
 
 catch_discover_tests(nearobject-test)
