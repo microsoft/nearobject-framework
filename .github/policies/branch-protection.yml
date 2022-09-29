@@ -21,7 +21,6 @@ configuration:
       whoCanDismissReviews:
       - nofmaintainers
     - branchNamePattern: "active"
-      requiredApprovingReviewsCount: 1
       requireCodeOwnersReview: true
       requiresConversationResolution: true
       requiresStrictStatusChecks: true
