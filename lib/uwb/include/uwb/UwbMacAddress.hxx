@@ -9,6 +9,8 @@
 #include <variant>
 #include <type_traits>
 
+#include <notstd/hash.hxx>
+
 namespace uwb
 {
 /**
@@ -320,5 +322,18 @@ bool
 operator!=(const UwbMacAddress&, const UwbMacAddress&) noexcept;
 
 } // namespace uwb
+
+namespace std
+{
+    template <>
+    struct hash<uwb::UwbMacAddress>
+    {
+        size_t operator()(const uwb::UwbMacAddress& uwbMacAddress) const noexcept
+        {
+            const auto& value = uwbMacAddress.GetValue();
+            return notstd::hash_range(std::cbegin(value), std::cend(value));
+        }
+    };
+} // namespace std
 
 #endif // UWB_DEVICE_ADDRESS_HXX

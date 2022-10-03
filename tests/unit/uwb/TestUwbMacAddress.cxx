@@ -1,6 +1,7 @@
 
 #include <algorithm>
 #include <array> 
+#include <unordered_set>
 
 #include <catch2/catch.hpp>
 
@@ -165,5 +166,23 @@ TEST_CASE("uwb address type traits are accurate")
         // This test doesn't do anything other than to ensure compilation.
         const UwbMacAddress::ExtendedType addressExtendedValue{ AddressExtendedValueZero };
         const UwbMacAddress addressExtended{ addressExtendedValue };
+    }
+}
+
+TEST_CASE("uwb address can be used in unordered_set", "[basic][container]")
+{
+    using namespace uwb;
+
+    std::vector<std::pair<UwbMacAddress, bool>> macAddressesIn{
+        { UwbMacAddress{ std::array<uint8_t, 2>{ 0xAA, 0xBB } }, true },
+        { UwbMacAddress{ std::array<uint8_t, 2>{ 0xBB, 0xAA } }, true },
+        { UwbMacAddress{ std::array<uint8_t, 2>{ 0xBB, 0xAA } }, false },
+    };
+
+    std::unordered_set<UwbMacAddress> macAddresses{};
+
+    for (const auto& [macAddress, expected] : macAddressesIn) {
+        auto [_, inserted] = macAddresses.insert(macAddress);
+        REQUIRE(inserted == expected);
     }
 }
