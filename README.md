@@ -53,7 +53,7 @@ Both a compiler and standard C++ library supporting C++20 are required. The C++ 
 
 #### Linux
 
-g++ or llvm/clang are suitable, however, some care must be taken to obtain a compatible standard library. A known, working environment is ubuntu 20.04 (focal) with LLVM 15.0.1 and the `libstdc++-10-dev` package. LLVM 15.0.1 can be installed using the [automatic installation script](https://apt.llvm.org/#llvmsh) and `libstdc++-10-dev` can be installed with `sudo apt-get install -y libstdc++-10-dev`.
+g++ or llvm/clang are suitable, however, some care must be taken to obtain a compatible standard library. A known, working environment is ubuntu 22.04 (jammy) with clang 14.0.0 and LLVM 14.0.0. Both are both provided by the official ubuntu package repository so can be installed using `apt`. Detailed development environment setup instructions can be found in the Linux [`README`](/linux/README.md).
 
 ### CMake
 
