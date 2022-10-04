@@ -6,6 +6,8 @@
 #include <catch2/catch.hpp>
 #include <notstd/range.hxx>
 
+// NOLINTBEGIN(*-avoid-c-arrays, cppcoreguidelines-pro-bounds-pointer-arithmetic)
+
 /**
  * @brief Helper to validate a created range.
  * 
@@ -69,6 +71,7 @@ namespace test
 } // namespace test
 } // namespace notstd
 
+// This test specifically tests iterators which use arithmetic, so disable lint for that.
 TEST_CASE("range can be created from range bounds", "[notstd][range][utility]")
 {
     using namespace notstd::test;
@@ -148,3 +151,5 @@ TEST_CASE("range can be used in range-based for loops")
         }()); 
     }
 }
+
+// NOLINTEND(*-avoid-c-arrays, cppcoreguidelines-pro-bounds-pointer-arithmetic)

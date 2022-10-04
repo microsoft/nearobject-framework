@@ -29,7 +29,7 @@ constexpr bool is_variant_alternative = std::false_type::value;
  * @tparam CandidateType The type to check.
  */
 template <typename... VariantTypes, typename CandidateType>
-constexpr bool is_variant_alternative<std::variant<VariantTypes...>, CandidateType> = 
+inline constexpr bool is_variant_alternative<std::variant<VariantTypes...>, CandidateType> = 
     (std::is_same_v<CandidateType, VariantTypes> || ...);
 }
 

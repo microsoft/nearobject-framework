@@ -40,7 +40,7 @@ NearObjectServiceConfiguration ParseCliAppOptions(bool throwOnParseError, Args&&
         app.parse(std::forward<Args>(args)...);
     } catch (const CLI::ParseError &parseError) {
         if (throwOnParseError) {
-            throw parseError;
+            throw parseError; // NOLINT(cert-err60-cpp)
         }
     }
 
@@ -48,12 +48,14 @@ NearObjectServiceConfiguration ParseCliAppOptions(bool throwOnParseError, Args&&
 }
 } // namespace details
 
+// NOLINTBEGIN(*-avoid-c-arrays)
 /* static */
 NearObjectServiceConfiguration
 NearObjectServiceConfiguration::FromCommandLineArguments(int argc, char *argv[], bool throwOnParseError)
 {
     return details::ParseCliAppOptions(throwOnParseError, argc, argv);
 }
+// NOLINTEND(*-avoid-c-arrays)
 
 /* static */
 NearObjectServiceConfiguration

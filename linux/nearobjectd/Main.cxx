@@ -23,6 +23,7 @@ GetUserHomePath() noexcept
 {
     static constexpr auto LinuxHomePathEnvironmentValueName = "HOME";
 
+    // NOLINTNEXTLINE(concurrency-mt-unsafe)
     char *value = std::getenv(LinuxHomePathEnvironmentValueName);
     if (!value) {
         return {};

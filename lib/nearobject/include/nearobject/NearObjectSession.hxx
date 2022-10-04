@@ -118,7 +118,7 @@ protected:
      *
      */
     void
-    InvokeEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor);
+    InvokeEventCallback(std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor);
 
     /**
      * @brief Add a near object to this session.

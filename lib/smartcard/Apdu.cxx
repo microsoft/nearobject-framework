@@ -10,7 +10,7 @@ ApduCommand::ApduCommand(std::byte cla, std::byte ins, std::byte p1, std::byte p
 {
 }
 
-ApduCommand::ApduCommand(std::byte cla, std::byte ins, std::byte p1, std::byte p2, std::vector<std::byte> data)
+ApduCommand::ApduCommand(std::byte cla, std::byte ins, std::byte p1, std::byte p2, const std::vector<std::byte>& data)
 {
     // TODO: this doesn't account for all the crazy combinations, so must be updated to handle them.
     m_payload.resize(4 + data.size());

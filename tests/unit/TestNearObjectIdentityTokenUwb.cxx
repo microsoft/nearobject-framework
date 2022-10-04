@@ -23,11 +23,12 @@ namespace nearobject::test
  * 
  * @tparam N The number of array values to expand.
  * @tparam values The array values.
+ * @param sequence 
  * @return uwb::UwbMacAddress 
  */
 template<std::size_t N, uint8_t... values>
 uwb::UwbMacAddress
-MakeAddressImpl(std::integer_sequence<uint8_t, values...>)
+MakeAddressImpl(std::integer_sequence<uint8_t, values...> sequence)
 {
     return uwb::UwbMacAddress{ std::array<uint8_t, N>{values...} };
 }

@@ -4,8 +4,6 @@
 
 using namespace linux::nearobject::service;
 using ::nearobject::service::NearObjectDeviceController;
-using ::nearobject::service::NearObjectDevicePresence;
-using ::nearobject::service::NearObjectDeviceControllerUwb;
 
 std::vector<std::shared_ptr<::nearobject::service::NearObjectDeviceController>>
 NearObjectDeviceDiscoveryAgentUwb::Probe()

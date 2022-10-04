@@ -12,7 +12,7 @@ namespace uwb
  * @brief Specialize enum serialization to avoid any potential issues with
  * changes or re-ordering of the underlying values.
  */
-NLOHMANN_JSON_SERIALIZE_ENUM(UwbMacAddressType, {
+NLOHMANN_JSON_SERIALIZE_ENUM(UwbMacAddressType, { // NOLINT(*-avoid-c-arrays)
     { UwbMacAddressType::Short, "Short" },  
     { UwbMacAddressType::Extended, "Extended" },
 })

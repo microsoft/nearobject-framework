@@ -4,11 +4,14 @@
 
 using namespace nearobject;
 
+// Below is to silence a false positive from clang-tidy which somehow believes uwbMacAddress is const.
+// NOLINTBEGIN(performance-unnecessary-value-param, performance-move-const-arg, hicpp-move-const-arg)
 NearObjectIdentityTokenUwb::NearObjectIdentityTokenUwb(uwb::UwbMacAddress uwbMacAddress) :
     m_uwbMacAddress(std::move(uwbMacAddress)),
     m_token(ToToken(*this))
 {
 }
+// NOLINTEND(performance-unnecessary-value-param, performance-move-const-arg, hicpp-move-const-arg)
 
 /* static */
 NearObjectIdentityTokenUwb
@@ -58,6 +61,7 @@ NearObjectIdentityTokenUwb::IsEqual(const NearObjectIdentityToken& other) const 
 {
     // This cast is safe since the operator==() implementation guarantees the
     // type of 'other' to be 'NearObjectIdentityTokenUwb' using a typeid check.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast)
     const auto rhs = static_cast<const NearObjectIdentityTokenUwb&>(other);
 
     // Forward base class checks, then validate specifics from this class.

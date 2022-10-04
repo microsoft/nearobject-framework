@@ -1,4 +1,6 @@
 
+#include <limits>
+
 #include "TlvSimple.hxx"
 
 using namespace encoding;
@@ -36,7 +38,7 @@ TlvSimple::Parse(TlvSimple **tlvOutput, const std::span<std::byte> &data)
             return parseResult;
         }
         length = (uint8_t)data[2];
-        length <<= 8;
+        length <<= (std::size_t)std::numeric_limits<uint8_t>::digits;
         length |= (uint8_t)data[3];
         if (datasize != TlvSimple::ThreeByteLengthMinimumSize + length) {
             return parseResult;

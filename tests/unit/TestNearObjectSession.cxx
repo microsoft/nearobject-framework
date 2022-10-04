@@ -14,6 +14,8 @@
 
 #include "NearObjectIdentityTokenTest.hxx"
 
+// NOLINTBEGIN(cert-err58-cpp, cppcoreguidelines-non-private-member-variables-in-classes,misc-non-private-member-variables-in-classes)
+
 namespace nearobject::test
 {
 static constexpr NearObjectCapabilities AllCapabilitiesSupported = {
@@ -49,23 +51,23 @@ struct NearObjectSessionEventCallbacksNoop :
     public NearObjectSessionEventCallbacks
 {
     void
-    OnSessionEnded(NearObjectSession *) override
+    OnSessionEnded(NearObjectSession *session) override
     {}
 
     void
-    OnRangingStarted(NearObjectSession *) override
+    OnRangingStarted(NearObjectSession *session) override
     {}
 
     void
-    OnRangingStopped(NearObjectSession *) override
+    OnRangingStopped(NearObjectSession *session) override
     {}
 
     void
-    OnNearObjectPropertiesChanged(NearObjectSession *, const std::vector<std::shared_ptr<NearObject>>) override
+    OnNearObjectPropertiesChanged(NearObjectSession *session, const std::vector<std::shared_ptr<NearObject>> nearObjectsChanged) override
     {}
 
     void
-    OnSessionMembershipChanged(NearObjectSession *, const std::vector<std::shared_ptr<NearObject>>, const std::vector<std::shared_ptr<NearObject>>) override
+    OnSessionMembershipChanged(NearObjectSession *session, const std::vector<std::shared_ptr<NearObject>> nearObjectsAdded, const std::vector<std::shared_ptr<NearObject>> nearObjectsRemoved) override
     {}
 };
 
@@ -492,3 +494,5 @@ TEST_CASE("near object event handlers reflect near object changes", "[basic]")
         }
     }
 }
+
+// NOLINTEND(cert-err58-cpp, cppcoreguidelines-non-private-member-variables-in-classes,misc-non-private-member-variables-in-classes)

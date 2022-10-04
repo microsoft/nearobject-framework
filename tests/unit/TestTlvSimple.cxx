@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
+
 /**
 * @brief Convert a string to a byte vector
 *
@@ -145,3 +147,5 @@ TEST_CASE("TlvSimple object can be created properly from the Parse function", "[
         REQUIRE(result == encoding::Tlv::ParseResult::Failed);
     }
 }
+
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)

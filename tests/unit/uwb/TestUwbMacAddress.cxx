@@ -7,6 +7,8 @@
 
 #include <uwb/UwbMacAddress.hxx>
 
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
+
 namespace uwb::test
 {
 static constexpr std::array<uint8_t, 2> AddressShortValueZero{
@@ -186,3 +188,5 @@ TEST_CASE("uwb address can be used in unordered_set", "[basic][container]")
         REQUIRE(inserted == expected);
     }
 }
+
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)

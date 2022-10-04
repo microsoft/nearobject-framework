@@ -35,11 +35,11 @@ NearObjectSession::GetCapabilities() const noexcept
 }
 
 void
-NearObjectSession::InvokeEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor)
+NearObjectSession::InvokeEventCallback(std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor)
 {
     auto dispatcher = m_taskQueue.get_dispatcher();
 
-    auto const task = [this, executor]() {
+    auto const task = [this, executor = std::move(executor)]() {
         const auto eventCallbacks = m_eventCallbacks.lock();
         if (!eventCallbacks) {
             return;
@@ -76,7 +76,7 @@ NearObjectSession::AddNearObjects(std::vector<std::shared_ptr<NearObject>> nearO
 
     // Signal the membership changed event with the added near objects.
     InvokeEventCallback([this, nearObjectsToAdd = std::move(nearObjectsToAdd)](auto& eventCallbacks) {
-        eventCallbacks.OnSessionMembershipChanged(this, std::move(nearObjectsToAdd), {});
+        eventCallbacks.OnSessionMembershipChanged(this, nearObjectsToAdd, {});
     });
 }
 
@@ -95,7 +95,7 @@ NearObjectSession::RemoveNearObjects(std::vector<std::shared_ptr<NearObject>> ne
     // partition) and ones that should be removed (second partition), keeping
     // their relative order (stable). std::stable_partition returns an iterator
     // to the beginning of the second partition.
-    const auto nearObjectsRemoved = std::stable_partition(std::begin(m_nearObjects), std::end(m_nearObjects), [&](const auto nearObjectToCheck) { 
+    auto nearObjectsRemoved = std::stable_partition(std::begin(m_nearObjects), std::end(m_nearObjects), [&](const auto nearObjectToCheck) { 
         return std::none_of(std::cbegin(nearObjectsToRemove), std::cend(nearObjectsToRemove), [&](const auto& nearObjectToRemove){
             return (nearObjectToCheck == nearObjectToRemove);
         });
@@ -112,7 +112,7 @@ NearObjectSession::RemoveNearObjects(std::vector<std::shared_ptr<NearObject>> ne
 
     // Signal the membership changed event with the removed near objects.
     InvokeEventCallback([this, nearObjectsToRemove = std::move(nearObjectsToRemove)](auto& eventCallbacks) {
-        eventCallbacks.OnSessionMembershipChanged(this, {}, std::move(nearObjectsToRemove));
+        eventCallbacks.OnSessionMembershipChanged(this, {}, nearObjectsToRemove);
     });
 }
 

@@ -12,7 +12,7 @@ Smartcard::Transmit(const ApduCommand& command, ApduResponse& response, std::chr
 Smartcard::TransmitAsyncRequest
 Smartcard::TransmitAsync(const ApduCommand& command, std::chrono::milliseconds timeout)
 {
-    return TransmitAsync(command, timeout);
+    return TransmitAsyncImpl(command, timeout);
 }
 
 void

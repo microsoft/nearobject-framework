@@ -7,6 +7,8 @@
 #include <nearobject/service/NearObjectDeviceController.hxx>
 #include <nearobject/service/NearObjectDeviceControllerDiscoveryAgent.hxx>
 
+// NOLINTBEGIN(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
+
 namespace nearobject
 {
 namespace service
@@ -161,3 +163,5 @@ TEST_CASE("near object device discovery agent can be created", "[basic][service]
         REQUIRE(probeResults.size() == probeDevices.size());
     }
 }
+
+// NOLINTEND(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)

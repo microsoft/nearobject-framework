@@ -13,7 +13,7 @@ class ApduCommand
 {
 public:
     ApduCommand(std::byte cla, std::byte ins, std::byte p1, std::byte p2);
-    ApduCommand(std::byte cla, std::byte ins, std::byte p1, std::byte p2, std::vector<std::byte> data);
+    ApduCommand(std::byte cla, std::byte ins, std::byte p1, std::byte p2, const std::vector<std::byte>& data);
 
     const std::byte
     Cla() const;

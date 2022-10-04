@@ -8,8 +8,8 @@
 using namespace nearobject::service;
 
 NearObjectService::NearObjectService(NearObjectServiceInjector injector) :
-    DeviceManager(injector.DeviceManager),
-    ProfileManager(injector.ProfileManager)
+    DeviceManager(std::move(injector.DeviceManager)),
+    ProfileManager(std::move(injector.ProfileManager))
 {
 }
 
