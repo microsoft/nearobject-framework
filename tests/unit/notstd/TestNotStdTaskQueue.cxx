@@ -7,7 +7,7 @@
 #include <optional>
 #include <vector>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <notstd/task_queue.hxx>
 
 using namespace std::chrono_literals;

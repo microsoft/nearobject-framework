@@ -1,14 +1,17 @@
 
 include(FetchContent)
 
-FetchContent_Declare(
-  Catch2
-  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-  GIT_TAG v2.13.9
-  GIT_SHALLOW ON
-)
-
-FetchContent_MakeAvailable(Catch2)
+if (USE_VCPKG)
+  find_package(Catch2 CONFIG ${VERSION_CATCH2} REQUIRED)
+else()
+  FetchContent_Declare(
+    Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG v${VERSION_CATCH2}
+    GIT_SHALLOW ON
+  )
+  FetchContent_MakeAvailable(Catch2)
+endif()
 
 # Allow CTest to discover Catch2 tests automatically
 list(APPEND CMAKE_MODULE_PATH "${catch2_SOURCE_DIR}/contrib")
@@ -34,7 +37,7 @@ target_sources(nearobject-test
 
 target_link_libraries(nearobject-test
     PRIVATE
-        Catch2::Catch2
+        Catch2::Catch2WithMain
         nearobject
         notstd
         tlv

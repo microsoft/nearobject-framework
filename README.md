@@ -84,3 +84,34 @@ In general, you set a build target and variant, then use the `CMake: Build` comm
 ### Razzle
 
 The source tree is not *currently* configured for building in Razzle. The parts of the tree that can be built in Windows will eventually be augmented with [nmake](https://docs.microsoft.com/en-us/cpp/build/nmake-reference), NTBuild (`build.exe`), and/or MSBuild configuration files.
+
+### Source Dependencies
+
+Source dependencies can be satisfied in two (2) ways:
+
+1. From a URL using the CMake [`FetchContent`](https://cmake.org/cmake/help/latest/module/FetchContent.html) module (default).
+2. From the [`vcpkg`](https://github.com/microsoft/vcpkg) package manager.
+
+The `FetchContent` method works out of the box with no setup required, so is the default method. The `vcpkg` method requires one-time bootstrapping, described below.
+
+#### vcpkg
+
+The `vcpkg` source dependency method is configurable through the CMake build option `USE_VCPKG`. This option defaults to `OFF` since `FetchContent` is much faster for development loop tasks. Set this to `ON` to use `vcpkg` for source dependency resolution (eg. via command line argument such as `cmake -DUSE_VCPKG:BOOL=ON .`, or by editing the CMake cache directly). Note that this is a cache setting, thus it is sticky; once set, the chosen setting will be stored in the CMake variable cache (`CMakeCache.txt`) and so it must be explicitly reset to `OFF` when no longer desired.
+
+`vcpkg` has extra dependencies on Linux including curl, zip, unzip, tar, and pkg-config. These can be installed on Debian or Ubuntu distributions using the following command:
+
+```bash
+sudo apt-get install curl zip unzip tar pkg-config
+```
+
+Once configured in the build, the `vcpkg` binary must be made available. This can be installed globally for the entire system, locally for the current user, or directly in the project workspace.
+
+For project-direct installation, the project has been configured to include `vcpkg` source as a sub-module @ `./vcpkg` and attempt to automatically bootstrap it. If this fails for some reason, the following steps can be taken to manually bootstrap `vcpkg`:
+
+The `vcpkg` submodule must first be initialized and updated to sync it to the fixed, known working release tag, which is accomplished by issuing the following git command at the project root:
+
+```Shell
+git submodule update --init --recursive
+```
+
+Next, run the OS-specific bootstapping script (`./vcpkg/bootstrap-vcpkg.[bat|sh]`). This should produce the binary `./vcpkg/vcpkg`.

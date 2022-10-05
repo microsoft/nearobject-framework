@@ -10,7 +10,7 @@ target_sources(nearobject-test-windows
 
 target_link_libraries(nearobject-test-windows
     PRIVATE
-        Catch2::Catch2
+        Catch2::Catch2WithMain
         nearobject-service-windows
         notstd-windows
 )

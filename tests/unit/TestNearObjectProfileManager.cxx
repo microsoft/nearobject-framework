@@ -2,7 +2,7 @@
 #include <filesystem>
 #include <vector>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <nearobject/NearObjectProfile.hxx>
 #include <nearobject/service/NearObjectProfileManager.hxx>

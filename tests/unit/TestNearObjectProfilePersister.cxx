@@ -8,7 +8,7 @@
 #include <system_error>
 #include <vector>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <nearobject/NearObjectProfile.hxx>
 #include <nearobject/persist/NearObjectProfilePersister.hxx>
 #include <nearobject/persist/NearObjectProfilePersisterFilesystem.hxx>

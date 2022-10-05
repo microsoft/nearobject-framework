@@ -9,7 +9,7 @@ target_sources(uwb-test
 
 target_link_libraries(uwb-test
     PRIVATE
-        Catch2::Catch2
+        Catch2::Catch2WithMain
         uwb
 )
 

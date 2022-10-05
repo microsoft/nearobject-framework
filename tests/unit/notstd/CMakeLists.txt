@@ -12,7 +12,7 @@ target_sources(notstd-test
 
 target_link_libraries(notstd-test
     PRIVATE
-        Catch2::Catch2
+        Catch2::Catch2WithMain
         notstd
 )
 

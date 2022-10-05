@@ -1,5 +1,5 @@
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <notstd/scope.hxx>
 
 TEST_CASE("scope_exit creation doesn't cause a crash", "[notstd][shared][utility][scope]")

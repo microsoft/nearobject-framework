@@ -1,0 +1,12 @@
+{
+  "name": "nearobject-framework",
+  "version-string": "0.0.1",
+  "dependencies": [
+    "catch2",
+    "nlohmann-json",
+    "magic-enum",
+    "cli11",
+    "wil"
+  ],
+  "builtin-baseline": "779ce74ef67d3e12d904da1b15f9ed5626d5f677"
+}
