@@ -1,10 +1,10 @@
 
-#ifndef STATUS_CODES_HXX
-#define STATUS_CODES_HXX
+#ifndef FIRA_UCI_STATUS_CODES_HXX
+#define FIRA_UCI_STATUS_CODES_HXX
 
 #include <cstdint>
 
-namespace nearobject::protocol::fira::uci
+namespace uwb::protocol::fira::uci
 {
 enum class StatusCode : uint8_t {
     // Generic Status Codes
@@ -48,6 +48,6 @@ enum class StatusCode : uint8_t {
     // Vendor Specific = 0x50-0xFF
 };
 
-} // namespace nearobject::protocol::fira::uci
+} // namespace uwb::protocol::fira::uci
 
-#endif // STATUS_CODES_HXX
+#endif // FIRA_UCI_STATUS_CODES_HXX

@@ -28,3 +28,5 @@ target_link_libraries(uwb
 )
 
 set_target_properties(uwb PROPERTIES FOLDER lib/uwb)
+
+add_subdirectory(protocols)

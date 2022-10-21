@@ -2,7 +2,7 @@
 #ifndef FIRA_DEVICE_HXX
 #define FIRA_DEVICE_HXX
 
-namespace nearobject::protocol::fira
+namespace uwb::protocol::fira
 {
 /**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
@@ -43,11 +43,20 @@ enum class RangingMethod {
 
 /**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
+ * 1.1.
+ */
+enum class RangingMode {
+    BlockBasedMode,
+};
+
+/**
+ * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
  * 5.5.
  */
 enum class MultiNodeMode {
     Unicast,
     OneToMany,
+    ManyToMany,
 };
 
 /**
@@ -77,6 +86,6 @@ enum class BlockBasedMode {
     BlockStriding,
 };
 
-} // namespace nearobject::protocol::fira
+} // namespace uwb::protocol::fira
 
 #endif // FIRA_DEVICE_HXX

@@ -44,6 +44,5 @@ set_target_properties(nearobject PROPERTIES FOLDER lib/nearobject)
 
 add_subdirectory(discovery)
 add_subdirectory(persist)
-add_subdirectory(protocols)
 add_subdirectory(serialization)
 add_subdirectory(service)
