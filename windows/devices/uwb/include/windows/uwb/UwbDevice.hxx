@@ -2,6 +2,7 @@
 #ifndef WINDOWS_DEVICE_UWB_HXX
 #define WINDOWS_DEVICE_UWB_HXX
 
+#include <memory>
 #include <string>
 
 #include <windows.h>
@@ -10,6 +11,11 @@
 
 #include <uwb/UwbDevice.hxx>
 #include <windows/devices/DeviceResource.hxx>
+
+namespace uwb
+{
+class UwbSession;
+}
 
 namespace windows
 {
@@ -41,10 +47,19 @@ public:
 
     /**
      * @brief Initialize the device. 
-     *  TODO: return type needs to convey whether this worked.
+     * TODO: return type needs to convey whether this worked.
      */
     void
     Initialize();
+
+    /**
+     * @brief Create a new UWB session.
+     * 
+     * @param sessionId The unique session identifier to use.
+     * @return std::unique_ptr<uwb::UwbSession> 
+     */
+    std::unique_ptr<uwb::UwbSession>
+    CreateSession(uint32_t sessionId) override;
 
 private:
     const std::wstring m_deviceName;

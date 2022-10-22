@@ -4,6 +4,7 @@
 
 #include <atomic>
 #include <cstdint>
+#include <mutex>
 #include <unordered_set>
 
 #include <uwb/UwbMacAddress.hxx>
@@ -20,9 +21,8 @@ public:
      * @brief Construct a new UwbSession object.
      * 
      * @param sessionId The associated session id.
-     * @param peers The initial set of peers.
      */
-    UwbSession(uint32_t sessionId, std::unordered_set<UwbMacAddress> peers);
+    explicit UwbSession(uint32_t sessionId);
 
     /**
      * @brief Get the unique session id.
@@ -31,6 +31,23 @@ public:
      */
     uint32_t
     GetId() const noexcept;
+
+    /**
+     * @brief Set the type of mac address to be used for session participants.
+     * 
+     * @param uwbMacAddressType The type of mac address to use.
+     */
+    void
+    SetMacAddressType(UwbMacAddressType uwbMacAddressType) noexcept;
+
+    /**
+     * @brief Add a peer to this session.
+     * 
+     * @param peerMacAddress The mac address of the peer. This is expected to be
+     * in the mac address format configured for the session.
+     */
+    void
+    AddPeer(UwbMacAddress peerMacAddress);
 
     /**
      * @brief 
@@ -45,8 +62,21 @@ public:
     StopRanging();
 
 private:
+    virtual void
+    StartRangingImpl() = 0;
+
+    virtual void
+    StopRangingImpl() = 0;
+
+    virtual void
+    AddPeerImpl(UwbMacAddress peerMacAddress) = 0;
+
+protected:
     uint32_t m_sessionId;
+    UwbMacAddressType m_uwbMacAddressType{ UwbMacAddressType::Extended };
+    UwbMacAddress m_uwbMacAddressSelf;
     std::atomic<bool> m_rangingActive{ false };
+    std::mutex m_peerGate;
     std::unordered_set<uwb::UwbMacAddress> m_peers{};
 };
 

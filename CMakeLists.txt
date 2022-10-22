@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 
+project(nearobject-framework LANGUAGES CXX)
+
 # Configuration option for using vcpkg to satisfy source package dependencies.
 # This must be set to ON for official Windows builds.
 option(USE_VCPKG "Use vcpkg for obtaining source dependencies" OFF)
@@ -7,8 +9,12 @@ option(USE_VCPKG "Use vcpkg for obtaining source dependencies" OFF)
 # Conditional inclusion of OS-dependent source trees.
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
   set(BUILD_FOR_LINUX TRUE)
+  MESSAGE(STATUS "Target OS Linux detected")
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
   set(BUILD_FOR_WINDOWS TRUE)
+  MESSAGE(STATUS "Target OS Windows detected")
+else ()
+  MESSAGE(FATAL_ERROR "No supported target OS detected, SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
 endif()
 
 # Select source package dependency manager based on selected option.
@@ -29,8 +35,6 @@ if (USE_VCPKG)
 else()
   MESSAGE(STATUS "using FetchContent for source dependencies")
 endif()
-
-project(nearobject-framework LANGUAGES CXX)
 
 # Set language configutation options. The C++ standard used must be the lowest
 # common denominator for all the OS-dependent projects. In practice, since this
