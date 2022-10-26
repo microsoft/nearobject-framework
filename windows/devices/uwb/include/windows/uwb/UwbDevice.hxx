@@ -61,6 +61,14 @@ public:
     std::unique_ptr<uwb::UwbSession>
     CreateSession(uint32_t sessionId) override;
 
+    /**
+     * @brief Get the capabilities of the devie.
+     * 
+     * @return uwb::protocol::fira::UwbCapability 
+     */
+    uwb::protocol::fira::UwbCapability
+    GetCapabilities() const override;
+
 private:
     const std::wstring m_deviceName;
 

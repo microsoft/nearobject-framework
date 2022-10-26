@@ -4,6 +4,8 @@
 
 #include <memory>
 
+#include <uwb/protocols/fira/UwbCapability.hxx>
+
 namespace uwb
 {
 class UwbSession;
@@ -22,6 +24,14 @@ public:
      */
     virtual std::unique_ptr<UwbSession>
     CreateSession(uint32_t sessionId) = 0;
+
+    /**
+     * @brief Get the FiRa capabilities of the device.
+     * 
+     * @return uwb::protocol::fira::UwbCapability 
+     */
+    virtual uwb::protocol::fira::UwbCapability
+    GetCapabilities() const = 0;
 };
 
 } // namespace uwb

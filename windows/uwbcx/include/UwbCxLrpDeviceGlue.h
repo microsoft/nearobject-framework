@@ -1,6 +1,6 @@
 
-#ifndef UWBCX_LRP_DEVICE_H
-#define UWBCX_LRP_DEVICE_H
+#ifndef UWBCX_LRP_DEVICE_GLUE_H
+#define UWBCX_LRP_DEVICE_GLUE_H
 
 /**
  * Definitions below copied from the Windows WDK; these must eventually be
@@ -18,4 +18,4 @@
 #include <windows.h>
 #include <UwbCxLrpDevice.h>
 
-#endif // UWBCX_LRP_DEVICE_H
+#endif // UWBCX_LRP_DEVICE_GLUE_H

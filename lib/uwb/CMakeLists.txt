@@ -25,6 +25,7 @@ target_link_libraries(uwb
         magic_enum::magic_enum
     PUBLIC
         notstd
+        uwb-proto-fira
 )
 
 set_target_properties(uwb PROPERTIES FOLDER lib/uwb)

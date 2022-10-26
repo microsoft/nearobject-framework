@@ -41,7 +41,7 @@ struct ControleePreference
         RangingMethod = 0x83,
         StsConfig = 0x84,
         MultiNodeMode = 0x85,
-        RangingTimeStruct = 0x86,
+        RangingMode = 0x86,
         ScheduledMode = 0x87,
         HoppingMode = 0x88,
         BlockStriding = 0x89,
@@ -63,7 +63,7 @@ struct ControleePreference
     bool RangingMethodDsTwrNonDeferredMode;
     std::bitset<3> StsConfig;
     std::vector<uwb::protocol::fira::MultiNodeMode> MulitNodeModes;
-    std::bitset<2> RangingTimeStruct;
+    std::bitset<2> RangingMode;
     bool ScheduledMode{ false };
     bool HoppingMode{ false };
     bool BlockStriding{ false };
