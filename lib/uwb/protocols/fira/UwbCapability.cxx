@@ -127,9 +127,9 @@ const std::unordered_map<HprfParameter, std::size_t> UwbCapability::HprfParamete
 std::unique_ptr<encoding::Tlv>
 UwbCapability::ToOobDataObject() const
 {
-    std::vector<std::byte> data{};
+    std::vector<uint8_t> data{};
     // TODO: perform actual conversion
-    return std::make_unique<encoding::TlvSimple>(static_cast<std::byte>(Tag), data);
+    return std::make_unique<encoding::TlvSimple>(Tag, data);
 }
 
 /* static */

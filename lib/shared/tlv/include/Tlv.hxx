@@ -3,6 +3,7 @@
 #define TLV_HXX
 
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <span>
 #include <vector>
@@ -12,8 +13,8 @@ namespace encoding
 class Tlv
 {
 public:
-    std::span<const std::byte> Tag;
-    std::span<const std::byte> Value;
+    std::span<const uint8_t> Tag;
+    std::span<const uint8_t> Value;
 
     /**
      * @brief Describes the result of parsing a Tlv

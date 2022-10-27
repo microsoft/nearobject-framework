@@ -17,13 +17,13 @@ private:
     static constexpr auto OneByteLengthMinimumSize = 2;
     static constexpr auto ThreeByteLengthMinimumSize = 4;
 
-    const std::vector<std::byte> m_tag;
-    const std::vector<std::byte> m_value;
+    const std::vector<uint8_t> m_tag;
+    const std::vector<uint8_t> m_value;
 
 public:
     static constexpr auto ThreeByteLengthIndicatorValue = 0xFF;
 
-    TlvSimple(std::byte tag, std::vector<std::byte> value);
+    TlvSimple(uint8_t tag, std::vector<uint8_t> value);
 
     /**
      * @brief Decode a Tlv from a blob of SIMPLE-TLV data.
@@ -33,7 +33,7 @@ public:
      * @return ParseResult The result of the parsing operation.
      */
     static ParseResult
-    Parse(TlvSimple **tlvOutput, const std::span<std::byte> &data);
+    Parse(TlvSimple **tlvOutput, const std::span<uint8_t> &data);
 };
 
 } // namespace encoding
