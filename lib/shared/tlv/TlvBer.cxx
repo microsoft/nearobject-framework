@@ -24,21 +24,33 @@ TlvBer::TagIsConstructed(std::span<const uint8_t> tag)
 void 
 TlvBer::Builder::WriteLength(uint64_t length)
 {
-    std::vector<const uint8_t> bytesInLittleEndian ;
+    if(length<=127) return WriteLength(uint8_t(length));
+
+    m_data.push_back(0x88);
+
+    // std::vector<const uint8_t> bytesInBigEndian;
 
     for(int i=0;i<8;i++){
-        const auto b = static_cast<uint8_t>((length & 0xFF));
-        bytesInLittleEndian.push_back(b);
-        length >>= 8;
+        const auto b = static_cast<uint8_t>((length & 0xFF00'0000'0000'0000)>>56);
+        m_data.push_back(b);
+        // bytesInBigEndian.push_back(b);
+        length <<= 8;
     }
     
     // write the bytes in big endian 
-    m_data.insert(std::cend(m_data), std::rbegin(bytesInLittleEndian), std::rend(bytesInLittleEndian));
+    // m_data.insert(std::cend(m_data), std::cbegin(bytesInBigEndian), std::cend(bytesInBigEndian));
 }
 
-template <typename IterableOfBytes>
+void 
+TlvBer::Builder::WriteLength(uint8_t length)
+{
+    if(length>127) WriteLength(uint64_t(length));
+    else m_data.push_back(length);
+}
+
+template <typename T>
 TlvBer::Builder&
-TlvBer::Builder::SetTag(const IterableOfBytes& tag)
+TlvBer::Builder::SetTag(const T& tag)
 {
     m_tag.assign(std::cbegin(tag), std::cend(tag));
     return *this;
@@ -62,7 +74,7 @@ TlvBer::Builder::WriteLengthAndValue(const D& data){
 template <>
 void
 TlvBer::Builder::WriteLengthAndValue(const uint8_t& value){
-    WriteLength(1);
+    WriteLength(uint8_t(1));
     m_data.push_back(value);
 }
 

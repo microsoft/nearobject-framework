@@ -106,17 +106,23 @@ public:
          */
         void WriteLength(uint64_t length);
 
+        /**
+         * @brief subroutine to write some length octets
+         * 
+         */
+        void WriteLength(uint8_t length);
+
     public:
         /**
          * @brief Set the tag of the top-level/parent TlvBer.
          * 
-         * @tparam IterableOfBytes must be uint8_t, std::span<const uint8_t>, std::array<const uint8_t, N>
+         * @tparam T must be uint8_t, std::span<const uint8_t>, std::array<const uint8_t, N>
          * @param tag 
          * @return Builder& 
          */
-        template <typename IterableOfBytes>
+        template <typename T>
         Builder&
-        SetTag(const IterableOfBytes& tag);
+        SetTag(const T& tag);
 
         /**
          * @brief Sets a sequence of data, including its length, as the tlv
