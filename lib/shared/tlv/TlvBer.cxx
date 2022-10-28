@@ -22,68 +22,54 @@ TlvBer::TagIsConstructed(std::span<const uint8_t> tag)
 }
 
 void 
-TlvBer::Builder::WriteData(uint32_t data)
+TlvBer::Builder::WriteLength(uint64_t length)
 {
-    const auto b0 = static_cast<uint8_t>((data & 0xFF000000U) >> 24U);
-    const auto b1 = static_cast<uint8_t>((data & 0x00FF0000U) >> 16U);
-    const auto b2 = static_cast<uint8_t>((data & 0x0000FF00U) >>  8U);
-    const auto b3 = static_cast<uint8_t>((data & 0x000000FFU) >>  0U);
+    std::vector<const uint8_t> bytesInLittleEndian ;
 
-    if constexpr (std::endian::native == std::endian::little) {
-        m_data.push_back(b3);
-        m_data.push_back(b2);
-        m_data.push_back(b1);
-        m_data.push_back(b0);
-    } else {
-        m_data.push_back(b0);
-        m_data.push_back(b1);
-        m_data.push_back(b2);
-        m_data.push_back(b3);
+    for(int i=0;i<8;i++){
+        const auto b = static_cast<uint8_t>((length & 0xFF));
+        bytesInLittleEndian.push_back(b);
+        length >>= 8;
     }
+    
+    // write the bytes in big endian 
+    m_data.insert(std::cend(m_data), std::rbegin(bytesInLittleEndian), std::rend(bytesInLittleEndian));
 }
 
-void
-TlvBer::Builder::WriteData(std::span<const uint8_t> data)
-{
-    m_data.insert(std::cend(m_data), std::cbegin(data), std::cend(data));
-}
-
-void
-TlvBer::Builder::WriteValue(uint8_t value)
-{
-    m_data.push_back(1);
-    m_data.push_back(value);
-}
-
-void
-TlvBer::Builder::WriteValue(std::span<const uint8_t> value)
-{
-    WriteData(value.size_bytes());
-    WriteData(value);
-}
-
+template <typename IterableOfBytes>
 TlvBer::Builder&
-TlvBer::Builder::SetTag(uint8_t tag)
+TlvBer::Builder::SetTag(const IterableOfBytes& tag)
+{
+    m_tag.assign(std::cbegin(tag), std::cend(tag));
+    return *this;
+}
+
+template<>
+TlvBer::Builder&
+TlvBer::Builder::SetTag(const uint8_t& tag)
 {
     m_tag.assign(1, tag);
     return *this;
 }
 
-TlvBer::Builder&
-TlvBer::Builder::AddTlv(auto&& func)
-{
-    func();
-    m_validateConstructed = true;
-    return *this;
+template <class D>
+void
+TlvBer::Builder::WriteLengthAndValue(const D& data){
+    WriteLength(data.size());
+    WriteBytes(data);
+}
+
+template <>
+void
+TlvBer::Builder::WriteLengthAndValue(const uint8_t& value){
+    WriteLength(1);
+    m_data.push_back(value);
 }
 
 TlvBer::Builder&
 TlvBer::Builder::AddTlv(const Tlv& tlv)
 {
-    return AddTlv([&]{
-        WriteData(tlv.Tag);
-        WriteValue(tlv.Value);
-    });
+    return AddTlv(tlv.Tag, tlv.Value);
 }
 
 TlvBer 

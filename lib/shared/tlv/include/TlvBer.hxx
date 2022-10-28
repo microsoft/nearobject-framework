@@ -23,8 +23,15 @@ public:
     static constexpr uint8_t TypeConstructed = 0b00100000;
     static constexpr uint8_t TypePrimitive   = 0b00000000;
 
+    enum class ClassTypes {
+        UniversalClass                    = 0b00000000,
+        ApplicationClass                  = 0b01000000,
+        ContextSpecificClass              = 0b10000000,
+        PrivateClass                      = 0b11000000
+    };
+
     /**
-     * @brief Determines if the specified tag denotes a constructed BerTlv.
+     * @brief Determines if the specified tag denotes a constructed TlvBer.
      * 
      * @param tag The tag to check.
      * @return true 
@@ -34,7 +41,7 @@ public:
     bool TagIsConstructed(std::span<const uint8_t> tag);
 
     /**
-     * @brief Construct a new BerTlv with given tag and value.
+     * @brief Construct a new TlvBer with given tag and value.
      * 
      * @param tag The tag to use.
      * @param value The data value to use.
@@ -52,7 +59,7 @@ public:
     Parse(TlvBer **tlvOutput, const std::span<uint8_t>& data);
 
     /**
-     * @brief Helper class to iteratively build a BerTlv. This allows separating
+     * @brief Helper class to iteratively build a TlvBer. This allows separating
      * the creation logic from the main class and enables it to be immutable.
      * 
      * This allows the following pattern to build a TlvBer:
@@ -60,7 +67,7 @@ public:
      * std::vector<uint8_t> tag81Value{};
      * Tlv tag82Value = MakeATlv{};
      * 
-     * BerTlv::Builder builder{};
+     * TlvBer::Builder builder{};
      * auto tlvBer = builder
      *      .SetTag(0xA3)
      *      .AddTlv(0x81, tag81Value)
@@ -73,113 +80,79 @@ public:
         /**
          * @brief Write a fixed-length array of data to the tlv storage buffer.
          * 
-         * @tparam N 
+         * @tparam D must be std::span<const uint8_t> or std::array<uint8_t, N>
          * @param data 
          */
-        template <size_t N>
+        template <class D>
         void
-        WriteData(std::array<uint8_t, N> data)
+        WriteBytes(const D& data)
         {
             m_data.insert(std::cend(m_data), std::cbegin(data), std::cend(data));
         }
 
         /**
-         * @brief Write an unsigned 32-bit integer to the tlv storage buffer.
+         * @brief Write a Value field, including the Length, to the tlv storage buffer.
          * 
+         * @tparam D must be uint8_t, or std::span<const uint8_t>, or std::array<const uint8_t, N>
          * @param data 
          */
-        void 
-        WriteData(uint32_t data);
-
-        /**
-         * @brief Write a sequence of data to the tlv storage buffer.
-         * 
-         * @param data 
-         */
+        template <class D>
         void
-        WriteData(std::span<const uint8_t> data);
-
+        WriteLengthAndValue(const D& data);
+ 
         /**
-         * @brief Write a single-byte value, including its length, to the tlv
-         * storage buffer.
+         * @brief subroutine to write some length octets
          * 
-         * @param value 
          */
-        void
-        WriteValue(uint8_t value);
-
-        /**
-         * @brief Write a sequence of data, including its length, to the tlv
-         * storage buffer.
-         * 
-         * @param value 
-         */
-        void
-        WriteValue(std::span<const uint8_t> value);
+        void WriteLength(uint64_t length);
 
     public:
         /**
-         * @brief Set the tag of the top-level/parent BerTlv.
+         * @brief Set the tag of the top-level/parent TlvBer.
          * 
+         * @tparam IterableOfBytes must be uint8_t, std::span<const uint8_t>, std::array<const uint8_t, N>
          * @param tag 
          * @return Builder& 
          */
+        template <typename IterableOfBytes>
         Builder&
-        SetTag(uint8_t tag);
+        SetTag(const IterableOfBytes& tag);
 
         /**
-         * @brief Set the tag of the top-level/parent BerTlv.
+         * @brief Sets a sequence of data, including its length, as the tlv
+         * storage buffer.
          * 
-         * @tparam Iterable 
-         * @param tag 
+         * @tparam V must be uint8_t, std::span<const uint8_t>, std::array<const uint8_t, N>
+         * @param value 
          * @return Builder& 
          */
-        template <typename Iterable>
+        template<class V>
         Builder&
-        SetTag(Iterable& tag)
-        {
-            m_tag.assign(std::cbegin(tag), std::cend(tag));
+        SetValue(const V& value){
+            WriteLengthAndValue(value);
             return *this;
         }
 
         /**
-         * @brief Add a nested tlv to this tlv. This makes it a constructed BerTlv.
+         * @brief Add a nested tlv to this tlv. This makes it a constructed TlvBer.
          * 
-         * @tparam N 
+         * @tparam T, must be std::array<uint8_t, N>, or std::span<const uint8_t>
+         * @tparam V, must be std::array<uint8_t, N>, std::span<const uint8_t> or uint8_t
          * @param tag 
          * @param value 
          * @return Builder& 
          */
-        template <size_t N>
+        template <class T, class V>
         Builder&
-        AddTlv(std::array<uint8_t, N> tag, uint8_t value)
-        {
-            return AddTlv([&]{
-                WriteData(tag);
-                WriteValue(value);
-            });
+        AddTlv(const T& tag, const V& value){
+            WriteBytes(tag);
+            WriteLengthAndValue(value);
+            m_validateConstructed = true;
+            return *this;
         }
 
         /**
-         * @brief Add a nested tlv to this tlv. This makes it a constructed BerTlv.
-         * 
-         * @tparam N 
-         * @param tag 
-         * @param value 
-         * @return Builder& 
-         */
-        template <size_t N>
-        Builder&
-        AddTlv(std::array<uint8_t, N> tag, std::span<uint8_t> value)
-        {
-            return AddTlv([&]{
-                WriteData(tag);
-                WriteValue(value);
-            });
-        }
-
-        /**
-         * @brief Add a pre-existing tlv to this tlv. This makes it a constructed BerTlv.
+         * @brief Add a pre-existing tlv to this tlv. This makes it a constructed TlvBer.
          * 
          * @param tlv 
          * @return Builder& 
@@ -188,7 +161,7 @@ public:
         AddTlv(const Tlv& tlv);
 
         /**
-         * @brief Build and return the BerTlv.
+         * @brief Build and return the TlvBer.
          * 
          * @return TlvBer 
          */
@@ -208,18 +181,6 @@ public:
         struct InvalidTlvBerTagException : public InvalidTlvBerException {};
 
     private:
-        /**
-         * @brief Helper function which adds a tlv to the parent tlv.
-         * 
-         * This does internal housekeeping to ensure the parent tag is set as
-         * constructed when the tlv is eventually built.
-         * 
-         * @param func The function to add the actual tlv.
-         * @return Builder& 
-         */
-        Builder&
-        AddTlv(auto&& func);
-
         /**
          * @brief Validates the to-be-built tlv has a valid tag.
          */
