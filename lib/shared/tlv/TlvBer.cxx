@@ -103,8 +103,8 @@ TlvBer::Parse(TlvBer **tlvOutput, const std::span<uint8_t>& data)
         // TODO: parse nested tlvs
         break;
     case Type::Primitive:
-        auto tlv = std::make_unique<TlvBer>(tag, value);
-        *tlvOutput = tlv.release();
+        *tlvOutput = std::make_unique<TlvBer>(tag, value).release();
+        parseResult = ParseResult::Succeeded;
         break;
     }
 
