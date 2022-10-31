@@ -42,7 +42,7 @@ TlvBer::Builder::WriteLength(uint64_t length)
 std::vector<uint8_t>
 TlvBer::Builder::CalculateLengthEncoding(uint8_t length)
 {
-    if(length>127) CalculateLengthEncoding(uint64_t(length));
+    if(length>127) return CalculateLengthEncoding(uint64_t(length));
     else 
         return std::vector<uint8_t>(1,length);
 }
@@ -67,15 +67,21 @@ TlvBer::Builder::CalculateLengthEncoding(uint64_t length)
     return holder;
 }
 
-template <typename T>
 TlvBer::Builder&
-TlvBer::Builder::SetTag(const T& tag)
+TlvBer::Builder::SetTag(const std::span<const uint8_t>& tag)
 {
     m_tag.assign(std::cbegin(tag), std::cend(tag));
     return *this;
 }
 
-template<>
+template <size_t N>
+TlvBer::Builder&
+TlvBer::Builder::SetTag(const std::array<uint8_t,N>& tag)
+{
+    m_tag.assign(std::cbegin(tag), std::cend(tag));
+    return *this;
+}
+
 TlvBer::Builder&
 TlvBer::Builder::SetTag(const uint8_t& tag)
 {
@@ -97,14 +103,19 @@ TlvBer::Builder::WriteLengthAndValue(const uint8_t& value){
     m_data.push_back(value);
 }
 
-template <class D>
+template <size_t N>
 TlvBer::Builder&
-TlvBer::Builder::SetValue(const D& data){
+TlvBer::Builder::SetValue(const std::array<const uint8_t, N>& data){
     m_data.assign(std::cbegin(data),std::cend(data));
     return *this;
 }
 
-template <>
+TlvBer::Builder&
+TlvBer::Builder::SetValue(const std::span<const uint8_t>& data){
+    m_data.assign(std::cbegin(data),std::cend(data));
+    return *this;
+}
+
 TlvBer::Builder&
 TlvBer::Builder::SetValue(const uint8_t& value){
     m_data.assign(1,value);

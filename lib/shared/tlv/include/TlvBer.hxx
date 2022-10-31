@@ -133,9 +133,15 @@ public:
          * @param tag 
          * @return Builder& 
          */
-        template <typename T>
         Builder&
-        SetTag(const T& tag);
+        SetTag(const uint8_t& tag);
+
+        Builder&
+        SetTag(const std::span<const uint8_t>& tag);
+
+        template <size_t N>
+        Builder&
+        SetTag(const std::array<uint8_t,N>& tag);
 
         /**
          * @brief Sets a sequence of data, as the tlv value
@@ -144,9 +150,15 @@ public:
          * @param value 
          * @return Builder& 
          */
-        template<class V>
+        template<size_t N>
         Builder&
-        SetValue(const V& value);
+        SetValue(const std::array<const uint8_t, N>& value);
+
+        Builder&
+        SetValue(const std::span<const uint8_t>& value);
+
+        Builder&
+        SetValue(const uint8_t& value);
 
         /**
          * @brief Add a nested tlv to this tlv. This makes it a constructed TlvBer.

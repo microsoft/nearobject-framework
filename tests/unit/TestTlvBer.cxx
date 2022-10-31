@@ -6,29 +6,14 @@
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 
-/**
-* @brief Convert a string to a byte vector
-*
-* @param str 
-* @return std::vector<uint8_t>
-*/
-std::vector<uint8_t>
-StringToByteVector(const std::string &str) noexcept
-{
-    std::vector<uint8_t> vec(str.size());
-    std::transform(std::cbegin(str), std::cend(str), std::begin(vec), [](const auto &element) {
-        return uint8_t(element);
-    });
-
-    return vec;
-}
-
 using namespace encoding;
 
 template <class A,class B>
-bool byte_array_matches(A a,B b){
-    if(a.size()!= b.size()) return false;
-    for(auto ait = std::begin(a), bit = std::begin(b); ait!=std::end(a); ){
+bool byte_array_matches(const A& a,const B& b){
+    std::vector<uint8_t> avec(std::cbegin(a),std::cend(a));
+    std::vector<uint8_t> bvec(std::cbegin(b),std::cend(b));
+    if(avec.size()!= bvec.size()) return false;
+    for(auto ait = std::begin(avec), bit = std::begin(bvec); ait!=std::end(avec); ){
         if(uint8_t(*ait)!=uint8_t(*bit)) return false;
         ait++;
         bit++;
@@ -36,13 +21,13 @@ bool byte_array_matches(A a,B b){
     return true;
 }
 
-TEST_CASE("", "[basic][infra]")
+TEST_CASE("test TlvBer", "[basic][infra]")
 {
     SECTION("creating a TlvBer with no value works as expected")
     {
         TlvBer::Builder builder{};
         auto tlvBer = builder
-                    .SetTag(0x93)
+                    .SetTag('\x93')
                     .Build();
         REQUIRE(tlvBer.Tag.size() == 1);
         REQUIRE(tlvBer.Tag[0]==0x93);
@@ -53,8 +38,8 @@ TEST_CASE("", "[basic][infra]")
     {
         TlvBer::Builder builder{};
         auto tlvBer = builder
-                    .SetTag(0x93)
-                    .SetValue(0x43)
+                    .SetTag('\x93')
+                    .SetValue('\x43')
                     .Build();
         REQUIRE(tlvBer.Tag.size() == 1);
         REQUIRE(tlvBer.Tag[0]==0x93);
@@ -68,7 +53,7 @@ TEST_CASE("", "[basic][infra]")
         const uint8_t tag[] = {0x93,0x94};
         auto tlvBer = builder
                     .SetTag(tag)
-                    .SetValue(0x43)
+                    .SetValue('\x43')
                     .Build();
         REQUIRE(tlvBer.Tag.size() == 2);
         REQUIRE(tlvBer.Tag[0]==tag[0]);
@@ -94,7 +79,7 @@ TEST_CASE("", "[basic][infra]")
         REQUIRE(tlvBer.Value[1] == value[1]);
 
         auto bytes = tlvBer.ToBytes();
-        REQUIRE(byte_array_matches(bytes,std::array{0x93,0x94,0x82,0x91,0x92}));
+        REQUIRE(byte_array_matches(bytes,std::vector<uint8_t>{0x93,0x94,0x02,0x91,0x92}));
     }
 
     SECTION("creating a TlvBer with a nested TLV value works as expected")
@@ -107,7 +92,7 @@ TEST_CASE("", "[basic][infra]")
                     .SetValue(value)
                     .Build();
 
-        const uint8_t ptag[] = {0x93,0x94};
+        const uint8_t ptag[] = {0xB3,0x94};
         auto parent = builder
                     .Reset()
                     .SetTag(ptag)
@@ -116,8 +101,6 @@ TEST_CASE("", "[basic][infra]")
         REQUIRE(byte_array_matches(parent.Tag,ptag));
         REQUIRE(byte_array_matches(parent.Value,child.ToBytes()));
     }
-
-
 }
 
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
