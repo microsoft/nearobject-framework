@@ -17,17 +17,17 @@ class TlvBer : public Tlv
 {
 public:
     static constexpr uint8_t BitmaskClass = 0b11000000;
-    static constexpr uint8_t BitmaskType  = 0b00100000;
-    static constexpr uint8_t BitmaskTag   = 0b00011111;
+    static constexpr uint8_t BitmaskType = 0b00100000;
+    static constexpr uint8_t BitmaskTag = 0b00011111;
 
     static constexpr uint8_t TypeConstructed = 0b00100000;
-    static constexpr uint8_t TypePrimitive   = 0b00000000;
+    static constexpr uint8_t TypePrimitive = 0b00000000;
 
     enum class Classes {
-        UniversalClass                    = 0b00000000,
-        ApplicationClass                  = 0b01000000,
-        ContextSpecificClass              = 0b10000000,
-        PrivateClass                      = 0b11000000
+        UniversalClass = 0b00000000,
+        ApplicationClass = 0b01000000,
+        ContextSpecificClass = 0b10000000,
+        PrivateClass = 0b11000000
     };
 
     /**
@@ -37,8 +37,8 @@ public:
      * @return true 
      * @return false 
      */
-    static 
-    bool TagIsConstructed(std::span<const uint8_t> tag);
+    static bool
+    TagIsConstructed(std::span<const uint8_t> tag);
 
     /**
      * @brief Construct a new TlvBer with given tag and value.
@@ -46,7 +46,7 @@ public:
      * @param tag The tag to use.
      * @param value The data value to use.
      */
-    TlvBer(const std::vector<uint8_t>& tag, const std::vector<uint8_t>& length,const std::vector<uint8_t>& value);
+    TlvBer(const std::vector<uint8_t>& tag, const std::vector<uint8_t>& length, const std::vector<uint8_t>& value);
 
     /**
      * @brief Decode a Tlv from a blob of BER-TLV data.
@@ -56,7 +56,7 @@ public:
      * @return ParseResult The result of the parsing operation.
      */
     static ParseResult
-    Parse(TlvBer **tlvOutput, const std::span<uint8_t>& data);
+    Parse(TlvBer** tlvOutput, const std::span<uint8_t>& data);
 
     /**
      * @brief Encode this TlvBer into binary and returns a vector of bytes
@@ -90,7 +90,7 @@ public:
          * @tparam D must be std::span<const uint8_t> or std::array<uint8_t, N>
          * @param data 
          */
-        template <class D>
+        template<class D>
         void
         WriteBytes(const D& data)
         {
@@ -103,27 +103,30 @@ public:
          * @tparam D must be uint8_t, or std::span<const uint8_t>, or std::array<const uint8_t, N>
          * @param data 
          */
-        template <class D>
+        template<class D>
         void
         WriteLengthAndValue(const D& data);
- 
+
         /**
          * @brief subroutine to write some length octets
          * 
          */
-        void WriteLength(uint64_t length);
+        void
+        WriteLength(uint64_t length);
 
         /**
          * @brief subroutine to return some length octets
          * 
          */
-        std::vector<uint8_t> CalculateLengthEncoding(uint64_t length);
+        std::vector<uint8_t>
+        CalculateLengthEncoding(uint64_t length);
 
         /**
          * @brief subroutine to return some length octets
          * 
          */
-        std::vector<uint8_t> CalculateLengthEncoding(uint8_t length);
+        std::vector<uint8_t>
+        CalculateLengthEncoding(uint8_t length);
 
     public:
         /**
@@ -139,9 +142,9 @@ public:
         Builder&
         SetTag(const std::span<const uint8_t>& tag);
 
-        template <size_t N>
+        template<size_t N>
         Builder&
-        SetTag(const std::array<uint8_t,N>& tag);
+        SetTag(const std::array<uint8_t, N>& tag);
 
         /**
          * @brief Sets a sequence of data, as the tlv value
@@ -169,9 +172,10 @@ public:
          * @param value 
          * @return Builder& 
          */
-        template <class T, class V>
+        template<class T, class V>
         Builder&
-        AddTlv(const T& tag, const V& value){
+        AddTlv(const T& tag, const V& value)
+        {
             WriteBytes(tag);
             WriteLengthAndValue(value);
             m_validateConstructed = true;
@@ -192,7 +196,7 @@ public:
          * 
          * @return TlvBer 
          */
-        TlvBer 
+        TlvBer
         Build();
 
         /**
@@ -206,14 +210,16 @@ public:
         /**
          * @brief Top-level exception from which all context-specific exceptions derived.
          */
-        struct InvalidTlvBerException : public std::exception {};
+        struct InvalidTlvBerException : public std::exception
+        {};
 
         /**
          * @brief Exception thrown when the specified tag does not specify the
          * constructed bit, which is required for tlvs constructed with the
          * builder.
          */
-        struct InvalidTlvBerTagException : public InvalidTlvBerException {};
+        struct InvalidTlvBerTagException : public InvalidTlvBerException
+        {};
 
     private:
         /**
@@ -226,7 +232,8 @@ public:
          * @brief Populates the Length member, only called by Build()
          * 
          */
-        void CalculateAndSetLength();
+        void
+        CalculateAndSetLength();
 
     private:
         bool m_validateConstructed{ false };
