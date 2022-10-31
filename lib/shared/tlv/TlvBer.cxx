@@ -53,6 +53,56 @@ TlvBer::GetClass(std::span<const uint8_t> tag)
     }
 }
 
+/* static */
+Tlv::ParseResult
+TlvBer::Parse(TlvBer **tlvOutput, const std::span<uint8_t>& data)
+{
+    if (!tlvOutput) {
+        return Tlv::ParseResult::Failed;
+    }
+
+    *tlvOutput = nullptr;
+    auto dataIt = std::cbegin(data);
+    auto parseResult = Tlv::ParseResult::Failed;
+
+    // Parse tag.
+    std::vector<uint8_t> tag;
+
+    // Is tag short type?
+    if ((*dataIt & BitmaskTagFirstByte) != TagValueLongField) {
+        tag.push_back(*dataIt & BitmaskTagFirstByte);
+    // Tag is long-type. 
+    } else {
+        do {
+            std::advance(dataIt, 1);
+            tag.push_back(*dataIt & BitmaskTagLong);
+        } while ((*dataIt & BitmaskTagLastByte) != TagValueLastByte);
+    }
+
+    // Parse length.
+    std::advance(dataIt, 1);
+    std::size_t length;
+
+    // Is length short form?
+    if ((*dataIt & BitmaskLengthForm) == LengthFormShort) {
+        length = *dataIt & BitmaskLengthShort;
+    // Length is long form.
+    } else {
+        auto numOctets = *dataIt & BitmaskLengthNumOctets;
+        for (auto i = 0; i < numOctets; i++, std::advance(dataIt, 1)) {
+            length  = length << 8U;
+            length |= *dataIt;
+        }
+    }
+
+    // Parse value.
+    std::vector<uint8_t> value;
+    std::advance(dataIt, 1);
+    // TODO
+
+    return parseResult;
+}
+
 std::span<const uint8_t>
 TlvBer::GetTag() const noexcept
 {

@@ -26,7 +26,13 @@ public:
      */
     static constexpr uint8_t BitmaskClass = 0b11000000;
     static constexpr uint8_t BitmaskType = 0b00100000;
-    static constexpr uint8_t BitmaskTag = 0b00011111;
+    static constexpr uint8_t BitmaskTagFirstByte = 0b00011111;
+    static constexpr uint8_t BitmaskTagLastByte = 0b10000000;
+    static constexpr uint8_t BitmaskTagShort = 0b00011111;
+    static constexpr uint8_t BitmaskTagLong = 0b01111111;
+    static constexpr uint8_t BitmaskLengthForm = 0b10000000;
+    static constexpr uint8_t BitmaskLengthShort = 0b01111111;
+    static constexpr uint8_t BitmaskLengthNumOctets = 0b01111111;
 
     static constexpr uint8_t ClassUniversal = 0b00000000;
     static constexpr uint8_t ClassApplication = 0b01000000; 
@@ -40,6 +46,11 @@ public:
     static constexpr uint8_t LengthTag3Byte = 0x82U;
     static constexpr uint8_t LengthTag4Byte = 0x83U;
     static constexpr uint8_t LengthTag5Byte = 0x84U;
+    static constexpr uint8_t LengthFormShort = 0b00000000;
+    static constexpr uint8_t LengthFormLong = 0b10000000;
+
+    static constexpr uint8_t TagValueLongField = 0b00011111;
+    static constexpr uint8_t TagValueLastByte = 0b10000000;
 
     /**
      * @brief The class of the TLV.
