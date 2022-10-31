@@ -7,8 +7,9 @@
 
 using namespace encoding;
 
-TlvBer::TlvBer(const std::vector<uint8_t>& tag, const std::vector<uint8_t>& value) :
+TlvBer::TlvBer(const std::vector<uint8_t>& tag, const std::vector<uint8_t>& length,const std::vector<uint8_t>& value) :
     m_tag(tag),
+    m_length(length),
     m_value(value)
 {
     ::Tlv::Tag = m_tag;
@@ -21,31 +22,49 @@ TlvBer::TagIsConstructed(std::span<const uint8_t> tag)
     return (tag.front() & BitmaskType) == TypeConstructed;
 }
 
+std::vector<uint8_t>
+TlvBer::ToBytes()
+{
+    std::vector<uint8_t> accumulate;
+    accumulate.assign(std::cbegin(m_tag),std::cend(m_tag));
+    accumulate.insert(std::cend(accumulate),std::cbegin(m_length),std::cend(m_length));
+    accumulate.insert(std::cend(accumulate),std::cbegin(m_value),std::cend(m_value));
+    return accumulate;
+}
+
 void 
 TlvBer::Builder::WriteLength(uint64_t length)
 {
-    if(length<=127) return WriteLength(uint8_t(length));
+    std::vector<uint8_t> lengthEncoding = CalculateLengthEncoding(length);
+    m_data.insert(std::cend(m_data),std::cbegin(lengthEncoding),std::cend(lengthEncoding));
+}
 
-    m_data.push_back(0x88);
+std::vector<uint8_t>
+TlvBer::Builder::CalculateLengthEncoding(uint8_t length)
+{
+    if(length>127) CalculateLengthEncoding(uint64_t(length));
+    else 
+        return std::vector<uint8_t>(1,length);
+}
+
+std::vector<uint8_t>
+TlvBer::Builder::CalculateLengthEncoding(uint64_t length)
+{
+    if(length<=127) return CalculateLengthEncoding(uint8_t(length));
+
+    std::vector<uint8_t> holder;
+
+    holder.push_back(0x88);
 
     // std::vector<const uint8_t> bytesInBigEndian;
 
     for(int i=0;i<8;i++){
         const auto b = static_cast<uint8_t>((length & 0xFF00'0000'0000'0000)>>56);
-        m_data.push_back(b);
+        holder.push_back(b);
         // bytesInBigEndian.push_back(b);
         length <<= 8;
     }
-    
-    // write the bytes in big endian 
-    // m_data.insert(std::cend(m_data), std::cbegin(bytesInBigEndian), std::cend(bytesInBigEndian));
-}
-
-void 
-TlvBer::Builder::WriteLength(uint8_t length)
-{
-    if(length>127) WriteLength(uint64_t(length));
-    else m_data.push_back(length);
+    return holder;
 }
 
 template <typename T>
@@ -78,17 +97,47 @@ TlvBer::Builder::WriteLengthAndValue(const uint8_t& value){
     m_data.push_back(value);
 }
 
+template <class D>
+TlvBer::Builder&
+TlvBer::Builder::SetValue(const D& data){
+    m_data.assign(std::cbegin(data),std::cend(data));
+    return *this;
+}
+
+template <>
+TlvBer::Builder&
+TlvBer::Builder::SetValue(const uint8_t& value){
+    m_data.assign(1,value);
+    return *this;
+}
+
 TlvBer::Builder&
 TlvBer::Builder::AddTlv(const Tlv& tlv)
 {
     return AddTlv(tlv.Tag, tlv.Value);
 }
 
+TlvBer::Builder&
+TlvBer::Builder::Reset()
+{
+    m_validateConstructed = false;
+    m_tag.clear();
+    m_data.clear();
+    return *this;
+}
+
 TlvBer 
 TlvBer::Builder::Build()
 {
     ValidateTag();
-    return TlvBer{ m_tag, m_data };
+    CalculateAndSetLength();
+    return TlvBer{ m_tag, m_length, m_data };
+}
+
+void 
+TlvBer::Builder::CalculateAndSetLength()
+{
+    m_length = CalculateLengthEncoding(m_data.size());
 }
 
 void

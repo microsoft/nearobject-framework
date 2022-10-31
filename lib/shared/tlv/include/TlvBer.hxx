@@ -23,7 +23,7 @@ public:
     static constexpr uint8_t TypeConstructed = 0b00100000;
     static constexpr uint8_t TypePrimitive   = 0b00000000;
 
-    enum class ClassTypes {
+    enum class Classes {
         UniversalClass                    = 0b00000000,
         ApplicationClass                  = 0b01000000,
         ContextSpecificClass              = 0b10000000,
@@ -46,7 +46,7 @@ public:
      * @param tag The tag to use.
      * @param value The data value to use.
      */
-    TlvBer(const std::vector<uint8_t>& tag, const std::vector<uint8_t>& value);
+    TlvBer(const std::vector<uint8_t>& tag, const std::vector<uint8_t>& length,const std::vector<uint8_t>& value);
 
     /**
      * @brief Decode a Tlv from a blob of BER-TLV data.
@@ -59,19 +59,26 @@ public:
     Parse(TlvBer **tlvOutput, const std::span<uint8_t>& data);
 
     /**
+     * @brief Encode this TlvBer into binary and returns a vector of bytes
+     * 
+     */
+    std::vector<uint8_t>
+    ToBytes();
+
+    /**
      * @brief Helper class to iteratively build a TlvBer. This allows separating
      * the creation logic from the main class and enables it to be immutable.
      * 
      * This allows the following pattern to build a TlvBer:
      * 
      * std::vector<uint8_t> tag81Value{};
-     * Tlv tag82Value = MakeATlv{};
+     * Tlv tlv = MakeATlv{};
      * 
      * TlvBer::Builder builder{};
      * auto tlvBer = builder
      *      .SetTag(0xA3)
      *      .AddTlv(0x81, tag81Value)
-     *      .AddTlv(Tlv.Tag, tag82Value)
+     *      .AddTlv(tlv)
      *      .Build();
      */
     class Builder
@@ -107,14 +114,20 @@ public:
         void WriteLength(uint64_t length);
 
         /**
-         * @brief subroutine to write some length octets
+         * @brief subroutine to return some length octets
          * 
          */
-        void WriteLength(uint8_t length);
+        std::vector<uint8_t> CalculateLengthEncoding(uint64_t length);
+
+        /**
+         * @brief subroutine to return some length octets
+         * 
+         */
+        std::vector<uint8_t> CalculateLengthEncoding(uint8_t length);
 
     public:
         /**
-         * @brief Set the tag of the top-level/parent TlvBer.
+         * @brief Set the tag of the top-level/parent TlvBer. This assumes that the input tag is already well constructed
          * 
          * @tparam T must be uint8_t, std::span<const uint8_t>, std::array<const uint8_t, N>
          * @param tag 
@@ -125,8 +138,7 @@ public:
         SetTag(const T& tag);
 
         /**
-         * @brief Sets a sequence of data, including its length, as the tlv
-         * storage buffer.
+         * @brief Sets a sequence of data, as the tlv value
          * 
          * @tparam V must be uint8_t, std::span<const uint8_t>, std::array<const uint8_t, N>
          * @param value 
@@ -134,10 +146,7 @@ public:
          */
         template<class V>
         Builder&
-        SetValue(const V& value){
-            WriteLengthAndValue(value);
-            return *this;
-        }
+        SetValue(const V& value);
 
         /**
          * @brief Add a nested tlv to this tlv. This makes it a constructed TlvBer.
@@ -175,6 +184,14 @@ public:
         Build();
 
         /**
+         * @brief clears the tag and data
+         *
+         * @return Builder& 
+         */
+        Builder&
+        Reset();
+
+        /**
          * @brief Top-level exception from which all context-specific exceptions derived.
          */
         struct InvalidTlvBerException : public std::exception {};
@@ -193,14 +210,22 @@ public:
         void
         ValidateTag();
 
+        /**
+         * @brief Populates the Length member, only called by Build()
+         * 
+         */
+        void CalculateAndSetLength();
+
     private:
         bool m_validateConstructed{ false };
         std::vector<uint8_t> m_tag;
+        std::vector<uint8_t> m_length;
         std::vector<uint8_t> m_data;
     };
 
 private:
     std::vector<uint8_t> m_tag;
+    std::vector<uint8_t> m_length;
     std::vector<uint8_t> m_value;
 };
 
