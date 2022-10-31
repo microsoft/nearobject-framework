@@ -102,6 +102,14 @@ TEST_CASE("test TlvBer", "[basic][infra]")
                           .Build();
         REQUIRE(byte_array_matches(parent.Tag, ptag));
         REQUIRE(byte_array_matches(parent.Value, child.ToBytes()));
+
+        auto parent2 = builder
+                          .Reset()
+                          .SetTag(ptag)
+                          .AddTlv(tag,value)
+                          .Build();
+        REQUIRE(byte_array_matches(parent2.Tag, parent.Tag));
+        REQUIRE(byte_array_matches(parent2.Value, parent.Value));
     }
 }
 

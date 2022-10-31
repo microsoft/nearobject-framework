@@ -103,9 +103,15 @@ public:
          * @tparam D must be uint8_t, or std::span<const uint8_t>, or std::array<const uint8_t, N>
          * @param data 
          */
-        template<class D>
+        template<size_t N>
         void
-        WriteLengthAndValue(const D& data);
+        WriteLengthAndValue(const std::array<const uint8_t, N>& data);
+
+        void
+        WriteLengthAndValue(const std::span<const uint8_t>& data);
+
+        void
+        WriteLengthAndValue(const uint8_t& data);
 
         /**
          * @brief subroutine to write some length octets

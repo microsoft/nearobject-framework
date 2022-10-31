@@ -91,15 +91,21 @@ TlvBer::Builder::SetTag(const uint8_t& tag)
     return *this;
 }
 
-template<class D>
+template<size_t N>
 void
-TlvBer::Builder::WriteLengthAndValue(const D& data)
+TlvBer::Builder::WriteLengthAndValue(const std::array<const uint8_t, N>& data)
 {
     WriteLength(data.size());
     WriteBytes(data);
 }
 
-template<>
+void
+TlvBer::Builder::WriteLengthAndValue(const std::span<const uint8_t>& data)
+{
+    WriteLength(data.size());
+    WriteBytes(data);
+}
+
 void
 TlvBer::Builder::WriteLengthAndValue(const uint8_t& value)
 {
