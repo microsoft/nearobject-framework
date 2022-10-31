@@ -81,7 +81,7 @@ TlvBer::Parse(TlvBer **tlvOutput, const std::span<uint8_t>& data)
 
     // Parse length.
     std::advance(dataIt, 1);
-    std::size_t length;
+    std::size_t length = 0;
 
     // Is length short form?
     if ((*dataIt & BitmaskLengthForm) == LengthFormShort) {
@@ -96,9 +96,17 @@ TlvBer::Parse(TlvBer **tlvOutput, const std::span<uint8_t>& data)
     }
 
     // Parse value.
-    std::vector<uint8_t> value;
     std::advance(dataIt, 1);
-    // TODO
+    std::vector<uint8_t> value{ dataIt, std::next(dataIt, length) };
+    switch (GetTagType(tag)) {
+    case Type::Constructed:
+        // TODO: parse nested tlvs
+        break;
+    case Type::Primitive:
+        auto tlv = std::make_unique<TlvBer>(tag, value);
+        *tlvOutput = tlv.release();
+        break;
+    }
 
     return parseResult;
 }
