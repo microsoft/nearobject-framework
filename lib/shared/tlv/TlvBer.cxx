@@ -42,15 +42,15 @@ TlvBer::Class
 TlvBer::GetClass(std::span<const uint8_t> tag)
 {
     switch (tag.front() & BitmaskClass) {
-    case ClassUniversal:
-        return Class::Universal;
-    case ClassApplication:
-        return Class::Application;
-    case ClassContextSpecific:
-        return Class::ContextSpecific;
-    case ClassPrivate:
-    default:
-        return Class::Private;
+        case ClassUniversal:
+            return Class::Universal;
+        case ClassApplication:
+            return Class::Application;
+        case ClassContextSpecific:
+            return Class::ContextSpecific;
+        case ClassPrivate:
+        default:
+            return Class::Private;
     }
 }
 
@@ -137,7 +137,7 @@ const std::array<std::tuple<uint8_t, std::size_t, std::optional<uint8_t>>, 5> Le
 std::vector<uint8_t>
 TlvBer::Builder::GetLengthEncoding(std::size_t length)
 {
-    for (const auto& [numBytes, maxValue, numOctetsInLengthFieldValue]: detail::LengthInfo) {
+    for (const auto& [numBytes, maxValue, numOctetsInLengthFieldValue] : detail::LengthInfo) {
         if (length <= maxValue) {
             // Short-form, values 0-127.
             if (!numOctetsInLengthFieldValue.has_value()) {
@@ -155,7 +155,7 @@ TlvBer::Builder::GetLengthEncoding(std::size_t length)
         }
     }
 
-    throw std::length_error("length out of range");        
+    throw std::length_error("length out of range");
 }
 
 template<size_t N>

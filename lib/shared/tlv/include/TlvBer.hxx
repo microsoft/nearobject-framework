@@ -24,17 +24,17 @@ public:
      * @brief See ISO/IEC 7816-4, 2005-01-15 section 5.2.2.1 'BER-TLV tag
      * fields', Table 7.
      */
-    static constexpr uint8_t BitmaskClass = 0b11000000;
-    static constexpr uint8_t BitmaskType = 0b00100000;
-    static constexpr uint8_t BitmaskTag = 0b00011111;
+    static constexpr uint8_t BitmaskClass          = 0b11000000;
+    static constexpr uint8_t BitmaskType           = 0b00100000;
+    static constexpr uint8_t BitmaskTag            = 0b00011111;
 
-    static constexpr uint8_t ClassUniversal = 0b00000000;
-    static constexpr uint8_t ClassApplication = 0b01000000; 
-    static constexpr uint8_t ClassContextSpecific = 0b10000000;
-    static constexpr uint8_t ClassPrivate = 0b11000000;
+    static constexpr uint8_t ClassUniversal        = 0b00000000;
+    static constexpr uint8_t ClassApplication      = 0b01000000;
+    static constexpr uint8_t ClassContextSpecific  = 0b10000000;
+    static constexpr uint8_t ClassPrivate          = 0b11000000;
 
-    static constexpr uint8_t TypeConstructed = 0b00100000;
-    static constexpr uint8_t TypePrimitive = 0b00000000;
+    static constexpr uint8_t TypeConstructed       = 0b00100000;
+    static constexpr uint8_t TypePrimitive         = 0b00000000;
 
     static constexpr uint8_t LengthTag2Byte = 0x81U;
     static constexpr uint8_t LengthTag3Byte = 0x82U;
@@ -119,7 +119,7 @@ public:
      * @return true 
      * @return false 
      */
-    bool 
+    bool
     IsPrimitive() const noexcept;
 
     /**
