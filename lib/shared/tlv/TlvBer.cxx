@@ -97,7 +97,7 @@ TlvBer::ToBytes()
 void
 TlvBer::Builder::WriteLength(uint64_t length)
 {
-    std::vector<uint8_t> lengthEncoding = GetLengthEncoding(length);
+    std::vector<uint8_t> lengthEncoding = TlvBer::GetLengthEncoding(length);
     m_data.insert(std::cend(m_data), std::cbegin(lengthEncoding), std::cend(lengthEncoding));
 }
 
@@ -135,7 +135,7 @@ const std::array<std::tuple<uint8_t, std::size_t, std::optional<uint8_t>>, 5> Le
 } // namespace detail
 
 std::vector<uint8_t>
-TlvBer::Builder::GetLengthEncoding(std::size_t length)
+TlvBer::GetLengthEncoding(std::size_t length)
 {
     for (const auto& [numBytes, maxValue, numOctetsInLengthFieldValue] : detail::LengthInfo) {
         if (length <= maxValue) {
@@ -228,7 +228,7 @@ TlvBer::Builder::Build()
 void
 TlvBer::Builder::CalculateAndSetLength()
 {
-    m_length = GetLengthEncoding(m_data.size());
+    m_length = TlvBer::GetLengthEncoding(m_data.size());
 }
 
 void

@@ -147,6 +147,19 @@ public:
     GetValues() const noexcept;
 
     /**
+     * @brief Generate the encoding of the length value. 
+     * 
+     * See ISO/IEC 7816-4, 2005-01-15 section 5.2.2.2 'BER-TLV length fields',
+     * Table 8.
+     * 
+     * @param length The length value to get the encoding for.
+     * @return std::vector<uint8_t> 
+     */
+    static
+    std::vector<uint8_t>
+    GetLengthEncoding(size_t length);
+
+    /**
      * @brief Decode a Tlv from a blob of BER-TLV data.
      *
      * @param tlvOutput The decoded Tlv, if parsing was successful (ParseResult::Succeeded). This must be a writeable pointer.
@@ -217,18 +230,6 @@ public:
          */
         void
         WriteLength(uint64_t length);
-
-        /**
-         * @brief Generate the encoding of the length value. 
-         * 
-         * See ISO/IEC 7816-4, 2005-01-15 section 5.2.2.2 'BER-TLV length fields',
-         * Table 8.
-         * 
-         * @param length The length value to get the encoding for.
-         * @return std::vector<uint8_t> 
-         */
-        std::vector<uint8_t>
-        GetLengthEncoding(size_t length);
 
     public:
         /**
