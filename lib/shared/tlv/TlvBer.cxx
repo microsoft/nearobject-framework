@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <bit>
 #include <iterator>
+#include <optional>
+#include <utility>
 
 #include "TlvBer.hxx"
 
@@ -15,10 +17,64 @@ TlvBer::TlvBer(const std::vector<uint8_t>& tag, const std::vector<uint8_t>& valu
     ::Tlv::Value = m_value;
 }
 
-bool
-TlvBer::TagIsConstructed(std::span<const uint8_t> tag)
+TlvBer::TlvBer(const std::vector<uint8_t>& tag, std::vector<TlvBer> values) :
+    m_tag(tag),
+    m_valuesConstructed(std::move(values))
 {
-    return (tag.front() & BitmaskType) == TypeConstructed;
+    ::Tlv::Tag = m_tag;
+    ::Tlv::Value = std::span<const uint8_t>{};
+}
+
+/* static */
+TlvBer::Type
+TlvBer::GetTagType(std::span<const uint8_t> tag)
+{
+    if ((tag.front() & BitmaskType) == TypeConstructed) {
+        return Type::Constructed;
+    } else {
+        return Type::Primitive;
+    }
+}
+
+/* static */
+TlvBer::Class
+TlvBer::GetClass(std::span<const uint8_t> tag)
+{
+    switch (tag.front() & BitmaskClass) {
+    case ClassUniversal:
+        return Class::Universal;
+    case ClassApplication:
+        return Class::Application;
+    case ClassContextSpecific:
+        return Class::ContextSpecific;
+    case ClassPrivate:
+    default:
+        return Class::Private;
+    }
+}
+
+std::span<const uint8_t>
+TlvBer::GetTag() const noexcept
+{
+    return m_tag;
+}
+
+std::vector<TlvBer>
+TlvBer::GetValues() const noexcept
+{
+    return m_valuesConstructed;
+}
+
+bool
+TlvBer::IsConstructed() const noexcept
+{
+    return GetType() == TlvBer::Type::Constructed;
+}
+
+bool
+TlvBer::IsPrimitive() const noexcept
+{
+    return GetType() == TlvBer::Type::Primitive;
 }
 
 void 
@@ -40,6 +96,42 @@ TlvBer::Builder::WriteData(uint32_t data)
         m_data.push_back(b2);
         m_data.push_back(b3);
     }
+}
+
+namespace detail
+{
+const std::array<std::tuple<uint8_t, std::size_t, std::optional<uint8_t>>, 5> LengthInfo = {
+    std::make_tuple(1, 0x0000007FU, std::nullopt),
+    std::make_tuple(2, 0x000000FFU, TlvBer::LengthTag2Byte),
+    std::make_tuple(3, 0x0000FFFFU, TlvBer::LengthTag3Byte),
+    std::make_tuple(4, 0x00FFFFFFU, TlvBer::LengthTag4Byte),
+    std::make_tuple(5, 0xFFFFFFFFU, TlvBer::LengthTag5Byte)
+};
+} // namespace detail
+
+/* static */
+std::vector<uint8_t>
+TlvBer::GetLengthEncoding(std::size_t length)
+{
+    for (const auto& [numBytes, maxValue, numOctetsInLengthFieldValue]: detail::LengthInfo) {
+        if (length <= maxValue) {
+            // Short-form, values 0-127.
+            if (!numOctetsInLengthFieldValue.has_value()) {
+                return { static_cast<uint8_t>(length) };
+            }
+
+            // Long-form, values 128+.
+            std::vector<uint8_t> encoding(numBytes);
+            for (auto i = numBytes; numBytes > 0; i--) {
+                encoding[i] = static_cast<uint8_t>(length & 0xFFU);
+                length >>= 8U;
+            }
+            encoding[0] = numOctetsInLengthFieldValue.value();
+            return encoding;
+        }
+    }
+
+    throw std::length_error("length out of range");        
 }
 
 void
@@ -96,7 +188,7 @@ TlvBer::Builder::Build()
 void
 TlvBer::Builder::ValidateTag()
 {
-    if (m_validateConstructed && !TlvBer::TagIsConstructed(m_tag)) {
+    if (m_validateConstructed && TlvBer::GetTagType(m_tag) != Type::Constructed) {
         throw InvalidTlvBerTagException();
     }
 }

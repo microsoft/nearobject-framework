@@ -13,15 +13,52 @@
 
 namespace encoding
 {
+/**
+ * @brief Represents a Basic Encoding Rules (BER) Tag-Length-Value (TLV)
+ * structure, as defined by ISO/IEC 8825-1:2015.
+ */
 class TlvBer : public Tlv
 {
 public:
+    /**
+     * @brief See ISO/IEC 7816-4, 2005-01-15 section 5.2.2.1 'BER-TLV tag
+     * fields', Table 7.
+     */
     static constexpr uint8_t BitmaskClass = 0b11000000;
-    static constexpr uint8_t BitmaskType  = 0b00100000;
-    static constexpr uint8_t BitmaskTag   = 0b00011111;
+    static constexpr uint8_t BitmaskType = 0b00100000;
+    static constexpr uint8_t BitmaskTag = 0b00011111;
+
+    static constexpr uint8_t ClassUniversal = 0b00000000;
+    static constexpr uint8_t ClassApplication = 0b01000000; 
+    static constexpr uint8_t ClassContextSpecific = 0b10000000;
+    static constexpr uint8_t ClassPrivate = 0b11000000;
 
     static constexpr uint8_t TypeConstructed = 0b00100000;
-    static constexpr uint8_t TypePrimitive   = 0b00000000;
+    static constexpr uint8_t TypePrimitive = 0b00000000;
+
+    static constexpr uint8_t LengthTag2Byte = 0x81U;
+    static constexpr uint8_t LengthTag3Byte = 0x82U;
+    static constexpr uint8_t LengthTag4Byte = 0x83U;
+    static constexpr uint8_t LengthTag5Byte = 0x84U;
+
+    /**
+     * @brief The class of the TLV.
+     */
+    enum class Class {
+        Invalid,
+        Universal,
+        Application,
+        ContextSpecific,
+        Private,
+    };
+
+    /**
+     * @brief The type of TLV.
+     */
+    enum class Type {
+        Primitive,
+        Constructed,
+    };
 
     /**
      * @brief Determines if the specified tag denotes a constructed BerTlv.
@@ -34,12 +71,92 @@ public:
     bool TagIsConstructed(std::span<const uint8_t> tag);
 
     /**
+     * @brief Get the BerTlv type from the tag value.
+     * 
+     * @param tag 
+     * @return Type 
+     */
+    static Type
+    GetTagType(std::span<const uint8_t> tag);
+
+    /**
+     * @brief Get the BerTlv class from the tag value.
+     * 
+     * @param tag 
+     * @return Class 
+     */
+    static Class
+    GetClass(std::span<const uint8_t> tag);
+
+    /**
+     * @brief Generate the encoding of the length value. 
+     * 
+     * See ISO/IEC 7816-4, 2005-01-15 section 5.2.2.2 'BER-TLV length fields',
+     * Table 8.
+     * 
+     * @param length The length value to get the encoding for.
+     * @return std::vector<uint8_t> 
+     */
+    static std::vector<uint8_t>
+    GetLengthEncoding(std::size_t length);
+
+    /**
      * @brief Construct a new BerTlv with given tag and value.
      * 
      * @param tag The tag to use.
      * @param value The data value to use.
      */
     TlvBer(const std::vector<uint8_t>& tag, const std::vector<uint8_t>& value);
+
+    /**
+     * @brief Construct a new constructed TlvBer object.
+     * 
+     * @param tag The tag to use.
+     * @param values The constructed values.
+     */
+    TlvBer(const std::vector<uint8_t>& tag, std::vector<TlvBer> values);
+
+    /**
+     * @brief Returns whether this TLV contains a constructed value.
+     * 
+     * @return true 
+     * @return false 
+     */
+    bool
+    IsConstructed() const noexcept;
+
+    /**
+     * @brief Returns whether this TLV contains a primitive value.
+     * 
+     * @return true 
+     * @return false 
+     */
+    bool 
+    IsPrimitive() const noexcept;
+
+    /**
+     * @brief Returns the type of thi TLV.
+     * 
+     * @return Type 
+     */
+    Type
+    GetType() const noexcept;
+
+    /**
+     * @brief Get the tag of the TLV.
+     * 
+     * @return std::span<const uint8_t> 
+     */
+    std::span<const uint8_t>
+    GetTag() const noexcept;
+
+    /**
+     * @brief Get the Values object
+     * 
+     * @return const std::vector<TlvBer> 
+     */
+    std::vector<TlvBer>
+    GetValues() const noexcept;
 
     /**
      * @brief Decode a Tlv from a blob of BER-TLV data.
@@ -235,6 +352,7 @@ public:
 private:
     std::vector<uint8_t> m_tag;
     std::vector<uint8_t> m_value;
+    std::vector<TlvBer> m_valuesConstructed;
 };
 
 } // namespace encoding
