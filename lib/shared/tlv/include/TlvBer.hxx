@@ -89,18 +89,6 @@ public:
     GetClass(std::span<const uint8_t> tag);
 
     /**
-     * @brief Generate the encoding of the length value. 
-     * 
-     * See ISO/IEC 7816-4, 2005-01-15 section 5.2.2.2 'BER-TLV length fields',
-     * Table 8.
-     * 
-     * @param length The length value to get the encoding for.
-     * @return std::vector<uint8_t> 
-     */
-    static std::vector<uint8_t>
-    GetLengthEncoding(std::size_t length);
-
-    /**
      * @brief Construct a new TlvBer with given tag and value.
      * 
      * @param tag The tag to use.
@@ -231,18 +219,16 @@ public:
         WriteLength(uint64_t length);
 
         /**
-         * @brief subroutine to return some length octets
+         * @brief Generate the encoding of the length value. 
          * 
+         * See ISO/IEC 7816-4, 2005-01-15 section 5.2.2.2 'BER-TLV length fields',
+         * Table 8.
+         * 
+         * @param length The length value to get the encoding for.
+         * @return std::vector<uint8_t> 
          */
         std::vector<uint8_t>
-        CalculateLengthEncoding(uint64_t length);
-
-        /**
-         * @brief subroutine to return some length octets
-         * 
-         */
-        std::vector<uint8_t>
-        CalculateLengthEncoding(uint8_t length);
+        GetLengthEncoding(size_t length);
 
     public:
         /**
