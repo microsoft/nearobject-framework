@@ -233,21 +233,28 @@ public:
 
     public:
         /**
-         * @brief Set the tag of the top-level/parent TlvBer. This assumes that the input tag is already well constructed
+         * @brief Set the tag of the top-level/parent BerTlv.
          * 
-         * @tparam T must be uint8_t, std::span<const uint8_t>, std::array<const uint8_t, N>
          * @param tag 
          * @return Builder& 
          */
         Builder&
-        SetTag(const uint8_t& tag);
+        SetTag(uint8_t tag);
 
+        /**
+         * @brief Set the tag of the top-level/parent BerTlv.
+         * 
+         * @tparam Iterable 
+         * @param tag 
+         * @return Builder& 
+         */
+        template <typename Iterable>
         Builder&
-        SetTag(const std::span<const uint8_t>& tag);
-
-        template<size_t N>
-        Builder&
-        SetTag(const std::array<uint8_t, N>& tag);
+        SetTag(Iterable& tag)
+        {
+            m_tag.assign(std::cbegin(tag), std::cend(tag));
+            return *this;
+        }
 
         /**
          * @brief Sets a sequence of data, as the tlv value

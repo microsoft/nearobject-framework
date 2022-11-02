@@ -102,22 +102,7 @@ TlvBer::Builder::WriteLength(uint64_t length)
 }
 
 TlvBer::Builder&
-TlvBer::Builder::SetTag(const std::span<const uint8_t>& tag)
-{
-    m_tag.assign(std::cbegin(tag), std::cend(tag));
-    return *this;
-}
-
-template<size_t N>
-TlvBer::Builder&
-TlvBer::Builder::SetTag(const std::array<uint8_t, N>& tag)
-{
-    m_tag.assign(std::cbegin(tag), std::cend(tag));
-    return *this;
-}
-
-TlvBer::Builder&
-TlvBer::Builder::SetTag(const uint8_t& tag)
+TlvBer::Builder::SetTag(uint8_t tag)
 {
     m_tag.assign(1, tag);
     return *this;
