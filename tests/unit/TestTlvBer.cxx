@@ -6,6 +6,28 @@
 
 using namespace encoding;
 
+std::vector<uint8_t>
+getOctets(size_t length){
+    
+    std::vector<uint8_t> holder;
+    holder.reserve(length);
+    for (size_t i=0;i<length;i++) {
+        holder.push_back(uint8_t(i));
+    }
+    return holder;
+}
+
+template<size_t N>
+std::vector<uint8_t>
+flatten(std::array<std::vector<uint8_t>, N> vectors) {
+    std::vector<uint8_t> accumulate;
+    size_t length = 0;
+    for(const auto& vec: vectors) length+= vec.size();
+    accumulate.reserve(length);
+    for(const auto& vec: vectors) accumulate.insert(std::cend(accumulate),std::cbegin(vec),std::cend(vec));
+    return accumulate;
+}
+
 TEST_CASE("test TlvBer", "[basic][infra]")
 {
     static constexpr std::array<uint8_t,2> tagTwoBytesPrimitive { 0x93, 0x14 };
@@ -15,6 +37,13 @@ TEST_CASE("test TlvBer", "[basic][infra]")
     static constexpr std::array<uint8_t,3> valueThreeBytes { 0x91, 0x92 , 0x93 };
     static constexpr std::array<uint8_t,4> valueFourBytes { 0x91, 0x92 , 0x93, 0x94 };
     static constexpr std::array<uint8_t,5> valueFiveBytes { 0x91, 0x92 , 0x93, 0x94, 0x95};
+
+    static constexpr size_t minSizeForTwoLengthOctets = 128;
+    static constexpr size_t minSizeForThreeLengthOctets = 256;
+    static constexpr size_t minSizeForFourLengthOctets = 65'536;
+    static constexpr size_t minSizeForFiveLengthOctets = 16'777'216;
+
+    // static constexpr std::array lengthEncodingForMinSizeForTwoLengthOctets
 
     SECTION("creating a TlvBer from an empty Builder holds no data")
     {
@@ -135,6 +164,26 @@ TEST_CASE("test TlvBer", "[basic][infra]")
         auto bytes = tlvBer.ToBytes();
         std::vector<uint8_t> desired{ 0x93, 0x94, 0x17, 0x05, 0x91, 0x92, 0x93, 0x94, 0x95 };
         REQUIRE(std::equal(std::cbegin(bytes),std::cend(bytes),std::cbegin(desired)));
+    }
+
+    SECTION("creating a TlvBer with a value that requires 2 length octets works")
+    {
+        TlvBer::Builder builder{};
+        auto valueOctets = getOctets(minSizeForTwoLengthOctets);
+        auto tlvBer = builder
+                          .SetTag(tagThreeBytesPrimitive)
+                          .SetValue(valueOctets)
+                          .Build();
+        REQUIRE(std::equal(std::cbegin(tlvBer.Tag),std::cend(tlvBer.Tag),std::cbegin(tagThreeBytesPrimitive)));
+        REQUIRE(std::equal(std::cbegin(tlvBer.Value),std::cend(tlvBer.Value),std::cbegin(valueOctets)));
+
+        // auto bytes = tlvBer.ToBytes();
+        // std::vector<uint8_t> desired = flatten({tagThreeBytesPrimitive,  ,valueOctets});
+        auto lengthEncoding = TlvBer::GetLengthEncoding(tlvBer.Value.size());
+        REQUIRE(lengthEncoding.size()>=2);
+        REQUIRE(lengthEncoding.size()<6);
+        REQUIRE(lengthEncoding.front() == TlvBer::LengthTag2Byte);
+        REQUIRE(lengthEncoding[1] == 1);
     }
 
     SECTION("resetting TlvBer::Builder works as expected")
