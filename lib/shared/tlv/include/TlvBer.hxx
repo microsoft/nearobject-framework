@@ -155,8 +155,7 @@ public:
      * @param length The length value to get the encoding for.
      * @return std::vector<uint8_t> 
      */
-    static
-    std::vector<uint8_t>
+    static std::vector<uint8_t>
     GetLengthEncoding(size_t length);
 
     /**
