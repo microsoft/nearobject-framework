@@ -173,7 +173,7 @@ public:
      * 
      */
     std::vector<uint8_t>
-    ToBytes();
+    ToBytes() const;
 
     /**
      * @brief Helper class to iteratively build a TlvBer. This allows separating

@@ -84,7 +84,7 @@ TlvBer::GetType() const noexcept
 }
 
 std::vector<uint8_t>
-TlvBer::ToBytes()
+TlvBer::ToBytes() const
 {
     std::vector<uint8_t> accumulate;
     accumulate.assign(std::cbegin(m_tag), std::cend(m_tag));
