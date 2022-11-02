@@ -52,6 +52,8 @@ public:
     static constexpr uint8_t TagValueLongField = 0b00011111;
     static constexpr uint8_t TagValueLastByte = 0b10000000;
 
+    static constexpr uint8_t MaxNumOctetsInLengthEncoding = 5;
+
     /**
      * @brief The class of the TLV.
      */
@@ -170,14 +172,45 @@ public:
     GetValues() const noexcept;
 
     /**
+     * @brief parses the first bytes to determine if they encode a tag properly. 
+     *        Advances the iterator it to once past the tag
+     *        Writes to tagOutput if a proper tag was parsed
+     * 
+     */
+    static
+    Tlv::ParseResult
+    ParseTag(std::vector<uint8_t>& tagOutput, std::span<uint8_t>::iterator& it, std::span<uint8_t>::iterator end);
+
+
+    /**
+     * @brief parses the first bytes to determine if they encode a length properly
+     *        Advances the iterator it to once past the lengthEncoing
+     *        Writes to length if a proper length was parsed
+     * 
+     */
+    static
+    Tlv::ParseResult
+    ParseLength(size_t& length, std::span<uint8_t>::iterator& it, std::span<uint8_t>::iterator end);
+
+    /**
+     * @brief parses the first bytes to determine if they encode a value properly
+     *        Writes to valueOutput if a proper value was parsed
+     * 
+     */
+    static
+    Tlv::ParseResult
+    ParseValue(std::vector<uint8_t>& valueOutput, size_t length, std::span<uint8_t>::iterator& it, std::span<uint8_t>::iterator end);
+
+    /**
      * @brief Decode a Tlv from a blob of BER-TLV data.
      *
      * @param tlvOutput The decoded Tlv, if parsing was successful (ParseResult::Succeeded). This must be a writeable pointer.
      * @param data The data to parse a Tlv from.
      * @return ParseResult The result of the parsing operation.
      */
+    template<typename Iterable>
     static ParseResult
-    Parse(TlvBer **tlvOutput, const std::span<uint8_t>& data);
+    Parse(TlvBer **tlvOutput, Iterable& data);
 
     /**
      * @brief Helper class to iteratively build a BerTlv. This allows separating

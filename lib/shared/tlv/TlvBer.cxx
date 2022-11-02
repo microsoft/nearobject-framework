@@ -53,51 +53,90 @@ TlvBer::GetClass(std::span<const uint8_t> tag)
     }
 }
 
-/* static */
 Tlv::ParseResult
-TlvBer::Parse(TlvBer **tlvOutput, const std::span<uint8_t>& data)
+TlvBer::ParseTag(std::vector<uint8_t>& tagOutput, std::span<uint8_t>::iterator& dataIt, std::span<uint8_t>::iterator dataEnd){
+    if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
+
+    tagOutput.push_back(*dataIt);
+
+    // Is tag short type?
+    if ((*dataIt & BitmaskTagFirstByte) != TagValueLongField) {
+        return Tlv::ParseResult::Succeeded;
+    } else {
+        // Tag is long-type. 
+        do {
+            dataIt++;
+            if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
+            tagOutput.push_back(*dataIt);
+        } while ((*dataIt & BitmaskTagLastByte) != TagValueLastByte);
+    }
+    dataIt++; // advance the dataIt to once past the tag
+    return Tlv::ParseResult::Succeeded;
+}
+
+Tlv::ParseResult
+TlvBer::ParseLength(size_t& length, std::span<uint8_t>::iterator& dataIt, std::span<uint8_t>::iterator dataEnd){
+    if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
+
+    // Is length short form?
+    if ((*dataIt & BitmaskLengthForm) == LengthFormShort) {
+        length = *dataIt & BitmaskLengthShort;
+    } else {
+        // Length is long form.
+        auto numOctets = *dataIt & BitmaskLengthNumOctets;
+        if(numOctets > MaxNumOctetsInLengthEncoding) return Tlv::ParseResult::Failed;
+
+        for (auto i = 0; i < numOctets; i++) {
+            dataIt++;
+            if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
+
+            length  = length << 8U;
+            length |= *dataIt;
+        }
+    }
+    dataIt++; // advance the dataIt to once past the lengthEncoding
+
+    return Tlv::ParseResult::Succeeded;
+}
+
+Tlv::ParseResult
+TlvBer::ParseValue(std::vector<uint8_t>& valueOutput,size_t length, std::span<uint8_t>::iterator& dataIt, std::span<uint8_t>::iterator dataEnd){
+    if(dataEnd - dataIt != length) return Tlv::ParseResult::Failed;
+    valueOutput = std::vector<uint8_t> { dataIt, std::next(dataIt, length) };
+    return Tlv::ParseResult::Succeeded;
+}
+
+/* static */
+template<typename Iterable>
+Tlv::ParseResult
+TlvBer::Parse(TlvBer **tlvOutput, Iterable& dataInput)
 {
     if (!tlvOutput) {
         return Tlv::ParseResult::Failed;
     }
 
+    std::span<uint8_t> data {std::cbegin(dataInput),std::cend(dataInput)};
+
     *tlvOutput = nullptr;
     auto dataIt = std::cbegin(data);
+    auto dataEnd = std::cend(data);
     auto parseResult = Tlv::ParseResult::Failed;
 
     // Parse tag.
     std::vector<uint8_t> tag;
-
-    // Is tag short type?
-    if ((*dataIt & BitmaskTagFirstByte) != TagValueLongField) {
-        tag.push_back(*dataIt & BitmaskTagFirstByte);
-    // Tag is long-type. 
-    } else {
-        do {
-            std::advance(dataIt, 1);
-            tag.push_back(*dataIt & BitmaskTagLong);
-        } while ((*dataIt & BitmaskTagLastByte) != TagValueLastByte);
-    }
+    parseResult = ParseTag(tag,dataIt,dataEnd);
+    if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
 
     // Parse length.
-    std::advance(dataIt, 1);
     std::size_t length = 0;
-
-    // Is length short form?
-    if ((*dataIt & BitmaskLengthForm) == LengthFormShort) {
-        length = *dataIt & BitmaskLengthShort;
-    // Length is long form.
-    } else {
-        auto numOctets = *dataIt & BitmaskLengthNumOctets;
-        for (auto i = 0; i < numOctets; i++, std::advance(dataIt, 1)) {
-            length  = length << 8U;
-            length |= *dataIt;
-        }
-    }
+    parseResult = ParseLength(length,dataIt,dataEnd);
+    if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
 
     // Parse value.
-    std::advance(dataIt, 1);
-    std::vector<uint8_t> value{ dataIt, std::next(dataIt, length) };
+    std::vector<uint8_t> value;
+    parseResult = ParseValue(value,length,dataIt,dataEnd);
+    if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
+
     switch (GetTagType(tag)) {
     case Type::Constructed:
         // TODO: parse nested tlvs
