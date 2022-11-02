@@ -197,7 +197,7 @@ public:
         /**
          * @brief Write a fixed-length array of data to the tlv storage buffer.
          * 
-         * @tparam D must be std::span<const uint8_t> or std::array<uint8_t, N>
+         * @tparam data must be an Iterable over uint8_t
          * @param data 
          */
         template<typename Iterable>
