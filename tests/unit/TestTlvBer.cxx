@@ -25,11 +25,14 @@ byte_array_matches(const A& a, const B& b)
 
 TEST_CASE("test TlvBer", "[basic][infra]")
 {
+    const std::array<uint8_t,2> tagTwoBytes { 0x93, 0x94 };
+    const std::array<uint8_t,2> valueTwoBytes { 0x91, 0x92 };
+
     SECTION("creating a TlvBer with no value works as expected")
     {
         TlvBer::Builder builder{};
         auto tlvBer = builder
-                          .SetTag('\x93')
+                          .SetTag(0x93)
                           .Build();
         REQUIRE(tlvBer.Tag.size() == 1);
         REQUIRE(tlvBer.Tag[0] == 0x93);
@@ -40,26 +43,24 @@ TEST_CASE("test TlvBer", "[basic][infra]")
     {
         TlvBer::Builder builder{};
         auto tlvBer = builder
-                          .SetTag('\x93')
-                          .SetValue('\x43')
+                          .SetTag(0x93)
+                          .SetValue(0x94)
                           .Build();
         REQUIRE(tlvBer.Tag.size() == 1);
         REQUIRE(tlvBer.Tag[0] == 0x93);
         REQUIRE(tlvBer.Value.size() == 1);
-        REQUIRE(tlvBer.Value[0] == 0x43);
+        REQUIRE(tlvBer.Value[0] == 0x94);
     }
 
     SECTION("creating a TlvBer with a long tag works as expected")
     {
         TlvBer::Builder builder{};
-        const uint8_t tag[] = { 0x93, 0x94 };
         auto tlvBer = builder
-                          .SetTag(tag)
-                          .SetValue('\x43')
+                          .SetTag(tagTwoBytes)
+                          .SetValue(0x43)
                           .Build();
-        REQUIRE(tlvBer.Tag.size() == 2);
-        REQUIRE(tlvBer.Tag[0] == tag[0]);
-        REQUIRE(tlvBer.Tag[1] == tag[1]);
+        REQUIRE(std::equal(std::cbegin(tlvBer.Tag),std::cend(tlvBer.Tag),std::cbegin(tagTwoBytes)));
+
         REQUIRE(tlvBer.Value.size() == 1);
         REQUIRE(tlvBer.Value[0] == 0x43);
     }
@@ -67,31 +68,24 @@ TEST_CASE("test TlvBer", "[basic][infra]")
     SECTION("creating a TlvBer with a long tag and value works as expected")
     {
         TlvBer::Builder builder{};
-        const uint8_t tag[] = { 0x93, 0x94 };
-        const uint8_t value[] = { 0x91, 0x92 };
         auto tlvBer = builder
-                          .SetTag(tag)
-                          .SetValue(value)
+                          .SetTag(tagTwoBytes)
+                          .SetValue(valueTwoBytes)
                           .Build();
-        REQUIRE(tlvBer.Tag.size() == 2);
-        REQUIRE(tlvBer.Tag[0] == tag[0]);
-        REQUIRE(tlvBer.Tag[1] == tag[1]);
-        REQUIRE(tlvBer.Value.size() == 2);
-        REQUIRE(tlvBer.Value[0] == value[0]);
-        REQUIRE(tlvBer.Value[1] == value[1]);
+        REQUIRE(std::equal(std::cbegin(tlvBer.Tag),std::cend(tlvBer.Tag),std::cbegin(tagTwoBytes)));
+        REQUIRE(std::equal(std::cbegin(tlvBer.Value),std::cend(tlvBer.Value),std::cbegin(valueTwoBytes)));
 
         auto bytes = tlvBer.ToBytes();
-        REQUIRE(byte_array_matches(bytes, std::vector<uint8_t>{ 0x93, 0x94, 0x02, 0x91, 0x92 }));
+        std::vector<uint8_t> desired{ 0x93, 0x94, 0x02, 0x91, 0x92 };
+        REQUIRE(std::equal(std::cbegin(bytes),std::cend(bytes),std::cbegin(desired)));
     }
 
     SECTION("creating a TlvBer with a nested TLV value works as expected")
     {
         TlvBer::Builder builder{};
-        const uint8_t tag[] = { 0x93, 0x94 };
-        const uint8_t value[] = { 0x91, 0x92 };
         auto child = builder
-                         .SetTag(tag)
-                         .SetValue(value)
+                         .SetTag(tagTwoBytes)
+                         .SetValue(valueTwoBytes)
                          .Build();
 
         const uint8_t ptag[] = { 0xB3, 0x94 };
@@ -100,16 +94,16 @@ TEST_CASE("test TlvBer", "[basic][infra]")
                           .SetTag(ptag)
                           .AddTlv(child)
                           .Build();
-        REQUIRE(byte_array_matches(parent.Tag, ptag));
-        REQUIRE(byte_array_matches(parent.Value, child.ToBytes()));
+        REQUIRE(std::equal(std::cbegin(parent.Tag),std::cend(parent.Tag),std::cbegin(ptag)));
+        REQUIRE(std::equal(std::cbegin(parent.Value),std::cend(parent.Value),std::cbegin(child.ToBytes())));
 
         auto parent2 = builder
                           .Reset()
                           .SetTag(ptag)
-                          .AddTlv(tag,value)
+                          .AddTlv(tagTwoBytes,valueTwoBytes)
                           .Build();
-        REQUIRE(byte_array_matches(parent2.Tag, parent.Tag));
-        REQUIRE(byte_array_matches(parent2.Value, parent.Value));
+        REQUIRE(std::equal(std::cbegin(parent2.Tag),std::cend(parent2.Tag),std::cbegin(parent.Tag)));
+        REQUIRE(std::equal(std::cbegin(parent2.Value),std::cend(parent2.Value),std::cbegin(parent.Value)));
     }
 }
 
