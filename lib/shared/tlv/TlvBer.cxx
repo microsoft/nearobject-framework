@@ -152,14 +152,14 @@ TlvBer::Builder::WriteLengthAndValue(const std::array<const uint8_t, N>& data)
 }
 
 void
-TlvBer::Builder::WriteLengthAndValue(const std::span<const uint8_t>& data)
+TlvBer::Builder::WriteLengthAndValue(std::span<const uint8_t> data)
 {
     WriteLength(data.size());
     WriteBytes(data);
 }
 
 void
-TlvBer::Builder::WriteLengthAndValue(const uint8_t& value)
+TlvBer::Builder::WriteLengthAndValue(uint8_t value)
 {
     WriteLength(uint8_t(1));
     m_data.push_back(value);
@@ -174,14 +174,14 @@ TlvBer::Builder::SetValue(const std::array<const uint8_t, N>& data)
 }
 
 TlvBer::Builder&
-TlvBer::Builder::SetValue(const std::span<const uint8_t>& data)
+TlvBer::Builder::SetValue(std::span<const uint8_t> data)
 {
     m_data.assign(std::cbegin(data), std::cend(data));
     return *this;
 }
 
 TlvBer::Builder&
-TlvBer::Builder::SetValue(const uint8_t& value)
+TlvBer::Builder::SetValue(uint8_t value)
 {
     m_data.assign(1, value);
     return *this;

@@ -219,10 +219,10 @@ public:
         WriteLengthAndValue(const std::array<const uint8_t, N>& data);
 
         void
-        WriteLengthAndValue(const std::span<const uint8_t>& data);
+        WriteLengthAndValue(std::span<const uint8_t> data);
 
         void
-        WriteLengthAndValue(const uint8_t& data);
+        WriteLengthAndValue(uint8_t data);
 
         /**
          * @brief subroutine to write some length octets
@@ -268,10 +268,10 @@ public:
         SetValue(const std::array<const uint8_t, N>& value);
 
         Builder&
-        SetValue(const std::span<const uint8_t>& value);
+        SetValue(std::span<const uint8_t> value);
 
         Builder&
-        SetValue(const uint8_t& value);
+        SetValue(uint8_t value);
 
         /**
          * @brief Add a nested tlv to this tlv. This makes it a constructed TlvBer.
