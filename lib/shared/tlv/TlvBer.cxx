@@ -196,9 +196,7 @@ TlvBer::Builder::AddTlv(const Tlv& tlv)
 TlvBer::Builder&
 TlvBer::Builder::Reset()
 {
-    m_validateConstructed = false;
-    m_tag.clear();
-    m_data.clear();
+    *this = {};
     return *this;
 }
 
