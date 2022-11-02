@@ -101,7 +101,7 @@ TlvBer::ParseLength(size_t& length, std::span<uint8_t>::iterator& dataIt, std::s
 
 Tlv::ParseResult
 TlvBer::ParseValue(std::vector<uint8_t>& valueOutput,size_t length, std::span<uint8_t>::iterator& dataIt, std::span<uint8_t>::iterator dataEnd){
-    if(dataEnd - dataIt != length) return Tlv::ParseResult::Failed;
+    if(dataEnd - dataIt < length) return Tlv::ParseResult::Failed;
     valueOutput = std::vector<uint8_t> { dataIt, std::next(dataIt, length) };
     return Tlv::ParseResult::Succeeded;
 }
