@@ -25,8 +25,8 @@ byte_array_matches(const A& a, const B& b)
 
 TEST_CASE("test TlvBer", "[basic][infra]")
 {
-    const std::array<uint8_t,2> tagTwoBytes { 0x93, 0x94 };
-    const std::array<uint8_t,2> valueTwoBytes { 0x91, 0x92 };
+    static constexpr std::array<uint8_t,2> tagTwoBytes { 0x93, 0x94 };
+    static constexpr std::array<uint8_t,2> valueTwoBytes { 0x91, 0x92 };
 
     SECTION("creating a TlvBer with no value works as expected")
     {
