@@ -29,6 +29,8 @@ TlvBer::TlvBer(const std::vector<uint8_t>& tag, std::vector<TlvBer> values) :
 TlvBer::Type
 TlvBer::GetTagType(std::span<const uint8_t> tag)
 {
+    if (tag.empty()) return Type::Primitive;
+    
     if ((tag.front() & BitmaskType) == TypeConstructed) {
         return Type::Constructed;
     } else {
@@ -210,7 +212,7 @@ TlvBer::Builder::Build()
 void
 TlvBer::Builder::ValidateTag()
 {
-    if (m_validateConstructed && TlvBer::GetTagType(m_tag) != Type::Constructed) {
+    if (m_validateConstructed != (TlvBer::GetTagType(m_tag) == Type::Constructed)) {
         throw InvalidTlvBerTagException();
     }
 }
