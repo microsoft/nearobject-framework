@@ -9,9 +9,8 @@
 
 using namespace encoding;
 
-TlvBer::TlvBer(const std::vector<uint8_t>& tag, const std::vector<uint8_t>& length, const std::vector<uint8_t>& value) :
+TlvBer::TlvBer(const std::vector<uint8_t>& tag, const std::vector<uint8_t>& value) :
     m_tag(tag),
-    m_length(length),
     m_value(value)
 {
     ::Tlv::Tag = m_tag;
@@ -89,7 +88,8 @@ TlvBer::ToBytes()
 {
     std::vector<uint8_t> accumulate;
     accumulate.assign(std::cbegin(m_tag), std::cend(m_tag));
-    accumulate.insert(std::cend(accumulate), std::cbegin(m_length), std::cend(m_length));
+    auto lengthOctets = TlvBer::GetLengthEncoding(m_value.size());
+    accumulate.insert(std::cend(accumulate), std::cbegin(lengthOctets), std::cend(lengthOctets));
     accumulate.insert(std::cend(accumulate), std::cbegin(m_value), std::cend(m_value));
     return accumulate;
 }
@@ -221,14 +221,7 @@ TlvBer
 TlvBer::Builder::Build()
 {
     ValidateTag();
-    CalculateAndSetLength();
-    return TlvBer{ m_tag, m_length, m_data };
-}
-
-void
-TlvBer::Builder::CalculateAndSetLength()
-{
-    m_length = TlvBer::GetLengthEncoding(m_data.size());
+    return TlvBer{ m_tag, m_data };
 }
 
 void

@@ -94,7 +94,7 @@ public:
      * @param tag The tag to use.
      * @param value The data value to use.
      */
-    TlvBer(const std::vector<uint8_t>& tag, const std::vector<uint8_t>& length, const std::vector<uint8_t>& value);
+    TlvBer(const std::vector<uint8_t>& tag, const std::vector<uint8_t>& value);
 
     /**
      * @brief Construct a new constructed TlvBer object.
@@ -331,23 +331,14 @@ public:
         void
         ValidateTag();
 
-        /**
-         * @brief Populates the Length member, only called by Build()
-         * 
-         */
-        void
-        CalculateAndSetLength();
-
     private:
         bool m_validateConstructed{ false };
         std::vector<uint8_t> m_tag;
-        std::vector<uint8_t> m_length;
         std::vector<uint8_t> m_data;
     };
 
 private:
     std::vector<uint8_t> m_tag;
-    std::vector<uint8_t> m_length;
     std::vector<uint8_t> m_value;
     std::vector<TlvBer> m_valuesConstructed;
 };
