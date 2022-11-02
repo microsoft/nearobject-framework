@@ -90,8 +90,8 @@ TlvBer::ToBytes() const
 {
     std::vector<uint8_t> accumulate;
     accumulate.assign(std::cbegin(m_tag), std::cend(m_tag));
-    auto lengthOctets = TlvBer::GetLengthEncoding(m_value.size());
-    accumulate.insert(std::cend(accumulate), std::cbegin(lengthOctets), std::cend(lengthOctets));
+    const auto lengthEncoding = TlvBer::GetLengthEncoding(m_value.size());
+    accumulate.insert(std::cend(accumulate), std::cbegin(lengthEncoding), std::cend(lengthEncoding));
     accumulate.insert(std::cend(accumulate), std::cbegin(m_value), std::cend(m_value));
     return accumulate;
 }
@@ -99,7 +99,7 @@ TlvBer::ToBytes() const
 void
 TlvBer::Builder::WriteLength(uint64_t length)
 {
-    std::vector<uint8_t> lengthEncoding = TlvBer::GetLengthEncoding(length);
+    const auto lengthEncoding = TlvBer::GetLengthEncoding(length);
     m_data.insert(std::cend(m_data), std::cbegin(lengthEncoding), std::cend(lengthEncoding));
 }
 

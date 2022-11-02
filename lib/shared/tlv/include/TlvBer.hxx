@@ -200,9 +200,9 @@ public:
          * @tparam D must be std::span<const uint8_t> or std::array<uint8_t, N>
          * @param data 
          */
-        template<class D>
+        template<typename Iterable>
         void
-        WriteBytes(const D& data)
+        WriteBytes(Iterable& data)
         {
             m_data.insert(std::cend(m_data), std::cbegin(data), std::cend(data));
         }
