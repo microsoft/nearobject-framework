@@ -78,10 +78,12 @@ TlvBer::ParseTag(TagClass& tagClass, TagType& tagType,std::vector<uint8_t>& tagN
 
     // Is tag short type?
     if ((*dataIt & BitmaskTagFirstByte) != TagValueLongField) {
+        tagComplete.push_back(*dataIt);
         tagNumber.push_back(*dataIt & BitmaskTagShort);
         return Tlv::ParseResult::Succeeded;
     } else {
         // Tag is long-type. 
+        tagComplete.push_back(*dataIt);
         int i = 0;
         do {
             i++;
@@ -89,6 +91,7 @@ TlvBer::ParseTag(TagClass& tagClass, TagType& tagType,std::vector<uint8_t>& tagN
             std::advance(dataIt,1);
             if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
             tagNumber.push_back(*dataIt & BitmaskTagLong);
+            tagComplete.push_back(*dataIt);
         } while ((*dataIt & BitmaskTagLastByte) != TagValueLastByte);
     }
     std::advance(dataIt,1); // advance the dataIt to once past the tag
