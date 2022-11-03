@@ -132,15 +132,31 @@ public:
     IsPrimitive() const noexcept;
 
     /**
-     * @brief Returns the type of thi TLV.
+     * @brief Returns the type of this TLV.
      * 
      * @return TagType 
      */
     TagType
-    GetType() const noexcept;
+    GetTagType() const noexcept;
 
     /**
-     * @brief Get the tag of the TLV.
+     * @brief Returns the class of this TLV.
+     * 
+     * @return TagClass
+     */
+    TagClass
+    GetTagClass() const noexcept;
+
+    /**
+     * @brief Get the tagNumber of the TLV.
+     * 
+     * @return std::span<const uint8_t> 
+     */
+    std::span<const uint8_t>
+    GetTagNumber() const noexcept;
+
+    /**
+     * @brief Get the tagComplete of the TLV.
      * 
      * @return std::span<const uint8_t> 
      */

@@ -189,6 +189,24 @@ TlvBer::Parse(TlvBer **tlvOutput, Iterable& dataInput)
     return parseResult;
 }
 
+TlvBer::TagType
+TlvBer::GetTagType() const noexcept
+{
+    return m_tagType;
+}
+
+TlvBer::TagClass
+TlvBer::GetTagClass() const noexcept
+{
+    return m_tagClass;
+}
+
+std::span<const uint8_t>
+TlvBer::GetTagNumber() const noexcept
+{
+    return m_tagNumber;
+}
+
 std::span<const uint8_t>
 TlvBer::GetTagComplete() const noexcept
 {
