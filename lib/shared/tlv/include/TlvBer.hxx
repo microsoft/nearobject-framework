@@ -196,7 +196,37 @@ public:
     template <typename Iterable>
     static
     Tlv::ParseResult
-    ParseTag(TagClass& tagClass, TagType& tagType,std::vector<uint8_t>& tagNumber, std::vector<uint8_t>& tagComplete, Iterable& data, size_t& bytesParsed);
+    ParseTag(TagClass& tagClass, TagType& tagType,std::vector<uint8_t>& tagNumber, std::vector<uint8_t>& tagComplete, Iterable& data, size_t& bytesParsed)
+    {
+        auto dataIt = std::cbegin(data);
+        auto dataEnd = std::cend(data);
+        if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
+
+        tagClass = GetTagClass(*dataIt);
+        tagType = GetTagType(*dataIt);
+
+        // Is tag short type?
+        if ((*dataIt & BitmaskTagFirstByte) != TagValueLongField) {
+            tagComplete.push_back(*dataIt);
+            tagNumber.push_back(*dataIt & BitmaskTagShort);
+            return Tlv::ParseResult::Succeeded;
+        } else {
+            // Tag is long-type. 
+            tagComplete.push_back(*dataIt);
+            int i = 0;
+            do {
+                i++;
+                if (i>3) return Tlv::ParseResult::Failed;
+                std::advance(dataIt,1);
+                if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
+                tagNumber.push_back(*dataIt & BitmaskTagLong);
+                tagComplete.push_back(*dataIt);
+            } while ((*dataIt & BitmaskTagLastByte) != TagValueLastByte);
+        }
+        std::advance(dataIt,1); // advance the dataIt to once past the tag
+        bytesParsed = std::distance(std::cbegin(data),dataIt);
+        return Tlv::ParseResult::Succeeded;
+    }
 
     static
     Tlv::ParseResult
