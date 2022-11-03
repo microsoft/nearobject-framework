@@ -162,13 +162,15 @@ TlvBer::Parse(TlvBer **tlvOutput, Iterable& dataInput)
     // Parse length.
     offset += bytesParsed;
     std::size_t length = 0;
-    parseResult = ParseLength(length,data.subspan(offset),bytesParsed);
+    auto subspan = data.subspan(offset);
+    parseResult = ParseLength(length,subspan,bytesParsed);
     if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
 
     // Parse value.
     offset += bytesParsed;
     std::vector<uint8_t> value;
-    parseResult = ParseValue(value,length,data.subspan(offset),bytesParsed);
+    subspan = data.subspan(offset);
+    parseResult = ParseValue(value,length,subspan,bytesParsed);
     if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
 
     switch (tagType) {
