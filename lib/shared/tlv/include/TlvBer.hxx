@@ -24,9 +24,15 @@ public:
      * @brief See ISO/IEC 7816-4, 2005-01-15 section 5.2.2.1 'BER-TLV tag
      * fields', Table 7.
      */
-    static constexpr uint8_t BitmaskClass          = 0b11000000;
-    static constexpr uint8_t BitmaskType           = 0b00100000;
-    static constexpr uint8_t BitmaskTag            = 0b00011111;
+    static constexpr uint8_t BitmaskClass = 0b11000000;
+    static constexpr uint8_t BitmaskType = 0b00100000;
+    static constexpr uint8_t BitmaskTagFirstByte = 0b00011111;
+    static constexpr uint8_t BitmaskTagLastByte = 0b10000000;
+    static constexpr uint8_t BitmaskTagShort = 0b00011111;
+    static constexpr uint8_t BitmaskTagLong = 0b01111111;
+    static constexpr uint8_t BitmaskLengthForm = 0b10000000;
+    static constexpr uint8_t BitmaskLengthShort = 0b01111111;
+    static constexpr uint8_t BitmaskLengthNumOctets = 0b01111111;
 
     static constexpr uint8_t ClassUniversal        = 0b00000000;
     static constexpr uint8_t ClassApplication      = 0b01000000;
@@ -40,11 +46,18 @@ public:
     static constexpr uint8_t LengthTag3Byte = 0x82U;
     static constexpr uint8_t LengthTag4Byte = 0x83U;
     static constexpr uint8_t LengthTag5Byte = 0x84U;
+    static constexpr uint8_t LengthFormShort = 0b00000000;
+    static constexpr uint8_t LengthFormLong = 0b10000000;
+
+    static constexpr uint8_t TagValueLongField = 0b00011111;
+    static constexpr uint8_t TagValueLastByte = 0b10000000;
+
+    static constexpr uint8_t MaxNumOctetsInLengthEncoding = 5;
 
     /**
      * @brief The class of the TLV.
      */
-    enum class Class {
+    enum class TagClass {
         Invalid,
         Universal,
         Application,
@@ -55,7 +68,7 @@ public:
     /**
      * @brief The type of TLV.
      */
-    enum class Type {
+    enum class TagType {
         Primitive,
         Constructed,
     };
@@ -74,27 +87,39 @@ public:
      * @brief Get the TlvBer type from the tag value.
      * 
      * @param tag 
-     * @return Type 
+     * @return TagType 
      */
-    static Type
-    GetTagType(std::span<const uint8_t> tag);
+    static TagType
+    GetTagType(uint8_t tag);
 
     /**
      * @brief Get the TlvBer class from the tag value.
      * 
      * @param tag 
-     * @return Class 
+     * @return TagClass 
      */
-    static Class
-    GetClass(std::span<const uint8_t> tag);
+    static TagClass
+    GetTagClass(uint8_t tag);
 
     /**
-     * @brief Construct a new TlvBer with given tag and value.
+     * @brief Generate the encoding of the length value. 
+     * 
+     * See ISO/IEC 7816-4, 2005-01-15 section 5.2.2.2 'BER-TLV length fields',
+     * Table 8.
+     * 
+     * @param length The length value to get the encoding for.
+     * @return std::vector<uint8_t> 
+     */
+    static std::vector<uint8_t>
+    GetLengthEncoding(std::size_t length);
+    
+    /**
+     * @brief Construct a new BerTlv with given tag and value.
      * 
      * @param tag The tag to use.
      * @param value The data value to use.
      */
-    TlvBer(const std::vector<uint8_t>& tag, const std::vector<uint8_t>& value);
+    TlvBer(TagClass tagClass, TagType tagType, const std::vector<uint8_t>& tagNumber, const std::vector<uint8_t>& tagComplete, const std::vector<uint8_t>& value);
 
     /**
      * @brief Construct a new constructed TlvBer object.
@@ -102,8 +127,8 @@ public:
      * @param tag The tag to use.
      * @param values The constructed values.
      */
-    TlvBer(const std::vector<uint8_t>& tag, std::vector<TlvBer> values);
-
+    TlvBer(TagClass tagClass, TagType tagType, const std::vector<uint8_t>& tagNumber, const std::vector<uint8_t>& tagComplete, std::vector<TlvBer>& value);
+   
     /**
      * @brief Returns whether this TLV contains a constructed value.
      * 
@@ -125,21 +150,37 @@ public:
     /**
      * @brief Returns the type of this TLV.
      * 
-     * @return Type 
+     * @return TagType 
      */
-    Type
-    GetType() const noexcept;
+    TagType
+    GetTagType() const noexcept;
 
     /**
-     * @brief Get the tag of the TLV.
+     * @brief Returns the class of this TLV.
+     * 
+     * @return TagClass
+     */
+    TagClass
+    GetTagClass() const noexcept;
+
+    /**
+     * @brief Get the tagNumber of the TLV.
      * 
      * @return std::span<const uint8_t> 
      */
     std::span<const uint8_t>
-    GetTag() const noexcept;
+    GetTagNumber() const noexcept;
 
     /**
-     * @brief Get the Values object
+     * @brief Get the tagComplete of the TLV.
+     * 
+     * @return std::span<const uint8_t> 
+     */
+    std::span<const uint8_t>
+    GetTagComplete() const noexcept;
+
+    /**
+     * @brief Get the Values object. Returns empty if this object is Primitive
      * 
      * @return const std::vector<TlvBer> 
      */
@@ -147,16 +188,39 @@ public:
     GetValues() const noexcept;
 
     /**
-     * @brief Generate the encoding of the length value. 
+     * @brief parses the first bytes to determine if they encode a tag properly. 
+     *        Advances the iterator it to once past the tag
+     *        Writes to tagClass, tagType, tagNumber, tagComplete, and bytesParsed if a proper tag was parsed
      * 
-     * See ISO/IEC 7816-4, 2005-01-15 section 5.2.2.2 'BER-TLV length fields',
-     * Table 8.
-     * 
-     * @param length The length value to get the encoding for.
-     * @return std::vector<uint8_t> 
      */
-    static std::vector<uint8_t>
-    GetLengthEncoding(size_t length);
+    template <typename Iterable>
+    static
+    Tlv::ParseResult
+    ParseTag(TagClass& tagClass, TagType& tagType,std::vector<uint8_t>& tagNumber, std::vector<uint8_t>& tagComplete, Iterable& data, size_t& bytesParsed);
+
+    static
+    Tlv::ParseResult
+    ParseTag(TagClass& tagClass, TagType& tagType,std::vector<uint8_t>& tagNumber, std::vector<uint8_t>& tagComplete, uint8_t tag);
+
+    /**
+     * @brief parses the first bytes to determine if they encode a length properly
+     *        Writes to length and bytesParsed if a proper length was parsed
+     * 
+     */
+    template <typename Iterable>
+    static
+    Tlv::ParseResult
+    ParseLength(size_t& length, Iterable& data, size_t& bytesParsed);
+
+    /**
+     * @brief parses the first bytes to determine if they encode a value properly
+     *        Writes to valueOutput if a proper value was parsed
+     * 
+     */
+    template <typename Iterable>
+    static
+    Tlv::ParseResult
+    ParseValue(std::vector<uint8_t>& valueOutput, size_t length, Iterable& data, size_t& bytesParsed);
 
     /**
      * @brief Decode a Tlv from a blob of BER-TLV data.
@@ -165,8 +229,9 @@ public:
      * @param data The data to parse a Tlv from.
      * @return ParseResult The result of the parsing operation.
      */
+    template<typename Iterable>
     static ParseResult
-    Parse(TlvBer** tlvOutput, const std::span<uint8_t>& data);
+    Parse(TlvBer **tlvOutput, Iterable& data);
 
     /**
      * @brief Encode this TlvBer into binary and returns a vector of bytes
@@ -251,7 +316,8 @@ public:
         Builder&
         SetTag(Iterable& tag)
         {
-            m_tag.assign(std::cbegin(tag), std::cend(tag));
+            size_t bytesParsed;
+            ParseTag(m_tagClass,m_tagType,m_tagNumber,m_tagComplete,tag,bytesParsed);
             return *this;
         }
 
@@ -262,18 +328,18 @@ public:
          * @param value 
          * @return Builder& 
          */
-        template<size_t N>
+        template<typename Iterable>
         Builder&
-        SetValue(const std::array<const uint8_t, N>& value);
-
-        Builder&
-        SetValue(std::span<const uint8_t> value);
+        SetValue(Iterable& value){
+            m_data.assign(std::cbegin(value), std::cend(value));
+            return *this;
+        }
 
         Builder&
         SetValue(uint8_t value);
 
         /**
-         * @brief Add a nested tlv to this tlv. This makes it a constructed TlvBer.
+         * @brief Add a nested tlv to this tlv. This makes it a constructed TlvBer. TODO will have to add to the m_valuesConstructed field
          * 
          * @tparam T, must be std::array<uint8_t, N>, or std::span<const uint8_t>
          * @tparam V, must be std::array<uint8_t, N>, std::span<const uint8_t> or uint8_t
@@ -339,12 +405,19 @@ public:
 
     private:
         bool m_validateConstructed{ false };
-        std::vector<uint8_t> m_tag;
+        TagClass m_tagClass;
+        TagType m_tagType;
+        std::vector<uint8_t> m_tagComplete;
+        std::vector<uint8_t> m_tagNumber;
         std::vector<uint8_t> m_data;
+        std::vector<TlvBer> m_valuesConstructed;
     };
 
 private:
-    std::vector<uint8_t> m_tag;
+    TagClass m_tagClass;
+    TagType m_tagType;
+    std::vector<uint8_t> m_tagNumber;
+    std::vector<uint8_t> m_tagComplete;
     std::vector<uint8_t> m_value;
     std::vector<TlvBer> m_valuesConstructed;
 };
