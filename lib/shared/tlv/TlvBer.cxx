@@ -9,73 +9,98 @@
 
 using namespace encoding;
 
-TlvBer::TlvBer(const std::vector<uint8_t>& tag, const std::vector<uint8_t>& value) :
-    m_tag(tag),
+TlvBer::TlvBer(TagClass tagClass, TagType tagType, const std::vector<uint8_t>& tagNumber, const std::vector<uint8_t>& tagComplete, const std::vector<uint8_t>& value) :
+    m_tagClass(tagClass),
+    m_tagType(tagType),
+    m_tagNumber(tagNumber),
+    m_tagComplete(tagComplete),
     m_value(value)
 {
-    ::Tlv::Tag = m_tag;
+    ::Tlv::Tag = m_tagComplete;
     ::Tlv::Value = m_value;
 }
 
-TlvBer::TlvBer(const std::vector<uint8_t>& tag, std::vector<TlvBer> values) :
-    m_tag(tag),
+TlvBer::TlvBer(TagClass tagClass, TagType tagType, const std::vector<uint8_t>& tagNumber, const std::vector<uint8_t>& tagComplete, std::vector<TlvBer>& values) :
+    m_tagClass(tagClass),
+    m_tagType(tagType),
+    m_tagNumber(tagNumber),
+    m_tagComplete(tagComplete),
     m_valuesConstructed(std::move(values))
 {
-    ::Tlv::Tag = m_tag;
+    ::Tlv::Tag = m_tagComplete;
     ::Tlv::Value = std::span<const uint8_t>{};
 }
 
 /* static */
-TlvBer::Type
-TlvBer::GetTagType(std::span<const uint8_t> tag)
+TlvBer::TagType
+TlvBer::GetTagType(uint8_t tag)
 {
-    if ((tag.front() & BitmaskType) == TypeConstructed) {
-        return Type::Constructed;
+    if ((tag & BitmaskType) == TypeConstructed) {
+        return TagType::Constructed;
     } else {
-        return Type::Primitive;
+        return TagType::Primitive;
     }
 }
 
 /* static */
-TlvBer::Class
-TlvBer::GetClass(std::span<const uint8_t> tag)
+TlvBer::TagClass
+TlvBer::GetTagClass(uint8_t tag)
 {
-    switch (tag.front() & BitmaskClass) {
+    switch (tag & BitmaskClass) {
     case ClassUniversal:
-        return Class::Universal;
+        return TagClass::Universal;
     case ClassApplication:
-        return Class::Application;
+        return TagClass::Application;
     case ClassContextSpecific:
-        return Class::ContextSpecific;
+        return TagClass::ContextSpecific;
     case ClassPrivate:
     default:
-        return Class::Private;
+        return TagClass::Private;
     }
 }
 
 Tlv::ParseResult
-TlvBer::ParseTag(std::vector<uint8_t>& tagOutput, std::span<uint8_t>::iterator& dataIt, std::span<uint8_t>::iterator dataEnd){
+TlvBer::ParseTag(TagClass& tagClass, TagType& tagType,std::vector<uint8_t>& tagNumber, std::vector<uint8_t>& tagComplete, uint8_t tag){
+    size_t bytesParsed;
+    uint8_t tagArray[] = {tag};
+    return ParseTag(tagClass,tagType,tagNumber,tagComplete,tagArray,bytesParsed);
+}
+
+template<typename Iterable>
+Tlv::ParseResult
+TlvBer::ParseTag(TagClass& tagClass, TagType& tagType,std::vector<uint8_t>& tagNumber, std::vector<uint8_t>& tagComplete, Iterable& data, size_t& bytesParsed){
+    auto dataIt = std::cbegin(data);
+    auto dataEnd = std::cend(data);
     if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
 
-    tagOutput.push_back(*dataIt);
+    tagClass = GetTagClass(*dataIt);
+    tagType = GetTagType(*dataIt);
 
     // Is tag short type?
     if ((*dataIt & BitmaskTagFirstByte) != TagValueLongField) {
+        tagNumber.push_back(*dataIt & BitmaskTagShort);
         return Tlv::ParseResult::Succeeded;
     } else {
         // Tag is long-type. 
+        int i = 0;
         do {
-            dataIt++;
+            i++;
+            if (i>3) return Tlv::ParseResult::Failed;
+            std::advance(dataIt,1);
             if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
-            tagOutput.push_back(*dataIt);
+            tagNumber.push_back(*dataIt & BitmaskTagLong);
         } while ((*dataIt & BitmaskTagLastByte) != TagValueLastByte);
     }
-    dataIt++; // advance the dataIt to once past the tag
+    std::advance(dataIt,1); // advance the dataIt to once past the tag
+    bytesParsed = std::distance(std::cbegin(data),dataIt);
     return Tlv::ParseResult::Succeeded;
 }
 
+template <typename Iterable>
 Tlv::ParseResult
-TlvBer::ParseLength(size_t& length, std::span<uint8_t>::iterator& dataIt, std::span<uint8_t>::iterator dataEnd){
+TlvBer::ParseLength(size_t& length, Iterable& data, size_t& bytesParsed){
+    auto dataIt = std::cbegin(data);
+    auto dataEnd = std::cend(data);
     if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
 
     // Is length short form?
@@ -87,22 +112,26 @@ TlvBer::ParseLength(size_t& length, std::span<uint8_t>::iterator& dataIt, std::s
         if(numOctets > MaxNumOctetsInLengthEncoding) return Tlv::ParseResult::Failed;
 
         for (auto i = 0; i < numOctets; i++) {
-            dataIt++;
+            std::advance(dataIt,1);
             if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
 
             length  = length << 8U;
             length |= *dataIt;
         }
     }
-    dataIt++; // advance the dataIt to once past the lengthEncoding
-
+    std::advance(dataIt,1); // advance the dataIt to once past the lengthEncoding
+    bytesParsed = std::distance(std::cbegin(data),dataIt);
     return Tlv::ParseResult::Succeeded;
 }
 
+template <typename Iterable>
 Tlv::ParseResult
-TlvBer::ParseValue(std::vector<uint8_t>& valueOutput,size_t length, std::span<uint8_t>::iterator& dataIt, std::span<uint8_t>::iterator dataEnd){
-    if(dataEnd - dataIt < length) return Tlv::ParseResult::Failed;
+TlvBer::ParseValue(std::vector<uint8_t>& valueOutput,size_t length, Iterable& data, size_t& bytesParsed){
+    auto dataIt = std::cbegin(data);
+    auto dataEnd = std::cend(data);
+    if(std::distance(dataIt,dataEnd) < length) return Tlv::ParseResult::Failed;
     valueOutput = std::vector<uint8_t> { dataIt, std::next(dataIt, length) };
+    bytesParsed = length;
     return Tlv::ParseResult::Succeeded;
 }
 
@@ -118,31 +147,36 @@ TlvBer::Parse(TlvBer **tlvOutput, Iterable& dataInput)
     std::span<uint8_t> data {std::cbegin(dataInput),std::cend(dataInput)};
 
     *tlvOutput = nullptr;
-    auto dataIt = std::cbegin(data);
-    auto dataEnd = std::cend(data);
     auto parseResult = Tlv::ParseResult::Failed;
 
     // Parse tag.
-    std::vector<uint8_t> tag;
-    parseResult = ParseTag(tag,dataIt,dataEnd);
+    TagClass tagClass;
+    TagType tagType;
+    std::vector<uint8_t> tagNumber;
+    std::vector<uint8_t> tagComplete;
+    size_t offset = 0;
+    size_t bytesParsed = 0;
+    parseResult = ParseTag(tagClass,tagType,tagNumber,tagComplete,data,bytesParsed);
     if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
 
     // Parse length.
+    offset += bytesParsed;
     std::size_t length = 0;
-    parseResult = ParseLength(length,dataIt,dataEnd);
+    parseResult = ParseLength(length,data.subspan(offset),bytesParsed);
     if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
 
     // Parse value.
+    offset += bytesParsed;
     std::vector<uint8_t> value;
-    parseResult = ParseValue(value,length,dataIt,dataEnd);
+    parseResult = ParseValue(value,length,data.subspan(offset),bytesParsed);
     if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
 
-    switch (GetTagType(tag)) {
-    case Type::Constructed:
+    switch (tagType) {
+    case TagType::Constructed:
         // TODO: parse nested tlvs
         break;
-    case Type::Primitive:
-        *tlvOutput = std::make_unique<TlvBer>(tag, value).release();
+    case TagType::Primitive:
+        *tlvOutput = std::make_unique<TlvBer>(tagClass, tagType, tagNumber, tagComplete, value).release();
         parseResult = ParseResult::Succeeded;
         break;
     }
@@ -151,9 +185,9 @@ TlvBer::Parse(TlvBer **tlvOutput, Iterable& dataInput)
 }
 
 std::span<const uint8_t>
-TlvBer::GetTag() const noexcept
+TlvBer::GetTagComplete() const noexcept
 {
-    return m_tag;
+    return m_tagComplete;
 }
 
 std::vector<TlvBer>
@@ -165,13 +199,13 @@ TlvBer::GetValues() const noexcept
 bool
 TlvBer::IsConstructed() const noexcept
 {
-    return GetType() == TlvBer::Type::Constructed;
+    return m_tagType == TlvBer::TagType::Constructed;
 }
 
 bool
 TlvBer::IsPrimitive() const noexcept
 {
-    return GetType() == TlvBer::Type::Primitive;
+    return m_tagType == TlvBer::TagType::Primitive;
 }
 
 void 
@@ -254,7 +288,7 @@ TlvBer::Builder::WriteValue(std::span<const uint8_t> value)
 TlvBer::Builder&
 TlvBer::Builder::SetTag(uint8_t tag)
 {
-    m_tag.assign(1, tag);
+    TlvBer::ParseTag(m_tagClass,m_tagType,m_tagNumber,m_tagComplete,tag);
     return *this;
 }
 
@@ -279,13 +313,13 @@ TlvBer
 TlvBer::Builder::Build()
 {
     ValidateTag();
-    return TlvBer{ m_tag, m_data };
+    return TlvBer{ m_tagClass, m_tagType, m_tagNumber, m_tagComplete, m_data };
 }
 
 void
 TlvBer::Builder::ValidateTag()
 {
-    if (m_validateConstructed && TlvBer::GetTagType(m_tag) != Type::Constructed) {
+    if (m_validateConstructed && m_tagType != TagType::Constructed) {
         throw InvalidTlvBerTagException();
     }
 }

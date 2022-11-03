@@ -57,7 +57,7 @@ public:
     /**
      * @brief The class of the TLV.
      */
-    enum class Class {
+    enum class TagClass {
         Invalid,
         Universal,
         Application,
@@ -68,7 +68,7 @@ public:
     /**
      * @brief The type of TLV.
      */
-    enum class Type {
+    enum class TagType {
         Primitive,
         Constructed,
     };
@@ -87,19 +87,19 @@ public:
      * @brief Get the BerTlv type from the tag value.
      * 
      * @param tag 
-     * @return Type 
+     * @return TagType 
      */
-    static Type
-    GetTagType(std::span<const uint8_t> tag);
+    static TagType
+    GetTagType(uint8_t tag);
 
     /**
      * @brief Get the BerTlv class from the tag value.
      * 
      * @param tag 
-     * @return Class 
+     * @return TagClass 
      */
-    static Class
-    GetClass(std::span<const uint8_t> tag);
+    static TagClass
+    GetTagClass(uint8_t tag);
 
     /**
      * @brief Generate the encoding of the length value. 
@@ -112,22 +112,6 @@ public:
      */
     static std::vector<uint8_t>
     GetLengthEncoding(std::size_t length);
-
-    /**
-     * @brief Construct a new BerTlv with given tag and value.
-     * 
-     * @param tag The tag to use.
-     * @param value The data value to use.
-     */
-    TlvBer(const std::vector<uint8_t>& tag, const std::vector<uint8_t>& value);
-
-    /**
-     * @brief Construct a new constructed TlvBer object.
-     * 
-     * @param tag The tag to use.
-     * @param values The constructed values.
-     */
-    TlvBer(const std::vector<uint8_t>& tag, std::vector<TlvBer> values);
 
     /**
      * @brief Returns whether this TLV contains a constructed value.
@@ -150,9 +134,9 @@ public:
     /**
      * @brief Returns the type of thi TLV.
      * 
-     * @return Type 
+     * @return TagType 
      */
-    Type
+    TagType
     GetType() const noexcept;
 
     /**
@@ -161,10 +145,10 @@ public:
      * @return std::span<const uint8_t> 
      */
     std::span<const uint8_t>
-    GetTag() const noexcept;
+    GetTagComplete() const noexcept;
 
     /**
-     * @brief Get the Values object
+     * @brief Get the Values object. Returns empty if this object is Primitive
      * 
      * @return const std::vector<TlvBer> 
      */
@@ -174,13 +158,17 @@ public:
     /**
      * @brief parses the first bytes to determine if they encode a tag properly. 
      *        Advances the iterator it to once past the tag
-     *        Writes to tagOutput if a proper tag was parsed
+     *        Writes to tagClass, tagType, and tagNumber if a proper tag was parsed
      * 
      */
+    template <typename Iterable>
     static
     Tlv::ParseResult
-    ParseTag(std::vector<uint8_t>& tagOutput, std::span<uint8_t>::iterator& it, std::span<uint8_t>::iterator end);
+    ParseTag(TagClass& tagClass, TagType& tagType,std::vector<uint8_t>& tagNumber, std::vector<uint8_t>& tagComplete, Iterable& data, size_t& bytesParsed);
 
+    static
+    Tlv::ParseResult
+    ParseTag(TagClass& tagClass, TagType& tagType,std::vector<uint8_t>& tagNumber, std::vector<uint8_t>& tagComplete, uint8_t tag);
 
     /**
      * @brief parses the first bytes to determine if they encode a length properly
@@ -188,18 +176,20 @@ public:
      *        Writes to length if a proper length was parsed
      * 
      */
+    template <typename Iterable>
     static
     Tlv::ParseResult
-    ParseLength(size_t& length, std::span<uint8_t>::iterator& it, std::span<uint8_t>::iterator end);
+    ParseLength(size_t& length, Iterable& data, size_t& bytesParsed);
 
     /**
      * @brief parses the first bytes to determine if they encode a value properly
      *        Writes to valueOutput if a proper value was parsed
      * 
      */
+    template <typename Iterable>
     static
     Tlv::ParseResult
-    ParseValue(std::vector<uint8_t>& valueOutput, size_t length, std::span<uint8_t>::iterator& it, std::span<uint8_t>::iterator end);
+    ParseValue(std::vector<uint8_t>& valueOutput, size_t length, Iterable& data, size_t& bytesParsed);
 
     /**
      * @brief Decode a Tlv from a blob of BER-TLV data.
@@ -299,12 +289,13 @@ public:
         Builder&
         SetTag(Iterable& tag)
         {
-            m_tag.assign(std::cbegin(tag), std::cend(tag));
+            size_t bytesParsed;
+            ParseTag(m_tagClass,m_tagType,m_tagNumber,m_tagComplete,tag,bytesParsed);
             return *this;
         }
 
         /**
-         * @brief Add a nested tlv to this tlv. This makes it a constructed BerTlv.
+         * @brief Add a nested tlv to this tlv. This makes it a constructed BerTlv. TODO will have to add to the m_valuesConstructed field
          * 
          * @tparam N 
          * @param tag 
@@ -389,12 +380,35 @@ public:
 
     private:
         bool m_validateConstructed{ false };
-        std::vector<uint8_t> m_tag;
+        TagClass m_tagClass;
+        TagType m_tagType;
+        std::vector<uint8_t> m_tagComplete;
+        std::vector<uint8_t> m_tagNumber;
         std::vector<uint8_t> m_data;
+        std::vector<TlvBer> m_valuesConstructed;
     };
 
 private:
-    std::vector<uint8_t> m_tag;
+    /**
+     * @brief Construct a new BerTlv with given tag and value.
+     * 
+     * @param tag The tag to use. Attempts to parse tag into its constituents, and if fails throws and error
+     * @param value The data value to use.
+     */
+    TlvBer(TagClass tagClass, TagType tagType, const std::vector<uint8_t>& tagNumber, const std::vector<uint8_t>& tagComplete, const std::vector<uint8_t>& value);
+
+    /**
+     * @brief Construct a new constructed TlvBer object.
+     * 
+     * @param tag The tag to use.
+     * @param values The constructed values.
+     */
+    TlvBer(TagClass tagClass, TagType tagType, const std::vector<uint8_t>& tagNumber, const std::vector<uint8_t>& tagComplete, std::vector<TlvBer>& value);
+
+    TagClass m_tagClass;
+    TagType m_tagType;
+    std::vector<uint8_t> m_tagNumber;
+    std::vector<uint8_t> m_tagComplete;
     std::vector<uint8_t> m_value;
     std::vector<TlvBer> m_valuesConstructed;
 };
