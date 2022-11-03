@@ -112,7 +112,23 @@ public:
      */
     static std::vector<uint8_t>
     GetLengthEncoding(std::size_t length);
+    
+    /**
+     * @brief Construct a new BerTlv with given tag and value.
+     * 
+     * @param tag The tag to use. Attempts to parse tag into its constituents, and if fails throws and error
+     * @param value The data value to use.
+     */
+    TlvBer(TagClass tagClass, TagType tagType, const std::vector<uint8_t>& tagNumber, const std::vector<uint8_t>& tagComplete, const std::vector<uint8_t>& value);
 
+    /**
+     * @brief Construct a new constructed TlvBer object.
+     * 
+     * @param tag The tag to use.
+     * @param values The constructed values.
+     */
+    TlvBer(TagClass tagClass, TagType tagType, const std::vector<uint8_t>& tagNumber, const std::vector<uint8_t>& tagComplete, std::vector<TlvBer>& value);
+   
     /**
      * @brief Returns whether this TLV contains a constructed value.
      * 
@@ -405,22 +421,6 @@ public:
     };
 
 private:
-    /**
-     * @brief Construct a new BerTlv with given tag and value.
-     * 
-     * @param tag The tag to use. Attempts to parse tag into its constituents, and if fails throws and error
-     * @param value The data value to use.
-     */
-    TlvBer(TagClass tagClass, TagType tagType, const std::vector<uint8_t>& tagNumber, const std::vector<uint8_t>& tagComplete, const std::vector<uint8_t>& value);
-
-    /**
-     * @brief Construct a new constructed TlvBer object.
-     * 
-     * @param tag The tag to use.
-     * @param values The constructed values.
-     */
-    TlvBer(TagClass tagClass, TagType tagType, const std::vector<uint8_t>& tagNumber, const std::vector<uint8_t>& tagComplete, std::vector<TlvBer>& value);
-
     TagClass m_tagClass;
     TagType m_tagType;
     std::vector<uint8_t> m_tagNumber;
