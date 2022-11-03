@@ -116,7 +116,7 @@ public:
     /**
      * @brief Construct a new BerTlv with given tag and value.
      * 
-     * @param tag The tag to use. Attempts to parse tag into its constituents, and if fails throws and error
+     * @param tag The tag to use.
      * @param value The data value to use.
      */
     TlvBer(TagClass tagClass, TagType tagType, const std::vector<uint8_t>& tagNumber, const std::vector<uint8_t>& tagComplete, const std::vector<uint8_t>& value);
