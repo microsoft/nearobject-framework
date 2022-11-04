@@ -14,7 +14,7 @@ getOctets(size_t length){
     std::vector<uint8_t> holder;
     holder.reserve(length);
 
-    std::independent_bits_engine<std::mt19937, /*bits*/ 1, unsigned int> engine;
+    std::independent_bits_engine<std::mt19937, sizeof(uint8_t), unsigned int> engine;
 
     for (size_t i=0;i<length;i++) {
         holder.push_back(uint8_t(engine()));
@@ -43,8 +43,6 @@ TEST_CASE("test TlvBer", "[basic][infra]")
         std::make_tuple(4, minSizeForFourLengthOctets),
         std::make_tuple(5, minSizeForFiveLengthOctets)
     };
-
-    // static constexpr std::array lengthEncodingForMinSizeForTwoLengthOctets
 
     SECTION("ParseTag fails if the tag is more than 3 bytes")
     {
