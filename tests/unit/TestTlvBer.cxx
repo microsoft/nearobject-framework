@@ -30,9 +30,9 @@ flatten(std::array<std::vector<uint8_t>, N> vectors) {
 
 TEST_CASE("test TlvBer", "[basic][infra]")
 {
-    static constexpr std::array<uint8_t,2> tagTwoBytesPrimitive { 0x93, 0x14 };
-    static constexpr std::array<uint8_t,2> tagTwoBytesConstructed { 0xB3, 0x14 };
-    static constexpr std::array<uint8_t,3> tagThreeBytesPrimitive { 0x93, 0x94, 0x17 };
+    static constexpr std::array<uint8_t,2> tagTwoBytesPrimitive { 0b11011111, 0x24 };
+    static constexpr std::array<uint8_t,2> tagTwoBytesConstructed { 0xFF, 0x24 };
+    static constexpr std::array<uint8_t,3> tagThreeBytesPrimitive { 0b11011111, 0x94, 0x17 };
     static constexpr std::array<uint8_t,2> valueTwoBytes { 0x91, 0x92 };
     static constexpr std::array<uint8_t,3> valueThreeBytes { 0x91, 0x92 , 0x93 };
     static constexpr std::array<uint8_t,4> valueFourBytes { 0x91, 0x92 , 0x93, 0x94 };
@@ -47,7 +47,7 @@ TEST_CASE("test TlvBer", "[basic][infra]")
 
     SECTION("ParseTag fails if the tag is more than 3 bytes")
     {
-        std::array<uint8_t,4> invalidTag {0x93,0x84,0x85,0x16};
+        std::array<uint8_t,4> invalidTag {0xFF,0x84,0x85,0x16};
         TlvBer::TagClass tagClass;
         TlvBer::TagType tagType;
         std::vector<uint8_t> tagNumber, tagComplete;
@@ -58,7 +58,7 @@ TEST_CASE("test TlvBer", "[basic][infra]")
     SECTION("ParseTag fails if the tag is 2 bytes long and the second byte is not valued from 0x1F to 0x7F")
     {
         for(uint8_t invalidSecondByte = 0x0; invalidSecondByte <0x1F; invalidSecondByte++){
-            std::array<uint8_t,2> invalidTag {0x93,invalidSecondByte};
+            std::array<uint8_t,2> invalidTag {0xFF,invalidSecondByte};
             TlvBer::TagClass tagClass;
             TlvBer::TagType tagType;
             std::vector<uint8_t> tagNumber, tagComplete;
@@ -67,7 +67,7 @@ TEST_CASE("test TlvBer", "[basic][infra]")
         }
 
         for(uint8_t invalidSecondByte = 0x80; invalidSecondByte != 0; invalidSecondByte++){
-            std::array<uint8_t,2> invalidTag {0x93,invalidSecondByte};
+            std::array<uint8_t,2> invalidTag {0xFF,invalidSecondByte};
             TlvBer::TagClass tagClass;
             TlvBer::TagType tagType;
             std::vector<uint8_t> tagNumber, tagComplete;
@@ -150,7 +150,7 @@ TEST_CASE("test TlvBer", "[basic][infra]")
         REQUIRE(std::equal(std::cbegin(tlvBer.Value),std::cend(tlvBer.Value),std::cbegin(valueTwoBytes)));
 
         auto bytes = tlvBer.ToBytes();
-        std::vector<uint8_t> desired{ 0x93, 0x14, 0x02, 0x91, 0x92 };
+        std::vector<uint8_t> desired{ 0b11011111, 0x24, 0x02, 0x91, 0x92 };
         REQUIRE(std::equal(std::cbegin(bytes),std::cend(bytes),std::cbegin(desired)));
     }
 
@@ -165,7 +165,7 @@ TEST_CASE("test TlvBer", "[basic][infra]")
         REQUIRE(std::equal(std::cbegin(tlvBer.Value),std::cend(tlvBer.Value),std::cbegin(valueTwoBytes)));
 
         auto bytes = tlvBer.ToBytes();
-        std::vector<uint8_t> desired{ 0x93, 0x94, 0x17, 0x02, 0x91, 0x92 };
+        std::vector<uint8_t> desired{ 0b11011111, 0x94, 0x17, 0x02, 0x91, 0x92 };
         REQUIRE(std::equal(std::cbegin(bytes),std::cend(bytes),std::cbegin(desired)));
     }
 
@@ -180,7 +180,7 @@ TEST_CASE("test TlvBer", "[basic][infra]")
         REQUIRE(std::equal(std::cbegin(tlvBer.Value),std::cend(tlvBer.Value),std::cbegin(valueThreeBytes)));
 
         auto bytes = tlvBer.ToBytes();
-        std::vector<uint8_t> desired{ 0x93, 0x94, 0x17, 0x03, 0x91, 0x92, 0x93 };
+        std::vector<uint8_t> desired{ 0b11011111, 0x94, 0x17, 0x03, 0x91, 0x92, 0x93 };
         REQUIRE(std::equal(std::cbegin(bytes),std::cend(bytes),std::cbegin(desired)));
     }
 

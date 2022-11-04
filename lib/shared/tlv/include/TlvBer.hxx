@@ -222,7 +222,7 @@ public:
             tagComplete.push_back(*dataIt);
 
             // check the third byte?
-            if((*dataIt & BitmaskTagLastByte) != TagValueLastByte) {
+            if((*dataIt & BitmaskTagLastByte) == TagValueLastByte) {
                 std::advance(dataIt,1);
                 if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
                 
