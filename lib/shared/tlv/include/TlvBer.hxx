@@ -260,10 +260,10 @@ public:
             length = *dataIt & BitmaskLengthShort;
         } else {
             // Length is long form.
-            auto numOctets = *dataIt & BitmaskLengthNumOctets;
-            if(numOctets > MaxNumOctetsInLengthEncoding) return Tlv::ParseResult::Failed;
+            auto numFollowingOctets = *dataIt & BitmaskLengthNumOctets;
+            if(numFollowingOctets >= MaxNumOctetsInLengthEncoding) return Tlv::ParseResult::Failed;
 
-            for (auto i = 0; i < numOctets; i++) {
+            for (auto i = 0; i < numFollowingOctets; i++) {
                 std::advance(dataIt,1);
                 if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
 

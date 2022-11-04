@@ -2,6 +2,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <vector>
 
+#include <random>
+
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 
 using namespace encoding;
@@ -11,8 +13,11 @@ getOctets(size_t length){
     
     std::vector<uint8_t> holder;
     holder.reserve(length);
+
+    std::independent_bits_engine<std::mt19937, /*bits*/ 1, uint8_t> engine;
+
     for (size_t i=0;i<length;i++) {
-        holder.push_back(uint8_t(i));
+        holder.push_back(engine());
     }
     return holder;
 }
@@ -184,24 +189,23 @@ TEST_CASE("test TlvBer", "[basic][infra]")
         REQUIRE(std::equal(std::cbegin(bytes),std::cend(bytes),std::cbegin(desired)));
     }
 
-    // SECTION("creating a TlvBer with a value that requires 2 length octets works")
-    // {
-    //     TlvBer::Builder builder{};
-    //     auto valueOctets = getOctets(minSizeForTwoLengthOctets);
-    //     auto tlvBer = builder
-    //                       .SetTag(tagThreeBytesPrimitive)
-    //                       .SetValue(valueOctets)
-    //                       .Build();
-    //     REQUIRE(std::equal(std::cbegin(tlvBer.Tag),std::cend(tlvBer.Tag),std::cbegin(tagThreeBytesPrimitive)));
-    //     REQUIRE(std::equal(std::cbegin(tlvBer.Value),std::cend(tlvBer.Value),std::cbegin(valueOctets)));
+    SECTION("creating a TlvBer with a value that requires 2 length octets works")
+    {
+        TlvBer::Builder builder{};
+        auto valueOctets = getOctets(minSizeForTwoLengthOctets);
+        auto tlvBer = builder
+                          .SetTag(tagThreeBytesPrimitive)
+                          .SetValue(valueOctets)
+                          .Build();
+        REQUIRE(std::equal(std::cbegin(tlvBer.Tag),std::cend(tlvBer.Tag),std::cbegin(tagThreeBytesPrimitive)));
+        REQUIRE(std::equal(std::cbegin(tlvBer.Value),std::cend(tlvBer.Value),std::cbegin(valueOctets)));
 
-    //     // auto bytes = tlvBer.ToBytes();
-    //     // std::vector<uint8_t> desired = flatten({tagThreeBytesPrimitive,  ,valueOctets});
-    //     auto lengthEncoding = TlvBer::GetLengthEncoding(tlvBer.Value.size());
-    //     size_t length, bytesParsed;
-    //     TlvBer::ParseLength(length,lengthEncoding,bytesParsed);
-    //     REQUIRE(length==2);
-    // }
+        auto lengthEncoding = TlvBer::GetLengthEncoding(tlvBer.Value.size());
+        REQUIRE(lengthEncoding.size()>=2);
+        size_t length, bytesParsed;
+        TlvBer::ParseLength(length,lengthEncoding,bytesParsed);
+        REQUIRE(length == minSizeForTwoLengthOctets);        
+    }
 
     SECTION("resetting TlvBer::Builder works as expected")
     {

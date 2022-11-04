@@ -156,7 +156,7 @@ TlvBer::GetLengthEncoding(std::size_t length)
 
             // Long-form, values 128+.
             std::vector<uint8_t> encoding(numBytes);
-            for (auto i = numBytes; numBytes > 0; i--) {
+            for (auto i = numBytes-1; i != 0; i--) {
                 encoding[i] = static_cast<uint8_t>(length & 0xFFU);
                 length >>= 8U;
             }
