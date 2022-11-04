@@ -219,6 +219,7 @@ public:
                 if (i>3) return Tlv::ParseResult::Failed;
                 std::advance(dataIt,1);
                 if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
+                if(i==1 && *dataIt<0x1F) return Tlv::ParseResult::Failed;
                 tagNumber.push_back(*dataIt & BitmaskTagLong);
                 tagComplete.push_back(*dataIt);
             } while ((*dataIt & BitmaskTagLastByte) != TagValueLastByte);

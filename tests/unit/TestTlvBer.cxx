@@ -76,18 +76,6 @@ TEST_CASE("test TlvBer", "[basic][infra]")
         }
     }
 
-    SECTION("ParseTag throws an error if the tag is 3 bytes long and the second byte is valued < 0x81")
-    {
-        for(uint8_t invalidSecondByte = 0x0; invalidSecondByte < 0x81; invalidSecondByte++){
-            std::array<uint8_t,3> invalidTag {0x93,invalidSecondByte,0x0};
-            TlvBer::TagClass tagClass;
-            TlvBer::TagType tagType;
-            std::vector<uint8_t> tagNumber, tagComplete;
-            size_t bytesParsed;
-            REQUIRE_THROWS(TlvBer::ParseTag(tagClass,tagType,tagNumber,tagComplete,invalidTag,bytesParsed));
-        }
-    }
-
     SECTION("ParseLength throws an error if the indicated length is longer than 5 bytes")
     {
         for(uint8_t invalidNumberOfOctets = 0x85; invalidNumberOfOctets != 0; invalidNumberOfOctets++){
