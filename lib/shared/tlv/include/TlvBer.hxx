@@ -240,7 +240,31 @@ public:
     template <typename Iterable>
     static
     Tlv::ParseResult
-    ParseLength(size_t& length, Iterable& data, size_t& bytesParsed);
+    ParseLength(size_t& length, Iterable& data, size_t& bytesParsed){
+        auto dataIt = std::cbegin(data);
+        auto dataEnd = std::cend(data);
+        if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
+
+        // Is length short form?
+        if ((*dataIt & BitmaskLengthForm) == LengthFormShort) {
+            length = *dataIt & BitmaskLengthShort;
+        } else {
+            // Length is long form.
+            auto numOctets = *dataIt & BitmaskLengthNumOctets;
+            if(numOctets > MaxNumOctetsInLengthEncoding) return Tlv::ParseResult::Failed;
+
+            for (auto i = 0; i < numOctets; i++) {
+                std::advance(dataIt,1);
+                if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
+
+                length  = length << 8U;
+                length |= *dataIt;
+            }
+        }
+        std::advance(dataIt,1); // advance the dataIt to once past the lengthEncoding
+        bytesParsed = std::distance(std::cbegin(data),dataIt);
+        return Tlv::ParseResult::Succeeded;
+    }
 
     /**
      * @brief parses the first bytes to determine if they encode a value properly
@@ -250,7 +274,14 @@ public:
     template <typename Iterable>
     static
     Tlv::ParseResult
-    ParseValue(std::vector<uint8_t>& valueOutput, size_t length, Iterable& data, size_t& bytesParsed);
+    ParseValue(std::vector<uint8_t>& valueOutput, size_t length, Iterable& data, size_t& bytesParsed){
+        auto dataIt = std::cbegin(data);
+        auto dataEnd = std::cend(data);
+        if(std::distance(dataIt,dataEnd) < length) return Tlv::ParseResult::Failed;
+        valueOutput = std::vector<uint8_t> { dataIt, std::next(dataIt, length) };
+        bytesParsed = length;
+        return Tlv::ParseResult::Succeeded;
+    }
 
     /**
      * @brief Decode a Tlv from a blob of BER-TLV data.
@@ -261,7 +292,53 @@ public:
      */
     template<typename Iterable>
     static ParseResult
-    Parse(TlvBer **tlvOutput, Iterable& data);
+    Parse(TlvBer **tlvOutput, Iterable& dataInput)
+    {
+        if (!tlvOutput) {
+            return Tlv::ParseResult::Failed;
+        }
+
+        std::span<uint8_t> data {std::cbegin(dataInput),std::cend(dataInput)};
+
+        *tlvOutput = nullptr;
+        auto parseResult = Tlv::ParseResult::Failed;
+
+        // Parse tag.
+        TagClass tagClass;
+        TagType tagType;
+        std::vector<uint8_t> tagNumber;
+        std::vector<uint8_t> tagComplete;
+        size_t offset = 0;
+        size_t bytesParsed = 0;
+        parseResult = ParseTag(tagClass,tagType,tagNumber,tagComplete,data,bytesParsed);
+        if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
+
+        // Parse length.
+        offset += bytesParsed;
+        std::size_t length = 0;
+        auto subspan = data.subspan(offset);
+        parseResult = ParseLength(length,subspan,bytesParsed);
+        if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
+
+        // Parse value.
+        offset += bytesParsed;
+        std::vector<uint8_t> value;
+        subspan = data.subspan(offset);
+        parseResult = ParseValue(value,length,subspan,bytesParsed);
+        if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
+
+        switch (tagType) {
+        case TagType::Constructed:
+            // TODO: parse nested tlvs
+            break;
+        case TagType::Primitive:
+            *tlvOutput = std::make_unique<TlvBer>(tagClass, tagType, tagNumber, tagComplete, value).release();
+            parseResult = ParseResult::Succeeded;
+            break;
+        }
+
+        return parseResult;
+    }
 
     /**
      * @brief Encode this TlvBer into binary and returns a vector of bytes

@@ -45,6 +45,66 @@ TEST_CASE("test TlvBer", "[basic][infra]")
 
     // static constexpr std::array lengthEncodingForMinSizeForTwoLengthOctets
 
+    SECTION("ParseTag throws an error if the tag is more than 3 bytes")
+    {
+        std::array<uint8_t,4> invalidTag {0x93,0x84,0x85,0x16};
+        TlvBer::TagClass tagClass;
+        TlvBer::TagType tagType;
+        std::vector<uint8_t> tagNumber, tagComplete;
+        size_t bytesParsed;
+        REQUIRE_THROWS(TlvBer::ParseTag(tagClass,tagType,tagNumber,tagComplete,invalidTag,bytesParsed));
+    }
+
+    SECTION("ParseTag throws an error if the tag is 2 bytes long and the second byte is not valued from 0x1F to 0x7F")
+    {
+        for(uint8_t invalidSecondByte = 0x0; invalidSecondByte <0x1F; invalidSecondByte++){
+            std::array<uint8_t,2> invalidTag {0x93,invalidSecondByte};
+            TlvBer::TagClass tagClass;
+            TlvBer::TagType tagType;
+            std::vector<uint8_t> tagNumber, tagComplete;
+            size_t bytesParsed;
+            REQUIRE_THROWS(TlvBer::ParseTag(tagClass,tagType,tagNumber,tagComplete,invalidTag,bytesParsed));
+        }
+
+        for(uint8_t invalidSecondByte = 0x80; invalidSecondByte != 0; invalidSecondByte++){
+            std::array<uint8_t,2> invalidTag {0x93,invalidSecondByte};
+            TlvBer::TagClass tagClass;
+            TlvBer::TagType tagType;
+            std::vector<uint8_t> tagNumber, tagComplete;
+            size_t bytesParsed;
+            REQUIRE_THROWS(TlvBer::ParseTag(tagClass,tagType,tagNumber,tagComplete,invalidTag,bytesParsed));
+        }
+    }
+
+    SECTION("ParseTag throws an error if the tag is 3 bytes long and the second byte is valued < 0x81")
+    {
+        for(uint8_t invalidSecondByte = 0x0; invalidSecondByte < 0x81; invalidSecondByte++){
+            std::array<uint8_t,3> invalidTag {0x93,invalidSecondByte,0x0};
+            TlvBer::TagClass tagClass;
+            TlvBer::TagType tagType;
+            std::vector<uint8_t> tagNumber, tagComplete;
+            size_t bytesParsed;
+            REQUIRE_THROWS(TlvBer::ParseTag(tagClass,tagType,tagNumber,tagComplete,invalidTag,bytesParsed));
+        }
+    }
+
+    SECTION("ParseLength throws an error if the indicated length is longer than 5 bytes")
+    {
+        for(uint8_t invalidNumberOfOctets = 0x85; invalidNumberOfOctets != 0; invalidNumberOfOctets++){
+            std::array<uint8_t,1> invalidLengthEncoding {invalidNumberOfOctets};
+            size_t bytesParsed;
+            size_t length;
+            REQUIRE_THROWS(TlvBer::ParseLength(length,invalidLengthEncoding,bytesParsed));
+        }
+    }
+
+    SECTION("ParseValue throws an error if the provided span doesn't have enough bytes")
+    {
+            size_t bytesParsed;
+            std::vector<uint8_t> valueOutput;
+            REQUIRE_THROWS(TlvBer::ParseValue(valueOutput,4,valueThreeBytes,bytesParsed));
+    }
+
     SECTION("creating a TlvBer from an empty Builder holds no data")
     {
         TlvBer::Builder builder{};
