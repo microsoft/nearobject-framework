@@ -34,13 +34,13 @@ public:
     static constexpr uint8_t BitmaskLengthShort = 0b01111111;
     static constexpr uint8_t BitmaskLengthNumOctets = 0b01111111;
 
-    static constexpr uint8_t ClassUniversal = 0b00000000;
-    static constexpr uint8_t ClassApplication = 0b01000000; 
-    static constexpr uint8_t ClassContextSpecific = 0b10000000;
-    static constexpr uint8_t ClassPrivate = 0b11000000;
+    static constexpr uint8_t ClassUniversal        = 0b00000000;
+    static constexpr uint8_t ClassApplication      = 0b01000000;
+    static constexpr uint8_t ClassContextSpecific  = 0b10000000;
+    static constexpr uint8_t ClassPrivate          = 0b11000000;
 
-    static constexpr uint8_t TypeConstructed = 0b00100000;
-    static constexpr uint8_t TypePrimitive = 0b00000000;
+    static constexpr uint8_t TypeConstructed       = 0b00100000;
+    static constexpr uint8_t TypePrimitive         = 0b00000000;
 
     static constexpr uint8_t LengthTag2Byte = 0x81U;
     static constexpr uint8_t LengthTag3Byte = 0x82U;
@@ -74,17 +74,17 @@ public:
     };
 
     /**
-     * @brief Determines if the specified tag denotes a constructed BerTlv.
+     * @brief Determines if the specified tag denotes a constructed TlvBer.
      * 
      * @param tag The tag to check.
      * @return true 
      * @return false 
      */
-    static 
-    bool TagIsConstructed(std::span<const uint8_t> tag);
+    static bool
+    TagIsConstructed(std::span<const uint8_t> tag);
 
     /**
-     * @brief Get the BerTlv type from the tag value.
+     * @brief Get the TlvBer type from the tag value.
      * 
      * @param tag 
      * @return TagType 
@@ -93,7 +93,7 @@ public:
     GetTagType(uint8_t tag);
 
     /**
-     * @brief Get the BerTlv class from the tag value.
+     * @brief Get the TlvBer class from the tag value.
      * 
      * @param tag 
      * @return TagClass 
@@ -144,7 +144,7 @@ public:
      * @return true 
      * @return false 
      */
-    bool 
+    bool
     IsPrimitive() const noexcept;
 
     /**
@@ -190,13 +190,54 @@ public:
     /**
      * @brief parses the first bytes to determine if they encode a tag properly. 
      *        Advances the iterator it to once past the tag
-     *        Writes to tagClass, tagType, and tagNumber if a proper tag was parsed
+     *        Writes to tagClass, tagType, tagNumber, tagComplete, and bytesParsed if a proper tag was parsed
      * 
      */
     template <typename Iterable>
     static
     Tlv::ParseResult
-    ParseTag(TagClass& tagClass, TagType& tagType,std::vector<uint8_t>& tagNumber, std::vector<uint8_t>& tagComplete, Iterable& data, size_t& bytesParsed);
+    ParseTag(TagClass& tagClass, TagType& tagType,std::vector<uint8_t>& tagNumber, std::vector<uint8_t>& tagComplete, Iterable& data, size_t& bytesParsed)
+    {
+        auto dataIt = std::cbegin(data);
+        auto dataEnd = std::cend(data);
+        if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
+
+        bytesParsed = 0;
+        tagClass = GetTagClass(*dataIt);
+        tagType = GetTagType(*dataIt);
+
+        // Is tag short type?
+        if ((*dataIt & BitmaskTagFirstByte) != TagValueLongField) {
+            tagComplete.push_back(*dataIt);
+            tagNumber.push_back(*dataIt & BitmaskTagShort);
+            return Tlv::ParseResult::Succeeded;
+        } else {
+            // Tag is long-type. 
+            tagComplete.push_back(*dataIt);
+            
+            // check the second byte
+            std::advance(dataIt,1);
+            if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
+            if(*dataIt<0x1F) return Tlv::ParseResult::Failed;
+            tagNumber.push_back(*dataIt & BitmaskTagLong);
+            tagComplete.push_back(*dataIt);
+
+            // check the third byte?
+            if((*dataIt & BitmaskTagLastByte) == TagValueLastByte) {
+                std::advance(dataIt,1);
+                if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
+                
+                // make sure there's no fourth byte
+                if((*dataIt & BitmaskTagLastByte)==TagValueLastByte) return Tlv::ParseResult::Failed;
+                
+                tagNumber.push_back(*dataIt & BitmaskTagLong);
+                tagComplete.push_back(*dataIt);
+            }
+        }
+        std::advance(dataIt,1); // advance the dataIt to once past the tag
+        bytesParsed = std::distance(std::cbegin(data),dataIt);
+        return Tlv::ParseResult::Succeeded;
+    }
 
     static
     Tlv::ParseResult
@@ -204,14 +245,39 @@ public:
 
     /**
      * @brief parses the first bytes to determine if they encode a length properly
-     *        Advances the iterator it to once past the lengthEncoing
-     *        Writes to length if a proper length was parsed
+     *        Writes to length and bytesParsed if a proper length was parsed
      * 
      */
     template <typename Iterable>
     static
     Tlv::ParseResult
-    ParseLength(size_t& length, Iterable& data, size_t& bytesParsed);
+    ParseLength(size_t& length, Iterable& data, size_t& bytesParsed){
+        auto dataIt = std::cbegin(data);
+        auto dataEnd = std::cend(data);
+        if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
+
+        bytesParsed = length = 0;
+
+        // Is length short form?
+        if ((*dataIt & BitmaskLengthForm) == LengthFormShort) {
+            length = *dataIt & BitmaskLengthShort;
+        } else {
+            // Length is long form.
+            auto numFollowingOctets = *dataIt & BitmaskLengthNumOctets;
+            if(numFollowingOctets >= MaxNumOctetsInLengthEncoding) return Tlv::ParseResult::Failed;
+
+            for (auto i = 0; i < numFollowingOctets; i++) {
+                std::advance(dataIt,1);
+                if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
+
+                length  = length << 8U;
+                length |= *dataIt;
+            }
+        }
+        std::advance(dataIt,1); // advance the dataIt to once past the lengthEncoding
+        bytesParsed = std::distance(std::cbegin(data),dataIt);
+        return Tlv::ParseResult::Succeeded;
+    }
 
     /**
      * @brief parses the first bytes to determine if they encode a value properly
@@ -221,7 +287,14 @@ public:
     template <typename Iterable>
     static
     Tlv::ParseResult
-    ParseValue(std::vector<uint8_t>& valueOutput, size_t length, Iterable& data, size_t& bytesParsed);
+    ParseValue(std::vector<uint8_t>& valueOutput, size_t length, Iterable& data, size_t& bytesParsed){
+        auto dataIt = std::cbegin(data);
+        auto dataEnd = std::cend(data);
+        if(std::distance(dataIt,dataEnd) < length) return Tlv::ParseResult::Failed;
+        valueOutput = std::vector<uint8_t> { dataIt, std::next(dataIt, length) };
+        bytesParsed = length;
+        return Tlv::ParseResult::Succeeded;
+    }
 
     /**
      * @brief Decode a Tlv from a blob of BER-TLV data.
@@ -232,22 +305,75 @@ public:
      */
     template<typename Iterable>
     static ParseResult
-    Parse(TlvBer **tlvOutput, Iterable& data);
+    Parse(TlvBer **tlvOutput, Iterable& dataInput)
+    {
+        if (!tlvOutput) {
+            return Tlv::ParseResult::Failed;
+        }
+
+        std::span<uint8_t> data {std::cbegin(dataInput),std::cend(dataInput)};
+
+        *tlvOutput = nullptr;
+        auto parseResult = Tlv::ParseResult::Failed;
+
+        // Parse tag.
+        TagClass tagClass;
+        TagType tagType;
+        std::vector<uint8_t> tagNumber;
+        std::vector<uint8_t> tagComplete;
+        size_t offset = 0;
+        size_t bytesParsed = 0;
+        parseResult = ParseTag(tagClass,tagType,tagNumber,tagComplete,data,bytesParsed);
+        if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
+
+        // Parse length.
+        offset += bytesParsed;
+        std::size_t length = 0;
+        auto subspan = data.subspan(offset);
+        parseResult = ParseLength(length,subspan,bytesParsed);
+        if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
+
+        // Parse value.
+        offset += bytesParsed;
+        std::vector<uint8_t> value;
+        subspan = data.subspan(offset);
+        parseResult = ParseValue(value,length,subspan,bytesParsed);
+        if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
+
+        switch (tagType) {
+        case TagType::Constructed:
+            // TODO: parse nested tlvs
+            break;
+        case TagType::Primitive:
+            *tlvOutput = std::make_unique<TlvBer>(tagClass, tagType, tagNumber, tagComplete, value).release();
+            parseResult = ParseResult::Succeeded;
+            break;
+        }
+
+        return parseResult;
+    }
 
     /**
-     * @brief Helper class to iteratively build a BerTlv. This allows separating
+     * @brief Encode this TlvBer into binary and returns a vector of bytes
+     * 
+     */
+    std::vector<uint8_t>
+    ToBytes() const;
+
+    /**
+     * @brief Helper class to iteratively build a TlvBer. This allows separating
      * the creation logic from the main class and enables it to be immutable.
      * 
      * This allows the following pattern to build a TlvBer:
      * 
      * std::vector<uint8_t> tag81Value{};
-     * Tlv tag82Value = MakeATlv{};
+     * Tlv tlv = MakeATlv{};
      * 
-     * BerTlv::Builder builder{};
+     * TlvBer::Builder builder{};
      * auto tlvBer = builder
      *      .SetTag(0xA3)
      *      .AddTlv(0x81, tag81Value)
-     *      .AddTlv(Tlv.Tag, tag82Value)
+     *      .AddTlv(tlv)
      *      .Build();
      */
     class Builder
@@ -256,49 +382,38 @@ public:
         /**
          * @brief Write a fixed-length array of data to the tlv storage buffer.
          * 
-         * @tparam N 
+         * @tparam data must be an Iterable over uint8_t
          * @param data 
          */
-        template <size_t N>
+        template<typename Iterable>
         void
-        WriteData(std::array<uint8_t, N> data)
+        WriteBytes(Iterable& data)
         {
             m_data.insert(std::cend(m_data), std::cbegin(data), std::cend(data));
         }
 
         /**
-         * @brief Write an unsigned 32-bit integer to the tlv storage buffer.
+         * @brief Write a Value field, including the Length, to the tlv storage buffer.
          * 
+         * @tparam D must be uint8_t, or std::span<const uint8_t>, or std::array<const uint8_t, N>
          * @param data 
          */
-        void 
-        WriteData(uint32_t data);
+        template<size_t N>
+        void
+        WriteLengthAndValue(const std::array<const uint8_t, N>& data);
+
+        void
+        WriteLengthAndValue(std::span<const uint8_t> data);
+
+        void
+        WriteLengthAndValue(uint8_t data);
 
         /**
-         * @brief Write a sequence of data to the tlv storage buffer.
+         * @brief subroutine to write some length octets
          * 
-         * @param data 
          */
         void
-        WriteData(std::span<const uint8_t> data);
-
-        /**
-         * @brief Write a single-byte value, including its length, to the tlv
-         * storage buffer.
-         * 
-         * @param value 
-         */
-        void
-        WriteValue(uint8_t value);
-
-        /**
-         * @brief Write a sequence of data, including its length, to the tlv
-         * storage buffer.
-         * 
-         * @param value 
-         */
-        void
-        WriteValue(std::span<const uint8_t> value);
+        WriteLength(uint64_t length);
 
     public:
         /**
@@ -327,43 +442,43 @@ public:
         }
 
         /**
-         * @brief Add a nested tlv to this tlv. This makes it a constructed BerTlv. TODO will have to add to the m_valuesConstructed field
+         * @brief Sets a sequence of data, as the tlv value
          * 
-         * @tparam N 
+         * @tparam V must be uint8_t, std::span<const uint8_t>, std::array<const uint8_t, N>
+         * @param value 
+         * @return Builder& 
+         */
+        template<typename Iterable>
+        Builder&
+        SetValue(Iterable& value){
+            m_data.assign(std::cbegin(value), std::cend(value));
+            return *this;
+        }
+
+        Builder&
+        SetValue(uint8_t value);
+
+        /**
+         * @brief Add a nested tlv to this tlv. This makes it a constructed TlvBer. TODO will have to add to the m_valuesConstructed field
+         * 
+         * @tparam T, must be std::array<uint8_t, N>, or std::span<const uint8_t>
+         * @tparam V, must be std::array<uint8_t, N>, std::span<const uint8_t> or uint8_t
          * @param tag 
          * @param value 
          * @return Builder& 
          */
-        template <size_t N>
+        template<class T, class V>
         Builder&
-        AddTlv(std::array<uint8_t, N> tag, uint8_t value)
+        AddTlv(const T& tag, const V& value)
         {
-            return AddTlv([&]{
-                WriteData(tag);
-                WriteValue(value);
-            });
+            WriteBytes(tag);
+            WriteLengthAndValue(value);
+            m_validateConstructed = true;
+            return *this;
         }
 
         /**
-         * @brief Add a nested tlv to this tlv. This makes it a constructed BerTlv.
-         * 
-         * @tparam N 
-         * @param tag 
-         * @param value 
-         * @return Builder& 
-         */
-        template <size_t N>
-        Builder&
-        AddTlv(std::array<uint8_t, N> tag, std::span<uint8_t> value)
-        {
-            return AddTlv([&]{
-                WriteData(tag);
-                WriteValue(value);
-            });
-        }
-
-        /**
-         * @brief Add a pre-existing tlv to this tlv. This makes it a constructed BerTlv.
+         * @brief Add a pre-existing tlv to this tlv. This makes it a constructed TlvBer.
          * 
          * @param tlv 
          * @return Builder& 
@@ -372,38 +487,36 @@ public:
         AddTlv(const Tlv& tlv);
 
         /**
-         * @brief Build and return the BerTlv.
+         * @brief Build and return the TlvBer.
          * 
          * @return TlvBer 
          */
-        TlvBer 
+        TlvBer
         Build();
+
+        /**
+         * @brief clears the tag and data
+         *
+         * @return Builder& 
+         */
+        Builder&
+        Reset();
 
         /**
          * @brief Top-level exception from which all context-specific exceptions derived.
          */
-        struct InvalidTlvBerException : public std::exception {};
+        struct InvalidTlvBerException : public std::exception
+        {};
 
         /**
          * @brief Exception thrown when the specified tag does not specify the
          * constructed bit, which is required for tlvs constructed with the
          * builder.
          */
-        struct InvalidTlvBerTagException : public InvalidTlvBerException {};
+        struct InvalidTlvBerTagException : public InvalidTlvBerException
+        {};
 
     private:
-        /**
-         * @brief Helper function which adds a tlv to the parent tlv.
-         * 
-         * This does internal housekeeping to ensure the parent tag is set as
-         * constructed when the tlv is eventually built.
-         * 
-         * @param func The function to add the actual tlv.
-         * @return Builder& 
-         */
-        Builder&
-        AddTlv(auto&& func);
-
         /**
          * @brief Validates the to-be-built tlv has a valid tag.
          */
