@@ -32,6 +32,11 @@ public:
      */
     virtual uwb::protocol::fira::UwbCapability
     GetCapabilities() const = 0;
+
+    /**
+     * @brief Destroy the UwbDevice object.
+     */
+    virtual ~UwbDevice() = default;
 };
 
 } // namespace uwb
