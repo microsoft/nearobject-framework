@@ -202,6 +202,7 @@ public:
         auto dataEnd = std::cend(data);
         if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
 
+        bytesParsed = 0;
         tagClass = GetTagClass(*dataIt);
         tagType = GetTagType(*dataIt);
 
@@ -255,7 +256,7 @@ public:
         auto dataEnd = std::cend(data);
         if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
 
-        length = 0;
+        bytesParsed = length = 0;
 
         // Is length short form?
         if ((*dataIt & BitmaskLengthForm) == LengthFormShort) {
