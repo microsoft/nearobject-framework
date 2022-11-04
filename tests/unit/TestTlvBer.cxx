@@ -22,17 +22,6 @@ getOctets(size_t length){
     return holder;
 }
 
-template<size_t N>
-std::vector<uint8_t>
-flatten(std::array<std::vector<uint8_t>, N> vectors) {
-    std::vector<uint8_t> accumulate;
-    size_t length = 0;
-    for(const auto& vec: vectors) length+= vec.size();
-    accumulate.reserve(length);
-    for(const auto& vec: vectors) accumulate.insert(std::cend(accumulate),std::cbegin(vec),std::cend(vec));
-    return accumulate;
-}
-
 TEST_CASE("test TlvBer", "[basic][infra]")
 {
     static constexpr std::array<uint8_t,2> tagTwoBytesPrimitive { 0b11011111, 0x24 };
@@ -47,6 +36,13 @@ TEST_CASE("test TlvBer", "[basic][infra]")
     static constexpr size_t minSizeForThreeLengthOctets = 256;
     static constexpr size_t minSizeForFourLengthOctets = 65'536;
     static constexpr size_t minSizeForFiveLengthOctets = 16'777'216;
+
+    const std::array<std::tuple<size_t, size_t>, 4> minSizesForLengthOctets = {
+        std::make_tuple(2, minSizeForTwoLengthOctets),
+        std::make_tuple(3, minSizeForThreeLengthOctets),
+        std::make_tuple(4, minSizeForFourLengthOctets),
+        std::make_tuple(5, minSizeForFiveLengthOctets)
+    };
 
     // static constexpr std::array lengthEncodingForMinSizeForTwoLengthOctets
 
@@ -189,22 +185,26 @@ TEST_CASE("test TlvBer", "[basic][infra]")
         REQUIRE(std::equal(std::cbegin(bytes),std::cend(bytes),std::cbegin(desired)));
     }
 
-    SECTION("creating a TlvBer with a value that requires 2 length octets works")
+    SECTION("creating a TlvBer with a value that requires 2,3,4,5 length octets works")
     {
         TlvBer::Builder builder{};
-        auto valueOctets = getOctets(minSizeForTwoLengthOctets);
-        auto tlvBer = builder
-                          .SetTag(tagThreeBytesPrimitive)
-                          .SetValue(valueOctets)
-                          .Build();
-        REQUIRE(std::equal(std::cbegin(tlvBer.Tag),std::cend(tlvBer.Tag),std::cbegin(tagThreeBytesPrimitive)));
-        REQUIRE(std::equal(std::cbegin(tlvBer.Value),std::cend(tlvBer.Value),std::cbegin(valueOctets)));
+        for (const auto& [numMinBytes, minSize] : minSizesForLengthOctets)
+        {
+            auto valueOctets = getOctets(minSize);
+            auto tlvBer = builder
+                            .Reset()
+                            .SetTag(tagThreeBytesPrimitive)
+                            .SetValue(valueOctets)
+                            .Build();
+            REQUIRE(std::equal(std::cbegin(tlvBer.Tag),std::cend(tlvBer.Tag),std::cbegin(tagThreeBytesPrimitive)));
+            REQUIRE(std::equal(std::cbegin(tlvBer.Value),std::cend(tlvBer.Value),std::cbegin(valueOctets)));
 
-        auto lengthEncoding = TlvBer::GetLengthEncoding(tlvBer.Value.size());
-        REQUIRE(lengthEncoding.size()>=2);
-        size_t length, bytesParsed;
-        TlvBer::ParseLength(length,lengthEncoding,bytesParsed);
-        REQUIRE(length == minSizeForTwoLengthOctets);        
+            auto lengthEncoding = TlvBer::GetLengthEncoding(tlvBer.Value.size());
+            REQUIRE(lengthEncoding.size()>=numMinBytes);
+            size_t length, bytesParsed;
+            TlvBer::ParseLength(length,lengthEncoding,bytesParsed);
+            REQUIRE(length == minSize);        
+        }
     }
 
     SECTION("resetting TlvBer::Builder works as expected")
