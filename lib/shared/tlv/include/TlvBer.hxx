@@ -213,16 +213,25 @@ public:
         } else {
             // Tag is long-type. 
             tagComplete.push_back(*dataIt);
-            int i = 0;
-            do {
-                i++;
-                if (i>3) return Tlv::ParseResult::Failed;
+            
+            // check the second byte
+            std::advance(dataIt,1);
+            if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
+            if(*dataIt<0x1F) return Tlv::ParseResult::Failed;
+            tagNumber.push_back(*dataIt & BitmaskTagLong);
+            tagComplete.push_back(*dataIt);
+
+            // check the third byte?
+            if((*dataIt & BitmaskTagLastByte) != TagValueLastByte) {
                 std::advance(dataIt,1);
                 if(dataIt==dataEnd) return Tlv::ParseResult::Failed;
-                if(i==1 && *dataIt<0x1F) return Tlv::ParseResult::Failed;
+                
+                // make sure there's no fourth byte
+                if((*dataIt & BitmaskTagLastByte)==TagValueLastByte) return Tlv::ParseResult::Failed;
+                
                 tagNumber.push_back(*dataIt & BitmaskTagLong);
                 tagComplete.push_back(*dataIt);
-            } while ((*dataIt & BitmaskTagLastByte) != TagValueLastByte);
+            }
         }
         std::advance(dataIt,1); // advance the dataIt to once past the tag
         bytesParsed = std::distance(std::cbegin(data),dataIt);

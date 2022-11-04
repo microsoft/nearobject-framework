@@ -45,17 +45,17 @@ TEST_CASE("test TlvBer", "[basic][infra]")
 
     // static constexpr std::array lengthEncodingForMinSizeForTwoLengthOctets
 
-    SECTION("ParseTag throws an error if the tag is more than 3 bytes")
+    SECTION("ParseTag fails if the tag is more than 3 bytes")
     {
         std::array<uint8_t,4> invalidTag {0x93,0x84,0x85,0x16};
         TlvBer::TagClass tagClass;
         TlvBer::TagType tagType;
         std::vector<uint8_t> tagNumber, tagComplete;
         size_t bytesParsed;
-        REQUIRE_THROWS(TlvBer::ParseTag(tagClass,tagType,tagNumber,tagComplete,invalidTag,bytesParsed));
+        REQUIRE(Tlv::ParseResult::Failed == TlvBer::ParseTag(tagClass,tagType,tagNumber,tagComplete,invalidTag,bytesParsed));
     }
 
-    SECTION("ParseTag throws an error if the tag is 2 bytes long and the second byte is not valued from 0x1F to 0x7F")
+    SECTION("ParseTag fails if the tag is 2 bytes long and the second byte is not valued from 0x1F to 0x7F")
     {
         for(uint8_t invalidSecondByte = 0x0; invalidSecondByte <0x1F; invalidSecondByte++){
             std::array<uint8_t,2> invalidTag {0x93,invalidSecondByte};
@@ -63,7 +63,7 @@ TEST_CASE("test TlvBer", "[basic][infra]")
             TlvBer::TagType tagType;
             std::vector<uint8_t> tagNumber, tagComplete;
             size_t bytesParsed;
-            REQUIRE_THROWS(TlvBer::ParseTag(tagClass,tagType,tagNumber,tagComplete,invalidTag,bytesParsed));
+            REQUIRE(Tlv::ParseResult::Failed == TlvBer::ParseTag(tagClass,tagType,tagNumber,tagComplete,invalidTag,bytesParsed));
         }
 
         for(uint8_t invalidSecondByte = 0x80; invalidSecondByte != 0; invalidSecondByte++){
@@ -72,25 +72,25 @@ TEST_CASE("test TlvBer", "[basic][infra]")
             TlvBer::TagType tagType;
             std::vector<uint8_t> tagNumber, tagComplete;
             size_t bytesParsed;
-            REQUIRE_THROWS(TlvBer::ParseTag(tagClass,tagType,tagNumber,tagComplete,invalidTag,bytesParsed));
+            REQUIRE(Tlv::ParseResult::Failed == TlvBer::ParseTag(tagClass,tagType,tagNumber,tagComplete,invalidTag,bytesParsed));
         }
     }
 
-    SECTION("ParseLength throws an error if the indicated length is longer than 5 bytes")
+    SECTION("ParseLength fails if the indicated length is longer than 5 bytes")
     {
         for(uint8_t invalidNumberOfOctets = 0x85; invalidNumberOfOctets != 0; invalidNumberOfOctets++){
             std::array<uint8_t,1> invalidLengthEncoding {invalidNumberOfOctets};
             size_t bytesParsed;
             size_t length;
-            REQUIRE_THROWS(TlvBer::ParseLength(length,invalidLengthEncoding,bytesParsed));
+            REQUIRE(Tlv::ParseResult::Failed == TlvBer::ParseLength(length,invalidLengthEncoding,bytesParsed));
         }
     }
 
-    SECTION("ParseValue throws an error if the provided span doesn't have enough bytes")
+    SECTION("ParseValue fails if the provided span doesn't have enough bytes")
     {
             size_t bytesParsed;
             std::vector<uint8_t> valueOutput;
-            REQUIRE_THROWS(TlvBer::ParseValue(valueOutput,4,valueThreeBytes,bytesParsed));
+            REQUIRE(Tlv::ParseResult::Failed == TlvBer::ParseValue(valueOutput,4,valueThreeBytes,bytesParsed));
     }
 
     SECTION("creating a TlvBer from an empty Builder holds no data")
@@ -184,55 +184,24 @@ TEST_CASE("test TlvBer", "[basic][infra]")
         REQUIRE(std::equal(std::cbegin(bytes),std::cend(bytes),std::cbegin(desired)));
     }
 
-    SECTION("creating a TlvBer with a 3 byte tag and 4 byte value works as expected")
-    {
-        TlvBer::Builder builder{};
-        auto tlvBer = builder
-                          .SetTag(tagThreeBytesPrimitive)
-                          .SetValue(valueFourBytes)
-                          .Build();
-        REQUIRE(std::equal(std::cbegin(tlvBer.Tag),std::cend(tlvBer.Tag),std::cbegin(tagThreeBytesPrimitive)));
-        REQUIRE(std::equal(std::cbegin(tlvBer.Value),std::cend(tlvBer.Value),std::cbegin(valueFourBytes)));
+    // SECTION("creating a TlvBer with a value that requires 2 length octets works")
+    // {
+    //     TlvBer::Builder builder{};
+    //     auto valueOctets = getOctets(minSizeForTwoLengthOctets);
+    //     auto tlvBer = builder
+    //                       .SetTag(tagThreeBytesPrimitive)
+    //                       .SetValue(valueOctets)
+    //                       .Build();
+    //     REQUIRE(std::equal(std::cbegin(tlvBer.Tag),std::cend(tlvBer.Tag),std::cbegin(tagThreeBytesPrimitive)));
+    //     REQUIRE(std::equal(std::cbegin(tlvBer.Value),std::cend(tlvBer.Value),std::cbegin(valueOctets)));
 
-        auto bytes = tlvBer.ToBytes();
-        std::vector<uint8_t> desired{ 0x93, 0x94, 0x17, 0x04, 0x91, 0x92, 0x93, 0x94 };
-        REQUIRE(std::equal(std::cbegin(bytes),std::cend(bytes),std::cbegin(desired)));
-    }
-
-    SECTION("creating a TlvBer with a 3 byte tag and 5 byte value works as expected")
-    {
-        TlvBer::Builder builder{};
-        auto tlvBer = builder
-                          .SetTag(tagThreeBytesPrimitive)
-                          .SetValue(valueFiveBytes)
-                          .Build();
-        REQUIRE(std::equal(std::cbegin(tlvBer.Tag),std::cend(tlvBer.Tag),std::cbegin(tagThreeBytesPrimitive)));
-        REQUIRE(std::equal(std::cbegin(tlvBer.Value),std::cend(tlvBer.Value),std::cbegin(valueFiveBytes)));
-
-        auto bytes = tlvBer.ToBytes();
-        std::vector<uint8_t> desired{ 0x93, 0x94, 0x17, 0x05, 0x91, 0x92, 0x93, 0x94, 0x95 };
-        REQUIRE(std::equal(std::cbegin(bytes),std::cend(bytes),std::cbegin(desired)));
-    }
-
-    SECTION("creating a TlvBer with a value that requires 2 length octets works")
-    {
-        TlvBer::Builder builder{};
-        auto valueOctets = getOctets(minSizeForTwoLengthOctets);
-        auto tlvBer = builder
-                          .SetTag(tagThreeBytesPrimitive)
-                          .SetValue(valueOctets)
-                          .Build();
-        REQUIRE(std::equal(std::cbegin(tlvBer.Tag),std::cend(tlvBer.Tag),std::cbegin(tagThreeBytesPrimitive)));
-        REQUIRE(std::equal(std::cbegin(tlvBer.Value),std::cend(tlvBer.Value),std::cbegin(valueOctets)));
-
-        // auto bytes = tlvBer.ToBytes();
-        // std::vector<uint8_t> desired = flatten({tagThreeBytesPrimitive,  ,valueOctets});
-        auto lengthEncoding = TlvBer::GetLengthEncoding(tlvBer.Value.size());
-        REQUIRE(lengthEncoding.size()>=2);
-        REQUIRE(lengthEncoding.size()<6);
-        REQUIRE(lengthEncoding.front() == TlvBer::LengthTag2Byte);
-        REQUIRE(lengthEncoding[1] == 1);
-    }
+    //     // auto bytes = tlvBer.ToBytes();
+    //     // std::vector<uint8_t> desired = flatten({tagThreeBytesPrimitive,  ,valueOctets});
+    //     auto lengthEncoding = TlvBer::GetLengthEncoding(tlvBer.Value.size());
+    //     size_t length, bytesParsed;
+    //     TlvBer::ParseLength(length,lengthEncoding,bytesParsed);
+    //     REQUIRE(length==2);
+    // }
 
     SECTION("resetting TlvBer::Builder works as expected")
     {
