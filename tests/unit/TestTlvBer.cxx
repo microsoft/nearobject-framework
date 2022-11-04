@@ -14,10 +14,10 @@ getOctets(size_t length){
     std::vector<uint8_t> holder;
     holder.reserve(length);
 
-    std::independent_bits_engine<std::mt19937, /*bits*/ 1, uint8_t> engine;
+    std::independent_bits_engine<std::mt19937, /*bits*/ 1, int> engine;
 
     for (size_t i=0;i<length;i++) {
-        holder.push_back(engine());
+        holder.push_back(uint8_t(engine()));
     }
     return holder;
 }
