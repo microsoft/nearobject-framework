@@ -112,7 +112,9 @@ public:
      */
     static std::vector<uint8_t>
     GetLengthEncoding(std::size_t length);
-    
+
+    TlvBer() = default;
+
     /**
      * @brief Construct a new BerTlv with given tag and value.
      * 
@@ -280,20 +282,95 @@ public:
     }
 
     /**
-     * @brief parses the first bytes to determine if they encode a value properly
+     * @brief parses the first bytes to determine if they encode a primitive value properly
      *        Writes to valueOutput if a proper value was parsed
      * 
      */
     template <typename Iterable>
     static
     Tlv::ParseResult
-    ParseValue(std::vector<uint8_t>& valueOutput, size_t length, Iterable& data, size_t& bytesParsed){
+    ParsePrimitiveValue(std::vector<uint8_t>& valueOutput, size_t length, Iterable& data, size_t& bytesParsed){
         auto dataIt = std::cbegin(data);
         auto dataEnd = std::cend(data);
         if(std::distance(dataIt,dataEnd) < length) return Tlv::ParseResult::Failed;
         valueOutput = std::vector<uint8_t> { dataIt, std::next(dataIt, length) };
         bytesParsed = length;
         return Tlv::ParseResult::Succeeded;
+    }
+
+    /**
+     * @brief parses the first bytes to determine if they encode a constructed value properly
+     *        Writes to valueOutput if a proper value was parsed
+     * 
+     */
+    template <typename Iterable>
+    static
+    Tlv::ParseResult
+    ParseConstructedValue(std::vector<TlvBer>& valueOutput, size_t length, Iterable& data, size_t& bytesParsedOverall){
+        bytesParsedOverall = 0;
+        size_t bytesParsed = 0;
+        auto subspan = data;
+        TlvBer subtlv;
+        while(bytesParsedOverall < length){
+            auto parseResult = Parse(subtlv,data,bytesParsed);
+            if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
+            bytesParsedOverall += bytesParsed;
+            subspan = dataInput.subspan(bytesParsedOverall);
+            valueOutput.push_back(subtlv);
+        }
+        if(bytesParsedOverall == length) return Tlv::ParseResult::Succeeded;
+        return Tlv::ParseResult::Failed;
+    }
+
+    /**
+     * @brief Decode a Tlv from a blob of BER-TLV data.
+     *
+     * @param tlvOutput The decoded Tlv, if parsing was successful (ParseResult::Succeeded).
+     * @param data The data to parse a Tlv from.
+     * @return ParseResult The result of the parsing operation.
+     */
+    template<typename Iterable>
+    static ParseResult
+    Parse(TlvBer& tlvOutput, Iterable& dataInput, size_t& bytesParsedOverall){
+        *tlvOutput = nullptr;
+        auto parseResult = Tlv::ParseResult::Failed;
+
+        // Parse tag.
+        TagClass tagClass;
+        TagType tagType;
+        std::vector<uint8_t> tagNumber;
+        std::vector<uint8_t> tagComplete;
+        size_t offset = 0;
+        size_t bytesParsed = 0;
+        parseResult = ParseTag(tagClass,tagType,tagNumber,tagComplete,dataInput,bytesParsed);
+        if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
+
+        // Parse length.
+        offset += bytesParsed;
+        std::size_t length = 0;
+        auto subspan = dataInput.subspan(offset);
+        parseResult = ParseLength(length,subspan,bytesParsed);
+        if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
+
+        // Parse value.
+        offset += bytesParsed;
+        subspan = dataInput.subspan(offset);
+        if(tagType == TagType::Constructed) {
+            std::vector<TlvBer> values;
+            parseResult = ParseConstructedValue(values,length,subspan,bytesParsed);
+            if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;    
+            tlvOutput = TlvBer(tagClass, tagType, tagNumber, tagComplete, values).release();
+        } else{
+            std::vector<uint8_t> value;
+            parseResult = ParsePrimitiveValue(value,length,subspan,bytesParsed);
+            if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
+            tlvOutput = TlvBer(tagClass, tagType, tagNumber, tagComplete, value).release();
+        }
+
+        offset += bytesParsed;
+        bytesParsedOverall = offset;
+        
+        return ParseResult::Succeeded;
     }
 
     /**
@@ -307,49 +384,12 @@ public:
     static ParseResult
     Parse(TlvBer **tlvOutput, Iterable& dataInput)
     {
-        if (!tlvOutput) {
-            return Tlv::ParseResult::Failed;
-        }
-
-        std::span<uint8_t> data {std::cbegin(dataInput),std::cend(dataInput)};
-
-        *tlvOutput = nullptr;
-        auto parseResult = Tlv::ParseResult::Failed;
-
-        // Parse tag.
-        TagClass tagClass;
-        TagType tagType;
-        std::vector<uint8_t> tagNumber;
-        std::vector<uint8_t> tagComplete;
-        size_t offset = 0;
-        size_t bytesParsed = 0;
-        parseResult = ParseTag(tagClass,tagType,tagNumber,tagComplete,data,bytesParsed);
+        size_t bytesParsed;
+        TlvBer tlv;
+        auto parseResult = Parse(tlv,dataInput,bytesParsed);
         if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
-
-        // Parse length.
-        offset += bytesParsed;
-        std::size_t length = 0;
-        auto subspan = data.subspan(offset);
-        parseResult = ParseLength(length,subspan,bytesParsed);
-        if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
-
-        // Parse value.
-        offset += bytesParsed;
-        std::vector<uint8_t> value;
-        subspan = data.subspan(offset);
-        parseResult = ParseValue(value,length,subspan,bytesParsed);
-        if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
-
-        switch (tagType) {
-        case TagType::Constructed:
-            // TODO: parse nested tlvs
-            break;
-        case TagType::Primitive:
-            *tlvOutput = std::make_unique<TlvBer>(tagClass, tagType, tagNumber, tagComplete, value).release();
-            parseResult = ParseResult::Succeeded;
-            break;
-        }
-
+        *tlvOutput = std::make_unique<TlvBer>();
+        *tlvOutput = std::move(tlv);
         return parseResult;
     }
 

@@ -85,11 +85,11 @@ TEST_CASE("test TlvBer", "[basic][infra]")
         }
     }
 
-    SECTION("ParseValue fails if the provided span doesn't have enough bytes")
+    SECTION("ParsePrimitiveValue fails if the provided span doesn't have enough bytes")
     {
             size_t bytesParsed;
             std::vector<uint8_t> valueOutput;
-            REQUIRE(Tlv::ParseResult::Failed == TlvBer::ParseValue(valueOutput,4,valueThreeBytes,bytesParsed));
+            REQUIRE(Tlv::ParseResult::Failed == TlvBer::ParsePrimitiveValue(valueOutput,4,valueThreeBytes,bytesParsed));
     }
 
     SECTION("creating a TlvBer from an empty Builder holds no data")
