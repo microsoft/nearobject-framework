@@ -113,9 +113,19 @@ TlvBer::ToBytes() const
 {
     std::vector<uint8_t> accumulate;
     accumulate.assign(std::cbegin(m_tagComplete), std::cend(m_tagComplete));
-    const auto lengthEncoding = TlvBer::GetLengthEncoding(m_value.size());
+    std::vector<uint8_t> value;
+    if(IsPrimitive())
+    {   
+        value = m_value;
+    } else {
+        for(const auto& tlv : m_valuesConstructed) {
+            auto data = tlv.ToBytes();
+            value.insert(std::cend(value),std::cbegin(data),std::cend(data));
+        }
+    }
+    const auto lengthEncoding = TlvBer::GetLengthEncoding(value.size());
     accumulate.insert(std::cend(accumulate), std::cbegin(lengthEncoding), std::cend(lengthEncoding));
-    accumulate.insert(std::cend(accumulate), std::cbegin(m_value), std::cend(m_value));
+    accumulate.insert(std::cend(accumulate), std::cbegin(value), std::cend(value));
     return accumulate;
 }
 
@@ -198,9 +208,11 @@ TlvBer::Builder::SetValue(uint8_t value)
 }
 
 TlvBer::Builder&
-TlvBer::Builder::AddTlv(const Tlv& tlv)
+TlvBer::Builder::AddTlv(const TlvBer& tlv)
 {
-    return AddTlv(tlv.Tag, tlv.Value);
+    m_addedSubTlvFlag = true;
+    m_valuesConstructed.push_back(tlv);
+    return *this;
 }
 
 TlvBer::Builder&
@@ -220,7 +232,7 @@ TlvBer::Builder::Build()
 void
 TlvBer::Builder::ValidateTag()
 {
-    if (m_validateConstructed != (m_tagType == TagType::Constructed)) {
+    if (m_addedSubTlvFlag != (m_tagType == TagType::Constructed)) {
         throw InvalidTlvBerTagException();
     }
 }

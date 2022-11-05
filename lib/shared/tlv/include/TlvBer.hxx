@@ -467,15 +467,15 @@ public:
          * @param value 
          * @return Builder& 
          */
-        template<class T, class V>
-        Builder&
-        AddTlv(const T& tag, const V& value)
-        {
-            WriteBytes(tag);
-            WriteLengthAndValue(value);
-            m_validateConstructed = true;
-            return *this;
-        }
+        // template<class T, class V>
+        // Builder&
+        // AddTlv(const T& tag, const V& value)
+        // {
+        //     WriteBytes(tag);
+        //     WriteLengthAndValue(value);
+        //     m_addedSubTlvFlag = true;
+        //     return *this;
+        // }
 
         /**
          * @brief Add a pre-existing tlv to this tlv. This makes it a constructed TlvBer.
@@ -484,7 +484,7 @@ public:
          * @return Builder& 
          */
         Builder&
-        AddTlv(const Tlv& tlv);
+        AddTlv(const TlvBer& tlv);
 
         /**
          * @brief Build and return the TlvBer.
@@ -524,7 +524,7 @@ public:
         ValidateTag();
 
     private:
-        bool m_validateConstructed{ false };
+        bool m_addedSubTlvFlag{ false };
         TagClass m_tagClass;
         TagType m_tagType;
         std::vector<uint8_t> m_tagComplete;

@@ -232,14 +232,6 @@ TEST_CASE("test TlvBer", "[basic][infra]")
                           .Build();
         REQUIRE(std::equal(std::cbegin(parent.Tag),std::cend(parent.Tag),std::cbegin(tagTwoBytesConstructed)));
         REQUIRE(std::equal(std::cbegin(parent.Value),std::cend(parent.Value),std::cbegin(child.ToBytes())));
-
-        auto parent2 = builder
-                          .Reset()
-                          .SetTag(tagTwoBytesConstructed)
-                          .AddTlv(tagTwoBytesPrimitive,valueTwoBytes)
-                          .Build();
-        REQUIRE(std::equal(std::cbegin(parent2.Tag),std::cend(parent2.Tag),std::cbegin(parent.Tag)));
-        REQUIRE(std::equal(std::cbegin(parent2.Value),std::cend(parent2.Value),std::cbegin(parent.Value)));
     }
 
     SECTION("creating a TlvBer with a nested TLV value that itself has a nested TLV value works as expected")
