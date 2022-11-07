@@ -284,7 +284,7 @@ public:
     /**
      * @brief parses the first bytes to determine if they encode a primitive value properly
      *        Writes to valueOutput if a proper value was parsed
-     * 
+     *        Writes how many bytes were parsed in this function into bytesParsed
      */
     template <typename Iterable>
     static
@@ -301,6 +301,7 @@ public:
     /**
      * @brief parses the first bytes to determine if they encode a constructed value properly
      *        Writes to valueOutput if a proper value was parsed
+     *        Writes how many bytes were parsed in this function into bytesParsedOverall
      * 
      */
     template <typename Iterable>
@@ -332,7 +333,6 @@ public:
     template<typename Iterable>
     static ParseResult
     Parse(TlvBer& tlvOutput, Iterable& dataInput, size_t& bytesParsedOverall){
-        *tlvOutput = nullptr;
         auto parseResult = Tlv::ParseResult::Failed;
 
         // Parse tag.
@@ -359,12 +359,12 @@ public:
             std::vector<TlvBer> values;
             parseResult = ParseConstructedValue(values,length,subspan,bytesParsed);
             if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;    
-            tlvOutput = TlvBer(tagClass, tagType, tagNumber, tagComplete, values).release();
+            tlvOutput = TlvBer(tagClass, tagType, tagNumber, tagComplete, values);
         } else{
             std::vector<uint8_t> value;
             parseResult = ParsePrimitiveValue(value,length,subspan,bytesParsed);
             if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
-            tlvOutput = TlvBer(tagClass, tagType, tagNumber, tagComplete, value).release();
+            tlvOutput = TlvBer(tagClass, tagType, tagNumber, tagComplete, value);
         }
 
         offset += bytesParsed;
@@ -385,11 +385,9 @@ public:
     Parse(TlvBer **tlvOutput, Iterable& dataInput)
     {
         size_t bytesParsed;
-        TlvBer tlv;
-        auto parseResult = Parse(tlv,dataInput,bytesParsed);
-        if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
         *tlvOutput = std::make_unique<TlvBer>();
-        *tlvOutput = std::move(tlv);
+        auto parseResult = Parse(*tlvOutput,dataInput,bytesParsed);
+        if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
         return parseResult;
     }
 
