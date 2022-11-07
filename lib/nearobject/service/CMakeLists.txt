@@ -13,6 +13,7 @@ target_sources(nearobject-service
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectProfileManager.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectService.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectServiceConfiguration.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/NearObjectSessionIdGeneratorRandom.cxx
         ${CMAKE_CURRENT_LIST_DIR}/SecureDevice.cxx
         ${CMAKE_CURRENT_LIST_DIR}/ServiceRuntime.cxx
     PUBLIC
@@ -24,6 +25,8 @@ target_sources(nearobject-service
         ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectService.hxx
         ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectServiceConfiguration.hxx
         ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectServiceInjector.hxx
+        ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectSessionIdGenerator.hxx
+        ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectSessionIdGeneratorRandom.hxx
         ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/SecureDevice.hxx
         ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/SecureDeviceChannel.hxx
         ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/ServiceRuntime.hxx
