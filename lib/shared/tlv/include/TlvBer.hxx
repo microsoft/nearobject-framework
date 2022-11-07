@@ -362,24 +362,9 @@ public:
      *        Writes how many bytes were parsed in this function into bytesParsedOverall
      * 
      */
-    template <typename Iterable>
     static
     Tlv::ParseResult
-    ParseConstructedValue(std::vector<TlvBer>& valueOutput, size_t length, Iterable& dataInput, size_t& bytesParsedOverall){
-        bytesParsedOverall = 0;
-        size_t bytesParsed = 0;
-        auto subspan = dataInput;
-        TlvBer subtlv;
-        while(bytesParsedOverall < length){
-            auto parseResult = Parse(subtlv,dataInput,bytesParsed);
-            if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
-            bytesParsedOverall += bytesParsed;
-            subspan = dataInput.subspan(bytesParsedOverall);
-            valueOutput.push_back(subtlv);
-        }
-        if(bytesParsedOverall == length) return Tlv::ParseResult::Succeeded;
-        return Tlv::ParseResult::Failed;
-    }
+    ParseConstructedValue(std::vector<TlvBer>& valueOutput, size_t length, std::span<uint8_t> dataInput, size_t& bytesParsedOverall);
 
     /**
      * @brief Decode a Tlv from a blob of BER-TLV data.
@@ -388,48 +373,8 @@ public:
      * @param data The data to parse a Tlv from.
      * @return ParseResult The result of the parsing operation.
      */
-    template <typename Iterable>
-    static ParseResult
-    Parse(TlvBer& tlvOutput, Iterable& dataInput, size_t& bytesParsedOverall){
-        auto parseResult = Tlv::ParseResult::Failed;
-
-        // Parse tag.
-        TlvBer::Class tlvClass = TlvBer::Class::Invalid;
-        TlvBer::Type tlvType = TlvBer::Type::Primitive;
-        uint32_t tagNumber;
-        std::vector<uint8_t> tag;
-        size_t offset = 0;
-        size_t bytesParsed = 0;
-        parseResult = ParseTag(tlvClass,tlvType,tagNumber,tag,dataInput,bytesParsed);
-        if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
-
-        // Parse length.
-        offset += bytesParsed;
-        std::size_t length = 0;
-        auto subspan = dataInput.subspan(offset);
-        parseResult = ParseLength(length,subspan,bytesParsed);
-        if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
-
-        // Parse value.
-        offset += bytesParsed;
-        subspan = dataInput.subspan(offset);
-        if(tlvType == Type::Constructed) {
-            std::vector<TlvBer> values;
-            parseResult = ParseConstructedValue(values,length,subspan,bytesParsed);
-            if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;    
-            tlvOutput = TlvBer(tlvClass, tlvType, tagNumber, tag, values);
-        } else{
-            std::vector<uint8_t> value;
-            parseResult = ParsePrimitiveValue(value,length,subspan,bytesParsed);
-            if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
-            tlvOutput = TlvBer(tlvClass, tlvType, tagNumber, tag, value);
-        }
-
-        offset += bytesParsed;
-        bytesParsedOverall = offset;
-        
-        return ParseResult::Succeeded;
-    }
+    static Tlv::ParseResult
+    Parse(TlvBer& tlvOutput, std::span<uint8_t> dataInput, size_t& bytesParsedOverall);
 
     /**
      * @brief Decode a Tlv from a blob of BER-TLV data.
@@ -444,7 +389,8 @@ public:
     {
         size_t bytesParsed;
         *tlvOutput = std::make_unique<TlvBer>().release();
-        auto parseResult = Parse(**tlvOutput,dataInput,bytesParsed);
+        std::span<uint8_t> dataSpan {std::begin(dataInput), std::end(dataInput)};
+        auto parseResult = Parse(**tlvOutput,dataSpan,bytesParsed);
         if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
         return parseResult;
     }
