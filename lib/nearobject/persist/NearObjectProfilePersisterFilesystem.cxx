@@ -19,8 +19,8 @@ NearObjectProfilePersisterFilesystem::NearObjectProfilePersisterFilesystem(const
 {
     if (!std::filesystem::exists(m_persistFilepath.parent_path())) {
         std::error_code errorCode;
-        bool persistLocationCreated = std::filesystem::create_directories(m_persistFilepath.parent_path(), errorCode);
-        if (!persistLocationCreated) {
+        const bool persistLocationCreated = std::filesystem::create_directories(m_persistFilepath.parent_path(), errorCode);
+        if (!persistLocationCreated && !std::filesystem::exists(m_persistFilepath.parent_path())) {
             throw std::filesystem::filesystem_error("failed to create profile persistence directory", m_persistFilepath, errorCode);
         }
     }
