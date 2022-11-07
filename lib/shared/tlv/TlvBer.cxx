@@ -9,22 +9,22 @@
 
 using namespace encoding;
 
-TlvBer::TlvBer(TlvBer::Class tlvClass, TlvBer::Type tlvType, const std::vector<uint8_t>& tagNumber, const std::vector<uint8_t>& tagComplete, const std::vector<uint8_t>& value) :
+TlvBer::TlvBer(TlvBer::Class tlvClass, TlvBer::Type tlvType, uint32_t tagNumber, const std::vector<uint8_t>& tag, const std::vector<uint8_t>& value) :
     m_class(tlvClass),
     m_type(tlvType),
     m_tagNumber(tagNumber),
-    m_tag(tagComplete),
+    m_tag(tag),
     m_value(value)
 {
     ::Tlv::Tag = m_tag;
     ::Tlv::Value = m_value;
 }
 
-TlvBer::TlvBer(TlvBer::Class tlvClass, TlvBer::Type tlvType, const std::vector<uint8_t>& tagNumber, const std::vector<uint8_t>& tagComplete, std::vector<TlvBer>& values) :
+TlvBer::TlvBer(TlvBer::Class tlvClass, TlvBer::Type tlvType, uint32_t tagNumber, const std::vector<uint8_t>& tag, std::vector<TlvBer>& values) :
     m_class(tlvClass),
     m_type(tlvType),
     m_tagNumber(tagNumber),
-    m_tag(tagComplete),
+    m_tag(tag),
     m_valuesConstructed(std::move(values))
 {
     ::Tlv::Tag = m_tag;
@@ -61,10 +61,10 @@ TlvBer::GetClass(uint8_t tag)
 
 /* static */
 Tlv::ParseResult
-TlvBer::ParseTag(TlvBer::Class& tlvClass, TlvBer::Type& tlvType, std::vector<uint8_t>& tagNumber, std::vector<uint8_t>& tagComplete, uint8_t tag) {
+TlvBer::ParseTag(TlvBer::Class& tlvClass, TlvBer::Type& tlvType, uint32_t& tagNumber, std::vector<uint8_t>& tag, uint8_t tagValue) {
     std::size_t bytesParsed = 0;
-    const std::array<uint8_t, 1> tagArray{ tag };
-    return ParseTag(tlvClass, tlvType, tagNumber, tagComplete, tagArray, bytesParsed);
+    const std::array<uint8_t, 1> tagArray{ tagValue };
+    return ParseTag(tlvClass, tlvType, tagNumber, tag, tagArray, bytesParsed);
 }
 
 TlvBer::Type
@@ -79,7 +79,7 @@ TlvBer::GetClass() const noexcept
     return m_class;
 }
 
-std::span<const uint8_t>
+uint32_t 
 TlvBer::GetTagNumber() const noexcept
 {
     return m_tagNumber;

@@ -125,10 +125,13 @@ public:
     /**
      * @brief Construct a new BerTlv with given tag and value.
      * 
-     * @param tag The tag to use.
-     * @param value The data value to use.
+     * @param tlvClass 
+     * @param tlvType 
+     * @param tagNumber 
+     * @param tag
+     * @param value 
      */
-    TlvBer(TlvBer::Class tlvClass, TlvBer::Type tlvType, const std::vector<uint8_t>& tagNumber, const std::vector<uint8_t>& tagComplete, const std::vector<uint8_t>& value);
+    TlvBer(TlvBer::Class tlvClass, TlvBer::Type tlvType, uint32_t tagNumber, const std::vector<uint8_t>& tag, const std::vector<uint8_t>& value);
 
     /**
      * @brief Construct a new constructed TlvBer object.
@@ -136,7 +139,7 @@ public:
      * @param tag The tag to use.
      * @param values The constructed values.
      */
-    TlvBer(TlvBer::Class tlvClass, TlvBer::Type tlvType, const std::vector<uint8_t>& tagNumber, const std::vector<uint8_t>& tagComplete, std::vector<TlvBer>& value);
+    TlvBer(TlvBer::Class tlvClass, TlvBer::Type tlvType, uint32_t tagNumber, const std::vector<uint8_t>& tag, std::vector<TlvBer>& value);
    
     /**
      * @brief Returns whether this TLV contains a constructed value.
@@ -175,13 +178,13 @@ public:
     /**
      * @brief Get the tagNumber of the TLV.
      * 
-     * @return std::span<const uint8_t> 
+     * @return uint32_t 
      */
-    std::span<const uint8_t>
+    uint32_t
     GetTagNumber() const noexcept;
 
     /**
-     * @brief Get the tagComplete of the TLV.
+     * @brief Get the tag of the TLV.
      * 
      * @return std::span<const uint8_t> 
      */
@@ -199,21 +202,21 @@ public:
     /**
      * @brief Parses the first bytes to determine if they encode a tag properly.
      * Advances the iterator it to once past the tag. Writes to tlvClass,
-     * tlvType, tagNumber, tagComplete, and bytesParsed if a proper tag was
+     * tlvType, tagNumber, tag, and bytesParsed if a proper tag was
      * parsed.
      * 
      * @tparam Iterable 
      * @param tlvClass 
      * @param tlvType 
      * @param tagNumber 
-     * @param tagComplete 
+     * @param tag 
      * @param data 
      * @param bytesParsed 
      * @return Tlv::ParseResult 
      */
     template <typename Iterable>
     static Tlv::ParseResult
-    ParseTag(TlvBer::Class& tlvClass, TlvBer::Type& tlvType, std::vector<uint8_t>& tagNumber, std::vector<uint8_t>& tagComplete, Iterable& data, std::size_t& bytesParsed)
+    ParseTag(TlvBer::Class& tlvClass, TlvBer::Type& tlvType, uint32_t& tagNumber, std::vector<uint8_t>& tag, Iterable& data, std::size_t& bytesParsed)
     {
         auto dataIt = std::cbegin(data);
         auto dataEnd = std::cend(data);
@@ -227,13 +230,13 @@ public:
 
         // Is tag short type?
         if ((*dataIt & BitmaskTagFirstByte) != TagValueLongField) {
-            tagComplete.push_back(*dataIt);
-            tagNumber.push_back(*dataIt & BitmaskTagShort);
+            tag.push_back(*dataIt);
+            tagNumber = *dataIt & BitmaskTagShort;
             return Tlv::ParseResult::Succeeded;
         }
 
         // Tag is long-type. 
-        tagComplete.push_back(*dataIt);
+        tag.push_back(*dataIt);
         
         // check the second byte
         std::advance(dataIt, 1);
@@ -243,8 +246,8 @@ public:
             return Tlv::ParseResult::Failed;
         }
 
-        tagNumber.push_back(*dataIt & BitmaskTagLong);
-        tagComplete.push_back(*dataIt);
+        tagNumber = *dataIt & BitmaskTagLong;
+        tag.push_back(*dataIt);
 
         // check the third byte?
         if ((*dataIt & BitmaskTagLastByte) == TagValueLastByte) {
@@ -258,8 +261,9 @@ public:
                 return Tlv::ParseResult::Failed;
             }
             
-            tagNumber.push_back(*dataIt & BitmaskTagLong);
-            tagComplete.push_back(*dataIt);
+            tagNumber <<= 8;
+            tagNumber |= *dataIt & BitmaskTagLong;
+            tag.push_back(*dataIt);
         }
 
         // advance the dataIt to once past the tag
@@ -275,12 +279,12 @@ public:
      * @param tlvClass 
      * @param tlvType 
      * @param tagNumber 
-     * @param tagComplete 
+     * @param tag 
      * @param tag 
      * @return Tlv::ParseResult 
      */
     static Tlv::ParseResult
-    ParseTag(Class& tlvClass, TlvBer::Type& tlvType, std::vector<uint8_t>& tagNumber, std::vector<uint8_t>& tagComplete, uint8_t tag);
+    ParseTag(Class& tlvClass, TlvBer::Type& tlvType, uint32_t& tagNumber, std::vector<uint8_t>& tag, uint8_t tagValue);
 
     /**
      * @brief Parses the first bytes to determine if they encode a length
@@ -348,7 +352,7 @@ public:
     ParseValue(std::vector<uint8_t>& valueOutput, std::size_t length, Iterable& data, std::size_t& bytesParsed) {
         const auto dataIt = std::cbegin(data);
         const auto dataEnd = std::cend(data);
-        if (std::distance(dataIt, dataEnd) < length) {
+        if (std::distance(dataIt, dataEnd) < static_cast<std::ptrdiff_t>(length)) {
             return Tlv::ParseResult::Failed;
         }
 
@@ -381,11 +385,11 @@ public:
         // Parse tag.
         TlvBer::Class tlvClass = TlvBer::Class::Invalid;
         TlvBer::Type tlvType = TlvBer::Type::Primitive;
-        std::vector<uint8_t> tagNumber;
-        std::vector<uint8_t> tagComplete;
+        uint32_t tagNumber;
+        std::vector<uint8_t> tag;
         std::size_t offset = 0;
         std::size_t bytesParsed = 0;
-        parseResult = ParseTag(tlvClass, tlvType, tagNumber, tagComplete, data, bytesParsed);
+        parseResult = ParseTag(tlvClass, tlvType, tagNumber, tag, data, bytesParsed);
         if (Tlv::ParseResult::Succeeded != parseResult) {
             return parseResult;
         }
@@ -413,7 +417,7 @@ public:
             // TODO: parse nested tlvs
             break;
         case TlvBer::Type::Primitive: {
-            *tlvOutput = std::make_unique<TlvBer>(tlvClass, tlvType, tagNumber, tagComplete, value).release();
+            *tlvOutput = std::make_unique<TlvBer>(tlvClass, tlvType, tagNumber, tag, value).release();
             parseResult = ParseResult::Succeeded;
             break;
         }
@@ -622,8 +626,8 @@ public:
         bool m_validateConstructed{ false };
         TlvBer::Class m_class;
         TlvBer::Type m_type;
+        uint32_t m_tagNumber;
         std::vector<uint8_t> m_tag;
-        std::vector<uint8_t> m_tagNumber;
         std::vector<uint8_t> m_data;
         std::vector<TlvBer> m_valuesConstructed;
     };
@@ -631,7 +635,7 @@ public:
 private:
     TlvBer::Class m_class;
     TlvBer::Type m_type;
-    std::vector<uint8_t> m_tagNumber;
+    uint32_t m_tagNumber;
     std::vector<uint8_t> m_tag;
     std::vector<uint8_t> m_value;
     std::vector<TlvBer> m_valuesConstructed;

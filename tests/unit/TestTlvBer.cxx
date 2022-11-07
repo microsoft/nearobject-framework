@@ -49,7 +49,7 @@ TEST_CASE("test TlvBer", "[basic][infra]")
         std::array<uint8_t, 4> invalidTag{ 0xFF, 0x84, 0x85, 0x16 };
         TlvBer::Class tlvClass = TlvBer::Class::Invalid;
         TlvBer::Type tlvType = TlvBer::Type::Primitive;
-        std::vector<uint8_t> tagNumber;
+        uint32_t tagNumber;
         std::vector<uint8_t> tagComplete;
         std::size_t bytesParsed = 0;
         REQUIRE(Tlv::ParseResult::Failed == TlvBer::ParseTag(tlvClass, tlvType, tagNumber, tagComplete, invalidTag, bytesParsed));
@@ -61,7 +61,7 @@ TEST_CASE("test TlvBer", "[basic][infra]")
             std::array<uint8_t, 2> invalidTag{ 0xFF, invalidSecondByte };
             TlvBer::Class tlvClass = TlvBer::Class::Invalid;
             TlvBer::TlvBer::Type tlvType = TlvBer::Type::Primitive;
-            std::vector<uint8_t> tagNumber;
+            uint32_t tagNumber;
             std::vector<uint8_t> tagComplete;
             std::size_t bytesParsed = 0;
             REQUIRE(Tlv::ParseResult::Failed == TlvBer::ParseTag(tlvClass, tlvType, tagNumber, tagComplete, invalidTag, bytesParsed));
@@ -71,7 +71,7 @@ TEST_CASE("test TlvBer", "[basic][infra]")
             std::array<uint8_t, 2> invalidTag{ 0xFF, invalidSecondByte };
             TlvBer::Class tlvClass = TlvBer::Class::Invalid;
             TlvBer::TlvBer::Type tlvType = TlvBer::Type::Primitive;
-            std::vector<uint8_t> tagNumber;
+            uint32_t tagNumber;
             std::vector<uint8_t> tagComplete;
             std::size_t bytesParsed = 0;
             REQUIRE(Tlv::ParseResult::Failed == TlvBer::ParseTag(tlvClass, tlvType, tagNumber, tagComplete, invalidTag, bytesParsed));
