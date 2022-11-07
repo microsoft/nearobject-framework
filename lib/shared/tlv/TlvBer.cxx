@@ -9,73 +9,74 @@
 
 using namespace encoding;
 
-TlvBer::TlvBer(TagClass tagClass, TagType tagType, const std::vector<uint8_t>& tagNumber, const std::vector<uint8_t>& tagComplete, const std::vector<uint8_t>& value) :
-    m_tagClass(tagClass),
-    m_tagType(tagType),
+TlvBer::TlvBer(TlvBer::Class tlvClass, TlvBer::Type tlvType, const std::vector<uint8_t>& tagNumber, const std::vector<uint8_t>& tagComplete, const std::vector<uint8_t>& value) :
+    m_class(tlvClass),
+    m_type(tlvType),
     m_tagNumber(tagNumber),
-    m_tagComplete(tagComplete),
+    m_tag(tagComplete),
     m_value(value)
 {
-    ::Tlv::Tag = m_tagComplete;
+    ::Tlv::Tag = m_tag;
     ::Tlv::Value = m_value;
 }
 
-TlvBer::TlvBer(TagClass tagClass, TagType tagType, const std::vector<uint8_t>& tagNumber, const std::vector<uint8_t>& tagComplete, std::vector<TlvBer>& values) :
-    m_tagClass(tagClass),
-    m_tagType(tagType),
+TlvBer::TlvBer(TlvBer::Class tlvClass, TlvBer::Type tlvType, const std::vector<uint8_t>& tagNumber, const std::vector<uint8_t>& tagComplete, std::vector<TlvBer>& values) :
+    m_class(tlvClass),
+    m_type(tlvType),
     m_tagNumber(tagNumber),
-    m_tagComplete(tagComplete),
+    m_tag(tagComplete),
     m_valuesConstructed(std::move(values))
 {
-    ::Tlv::Tag = m_tagComplete;
+    ::Tlv::Tag = m_tag;
     ::Tlv::Value = std::span<const uint8_t>{};
 }
 
 /* static */
-TlvBer::TagType
-TlvBer::GetTagType(uint8_t tag)
+TlvBer::TlvBer::Type
+TlvBer::GetType(uint8_t tag)
 {
     if ((tag & BitmaskType) == TypeConstructed) {
-        return TagType::Constructed;
+        return TlvBer::Type::Constructed;
     } else {
-        return TagType::Primitive;
+        return TlvBer::Type::Primitive;
     }
 }
 
 /* static */
-TlvBer::TagClass
-TlvBer::GetTagClass(uint8_t tag)
+TlvBer::Class
+TlvBer::GetClass(uint8_t tag)
 {
     switch (tag & BitmaskClass) {
     case ClassUniversal:
-        return TagClass::Universal;
+        return TlvBer::Class::Universal;
     case ClassApplication:
-        return TagClass::Application;
+        return TlvBer::Class::Application;
     case ClassContextSpecific:
-        return TagClass::ContextSpecific;
+        return TlvBer::Class::ContextSpecific;
     case ClassPrivate:
     default:
-        return TagClass::Private;
+        return TlvBer::Class::Private;
     }
 }
 
+/* static */
 Tlv::ParseResult
-TlvBer::ParseTag(TagClass& tagClass, TagType& tagType,std::vector<uint8_t>& tagNumber, std::vector<uint8_t>& tagComplete, uint8_t tag){
-    size_t bytesParsed;
-    uint8_t tagArray[] = {tag};
-    return ParseTag(tagClass,tagType,tagNumber,tagComplete,tagArray,bytesParsed);
+TlvBer::ParseTag(TlvBer::Class& tlvClass, TlvBer::Type& tlvType, std::vector<uint8_t>& tagNumber, std::vector<uint8_t>& tagComplete, uint8_t tag) {
+    std::size_t bytesParsed = 0;
+    const std::array<uint8_t, 1> tagArray{ tag };
+    return ParseTag(tlvClass, tlvType, tagNumber, tagComplete, tagArray, bytesParsed);
 }
 
-TlvBer::TagType
-TlvBer::GetTagType() const noexcept
+TlvBer::Type
+TlvBer::GetType() const noexcept
 {
-    return m_tagType;
+    return m_type;
 }
 
-TlvBer::TagClass
-TlvBer::GetTagClass() const noexcept
+TlvBer::Class
+TlvBer::GetClass() const noexcept
 {
-    return m_tagClass;
+    return m_class;
 }
 
 std::span<const uint8_t>
@@ -85,9 +86,9 @@ TlvBer::GetTagNumber() const noexcept
 }
 
 std::span<const uint8_t>
-TlvBer::GetTagComplete() const noexcept
+TlvBer::GetTag() const noexcept
 {
-    return m_tagComplete;
+    return m_tag;
 }
 
 std::vector<TlvBer>
@@ -99,20 +100,20 @@ TlvBer::GetValues() const noexcept
 bool
 TlvBer::IsConstructed() const noexcept
 {
-    return m_tagType == TlvBer::TagType::Constructed;
+    return m_type == TlvBer::TlvBer::Type::Constructed;
 }
 
 bool
 TlvBer::IsPrimitive() const noexcept
 {
-    return m_tagType == TlvBer::TagType::Primitive;
+    return m_type == TlvBer::TlvBer::Type::Primitive;
 }
 
 std::vector<uint8_t>
 TlvBer::ToBytes() const
 {
     std::vector<uint8_t> accumulate;
-    accumulate.assign(std::cbegin(m_tagComplete), std::cend(m_tagComplete));
+    accumulate.assign(std::cbegin(m_tag), std::cend(m_tag));
     const auto lengthEncoding = TlvBer::GetLengthEncoding(m_value.size());
     accumulate.insert(std::cend(accumulate), std::cbegin(lengthEncoding), std::cend(lengthEncoding));
     accumulate.insert(std::cend(accumulate), std::cbegin(m_value), std::cend(m_value));
@@ -129,7 +130,7 @@ TlvBer::Builder::WriteLength(uint64_t length)
 TlvBer::Builder&
 TlvBer::Builder::SetTag(uint8_t tag)
 {
-    TlvBer::ParseTag(m_tagClass,m_tagType,m_tagNumber,m_tagComplete,tag);
+    TlvBer::ParseTag(m_class, m_type, m_tagNumber, m_tag, tag);
     return *this;
 }
 
@@ -214,13 +215,13 @@ TlvBer
 TlvBer::Builder::Build()
 {
     ValidateTag();
-    return TlvBer{ m_tagClass, m_tagType, m_tagNumber, m_tagComplete, m_data };
+    return TlvBer{ m_class, m_type, m_tagNumber, m_tag, m_data };
 }
 
 void
 TlvBer::Builder::ValidateTag()
 {
-    if (m_validateConstructed != (m_tagType == TagType::Constructed)) {
+    if (m_validateConstructed != (m_type == TlvBer::Type::Constructed)) {
         throw InvalidTlvBerTagException();
     }
 }
