@@ -47,8 +47,7 @@ protected:
 struct NearObjectDeviceTest :
     public NearObjectDeviceController
 {
-    explicit NearObjectDeviceTest(uint64_t deviceId) :
-        NearObjectDeviceController(deviceId)
+    explicit NearObjectDeviceTest(uint64_t deviceId) : DeviceId(deviceId)
     {}
 
     StartSessionResult
@@ -56,6 +55,15 @@ struct NearObjectDeviceTest :
     {
         return { std::nullopt };
     }
+
+    bool
+    IsEqual(const NearObjectDeviceController& other) const noexcept override
+    {
+        const auto& rhs = static_cast<const NearObjectDeviceTest&>(other);
+        return (this->DeviceId == rhs.DeviceId);
+    }
+
+    uint8_t DeviceId;
 };
 } // namespace test
 } // namespace service

@@ -62,7 +62,7 @@ NearObjectIdentityTokenUwb::IsEqual(const NearObjectIdentityToken& other) const 
     // This cast is safe since the operator==() implementation guarantees the
     // type of 'other' to be 'NearObjectIdentityTokenUwb' using a typeid check.
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast)
-    const auto rhs = static_cast<const NearObjectIdentityTokenUwb&>(other);
+    const auto& rhs = static_cast<const NearObjectIdentityTokenUwb&>(other);
 
     // Forward base class checks, then validate specifics from this class.
     return NearObjectIdentityToken::IsEqual(other) && rhs.GetMacAddress() == this->GetMacAddress();

@@ -5,20 +5,25 @@
 
 using namespace nearobject::service;
 
-namespace
-{
-static constexpr auto deviceIdFallback = 0x1234;
-} // namespace detail
-
 NearObjectDeviceControllerUwb::NearObjectDeviceControllerUwb(std::unique_ptr<uwb::UwbDevice> uwbDevice) :
-    NearObjectDeviceController(deviceIdFallback),
     m_uwbDevice(std::move(uwbDevice))
 {
-    // TODO: obtain device GUID from uwbDevice and use that in place of deviceIdFallback above
 }
 
 NearObjectDeviceController::StartSessionResult
 NearObjectDeviceControllerUwb::StartSessionImpl(const NearObjectProfile& /* profile */, std::weak_ptr<NearObjectSessionEventCallbacks> /* eventCallbacks */)
 {
     return { std::nullopt };
+}
+
+bool
+NearObjectDeviceControllerUwb::IsEqual(const NearObjectDeviceController& other) const noexcept
+{
+    // This cast is safe since the operator==() implementation guarantees the
+    // type of 'other' to be 'NearObjectDeviceControllerUwb' using a typeid check.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast)
+    const auto& rhs = static_cast<const NearObjectDeviceControllerUwb&>(other);
+
+    // TODO: use m_uwbDevice to compare *this and rhs device ids.
+    return false;
 }
