@@ -69,6 +69,16 @@ public:
     uwb::protocol::fira::UwbCapability
     GetCapabilities() const override;
 
+    /**
+     * @brief Determine if this device is the same as another.
+     * 
+     * @param other 
+     * @return true 
+     * @return false 
+     */
+    bool
+    IsEqual(const uwb::UwbDevice& other) const noexcept override;
+
 private:
     const std::wstring m_deviceName;
 

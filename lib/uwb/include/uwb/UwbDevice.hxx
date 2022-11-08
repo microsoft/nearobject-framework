@@ -34,10 +34,26 @@ public:
     GetCapabilities() const = 0;
 
     /**
+     * @brief Determine if this device is the same as another.
+     * 
+     * @param other 
+     * @return true 
+     * @return false 
+     */
+    virtual bool
+    IsEqual(const UwbDevice& other) const noexcept = 0;
+
+    /**
      * @brief Destroy the UwbDevice object.
      */
     virtual ~UwbDevice() = default;
 };
+
+bool
+operator==(const UwbDevice&, const UwbDevice&) noexcept;
+
+bool
+operator!=(const UwbDevice&, const UwbDevice&) noexcept;
 
 } // namespace uwb
 

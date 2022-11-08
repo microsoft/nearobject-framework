@@ -243,3 +243,11 @@ UwbDevice::GetCapabilities() const
     const UWB_DEVICE_CAPABILITIES& uwbDeviceCapabilities = *reinterpret_cast<UWB_DEVICE_CAPABILITIES*>(uwbDeviceCapabilitiesBuffer.get());
     return detail::FromUwbCx(uwbDeviceCapabilities);
 }
+
+bool
+UwbDevice::IsEqual(const uwb::UwbDevice& other) const noexcept
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast)
+    const auto& rhs = static_cast<const windows::devices::UwbDevice&>(other);
+    return (this->DeviceName() == rhs.DeviceName());
+}
