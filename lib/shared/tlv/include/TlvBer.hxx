@@ -523,26 +523,6 @@ public:
         SetValue(uint8_t value);
 
         /**
-         * @brief Add a nested tlv to this tlv. This makes it a constructed
-         * TlvBer. TODO will have to add to the m_valuesConstructed field.
-         * 
-         * @tparam TagT
-         * @tparam ValueT
-         * @param tag 
-         * @param value 
-         * @return Builder& 
-         */
-        // template<class T, class V>
-        // Builder&
-        // AddTlv(const T& tag, const V& value)
-        // {
-        //     WriteBytes(tag);
-        //     WriteLengthAndValue(value);
-        //     m_addedSubTlvFlag = true;
-        //     return *this;
-        // }
-
-        /**
          * @brief Add a pre-existing tlv to this tlv. This makes it a constructed TlvBer.
          * 
          * @param tlv 
