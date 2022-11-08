@@ -270,7 +270,6 @@ TlvBer::Builder::SetValue(uint8_t value)
 TlvBer::Builder&
 TlvBer::Builder::AddTlv(const TlvBer& tlv)
 {
-    m_addedSubTlvFlag = true;
     m_valuesConstructed.push_back(tlv);
     return *this;
 }
@@ -292,7 +291,8 @@ TlvBer::Builder::Build()
 void
 TlvBer::Builder::ValidateTag()
 {
-    if (m_addedSubTlvFlag != (m_type == TlvBer::Type::Constructed)) {
+    if ((m_type == TlvBer::Type::Constructed) && (m_data.size()>0) || 
+        (m_type == TlvBer::Type::Primitive) && (m_valuesConstructed.size()>0)) {
         throw InvalidTlvBerTagException();
     }
 }

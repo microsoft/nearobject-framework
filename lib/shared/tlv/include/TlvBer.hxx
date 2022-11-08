@@ -569,7 +569,6 @@ public:
         ValidateTag();
 
     private:
-        bool m_addedSubTlvFlag{ false };
         TlvBer::Class m_class;
         TlvBer::Type m_type;
         uint32_t m_tagNumber;

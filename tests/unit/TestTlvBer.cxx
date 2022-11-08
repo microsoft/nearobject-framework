@@ -282,6 +282,18 @@ TEST_CASE("test TlvBer", "[basic][infra]")
                          .SetValue(valueTwoBytes);
         REQUIRE_THROWS(builder.Build());
     }
+
+    SECTION("An empty primitive value works"){
+        TlvBer::Builder builder;
+        builder.SetTag(tagTwoBytesPrimitive);
+        REQUIRE_NOTHROW(builder.Build());
+    }
+
+    SECTION("An empty constructed value works"){
+        TlvBer::Builder builder;
+        builder.SetTag(tagTwoBytesConstructed);
+        REQUIRE_NOTHROW(builder.Build());
+    }
     
     SECTION("Parsing a primitive tlv works")
     {
