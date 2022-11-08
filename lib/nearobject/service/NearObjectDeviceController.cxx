@@ -6,16 +6,6 @@
 
 using namespace nearobject::service;
 
-NearObjectDeviceController::NearObjectDeviceController(uint64_t deviceId) :
-    m_deviceId{ deviceId }
-{}
-
-uint64_t
-NearObjectDeviceController::Id() const noexcept
-{
-    return m_deviceId;
-}
-
 NearObjectDeviceController::StartSessionResult
 NearObjectDeviceController::StartSession(const NearObjectProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks)
 {
@@ -35,5 +25,15 @@ NearObjectDeviceController::StartSession(const NearObjectProfile& profile, std::
 bool
 nearobject::service::operator==(const NearObjectDeviceController& lhs, const NearObjectDeviceController& rhs) noexcept
 {
-    return lhs.Id() == rhs.Id();
+    // Ensure types are the same, then compare using overidden equality
+    // function. This guarantees that the overriden IsEqual() member function
+    // always receives instances of the same type, allowing it to be safely
+    // converted using static_cast.
+    return (typeid(lhs) == typeid(rhs)) && lhs.IsEqual(rhs);
+}
+
+bool
+nearobject::service::operator!=(const NearObjectDeviceController& lhs, const NearObjectDeviceController& rhs) noexcept
+{
+    return !(lhs == rhs);
 }
