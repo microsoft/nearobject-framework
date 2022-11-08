@@ -24,6 +24,6 @@ NearObjectDeviceControllerUwb::IsEqual(const NearObjectDeviceController& other) 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast)
     const auto& rhs = static_cast<const NearObjectDeviceControllerUwb&>(other);
 
-    // TODO: use m_uwbDevice to compare *this and rhs device ids.
-    return false;
+    // The controller is equal if it is managing the same underlying uwb device.
+    return (rhs.m_uwbDevice != nullptr) && this->m_uwbDevice->IsEqual(*(rhs.m_uwbDevice));
 }
