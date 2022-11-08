@@ -114,10 +114,79 @@ TlvBer::ToBytes() const
 {
     std::vector<uint8_t> accumulate;
     accumulate.assign(std::cbegin(m_tag), std::cend(m_tag));
-    const auto lengthEncoding = TlvBer::GetLengthEncoding(m_value.size());
+    std::vector<uint8_t> value;
+    if(IsPrimitive())
+    {   
+        value = m_value;
+    } else {
+        for(const auto& tlv : m_valuesConstructed) {
+            auto data = tlv.ToBytes();
+            value.insert(std::cend(value),std::cbegin(data),std::cend(data));
+        }
+    }
+    const auto lengthEncoding = TlvBer::GetLengthEncoding(value.size());
     accumulate.insert(std::cend(accumulate), std::cbegin(lengthEncoding), std::cend(lengthEncoding));
-    accumulate.insert(std::cend(accumulate), std::cbegin(m_value), std::cend(m_value));
+    accumulate.insert(std::cend(accumulate), std::cbegin(value), std::cend(value));
     return accumulate;
+}
+
+Tlv::ParseResult
+TlvBer::ParseConstructedValue(std::vector<TlvBer>& valueOutput, size_t length, std::span<uint8_t> dataInput, size_t& bytesParsedOverall){
+    bytesParsedOverall = 0;
+    size_t bytesParsed = 0;
+    auto subspan = dataInput;
+    TlvBer subtlv;
+    while(bytesParsedOverall < length){
+        auto parseResult = Parse(subtlv,dataInput,bytesParsed);
+        if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
+        bytesParsedOverall += bytesParsed;
+        subspan = dataInput.subspan(bytesParsedOverall);
+        valueOutput.push_back(subtlv);
+    }
+    if(bytesParsedOverall == length) return Tlv::ParseResult::Succeeded;
+    return Tlv::ParseResult::Failed;
+}
+
+Tlv::ParseResult
+TlvBer::Parse(TlvBer& tlvOutput, std::span<uint8_t> dataInput, size_t& bytesParsedOverall){
+    auto parseResult = Tlv::ParseResult::Failed;
+
+    // Parse tag.
+    TlvBer::Class tlvClass = TlvBer::Class::Invalid;
+    TlvBer::Type tlvType = TlvBer::Type::Primitive;
+    uint32_t tagNumber;
+    std::vector<uint8_t> tag;
+    size_t offset = 0;
+    size_t bytesParsed = 0;
+    parseResult = ParseTag(tlvClass,tlvType,tagNumber,tag,dataInput,bytesParsed);
+    if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
+
+    // Parse length.
+    offset += bytesParsed;
+    std::size_t length = 0;
+    auto subspan = dataInput.subspan(offset);
+    parseResult = ParseLength(length,subspan,bytesParsed);
+    if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
+
+    // Parse value.
+    offset += bytesParsed;
+    subspan = dataInput.subspan(offset);
+    if(tlvType == Type::Constructed) {
+        std::vector<TlvBer> values;
+        parseResult = ParseConstructedValue(values,length,subspan,bytesParsed);
+        if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;    
+        tlvOutput = TlvBer(tlvClass, tlvType, tagNumber, tag, values);
+    } else{
+        std::vector<uint8_t> value;
+        parseResult = ParsePrimitiveValue(value,length,subspan,bytesParsed);
+        if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
+        tlvOutput = TlvBer(tlvClass, tlvType, tagNumber, tag, value);
+    }
+
+    offset += bytesParsed;
+    bytesParsedOverall = offset;
+    
+    return ParseResult::Succeeded;
 }
 
 void
@@ -199,9 +268,10 @@ TlvBer::Builder::SetValue(uint8_t value)
 }
 
 TlvBer::Builder&
-TlvBer::Builder::AddTlv(const Tlv& tlv)
+TlvBer::Builder::AddTlv(const TlvBer& tlv)
 {
-    return AddTlv(tlv.Tag, tlv.Value);
+    m_valuesConstructed.push_back(tlv);
+    return *this;
 }
 
 TlvBer::Builder&
@@ -221,7 +291,8 @@ TlvBer::Builder::Build()
 void
 TlvBer::Builder::ValidateTag()
 {
-    if (m_validateConstructed != (m_type == TlvBer::Type::Constructed)) {
+    if ((m_type == TlvBer::Type::Constructed) && (m_data.size()>0) || 
+        (m_type == TlvBer::Type::Primitive) && (m_valuesConstructed.size()>0)) {
         throw InvalidTlvBerTagException();
     }
 }

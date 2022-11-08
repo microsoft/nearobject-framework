@@ -88,11 +88,11 @@ TEST_CASE("test TlvBer", "[basic][infra]")
         }
     }
 
-    SECTION("ParseValue fails if the provided span doesn't have enough bytes")
+    SECTION("ParsePrimitiveValue fails if the provided span doesn't have enough bytes")
     {
             std::size_t bytesParsed = 0;
             std::vector<uint8_t> valueOutput;
-            REQUIRE(Tlv::ParseResult::Failed == TlvBer::ParseValue(valueOutput, 4, valueThreeBytes, bytesParsed));
+            REQUIRE(Tlv::ParseResult::Failed == TlvBer::ParsePrimitiveValue(valueOutput,4,valueThreeBytes,bytesParsed));
     }
 
     SECTION("creating a TlvBer from an empty Builder holds no data")
@@ -233,16 +233,8 @@ TEST_CASE("test TlvBer", "[basic][infra]")
                           .SetTag(tagTwoBytesConstructed)
                           .AddTlv(child)
                           .Build();
-        REQUIRE(std::equal(std::cbegin(parent.Tag), std::cend(parent.Tag), std::cbegin(tagTwoBytesConstructed)));
-        REQUIRE(std::equal(std::cbegin(parent.Value), std::cend(parent.Value), std::cbegin(child.ToBytes())));
-
-        auto parent2 = builder
-                          .Reset()
-                          .SetTag(tagTwoBytesConstructed)
-                          .AddTlv(tagTwoBytesPrimitive, valueTwoBytes)
-                          .Build();
-        REQUIRE(std::equal(std::cbegin(parent2.Tag), std::cend(parent2.Tag), std::cbegin(parent.Tag)));
-        REQUIRE(std::equal(std::cbegin(parent2.Value), std::cend(parent2.Value), std::cbegin(parent.Value)));
+        REQUIRE(std::equal(std::cbegin(parent.Tag),std::cend(parent.Tag),std::cbegin(tagTwoBytesConstructed)));
+        REQUIRE(std::equal(std::cbegin(parent.Value),std::cend(parent.Value),std::cbegin(child.ToBytes())));
     }
 
     SECTION("creating a TlvBer with a nested TLV value that itself has a nested TLV value works as expected")
@@ -289,6 +281,113 @@ TEST_CASE("test TlvBer", "[basic][infra]")
                          .SetTag(tagTwoBytesConstructed)
                          .SetValue(valueTwoBytes);
         REQUIRE_THROWS(builder.Build());
+    }
+
+    SECTION("An empty primitive value works"){
+        TlvBer::Builder builder;
+        builder.SetTag(tagTwoBytesPrimitive);
+        REQUIRE_NOTHROW(builder.Build());
+        auto value = builder.Build();
+        REQUIRE(value.Value.size()==0);
+    }
+
+    SECTION("An empty constructed value works"){
+        TlvBer::Builder builder;
+        builder.SetTag(tagTwoBytesConstructed);
+        REQUIRE_NOTHROW(builder.Build());
+        auto value = builder.Build();
+        REQUIRE(value.Value.size()==0);
+    }
+    
+    SECTION("Parsing a primitive tlv works")
+    {
+        TlvBer::Builder builder{};
+        auto child = builder
+                         .SetTag(tagTwoBytesPrimitive)
+                         .SetValue(valueTwoBytes)
+                         .Build();
+        auto childBytes = child.ToBytes();
+        TlvBer *tlvParsed = nullptr;
+        auto presult = TlvBer::Parse(&tlvParsed,childBytes);
+        REQUIRE(presult == Tlv::ParseResult::Succeeded);
+
+        REQUIRE(tlvParsed != nullptr);
+        REQUIRE(std::equal(std::cbegin(child.Tag), std::cend(child.Tag), std::cbegin(tlvParsed->Tag)));
+        REQUIRE(std::equal(std::cbegin(child.Value), std::cend(child.Value), std::cbegin(tlvParsed->Value)));
+    }
+
+    SECTION("Parsing a a one level constructed tlv works")
+    {
+        TlvBer::Builder builder{};
+        auto child = builder
+                         .SetTag(tagTwoBytesPrimitive)
+                         .SetValue(valueTwoBytes)
+                         .Build();
+        auto childBytes = child.ToBytes();
+        auto child2 = builder
+                         .Reset()
+                         .SetTag(tagThreeBytesPrimitive)
+                         .SetValue(valueTwoBytes)
+                         .Build();
+        auto childBytes2 = child2.ToBytes();
+        
+        auto parent = builder
+                        .Reset()
+                        .SetTag(tagTwoBytesConstructed)
+                        .AddTlv(child)
+                        .AddTlv(child2)
+                        .Build();
+        auto parentBytes = parent.ToBytes();
+
+        TlvBer *tlvParsed = nullptr;
+        auto presult = TlvBer::Parse(&tlvParsed,parentBytes);
+        REQUIRE(presult == Tlv::ParseResult::Succeeded);
+
+        REQUIRE(tlvParsed != nullptr);
+        REQUIRE(std::equal(std::cbegin(parent.Tag), std::cend(parent.Tag), std::cbegin(tlvParsed->Tag)));
+        REQUIRE(std::equal(std::cbegin(parent.Value), std::cend(parent.Value), std::cbegin(tlvParsed->Value)));
+    }
+
+    SECTION("Parsing a a two level constructed tlv works")
+    {
+        TlvBer::Builder builder{};
+        auto child = builder
+                         .SetTag(tagTwoBytesPrimitive)
+                         .SetValue(valueTwoBytes)
+                         .Build();
+        auto childBytes = child.ToBytes();
+        auto child2 = builder
+                         .Reset()
+                         .SetTag(tagThreeBytesPrimitive)
+                         .SetValue(valueTwoBytes)
+                         .Build();
+        auto childBytes2 = child2.ToBytes();
+        
+        auto parent = builder
+                        .Reset()
+                        .SetTag(tagTwoBytesConstructed)
+                        .AddTlv(child)
+                        .AddTlv(child2)
+                        .Build();
+        auto parentBytes = parent.ToBytes();
+        
+        auto parentparent = builder
+                            .Reset()
+                            .SetTag(tagTwoBytesConstructed)
+                            .AddTlv(child)
+                            .AddTlv(child2)
+                            .AddTlv(parent)
+                            .Build();
+
+        auto parentparentBytes = parentparent.ToBytes();
+
+        TlvBer *tlvParsed = nullptr;
+        auto presult = TlvBer::Parse(&tlvParsed,parentparentBytes);
+        REQUIRE(presult == Tlv::ParseResult::Succeeded);
+
+        REQUIRE(tlvParsed != nullptr);
+        REQUIRE(std::equal(std::cbegin(parentparent.Tag), std::cend(parentparent.Tag), std::cbegin(tlvParsed->Tag)));
+        REQUIRE(std::equal(std::cbegin(parentparent.Value), std::cend(parentparent.Value), std::cbegin(tlvParsed->Value)));
     }
 }
 
