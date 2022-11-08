@@ -10,13 +10,13 @@ namespace devices
 {
 namespace uwb
 {
-#ifndef GUID_DEVINTERFACE_UWB
-    // TODO: remove once the actual driver interface is defined and exposes this officially
-    // 1f49c35a-f284-4f81-87d7-4725a6eec3e8
-    DEFINE_GUID(GUID_DEVINTERFACE_UWB, 0x1f49c35a, 0xf284, 0x4f81, 0x87, 0xd7, 0x47, 0x25, 0xa6, 0xee, 0xc3, 0xe8);
+// TODO: remove once the driver DDI is exposed through the Windows SDK/WDK.
+#ifndef GUID_UWB_DEVICE_INTERFACE
+// {A7424370-45E5-49C3-AE35-42A3C41B34AD}
+DEFINE_GUID(GUID_UWB_DEVICE_INTERFACE, 0xa7424370, 0x45e5, 0x49c3, 0xae, 0x35, 0x42, 0xa3, 0xc4, 0x1b, 0x34, 0xad);
 #endif
 
-const GUID InterfaceClassUwb = GUID_DEVINTERFACE_UWB;
+const GUID InterfaceClassUwb = GUID_UWB_DEVICE_INTERFACE;
 }
 }
 } // namespace windows
