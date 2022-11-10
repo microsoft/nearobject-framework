@@ -16,6 +16,7 @@ FromOobDataObject(const encoding::TlvBer& tlv)
     for (auto subtlv : tlv.GetValues()){
         auto dataObject = DataObject.matchTag(subtlv.Tag);
         switch(dataObject){
+            
             default:
                 // error case
                 throw TagNotFoundError();

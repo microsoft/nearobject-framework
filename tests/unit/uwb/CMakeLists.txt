@@ -10,6 +10,7 @@ target_sources(uwb-test
         ${CMAKE_CURRENT_LIST_DIR}/protocols/fira/TestUwbFiraStaticRangingInfo.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestUwbDevice.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestUwbMacAddress.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/TestUwbPeer.cxx
 )
 
 target_link_libraries(uwb-test

@@ -5,6 +5,7 @@
 #include <memory>
 
 #include <uwb/protocols/fira/UwbCapability.hxx>
+#include <uwb/UwbSessionEventCallbacks.hxx>
 
 namespace uwb
 {
@@ -23,7 +24,7 @@ public:
      * @return std::unique_ptr<uwb::UwbSession> 
      */
     virtual std::unique_ptr<UwbSession>
-    CreateSession(uint32_t sessionId) = 0;
+    CreateSession(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks) = 0;
 
     /**
      * @brief Get the FiRa capabilities of the device.

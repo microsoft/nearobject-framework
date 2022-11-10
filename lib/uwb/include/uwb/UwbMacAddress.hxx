@@ -2,8 +2,12 @@
 #ifndef UWB_DEVICE_ADDRESS_HXX
 #define UWB_DEVICE_ADDRESS_HXX
 
+#include <algorithm>
 #include <array>
+#include <chrono>
+#include <climits>
 #include <cstdint>
+#include <random>
 #include <span>
 #include <string>
 #include <variant>
@@ -43,6 +47,41 @@ concept ValidUwbMacAddressLength =
 
 namespace detail
 {
+    /**
+     * @brief Compile-time address length lookup, given type.
+     * 
+     * @tparam AddressType 
+     */
+    template <UwbMacAddressType AddressType>
+    struct UwbMacAddressSizeImpl {};
+
+    /**
+     * @brief Address length lookup full specialization for short addresses.
+     * 
+     * @tparam  
+     */
+    template <>
+    struct UwbMacAddressSizeImpl<UwbMacAddressType::Short> 
+    {
+        static constexpr std::size_t value = UwbMacAddressLength::Short;
+    };
+
+    /**
+     * @brief Address length lookup full specialization for extended addresses.
+     * 
+     * @tparam  
+     */
+    template <>
+    struct UwbMacAddressSizeImpl<UwbMacAddressType::Extended> 
+    {
+        static constexpr std::size_t value = UwbMacAddressLength::Extended;
+    };
+
+    /**
+     * @brief Compile-time address type lookup helper, given length.
+     * 
+     * @tparam Length 
+     */
     template <size_t Length>
     struct UwbMacAddressTypeImpl {};
 
@@ -76,6 +115,15 @@ namespace detail
      */
     template <size_t Length>
     inline constexpr UwbMacAddressType UwbMacAddressTypeV = UwbMacAddressTypeImpl<Length>::value;
+
+    /**
+     * @brief Helper providing compile-time lookup of UwbMacAddress size for the
+     * supported address types.
+     * 
+     * @tparam AddressType The compile-time address type to get the size for.
+     */
+    template <UwbMacAddressType AddressType>
+    inline constexpr std::size_t UwbMacAddressSizeV = UwbMacAddressSizeImpl<AddressType>::value;
 
     /**
      * @brief Type traits for uwb mac addresses.
@@ -168,7 +216,7 @@ public:
      * The address is output as hexadecimal values, separated by colons, eg.
      *  
      *     ab (short address)
-     *     1a2f3e4d (extended address)
+     *     1a:2f:3e:4d (extended address)
      * 
      * @return std::string 
      */
@@ -236,6 +284,33 @@ public:
     UwbMacAddress(std::array<uint8_t, Length> address) :
         UwbMacAddress(detail::UwbMacAddressValueWrapper<Length>{ address })
     {}
+
+    /**
+     * @brief Construct a new, randomly generated UwbMacAddress object based on
+     * compile-time deduced arguments. 
+     * 
+     * @tparam AddressType The type of address to generate.
+     * @return UwbMacAddress The randomly generated address value.
+     */
+    template <UwbMacAddressType AddressType = UwbMacAddressType::Extended>
+    static UwbMacAddress
+    Random()
+    {
+        using byte_generator = std::independent_bits_engine<std::mt19937, CHAR_BIT * sizeof(uint8_t), uint16_t>;
+
+        // Create a new bit engine seeded with the current time. Note that this
+        // could be predictable for a motivated attacker so should not be relied
+        // upon if security is a concern.
+        const auto timeSinceEpoch = std::chrono::system_clock::now().time_since_epoch();
+        byte_generator byteGenerator(static_cast<byte_generator::result_type>(timeSinceEpoch.count()));
+
+        std::array<uint8_t, detail::UwbMacAddressSizeV<AddressType>> address{};
+        std::generate(std::begin(address), std::end(address), [&byteGenerator]() {
+            return static_cast<uint8_t>(byteGenerator());
+        });
+
+        return UwbMacAddress{ address };
+    }
 
     /**
      * @brief Construct a default UwbMacAddress.

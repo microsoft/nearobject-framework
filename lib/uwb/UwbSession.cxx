@@ -1,30 +1,16 @@
 
+#include <cstdint>
 #include <stdexcept>
+
 #include <uwb/UwbSession.hxx>
+#include <uwb/UwbSessionEventCallbacks.hxx>
 
 using namespace uwb;
 
-namespace detail
-{
-UwbMacAddress
-GenerateRandomUwbMacAddress(UwbMacAddressType uwbMacAddressType)
-{
-    // TODO: implement this correctly and put it somewhere shared
-
-    switch (uwbMacAddressType) {
-    case UwbMacAddressType::Short:
-        return UwbMacAddress{ std::array<uint8_t, 2>{ 0x00, 0x01 } };
-    case UwbMacAddressType::Extended:
-        return UwbMacAddress{ std::array<uint8_t, 8>{ 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 } };
-    default:
-        throw std::runtime_error("invalid mac address type specified");
-    }
-}
-}
-
-UwbSession::UwbSession(uint32_t sessionId) :
+UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks) :
     m_sessionId(sessionId),
-    m_uwbMacAddressSelf(::detail::GenerateRandomUwbMacAddress(UwbMacAddressType::Extended))
+    m_callbacks(std::move(callbacks)),
+    m_uwbMacAddressSelf(UwbMacAddress::Random<UwbMacAddressType::Extended>())
 {}
 
 uint32_t
@@ -63,9 +49,6 @@ UwbSession::StartRanging()
     StartRangingImpl();
 }
 
-/**
- * @brief 
- */
 void 
 UwbSession::StopRanging()
 {
