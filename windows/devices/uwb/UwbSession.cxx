@@ -9,8 +9,8 @@
 
 using namespace windows::devices;
 
-UwbSession::UwbSession(uint32_t sessionId, wil::unique_hfile handleDriver) :
-    uwb::UwbSession(sessionId),
+UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks, wil::unique_hfile handleDriver) :
+    uwb::UwbSession(sessionId, std::move(callbacks)),
     m_handleDriver(std::move(handleDriver))
 {}
 

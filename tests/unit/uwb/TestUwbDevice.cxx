@@ -4,6 +4,7 @@
 
 #include <uwb/UwbDevice.hxx>
 #include <uwb/UwbSession.hxx>
+#include <uwb/UwbSessionEventCallbacks.hxx>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -21,7 +22,7 @@ struct UwbDeviceTestBase
     uint16_t Id;
 
     std::unique_ptr<UwbSession>
-    CreateSession(uint32_t sessionId) override
+    CreateSession(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks) override
     {
         return nullptr;
     }
@@ -65,7 +66,7 @@ struct UwbDeviceTestDerivedTwo
 };
 } // namespace uwb::test
 
-TEST_CASE("uwb devices can be compared for equality", "basic")
+TEST_CASE("uwb devices can be compared for equality", "[basic]")
 {
     using namespace uwb;
 

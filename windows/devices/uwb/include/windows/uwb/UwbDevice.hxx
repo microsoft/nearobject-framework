@@ -10,6 +10,7 @@
 #include <wil/resource.h>
 
 #include <uwb/UwbDevice.hxx>
+#include <uwb/UwbSessionEventCallbacks.hxx>
 #include <windows/devices/DeviceResource.hxx>
 
 namespace uwb
@@ -56,13 +57,14 @@ public:
      * @brief Create a new UWB session.
      * 
      * @param sessionId The unique session identifier to use.
+     * @param callbacks The event callback instance.
      * @return std::unique_ptr<uwb::UwbSession> 
      */
     std::unique_ptr<uwb::UwbSession>
-    CreateSession(uint32_t sessionId) override;
+    CreateSession(uint32_t sessionId, std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks) override;
 
     /**
-     * @brief Get the capabilities of the devie.
+     * @brief Get the capabilities of the device.
      * 
      * @return uwb::protocol::fira::UwbCapability 
      */

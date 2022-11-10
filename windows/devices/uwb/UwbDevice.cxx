@@ -198,7 +198,7 @@ UwbDevice::Initialize()
 }
 
 std::unique_ptr<uwb::UwbSession>
-UwbDevice::CreateSession(uint32_t sessionId)
+UwbDevice::CreateSession(uint32_t sessionId, std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks)
 {
     // Create a duplicate handle to the driver for use by the session.
     wil::unique_hfile handleDriverForSession;
@@ -217,7 +217,7 @@ UwbDevice::CreateSession(uint32_t sessionId)
         return nullptr;
     }
 
-    return std::make_unique<UwbSession>(sessionId, std::move(handleDriverForSession));
+    return std::make_unique<UwbSession>(sessionId, std::move(callbacks), std::move(handleDriverForSession));
 }
 
 uwb::protocol::fira::UwbCapability

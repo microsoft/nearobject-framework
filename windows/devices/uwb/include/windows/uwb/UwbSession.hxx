@@ -9,6 +9,7 @@
 
 #include <uwb/UwbMacAddress.hxx>
 #include <uwb/UwbSession.hxx>
+#include <uwb/UwbSessionEventCallbacks.hxx>
 
 namespace windows
 {
@@ -26,9 +27,10 @@ public:
      * @brief Construct a new UwbSession object.
      * 
      * @param sessionId The unique session identifier.
+     * @param callbacks The event callback instance.
      * @param handleDriver File handle for a UWB-CX driver instance.
      */
-    UwbSession(uint32_t sessionId, wil::unique_hfile handleDriver);
+    UwbSession(uint32_t sessionId, std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks, wil::unique_hfile handleDriver);
 
 private:
     /**

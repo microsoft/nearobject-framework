@@ -4,6 +4,7 @@
 
 #include <atomic>
 #include <cstdint>
+#include <memory>
 #include <mutex>
 #include <unordered_set>
 
@@ -11,6 +12,36 @@
 
 namespace uwb
 {
+struct UwbSessionEventCallbacks;
+
+/**
+ * @brief The possible reasons for a session ending.
+ */
+enum class UwbSessionEndReason
+{
+    /**
+     * @brief The session owner stopped the session. 
+     * 
+     * This is the reason used when the session ends naturally.
+     */
+    Stopped,
+
+    /**
+     * @brief The session was locally canceled.
+     */
+    Canceled,
+
+    /**
+     * @brief The session timed out due to policy.
+     */
+    Timeout,
+
+    /**
+     * @brief The session ended for an unknown or unspecified reason.
+     */
+    Unspecified,
+};
+
 /**
  * @brief Represents a UWB session.
  */
@@ -22,7 +53,7 @@ public:
      * 
      * @param sessionId The associated session id.
      */
-    explicit UwbSession(uint32_t sessionId);
+    UwbSession(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks);
 
     /**
      * @brief Get the unique session id.
@@ -78,6 +109,7 @@ protected:
     std::atomic<bool> m_rangingActive{ false };
     std::mutex m_peerGate;
     std::unordered_set<uwb::UwbMacAddress> m_peers{};
+    std::weak_ptr<UwbSessionEventCallbacks> m_callbacks;
 };
 
 } // namespace uwb
