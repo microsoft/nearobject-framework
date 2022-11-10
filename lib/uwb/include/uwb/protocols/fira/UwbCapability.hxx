@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <Tlv.hxx>
+#include <TlvBer.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/RangingConfiguration.hxx>
 
@@ -193,7 +193,7 @@ struct UwbCapability
      * 
      * @return encoding::TlvBer 
      */
-    std::unique_ptr<encoding::Tlv>
+    std::unique_ptr<encoding::TlvBer>
     ToOobDataObject() const;
 
     /**
@@ -202,7 +202,7 @@ struct UwbCapability
      * @return UwbCapability 
      */
     static UwbCapability
-    FromOobDataObject(const encoding::Tlv& tlv);
+    FromOobDataObject(const encoding::TlvBer& tlv);
 };
 } // namespace uwb::protocol::fira
 

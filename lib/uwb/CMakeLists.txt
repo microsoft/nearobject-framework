@@ -9,10 +9,12 @@ target_sources(uwb
         ${CMAKE_CURRENT_LIST_DIR}/UwbDevice.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbMacAddress.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbSession.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/UwbCapability.cxx
     PUBLIC
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDevice.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbMacAddress.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSession.hxx
+        ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/protocols/fira/UwbCapability.hxx
 )
 
 target_include_directories(uwb
@@ -23,6 +25,7 @@ target_include_directories(uwb
 target_link_libraries(uwb
     PRIVATE
         magic_enum::magic_enum
+        tlv
     PUBLIC
         notstd
         uwb-proto-fira
