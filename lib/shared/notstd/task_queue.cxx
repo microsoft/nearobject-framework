@@ -138,6 +138,7 @@ task_queue::process_queue()
         // the lock to run them later.
         assert(m_runnables.size() > 0);
         auto tasks = std::move(m_runnables);
+        m_runnables = {};
 
         // Now that all pending tasks have been popped from the queue, release
         // the lock. This allows clients to continue pushing onto the queue
