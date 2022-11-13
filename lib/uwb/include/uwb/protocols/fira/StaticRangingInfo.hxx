@@ -27,8 +27,7 @@ struct StaticRangingInfo
      * Specification v1.0.0, Section 7.5.3.2, 'UWB Controlee Info', Table 52,
      * page 101.
      */
-    enum class ParameterTag : uint8_t
-    {
+    enum class ParameterTag : uint8_t {
         VendorId = 0x80,
         StaticStsIv = 0x81,
     };

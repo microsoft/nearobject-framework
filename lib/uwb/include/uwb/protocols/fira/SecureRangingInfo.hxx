@@ -21,8 +21,7 @@ struct SecureRangingInfo
      * Specification v1.0.0, Section 7.5.3.2, 'UWB Controlee Info', Table 52,
      * pages 101-102.
      */
-    enum class ParameterTag : uint8_t
-    {
+    enum class ParameterTag : uint8_t {
         UwbSessionKeyInfo = 0x80,
         ResponderSpecificSubSessionKeyInfo = 0x81,
         SusAdditionalParameters = 0x82,

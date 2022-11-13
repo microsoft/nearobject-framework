@@ -59,14 +59,15 @@ public:
      * @param other 
      * @return UwbPeer 
      */
-    UwbPeer& operator=(const UwbPeer& other);
+    UwbPeer&
+    operator=(const UwbPeer& other);
 
     /**
      * @brief Get the peer's mac address.
      * 
      * @return UwbMacAddress 
      */
-    UwbMacAddress 
+    UwbMacAddress
     GetAddress() const noexcept;
 
     /**

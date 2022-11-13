@@ -17,8 +17,7 @@ struct UwbSessionEventCallbacks;
 /**
  * @brief The possible reasons for a session ending.
  */
-enum class UwbSessionEndReason
-{
+enum class UwbSessionEndReason {
     /**
      * @brief The session owner stopped the session. 
      * 
@@ -89,7 +88,7 @@ public:
     /**
      * @brief 
      */
-    void 
+    void
     StopRanging();
 
 private:

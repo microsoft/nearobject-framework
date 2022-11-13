@@ -8,8 +8,8 @@
 #include <vector>
 
 #include <smartcard/Apdu.hxx>
-#include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/UwbMacAddress.hxx>
+#include <uwb/protocols/fira/FiraDevice.hxx>
 
 namespace uwb::protocol::fira
 {
@@ -35,8 +35,7 @@ struct ControleePreference
      * Specification v1.0.0, Section 7.5.3.2, 'UWB Controlee Info', Table 52,
      * pages 99-101.
      */
-    enum class ParameterTag : uint8_t
-    {
+    enum class ParameterTag : uint8_t {
         DeviceRoles = 0x82,
         RangingMethod = 0x83,
         StsConfig = 0x84,
@@ -81,7 +80,7 @@ struct ControleePreference
      * 
      * @return smartcard::ApduCommand 
      */
-    smartcard::ApduCommand 
+    smartcard::ApduCommand
     ToApdu() const;
 
     /**
@@ -92,7 +91,7 @@ struct ControleePreference
      * 
      * @return ControleePreference 
      */
-    static ControleePreference 
+    static ControleePreference
     FromApdu();
 };
 } // namespace uwb::protocol::fira

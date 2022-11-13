@@ -27,8 +27,7 @@ struct UwbCapability
      * Specification v1.0.0, Section 7.5.3.2, 'UWB Controlee Info', Table 52,
      * pages 96-99.
      */
-    enum class ParameterTag : uint8_t
-    {
+    enum class ParameterTag : uint8_t {
         FiraPhyVersionRange = 0x80,
         FiraMacVersionRange = 0x81,
         DeviceRoles = 0x82,
@@ -43,8 +42,8 @@ struct UwbCapability
         Channels = 0x8B,
         RFrameConfig = 0x8C,
         CcConstraintLength = 0x8D,
-        BprfParameterSets = 0x8E, 
-        HprfParameterSets = 0x8F, 
+        BprfParameterSets = 0x8E,
+        HprfParameterSets = 0x8F,
         AoaSupport = 0x90,
         ExtendedMaxAddress = 0x91,
     };
@@ -174,16 +173,16 @@ struct UwbCapability
     bool UwbInitiationTime{ false };
     bool AngleOfArrivalFom{ false };
     bool BlockStriding{ true };
-    bool HoppingMode { true };
+    bool HoppingMode{ true };
     std::vector<MultiNodeMode> MultiNodeModes{ MultiNodeModesDefault };
     std::vector<DeviceRole> DeviceRoles{ DeviceRolesDefault };
     std::vector<StsConfiguration> StsConfigurations{ StsConfigurationsDefault };
-    std::vector<StsPacketConfiguration> RFrameConfigurations { RFrameConfigurationsDefault };
+    std::vector<StsPacketConfiguration> RFrameConfigurations{ RFrameConfigurationsDefault };
     std::vector<AngleOfArrival> AngleOfArrivalTypes{ AngleOfArrivalTypesDefault };
     std::vector<SchedulingMode> SchedulingModes{ SchedulingModeTypesDefault };
     std::vector<RangingMode> RangingTimeStructs{ RangingTimeStructsDefault };
     std::vector<RangingConfiguration> RangingConfigurations{ RangingConfigurationsDefault };
-    std::vector<ConvolutionalCodeConstraintLength> ConvolutionalCodeConstraintLengths{ ConvolutionalCodeConstraintLengthsDefault }; 
+    std::vector<ConvolutionalCodeConstraintLength> ConvolutionalCodeConstraintLengths{ ConvolutionalCodeConstraintLengthsDefault };
     std::vector<Channel> Channels{ ChannelsDefault };
     std::vector<BprfParameter> BprfParameterSets{ BprfParameterSetsDefault };
     std::vector<HprfParameter> HprfParameterSets{ HprfParameterSetsDefault };

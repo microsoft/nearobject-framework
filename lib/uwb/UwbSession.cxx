@@ -49,7 +49,7 @@ UwbSession::StartRanging()
     StartRangingImpl();
 }
 
-void 
+void
 UwbSession::StopRanging()
 {
     bool rangingActiveExpected = true;
