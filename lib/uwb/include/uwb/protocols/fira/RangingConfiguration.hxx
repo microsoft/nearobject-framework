@@ -15,13 +15,14 @@ struct RangingConfiguration
 {
     RangingMethod Method;
     MeasurementReportMode ReportMode;
+    bool operator==(const RangingConfiguration&) const = default;
 };
 
-bool
-operator==(const RangingConfiguration& lhs, const RangingConfiguration& rhs) noexcept;
+// bool
+// operator==(const RangingConfiguration& lhs, const RangingConfiguration& rhs) noexcept;
 
-bool
-operator!=(const RangingConfiguration& lhs, const RangingConfiguration& rhs) noexcept;
+// bool
+// operator!=(const RangingConfiguration& lhs, const RangingConfiguration& rhs) noexcept;
 
 } // namespace uwb::protocol::fira
 
