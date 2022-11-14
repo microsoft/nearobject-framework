@@ -396,24 +396,21 @@ UwbCapability::FromOobDataObject(const encoding::TlvBer& tlv)
             if (object.Value.size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            auto byte = object.Value[0];
-            uwbCapability.HoppingMode = byte;
+            uwbCapability.HoppingMode = object.Value[0];
             break;
         }
         case ParameterTag::BlockStriding: {
             if (object.Value.size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            auto byte = object.Value[0];
-            uwbCapability.BlockStriding = byte;
+            uwbCapability.BlockStriding = object.Value[0];
             break;
         }
         case ParameterTag::UwbInitiationTime: {
             if (object.Value.size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            auto byte = object.Value[0];
-            uwbCapability.UwbInitiationTime = byte;
+            uwbCapability.UwbInitiationTime = object.Value[0];
             break;
         }
         case ParameterTag::Channels: {
@@ -457,16 +454,14 @@ UwbCapability::FromOobDataObject(const encoding::TlvBer& tlv)
             }
 
             AssignValuesFromBytes(uwbCapability.AngleOfArrivalTypes, UwbCapability::AngleOfArrivalBit, object.Value);
-            auto byte = object.Value[0];
-            uwbCapability.AngleOfArrivalFom = (byte | GetBitMaskFromBitIndex(UwbCapability::AngleOfArrivalFomBit));
+            uwbCapability.AngleOfArrivalFom = (object.Value[0] | GetBitMaskFromBitIndex(UwbCapability::AngleOfArrivalFomBit));
             break;
         }
         case ParameterTag::ExtendedMacAddress: {
             if (object.Value.size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            auto byte = object.Value[0];
-            uwbCapability.ExtendedMacAddress = byte;
+            uwbCapability.ExtendedMacAddress = object.Value[0];
             break;
         }
         }
