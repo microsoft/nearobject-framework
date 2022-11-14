@@ -288,6 +288,18 @@ TlvBer::Builder::AddTlv(const TlvBer& tlv)
 }
 
 TlvBer::Builder&
+TlvBer::Builder::SetAsCopyOfTlv(const TlvBer& tlv)
+{
+    m_class = tlv.m_class;
+    m_type = tlv.m_type;
+    m_tagNumber = tlv.m_tagNumber;
+    m_tag = tlv.m_tag;
+    m_data = tlv.m_value;
+    m_valuesConstructed = tlv.m_valuesConstructed;
+    return *this;
+}
+
+TlvBer::Builder&
 TlvBer::Builder::Reset()
 {
     *this = {};
@@ -308,6 +320,16 @@ TlvBer::Builder::ValidateTag()
         (m_type == TlvBer::Type::Primitive) && (!m_valuesConstructed.empty())) {
         throw InvalidTlvBerTagException();
     }
+}
+
+bool
+TlvBer::operator==(const TlvBer& other) const {
+    return m_class == other.m_class
+        and m_type == other.m_type
+        and m_tagNumber == other.m_tagNumber
+        and m_tag == other.m_tag
+        and m_value == other.m_value
+        and m_valuesConstructed == other.m_valuesConstructed;
 }
 
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)

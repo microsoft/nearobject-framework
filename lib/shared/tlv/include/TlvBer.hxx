@@ -542,6 +542,15 @@ public:
         AddTlv(const TlvBer& tlv);
 
         /**
+         * @brief Set the field members of this builder so that when Build is called it will create a copy Of Tlv object
+         * 
+         * @param tlv the tlv to be copied
+         * @return Builder& 
+         */
+        Builder&
+        SetAsCopyOfTlv(const TlvBer& tlv);
+
+        /**
          * @brief Build and return the TlvBer.
          * 
          * @return TlvBer 
@@ -586,6 +595,9 @@ public:
         std::vector<uint8_t> m_data;
         std::vector<TlvBer> m_valuesConstructed;
     };
+
+public:
+    bool operator==(const TlvBer&) const;
 
 private:
     TlvBer::Class m_class{ TlvBer::Class::Invalid };
