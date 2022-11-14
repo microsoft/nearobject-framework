@@ -124,11 +124,26 @@ const std::unordered_map<HprfParameter, std::size_t> UwbCapability::HprfParamete
     { HprfParameter::Set35, 34 },
 };
 
-std::unique_ptr<encoding::TlvBer>
-UwbCapability::ToOobDataObject() const
+/**
+ * @brief Get the Bytes Big Endian From size_t
+ * 
+ * @param value the value to encode in big endian
+ * @param desiredLength the desired number of bytes in the encoding, padding with zeros if necessary. 
+ *                      If the value is too large, this will only encode the lowest desiredLength bytes
+ * @return std::span<const uint8_t> 
+ */
+std::span<const uint8_t>
+GetBytesBigEndianFromSizeT(size_t value, int desiredLength)
 {
-    //
-    return nullptr;
+    std::vector<uint8_t> bytes;
+
+    size_t bytemask = 0xFF << (desiredLength * 8);
+
+    for (int i = 0; i < desiredLength; i++) {
+        bytes.push_back(bytemask & value);
+        value <<= 8;
+    }
+    return std::span(std::cbegin(bytes), std::cend(bytes));
 }
 
 uint32_t
@@ -159,18 +174,153 @@ GetBitMaskFromBitIndex(size_t bitIndex)
     return 1 << bitIndex;
 }
 
+/**
+ * @brief Get the Bit Index From Bit Mask object. 
+ * 
+ * @param bitMask 
+ * @return size_t 
+ */
+size_t
+GetBitIndexFromBitMask(size_t bitMask)
+{
+    for (int index = 0; index < 64; index++) {
+        if (bitMask == GetBitMaskFromBitIndex(index)) {
+            return index;
+        }
+    }
+}
+
+// TODO find a better place for this function
+template <class T>
+std::span<const uint8_t>
+EncodeValuesAsBytes(const std::vector<T>& valueSet, const std::unordered_map<T, std::size_t>& bitIndexMap, int desiredLength)
+{
+    size_t valueSetEncoded = 0;
+    for (auto value : valueSet) {
+        auto bitIndex = bitIndexMap.at(value);
+        valueSetEncoded = GetBitMaskFromBitIndex(bitIndex);
+    }
+    return GetBytesBigEndianFromSizeT(valueSetEncoded, desiredLength);
+}
+
 // TODO find a better place for this function
 template <class T>
 void
-AssignValuesFromBytes(std::vector<T>& assignee, const std::unordered_map<T, std::size_t>& bitmaskMap, std::span<const uint8_t> bytes)
+AssignValuesFromBytes(std::vector<T>& assignee, const std::unordered_map<T, std::size_t>& bitIndexMap, std::span<const uint8_t> bytes)
 {
     auto bitmasks = ReadSizeTFromBytesBigEndian(bytes);
     assignee.clear();
-    for (auto iter : bitmaskMap) {
+    for (auto iter : bitIndexMap) {
         if (bitmasks & GetBitMaskFromBitIndex(iter.second)) {
             assignee.push_back(iter.first);
         }
     }
+}
+
+// TODO find a better place for this function
+template <class T>
+void
+ToOobDataObjectHelper(encoding::TlvBer::Builder& builder, encoding::TlvBer::Builder& childbuilder, uint8_t tag, const std::vector<T>& valueSet, const std::unordered_map<T, std::size_t>& bitIndexMap, int desiredLength)
+{
+    auto bytes = EncodeValuesAsBytes(valueSet, bitIndexMap, desiredLength);
+    auto tlv = childbuilder.Reset()
+                   .SetTag(tag)
+                   .SetValue(bytes)
+                   .Build();
+    builder.AddTlv(tlv);
+}
+
+std::unique_ptr<encoding::TlvBer>
+UwbCapability::ToOobDataObject() const
+{
+    auto returnTlvBer = std::make_unique<encoding::TlvBer>();
+    auto builder = encoding::TlvBer::Builder();
+    builder.Reset()
+        .SetTag(UwbCapability::Tag);
+    auto childbuilder = encoding::TlvBer::Builder();
+
+    {
+        auto phyRange = GetBytesBigEndianFromSizeT(FiraPhyVersionRange, 4);
+        auto phyRangeTlv = childbuilder.Reset()
+                               .SetTag(size_t(ParameterTag::FiraPhyVersionRange))
+                               .SetValue(phyRange)
+                               .Build();
+        builder.AddTlv(phyRangeTlv);
+    }
+
+    {
+        auto macRange = GetBytesBigEndianFromSizeT(FiraMacVersionRange, 4);
+        auto macRangeTlv = childbuilder.Reset()
+                               .SetTag(size_t(ParameterTag::FiraMacVersionRange))
+                               .SetValue(macRange)
+                               .Build();
+        builder.AddTlv(macRangeTlv);
+    }
+
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::DeviceRoles), DeviceRoles, UwbCapability::DeviceRoleBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RangingMethod), RangingConfigurations, UwbCapability::RangingConfigurationBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::StsConfig), StsConfigurations, UwbCapability::StsConfigurationBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::MultiNodeMode), MultiNodeModes, UwbCapability::MultiNodeModeBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RangingMode), RangingTimeStructs, UwbCapability::RangingModeBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::ScheduledMode), SchedulingModes, UwbCapability::SchedulingModeBit, 1);
+    {
+        auto hoppingtlv = childbuilder.Reset()
+                              .SetTag(uint8_t(ParameterTag::HoppingMode))
+                              .SetValue(HoppingMode)
+                              .Build();
+        builder.AddTlv(hoppingtlv);
+    }
+
+    {
+        auto blocktlv = childbuilder.Reset()
+                            .SetTag(uint8_t(ParameterTag::BlockStriding))
+                            .SetValue(BlockStriding)
+                            .Build();
+        builder.AddTlv(blocktlv);
+    }
+
+    {
+        auto uwbtlv = childbuilder.Reset()
+                          .SetTag(uint8_t(ParameterTag::UwbInitiationTime))
+                          .SetValue(UwbInitiationTime)
+                          .Build();
+        builder.AddTlv(uwbtlv);
+    }
+
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::Channels), Channels, UwbCapability::ChannelsBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RFrameConfig), RFrameConfigurations, UwbCapability::RFrameConfigurationBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::CcConstraintLength), ConvolutionalCodeConstraintLengths, UwbCapability::ConvolutionalCodeConstraintLengthsBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::BprfParameterSets), BprfParameterSets, UwbCapability::BprfParameterSetsBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::HprfParameterSets), HprfParameterSets, UwbCapability::HprfParameterSetsBit, 5);
+
+    {
+        size_t aoaEncoded = 0;
+        for (auto value : AngleOfArrivalTypes) {
+            auto bitIndex = UwbCapability::AngleOfArrivalBit.at(value);
+            aoaEncoded |= GetBitMaskFromBitIndex(bitIndex);
+        }
+        if (AngleOfArrivalFom) {
+            aoaEncoded |= GetBitMaskFromBitIndex(UwbCapability::AngleOfArrivalFomBit);
+        }
+
+        auto aoaByte = GetBytesBigEndianFromSizeT(aoaEncoded, 1);
+        auto aoatlv = childbuilder.Reset()
+                          .SetTag(uint8_t(ParameterTag::AoaSupport))
+                          .SetValue(aoaByte)
+                          .Build();
+        builder.AddTlv(aoatlv);
+    }
+
+    {
+        auto mactlv = childbuilder.Reset()
+                          .SetTag(uint8_t(ParameterTag::ExtendedMacAddress))
+                          .SetValue(ExtendedMacAddress)
+                          .Build();
+        builder.AddTlv(mactlv);
+    }
+
+    *returnTlvBer = builder.Build();
+    return returnTlvBer;
 }
 
 /* static */
@@ -305,10 +455,13 @@ UwbCapability::FromOobDataObject(const encoding::TlvBer& tlv)
             if (object.Value.size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
+
+            AssignValuesFromBytes(uwbCapability.AngleOfArrivalTypes, UwbCapability::AngleOfArrivalBit, object.Value);
             auto byte = object.Value[0];
+            uwbCapability.AngleOfArrivalFom = (byte | GetBitMaskFromBitIndex(UwbCapability::AngleOfArrivalFomBit));
             break;
         }
-        case ParameterTag::ExtendedMaxAddress: {
+        case ParameterTag::ExtendedMacAddress: {
             if (object.Value.size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }

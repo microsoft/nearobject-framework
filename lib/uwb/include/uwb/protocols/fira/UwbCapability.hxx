@@ -49,7 +49,7 @@ struct UwbCapability
         BprfParameterSets = 0x8E,
         HprfParameterSets = 0x8F,
         AoaSupport = 0x90,
-        ExtendedMaxAddress = 0x91,
+        ExtendedMacAddress = 0x91,
     };
 
     static constexpr auto MultiNodeModesDefault = {
