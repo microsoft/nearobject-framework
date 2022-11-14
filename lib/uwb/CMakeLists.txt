@@ -10,7 +10,6 @@ target_sources(uwb
         ${CMAKE_CURRENT_LIST_DIR}/UwbMacAddress.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbPeer.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbSession.cxx
-        ${CMAKE_CURRENT_LIST_DIR}/UwbCapability.cxx
     PUBLIC
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDevice.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbMacAddress.hxx

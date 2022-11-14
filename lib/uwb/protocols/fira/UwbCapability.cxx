@@ -124,19 +124,60 @@ const std::unordered_map<HprfParameter, std::size_t> UwbCapability::HprfParamete
     { HprfParameter::Set35, 34 },
 };
 
-std::unique_ptr<encoding::Tlv>
+
+
+std::unique_ptr<encoding::TlvBer>
 UwbCapability::ToOobDataObject() const
 {
-    std::vector<uint8_t> data{};
-    // TODO: perform actual conversion
-    return std::make_unique<encoding::TlvSimple>(Tag, data);
+    // 
+    return ;
+}
+
+uint32_t ReadIntFromSpanOfFourBytes(std::span<const uint8_t> value){
+    uint32_t rvalue = 0;
+    
+    for(int i=0; i<4;i++)
+    {
+        rvalue += value[i];
+        rvalue <<= 8;
+        }
+    return rvalue;
 }
 
 /* static */
 UwbCapability
-UwbCapability::FromOobDataObject(const encoding::Tlv& tlv)
+UwbCapability::FromOobDataObject(const encoding::TlvBer& tlv)
 {
     UwbCapability uwbCapability;
-    // TODO: perform actual conversion
+    // for each of the tags
+        // look up the corresponding object
+        // parse the object and populate the corresponding field
+    
+    // TODO throw error if tlv is not a constructed tlv
+    for (const auto &  object : tlv.GetValues()){
+        // TODO throw error if the tag is not a single byte
+        switch(ParameterTag(object.Tag[0])) 
+        {
+            case ParameterTag::FiraPhyVersionRange:
+            {
+                // get the four bits from the value
+                // TODO throw error if there aren't exactly four bits in the value
+                
+                uwbCapability.FiraPhyVersionRange = ReadIntFromSpanOfFourBytes(object.Value);
+                break;
+            }
+            case ParameterTag::FiraMacVersionRange:
+            {
+                // TODO throw error if there aren't exactly four bits in the value
+                uwbCapability.FiraMacVersionRange = ReadIntFromSpanOfFourBytes(object.Value);
+                break;
+            }
+            case ParameterTag::DeviceRoles:
+            {
+
+            }
+        }
+    }
+
     return uwbCapability;
 }
