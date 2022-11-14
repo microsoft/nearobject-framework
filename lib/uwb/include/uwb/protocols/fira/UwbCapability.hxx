@@ -15,6 +15,10 @@ namespace uwb::protocol::fira
 {
 struct UwbCapability
 {
+    struct IncorrectNumberOfBytesInValueError : public std::exception {};
+    struct IncorrectNumberOfBytesInTagError : public std::exception {};
+    struct IncorrectTlvType : public std::exception {};
+
     /**
      * @brief See FiRa Consortium Common Service Management Layer Technical
      * Specification v1.0.0, Section 7.5.3.2, 'UWB Controlee Info', Table 52,
