@@ -1,8 +1,10 @@
+
 #include <algorithm>
-#include <catch2/catch_test_macros.hpp>
-#include <TlvSimple.hxx>
 #include <string>
 #include <vector>
+
+#include <catch2/catch_test_macros.hpp>
+#include <TlvSimple.hxx>
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 

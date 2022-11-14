@@ -97,7 +97,7 @@ const std::unordered_map<HprfParameter, std::size_t> UwbCapability::HprfParamete
     { HprfParameter::Set8, 7 },
     { HprfParameter::Set9, 8 },
     { HprfParameter::Set10, 9 },
-    { HprfParameter::Set11, 10  },
+    { HprfParameter::Set11, 10 },
     { HprfParameter::Set12, 11 },
     { HprfParameter::Set13, 12 },
     { HprfParameter::Set14, 13 },

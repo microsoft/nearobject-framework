@@ -20,7 +20,7 @@ UwbPeer::UwbPeer(UwbPeer&& other) noexcept
     std::swap(m_spatialProperties, other.m_spatialProperties);
 }
 
-UwbPeer& 
+UwbPeer&
 UwbPeer::operator=(const UwbPeer& other)
 {
     if (this == &other) {
@@ -32,7 +32,7 @@ UwbPeer::operator=(const UwbPeer& other)
     return *this;
 }
 
-UwbMacAddress 
+UwbMacAddress
 UwbPeer::GetAddress() const noexcept
 {
     return m_address;
@@ -60,8 +60,7 @@ uwb::operator!=(const UwbPeer& lhs, const UwbPeer& rhs) noexcept
 bool
 uwb::operator==(const UwbPeerSpatialProperties& lhs, const UwbPeerSpatialProperties& rhs) noexcept
 {
-    return std::tie(lhs.Distance, lhs.AngleAzimuth, lhs.AngleElevation, lhs.Elevation)
-        == std::tie(rhs.Distance, rhs.AngleAzimuth, rhs.AngleElevation, rhs.Elevation);
+    return std::tie(lhs.Distance, lhs.AngleAzimuth, lhs.AngleElevation, lhs.Elevation) == std::tie(rhs.Distance, rhs.AngleAzimuth, rhs.AngleElevation, rhs.Elevation);
 }
 
 bool

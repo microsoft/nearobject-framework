@@ -11,9 +11,10 @@ namespace uwb::protocol::fira
 /**
  * @brief Effective ranging configuration.
  */
-struct RangingConfiguration {
+struct RangingConfiguration
+{
     RangingMethod Method;
-    MeasurementReportMode ReportMode; 
+    MeasurementReportMode ReportMode;
 };
 
 bool
@@ -26,14 +27,15 @@ operator!=(const RangingConfiguration& lhs, const RangingConfiguration& rhs) noe
 
 namespace std
 {
-    template <>
-    struct hash<uwb::protocol::fira::RangingConfiguration>
+template <>
+struct hash<uwb::protocol::fira::RangingConfiguration>
+{
+    size_t
+    operator()(const uwb::protocol::fira::RangingConfiguration& rangingConfiguration) const noexcept
     {
-        size_t operator()(const uwb::protocol::fira::RangingConfiguration& rangingConfiguration) const noexcept
-        {
-            return (std::size_t)&rangingConfiguration;
-        }
-    };
+        return (std::size_t)&rangingConfiguration;
+    }
+};
 } // namespace std
 
 #endif // FIRA_RANGING_CONFIGURATION_HXX

@@ -12,6 +12,8 @@
 #include <type_traits>
 #include <vector>
 
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
+
 namespace encoding
 {
 /**
@@ -51,12 +53,9 @@ public:
     static constexpr uint8_t TypeConstructed = 0b00100000;
     static constexpr uint8_t TypePrimitive = 0b00000000;
 
-    static constexpr uint8_t LengthTag2Byte = 0x81U;
-    static constexpr uint8_t LengthTag3Byte = 0x82U;
-    static constexpr uint8_t LengthTag4Byte = 0x83U;
-    static constexpr uint8_t LengthTag5Byte = 0x84U;
     static constexpr uint8_t LengthFormShort = 0b00000000;
     static constexpr uint8_t LengthFormLong = 0b10000000;
+    static constexpr uint8_t LengthFormShortMax = 0b01111111;
 
     static constexpr uint8_t TagValueLongField = 0b00011111;
     static constexpr uint8_t TagValueLastByte = 0b10000000;
@@ -122,6 +121,9 @@ public:
     static std::vector<uint8_t>
     GetLengthEncoding(std::size_t length);
 
+    /**
+     * @brief Construct a new TlvBer object with no tag and no value.
+     */
     TlvBer() = default;
 
     /**
@@ -142,7 +144,7 @@ public:
      * @param values The constructed values.
      */
     TlvBer(TlvBer::Class tlvClass, TlvBer::Type tlvType, uint32_t tagNumber, const std::vector<uint8_t>& tag, std::vector<TlvBer>& value);
-   
+
     /**
      * @brief Returns whether this TLV contains a constructed value.
      * 
@@ -202,10 +204,10 @@ public:
     GetValues() const noexcept;
 
     /**
-     * @brief Parses the first bytes to determine if they encode a tag properly.
-     * Advances the iterator it to once past the tag. Writes to tlvClass,
-     * tlvType, tagNumber, tag, and bytesParsed if a proper tag was
-     * parsed.
+     * @brief Parses the tag portion of a BER-TLV from the specified buffer.
+     * 
+     * Writes to tlvClass, tlvType, tagNumber, tag, and bytesParsed if a proper
+     * tag was parsed.
      * 
      * @tparam Iterable 
      * @param tlvClass 
@@ -237,14 +239,12 @@ public:
             return Tlv::ParseResult::Succeeded;
         }
 
-        // Tag is long-type. 
+        // Tag is long-type.
         tag.push_back(*dataIt);
-        
+
         // check the second byte
         std::advance(dataIt, 1);
-        if (dataIt == dataEnd) {
-            return Tlv::ParseResult::Failed;
-        } else if (*dataIt < 0x1F) {
+        if (dataIt == dataEnd || *dataIt < 0x1F) {
             return Tlv::ParseResult::Failed;
         }
 
@@ -257,26 +257,26 @@ public:
             if (dataIt == dataEnd) {
                 return Tlv::ParseResult::Failed;
             }
-            
+
             // make sure there's no fourth byte
             if ((*dataIt & BitmaskTagLastByte) == TagValueLastByte) {
                 return Tlv::ParseResult::Failed;
             }
-            
-            tagNumber <<= 8;
-            tagNumber |= *dataIt & BitmaskTagLong;
+
+            tagNumber <<= 8U;
+            tagNumber |= static_cast<uint32_t>(*dataIt) & BitmaskTagLong;
             tag.push_back(*dataIt);
         }
 
         // advance the dataIt to once past the tag
-        std::advance(dataIt, 1); 
+        std::advance(dataIt, 1);
         bytesParsed = std::distance(std::cbegin(data), dataIt);
 
         return Tlv::ParseResult::Succeeded;
     }
 
     /**
-     * @brief 
+     * @brief Parses the tag portion of a BER-TLV from the specified buffer.
      * 
      * @param tlvClass 
      * @param tlvType 
@@ -289,18 +289,17 @@ public:
     ParseTag(Class& tlvClass, TlvBer::Type& tlvType, uint32_t& tagNumber, std::vector<uint8_t>& tag, uint8_t tagValue);
 
     /**
-     * @brief Parses the first bytes to determine if they encode a length
-     * properly. Writes to length and bytesParsed if a proper length was parsed.    * @brief 
+     * @brief Parses the length portion of a BER-TLV from the specified buffer.
      * 
      * @tparam Iterable 
      * @param length 
      * @param data 
-     * @param bytesParsed 
+     * @param bytesParsed The number of bytes parsed.
      * @return Tlv::ParseResult 
      */
     template <typename Iterable>
     static Tlv::ParseResult
-    ParseLength(size_t& length, Iterable& data, std::size_t& bytesParsed) 
+    ParseLength(std::size_t& length, Iterable& data, std::size_t& bytesParsed)
     {
         auto dataIt = std::cbegin(data);
         auto dataEnd = std::cend(data);
@@ -326,72 +325,90 @@ public:
                     return Tlv::ParseResult::Failed;
                 }
 
-                length  = length << 8U;
+                length = length << 8U;
                 length |= *dataIt;
             }
         }
 
-        // Advance the dataIt to once past the lengthEncoding.
-        std::advance(dataIt, 1); 
+        // Advance the dataIt to once passed the length encoding.
+        std::advance(dataIt, 1);
         bytesParsed = std::distance(std::cbegin(data), dataIt);
 
         return Tlv::ParseResult::Succeeded;
     }
 
     /**
-     * @brief parses the first bytes to determine if they encode a primitive value properly
-     *        Writes to valueOutput if a proper value was parsed
-     *        Writes how many bytes were parsed in this function into bytesParsed
+     * @brief Parses the (primitive) value portion of a BER-TLV.
+     * 
+     * Writes to valueOutput if a proper value was parsed.
+     * 
+     * @tparam Iterable 
+     * @param valueOutput 
+     * @param length 
+     * @param data 
+     * @param bytesParsed The number of bytes parsed.
+     * @return Tlv::ParseResult 
      */
     template <typename Iterable>
-    static
-    Tlv::ParseResult
-    ParsePrimitiveValue(std::vector<uint8_t>& valueOutput, size_t length, Iterable& data, size_t& bytesParsed){
-        auto dataIt = std::cbegin(data);
-        auto dataEnd = std::cend(data);
-        if(std::distance(dataIt,dataEnd) < length) return Tlv::ParseResult::Failed;
-        valueOutput = std::vector<uint8_t> { dataIt, std::next(dataIt, length) };
+    static Tlv::ParseResult
+    ParsePrimitiveValue(std::vector<uint8_t>& valueOutput, std::size_t length, Iterable& data, std::size_t& bytesParsed)
+    {
+        if (std::size(data) < length) {
+            return Tlv::ParseResult::Failed;
+        }
+
+        valueOutput = { std::cbegin(data), std::cend(data) };
         bytesParsed = length;
 
         return Tlv::ParseResult::Succeeded;
     }
 
     /**
-     * @brief parses the first bytes to determine if they encode a constructed value properly
-     *        Writes to valueOutput if a proper value was parsed
-     *        Writes how many bytes were parsed in this function into bytesParsedOverall
+     * @brief Parses the (constructed) value portion of a BER-TLV.
      * 
+     * Writes to valueOutput if a proper value was parsed.
+     * 
+     * @param valueOutput 
+     * @param length 
+     * @param dataInput 
+     * @param bytesParsedOverall The number of bytes parsed.
+     * @return Tlv::ParseResult 
      */
-    static
-    Tlv::ParseResult
+    static Tlv::ParseResult
     ParseConstructedValue(std::vector<TlvBer>& valueOutput, size_t length, std::span<uint8_t> dataInput, size_t& bytesParsedOverall);
 
     /**
      * @brief Decode a Tlv from a blob of BER-TLV data.
-     *
+     * 
      * @param tlvOutput The decoded Tlv, if parsing was successful (ParseResult::Succeeded).
-     * @param data The data to parse a Tlv from.
-     * @return ParseResult The result of the parsing operation.
+     * @param dataInput The data to parse a Tlv from.
+     * @param bytesParsedOverall 
+     * @return Tlv::ParseResult The result of the parsing operation.
      */
     static Tlv::ParseResult
     Parse(TlvBer& tlvOutput, std::span<uint8_t> dataInput, size_t& bytesParsedOverall);
 
     /**
      * @brief Decode a Tlv from a blob of BER-TLV data.
-     *
-     * @param tlvOutput The decoded Tlv, if parsing was successful (ParseResult::Succeeded). This must be a writeable pointer.
-     * @param data The data to parse a Tlv from.
+     * 
+     * @tparam Iterable 
+     * @param tlvOutput The decoded Tlv, if parsing was successful (ParseResult::Succeeded). This must be a writeable pointer.  
+     * @param dataInput The data to parse a Tlv from.
      * @return ParseResult The result of the parsing operation.
      */
-    template<typename Iterable>
+    template <typename Iterable>
     static ParseResult
-    Parse(TlvBer **tlvOutput, Iterable& dataInput)
+    Parse(TlvBer** tlvOutput, Iterable& dataInput)
     {
-        size_t bytesParsed;
-        *tlvOutput = std::make_unique<TlvBer>().release();
-        std::span<uint8_t> dataSpan {std::begin(dataInput), std::end(dataInput)};
-        auto parseResult = Parse(**tlvOutput,dataSpan,bytesParsed);
-        if(Tlv::ParseResult::Succeeded != parseResult) return parseResult;
+        size_t bytesParsed = 0;
+        auto tlv = std::make_unique<TlvBer>();
+        std::span<uint8_t> dataSpan{ std::begin(dataInput), std::end(dataInput) };
+        auto parseResult = Parse(*tlv, dataSpan, bytesParsed);
+        if (parseResult != Tlv::ParseResult::Succeeded) {
+            return parseResult;
+        }
+
+        *tlvOutput = tlv.release();
         return parseResult;
     }
 
@@ -429,23 +446,14 @@ public:
          * @param data 
          */
         template <typename Iterable>
+        // clang-format off
         requires IsTlvBerDataUnitType<typename Iterable::value_type>
         void
         WriteBytes(Iterable& data)
+        // clang-format on
         {
             m_data.insert(std::cend(m_data), std::cbegin(data), std::cend(data));
         }
-
-        /**
-         * @brief Write a Value field, including the Length, to the tlv storage
-         * buffer.
-         * 
-         * @tparam N 
-         * @param data 
-         */
-        template <size_t N>
-        void
-        WriteLengthAndValue(const std::array<const uint8_t, N>& data);
 
         /**
          * @brief 
@@ -458,10 +466,10 @@ public:
         /**
          * @brief 
          * 
-         * @param data 
+         * @param value
          */
         void
-        WriteLengthAndValue(uint8_t data);
+        WriteLengthAndValue(uint8_t value);
 
         /**
          * @brief Subroutine to write some length octets.
@@ -492,7 +500,7 @@ public:
         Builder&
         SetTag(Iterable& tag)
         {
-            std::size_t bytesParsed;
+            std::size_t bytesParsed = 0;
             ParseTag(m_class, m_type, m_tagNumber, m_tag, tag, bytesParsed);
             return *this;
         }
@@ -505,9 +513,11 @@ public:
          * @return requires& 
          */
         template <typename Iterable>
+        // clang-format off
         requires IsTlvBerDataUnitType<typename Iterable::value_type>
         Builder&
         SetValue(Iterable& value)
+        // clang-format on
         {
             m_data.assign(std::cbegin(value), std::cend(value));
             return *this;
@@ -569,23 +579,25 @@ public:
         ValidateTag();
 
     private:
-        TlvBer::Class m_class;
-        TlvBer::Type m_type;
-        uint32_t m_tagNumber;
+        TlvBer::Class m_class{ TlvBer::Class::Invalid };
+        TlvBer::Type m_type{ TlvBer::Type::Primitive };
+        uint32_t m_tagNumber{ 0 };
         std::vector<uint8_t> m_tag;
         std::vector<uint8_t> m_data;
         std::vector<TlvBer> m_valuesConstructed;
     };
 
 private:
-    TlvBer::Class m_class;
-    TlvBer::Type m_type;
-    uint32_t m_tagNumber;
+    TlvBer::Class m_class{ TlvBer::Class::Invalid };
+    TlvBer::Type m_type{ TlvBer::Type::Primitive };
+    uint32_t m_tagNumber{ 0 };
     std::vector<uint8_t> m_tag;
     std::vector<uint8_t> m_value;
     std::vector<TlvBer> m_valuesConstructed;
 };
 
 } // namespace encoding
+
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 
 #endif // TLV_BER_HXX

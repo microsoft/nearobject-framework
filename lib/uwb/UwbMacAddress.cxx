@@ -39,9 +39,11 @@ UwbMacAddress::operator=(UwbMacAddress other)
 void
 UwbMacAddress::InitializeView()
 {
+    // clang-format off
     std::visit([&](auto&& value) {
         m_view = { std::begin(value), std::end(value) };
     }, m_value);
+    // clang-format on
 }
 
 void
@@ -77,10 +79,10 @@ UwbMacAddress::ToString() const
     std::ostringstream macString{};
 
     macString << magic_enum::enum_name(m_type) << ' ' << std::hex;
-    for (const auto& b : m_view.first(m_view.size()-1)) { 
-        macString << +b << ':'; 
+    for (const auto& b : m_view.first(m_view.size() - 1)) {
+        macString << +b << ':';
     }
-    macString << +m_view[m_view.size()-1];
+    macString << +m_view[m_view.size() - 1];
 
     return macString.str();
 }

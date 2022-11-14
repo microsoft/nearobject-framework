@@ -10,8 +10,8 @@
 #include <random>
 #include <span>
 #include <string>
-#include <variant>
 #include <type_traits>
+#include <variant>
 
 #include <notstd/hash.hxx>
 
@@ -41,7 +41,7 @@ struct UwbMacAddressLength final
  * @tparam UwbMacAddessLength
  */
 template <size_t UwbMacAddessLength>
-concept ValidUwbMacAddressLength = 
+concept ValidUwbMacAddressLength =
     (UwbMacAddessLength == UwbMacAddressLength::Short) ||
     (UwbMacAddessLength == UwbMacAddressLength::Extended);
 
@@ -53,7 +53,8 @@ namespace detail
      * @tparam AddressType 
      */
     template <UwbMacAddressType AddressType>
-    struct UwbMacAddressSizeImpl {};
+    struct UwbMacAddressSizeImpl
+    {};
 
     /**
      * @brief Address length lookup full specialization for short addresses.
@@ -61,7 +62,7 @@ namespace detail
      * @tparam  
      */
     template <>
-    struct UwbMacAddressSizeImpl<UwbMacAddressType::Short> 
+    struct UwbMacAddressSizeImpl<UwbMacAddressType::Short>
     {
         static constexpr std::size_t value = UwbMacAddressLength::Short;
     };
@@ -72,7 +73,7 @@ namespace detail
      * @tparam  
      */
     template <>
-    struct UwbMacAddressSizeImpl<UwbMacAddressType::Extended> 
+    struct UwbMacAddressSizeImpl<UwbMacAddressType::Extended>
     {
         static constexpr std::size_t value = UwbMacAddressLength::Extended;
     };
@@ -83,15 +84,16 @@ namespace detail
      * @tparam Length 
      */
     template <size_t Length>
-    struct UwbMacAddressTypeImpl {};
+    struct UwbMacAddressTypeImpl
+    {};
 
-    /**
+/**
      * @brief Address type lookup full specialization for short addresses. 
      * 
      * @tparam  
      */
     template <>
-    struct UwbMacAddressTypeImpl<UwbMacAddressLength::Short> 
+    struct UwbMacAddressTypeImpl<UwbMacAddressLength::Short>
     {
         static constexpr UwbMacAddressType value = UwbMacAddressType::Short;
     };
@@ -102,7 +104,7 @@ namespace detail
      * @tparam  
      */
     template <>
-    struct UwbMacAddressTypeImpl<UwbMacAddressLength::Extended> 
+    struct UwbMacAddressTypeImpl<UwbMacAddressLength::Extended>
     {
         static constexpr UwbMacAddressType value = UwbMacAddressType::Extended;
     };
@@ -155,8 +157,8 @@ namespace detail
     template <std::size_t Length>
     struct UwbMacAddressValueWrapper : public UwbMacAddressTraits<Length>
     {
-        explicit UwbMacAddressValueWrapper(typename UwbMacAddressTraits<Length>::value_type addressIn) : 
-            address(std::move(addressIn)) 
+        explicit UwbMacAddressValueWrapper(typename UwbMacAddressTraits<Length>::value_type addressIn) :
+            address(std::move(addressIn))
         {}
 
         typename UwbMacAddressTraits<Length>::value_type address;
@@ -166,7 +168,7 @@ namespace detail
 /**
  * @brief Represents the address of a near object.
  */
-class UwbMacAddress 
+class UwbMacAddress
 {
 public:
     /**
@@ -191,7 +193,7 @@ public:
      * 
      * @return UwbMacAddressType 
      */
-    UwbMacAddressType 
+    UwbMacAddressType
     GetType() const noexcept;
 
     /**
@@ -207,7 +209,7 @@ public:
      * 
      * @return std::span<const uint8_t> 
      */
-    std::span<const uint8_t> 
+    std::span<const uint8_t>
     GetValue() const noexcept;
 
     /**
@@ -233,7 +235,7 @@ private:
      * @return std::array<uint8_t, Length>& 
      */
     template <size_t Length>
-    std::array<uint8_t, Length>& 
+    std::array<uint8_t, Length>&
     UwbMacAddressValue(UwbMacAddress& uwbMacAddress)
     {
         return std::get<std::array<uint8_t, Length>>(uwbMacAddress.m_value);
@@ -248,7 +250,7 @@ private:
      * @return std::span<const uint8_t> 
      */
     template <size_t Length>
-    std::span<const uint8_t> 
+    std::span<const uint8_t>
     UwbMacAddressView(UwbMacAddress& uwbMacAddress)
     {
         auto& value = UwbMacAddressValue<Length>(uwbMacAddress);
@@ -330,7 +332,7 @@ public:
      * @param other
      * @return UwbMacAddress& 
       */
-    UwbMacAddress& 
+    UwbMacAddress&
     operator=(UwbMacAddress other);
 
 private:
@@ -400,15 +402,16 @@ operator!=(const UwbMacAddress&, const UwbMacAddress&) noexcept;
 
 namespace std
 {
-    template <>
-    struct hash<uwb::UwbMacAddress>
+template <>
+struct hash<uwb::UwbMacAddress>
+{
+    size_t
+    operator()(const uwb::UwbMacAddress& uwbMacAddress) const noexcept
     {
-        size_t operator()(const uwb::UwbMacAddress& uwbMacAddress) const noexcept
-        {
-            const auto& value = uwbMacAddress.GetValue();
-            return notstd::hash_range(std::cbegin(value), std::cend(value));
-        }
-    };
+        const auto& value = uwbMacAddress.GetValue();
+        return notstd::hash_range(std::cbegin(value), std::cend(value));
+    }
+};
 } // namespace std
 
 #endif // UWB_DEVICE_ADDRESS_HXX

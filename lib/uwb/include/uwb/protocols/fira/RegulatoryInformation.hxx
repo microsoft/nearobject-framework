@@ -21,8 +21,7 @@ struct RegulatoryInformation
      * Specification v1.0.0, Section 7.5.3.2, 'UWB Controlee Info', Table 52,
      * pages 102-103.
      */
-    enum class ParameterTag : uint8_t
-    {
+    enum class ParameterTag : uint8_t {
         InformationSource = 0x80,
         OutdoorPermitted = 0x81,
         CountryCode = 0x82,
@@ -44,8 +43,7 @@ struct RegulatoryInformation
      * Specification v1.0.0, Section 7.5.3.2, 'UWB Controlee Info', Table 52,
      * page 102.
      */
-    enum class InformationSource
-    {
+    enum class InformationSource {
         UserDefined,
         Satellite,
         Cellular,
@@ -54,8 +52,8 @@ struct RegulatoryInformation
 
     InformationSource InformationSource{ InformationSource::UserDefined };
     bool OutdoorPermitted{ true };
-    uint16_t CountryCode { 0x0000U };
-    uint64_t Timestamp { 0x0000000000000000U };
+    uint16_t CountryCode{ 0x0000U };
+    uint64_t Timestamp{ 0x0000000000000000U };
     std::bitset<8> Channels{ 0b00000000 };
 };
 } // namespace nearobject::protocol::fira

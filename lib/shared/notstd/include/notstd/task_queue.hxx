@@ -13,7 +13,7 @@
 #include <thread>
 #include <version>
 
-namespace notstd 
+namespace notstd
 {
 /**
  * @brief A thread-safe, serialized task queue supporting cancelation.
@@ -55,7 +55,7 @@ public:
          * 
          * @param taskQueue 
          */
-        dispatcher(task_queue &taskQueue);
+        explicit dispatcher(task_queue &task_queue);
 
     private:
         task_queue &m_task_queue;
@@ -65,7 +65,8 @@ public:
     /**
      * @brief Signifies that the worker thread could not be started.
      */
-    struct creation_exception : public std::exception {};
+    struct creation_exception : public std::exception
+    {};
 
     /**
      * @brief Constructs the task queue and starts the worker thread. 
@@ -77,6 +78,14 @@ public:
      * @brief Destroy the Task Queue object.
      */
     ~task_queue();
+
+    /**
+     * @brief Delete other unneeded special member functions.
+     */
+    task_queue(const task_queue&) = delete;
+    task_queue(task_queue&&) = delete;
+    task_queue& operator=(const task_queue&) = delete;
+    task_queue& operator=(task_queue&&) = delete;
 
     /**
      * @brief The action to apply to pending tasks.

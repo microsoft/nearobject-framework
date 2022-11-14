@@ -12,4 +12,3 @@ uwb::operator!=(const UwbDevice& lhs, const UwbDevice& rhs) noexcept
 {
     return !(lhs == rhs);
 }
-
