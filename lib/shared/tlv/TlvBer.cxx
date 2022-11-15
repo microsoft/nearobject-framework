@@ -252,9 +252,9 @@ TlvBer::GetLengthEncoding(std::size_t length)
     if constexpr (std::endian::native == std::endian::big) {
         return encoding;
     } else {
-        return { 
+        return {
             std::make_move_iterator(std::rbegin(encoding)),
-            std::make_move_iterator(std::rend(encoding)) 
+            std::make_move_iterator(std::rend(encoding))
         };
     }
 }
@@ -310,7 +310,10 @@ TlvBer
 TlvBer::Builder::Build()
 {
     ValidateTag();
-    return TlvBer{ m_class, m_type, m_tagNumber, m_tag, m_data };
+    if (m_type == TlvBer::Type::Primitive) {
+        return TlvBer{ m_class, m_type, m_tagNumber, m_tag, m_data };
+    }
+    return TlvBer{ m_class, m_type, m_tagNumber, m_tag, m_valuesConstructed };
 }
 
 void
@@ -322,14 +325,10 @@ TlvBer::Builder::ValidateTag()
     }
 }
 
-bool
-TlvBer::operator==(const TlvBer& other) const {
-    return m_class == other.m_class
-        and m_type == other.m_type
-        and m_tagNumber == other.m_tagNumber
-        and m_tag == other.m_tag
-        and m_value == other.m_value
-        and m_valuesConstructed == other.m_valuesConstructed;
-}
+// bool
+// TlvBer::operator==(const TlvBer& other) const
+// {
+//     return m_class == other.m_class and m_type == other.m_type and m_tagNumber == other.m_tagNumber and m_tag == other.m_tag and m_value == other.m_value and m_valuesConstructed == other.m_valuesConstructed;
+// }
 
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
