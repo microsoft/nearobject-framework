@@ -288,6 +288,18 @@ TlvBer::Builder::AddTlv(const TlvBer& tlv)
 }
 
 TlvBer::Builder&
+TlvBer::Builder::SetAsCopyOfTlv(const TlvBer& tlv)
+{
+    m_class = tlv.m_class;
+    m_type = tlv.m_type;
+    m_tagNumber = tlv.m_tagNumber;
+    m_tag = tlv.m_tag;
+    m_data = tlv.m_value;
+    m_valuesConstructed = tlv.m_valuesConstructed;
+    return *this;
+}
+
+TlvBer::Builder&
 TlvBer::Builder::Reset()
 {
     *this = {};

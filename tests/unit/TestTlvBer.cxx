@@ -359,6 +359,9 @@ TEST_CASE("test TlvBer", "[basic][infra]")
         REQUIRE(tlvParsed != nullptr);
         REQUIRE(std::equal(std::cbegin(parent.Tag), std::cend(parent.Tag), std::cbegin(tlvParsed->Tag)));
         REQUIRE(std::equal(std::cbegin(parent.Value), std::cend(parent.Value), std::cbegin(tlvParsed->Value)));
+        auto pValuesConstructed = parent.GetValues();
+        auto pValuesConstructedParsed = tlvParsed->GetValues();
+        REQUIRE(std::equal(std::cbegin(pValuesConstructed), std::cend(pValuesConstructed), std::cbegin(pValuesConstructedParsed)));
     }
 
     SECTION("Parsing a a two level constructed tlv works")
@@ -401,6 +404,66 @@ TEST_CASE("test TlvBer", "[basic][infra]")
         REQUIRE(tlvParsed != nullptr);
         REQUIRE(std::equal(std::cbegin(parentparent.Tag), std::cend(parentparent.Tag), std::cbegin(tlvParsed->Tag)));
         REQUIRE(std::equal(std::cbegin(parentparent.Value), std::cend(parentparent.Value), std::cbegin(tlvParsed->Value)));
+        auto pValuesConstructed = parentparent.GetValues();
+        auto pValuesConstructedParsed = tlvParsed->GetValues();
+        REQUIRE(std::equal(std::cbegin(pValuesConstructed), std::cend(pValuesConstructed), std::cbegin(pValuesConstructedParsed)));
+    }
+
+    SECTION("SetAsCopyOfTlv works for primitives"){
+        TlvBer::Builder builder{};
+        auto tlvBer = builder
+                          .SetTag(tagTwoBytesPrimitive)
+                          .SetValue(0x43)
+                          .Build();
+        auto tlvBerCopy = builder
+                          .Reset()
+                          .SetAsCopyOfTlv(tlvBer)
+                          .Build();
+
+        REQUIRE(std::equal(std::cbegin(tlvBer.Tag), std::cend(tlvBer.Tag), std::cbegin(tlvBerCopy.Tag)));
+        REQUIRE(std::equal(std::cbegin(tlvBer.Value), std::cend(tlvBer.Value), std::cbegin(tlvBerCopy.Value)));
+        auto pValuesConstructed = tlvBer.GetValues();
+        auto pValuesConstructedCopy = tlvBerCopy.GetValues();
+        REQUIRE(std::equal(std::cbegin(pValuesConstructed), std::cend(pValuesConstructed), std::cbegin(pValuesConstructedCopy)));
+    }
+
+    SECTION("SetAsCopyOfTlv works for two layer constructed"){
+        TlvBer::Builder builder{};
+        auto child = builder
+                         .SetTag(tagTwoBytesPrimitive)
+                         .SetValue(valueTwoBytes)
+                         .Build();
+        auto child2 = builder
+                          .Reset()
+                          .SetTag(tagThreeBytesPrimitive)
+                          .SetValue(valueTwoBytes)
+                          .Build();
+
+        auto parent = builder
+                          .Reset()
+                          .SetTag(tagTwoBytesConstructed)
+                          .AddTlv(child)
+                          .AddTlv(child2)
+                          .Build();
+
+        auto parentparent = builder
+                                .Reset()
+                                .SetTag(tagTwoBytesConstructed)
+                                .AddTlv(child)
+                                .AddTlv(child2)
+                                .AddTlv(parent)
+                                .Build();
+
+        auto tlvBerCopy = builder
+                          .Reset()
+                          .SetAsCopyOfTlv(parentparent)
+                          .Build();
+
+        REQUIRE(std::equal(std::cbegin(parentparent.Tag), std::cend(parentparent.Tag), std::cbegin(tlvBerCopy.Tag)));
+        REQUIRE(std::equal(std::cbegin(parentparent.Value), std::cend(parentparent.Value), std::cbegin(tlvBerCopy.Value)));
+        auto pValuesConstructed = parentparent.GetValues();
+        auto pValuesConstructedCopy = tlvBerCopy.GetValues();
+        REQUIRE(std::equal(std::cbegin(pValuesConstructed), std::cend(pValuesConstructed), std::cbegin(pValuesConstructedCopy)));
     }
 }
 
