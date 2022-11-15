@@ -146,7 +146,7 @@ TlvBer::ParseConstructedValue(std::vector<TlvBer>& valueOutput, std::size_t leng
 
     while (bytesParsedOverall < length) {
         TlvBer subtlv{};
-        auto parseResult = Parse(subtlv, dataInput, bytesParsed);
+        auto parseResult = Parse(subtlv, subspan, bytesParsed);
         if (parseResult != Tlv::ParseResult::Succeeded) {
             return parseResult;
         }
