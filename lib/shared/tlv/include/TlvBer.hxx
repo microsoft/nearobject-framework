@@ -127,7 +127,7 @@ public:
     TlvBer() = default;
 
     /**
-     * @brief Construct a new BerTlv with given tag and value.
+     * @brief Construct a new TlvBer with given tag and value.
      * 
      * @param tlvClass 
      * @param tlvType 
@@ -357,7 +357,7 @@ public:
             return Tlv::ParseResult::Failed;
         }
 
-        valueOutput = { std::cbegin(data), std::cend(data) };
+        valueOutput = { std::cbegin(data), std::cbegin(data) + length };
         bytesParsed = length;
 
         return Tlv::ParseResult::Succeeded;
