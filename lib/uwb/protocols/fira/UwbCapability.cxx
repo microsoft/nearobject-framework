@@ -4,6 +4,63 @@
 
 using namespace uwb::protocol::fira;
 
+bool
+UwbCapability::check(const UwbCapability& other) const
+{
+    auto a = FiraPhyVersionRange == other.FiraPhyVersionRange;
+    auto b = FiraMacVersionRange == other.FiraMacVersionRange;
+    auto c = ExtendedMacAddress == other.ExtendedMacAddress;
+    auto d = UwbInitiationTime == other.UwbInitiationTime;
+    auto e = AngleOfArrivalFom == other.AngleOfArrivalFom;
+    auto f = BlockStriding == other.BlockStriding;
+    auto g = HoppingMode == other.HoppingMode;
+    auto h = std::equal(std::cbegin(MultiNodeModes), std::cend(MultiNodeModes), std::cbegin(other.MultiNodeModes));
+    auto i = std::equal(std::cbegin(DeviceRoles), std::cend(DeviceRoles), std::cbegin(other.DeviceRoles));
+    auto j = std::equal(std::cbegin(StsConfigurations), std::cend(StsConfigurations), std::cbegin(other.StsConfigurations));
+    auto k = std::equal(std::cbegin(RFrameConfigurations), std::cend(RFrameConfigurations), std::cbegin(other.RFrameConfigurations));
+    auto l = std::equal(std::cbegin(AngleOfArrivalTypes), std::cend(AngleOfArrivalTypes), std::cbegin(other.AngleOfArrivalTypes));
+    auto m = std::equal(std::cbegin(SchedulingModes), std::cend(SchedulingModes), std::cbegin(other.SchedulingModes));
+    auto n = std::equal(std::cbegin(RangingTimeStructs), std::cend(RangingTimeStructs), std::cbegin(other.RangingTimeStructs));
+    printf("a%d\n",a);
+    printf("b%d\n",b);
+    printf("c%d\n",c);
+    printf("d%d\n",d);
+    printf("e%d\n",e);
+    printf("f%d\n",f);
+    printf("g%d\n",g);
+    
+    printf("h%d\n",h);
+    printf("i%d\n",i);
+    printf("j%d\n",j);
+    printf("k%d\n",k);
+    printf("l%d\n",l);
+    printf("m%d\n",m);
+    printf("n%d\n",n);
+    return a && b && c && d and e and f and g and h and i and j and k and l and m;
+}
+// bool uwb::protocol::fira::operator!=(const UwbCapability& lhs, const UwbCapability& rhs) noexcept { return !(lhs == rhs); }
+
+const std::vector<UwbCapability::ParameterTag> UwbCapability::ParameterTags = {
+    UwbCapability::ParameterTag::FiraPhyVersionRange,
+    UwbCapability::ParameterTag::FiraMacVersionRange,
+    UwbCapability::ParameterTag::DeviceRoles,
+    UwbCapability::ParameterTag::RangingMethod,
+    UwbCapability::ParameterTag::StsConfig,
+    UwbCapability::ParameterTag::MultiNodeMode,
+    UwbCapability::ParameterTag::RangingMode,
+    UwbCapability::ParameterTag::ScheduledMode,
+    UwbCapability::ParameterTag::HoppingMode,
+    UwbCapability::ParameterTag::BlockStriding,
+    UwbCapability::ParameterTag::UwbInitiationTime,
+    UwbCapability::ParameterTag::Channels,
+    UwbCapability::ParameterTag::RFrameConfig,
+    UwbCapability::ParameterTag::CcConstraintLength,
+    UwbCapability::ParameterTag::BprfParameterSets,
+    UwbCapability::ParameterTag::HprfParameterSets,
+    UwbCapability::ParameterTag::AoaSupport,
+    UwbCapability::ParameterTag::ExtendedMacAddress
+};
+
 const std::initializer_list<RangingConfiguration> UwbCapability::RangingConfigurationsDefault = {
     RangingConfiguration{ RangingMethod::OneWay, MeasurementReportMode::None },
     RangingConfiguration{ RangingMethod::SingleSidedTwoWay, MeasurementReportMode::Deferred },
@@ -190,6 +247,18 @@ GetBitIndexFromBitMask(size_t bitMask)
     }
 }
 
+template <class T>
+std::size_t
+unordered_map_lookup(const std::unordered_map<T, std::size_t>& bitIndexMap, const T key)
+{
+    for (auto entry : bitIndexMap) {
+        if (entry.first == key) {
+            return entry.second;
+        }
+    }
+    throw std::exception();
+}
+
 // TODO find a better place for this function
 template <class T>
 std::span<const uint8_t>
@@ -197,8 +266,9 @@ EncodeValuesAsBytes(const std::vector<T>& valueSet, const std::unordered_map<T, 
 {
     size_t valueSetEncoded = 0;
     for (auto value : valueSet) {
-        auto bitIndex = bitIndexMap.at(value);
-        valueSetEncoded = GetBitMaskFromBitIndex(bitIndex);
+        // auto bitIndex = bitIndexMap.at(value);
+        auto bitIndex = unordered_map_lookup(bitIndexMap, value);
+        valueSetEncoded |= GetBitMaskFromBitIndex(bitIndex);
     }
     return GetBytesBigEndianFromSizeT(valueSetEncoded, desiredLength);
 }
@@ -239,14 +309,12 @@ UwbCapability::ToOobDataObject() const
         .SetTag(UwbCapability::Tag);
     auto childbuilder = encoding::TlvBer::Builder();
 
-    {
         auto phyRange = GetBytesBigEndianFromSizeT(FiraPhyVersionRange, 4);
         auto phyRangeTlv = childbuilder.Reset()
                                .SetTag(size_t(ParameterTag::FiraPhyVersionRange))
                                .SetValue(phyRange)
                                .Build();
         builder.AddTlv(phyRangeTlv);
-    }
 
     {
         auto macRange = GetBytesBigEndianFromSizeT(FiraMacVersionRange, 4);
@@ -296,7 +364,8 @@ UwbCapability::ToOobDataObject() const
     {
         size_t aoaEncoded = 0;
         for (auto value : AngleOfArrivalTypes) {
-            auto bitIndex = UwbCapability::AngleOfArrivalBit.at(value);
+            // auto bitIndex = UwbCapability::AngleOfArrivalBit.at(value);
+            auto bitIndex = unordered_map_lookup(UwbCapability::AngleOfArrivalBit, value);
             aoaEncoded |= GetBitMaskFromBitIndex(bitIndex);
         }
         if (AngleOfArrivalFom) {
@@ -328,8 +397,8 @@ UwbCapability
 UwbCapability::FromOobDataObject(const encoding::TlvBer& tlv)
 {
     UwbCapability uwbCapability;
-    if (tlv.IsPrimitive()) {
-        throw UwbCapability::IncorrectTlvType();
+    if (tlv.Tag.size() != 1 || tlv.Tag[0] != UwbCapability::Tag) {
+        throw UwbCapability::IncorrectTlvTag();
     }
     for (const auto& object : tlv.GetValues()) {
         if (object.Tag.size() != 1) {

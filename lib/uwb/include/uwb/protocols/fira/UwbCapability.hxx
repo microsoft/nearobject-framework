@@ -13,11 +13,20 @@
 
 namespace uwb::protocol::fira
 {
+// bool
+// operator==(const UwbCapability& lhs, const UwbCapability& rhs) noexcept;
+
+// bool
+// operator!=(const UwbCapability& lhs, const UwbCapability& rhs) noexcept;
+
 struct UwbCapability
 {
-    struct IncorrectNumberOfBytesInValueError : public std::exception {};
-    struct IncorrectNumberOfBytesInTagError : public std::exception {};
-    struct IncorrectTlvType : public std::exception {};
+    struct IncorrectNumberOfBytesInValueError : public std::exception
+    {};
+    struct IncorrectNumberOfBytesInTagError : public std::exception
+    {};
+    struct IncorrectTlvTag : public std::exception
+    {};
 
     /**
      * @brief See FiRa Consortium Common Service Management Layer Technical
@@ -51,6 +60,8 @@ struct UwbCapability
         AoaSupport = 0x90,
         ExtendedMacAddress = 0x91,
     };
+
+    static const std::vector<ParameterTag> ParameterTags;
 
     static constexpr auto MultiNodeModesDefault = {
         MultiNodeMode::Unicast,
@@ -190,6 +201,9 @@ struct UwbCapability
     std::vector<Channel> Channels{ ChannelsDefault };
     std::vector<BprfParameter> BprfParameterSets{ BprfParameterSetsDefault };
     std::vector<HprfParameter> HprfParameterSets{ HprfParameterSetsDefault };
+
+    bool
+    check(const UwbCapability&) const;
 
     /**
      * @brief Convert this object into a FiRa Data Object (DO).
