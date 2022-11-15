@@ -313,10 +313,10 @@ TlvBer::Builder::ValidateTag()
     }
 }
 
-// bool
-// TlvBer::operator==(const TlvBer& other) const
-// {
-//     return m_class == other.m_class and m_type == other.m_type and m_tagNumber == other.m_tagNumber and m_tag == other.m_tag and m_value == other.m_value and m_valuesConstructed == other.m_valuesConstructed;
-// }
+bool
+TlvBer::operator==(const TlvBer& other) const
+{
+    return m_class == other.m_class and m_type == other.m_type and m_tagNumber == other.m_tagNumber and m_tag == other.m_tag and m_value == other.m_value and m_valuesConstructed == other.m_valuesConstructed;
+}
 
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
