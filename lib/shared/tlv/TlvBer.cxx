@@ -328,7 +328,7 @@ TlvBer::Builder::ValidateTag()
 bool
 TlvBer::operator==(const TlvBer& other) const
 {
-    return m_class == other.m_class and m_type == other.m_type and m_tagNumber == other.m_tagNumber and m_tag == other.m_tag and m_value == other.m_value and m_valuesConstructed == other.m_valuesConstructed;
+    return std::tie(m_class, m_type, m_tagNumber, m_tag, m_value, m_valuesConstructed) == std::tie(other.m_class, other.m_type, other.m_tagNumber, other.m_tag, other.m_value, other.m_valuesConstructed);
 }
 
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
