@@ -146,7 +146,7 @@ TlvBer::ParseConstructedValue(std::vector<TlvBer>& valueOutput, std::size_t leng
 
     while (bytesParsedOverall < length) {
         TlvBer subtlv{};
-        auto parseResult = Parse(subtlv, dataInput, bytesParsed);
+        auto parseResult = Parse(subtlv, subspan, bytesParsed);
         if (parseResult != Tlv::ParseResult::Succeeded) {
             return parseResult;
         }
@@ -252,9 +252,9 @@ TlvBer::GetLengthEncoding(std::size_t length)
     if constexpr (std::endian::native == std::endian::big) {
         return encoding;
     } else {
-        return { 
+        return {
             std::make_move_iterator(std::rbegin(encoding)),
-            std::make_move_iterator(std::rend(encoding)) 
+            std::make_move_iterator(std::rend(encoding))
         };
     }
 }
@@ -288,6 +288,18 @@ TlvBer::Builder::AddTlv(const TlvBer& tlv)
 }
 
 TlvBer::Builder&
+TlvBer::Builder::SetAsCopyOfTlv(const TlvBer& tlv)
+{
+    m_class = tlv.m_class;
+    m_type = tlv.m_type;
+    m_tagNumber = tlv.m_tagNumber;
+    m_tag = tlv.m_tag;
+    m_data = tlv.m_value;
+    m_valuesConstructed = tlv.m_valuesConstructed;
+    return *this;
+}
+
+TlvBer::Builder&
 TlvBer::Builder::Reset()
 {
     *this = {};
@@ -298,7 +310,10 @@ TlvBer
 TlvBer::Builder::Build()
 {
     ValidateTag();
-    return TlvBer{ m_class, m_type, m_tagNumber, m_tag, m_data };
+    if (m_type == TlvBer::Type::Primitive) {
+        return TlvBer{ m_class, m_type, m_tagNumber, m_tag, m_data };
+    }
+    return TlvBer{ m_class, m_type, m_tagNumber, m_tag, m_valuesConstructed };
 }
 
 void
@@ -308,6 +323,12 @@ TlvBer::Builder::ValidateTag()
         (m_type == TlvBer::Type::Primitive) && (!m_valuesConstructed.empty())) {
         throw InvalidTlvBerTagException();
     }
+}
+
+bool
+TlvBer::operator==(const TlvBer& other) const
+{
+    return std::tie(m_class, m_type, m_tagNumber, m_tag, m_value, m_valuesConstructed) == std::tie(other.m_class, other.m_type, other.m_tagNumber, other.m_tag, other.m_value, other.m_valuesConstructed);
 }
 
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
