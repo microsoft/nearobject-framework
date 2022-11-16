@@ -21,26 +21,26 @@ UwbCapability::check(const UwbCapability& other) const
     auto l = std::equal(std::cbegin(AngleOfArrivalTypes), std::cend(AngleOfArrivalTypes), std::cbegin(other.AngleOfArrivalTypes));
     auto m = std::equal(std::cbegin(SchedulingModes), std::cend(SchedulingModes), std::cbegin(other.SchedulingModes));
     auto n = std::equal(std::cbegin(RangingTimeStructs), std::cend(RangingTimeStructs), std::cbegin(other.RangingTimeStructs));
-    printf("a%d\n",a);
-    printf("b%d\n",b);
-    printf("c%d\n",c);
-    printf("d%d\n",d);
-    printf("e%d\n",e);
-    printf("f%d\n",f);
-    printf("g%d\n",g);
-    
-    printf("h%d\n",h);
-    printf("i%d\n",i);
-    printf("j%d\n",j);
-    printf("k%d\n",k);
-    printf("l%d\n",l);
-    printf("m%d\n",m);
-    printf("n%d\n",n);
+    printf("a%d\n", a);
+    printf("b%d\n", b);
+    printf("c%d\n", c);
+    printf("d%d\n", d);
+    printf("e%d\n", e);
+    printf("f%d\n", f);
+    printf("g%d\n", g);
+
+    printf("h%d\n", h);
+    printf("i%d\n", i);
+    printf("j%d\n", j);
+    printf("k%d\n", k);
+    printf("l%d\n", l);
+    printf("m%d\n", m);
+    printf("n%d\n", n);
     return a && b && c && d and e and f and g and h and i and j and k and l and m;
 }
 // bool uwb::protocol::fira::operator!=(const UwbCapability& lhs, const UwbCapability& rhs) noexcept { return !(lhs == rhs); }
 
-const std::vector<UwbCapability::ParameterTag> UwbCapability::ParameterTags = {
+const std::array<UwbCapability::ParameterTag, 18> UwbCapability::ParameterTags = {
     UwbCapability::ParameterTag::FiraPhyVersionRange,
     UwbCapability::ParameterTag::FiraMacVersionRange,
     UwbCapability::ParameterTag::DeviceRoles,
@@ -187,20 +187,22 @@ const std::unordered_map<HprfParameter, std::size_t> UwbCapability::HprfParamete
  * @param value the value to encode in big endian
  * @param desiredLength the desired number of bytes in the encoding, padding with zeros if necessary. 
  *                      If the value is too large, this will only encode the lowest desiredLength bytes
- * @return std::span<const uint8_t> 
+ * @return std::vector<uint8_t> 
  */
-std::span<const uint8_t>
+std::vector<uint8_t>
 GetBytesBigEndianFromSizeT(size_t value, int desiredLength)
 {
     std::vector<uint8_t> bytes;
 
-    size_t bytemask = 0xFF << (desiredLength * 8);
+    auto offset = (desiredLength - 1) * 8;
+
+    size_t bytemask = 0xFF << offset;
 
     for (int i = 0; i < desiredLength; i++) {
-        bytes.push_back(bytemask & value);
+        bytes.push_back((bytemask & value) >> offset);
         value <<= 8;
     }
-    return std::span(std::cbegin(bytes), std::cend(bytes));
+    return bytes;
 }
 
 uint32_t
@@ -245,15 +247,16 @@ GetBitIndexFromBitMask(size_t bitMask)
             return index;
         }
     }
+    throw std::exception();
 }
 
 template <class T>
 std::size_t
-unordered_map_lookup(const std::unordered_map<T, std::size_t>& bitIndexMap, const T key)
+unordered_map_lookup(const std::unordered_map<T, std::size_t>& bitIndexMap, const T keyTarget)
 {
-    for (auto entry : bitIndexMap) {
-        if (entry.first == key) {
-            return entry.second;
+    for (auto [key, value] : bitIndexMap) {
+        if (key == keyTarget) {
+            return value;
         }
     }
     throw std::exception();
@@ -261,7 +264,7 @@ unordered_map_lookup(const std::unordered_map<T, std::size_t>& bitIndexMap, cons
 
 // TODO find a better place for this function
 template <class T>
-std::span<const uint8_t>
+std::vector<uint8_t>
 EncodeValuesAsBytes(const std::vector<T>& valueSet, const std::unordered_map<T, std::size_t>& bitIndexMap, int desiredLength)
 {
     size_t valueSetEncoded = 0;
@@ -309,12 +312,12 @@ UwbCapability::ToOobDataObject() const
         .SetTag(UwbCapability::Tag);
     auto childbuilder = encoding::TlvBer::Builder();
 
-        auto phyRange = GetBytesBigEndianFromSizeT(FiraPhyVersionRange, 4);
-        auto phyRangeTlv = childbuilder.Reset()
-                               .SetTag(size_t(ParameterTag::FiraPhyVersionRange))
-                               .SetValue(phyRange)
-                               .Build();
-        builder.AddTlv(phyRangeTlv);
+    auto phyRange = GetBytesBigEndianFromSizeT(FiraPhyVersionRange, 4);
+    auto phyRangeTlv = childbuilder.Reset()
+                           .SetTag(size_t(ParameterTag::FiraPhyVersionRange))
+                           .SetValue(phyRange)
+                           .Build();
+    builder.AddTlv(phyRangeTlv);
 
     {
         auto macRange = GetBytesBigEndianFromSizeT(FiraMacVersionRange, 4);
