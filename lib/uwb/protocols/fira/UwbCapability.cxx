@@ -247,6 +247,7 @@ GetBitIndexFromBitMask(size_t bitMask)
             return index;
         }
     }
+    throw std::exception();
 }
 
 template <class T>
