@@ -19,7 +19,8 @@ TlvBer::TlvBer(TlvBer::Class tlvClass, TlvBer::Type tlvType, uint32_t tagNumber,
     m_value(value)
 {
     ::Tlv::Tag = m_tag;
-    ::Tlv::Value = m_value;
+    // ::Tlv::Value = m_value;
+    ::Tlv::Value = std::span<const uint8_t>{ std::cbegin(m_value), std::cend(m_value) };
 }
 
 TlvBer::TlvBer(TlvBer::Class tlvClass, TlvBer::Type tlvType, uint32_t tagNumber, const std::vector<uint8_t>& tag, std::vector<TlvBer>& values) :

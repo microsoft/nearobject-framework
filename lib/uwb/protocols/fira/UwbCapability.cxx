@@ -1,6 +1,11 @@
 
+#include <iterator>
+#include <notstd/utility.hxx>
 #include <TlvSimple.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
+
+#include <iostream>
+#include <iomanip>
 
 using namespace uwb::protocol::fira;
 
@@ -194,15 +199,16 @@ GetBytesBigEndianFromSizeT(size_t value, int desiredLength)
 {
     std::vector<uint8_t> bytes;
 
-    auto offset = (desiredLength - 1) * 8;
-
-    size_t bytemask = 0xFF << offset;
-
-    for (int i = 0; i < desiredLength; i++) {
-        bytes.push_back((bytemask & value) >> offset);
-        value <<= 8;
+    for (auto i = 0; i < desiredLength; i++) {
+        const auto b = static_cast<uint8_t>(value & 0xFFU);
+        bytes.push_back(b);
+        value >>= 8;
     }
-    return bytes;
+
+    return {
+        std::crbegin(bytes),
+        std::crend(bytes)
+    };
 }
 
 uint32_t
@@ -308,89 +314,95 @@ UwbCapability::ToOobDataObject() const
 {
     auto returnTlvBer = std::make_unique<encoding::TlvBer>();
     auto builder = encoding::TlvBer::Builder();
-    builder.Reset()
-        .SetTag(UwbCapability::Tag);
+    builder.SetTag(UwbCapability::Tag);
+    // builder.Reset()
+    //     .SetTag(UwbCapability::Tag);
     auto childbuilder = encoding::TlvBer::Builder();
 
-    auto phyRange = GetBytesBigEndianFromSizeT(FiraPhyVersionRange, 4);
-    auto phyRangeTlv = childbuilder.Reset()
-                           .SetTag(size_t(ParameterTag::FiraPhyVersionRange))
-                           .SetValue(phyRange)
-                           .Build();
-    builder.AddTlv(phyRangeTlv);
-
-    {
-        auto macRange = GetBytesBigEndianFromSizeT(FiraMacVersionRange, 4);
-        auto macRangeTlv = childbuilder.Reset()
-                               .SetTag(size_t(ParameterTag::FiraMacVersionRange))
-                               .SetValue(macRange)
+        auto phyRange = GetBytesBigEndianFromSizeT(FiraPhyVersionRange, 4);
+        auto phyRangeTlv = childbuilder.Reset()
+                               .SetTag(notstd::to_underlying(ParameterTag::FiraPhyVersionRange))
+                               .SetValue(phyRange)
                                .Build();
-        builder.AddTlv(macRangeTlv);
-    }
+        std::cout << "phyRangeTlv tag: " << std::hex << static_cast<int>(phyRangeTlv.Tag[0]) << std::endl;
+        builder.AddTlv(phyRangeTlv);
 
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::DeviceRoles), DeviceRoles, UwbCapability::DeviceRoleBit, 1);
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RangingMethod), RangingConfigurations, UwbCapability::RangingConfigurationBit, 1);
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::StsConfig), StsConfigurations, UwbCapability::StsConfigurationBit, 1);
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::MultiNodeMode), MultiNodeModes, UwbCapability::MultiNodeModeBit, 1);
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RangingMode), RangingTimeStructs, UwbCapability::RangingModeBit, 1);
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::ScheduledMode), SchedulingModes, UwbCapability::SchedulingModeBit, 1);
-    {
-        auto hoppingtlv = childbuilder.Reset()
-                              .SetTag(uint8_t(ParameterTag::HoppingMode))
-                              .SetValue(HoppingMode)
-                              .Build();
-        builder.AddTlv(hoppingtlv);
-    }
+    // {
+    //     auto macRange = GetBytesBigEndianFromSizeT(FiraMacVersionRange, 4);
+    //     auto macRangeTlv = childbuilder.Reset()
+    //                            .SetTag(size_t(ParameterTag::FiraMacVersionRange))
+    //                            .SetValue(macRange)
+    //                            .Build();
+    //     builder.AddTlv(macRangeTlv);
+    // }
 
-    {
-        auto blocktlv = childbuilder.Reset()
-                            .SetTag(uint8_t(ParameterTag::BlockStriding))
-                            .SetValue(BlockStriding)
-                            .Build();
-        builder.AddTlv(blocktlv);
-    }
+    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::DeviceRoles), DeviceRoles, UwbCapability::DeviceRoleBit, 1);
+    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RangingMethod), RangingConfigurations, UwbCapability::RangingConfigurationBit, 1);
+    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::StsConfig), StsConfigurations, UwbCapability::StsConfigurationBit, 1);
+    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::MultiNodeMode), MultiNodeModes, UwbCapability::MultiNodeModeBit, 1);
+    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RangingMode), RangingTimeStructs, UwbCapability::RangingModeBit, 1);
+    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::ScheduledMode), SchedulingModes, UwbCapability::SchedulingModeBit, 1);
+    // {
+    //     auto hoppingtlv = childbuilder.Reset()
+    //                           .SetTag(uint8_t(ParameterTag::HoppingMode))
+    //                           .SetValue(HoppingMode)
+    //                           .Build();
+    //     builder.AddTlv(hoppingtlv);
+    // }
 
-    {
-        auto uwbtlv = childbuilder.Reset()
-                          .SetTag(uint8_t(ParameterTag::UwbInitiationTime))
-                          .SetValue(UwbInitiationTime)
-                          .Build();
-        builder.AddTlv(uwbtlv);
-    }
+    // {
+    //     auto blocktlv = childbuilder.Reset()
+    //                         .SetTag(uint8_t(ParameterTag::BlockStriding))
+    //                         .SetValue(BlockStriding)
+    //                         .Build();
+    //     builder.AddTlv(blocktlv);
+    // }
 
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::Channels), Channels, UwbCapability::ChannelsBit, 1);
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RFrameConfig), RFrameConfigurations, UwbCapability::RFrameConfigurationBit, 1);
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::CcConstraintLength), ConvolutionalCodeConstraintLengths, UwbCapability::ConvolutionalCodeConstraintLengthsBit, 1);
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::BprfParameterSets), BprfParameterSets, UwbCapability::BprfParameterSetsBit, 1);
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::HprfParameterSets), HprfParameterSets, UwbCapability::HprfParameterSetsBit, 5);
+    // {
+    //     auto uwbtlv = childbuilder.Reset()
+    //                       .SetTag(uint8_t(ParameterTag::UwbInitiationTime))
+    //                       .SetValue(UwbInitiationTime)
+    //                       .Build();
+    //     builder.AddTlv(uwbtlv);
+    // }
 
-    {
-        size_t aoaEncoded = 0;
-        for (auto value : AngleOfArrivalTypes) {
-            // auto bitIndex = UwbCapability::AngleOfArrivalBit.at(value);
-            auto bitIndex = unordered_map_lookup(UwbCapability::AngleOfArrivalBit, value);
-            aoaEncoded |= GetBitMaskFromBitIndex(bitIndex);
-        }
-        if (AngleOfArrivalFom) {
-            aoaEncoded |= GetBitMaskFromBitIndex(UwbCapability::AngleOfArrivalFomBit);
-        }
+    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::Channels), Channels, UwbCapability::ChannelsBit, 1);
+    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RFrameConfig), RFrameConfigurations, UwbCapability::RFrameConfigurationBit, 1);
+    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::CcConstraintLength), ConvolutionalCodeConstraintLengths, UwbCapability::ConvolutionalCodeConstraintLengthsBit, 1);
+    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::BprfParameterSets), BprfParameterSets, UwbCapability::BprfParameterSetsBit, 1);
+    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::HprfParameterSets), HprfParameterSets, UwbCapability::HprfParameterSetsBit, 5);
 
-        auto aoaByte = GetBytesBigEndianFromSizeT(aoaEncoded, 1);
-        auto aoatlv = childbuilder.Reset()
-                          .SetTag(uint8_t(ParameterTag::AoaSupport))
-                          .SetValue(aoaByte)
-                          .Build();
-        builder.AddTlv(aoatlv);
-    }
+    // {
+    //     size_t aoaEncoded = 0;
+    //     for (auto value : AngleOfArrivalTypes) {
+    //         // auto bitIndex = UwbCapability::AngleOfArrivalBit.at(value);
+    //         auto bitIndex = unordered_map_lookup(UwbCapability::AngleOfArrivalBit, value);
+    //         aoaEncoded |= GetBitMaskFromBitIndex(bitIndex);
+    //     }
+    //     if (AngleOfArrivalFom) {
+    //         aoaEncoded |= GetBitMaskFromBitIndex(UwbCapability::AngleOfArrivalFomBit);
+    //     }
 
-    {
-        auto mactlv = childbuilder.Reset()
-                          .SetTag(uint8_t(ParameterTag::ExtendedMacAddress))
-                          .SetValue(ExtendedMacAddress)
-                          .Build();
-        builder.AddTlv(mactlv);
-    }
+    //     auto aoaByte = GetBytesBigEndianFromSizeT(aoaEncoded, 1);
+    //     auto aoatlv = childbuilder.Reset()
+    //                       .SetTag(uint8_t(ParameterTag::AoaSupport))
+    //                       .SetValue(aoaByte)
+    //                       .Build();
+    //     builder.AddTlv(aoatlv);
+    // }
 
+    // {
+    //     auto mactlv = childbuilder.Reset()
+    //                       .SetTag(uint8_t(ParameterTag::ExtendedMacAddress))
+    //                       .SetValue(ExtendedMacAddress)
+    //                       .Build();
+    //     builder.AddTlv(mactlv);
+    // }
+
+    // std::cout << "returnedTlv first cvalue tag[0]: " << std::hex << static_cast<int>(returnTlvBer->GetValues()[0].Tag[0]) << std::endl;
+    // std::cout << "returnedTlv first cvalue tag[1]: " << std::hex << static_cast<int>(returnTlvBer->GetValues()[0].Tag[0]) << std::endl;
+    // auto copy = *returnTlvBer;
+    // std::cout << "copy first cvalue tag: " << std::hex << static_cast<int>(copy.GetValues()[0].Tag[0]) << std::endl;
     *returnTlvBer = builder.Build();
     return returnTlvBer;
 }

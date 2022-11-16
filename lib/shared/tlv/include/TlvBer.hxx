@@ -203,6 +203,12 @@ public:
     std::vector<TlvBer>
     GetValues() const noexcept;
 
+    std::vector<TlvBer>
+    GetValuesRef() const noexcept { return m_valuesConstructed; }
+
+    std::vector<uint8_t>
+    GetValue() const { return m_value; }
+
     /**
      * @brief Parses the tag portion of a BER-TLV from the specified buffer.
      * 
