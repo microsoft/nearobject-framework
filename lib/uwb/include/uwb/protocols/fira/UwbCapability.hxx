@@ -61,7 +61,7 @@ struct UwbCapability
         ExtendedMacAddress = 0x91,
     };
 
-    static const std::vector<ParameterTag> ParameterTags;
+    static const std::array<ParameterTag, 18> ParameterTags;
 
     static constexpr auto MultiNodeModesDefault = {
         MultiNodeMode::Unicast,
