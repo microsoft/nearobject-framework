@@ -187,7 +187,7 @@ const std::unordered_map<HprfParameter, std::size_t> UwbCapability::HprfParamete
  * @param value the value to encode in big endian
  * @param desiredLength the desired number of bytes in the encoding, padding with zeros if necessary. 
  *                      If the value is too large, this will only encode the lowest desiredLength bytes
- * @return std::span<const uint8_t> 
+ * @return std::vector<uint8_t> 
  */
 std::vector<uint8_t>
 GetBytesBigEndianFromSizeT(size_t value, int desiredLength)
@@ -264,7 +264,7 @@ unordered_map_lookup(const std::unordered_map<T, std::size_t>& bitIndexMap, cons
 
 // TODO find a better place for this function
 template <class T>
-std::span<const uint8_t>
+std::vector<uint8_t>
 EncodeValuesAsBytes(const std::vector<T>& valueSet, const std::unordered_map<T, std::size_t>& bitIndexMap, int desiredLength)
 {
     size_t valueSetEncoded = 0;
