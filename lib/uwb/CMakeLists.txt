@@ -15,7 +15,6 @@ target_sources(uwb
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbMacAddress.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbPeer.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSession.hxx
-        ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/protocols/fira/UwbCapability.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionEventCallbacks.hxx
 )
 
