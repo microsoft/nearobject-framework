@@ -23,7 +23,6 @@ constexpr UnderlyingByte ValueTwoEnum = UnderlyingByte::Two;
 TEST_CASE("to_underlying works with uint8_t", "[basic]")
 {
     using namespace notstd;
-    using notstd::test::UnderlyingByte;
 
     constexpr auto underlyingValueOne = to_underlying(test::ValueOneEnum);
     constexpr auto underlyingValueTwo = to_underlying(test::ValueTwoEnum);
