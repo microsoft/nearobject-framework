@@ -5,5 +5,4 @@
 
 TEST_CASE("uwb capability placeholder", "[basic]")
 {
-
 }

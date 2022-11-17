@@ -11,7 +11,7 @@ UwbDevice::CreateSession(uint32_t sessionId, std::weak_ptr<uwb::UwbSessionEventC
 }
 
 uwb::protocol::fira::UwbCapability
-UwbDevice::GetCapabilities() const 
+UwbDevice::GetCapabilities() const
 {
     // TODO
     return {};

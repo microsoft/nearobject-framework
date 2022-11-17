@@ -36,15 +36,15 @@ struct unique_ptr_out
     std::unique_ptr<T>& wrapper;
     T* pointer_raw;
 
-    explicit unique_ptr_out(std::unique_ptr<T>& output) : 
+    explicit unique_ptr_out(std::unique_ptr<T>& output) :
         wrapper(output),
         pointer_raw(nullptr)
     {}
 
-    operator T**()
+    operator T* *()
     {
         return &pointer_raw;
-    } 
+    }
 
     ~unique_ptr_out()
     {
@@ -52,7 +52,8 @@ struct unique_ptr_out
     }
 
     unique_ptr_out(unique_ptr_out const& other) = delete;
-    unique_ptr_out &operator=(unique_ptr_out const& other) = delete;
+    unique_ptr_out&
+    operator=(unique_ptr_out const& other) = delete;
     unique_ptr_out(unique_ptr_out&& other) = delete;
 };
 } // namespace notstd

@@ -34,7 +34,7 @@ struct empty_value_provider
  * @param ref 
  * @return std::ostream& 
  */
-template<
+template <
     typename CharT,
     typename Traits,
     typename HasToStringT,
@@ -58,7 +58,7 @@ operator<<(std::basic_ostream<CharT, Traits>& stream, const HasToStringT& ref)
  * @param ref 
  * @return std::ostream& 
  */
-template<
+template <
     typename CharT,
     typename Traits,
     typename HasToStringT,
@@ -85,7 +85,7 @@ namespace containers
  * @param empty_name The name to output if the container is empty.
  * @return auto 
  */
-template<
+template <
     typename ContainerT,
     typename ItemT = typename ContainerT::value_type>
 auto

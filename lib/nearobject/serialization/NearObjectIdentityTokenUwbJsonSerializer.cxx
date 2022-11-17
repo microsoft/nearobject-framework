@@ -8,7 +8,7 @@ using namespace nearobject;
 void
 nearobject::to_json(nlohmann::json& json, const NearObjectIdentityTokenUwb& identityTokenUwb)
 {
-    json = nlohmann::json {
+    json = nlohmann::json{
         { "UwbMacAddress", identityTokenUwb.GetMacAddress() },
     };
 }

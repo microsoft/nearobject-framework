@@ -5,5 +5,4 @@
 
 TEST_CASE("static ranging info placeholder", "[basic]")
 {
-
 }

@@ -9,7 +9,7 @@ namespace devices
 namespace uwb
 {
 }
-}
+} // namespace devices
 } // namespace linux
 
 #endif // UWB_DEVICE_DRIVER_HXX

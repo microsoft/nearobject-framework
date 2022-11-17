@@ -205,9 +205,6 @@ TEST_CASE("GUID type can be used with STL containers", "[basic][shared][windows]
             REQUIRE(guidNodeOne.mapped() == test::Guids[2]);
             REQUIRE(umapsOfGuids[0] == umapsOfGuids[1]);
         }
-
-        {   // unordered_multiset
-        }
     }
 
     SECTION("GUID can be used in container adaptors")

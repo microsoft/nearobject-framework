@@ -16,9 +16,9 @@ DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(const GUID& deviceInterfa
 
     // Determine the size of the list needed.
     CONFIGRET configRet = CM_Get_Device_Interface_List_Size(
-        &deviceInterfaceNamesBufferSize, 
+        &deviceInterfaceNamesBufferSize,
         &deviceClassInterfaceGuid,
-        nullptr, 
+        nullptr,
         CM_GET_DEVICE_INTERFACE_LIST_PRESENT);
     if (configRet != CR_SUCCESS) {
         // TODO: ???
@@ -28,11 +28,11 @@ DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(const GUID& deviceInterfa
     }
 
     std::vector<wchar_t> deviceInterfaceNamesBuffer(deviceInterfaceNamesBufferSize);
-    
+
     // Query for the actual list.
     configRet = CM_Get_Device_Interface_List(
-        &deviceClassInterfaceGuid, 
-        nullptr, 
+        &deviceClassInterfaceGuid,
+        nullptr,
         std::data(deviceInterfaceNamesBuffer),
         deviceInterfaceNamesBufferSize,
         CM_GET_DEVICE_INTERFACE_LIST_PRESENT);
@@ -43,7 +43,7 @@ DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(const GUID& deviceInterfa
 
     // Pull out individual strings from the double-null terminated list returned above.
     std::vector<std::wstring> deviceInterfaceNames{};
-    for (auto deviceInterfaceName = std::data(deviceInterfaceNamesBuffer); *deviceInterfaceName != L'\0'; ) {
+    for (auto deviceInterfaceName = std::data(deviceInterfaceNamesBuffer); *deviceInterfaceName != L'\0';) {
         deviceInterfaceNames.emplace_back(deviceInterfaceName);
         deviceInterfaceName += deviceInterfaceNames.back().size() + 1;
     }

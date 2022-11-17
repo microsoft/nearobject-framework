@@ -11,7 +11,7 @@ Abstract:
     Header file for the UWB device driver interface
 
 --*/
-
+// clang-format off
 #pragma once
 
 #ifdef __cplusplus
@@ -522,3 +522,5 @@ typedef struct _UWB_NOTIFICATION_DATA
 #ifdef __cplusplus
 }
 #endif
+
+// clang-format on

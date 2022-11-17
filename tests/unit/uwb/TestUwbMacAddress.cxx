@@ -1,6 +1,6 @@
 
 #include <algorithm>
-#include <array> 
+#include <array>
 #include <unordered_set>
 
 #include <catch2/catch_test_macros.hpp>
@@ -12,27 +12,43 @@
 namespace uwb::test
 {
 static constexpr std::array<uint8_t, 2> AddressShortValueZero{
-    0x00, 0x00,
+    0x00,
+    0x00,
 };
 
 static constexpr std::array<uint8_t, 2> AddressShortValueAllOnes{
-    0xff, 0xff,
+    0xff,
+    0xff,
 };
 
 static constexpr std::array<uint8_t, 8> AddressExtendedValueZero{
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
 };
 
 static constexpr std::array<uint8_t, 8> AddressExtendedValueAllOnes{
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+    0xff,
+    0xff,
+    0xff,
+    0xff,
+    0xff,
+    0xff,
+    0xff,
+    0xff,
 };
 
-static constexpr std::array<std::array<uint8_t, 2>, 2> AddressShortValues {
+static constexpr std::array<std::array<uint8_t, 2>, 2> AddressShortValues{
     AddressShortValueZero,
     AddressShortValueAllOnes,
 };
 
-static constexpr std::array<std::array<uint8_t, 8>, 2> AddressExtendedValues {
+static constexpr std::array<std::array<uint8_t, 8>, 2> AddressExtendedValues{
     AddressExtendedValueZero,
     AddressExtendedValueAllOnes,
 };
@@ -43,7 +59,7 @@ static constexpr std::array<std::array<uint8_t, 8>, 2> AddressExtendedValues {
  * @param uwbMacAddress The mac address to validate the length.
  * @param lengthExpected The expected length.
  */
-void 
+void
 ValidateLength(const UwbMacAddress& uwbMacAddress, std::size_t lengthExpected) noexcept
 {
     REQUIRE(uwbMacAddress.GetLength() == lengthExpected);
@@ -68,28 +84,28 @@ TEST_CASE("uwb addresses can be checked for equality correctly", "[basic]")
 
     SECTION("same short addresses match")
     {
-        REQUIRE(UwbMacAddress{AddressShortValueZero} == UwbMacAddress{AddressShortValueZero});
+        REQUIRE(UwbMacAddress{ AddressShortValueZero } == UwbMacAddress{ AddressShortValueZero });
     }
 
     SECTION("same extended addresses match")
     {
-        REQUIRE(UwbMacAddress{AddressExtendedValueZero} == UwbMacAddress{AddressExtendedValueZero});
+        REQUIRE(UwbMacAddress{ AddressExtendedValueZero } == UwbMacAddress{ AddressExtendedValueZero });
     }
 
     SECTION("differing short addresses don't match")
     {
-        REQUIRE(UwbMacAddress{AddressShortValueZero} != UwbMacAddress{AddressShortValueAllOnes});
+        REQUIRE(UwbMacAddress{ AddressShortValueZero } != UwbMacAddress{ AddressShortValueAllOnes });
     }
 
     SECTION("differing extended addresses don't match")
     {
-        REQUIRE(UwbMacAddress{AddressExtendedValueZero} != UwbMacAddress{AddressExtendedValueAllOnes});
+        REQUIRE(UwbMacAddress{ AddressExtendedValueZero } != UwbMacAddress{ AddressExtendedValueAllOnes });
     }
 
     SECTION("differing address types don't match")
     {
-        REQUIRE(UwbMacAddress{AddressShortValueZero} != UwbMacAddress{AddressExtendedValueZero});
-        REQUIRE(UwbMacAddress{AddressShortValueAllOnes} != UwbMacAddress{AddressExtendedValueAllOnes});
+        REQUIRE(UwbMacAddress{ AddressShortValueZero } != UwbMacAddress{ AddressExtendedValueZero });
+        REQUIRE(UwbMacAddress{ AddressShortValueAllOnes } != UwbMacAddress{ AddressExtendedValueAllOnes });
     }
 }
 
@@ -100,12 +116,12 @@ TEST_CASE("uwb address type is accurate")
 
     SECTION("short type is accurate")
     {
-        REQUIRE(UwbMacAddress{AddressShortValueZero}.GetType() == UwbMacAddressType::Short);
+        REQUIRE(UwbMacAddress{ AddressShortValueZero }.GetType() == UwbMacAddressType::Short);
     }
 
     SECTION("extended type is accurate")
     {
-        REQUIRE(UwbMacAddress{AddressExtendedValueZero}.GetType() == UwbMacAddressType::Extended);
+        REQUIRE(UwbMacAddress{ AddressExtendedValueZero }.GetType() == UwbMacAddressType::Extended);
     }
 }
 
@@ -116,13 +132,13 @@ TEST_CASE("uwb address length is accurate")
 
     SECTION("short length is accurate")
     {
-        const UwbMacAddress addressShort{AddressShortValueZero};
+        const UwbMacAddress addressShort{ AddressShortValueZero };
         ValidateLength(addressShort, UwbMacAddressLength::Short);
     }
 
     SECTION("extended length is accurate")
     {
-        const UwbMacAddress addressExtrended{AddressExtendedValueZero};
+        const UwbMacAddress addressExtrended{ AddressExtendedValueZero };
         ValidateLength(addressExtrended, UwbMacAddressLength::Extended);
     }
 }
@@ -135,7 +151,7 @@ TEST_CASE("uwb address value is accurate")
     SECTION("short value is accurate")
     {
         for (const auto& addressShortValue : AddressShortValues) {
-            const UwbMacAddress addressShort{addressShortValue};
+            const UwbMacAddress addressShort{ addressShortValue };
             const auto& value = addressShort.GetValue();
             REQUIRE(std::equal(std::cbegin(value), std::cend(value), std::cbegin(addressShortValue)));
         }
@@ -144,7 +160,7 @@ TEST_CASE("uwb address value is accurate")
     SECTION("extended value is accurate")
     {
         for (const auto& addressExtendedValue : AddressExtendedValues) {
-            const UwbMacAddress addressExtended{addressExtendedValue};
+            const UwbMacAddress addressExtended{ addressExtendedValue };
             const auto& value = addressExtended.GetValue();
             REQUIRE(std::equal(std::cbegin(value), std::cend(value), std::cbegin(addressExtendedValue)));
         }

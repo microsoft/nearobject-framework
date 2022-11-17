@@ -18,7 +18,7 @@ NearObjectDeviceDiscoveryAgentUwb::ProbeAsyncImpl()
 {
     // TODO: this instance must be kept alive/valid until the async operation is
     // complete since it accesses members.
-    return std::async(std::launch::async, [&](){
+    return std::async(std::launch::async, [&]() {
         return Probe();
     });
 }

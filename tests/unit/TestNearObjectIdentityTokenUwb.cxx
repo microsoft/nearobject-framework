@@ -26,11 +26,11 @@ namespace nearobject::test
  * @param sequence 
  * @return uwb::UwbMacAddress 
  */
-template<std::size_t N, uint8_t... values>
+template <std::size_t N, uint8_t... values>
 uwb::UwbMacAddress
 MakeAddressImpl(std::integer_sequence<uint8_t, values...> sequence)
 {
-    return uwb::UwbMacAddress{ std::array<uint8_t, N>{values...} };
+    return uwb::UwbMacAddress{ std::array<uint8_t, N>{ values... } };
 }
 
 /**
@@ -43,10 +43,12 @@ MakeAddressImpl(std::integer_sequence<uint8_t, values...> sequence)
  * @tparam Values The vales to assign.
  * @return requires Constraint for value length.
  */
-template<std::size_t N, typename Values = std::make_integer_sequence<uint8_t, N>>
+// clang-format off
+template <std::size_t N, typename Values = std::make_integer_sequence<uint8_t, N>>
 requires uwb::ValidUwbMacAddressLength<N>
 uwb::UwbMacAddress
 MakeAddress()
+// clang-format on
 {
     return MakeAddressImpl<N>(Values{});
 }
@@ -80,7 +82,7 @@ MakeAddressExtended()
  * 
  * @return NearObjectIdentityTokenUwb 
  */
-NearObjectIdentityTokenUwb 
+NearObjectIdentityTokenUwb
 MakeTokenShort()
 {
     return NearObjectIdentityTokenUwb{ MakeAddressShort() };
@@ -91,7 +93,7 @@ MakeTokenShort()
  * 
  * @return NearObjectIdentityTokenUwb 
  */
-NearObjectIdentityTokenUwb 
+NearObjectIdentityTokenUwb
 MakeTokenExtended()
 {
     return NearObjectIdentityTokenUwb{ MakeAddressExtended() };
@@ -128,9 +130,11 @@ constexpr std::size_t NumStabilityVerificationsDefault = 25;
  * @param numVerificationsTotal The number of internal operations to perform.
  * @return requires The concept restricting the input to NearObjectIdentityToken base class.
  */
+// clang-format off
 template <typename NearObjectIdentityType>
 requires std::is_base_of_v<NearObjectIdentityToken, NearObjectIdentityType>
 void
+// clang-format on
 ValidateTokenStabilityLocal(const NearObjectIdentityType& identityToken, const std::size_t numVerificationsTotal = NumStabilityVerificationsDefault)
 {
     std::span<const uint8_t> tokenLast;
@@ -156,7 +160,7 @@ ValidateTokenStabilityExternal(const NearObjectIdentityTokenUwb& identityTokenUw
 TEST_CASE("uwb mac address serialization is stable", "[basic][uwb][serialize]")
 {
     using namespace uwb;
-    using namespace nearobject; 
+    using namespace nearobject;
     using namespace nearobject::test;
 
     SECTION("uwb short mac address serialization is stable")

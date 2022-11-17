@@ -17,8 +17,8 @@ DEFINE_GUID(GUID_UWB_DEVICE_INTERFACE, 0xa7424370, 0x45e5, 0x49c3, 0xae, 0x35, 0
 #endif
 
 const GUID InterfaceClassUwb = GUID_UWB_DEVICE_INTERFACE;
-}
-}
+} // namespace uwb
+} // namespace devices
 } // namespace windows
 
 #endif // UWB_DEVICE_DRIVER_HXX

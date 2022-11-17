@@ -47,122 +47,122 @@ concept ValidUwbMacAddressLength =
 
 namespace detail
 {
-    /**
-     * @brief Compile-time address length lookup, given type.
-     * 
-     * @tparam AddressType 
-     */
-    template <UwbMacAddressType AddressType>
-    struct UwbMacAddressSizeImpl
-    {};
-
-    /**
-     * @brief Address length lookup full specialization for short addresses.
-     * 
-     * @tparam  
-     */
-    template <>
-    struct UwbMacAddressSizeImpl<UwbMacAddressType::Short>
-    {
-        static constexpr std::size_t value = UwbMacAddressLength::Short;
-    };
-
-    /**
-     * @brief Address length lookup full specialization for extended addresses.
-     * 
-     * @tparam  
-     */
-    template <>
-    struct UwbMacAddressSizeImpl<UwbMacAddressType::Extended>
-    {
-        static constexpr std::size_t value = UwbMacAddressLength::Extended;
-    };
-
-    /**
-     * @brief Compile-time address type lookup helper, given length.
-     * 
-     * @tparam Length 
-     */
-    template <size_t Length>
-    struct UwbMacAddressTypeImpl
-    {};
+/**
+ * @brief Compile-time address length lookup, given type.
+ * 
+ * @tparam AddressType
+ */
+template <UwbMacAddressType AddressType>
+struct UwbMacAddressSizeImpl
+{};
 
 /**
-     * @brief Address type lookup full specialization for short addresses. 
-     * 
-     * @tparam  
-     */
-    template <>
-    struct UwbMacAddressTypeImpl<UwbMacAddressLength::Short>
-    {
-        static constexpr UwbMacAddressType value = UwbMacAddressType::Short;
-    };
+ * @brief Address length lookup full specialization for short addresses.
+ * 
+ * @tparam
+ */
+template <>
+struct UwbMacAddressSizeImpl<UwbMacAddressType::Short>
+{
+    static constexpr std::size_t value = UwbMacAddressLength::Short;
+};
 
-    /**
-     * @brief Address type lookup full specialization for extended addresses. 
-     * 
-     * @tparam  
-     */
-    template <>
-    struct UwbMacAddressTypeImpl<UwbMacAddressLength::Extended>
-    {
-        static constexpr UwbMacAddressType value = UwbMacAddressType::Extended;
-    };
+/**
+ * @brief Address length lookup full specialization for extended addresses.
+ * 
+ * @tparam
+ */
+template <>
+struct UwbMacAddressSizeImpl<UwbMacAddressType::Extended>
+{
+    static constexpr std::size_t value = UwbMacAddressLength::Extended;
+};
 
-    /**
-     * @brief Helper providing compile-time lookup of UwbMacAddressType for the
-     * supported address lengths. 
-     * 
-     * @tparam Length The compile-time address length, typically from an array extent. 
-     */
-    template <size_t Length>
-    inline constexpr UwbMacAddressType UwbMacAddressTypeV = UwbMacAddressTypeImpl<Length>::value;
+/**
+ * @brief Compile-time address type lookup helper, given length.
+ * 
+ * @tparam Length
+ */
+template <size_t Length>
+struct UwbMacAddressTypeImpl
+{};
 
-    /**
-     * @brief Helper providing compile-time lookup of UwbMacAddress size for the
-     * supported address types.
-     * 
-     * @tparam AddressType The compile-time address type to get the size for.
-     */
-    template <UwbMacAddressType AddressType>
-    inline constexpr std::size_t UwbMacAddressSizeV = UwbMacAddressSizeImpl<AddressType>::value;
+/**
+ * @brief Address type lookup full specialization for short addresses.
+ * 
+ * @tparam
+ */
+template <>
+struct UwbMacAddressTypeImpl<UwbMacAddressLength::Short>
+{
+    static constexpr UwbMacAddressType value = UwbMacAddressType::Short;
+};
 
-    /**
-     * @brief Type traits for uwb mac addresses.
-     * 
-     * This collects traits of uwb mac addresses for compile-time usage, based
-     * on the address length. This maps from address length to mac address type,
-     * value type (eg. std::array<> with correct extent), and their
-     * corresponding types. 
-     * 
-     * @tparam Length 
-     */
-    template <std::size_t Length>
-    struct UwbMacAddressTraits
-    {
-        using value_type = std::array<uint8_t, Length>;
-        using length_type = std::integral_constant<std::size_t, Length>;
+/**
+ * @brief Address type lookup full specialization for extended addresses.
+ * 
+ * @tparam
+ */
+template <>
+struct UwbMacAddressTypeImpl<UwbMacAddressLength::Extended>
+{
+    static constexpr UwbMacAddressType value = UwbMacAddressType::Extended;
+};
 
-        static constexpr std::size_t length = length_type::value;
-        static constexpr UwbMacAddressType address_type = detail::UwbMacAddressTypeV<Length>;
-    };
+/**
+ * @brief Helper providing compile-time lookup of UwbMacAddressType for the
+ * supported address lengths.
+ * 
+ * @tparam Length The compile-time address length, typically from an array extent.
+ */
+template <size_t Length>
+inline constexpr UwbMacAddressType UwbMacAddressTypeV = UwbMacAddressTypeImpl<Length>::value;
 
-    /**
-     * @brief Helper which generically wraps a uwb mac address value.
-     * 
-     * This is used later in a templated constructor to allow a single declaration.
-     * 
-     * @tparam Length The length of the address.
-     */
-    template <std::size_t Length>
-    struct UwbMacAddressValueWrapper : public UwbMacAddressTraits<Length>
-    {
-        explicit UwbMacAddressValueWrapper(typename UwbMacAddressTraits<Length>::value_type addressIn) :
-            address(std::move(addressIn))
-        {}
+/**
+ * @brief Helper providing compile-time lookup of UwbMacAddress size for the
+ * supported address types.
+ * 
+ * @tparam AddressType The compile-time address type to get the size for.
+ */
+template <UwbMacAddressType AddressType>
+inline constexpr std::size_t UwbMacAddressSizeV = UwbMacAddressSizeImpl<AddressType>::value;
 
-        typename UwbMacAddressTraits<Length>::value_type address;
-    };
+/**
+ * @brief Type traits for uwb mac addresses.
+ * 
+ * This collects traits of uwb mac addresses for compile-time usage, based
+ * on the address length. This maps from address length to mac address type,
+ * value type (eg. std::array<> with correct extent), and their
+ * corresponding types.
+ * 
+ * @tparam Length
+ */
+template <std::size_t Length>
+struct UwbMacAddressTraits
+{
+    using value_type = std::array<uint8_t, Length>;
+    using length_type = std::integral_constant<std::size_t, Length>;
+
+    static constexpr std::size_t length = length_type::value;
+    static constexpr UwbMacAddressType address_type = detail::UwbMacAddressTypeV<Length>;
+};
+
+/**
+ * @brief Helper which generically wraps a uwb mac address value.
+ * 
+ * This is used later in a templated constructor to allow a single declaration.
+ * 
+ * @tparam Length The length of the address.
+ */
+template <std::size_t Length>
+struct UwbMacAddressValueWrapper : public UwbMacAddressTraits<Length>
+{
+    explicit UwbMacAddressValueWrapper(typename UwbMacAddressTraits<Length>::value_type addressIn) :
+        address(std::move(addressIn))
+    {}
+
+    typename UwbMacAddressTraits<Length>::value_type address;
+};
 } // namespace detail
 
 /**
