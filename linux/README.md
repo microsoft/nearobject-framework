@@ -11,7 +11,7 @@ framework.
 
 If development on Windows is desired, ubuntu may be installed in WSL using a rootfs image. To install WSL, refer to [https://learn.microsoft.com/en-us/windows/wsl/install](https://learn.microsoft.com/en-us/windows/wsl/install). This will install a default version of ubuntu from the store, which can be removed by running `wsl --unregister Ubuntu`. Follow these steps to install jammy on WSL:
 
-1. Download the ubuntu 20.04 wsl rootfs archive [https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64-wsl.rootfs.tar.gz](https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64-wsl.rootfs.tar.gz)
+1. Download the ubuntu 22.04 wsl rootfs archive [https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz](https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz).
 2. Unzip the archive to get the .tar file (eg. [7-zip](https://www.7-zip.org/download.html)). **DO NOT UNTAR THE ARCHIVE**
 3. Choose a location to store the WSL ubuntu filesystem image. A good way to keep organized is to use a top-level directory for all wsl filesystem images such as `c:\wsl`, then add a sub-directory for each distribution installed, such as `c:\wsl\focal`, `c:\wsl\fedora35`, etc. It's also recommended to do this on a non-system drive if one is available for performance reasons.
 4. Start an elevated command-prompt, and enter the following series of commands:
@@ -49,7 +49,7 @@ You should now be logged on as `mycoolusername`.
 Execute the following commands in a shell:
 ```bash
 sudo apt update
-sudo apt-get install build-essential git cmake ninja-build clang clang-format clang-tidy llvm lldb
+sudo apt-get install build-essential git cmake ninja-build clang clang-format clang-tidy llvm lldb gnupg
 ```
 
 The above will install all the tools required to compile, lint, and debug the project.
