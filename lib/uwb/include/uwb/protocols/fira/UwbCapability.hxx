@@ -182,7 +182,7 @@ struct UwbCapability
     static constexpr std::size_t BlockStridingBit = 0;
     static constexpr std::size_t HoppingModeBit = 0;
 
-    uint32_t FiraPhyVersionRange;
+    uint32_t FiraPhyVersionRange{ 0xAABBCCDD };
     uint32_t FiraMacVersionRange;
     bool ExtendedMacAddress{ false };
     bool UwbInitiationTime{ false };
