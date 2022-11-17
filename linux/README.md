@@ -49,7 +49,7 @@ You should now be logged on as `mycoolusername`.
 Execute the following commands in a shell:
 ```bash
 sudo apt update
-sudo apt-get install build-essential git cmake ninja-build clang clang-format clang-tidy llvm lldb gnupg
+sudo apt-get install build-essential git cmake ninja-build clang clang-format clang-tidy llvm lldb gnupg gdb
 ```
 
 The above will install all the tools required to compile, lint, and debug the project.
