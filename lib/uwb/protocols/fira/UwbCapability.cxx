@@ -1,11 +1,12 @@
 
+#include <bit>
 #include <iterator>
+#include <stdexcept>
+
 #include <notstd/utility.hxx>
+
 #include <TlvSimple.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
-
-#include <iostream>
-#include <iomanip>
 
 using namespace uwb::protocol::fira;
 
@@ -197,18 +198,26 @@ const std::unordered_map<HprfParameter, std::size_t> UwbCapability::HprfParamete
 std::vector<uint8_t>
 GetBytesBigEndianFromSizeT(size_t value, int desiredLength)
 {
+    if (desiredLength > sizeof value) {
+        throw std::runtime_error("desired length exceeds size_t width, this is a bug!");
+    }
+
     std::vector<uint8_t> bytes;
 
     for (auto i = 0; i < desiredLength; i++) {
         const auto b = static_cast<uint8_t>(value & 0xFFU);
         bytes.push_back(b);
-        value >>= 8;
+        value >>= 8U;
     }
 
-    return {
-        std::crbegin(bytes),
-        std::crend(bytes)
-    };
+    if constexpr (std::endian::native == std::endian::big) {
+        return bytes;
+    } else {
+        return {
+            std::make_move_iterator(std::rbegin(bytes)),
+            std::make_move_iterator(std::rend(bytes))
+        };
+    }
 }
 
 uint32_t
@@ -315,17 +324,17 @@ UwbCapability::ToOobDataObject() const
     auto returnTlvBer = std::make_unique<encoding::TlvBer>();
     auto builder = encoding::TlvBer::Builder();
     builder.SetTag(UwbCapability::Tag);
-    // builder.Reset()
-    //     .SetTag(UwbCapability::Tag);
     auto childbuilder = encoding::TlvBer::Builder();
 
+    // Encode FiraPhyVersionRange
+    {
         auto phyRange = GetBytesBigEndianFromSizeT(FiraPhyVersionRange, 4);
         auto phyRangeTlv = childbuilder.Reset()
                                .SetTag(notstd::to_underlying(ParameterTag::FiraPhyVersionRange))
                                .SetValue(phyRange)
                                .Build();
-        std::cout << "phyRangeTlv tag: " << std::hex << static_cast<int>(phyRangeTlv.Tag[0]) << std::endl;
         builder.AddTlv(phyRangeTlv);
+    }
 
     // {
     //     auto macRange = GetBytesBigEndianFromSizeT(FiraMacVersionRange, 4);
@@ -399,10 +408,6 @@ UwbCapability::ToOobDataObject() const
     //     builder.AddTlv(mactlv);
     // }
 
-    // std::cout << "returnedTlv first cvalue tag[0]: " << std::hex << static_cast<int>(returnTlvBer->GetValues()[0].Tag[0]) << std::endl;
-    // std::cout << "returnedTlv first cvalue tag[1]: " << std::hex << static_cast<int>(returnTlvBer->GetValues()[0].Tag[0]) << std::endl;
-    // auto copy = *returnTlvBer;
-    // std::cout << "copy first cvalue tag: " << std::hex << static_cast<int>(copy.GetValues()[0].Tag[0]) << std::endl;
     *returnTlvBer = builder.Build();
     return returnTlvBer;
 }
