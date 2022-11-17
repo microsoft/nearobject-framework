@@ -196,6 +196,20 @@ public:
     GetTag() const noexcept;
 
     /**
+     * @brief Get the primitive value buffer.
+     * 
+     * @return std::vector<uint8_t> 
+     */
+    std::vector<uint8_t>
+    GetValue() const noexcept { return m_value; }
+
+    std::vector<uint8_t>&
+    GetValueRef() noexcept { return m_value; };
+
+    const std::vector<uint8_t>&
+    GetValueRef() const noexcept { return m_value; };
+
+    /**
      * @brief Get the Values object. Returns empty if this object is Primitive
      * 
      * @return const std::vector<TlvBer> 
@@ -203,11 +217,11 @@ public:
     std::vector<TlvBer>
     GetValues() const noexcept;
 
-    std::vector<TlvBer>
-    GetValuesRef() const noexcept { return m_valuesConstructed; }
+    std::vector<TlvBer>&
+    GetValuesRef() noexcept { return m_valuesConstructed; }
 
-    std::vector<uint8_t>
-    GetValue() const { return m_value; }
+    const std::vector<TlvBer>&
+    GetValuesRef() const noexcept { return m_valuesConstructed; }
 
     /**
      * @brief Parses the tag portion of a BER-TLV from the specified buffer.
