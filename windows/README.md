@@ -23,6 +23,7 @@ The following components are optional, but strongly recommended for a more compl
 * C++ Clang-cl for v143 build tools (x64/x86)
 
 The final list with all optional components would look like this:
+
 ![Visual Studio 2022 Build Tools Components List](/assets/vsbuildtools_finallist.png)
 
 Once installed, the project can be built using CMake as described in the main [`README`](/README.md#cmake).
