@@ -22,7 +22,7 @@ target_link_libraries(nearobject-service-windows
     PUBLIC
         cfgmgr32.lib
         nearobject-service
-        WIL
+        WIL::WIL
         windevutil
 )
 

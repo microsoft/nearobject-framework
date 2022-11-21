@@ -1,21 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(nearobject-framework LANGUAGES CXX)
-
 # Configuration option for using vcpkg to satisfy source package dependencies.
 # This must be set to ON for official Windows builds.
 option(USE_VCPKG "Use vcpkg for obtaining source dependencies" OFF)
-
-# Conditional inclusion of OS-dependent source trees.
-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  set(BUILD_FOR_LINUX TRUE)
-  MESSAGE(STATUS "Target OS Linux detected")
-elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  set(BUILD_FOR_WINDOWS TRUE)
-  MESSAGE(STATUS "Target OS Windows detected")
-else ()
-  MESSAGE(FATAL_ERROR "No supported target OS detected, SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
-endif()
 
 # Select source package dependency manager based on selected option.
 # This must occur prior to the first project() statement.
@@ -34,6 +21,24 @@ if (USE_VCPKG)
   MESSAGE(STATUS "using vcpkg for source dependencies")
 else()
   MESSAGE(STATUS "using FetchContent for source dependencies")
+endif()
+
+project(nearobject-framework LANGUAGES CXX)
+
+# Conditional inclusion of OS-dependent source trees.
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  set(BUILD_FOR_LINUX TRUE)
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+  set(BUILD_FOR_WINDOWS TRUE)
+else ()
+  MESSAGE(FATAL_ERROR "No supported target OS detected, SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
+endif()
+
+MESSAGE(STATUS "Target OS ${CMAKE_SYSTEM_NAME} detected")
+
+# Ensure FetchContent-based dependencies are rebuilt if their URL changes.
+if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
+  cmake_policy(SET CMP0135 NEW)
 endif()
 
 # Set language configutation options. The C++ standard used must be the lowest

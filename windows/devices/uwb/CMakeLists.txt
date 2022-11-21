@@ -26,7 +26,7 @@ target_link_libraries(windevuwb
     PUBLIC
         cfgmgr32.lib
         uwb
-        WIL
+        WIL::WIL
 )
 
 set_target_properties(windevuwb PROPERTIES FOLDER windows/devices)
