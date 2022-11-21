@@ -122,5 +122,8 @@ elseif (BUILD_FOR_WINDOWS)
 endif()
 
 add_subdirectory(lib)
-add_subdirectory(tests)
 add_subdirectory(tools)
+
+if (NOT NOF_DISABLE_TESTS)
+  add_subdirectory(tests)
+endif()
