@@ -174,9 +174,9 @@ GetBytesBigEndianFromBitMap(size_t value, int desiredLength)
     }
 
     return {
-            std::make_move_iterator(std::rbegin(bytes)),
-            std::make_move_iterator(std::rend(bytes))
-        };
+        std::make_move_iterator(std::rbegin(bytes)),
+        std::make_move_iterator(std::rend(bytes))
+    };
 }
 
 /**
@@ -190,9 +190,10 @@ GetBytesBigEndianFromBitMap(size_t value, int desiredLength)
 std::vector<uint8_t>
 GetBytesBigEndianFromSizeT(size_t value, int desiredLength)
 {
-    if(std::endian::native != std::endian::big)
-    {value = value & 0x000000FF << 24 | value & 0x0000FF00 << 8 | value & 0x00FF0000 >> 8 | value & 0xFF000000 >> 24;}
-    return GetBytesBigEndianFromBitMap(value,desiredLength);
+    if (std::endian::native != std::endian::big) {
+        value = value & 0x000000FF << 24 | value & 0x0000FF00 << 8 | value & 0x00FF0000 >> 8 | value & 0xFF000000 >> 24;
+    }
+    return GetBytesBigEndianFromBitMap(value, desiredLength);
 }
 
 size_t
@@ -273,7 +274,7 @@ AssignValuesFromBytes(std::vector<T>& assignee, const std::unordered_map<T, std:
 {
     auto bitmasks = ReadSizeTFromBytesBigEndian(bytes);
     assignee.clear();
-    for (auto [key,value] : bitIndexMap) {
+    for (auto [key, value] : bitIndexMap) {
         if (bitmasks & GetBitMaskFromBitIndex(value)) {
             assignee.push_back(key);
         }

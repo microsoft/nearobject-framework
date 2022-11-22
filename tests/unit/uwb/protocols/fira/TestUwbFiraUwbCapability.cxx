@@ -146,7 +146,7 @@ const std::vector<uint8_t> TestUwbCapability::DeviceRolesExpected{ 0x2 };
 const std::vector<uint8_t> TestUwbCapability::StsConfigurationsExpected{ 0x5 };
 const std::vector<uint8_t> TestUwbCapability::RFrameConfigurationsExpected{ 0xA };
 const std::vector<uint8_t> TestUwbCapability::AngleOfArrivalTypesExpected{ 0x3 };
-const std::vector<uint8_t> TestUwbCapability::AoaSupportExpected { 0x3 };
+const std::vector<uint8_t> TestUwbCapability::AoaSupportExpected{ 0x3 };
 const std::vector<uint8_t> TestUwbCapability::SchedulingModeTypesExpected{ 0x2 };
 const std::vector<uint8_t> TestUwbCapability::RangingTimeStructsExpected{ 0x1 };
 const std::vector<uint8_t> TestUwbCapability::RangingConfigurationsExpected{ 0x3 };
@@ -221,7 +221,7 @@ TEST_CASE("Encoding into a TlvBer", "[basic]")
         // verify that the tag exists in the values
         bool wefoundit = false;
         for (auto subtlv : values) {
-            wefoundit = (subtlv.GetTag().size()==1) and (subtlv.GetTag()[0] ==  notstd::to_underlying(tag));
+            wefoundit = (subtlv.GetTag().size() == 1) and (subtlv.GetTag()[0] == notstd::to_underlying(tag));
             if (wefoundit) {
                 // validate the value
                 auto tlvValue = subtlv.GetValue();
@@ -229,34 +229,34 @@ TEST_CASE("Encoding into a TlvBer", "[basic]")
                 break;
             }
         }
-        if(not wefoundit) {
+        if (not wefoundit) {
             REQUIRE(false);
         }
     }
 }
 
+// TODO find better place for this
 template <class T>
 bool
-leftIsSubset(const std::vector<T>& lhs, const std::vector<T>& rhs){
-    for(auto elem: lhs){
+leftIsSubset(const std::vector<T>& lhs, const std::vector<T>& rhs)
+{
+    for (auto elem : lhs) {
         bool found = false;
-        for(auto elem2: rhs){
-            if(elem==elem2) found = true;
+        for (auto elem2 : rhs) {
+            if (elem == elem2)
+                found = true;
         }
-        if(not found) return false;
+        if (not found)
+            return false;
     }
     return true;
 }
 
 template <class T>
 bool
-leftUnorderedEquals(const std::vector<T>& lhs, const std::vector<T>& rhs){
-    return leftIsSubset(lhs,rhs) and leftIsSubset(rhs,lhs);
-}
-
-// TODO add this to the UwbCapability interface?
-bool UwbCapabilityEquals(const UwbCapability& left, const UwbCapability& right){
-
+leftUnorderedEquals(const std::vector<T>& lhs, const std::vector<T>& rhs)
+{
+    return leftIsSubset(lhs, rhs) and leftIsSubset(rhs, lhs);
 }
 
 TEST_CASE("Parsing from TlvBer", "[basic][protocol]")
@@ -267,8 +267,8 @@ TEST_CASE("Parsing from TlvBer", "[basic][protocol]")
 
         encoding::TlvBer::Builder builder;
         auto invalidTlv = builder.SetAsCopyOfTlv(*tlv)
-                                .SetTag(0xFF)
-                                .Build();
+                              .SetTag(0xFF)
+                              .Build();
         REQUIRE_THROWS(UwbCapability::FromOobDataObject(invalidTlv));
     }
     SECTION("FromOobDataObject works")
@@ -279,26 +279,24 @@ TEST_CASE("Parsing from TlvBer", "[basic][protocol]")
         REQUIRE_NOTHROW(decodedCapability = UwbCapability::FromOobDataObject(*tlv));
         REQUIRE(decodedCapability.FiraPhyVersionRange == TestUwbCapability::testUwbCapability.FiraPhyVersionRange);
         REQUIRE(decodedCapability.FiraMacVersionRange == TestUwbCapability::testUwbCapability.FiraMacVersionRange);
-        REQUIRE(leftUnorderedEquals(decodedCapability.DeviceRoles,TestUwbCapability::testUwbCapability.DeviceRoles));
-        REQUIRE(leftUnorderedEquals(decodedCapability.RangingConfigurations,TestUwbCapability::testUwbCapability.RangingConfigurations));
-        REQUIRE(leftUnorderedEquals(decodedCapability.StsConfigurations,TestUwbCapability::testUwbCapability.StsConfigurations));
-        REQUIRE(leftUnorderedEquals(decodedCapability.MultiNodeModes,TestUwbCapability::testUwbCapability.MultiNodeModes));
-        REQUIRE(leftUnorderedEquals(decodedCapability.RangingTimeStructs,TestUwbCapability::testUwbCapability.RangingTimeStructs));
-        REQUIRE(leftUnorderedEquals(decodedCapability.SchedulingModes,TestUwbCapability::testUwbCapability.SchedulingModes));
+        REQUIRE(leftUnorderedEquals(decodedCapability.DeviceRoles, TestUwbCapability::testUwbCapability.DeviceRoles));
+        REQUIRE(leftUnorderedEquals(decodedCapability.RangingConfigurations, TestUwbCapability::testUwbCapability.RangingConfigurations));
+        REQUIRE(leftUnorderedEquals(decodedCapability.StsConfigurations, TestUwbCapability::testUwbCapability.StsConfigurations));
+        REQUIRE(leftUnorderedEquals(decodedCapability.MultiNodeModes, TestUwbCapability::testUwbCapability.MultiNodeModes));
+        REQUIRE(leftUnorderedEquals(decodedCapability.RangingTimeStructs, TestUwbCapability::testUwbCapability.RangingTimeStructs));
+        REQUIRE(leftUnorderedEquals(decodedCapability.SchedulingModes, TestUwbCapability::testUwbCapability.SchedulingModes));
         REQUIRE(decodedCapability.HoppingMode == TestUwbCapability::testUwbCapability.HoppingMode);
         REQUIRE(decodedCapability.BlockStriding == TestUwbCapability::testUwbCapability.BlockStriding);
         REQUIRE(decodedCapability.UwbInitiationTime == TestUwbCapability::testUwbCapability.UwbInitiationTime);
 
-        REQUIRE(leftUnorderedEquals(decodedCapability.Channels,TestUwbCapability::testUwbCapability.Channels));
-        REQUIRE(leftUnorderedEquals(decodedCapability.RFrameConfigurations,TestUwbCapability::testUwbCapability.RFrameConfigurations));
-        REQUIRE(leftUnorderedEquals(decodedCapability.ConvolutionalCodeConstraintLengths,TestUwbCapability::testUwbCapability.ConvolutionalCodeConstraintLengths));
-        REQUIRE(leftUnorderedEquals(decodedCapability.BprfParameterSets,TestUwbCapability::testUwbCapability.BprfParameterSets));
-        REQUIRE(leftUnorderedEquals(decodedCapability.HprfParameterSets,TestUwbCapability::testUwbCapability.HprfParameterSets));
-        REQUIRE(leftUnorderedEquals(decodedCapability.AngleOfArrivalTypes,TestUwbCapability::testUwbCapability.AngleOfArrivalTypes));
+        REQUIRE(leftUnorderedEquals(decodedCapability.Channels, TestUwbCapability::testUwbCapability.Channels));
+        REQUIRE(leftUnorderedEquals(decodedCapability.RFrameConfigurations, TestUwbCapability::testUwbCapability.RFrameConfigurations));
+        REQUIRE(leftUnorderedEquals(decodedCapability.ConvolutionalCodeConstraintLengths, TestUwbCapability::testUwbCapability.ConvolutionalCodeConstraintLengths));
+        REQUIRE(leftUnorderedEquals(decodedCapability.BprfParameterSets, TestUwbCapability::testUwbCapability.BprfParameterSets));
+        REQUIRE(leftUnorderedEquals(decodedCapability.HprfParameterSets, TestUwbCapability::testUwbCapability.HprfParameterSets));
+        REQUIRE(leftUnorderedEquals(decodedCapability.AngleOfArrivalTypes, TestUwbCapability::testUwbCapability.AngleOfArrivalTypes));
 
         REQUIRE(decodedCapability.AngleOfArrivalFom == TestUwbCapability::testUwbCapability.AngleOfArrivalFom);
         REQUIRE(decodedCapability.ExtendedMacAddress == TestUwbCapability::testUwbCapability.ExtendedMacAddress);
-
-
     }
 }
