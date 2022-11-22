@@ -10,45 +10,6 @@
 
 using namespace uwb::protocol::fira;
 
-bool
-UwbCapability::check(const UwbCapability& other) const
-{
-    auto a = FiraPhyVersionRange == other.FiraPhyVersionRange;
-    auto b = FiraMacVersionRange == other.FiraMacVersionRange;
-    auto c = ExtendedMacAddress == other.ExtendedMacAddress;
-    auto d = UwbInitiationTime == other.UwbInitiationTime;
-    auto e = AngleOfArrivalFom == other.AngleOfArrivalFom;
-    auto f = BlockStriding == other.BlockStriding;
-    auto g = HoppingMode == other.HoppingMode;
-    auto h = std::equal(std::cbegin(MultiNodeModes), std::cend(MultiNodeModes), std::cbegin(other.MultiNodeModes),std::cend(other.MultiNodeModes));
-    auto h2 = MultiNodeModes == other.MultiNodeModes;
-    auto i = std::equal(std::cbegin(DeviceRoles), std::cend(DeviceRoles), std::cbegin(other.DeviceRoles));
-    auto j = std::equal(std::cbegin(StsConfigurations), std::cend(StsConfigurations), std::cbegin(other.StsConfigurations));
-    auto k = std::equal(std::cbegin(RFrameConfigurations), std::cend(RFrameConfigurations), std::cbegin(other.RFrameConfigurations));
-    auto l = std::equal(std::cbegin(AngleOfArrivalTypes), std::cend(AngleOfArrivalTypes), std::cbegin(other.AngleOfArrivalTypes));
-    auto m = std::equal(std::cbegin(SchedulingModes), std::cend(SchedulingModes), std::cbegin(other.SchedulingModes));
-    auto n = std::equal(std::cbegin(RangingTimeStructs), std::cend(RangingTimeStructs), std::cbegin(other.RangingTimeStructs));
-    printf("a%d\n", a);
-    printf("b%d\n", b);
-    printf("c%d\n", c);
-    printf("d%d\n", d);
-    printf("e%d\n", e);
-    printf("f%d\n", f);
-    printf("g%d\n", g);
-
-    printf("h%d\n", h);
-    printf("h2 %d\n", h2);
-
-    printf("i%d\n", i);
-    printf("j%d\n", j);
-    printf("k%d\n", k);
-    printf("l%d\n", l);
-    printf("m%d\n", m);
-    printf("n%d\n", n);
-    return a && b && c && d and e and f and g and h and i and j and k and l and m;
-}
-// bool uwb::protocol::fira::operator!=(const UwbCapability& lhs, const UwbCapability& rhs) noexcept { return !(lhs == rhs); }
-
 const std::array<UwbCapability::ParameterTag, 18> UwbCapability::ParameterTags = {
     UwbCapability::ParameterTag::FiraPhyVersionRange,
     UwbCapability::ParameterTag::FiraMacVersionRange,

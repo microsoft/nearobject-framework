@@ -13,12 +13,6 @@
 
 namespace uwb::protocol::fira
 {
-// bool
-// operator==(const UwbCapability& lhs, const UwbCapability& rhs) noexcept;
-
-// bool
-// operator!=(const UwbCapability& lhs, const UwbCapability& rhs) noexcept;
-
 struct UwbCapability
 {
     struct IncorrectNumberOfBytesInValueError : public std::exception
@@ -200,9 +194,6 @@ struct UwbCapability
     std::vector<Channel> Channels{ ChannelsDefault };
     std::vector<BprfParameter> BprfParameterSets{ BprfParameterSetsDefault };
     std::vector<HprfParameter> HprfParameterSets{ HprfParameterSetsDefault };
-
-    bool
-    check(const UwbCapability&) const;
 
     /**
      * @brief Convert this object into a FiRa Data Object (DO).
