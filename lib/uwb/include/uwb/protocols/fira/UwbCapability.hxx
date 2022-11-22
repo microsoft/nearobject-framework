@@ -111,7 +111,6 @@ struct UwbCapability
         Channel::C8,
         Channel::C9,
         Channel::C10,
-        Channel::C11,
         Channel::C12,
         Channel::C13,
         Channel::C14,
@@ -182,7 +181,7 @@ struct UwbCapability
     static constexpr std::size_t BlockStridingBit = 0;
     static constexpr std::size_t HoppingModeBit = 0;
 
-    uint32_t FiraPhyVersionRange{ 0xAABBCCDD };
+    uint32_t FiraPhyVersionRange;
     uint32_t FiraMacVersionRange;
     bool ExtendedMacAddress{ false };
     bool UwbInitiationTime{ false };

@@ -25,10 +25,185 @@ tagIsPresent(UwbCapability::ParameterTag tag, const encoding::TlvBer& tlv)
     });
 }
 
-TEST_CASE("sanity", "[basic]")
+struct TestUwbCapability
+{
+    static constexpr auto MultiNodeModesDefault = {
+        MultiNodeMode::OneToMany,
+    };
+
+    static constexpr auto DeviceRolesDefault = {
+        DeviceRole::Initiator,
+    };
+
+    static constexpr auto StsConfigurationsDefault = {
+        StsConfiguration::Static,
+        StsConfiguration::DynamicWithResponderSubSessionKey,
+    };
+
+    static constexpr auto RFrameConfigurationsDefault = {
+        StsPacketConfiguration::SP1,
+        StsPacketConfiguration::SP3,
+    };
+
+    // TODO: spec says "if omitted, AoA is supported". We've assumed "all"
+    // support, but this could be wrong. Double-check this with FiRa directly.
+    static constexpr auto AngleOfArrivalTypesDefault = {
+        AngleOfArrival::Azimuth90,
+        AngleOfArrival::Azimuth180,
+    };
+
+    static constexpr auto SchedulingModeTypesDefault = {
+        SchedulingMode::Time,
+    };
+
+    static constexpr auto RangingTimeStructsDefault = {
+        RangingMode::Block,
+    };
+
+    static constexpr auto RangingConfigurationsDefault = {
+        RangingConfiguration{ RangingMethod::OneWay, MeasurementReportMode::None },
+        RangingConfiguration{ RangingMethod::SingleSidedTwoWay, MeasurementReportMode::Deferred },
+    };
+
+    static constexpr auto ConvolutionalCodeConstraintLengthsDefault = {
+        ConvolutionalCodeConstraintLength::K3,
+        ConvolutionalCodeConstraintLength::K7,
+    };
+
+    static constexpr auto ChannelsDefault = {
+        Channel::C5,
+        Channel::C6,
+        Channel::C8,
+        Channel::C9
+    };
+
+    static constexpr auto BprfParameterSetsDefault = {
+        BprfParameter::Set1,
+        BprfParameter::Set2,
+        BprfParameter::Set5,
+        BprfParameter::Set6,
+    };
+
+    static constexpr auto HprfParameterSetsDefault = {
+        HprfParameter::Set1,
+        HprfParameter::Set2,
+        HprfParameter::Set3,
+        HprfParameter::Set4,
+        HprfParameter::Set5,
+        HprfParameter::Set6,
+        HprfParameter::Set7,
+        HprfParameter::Set35,
+    };
+
+    static constexpr uint32_t phyVersionDefault = 0xAABBCCDD;
+    static constexpr uint32_t macVersionDefault = 0xAABBCCEE;
+
+    uint32_t FiraPhyVersionRange{ phyVersionDefault };
+    uint32_t FiraMacVersionRange{ macVersionDefault };
+    static const bool ExtendedMacAddressDefault{ false };
+    static const bool UwbInitiationTimeDefault{ false };
+    static const bool AngleOfArrivalFomDefault{ false };
+    static const bool BlockStridingDefault{ true };
+    static const bool HoppingModeDefault{ true };
+
+    static const UwbCapability testTlv;
+
+    static const std::vector<uint8_t> phyRangeExpected;
+    static const std::vector<uint8_t> macRangeExpected;
+    static const std::vector<uint8_t> ExtendedMacAddressExpected;
+    static const std::vector<uint8_t> UwbInitiationTimeExpected;
+    static const std::vector<uint8_t> AngleOfArrivalFomExpected;
+    static const std::vector<uint8_t> BlockStridingExpected;
+    static const std::vector<uint8_t> HoppingModeExpected;
+    static const std::vector<uint8_t> MultiNodeModesExpected;
+    static const std::vector<uint8_t> DeviceRolesExpected;
+    static const std::vector<uint8_t> StsConfigurationsExpected;
+    static const std::vector<uint8_t> RFrameConfigurationsExpected;
+    static const std::vector<uint8_t> AngleOfArrivalTypesExpected;
+    static const std::vector<uint8_t> AoaSupportExpected;
+    static const std::vector<uint8_t> SchedulingModeTypesExpected;
+    static const std::vector<uint8_t> RangingTimeStructsExpected;
+    static const std::vector<uint8_t> RangingConfigurationsExpected;
+    static const std::vector<uint8_t> ConvolutionalCodeConstraintLengthsExpected;
+    static const std::vector<uint8_t> ChannelsExpected;
+    static const std::vector<uint8_t> BprfParameterSetsExpected;
+    static const std::vector<uint8_t> HprfParameterSetsExpected;
+
+    static const std::vector<std::tuple<UwbCapability::ParameterTag, std::vector<uint8_t>>>
+        tagAndExpected;
+};
+
+// TODO this test code is reliant on the bitmaps staying the same
+const std::vector<uint8_t> TestUwbCapability::phyRangeExpected{ 0xAA, 0xBB, 0xCC, 0xDD };
+const std::vector<uint8_t> TestUwbCapability::macRangeExpected{ 0xAA, 0xBB, 0xCC, 0xEE };
+const std::vector<uint8_t> TestUwbCapability::ExtendedMacAddressExpected{ 0 };
+const std::vector<uint8_t> TestUwbCapability::UwbInitiationTimeExpected{ 0 };
+const std::vector<uint8_t> TestUwbCapability::AngleOfArrivalFomExpected{ 0 };
+const std::vector<uint8_t> TestUwbCapability::BlockStridingExpected{ 1 };
+const std::vector<uint8_t> TestUwbCapability::HoppingModeExpected{ 1 };
+const std::vector<uint8_t> TestUwbCapability::MultiNodeModesExpected{ 0x02 };
+const std::vector<uint8_t> TestUwbCapability::DeviceRolesExpected{ 0x2 };
+const std::vector<uint8_t> TestUwbCapability::StsConfigurationsExpected{ 0x5 };
+const std::vector<uint8_t> TestUwbCapability::RFrameConfigurationsExpected{ 0xA };
+const std::vector<uint8_t> TestUwbCapability::AngleOfArrivalTypesExpected{ 0x3 };
+const std::vector<uint8_t> TestUwbCapability::AoaSupportExpected { 0x3 };
+const std::vector<uint8_t> TestUwbCapability::SchedulingModeTypesExpected{ 0x2 };
+const std::vector<uint8_t> TestUwbCapability::RangingTimeStructsExpected{ 0x1 };
+const std::vector<uint8_t> TestUwbCapability::RangingConfigurationsExpected{ 0x3 };
+const std::vector<uint8_t> TestUwbCapability::ConvolutionalCodeConstraintLengthsExpected{ 0x3 };
+const std::vector<uint8_t> TestUwbCapability::ChannelsExpected{ 0xF };
+const std::vector<uint8_t> TestUwbCapability::BprfParameterSetsExpected{ 0x33 };
+const std::vector<uint8_t> TestUwbCapability::HprfParameterSetsExpected{ 0x4, 0, 0, 0, 0x7F };
+
+const std::vector<std::tuple<UwbCapability::ParameterTag, std::vector<uint8_t>>>
+    TestUwbCapability::tagAndExpected = {
+        std::make_tuple(UwbCapability::ParameterTag::FiraPhyVersionRange, TestUwbCapability::phyRangeExpected),
+        std::make_tuple(UwbCapability::ParameterTag::FiraMacVersionRange, TestUwbCapability::macRangeExpected),
+        std::make_tuple(UwbCapability::ParameterTag::DeviceRoles, TestUwbCapability::DeviceRolesExpected),
+        std::make_tuple(UwbCapability::ParameterTag::RangingMethod, TestUwbCapability::RangingConfigurationsExpected),
+        std::make_tuple(UwbCapability::ParameterTag::StsConfig, TestUwbCapability::StsConfigurationsExpected),
+        std::make_tuple(UwbCapability::ParameterTag::MultiNodeMode, TestUwbCapability::MultiNodeModesExpected),
+        std::make_tuple(UwbCapability::ParameterTag::RangingMode, TestUwbCapability::RangingTimeStructsExpected),
+        std::make_tuple(UwbCapability::ParameterTag::ScheduledMode, TestUwbCapability::SchedulingModeTypesExpected),
+        std::make_tuple(UwbCapability::ParameterTag::HoppingMode, TestUwbCapability::HoppingModeExpected),
+        std::make_tuple(UwbCapability::ParameterTag::BlockStriding, TestUwbCapability::BlockStridingExpected),
+        std::make_tuple(UwbCapability::ParameterTag::UwbInitiationTime, TestUwbCapability::UwbInitiationTimeExpected),
+        std::make_tuple(UwbCapability::ParameterTag::Channels, TestUwbCapability::ChannelsExpected),
+        std::make_tuple(UwbCapability::ParameterTag::RFrameConfig, TestUwbCapability::RFrameConfigurationsExpected),
+        std::make_tuple(UwbCapability::ParameterTag::CcConstraintLength, TestUwbCapability::ConvolutionalCodeConstraintLengthsExpected),
+        std::make_tuple(UwbCapability::ParameterTag::BprfParameterSets, TestUwbCapability::BprfParameterSetsExpected),
+        std::make_tuple(UwbCapability::ParameterTag::HprfParameterSets, TestUwbCapability::HprfParameterSetsExpected),
+        std::make_tuple(UwbCapability::ParameterTag::AoaSupport, TestUwbCapability::AoaSupportExpected),
+        std::make_tuple(UwbCapability::ParameterTag::ExtendedMacAddress, TestUwbCapability::ExtendedMacAddressExpected),
+    };
+
+const UwbCapability
+    TestUwbCapability::testTlv = {
+        TestUwbCapability::phyVersionDefault,
+        TestUwbCapability::macVersionDefault,
+        TestUwbCapability::ExtendedMacAddressDefault,
+        TestUwbCapability::UwbInitiationTimeDefault,
+        TestUwbCapability::AngleOfArrivalFomDefault,
+        TestUwbCapability::BlockStridingDefault,
+        TestUwbCapability::HoppingModeDefault,
+        TestUwbCapability::MultiNodeModesDefault,
+        TestUwbCapability::DeviceRolesDefault,
+        TestUwbCapability::StsConfigurationsDefault,
+        TestUwbCapability::RFrameConfigurationsDefault,
+        TestUwbCapability::AngleOfArrivalTypesDefault,
+        TestUwbCapability::SchedulingModeTypesDefault,
+        TestUwbCapability::RangingTimeStructsDefault,
+        TestUwbCapability::RangingConfigurationsDefault,
+        TestUwbCapability::ConvolutionalCodeConstraintLengthsDefault,
+        TestUwbCapability::ChannelsDefault,
+        TestUwbCapability::BprfParameterSetsDefault,
+        TestUwbCapability::HprfParameterSetsDefault
+    };
+
+TEST_CASE("Encoding into a TlvBer", "[basic]")
 {
     // Convert a default-constructed UwbCapability object to an OOB data object (tlv).
-    auto tlv = UwbCapability{}.ToOobDataObject();
+    auto tlv = TestUwbCapability::testTlv.ToOobDataObject();
 
     // Validate tag is as expected.
     const auto tag = tlv->GetTag();
@@ -40,26 +215,23 @@ TEST_CASE("sanity", "[basic]")
 
     // Validate values are as expected.
     auto values = tlv->GetValues();
-    REQUIRE(values.size() == 1);
+    REQUIRE(values.size() == TestUwbCapability::tagAndExpected.size());
 
-    // Validate FiraPhyVersionRange parameter child tlv.
-    {
-        REQUIRE(tagIsPresent(UwbCapability::ParameterTag::FiraPhyVersionRange, *tlv));
-        auto tlvPhyRange = values[0];
-
-        // Validate tag.
-        auto phyRangeTag = tlvPhyRange.GetTag();
-        REQUIRE(tlvPhyRange.IsPrimitive());
-        REQUIRE(phyRangeTag.size() == 1);
-        REQUIRE(phyRangeTag[0] == notstd::to_underlying(UwbCapability::ParameterTag::FiraPhyVersionRange));
-
-        // Validate type is primitive.
-        REQUIRE(tlvPhyRange.IsPrimitive());
-
-        // Validate value.
-        auto phyRangeValue = tlvPhyRange.GetValue();
-        constexpr std::array<uint8_t, 4> phyRangeExpected{ 0xAA, 0xBB, 0xCC, 0xDD };
-        REQUIRE(std::equal(std::cbegin(phyRangeExpected), std::cend(phyRangeExpected), std::cbegin(phyRangeValue), std::cend(phyRangeValue)));
+    for (auto [tag, expected] : TestUwbCapability::tagAndExpected) {
+        // verify that the tag exists in the values
+        bool wefoundit = false;
+        for (auto subtlv : values) {
+            wefoundit = (subtlv.GetTag().size()==1) and (subtlv.GetTag()[0] ==  notstd::to_underlying(tag));
+            if (wefoundit) {
+                // validate the value
+                auto tlvValue = subtlv.GetValue();
+                REQUIRE(std::equal(std::cbegin(expected), std::cend(expected), std::cbegin(tlvValue), std::cend(tlvValue)));
+                break;
+            }
+        }
+        if(not wefoundit) {
+            REQUIRE(false);
+        }
     }
 }
 

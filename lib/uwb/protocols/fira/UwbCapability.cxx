@@ -134,7 +134,6 @@ const std::unordered_map<Channel, std::size_t> UwbCapability::ChannelsBit = {
     { Channel::C8, 2 },
     { Channel::C9, 3 },
     { Channel::C10, 4 },
-    { Channel::C11, 5 },
     { Channel::C12, 6 },
     { Channel::C13, 7 },
     { Channel::C14, 8 },
@@ -190,13 +189,13 @@ const std::unordered_map<HprfParameter, std::size_t> UwbCapability::HprfParamete
 /**
  * @brief Get the Bytes Big Endian From size_t
  * 
- * @param value the value to encode in big endian
+ * @param value the bitmap to encode
  * @param desiredLength the desired number of bytes in the encoding, padding with zeros if necessary. 
  *                      If the value is too large, this will only encode the lowest desiredLength bytes
  * @return std::vector<uint8_t> 
  */
 std::vector<uint8_t>
-GetBytesBigEndianFromSizeT(size_t value, int desiredLength)
+GetBytesBigEndianFromBitMap(size_t value, int desiredLength)
 {
     if (desiredLength > sizeof value) {
         throw std::runtime_error("desired length exceeds size_t width, this is a bug!");
@@ -210,27 +209,39 @@ GetBytesBigEndianFromSizeT(size_t value, int desiredLength)
         value >>= 8U;
     }
 
-    if constexpr (std::endian::native == std::endian::big) {
-        return bytes;
-    } else {
-        return {
+    return {
             std::make_move_iterator(std::rbegin(bytes)),
             std::make_move_iterator(std::rend(bytes))
         };
-    }
 }
 
-uint32_t
+/**
+ * @brief Get the Bytes Big Endian From size_t
+ * 
+ * @param value the number to encode in big endian
+ * @param desiredLength the desired number of bytes in the encoding, padding with zeros if necessary. 
+ *                      If the value is too large, this will only encode the lowest desiredLength bytes
+ * @return std::vector<uint8_t> 
+ */
+std::vector<uint8_t>
+GetBytesBigEndianFromSizeT(size_t value, int desiredLength)
+{
+    if(std::endian::native != std::endian::big)
+    {value = value & 0x000000FF << 24 | value & 0x0000FF00 << 8 | value & 0x00FF0000 >> 8 | value & 0xFF000000 >> 24;}
+    return GetBytesBigEndianFromBitMap(value,desiredLength);
+}
+
+size_t
 ReadSizeTFromBytesBigEndian(std::span<const uint8_t> bytes)
 {
-    uint32_t rvalue = 0;
+    size_t rvalue = 0;
 
     if (bytes.size() >= 8)
         return 0; // TODO throw error? this isn't really part of an interface so may not be necessary
 
     for (int i = 0; i < bytes.size(); i++) {
         rvalue += bytes[i];
-        rvalue <<= 8;
+        rvalue *= 0x100;
     }
     return rvalue;
 }
@@ -245,7 +256,7 @@ GetBitMaskFromBitIndex(size_t bitIndex)
     if (bitIndex >= 64) {
         return 0; // TODO throw error? this isn't really part of an interface so may not be necessary
     }
-    return 1 << bitIndex;
+    return 1UL << bitIndex;
 }
 
 /**
@@ -288,7 +299,7 @@ EncodeValuesAsBytes(const std::vector<T>& valueSet, const std::unordered_map<T, 
         auto bitIndex = unordered_map_lookup(bitIndexMap, value);
         valueSetEncoded |= GetBitMaskFromBitIndex(bitIndex);
     }
-    return GetBytesBigEndianFromSizeT(valueSetEncoded, desiredLength);
+    return GetBytesBigEndianFromBitMap(valueSetEncoded, desiredLength);
 }
 
 // TODO find a better place for this function
@@ -336,77 +347,77 @@ UwbCapability::ToOobDataObject() const
         builder.AddTlv(phyRangeTlv);
     }
 
-    // {
-    //     auto macRange = GetBytesBigEndianFromSizeT(FiraMacVersionRange, 4);
-    //     auto macRangeTlv = childbuilder.Reset()
-    //                            .SetTag(size_t(ParameterTag::FiraMacVersionRange))
-    //                            .SetValue(macRange)
-    //                            .Build();
-    //     builder.AddTlv(macRangeTlv);
-    // }
+    {
+        auto macRange = GetBytesBigEndianFromSizeT(FiraMacVersionRange, 4);
+        auto macRangeTlv = childbuilder.Reset()
+                               .SetTag(size_t(ParameterTag::FiraMacVersionRange))
+                               .SetValue(macRange)
+                               .Build();
+        builder.AddTlv(macRangeTlv);
+    }
 
-    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::DeviceRoles), DeviceRoles, UwbCapability::DeviceRoleBit, 1);
-    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RangingMethod), RangingConfigurations, UwbCapability::RangingConfigurationBit, 1);
-    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::StsConfig), StsConfigurations, UwbCapability::StsConfigurationBit, 1);
-    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::MultiNodeMode), MultiNodeModes, UwbCapability::MultiNodeModeBit, 1);
-    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RangingMode), RangingTimeStructs, UwbCapability::RangingModeBit, 1);
-    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::ScheduledMode), SchedulingModes, UwbCapability::SchedulingModeBit, 1);
-    // {
-    //     auto hoppingtlv = childbuilder.Reset()
-    //                           .SetTag(uint8_t(ParameterTag::HoppingMode))
-    //                           .SetValue(HoppingMode)
-    //                           .Build();
-    //     builder.AddTlv(hoppingtlv);
-    // }
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::DeviceRoles), DeviceRoles, UwbCapability::DeviceRoleBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RangingMethod), RangingConfigurations, UwbCapability::RangingConfigurationBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::StsConfig), StsConfigurations, UwbCapability::StsConfigurationBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::MultiNodeMode), MultiNodeModes, UwbCapability::MultiNodeModeBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RangingMode), RangingTimeStructs, UwbCapability::RangingModeBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::ScheduledMode), SchedulingModes, UwbCapability::SchedulingModeBit, 1);
+    {
+        auto hoppingtlv = childbuilder.Reset()
+                              .SetTag(uint8_t(ParameterTag::HoppingMode))
+                              .SetValue(HoppingMode)
+                              .Build();
+        builder.AddTlv(hoppingtlv);
+    }
 
-    // {
-    //     auto blocktlv = childbuilder.Reset()
-    //                         .SetTag(uint8_t(ParameterTag::BlockStriding))
-    //                         .SetValue(BlockStriding)
-    //                         .Build();
-    //     builder.AddTlv(blocktlv);
-    // }
+    {
+        auto blocktlv = childbuilder.Reset()
+                            .SetTag(uint8_t(ParameterTag::BlockStriding))
+                            .SetValue(BlockStriding)
+                            .Build();
+        builder.AddTlv(blocktlv);
+    }
 
-    // {
-    //     auto uwbtlv = childbuilder.Reset()
-    //                       .SetTag(uint8_t(ParameterTag::UwbInitiationTime))
-    //                       .SetValue(UwbInitiationTime)
-    //                       .Build();
-    //     builder.AddTlv(uwbtlv);
-    // }
+    {
+        auto uwbtlv = childbuilder.Reset()
+                          .SetTag(uint8_t(ParameterTag::UwbInitiationTime))
+                          .SetValue(UwbInitiationTime)
+                          .Build();
+        builder.AddTlv(uwbtlv);
+    }
 
-    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::Channels), Channels, UwbCapability::ChannelsBit, 1);
-    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RFrameConfig), RFrameConfigurations, UwbCapability::RFrameConfigurationBit, 1);
-    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::CcConstraintLength), ConvolutionalCodeConstraintLengths, UwbCapability::ConvolutionalCodeConstraintLengthsBit, 1);
-    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::BprfParameterSets), BprfParameterSets, UwbCapability::BprfParameterSetsBit, 1);
-    // ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::HprfParameterSets), HprfParameterSets, UwbCapability::HprfParameterSetsBit, 5);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::Channels), Channels, UwbCapability::ChannelsBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RFrameConfig), RFrameConfigurations, UwbCapability::RFrameConfigurationBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::CcConstraintLength), ConvolutionalCodeConstraintLengths, UwbCapability::ConvolutionalCodeConstraintLengthsBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::BprfParameterSets), BprfParameterSets, UwbCapability::BprfParameterSetsBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::HprfParameterSets), HprfParameterSets, UwbCapability::HprfParameterSetsBit, 5);
 
-    // {
-    //     size_t aoaEncoded = 0;
-    //     for (auto value : AngleOfArrivalTypes) {
-    //         // auto bitIndex = UwbCapability::AngleOfArrivalBit.at(value);
-    //         auto bitIndex = unordered_map_lookup(UwbCapability::AngleOfArrivalBit, value);
-    //         aoaEncoded |= GetBitMaskFromBitIndex(bitIndex);
-    //     }
-    //     if (AngleOfArrivalFom) {
-    //         aoaEncoded |= GetBitMaskFromBitIndex(UwbCapability::AngleOfArrivalFomBit);
-    //     }
+    {
+        size_t aoaEncoded = 0;
+        for (auto value : AngleOfArrivalTypes) {
+            // auto bitIndex = UwbCapability::AngleOfArrivalBit.at(value);
+            auto bitIndex = unordered_map_lookup(UwbCapability::AngleOfArrivalBit, value);
+            aoaEncoded |= GetBitMaskFromBitIndex(bitIndex);
+        }
+        if (AngleOfArrivalFom) {
+            aoaEncoded |= GetBitMaskFromBitIndex(UwbCapability::AngleOfArrivalFomBit);
+        }
 
-    //     auto aoaByte = GetBytesBigEndianFromSizeT(aoaEncoded, 1);
-    //     auto aoatlv = childbuilder.Reset()
-    //                       .SetTag(uint8_t(ParameterTag::AoaSupport))
-    //                       .SetValue(aoaByte)
-    //                       .Build();
-    //     builder.AddTlv(aoatlv);
-    // }
+        auto aoaByte = GetBytesBigEndianFromSizeT(aoaEncoded, 1);
+        auto aoatlv = childbuilder.Reset()
+                          .SetTag(uint8_t(ParameterTag::AoaSupport))
+                          .SetValue(aoaByte)
+                          .Build();
+        builder.AddTlv(aoatlv);
+    }
 
-    // {
-    //     auto mactlv = childbuilder.Reset()
-    //                       .SetTag(uint8_t(ParameterTag::ExtendedMacAddress))
-    //                       .SetValue(ExtendedMacAddress)
-    //                       .Build();
-    //     builder.AddTlv(mactlv);
-    // }
+    {
+        auto mactlv = childbuilder.Reset()
+                          .SetTag(uint8_t(ParameterTag::ExtendedMacAddress))
+                          .SetValue(ExtendedMacAddress)
+                          .Build();
+        builder.AddTlv(mactlv);
+    }
 
     *returnTlvBer = builder.Build();
     return returnTlvBer;
