@@ -619,7 +619,7 @@ public:
 public:
     bool operator==(const TlvBer&) const;
 
-private:
+public:
     TlvBer::Class m_class{ TlvBer::Class::Invalid };
     TlvBer::Type m_type{ TlvBer::Type::Primitive };
     uint32_t m_tagNumber{ 0 };

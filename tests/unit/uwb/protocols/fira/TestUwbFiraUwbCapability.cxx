@@ -106,7 +106,7 @@ struct TestUwbCapability
     static const bool BlockStridingDefault{ true };
     static const bool HoppingModeDefault{ true };
 
-    static const UwbCapability testTlv;
+    static const UwbCapability testUwbCapability;
 
     static const std::vector<uint8_t> phyRangeExpected;
     static const std::vector<uint8_t> macRangeExpected;
@@ -178,7 +178,7 @@ const std::vector<std::tuple<UwbCapability::ParameterTag, std::vector<uint8_t>>>
     };
 
 const UwbCapability
-    TestUwbCapability::testTlv = {
+    TestUwbCapability::testUwbCapability = {
         TestUwbCapability::phyVersionDefault,
         TestUwbCapability::macVersionDefault,
         TestUwbCapability::ExtendedMacAddressDefault,
@@ -203,7 +203,7 @@ const UwbCapability
 TEST_CASE("Encoding into a TlvBer", "[basic]")
 {
     // Convert a default-constructed UwbCapability object to an OOB data object (tlv).
-    auto tlv = TestUwbCapability::testTlv.ToOobDataObject();
+    auto tlv = TestUwbCapability::testUwbCapability.ToOobDataObject();
 
     // Validate tag is as expected.
     const auto tag = tlv->GetTag();
@@ -235,35 +235,70 @@ TEST_CASE("Encoding into a TlvBer", "[basic]")
     }
 }
 
-// TEST_CASE("uwb capability", "[basic][protocol]")
-// {
-//     SECTION("FromOobDataObject works with a default UwbCapability TlvBer")
-//     {
-//         UwbCapability defaultCapability;
-//         auto tlv = defaultCapability.ToOobDataObject();
-//         REQUIRE(tlv);
-//         for (const auto& value : tlv->GetValuesRef()) {
-//         }
-//         // check that all of the fields are represented in the tlv
-//         for (const auto& tag : UwbCapability::ParameterTags) {
-//             auto found = tagIsPresent(tag, *tlv);
-//             if (not found) {
-//                 REQUIRE(false);
-//             }
-//         }
+template <class T>
+bool
+leftIsSubset(const std::vector<T>& lhs, const std::vector<T>& rhs){
+    for(auto elem: lhs){
+        bool found = false;
+        for(auto elem2: rhs){
+            if(elem==elem2) found = true;
+        }
+        if(not found) return false;
+    }
+    return true;
+}
 
-//         UwbCapability newCapability;
-//         REQUIRE_NOTHROW(newCapability = UwbCapability::FromOobDataObject(*tlv));
-//         REQUIRE(newCapability.check(defaultCapability));
-//     }
+template <class T>
+bool
+leftUnorderedEquals(const std::vector<T>& lhs, const std::vector<T>& rhs){
+    return leftIsSubset(lhs,rhs) and leftIsSubset(rhs,lhs);
+}
 
-//     SECTION("FromOobDataObject correctly throws error with an invalid TlvBer tag")
-//     {
-//         UwbCapability defaultCapability;
-//         auto tlv = defaultCapability.ToOobDataObject();
+// TODO add this to the UwbCapability interface?
+bool UwbCapabilityEquals(const UwbCapability& left, const UwbCapability& right){
 
-//         encoding::TlvBer::Builder builder;
-//         builder.SetAsCopyOfTlv(*tlv)
-//             .SetTag(0xFF);
-//     }
-// }
+}
+
+TEST_CASE("Parsing from TlvBer", "[basic][protocol]")
+{
+    SECTION("FromOobDataObject correctly throws error with an invalid TlvBer tag")
+    {
+        auto tlv = TestUwbCapability::testUwbCapability.ToOobDataObject();
+
+        encoding::TlvBer::Builder builder;
+        auto invalidTlv = builder.SetAsCopyOfTlv(*tlv)
+                                .SetTag(0xFF)
+                                .Build();
+        REQUIRE_THROWS(UwbCapability::FromOobDataObject(invalidTlv));
+    }
+    SECTION("FromOobDataObject works")
+    {
+        auto tlv = TestUwbCapability::testUwbCapability.ToOobDataObject();
+        REQUIRE(tlv);
+        UwbCapability decodedCapability;
+        REQUIRE_NOTHROW(decodedCapability = UwbCapability::FromOobDataObject(*tlv));
+        REQUIRE(decodedCapability.FiraPhyVersionRange == TestUwbCapability::testUwbCapability.FiraPhyVersionRange);
+        REQUIRE(decodedCapability.FiraMacVersionRange == TestUwbCapability::testUwbCapability.FiraMacVersionRange);
+        REQUIRE(leftUnorderedEquals(decodedCapability.DeviceRoles,TestUwbCapability::testUwbCapability.DeviceRoles));
+        REQUIRE(leftUnorderedEquals(decodedCapability.RangingConfigurations,TestUwbCapability::testUwbCapability.RangingConfigurations));
+        REQUIRE(leftUnorderedEquals(decodedCapability.StsConfigurations,TestUwbCapability::testUwbCapability.StsConfigurations));
+        REQUIRE(leftUnorderedEquals(decodedCapability.MultiNodeModes,TestUwbCapability::testUwbCapability.MultiNodeModes));
+        REQUIRE(leftUnorderedEquals(decodedCapability.RangingTimeStructs,TestUwbCapability::testUwbCapability.RangingTimeStructs));
+        REQUIRE(leftUnorderedEquals(decodedCapability.SchedulingModes,TestUwbCapability::testUwbCapability.SchedulingModes));
+        REQUIRE(decodedCapability.HoppingMode == TestUwbCapability::testUwbCapability.HoppingMode);
+        REQUIRE(decodedCapability.BlockStriding == TestUwbCapability::testUwbCapability.BlockStriding);
+        REQUIRE(decodedCapability.UwbInitiationTime == TestUwbCapability::testUwbCapability.UwbInitiationTime);
+
+        REQUIRE(leftUnorderedEquals(decodedCapability.Channels,TestUwbCapability::testUwbCapability.Channels));
+        REQUIRE(leftUnorderedEquals(decodedCapability.RFrameConfigurations,TestUwbCapability::testUwbCapability.RFrameConfigurations));
+        REQUIRE(leftUnorderedEquals(decodedCapability.ConvolutionalCodeConstraintLengths,TestUwbCapability::testUwbCapability.ConvolutionalCodeConstraintLengths));
+        REQUIRE(leftUnorderedEquals(decodedCapability.BprfParameterSets,TestUwbCapability::testUwbCapability.BprfParameterSets));
+        REQUIRE(leftUnorderedEquals(decodedCapability.HprfParameterSets,TestUwbCapability::testUwbCapability.HprfParameterSets));
+        REQUIRE(leftUnorderedEquals(decodedCapability.AngleOfArrivalTypes,TestUwbCapability::testUwbCapability.AngleOfArrivalTypes));
+
+        REQUIRE(decodedCapability.AngleOfArrivalFom == TestUwbCapability::testUwbCapability.AngleOfArrivalFom);
+        REQUIRE(decodedCapability.ExtendedMacAddress == TestUwbCapability::testUwbCapability.ExtendedMacAddress);
+
+
+    }
+}
