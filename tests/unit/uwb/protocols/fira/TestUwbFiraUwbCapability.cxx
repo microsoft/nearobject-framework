@@ -240,16 +240,11 @@ template <class T>
 bool
 leftIsSubset(const std::vector<T>& lhs, const std::vector<T>& rhs)
 {
-    for (auto elem : lhs) {
-        bool found = false;
-        for (auto elem2 : rhs) {
-            if (elem == elem2)
-                found = true;
-        }
-        if (not found)
-            return false;
-    }
-    return true;
+    return std::ranges::any_of(lhs, [&rhs](auto elem) {
+        return std::ranges::any_of(rhs, [elem](auto elem2) {
+            return elem == elem2;
+        });
+    });
 }
 
 template <class T>
