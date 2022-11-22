@@ -206,37 +206,13 @@ public:
         return m_value;
     }
 
-    std::vector<uint8_t>&
-    GetValueRef() noexcept
-    {
-        return m_value;
-    };
-
-    const std::vector<uint8_t>&
-    GetValueRef() const noexcept
-    {
-        return m_value;
-    };
-
     /**
      * @brief Get the Values object. Returns empty if this object is Primitive
      * 
      * @return const std::vector<TlvBer> 
      */
-    std::vector<TlvBer>
-    GetValues() const noexcept;
-
-    std::vector<TlvBer>&
-    GetValuesRef() noexcept
-    {
-        return m_valuesConstructed;
-    }
-
     const std::vector<TlvBer>&
-    GetValuesRef() const noexcept
-    {
-        return m_valuesConstructed;
-    }
+    GetValues() const noexcept;
 
     /**
      * @brief Parses the tag portion of a BER-TLV from the specified buffer.

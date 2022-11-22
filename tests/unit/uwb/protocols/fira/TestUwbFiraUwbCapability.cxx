@@ -19,7 +19,7 @@ using encoding::TlvBer;
 bool
 tagIsPresent(UwbCapability::ParameterTag tag, const encoding::TlvBer& tlv)
 {
-    return std::ranges::any_of(tlv.GetValuesRef(), [&tag](const auto& subTlv) {
+    return std::ranges::any_of(tlv.GetValues(), [&tag](const auto& subTlv) {
         const auto subTlvTag = subTlv.GetTag();
         return (subTlvTag.size() == 1) && (subTlvTag[0] == notstd::to_underlying(tag));
     });
