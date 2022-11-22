@@ -5,7 +5,9 @@
 #include <string>
 #include <vector>
 
+// NB: This must come before any other Windows include
 #include <windows.h>
+
 #include <guiddef.h>
 
 namespace windows

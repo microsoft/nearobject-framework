@@ -22,10 +22,10 @@ NearObjectIdentityToken::ToString() const
     const auto& token = GetToken();
 
     tokenStr << std::hex;
-    for (const auto& b : token.first(token.size()-1)) { 
-        tokenStr << +b << ':'; 
+    for (const auto& b : token.first(token.size() - 1)) {
+        tokenStr << +b << ':';
     }
-    tokenStr << +token[token.size()-1];
+    tokenStr << +token[token.size() - 1];
 
     return tokenStr.str();
 }

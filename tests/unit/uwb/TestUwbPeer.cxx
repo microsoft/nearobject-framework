@@ -18,7 +18,7 @@ const std::array<UwbPeer, 2> PeersRandom = {
     UwbPeer{ UwbMacAddressesRandom[0] },
     UwbPeer{ UwbMacAddressesRandom[1] },
 };
-}
+} // namespace uwb::test
 
 TEST_CASE("uwb peer objects can be created", "[basic]")
 {
@@ -37,7 +37,9 @@ TEST_CASE("uwb peer objects can be created", "[basic]")
 
         for (const auto& macAddress : test::UwbMacAddressesRandom) {
             auto peer = std::make_unique<UwbPeer>(macAddress);
-            REQUIRE_NOTHROW([&]{ peer.reset(); });
+            REQUIRE_NOTHROW([&] {
+                peer.reset();
+            });
         }
     }
 }
@@ -120,6 +122,8 @@ TEST_CASE("uwb peer spatial properties can be created", "[basic]")
     SECTION("destruction doesn't cause a crash")
     {
         auto spatialProperties = std::make_unique<UwbPeerSpatialProperties>();
-        REQUIRE_NOTHROW([&]{ spatialProperties.reset(); });
+        REQUIRE_NOTHROW([&] {
+            spatialProperties.reset();
+        });
     }
 }

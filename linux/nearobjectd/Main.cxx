@@ -57,10 +57,8 @@ main(int argc, char *argv[])
     // TODO: add discovery agent(s)
 
     // Create service.
-    auto service = NearObjectService::Create({
-        std::move(profileManager),
-        std::move(deviceManager)
-    });
+    auto service = NearObjectService::Create({ std::move(profileManager),
+        std::move(deviceManager) });
 
     // Start service runtime.
     ServiceRuntime nearObjectServiceRuntime{};
@@ -68,8 +66,8 @@ main(int argc, char *argv[])
 
     // Daemonize, if requested.
     if (configuration.RunInBackground) {
-        constexpr int nochdir = 0;  // Change current working directory to /
-        constexpr int noclose = 0;  // Don't redirect stdin, stdout to /dev/null
+        constexpr int nochdir = 0; // Change current working directory to /
+        constexpr int noclose = 0; // Don't redirect stdin, stdout to /dev/null
         if (daemon(nochdir, noclose) != 0) {
             int error = errno;
             const std::string what = "failed to daemonize (error=" + std::to_string(error) + ")";

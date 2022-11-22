@@ -12,11 +12,10 @@
 
 namespace uwb::test
 {
-struct UwbDeviceTestBase 
-    : public uwb::UwbDevice
+struct UwbDeviceTestBase : public uwb::UwbDevice
 {
-    explicit UwbDeviceTestBase(uint16_t id) 
-        : Id(id)
+    explicit UwbDeviceTestBase(uint16_t id) :
+        Id(id)
     {}
 
     uint16_t Id;
@@ -34,8 +33,7 @@ struct UwbDeviceTestBase
     }
 };
 
-struct UwbDeviceTestDerivedOne 
-    : UwbDeviceTestBase
+struct UwbDeviceTestDerivedOne : UwbDeviceTestBase
 {
     explicit UwbDeviceTestDerivedOne(uint8_t id) :
         UwbDeviceTestBase(static_cast<uint16_t>(id) << 8)
@@ -49,8 +47,7 @@ struct UwbDeviceTestDerivedOne
         return (this->Id == rhs.Id);
     }
 };
-struct UwbDeviceTestDerivedTwo
-    : UwbDeviceTestBase
+struct UwbDeviceTestDerivedTwo : UwbDeviceTestBase
 {
     explicit UwbDeviceTestDerivedTwo(uint8_t id) :
         UwbDeviceTestBase(static_cast<uint16_t>(id))
@@ -72,8 +69,8 @@ TEST_CASE("uwb devices can be compared for equality", "[basic]")
 
     SECTION("identical devices compare equal directly")
     {
-        test::UwbDeviceTestDerivedOne uwbDeviceInstanceOne{1};
-        test::UwbDeviceTestDerivedOne uwbDeviceInstanceTwo{1};
+        test::UwbDeviceTestDerivedOne uwbDeviceInstanceOne{ 1 };
+        test::UwbDeviceTestDerivedOne uwbDeviceInstanceTwo{ 1 };
         REQUIRE(uwbDeviceInstanceOne == uwbDeviceInstanceTwo);
     }
 
@@ -86,8 +83,8 @@ TEST_CASE("uwb devices can be compared for equality", "[basic]")
 
     SECTION("devices of different type compare unequal directly")
     {
-        test::UwbDeviceTestDerivedOne uwbDeviceOne{1};
-        test::UwbDeviceTestDerivedTwo uwbDeviceTwo{1};
+        test::UwbDeviceTestDerivedOne uwbDeviceOne{ 1 };
+        test::UwbDeviceTestDerivedTwo uwbDeviceTwo{ 1 };
         REQUIRE(uwbDeviceTwo != uwbDeviceOne);
     }
 
@@ -100,8 +97,8 @@ TEST_CASE("uwb devices can be compared for equality", "[basic]")
 
     SECTION("devices of same type but different instance compare unequal directly")
     {
-        test::UwbDeviceTestDerivedOne uwbDeviceInstanceOne{1};
-        test::UwbDeviceTestDerivedOne uwbDeviceInstanceTwo{2};
+        test::UwbDeviceTestDerivedOne uwbDeviceInstanceOne{ 1 };
+        test::UwbDeviceTestDerivedOne uwbDeviceInstanceTwo{ 2 };
         REQUIRE(uwbDeviceInstanceOne != uwbDeviceInstanceTwo);
     }
 
@@ -114,8 +111,8 @@ TEST_CASE("uwb devices can be compared for equality", "[basic]")
 
     SECTION("equal and not equal checks produce logically consistent values directly")
     {
-        test::UwbDeviceTestDerivedOne uwbDeviceInstanceOne{1};
-        test::UwbDeviceTestDerivedOne uwbDeviceInstanceTwo{1};
+        test::UwbDeviceTestDerivedOne uwbDeviceInstanceOne{ 1 };
+        test::UwbDeviceTestDerivedOne uwbDeviceInstanceTwo{ 1 };
         REQUIRE(uwbDeviceInstanceOne == uwbDeviceInstanceTwo);
         REQUIRE(!(uwbDeviceInstanceOne != uwbDeviceInstanceTwo));
     }

@@ -47,7 +47,8 @@ protected:
 struct NearObjectDeviceTest :
     public NearObjectDeviceController
 {
-    explicit NearObjectDeviceTest(uint64_t deviceId) : DeviceId(deviceId)
+    explicit NearObjectDeviceTest(uint64_t deviceId) :
+        DeviceId(deviceId)
     {}
 
     StartSessionResult

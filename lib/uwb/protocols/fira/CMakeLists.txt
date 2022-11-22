@@ -1,4 +1,4 @@
-add_library(uwb-proto-fira)
+add_library(uwb-proto-fira STATIC "")
 
 set(UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE ${UWB_DIR_PUBLIC_INCLUDE})
 set(UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX ${UWB_DIR_PUBLIC_INCLUDE}/uwb/protocols/fira)

@@ -4,7 +4,9 @@
 
 #include <cstdint>
 
+// NB: This must come before any other Windows include
 #include <windows.h>
+
 #include <wil/resource.h>
 
 #include <uwb/UwbMacAddress.hxx>
@@ -15,7 +17,6 @@ namespace windows
 {
 namespace devices
 {
-
 /**
  * @brief Windows concrete implementation of a UWB session. 
  */

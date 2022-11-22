@@ -26,6 +26,6 @@ to_json(nlohmann::json& json, const UwbMacAddress& uwbMacAddress);
 void
 from_json(const nlohmann::json& json, UwbMacAddress& uwbMacAddress);
 
-} // namespace nearobject
+} // namespace uwb
 
 #endif // UWB_MAC_ADDRESS_JSON_SERIALIZER_HXX

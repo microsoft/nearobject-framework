@@ -16,10 +16,10 @@ struct NearObjectSessionIdGeneratorRandom :
     public NearObjectSessionIdGenerator
 {
     uint32_t
-    GetNext() noexcept override;   
+    GetNext() noexcept override;
 
 private:
-    std::mt19937 m_generator{std::random_device{}()};
+    std::mt19937 m_generator{ std::random_device{}() };
     std::uniform_int_distribution<uint32_t> m_distribution{};
 };
 } //namespace nearobject::service

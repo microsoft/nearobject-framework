@@ -1,39 +1,48 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(nearobject-framework LANGUAGES CXX)
+option(NOF_OFFICIAL_BUILD "Configure the project for an official build" OFF)
 
 # Configuration option for using vcpkg to satisfy source package dependencies.
 # This must be set to ON for official Windows builds.
-option(USE_VCPKG "Use vcpkg for obtaining source dependencies" OFF)
+option(NOF_USE_VCPKG "Use vcpkg for obtaining source dependencies" OFF)
+
+# Select source package dependency manager based on selected option.
+# This must occur prior to the first project() statement.
+if (NOF_USE_VCPKG)
+  if (NOT NOF_OFFICIAL_BUILD)
+    find_package(Git REQUIRED)
+    set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg)
+
+    # Initialize vcpkg sub-module if not already done.
+    if (NOT EXISTS ${VCPKG_SUBMODULE_ROOT}/.git)
+      execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive -- ${VCPKG_SUBMODULE_ROOT}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR} 
+        COMMAND_ERROR_IS_FATAL ANY)
+    endif()
+
+    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "vcpkg toolchain file")
+  endif()
+  MESSAGE(STATUS "using vcpkg for source dependencies")
+else()
+  MESSAGE(STATUS "using FetchContent for source dependencies")
+endif()
+
+project(nearobject-framework LANGUAGES CXX)
 
 # Conditional inclusion of OS-dependent source trees.
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
   set(BUILD_FOR_LINUX TRUE)
-  MESSAGE(STATUS "Target OS Linux detected")
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
   set(BUILD_FOR_WINDOWS TRUE)
-  MESSAGE(STATUS "Target OS Windows detected")
 else ()
   MESSAGE(FATAL_ERROR "No supported target OS detected, SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
 endif()
 
-# Select source package dependency manager based on selected option.
-# This must occur prior to the first project() statement.
-if (USE_VCPKG)
-  find_package(Git REQUIRED)
-  set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg)
+MESSAGE(STATUS "Target OS ${CMAKE_SYSTEM_NAME} detected")
 
-  # Initialize vcpkg sub-module if not already done.
-  if (NOT EXISTS ${VCPKG_SUBMODULE_ROOT}/.git)
-    execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive -- ${VCPKG_SUBMODULE_ROOT}
-      WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR} 
-      COMMAND_ERROR_IS_FATAL ANY)
-  endif()
-
-  set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
-  MESSAGE(STATUS "using vcpkg for source dependencies")
-else()
-  MESSAGE(STATUS "using FetchContent for source dependencies")
+# Ensure FetchContent-based dependencies are rebuilt if their URL changes.
+if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
+  cmake_policy(SET CMP0135 NEW)
 endif()
 
 # Set language configutation options. The C++ standard used must be the lowest
@@ -49,6 +58,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED 1)
 
 include(CTest)
+include(GNUInstallDirs)
 include(FetchContent)
 
 # Set external dependency target versions.
@@ -58,7 +68,7 @@ set(VERSION_CLI11 2.2.0)
 set(VERSION_CATCH2 3.1.0)
 
 # Pull in external dependencies.
-if (USE_VCPKG)
+if (NOF_USE_VCPKG)
   set(nlohmann-json_IMPLICIT_CONVERSIONS OFF)
   find_package(nlohmann_json CONFIG ${VERSION_NLOHMANN_JSON} REQUIRED)
   find_package(magic_enum CONFIG ${VERSION_MAGIC_ENUM} REQUIRED)
@@ -100,7 +110,7 @@ elseif (BUILD_FOR_WINDOWS)
   set(WIL_BUILD_TESTS OFF CACHE INTERNAL "Turn off wil tests")
   set(WIL_BUILD_PACKAGING OFF CACHE INTERNAL "Turn off wil packaging")
 
-  if (USE_VCPKG)
+  if (NOF_USE_VCPKG)
     find_package(wil CONFIG REQUIRED)
   else()
     FetchContent_Declare(WIL
@@ -122,5 +132,9 @@ elseif (BUILD_FOR_WINDOWS)
 endif()
 
 add_subdirectory(lib)
-add_subdirectory(tests)
 add_subdirectory(tools)
+
+if (NOT NOF_DISABLE_TESTS)
+  add_subdirectory(tests)
+endif()
+

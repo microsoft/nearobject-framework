@@ -5,5 +5,4 @@
 
 TEST_CASE("secure ranging info placeholder", "[basic]")
 {
-
 }

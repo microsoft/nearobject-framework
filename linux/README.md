@@ -5,9 +5,9 @@ framework.
 
 # Development Environment Setup
 
- As described in the main project [`README`](/README.md), a C++ 20 compiler and CMake are required. So, any distribution satisfying these requirements may be used. A known working environment is ubuntu 22.04 (jammy) with a few development packages. Instructions for setting up this environment are provided below.
+As described in the main project [`README`](/README.md), a C++ 20 compiler and CMake are required. So, any distribution satisfying these requirements may be used. A known working environment is ubuntu 22.04 (jammy) with a few development packages. Instructions for setting up this environment are provided below.
 
- ## 1. Install Ubuntu 22.04 (jammy)
+## 1. Install Ubuntu 22.04 (jammy)
 
 If development on Windows is desired, ubuntu may be installed in WSL using a rootfs image. To install WSL, refer to [https://learn.microsoft.com/en-us/windows/wsl/install](https://learn.microsoft.com/en-us/windows/wsl/install). This will install a default version of ubuntu from the store, which can be removed by running `wsl --unregister Ubuntu`. Follow these steps to install jammy on WSL:
 

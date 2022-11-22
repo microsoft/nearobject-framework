@@ -55,10 +55,10 @@ public:
          * 
          * @param taskQueue 
          */
-        explicit dispatcher(task_queue &task_queue);
+        explicit dispatcher(task_queue& task_queue);
 
     private:
-        task_queue &m_task_queue;
+        task_queue& m_task_queue;
     };
 
 public:
@@ -84,8 +84,10 @@ public:
      */
     task_queue(const task_queue&) = delete;
     task_queue(task_queue&&) = delete;
-    task_queue& operator=(const task_queue&) = delete;
-    task_queue& operator=(task_queue&&) = delete;
+    task_queue&
+    operator=(const task_queue&) = delete;
+    task_queue&
+    operator=(task_queue&&) = delete;
 
     /**
      * @brief The action to apply to pending tasks.

@@ -26,7 +26,21 @@ target_link_libraries(windevuwb
     PUBLIC
         cfgmgr32.lib
         uwb
-        WIL
+        WIL::WIL
+)
+
+list(APPEND WINDEVUWB_PUBLIC_HEADERS
+    ${WINDEVUWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDevice.hxx
+    ${WINDEVUWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceDriver.hxx
+    ${WINDEVUWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSession.hxx
 )
 
 set_target_properties(windevuwb PROPERTIES FOLDER windows/devices)
+set_target_properties(windevuwb PROPERTIES PUBLIC_HEADER "${WINDEVUWB_PUBLIC_HEADERS}")
+
+install(
+    TARGETS windevuwb 
+    EXPORT uwb
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)

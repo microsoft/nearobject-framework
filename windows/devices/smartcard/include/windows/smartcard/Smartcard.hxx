@@ -14,7 +14,6 @@ namespace windows
 {
 namespace devices
 {
-
 /**
  * @brief Helper class to interact with Windows SmartCards using the Windows SmartCard DDI:
  * https://msdn.microsoft.com/en-us/library/windows/hardware/dn905601(v=vs.85).aspx

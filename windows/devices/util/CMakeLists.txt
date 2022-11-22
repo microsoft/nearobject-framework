@@ -20,7 +20,7 @@ target_include_directories(windevutil
 target_link_libraries(windevutil
     PUBLIC
         cfgmgr32.lib
-        WIL
+        WIL::WIL
 )
 
 set_target_properties(windevutil PROPERTIES FOLDER windows/devices)

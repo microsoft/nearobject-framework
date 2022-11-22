@@ -46,7 +46,7 @@ UwbSession::AddPeerImpl(uwb::UwbMacAddress /* peerMacAddress */)
     //
     // TODO: request UWB-CLX to update controlee list per below pseudo-code,
     // which is *very* rough and some parts probably plain wrong:
-    // 
+    //
     const auto macAddressLength = m_uwbMacAddressSelf.GetLength();
     const auto macAddressessLength = macAddressLength * m_peers.size();
 
@@ -55,7 +55,7 @@ UwbSession::AddPeerImpl(uwb::UwbMacAddress /* peerMacAddress */)
     // TODO: all other memory required for this structure must be accounted for, the above calculation was left incomplete.
     // Also, proper memory alignment of trailing structures in the allocated buffer has not been taken into account.
     auto appConfigParamsBuffer = std::make_unique<uint8_t[]>(appConfigParamsSize);
-    auto *appConfigParams = reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS*>(appConfigParamsBuffer.get());
+    auto *appConfigParams = reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS *>(appConfigParamsBuffer.get());
     appConfigParams->sessionId = GetId();
     appConfigParams->appConfigParamsCount = 2;
     UWB_APP_CONFIG_PARAM *appConfigParamList = reinterpret_cast<UWB_APP_CONFIG_PARAM *>(appConfigParams + 1);
@@ -63,7 +63,7 @@ UwbSession::AddPeerImpl(uwb::UwbMacAddress /* peerMacAddress */)
     UWB_APP_CONFIG_PARAM *appConfigParamDstMacAddress = appConfigParamList + 1;
 
     // Populate NUMBER_OF_CONTROLEES app configuration parameter.
-    auto& numberOfControleesPayload = *reinterpret_cast<uint8_t *>(appConfigParamNumberOfControlees + 1);
+    auto &numberOfControleesPayload = *reinterpret_cast<uint8_t *>(appConfigParamNumberOfControlees + 1);
     appConfigParamNumberOfControlees->paramType = UWB_APP_CONFIG_PARAM_TYPE_NUMBER_OF_CONTROLEES;
     appConfigParamNumberOfControlees->paramLength = 1;
     numberOfControleesPayload = static_cast<uint8_t>(m_peers.size());
@@ -73,7 +73,7 @@ UwbSession::AddPeerImpl(uwb::UwbMacAddress /* peerMacAddress */)
     appConfigParamDstMacAddress->paramType = UWB_APP_CONFIG_PARAM_TYPE_DST_MAC_ADDRESS;
     appConfigParamDstMacAddress->paramLength = static_cast<uint32_t>(macAddressessLength);
     auto dstMacAddress = dstMacAddressPayload;
-    for (const auto& peer : m_peers) {
+    for (const auto &peer : m_peers) {
         const auto value = peer.GetValue();
         std::copy(std::cbegin(value), std::cend(value), dstMacAddress);
         std::advance(dstMacAddress, std::size(value));

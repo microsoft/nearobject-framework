@@ -1,7 +1,7 @@
 
-#include <nearobject/service/NearObjectService.hxx>
 #include <nearobject/service/NearObjectDeviceControllerManager.hxx>
 #include <nearobject/service/NearObjectProfileManager.hxx>
+#include <nearobject/service/NearObjectService.hxx>
 #include <nearobject/service/NearObjectSessionIdGeneratorRandom.hxx>
 
 #include <notstd/memory.hxx>

@@ -9,7 +9,7 @@ ServiceRuntime::~ServiceRuntime()
     Stop();
 
     if (m_threadMain.joinable()) {
-        m_threadMain.join(); 
+        m_threadMain.join();
     }
 }
 

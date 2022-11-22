@@ -26,8 +26,10 @@ public:
     virtual ~NearObjectDeviceController() = default;
     NearObjectDeviceController(NearObjectDeviceController&) = delete;
     NearObjectDeviceController(NearObjectDeviceController&&) = delete;
-    NearObjectDeviceController& operator=(NearObjectDeviceController&) = delete;
-    NearObjectDeviceController& operator=(NearObjectDeviceController&&) = delete;
+    NearObjectDeviceController&
+    operator=(NearObjectDeviceController&) = delete;
+    NearObjectDeviceController&
+    operator=(NearObjectDeviceController&&) = delete;
 
     /**
      * @brief Construct a new NearObjectDeviceController object.

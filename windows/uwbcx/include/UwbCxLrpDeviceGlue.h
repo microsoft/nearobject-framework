@@ -2,6 +2,8 @@
 #ifndef UWBCX_LRP_DEVICE_GLUE_H
 #define UWBCX_LRP_DEVICE_GLUE_H
 
+// clang-format off
+
 /**
  * Definitions below copied from the Windows WDK; these must eventually be
  * removed and the project targeted to use the proper headers from the installed
@@ -15,7 +17,11 @@
     ((DeviceType) << 16) | ((Access) << 14) | ((Function) << 2) | (Method) \
 )
 
+// NB: This must come before any other Windows include
 #include <windows.h>
+
 #include <UwbCxLrpDevice.h>
+
+// clang-format on
 
 #endif // UWBCX_LRP_DEVICE_GLUE_H

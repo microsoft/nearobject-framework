@@ -5,5 +5,4 @@
 
 TEST_CASE("regulatory info placeholder", "[basic]")
 {
-
 }

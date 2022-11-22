@@ -1,10 +1,10 @@
 
 #include <algorithm>
+#include <chrono>
 #include <iterator>
 
 #include <nearobject/NearObjectSession.hxx>
 #include <nearobject/NearObjectSessionEventCallbacks.hxx>
-#include <chrono>
 
 using namespace std::chrono_literals;
 using namespace nearobject;
@@ -95,8 +95,8 @@ NearObjectSession::RemoveNearObjects(std::vector<std::shared_ptr<NearObject>> ne
     // partition) and ones that should be removed (second partition), keeping
     // their relative order (stable). std::stable_partition returns an iterator
     // to the beginning of the second partition.
-    auto nearObjectsRemoved = std::stable_partition(std::begin(m_nearObjects), std::end(m_nearObjects), [&](const auto nearObjectToCheck) { 
-        return std::none_of(std::cbegin(nearObjectsToRemove), std::cend(nearObjectsToRemove), [&](const auto& nearObjectToRemove){
+    auto nearObjectsRemoved = std::stable_partition(std::begin(m_nearObjects), std::end(m_nearObjects), [&](const auto nearObjectToCheck) {
+        return std::none_of(std::cbegin(nearObjectsToRemove), std::cend(nearObjectsToRemove), [&](const auto& nearObjectToRemove) {
             return (nearObjectToCheck == nearObjectToRemove);
         });
     });

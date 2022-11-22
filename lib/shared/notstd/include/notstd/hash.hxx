@@ -24,7 +24,7 @@ namespace notstd
  * @param values The remaining values to hash.
  */
 template <typename T, typename... ValuesRemaining>
-inline void 
+inline void
 hash_combine(std::size_t& seed, const T& value, ValuesRemaining... values)
 {
     seed ^= std::hash<T>{}(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
@@ -61,8 +61,8 @@ hash_range(std::size_t& seed, Iterator first, Iterator last)
  * @param last The iterator referring to the end of the range.
  * @return std::size_t 
  */
-template<typename Iterator> 
-std::size_t 
+template <typename Iterator>
+std::size_t
 hash_range(Iterator first, Iterator last)
 {
     size_t seed = 0;

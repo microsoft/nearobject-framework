@@ -5,5 +5,4 @@
 
 TEST_CASE("controlee preference placeholder", "[basic]")
 {
-
 }

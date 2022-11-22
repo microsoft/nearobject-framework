@@ -65,7 +65,7 @@ FromUwbCx(const UWB_DEVICE_CAPABILITIES& uwbDeviceCapabilities)
             break;
         }
         case UWB_CAPABILITY_PARAM_TYPE_PHY_VERSION_RANGE: {
-            const auto  value = *reinterpret_cast<const uint32_t*>(&capability.paramValue);
+            const auto value = *reinterpret_cast<const uint32_t*>(&capability.paramValue);
             uwbCapability.FiraPhyVersionRange = value;
             break;
         }
@@ -160,7 +160,7 @@ FromUwbCx(const UWB_DEVICE_CAPABILITIES& uwbDeviceCapabilities)
         default:
             // ignore unknown parameter tags
             break;
-        }        
+        }
     }
 
     return uwbCapability;
@@ -221,7 +221,7 @@ UwbDevice::CreateSession(uint32_t sessionId, std::weak_ptr<uwb::UwbSessionEventC
 }
 
 uwb::protocol::fira::UwbCapability
-UwbDevice::GetCapabilities() const 
+UwbDevice::GetCapabilities() const
 {
     // Determine the amount of memory required for the UWB_DEVICE_CAPABILITIES from the driver.
     DWORD bytesRequired = 0;

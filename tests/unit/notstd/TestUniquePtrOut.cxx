@@ -7,7 +7,8 @@
 
 namespace test
 {
-struct Thing {};
+struct Thing
+{};
 struct ThingFactory
 {
     Thing*

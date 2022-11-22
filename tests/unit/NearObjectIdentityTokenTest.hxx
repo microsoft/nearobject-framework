@@ -9,12 +9,12 @@
 
 namespace nearobject::test
 {
-struct NearObjectIdentityTokenTest : 
+struct NearObjectIdentityTokenTest :
     public NearObjectIdentityToken
 {
-    explicit NearObjectIdentityTokenTest(std::array<const uint8_t, 4> data = std::array<const uint8_t, 4>{0,0,0,0})  : 
-        m_data{data},
-        m_value{m_data}
+    explicit NearObjectIdentityTokenTest(std::array<const uint8_t, 4> data = std::array<const uint8_t, 4>{ 0, 0, 0, 0 }) :
+        m_data{ data },
+        m_value{ m_data }
     {}
 
     std::span<const uint8_t>

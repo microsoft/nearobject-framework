@@ -5,7 +5,9 @@
 #include <memory>
 #include <string>
 
+// NB: This must come before any other Windows include
 #include <windows.h>
+
 #include <cfgmgr32.h>
 #include <wil/resource.h>
 
@@ -22,7 +24,6 @@ namespace windows
 {
 namespace devices
 {
-
 /**
  * @brief Helper class to interact with Windows UWB devices using the Windows
  * UWB DDI. The DDI is to be determined.

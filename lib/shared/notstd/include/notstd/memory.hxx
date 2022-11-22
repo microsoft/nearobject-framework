@@ -22,10 +22,10 @@ namespace notstd
  * @tparam T The type to allow std::make_unique or std::make_shared access to
  * the protected constructor.
  */
-template<typename BaseT>
+template <typename BaseT>
 struct enable_make_protected : public BaseT
 {
-    template<typename... TArgs>
+    template <typename... TArgs>
     explicit enable_make_protected(TArgs&&... args) :
         BaseT(std::forward<TArgs>(args)...)
     {}
