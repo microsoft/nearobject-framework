@@ -196,6 +196,12 @@ GetBytesBigEndianFromSizeT(size_t value, int desiredLength)
     return GetBytesBigEndianFromBitMap(value, desiredLength);
 }
 
+/**
+ * @brief Parses a span of bytes as a size_t number encoded in big endian
+ * 
+ * @param bytes 
+ * @return size_t 
+ */
 size_t
 ReadSizeTFromBytesBigEndian(std::span<const uint8_t> bytes)
 {
@@ -212,6 +218,12 @@ ReadSizeTFromBytesBigEndian(std::span<const uint8_t> bytes)
 }
 
 // TODO find a better place for this function
+/**
+ * @brief Get the Bit Mask From Bit Index object
+ * 
+ * @param bitIndex 
+ * @return size_t 
+ */
 size_t
 GetBitMaskFromBitIndex(size_t bitIndex)
 {
@@ -241,6 +253,15 @@ GetBitIndexFromBitMask(size_t bitMask)
     throw std::exception();
 }
 
+/**
+ * @brief lookup a value associated with a key from an unordered map. 
+ *          TODO this function only exists because a good hash function has not been agreed upon yet
+ * 
+ * @tparam T 
+ * @param bitIndexMap 
+ * @param keyTarget 
+ * @return std::size_t 
+ */
 template <class T>
 std::size_t
 unordered_map_lookup(const std::unordered_map<T, std::size_t>& bitIndexMap, const T keyTarget)
@@ -254,6 +275,15 @@ unordered_map_lookup(const std::unordered_map<T, std::size_t>& bitIndexMap, cons
 }
 
 // TODO find a better place for this function
+/**
+ * @brief helper function to encode a given valueSet into a bitset according to bitIndexMap, using desiredLength bytes
+ * 
+ * @tparam T 
+ * @param valueSet 
+ * @param bitIndexMap 
+ * @param desiredLength 
+ * @return std::vector<uint8_t> 
+ */
 template <class T>
 std::vector<uint8_t>
 EncodeValuesAsBytes(const std::vector<T>& valueSet, const std::unordered_map<T, std::size_t>& bitIndexMap, int desiredLength)
@@ -268,6 +298,14 @@ EncodeValuesAsBytes(const std::vector<T>& valueSet, const std::unordered_map<T, 
 }
 
 // TODO find a better place for this function
+/**
+ * @brief helper function that writes the bitset for a given valueSet according to bitIndexMap, using desiredLength bytes
+ * 
+ * @tparam T 
+ * @param assignee the destination of the bitset
+ * @param bitIndexMap 
+ * @param bytes 
+ */
 template <class T>
 void
 AssignValuesFromBytes(std::vector<T>& assignee, const std::unordered_map<T, std::size_t>& bitIndexMap, std::span<const uint8_t> bytes)
