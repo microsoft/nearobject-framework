@@ -435,120 +435,120 @@ UwbCapability::FromOobDataObject(const encoding::TlvBer& tlv)
         throw UwbCapability::IncorrectTlvTag();
     }
     for (const auto& object : tlv.GetValues()) {
-        if (object.m_tag.size() != 1) {
+        if (object.GetTag().size() != 1) {
             throw UwbCapability::IncorrectNumberOfBytesInTagError();
         }
-        switch (ParameterTag(object.m_tag[0])) {
+        switch (ParameterTag(object.GetTag()[0])) {
         case ParameterTag::FiraPhyVersionRange: {
             if (object.GetValue().size() != 4) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            uwbCapability.FiraPhyVersionRange = ReadSizeTFromBytesBigEndian(object.m_value); // TODO verify that the bytes are indeed big endian
+            uwbCapability.FiraPhyVersionRange = ReadSizeTFromBytesBigEndian(object.GetValue()); // TODO verify that the bytes are indeed big endian
             break;
         }
         case ParameterTag::FiraMacVersionRange: {
             if (object.GetValue().size() != 4) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            uwbCapability.FiraMacVersionRange = ReadSizeTFromBytesBigEndian(object.m_value);
+            uwbCapability.FiraMacVersionRange = ReadSizeTFromBytesBigEndian(object.GetValue());
             break;
         }
         case ParameterTag::DeviceRoles: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.DeviceRoles, UwbCapability::DeviceRoleBit, object.m_value);
+            AssignValuesFromBytes(uwbCapability.DeviceRoles, UwbCapability::DeviceRoleBit, object.GetValue());
             break;
         }
         case ParameterTag::RangingMethod: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.RangingConfigurations, UwbCapability::RangingConfigurationBit, object.m_value);
+            AssignValuesFromBytes(uwbCapability.RangingConfigurations, UwbCapability::RangingConfigurationBit, object.GetValue());
             break;
         }
         case ParameterTag::StsConfig: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.StsConfigurations, UwbCapability::StsConfigurationBit, object.m_value);
+            AssignValuesFromBytes(uwbCapability.StsConfigurations, UwbCapability::StsConfigurationBit, object.GetValue());
             break;
         }
         case ParameterTag::MultiNodeMode: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.MultiNodeModes, UwbCapability::MultiNodeModeBit, object.m_value);
+            AssignValuesFromBytes(uwbCapability.MultiNodeModes, UwbCapability::MultiNodeModeBit, object.GetValue());
             break;
         }
         case ParameterTag::RangingMode: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.RangingTimeStructs, UwbCapability::RangingModeBit, object.m_value);
+            AssignValuesFromBytes(uwbCapability.RangingTimeStructs, UwbCapability::RangingModeBit, object.GetValue());
             break;
         }
         case ParameterTag::ScheduledMode: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.SchedulingModes, UwbCapability::SchedulingModeBit, object.m_value);
+            AssignValuesFromBytes(uwbCapability.SchedulingModes, UwbCapability::SchedulingModeBit, object.GetValue());
             break;
         }
         case ParameterTag::HoppingMode: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            uwbCapability.HoppingMode = object.m_value[0];
+            uwbCapability.HoppingMode = object.GetValue()[0];
             break;
         }
         case ParameterTag::BlockStriding: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            uwbCapability.BlockStriding = object.m_value[0];
+            uwbCapability.BlockStriding = object.GetValue()[0];
             break;
         }
         case ParameterTag::UwbInitiationTime: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            uwbCapability.UwbInitiationTime = object.m_value[0];
+            uwbCapability.UwbInitiationTime = object.GetValue()[0];
             break;
         }
         case ParameterTag::Channels: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.Channels, UwbCapability::ChannelsBit, object.m_value);
+            AssignValuesFromBytes(uwbCapability.Channels, UwbCapability::ChannelsBit, object.GetValue());
             break;
         }
         case ParameterTag::RFrameConfig: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.RFrameConfigurations, UwbCapability::RFrameConfigurationBit, object.m_value);
+            AssignValuesFromBytes(uwbCapability.RFrameConfigurations, UwbCapability::RFrameConfigurationBit, object.GetValue());
             break;
         }
         case ParameterTag::CcConstraintLength: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.ConvolutionalCodeConstraintLengths, UwbCapability::ConvolutionalCodeConstraintLengthsBit, object.m_value);
+            AssignValuesFromBytes(uwbCapability.ConvolutionalCodeConstraintLengths, UwbCapability::ConvolutionalCodeConstraintLengthsBit, object.GetValue());
             break;
         }
         case ParameterTag::BprfParameterSets: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.BprfParameterSets, UwbCapability::BprfParameterSetsBit, object.m_value);
+            AssignValuesFromBytes(uwbCapability.BprfParameterSets, UwbCapability::BprfParameterSetsBit, object.GetValue());
             break;
         }
         case ParameterTag::HprfParameterSets: {
             if (object.GetValue().size() != 5) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.HprfParameterSets, UwbCapability::HprfParameterSetsBit, object.m_value);
+            AssignValuesFromBytes(uwbCapability.HprfParameterSets, UwbCapability::HprfParameterSetsBit, object.GetValue());
             break;
         }
         case ParameterTag::AoaSupport: {
@@ -556,15 +556,15 @@ UwbCapability::FromOobDataObject(const encoding::TlvBer& tlv)
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
 
-            AssignValuesFromBytes(uwbCapability.AngleOfArrivalTypes, UwbCapability::AngleOfArrivalBit, object.m_value);
-            uwbCapability.AngleOfArrivalFom = (object.m_value[0] & GetBitMaskFromBitIndex(UwbCapability::AngleOfArrivalFomBit));
+            AssignValuesFromBytes(uwbCapability.AngleOfArrivalTypes, UwbCapability::AngleOfArrivalBit, object.GetValue());
+            uwbCapability.AngleOfArrivalFom = (object.GetValue()[0] & GetBitMaskFromBitIndex(UwbCapability::AngleOfArrivalFomBit));
             break;
         }
         case ParameterTag::ExtendedMacAddress: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            uwbCapability.ExtendedMacAddress = object.m_value[0];
+            uwbCapability.ExtendedMacAddress = object.GetValue()[0];
             break;
         }
         }
