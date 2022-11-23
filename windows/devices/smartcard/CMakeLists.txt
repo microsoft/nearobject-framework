@@ -21,4 +21,16 @@ target_link_libraries(windevsmartcard
         smartcard
 )
 
+list(APPEND SMARTCARD_PUBLIC_HEADERS
+    ${SMARTCARD_DIR_PUBLIC_INCLUDE_PREFIX}/Smartcard.hxx
+)
+
 set_target_properties(windevsmartcard PROPERTIES FOLDER windows/devices)
+
+set_target_properties(windevsmartcard PROPERTIES PUBLIC_HEADER "${SMARTCARD_PUBLIC_HEADERS}")
+
+install(
+    TARGETS windevsmartcard
+    EXPORT smartcard
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/windows/smartcard
+)

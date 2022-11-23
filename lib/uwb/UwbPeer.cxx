@@ -57,14 +57,3 @@ uwb::operator!=(const UwbPeer& lhs, const UwbPeer& rhs) noexcept
     return !(lhs == rhs);
 }
 
-bool
-uwb::operator==(const UwbPeerSpatialProperties& lhs, const UwbPeerSpatialProperties& rhs) noexcept
-{
-    return std::tie(lhs.Distance, lhs.AngleAzimuth, lhs.AngleElevation, lhs.Elevation) == std::tie(rhs.Distance, rhs.AngleAzimuth, rhs.AngleElevation, rhs.Elevation);
-}
-
-bool
-uwb::operator!=(const UwbPeerSpatialProperties& lhs, const UwbPeerSpatialProperties& rhs) noexcept
-{
-    return !(lhs == rhs);
-}

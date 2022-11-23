@@ -18,13 +18,10 @@ struct UwbPeerSpatialProperties
     std::optional<double> AngleAzimuth;
     std::optional<double> AngleElevation;
     std::optional<double> Elevation;
+
+    auto
+    operator<=>(const UwbPeerSpatialProperties& other) const = default;
 };
-
-bool
-operator==(const UwbPeerSpatialProperties&, const UwbPeerSpatialProperties&) noexcept;
-
-bool
-operator!=(const UwbPeerSpatialProperties&, const UwbPeerSpatialProperties&) noexcept;
 
 /**
  * @brief Represents a UWB peer device.
@@ -34,46 +31,46 @@ class UwbPeer
 public:
     /**
      * @brief Construct a new UwbPeer object.
-     * 
-     * @param address 
+     *
+     * @param address
      */
     explicit UwbPeer(UwbMacAddress address);
 
     /**
      * @brief Construct a new UwbPeer object from another.
-     * 
-     * @param other 
+     *
+     * @param other
      */
     UwbPeer(const UwbPeer& other);
 
     /**
      * @brief Construct a new UwbPeer object.
-     * 
-     * @param other 
+     *
+     * @param other
      */
     UwbPeer(UwbPeer&& other) noexcept;
 
     /**
      * @brief Copy-assignment operator.
-     * 
-     * @param other 
-     * @return UwbPeer 
+     *
+     * @param other
+     * @return UwbPeer
      */
     UwbPeer&
     operator=(const UwbPeer& other);
 
     /**
      * @brief Get the peer's mac address.
-     * 
-     * @return UwbMacAddress 
+     *
+     * @return UwbMacAddress
      */
     UwbMacAddress
     GetAddress() const noexcept;
 
     /**
      * @brief Retrieves the latest spatial properties for this peer.
-     * 
-     * @return UwbPeerSpatialProperties 
+     *
+     * @return UwbPeerSpatialProperties
      */
     UwbPeerSpatialProperties
     GetSpatialProperties() const noexcept;
