@@ -6,9 +6,12 @@
 #include <algorithm>
 #include <array>
 #include <cstdint>
+#include <initializer_list>
 #include <iomanip>
 #include <iostream>
 #include <memory>
+#include <unordered_map>
+#include <unordered_set>
 
 #include <TlvBer.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
@@ -284,5 +287,57 @@ TEST_CASE("Parsing from TlvBer", "[basic][protocol]")
 
         REQUIRE(decodedCapability.AngleOfArrivalFom == TestUwbCapability::testUwbCapability.AngleOfArrivalFom);
         REQUIRE(decodedCapability.ExtendedMacAddress == TestUwbCapability::testUwbCapability.ExtendedMacAddress);
+    }
+}
+
+TEST_CASE("UwbCapability can be used in unordered_containers", "[basic][container]")
+{
+    UwbCapability uwbCapabilityDeviceRoleInitiator{};
+    uwbCapabilityDeviceRoleInitiator.DeviceRoles = { DeviceRole::Initiator };
+    UwbCapability uwbCapabilityDeviceRoleResponder{};
+    uwbCapabilityDeviceRoleResponder.DeviceRoles = { DeviceRole::Responder };
+    UwbCapability uwbCapabilityDeviceRoleBoth{};
+    uwbCapabilityDeviceRoleBoth.DeviceRoles = { DeviceRole::Initiator, DeviceRole::Responder };
+
+    const std::initializer_list<UwbCapability> UwbCapabilities = {
+        uwbCapabilityDeviceRoleInitiator,
+        uwbCapabilityDeviceRoleResponder,
+        uwbCapabilityDeviceRoleBoth
+    };
+
+    SECTION("can be used in std::unordered_set")
+    {
+        std::unordered_set<UwbCapability> uwbCapabilities{};
+
+        const auto insertCapability = [&](const UwbCapability& uwbCapability) -> bool {
+            auto [_, inserted] = uwbCapabilities.insert(uwbCapability);
+            return inserted;
+        };
+
+        for (const auto& uwbCapability : UwbCapabilities) {
+            REQUIRE(insertCapability(uwbCapability));
+            REQUIRE(!insertCapability(uwbCapability));
+        }
+    }
+
+    SECTION("can be used as std::unordered_map key")
+    {
+        unsigned value = 0;
+        std::unordered_map<UwbCapability, unsigned> uwbCapabilities{};
+
+        // Populate map with initial objects, ensure all were inserted, implying no existing element.
+        for (const auto& uwbCapability : UwbCapabilities) {
+            auto [_, inserted] = uwbCapabilities.insert({ uwbCapability, value++ });
+            REQUIRE(inserted);
+        }
+
+        // Reset value such that insertion sequence matches the one above.
+        value = 0;
+
+        // Populate map with same objects, ensure none were inserted, implying elements already exist.
+        for (const auto& uwbCapability : UwbCapabilities) {
+            auto [_, inserted] = uwbCapabilities.insert({ uwbCapability, value++ });
+            REQUIRE(!inserted);
+        }
     }
 }
