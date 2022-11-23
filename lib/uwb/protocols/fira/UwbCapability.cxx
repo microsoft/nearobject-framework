@@ -228,13 +228,10 @@ ReadSizeTFromBytesBigEndian(std::span<const uint8_t> bytes)
 std::size_t
 GetBitMaskFromBitIndex(std::size_t bitIndex)
 {
-    if (bitIndex == 0) {
-        return 1;
-    }
-    if (bitIndex >= (sizeof bitIndex) * CHAR_BIT) {
+    if (bitIndex >= sizeof(std::size_t) * CHAR_BIT) {
         return 0; // TODO throw error? this isn't really part of an interface so may not be necessary
     }
-    return 1UL << bitIndex;
+    return static_cast<std::size_t>(1UL) << bitIndex;
 }
 
 /**
@@ -291,7 +288,6 @@ EncodeValuesAsBytes(const std::vector<T>& valueSet, const std::unordered_map<T, 
 {
     std::size_t valueSetEncoded = 0;
     for (auto value : valueSet) {
-        // auto bitIndex = bitIndexMap.at(value);
         auto bitIndex = unordered_map_lookup(bitIndexMap, value);
         valueSetEncoded |= GetBitMaskFromBitIndex(bitIndex);
     }
