@@ -196,15 +196,12 @@ public:
     GetTag() const noexcept;
 
     /**
-     * @brief Get the primitive value buffer.
+     * @brief Get the primitive value buffer. Returns empty if this object is Constructed
      * 
      * @return std::vector<uint8_t> 
      */
-    std::vector<uint8_t>
-    GetValue() const noexcept
-    {
-        return m_value;
-    }
+    const std::vector<uint8_t>&
+    GetValue() const noexcept;
 
     /**
      * @brief Get the Values object. Returns empty if this object is Primitive

@@ -93,6 +93,12 @@ TlvBer::GetTag() const noexcept
     return m_tag;
 }
 
+const std::vector<uint8_t>&
+TlvBer::GetValue() const noexcept
+{
+    return m_value;
+}
+
 const std::vector<TlvBer>&
 TlvBer::GetValues() const noexcept
 {
