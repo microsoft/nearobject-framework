@@ -1,4 +1,5 @@
 
+#include <algorithm>
 #include <bit>
 #include <climits>
 #include <iterator>
@@ -574,8 +575,32 @@ UwbCapability::FromOobDataObject(const encoding::TlvBer& tlv)
 bool
 uwb::protocol::fira::operator==(const UwbCapability& lhs, const UwbCapability& rhs) noexcept
 {
-    return std::tie(lhs.FiraPhyVersionRange, lhs.FiraMacVersionRange, lhs.ExtendedMacAddress, lhs.UwbInitiationTime, lhs.AngleOfArrivalFom, lhs.BlockStriding, lhs.HoppingMode, lhs.MultiNodeModes, lhs.DeviceRoles, lhs.StsConfigurations, lhs.RFrameConfigurations, lhs.AngleOfArrivalTypes, lhs.SchedulingModes, lhs.RangingTimeStructs, lhs.RangingConfigurations, lhs.ConvolutionalCodeConstraintLengths, lhs.Channels, lhs.BprfParameterSets, lhs.HprfParameterSets) ==
-           std::tie(rhs.FiraPhyVersionRange, rhs.FiraMacVersionRange, rhs.ExtendedMacAddress, rhs.UwbInitiationTime, rhs.AngleOfArrivalFom, rhs.BlockStriding, rhs.HoppingMode, rhs.MultiNodeModes, rhs.DeviceRoles, rhs.StsConfigurations, rhs.RFrameConfigurations, rhs.AngleOfArrivalTypes, rhs.SchedulingModes, rhs.RangingTimeStructs, rhs.RangingConfigurations, rhs.ConvolutionalCodeConstraintLengths, rhs.Channels, rhs.BprfParameterSets, rhs.HprfParameterSets);
+    // TODO: making copies to sort them is pretty horrible; change this to use a range or view
+    const auto haveSameContents = [&](const auto& v1, const auto& v2) -> bool {
+        auto v1Sorted = v1;
+        auto v2Sorted = v2;
+        std::sort(std::begin(v1Sorted), std::end(v1Sorted));
+        std::sort(std::begin(v2Sorted), std::end(v2Sorted));
+        return (v1Sorted == v2Sorted);
+    };
+
+    const bool basicFieldsEqual = 
+        std::tie(lhs.FiraPhyVersionRange, lhs.FiraMacVersionRange, lhs.ExtendedMacAddress, lhs.UwbInitiationTime, lhs.AngleOfArrivalFom, lhs.BlockStriding, lhs.HoppingMode) ==
+        std::tie(rhs.FiraPhyVersionRange, rhs.FiraMacVersionRange, rhs.ExtendedMacAddress, rhs.UwbInitiationTime, rhs.AngleOfArrivalFom, rhs.BlockStriding, rhs.HoppingMode);
+
+    return basicFieldsEqual
+        && haveSameContents(lhs.MultiNodeModes, rhs.MultiNodeModes)
+        && haveSameContents(lhs.DeviceRoles, rhs.DeviceRoles)
+        && haveSameContents(lhs.StsConfigurations, rhs.StsConfigurations)
+        && haveSameContents(lhs.RFrameConfigurations, rhs.RFrameConfigurations)
+        && haveSameContents(lhs.AngleOfArrivalTypes, rhs.AngleOfArrivalTypes)
+        && haveSameContents(lhs.SchedulingModes, rhs.SchedulingModes)
+        && haveSameContents(lhs.RangingTimeStructs, rhs.RangingTimeStructs)
+        && haveSameContents(lhs.RangingConfigurations, rhs.RangingConfigurations)
+        && haveSameContents(lhs.ConvolutionalCodeConstraintLengths, rhs.ConvolutionalCodeConstraintLengths)
+        && haveSameContents(lhs.Channels, rhs.Channels)
+        && haveSameContents(lhs.BprfParameterSets, rhs.BprfParameterSets)
+        && haveSameContents(lhs.HprfParameterSets, rhs.HprfParameterSets);
 }
 
 bool

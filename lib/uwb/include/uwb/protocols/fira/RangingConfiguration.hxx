@@ -25,13 +25,9 @@ struct RangingConfiguration
 
     RangingMethod Method{ RangingMethod::OneWay };
     MeasurementReportMode ReportMode{ MeasurementReportMode::None };
+
+    auto operator<=>(const RangingConfiguration& other) const = default;
 };
-
-bool
-operator==(const RangingConfiguration& lhs, const RangingConfiguration& rhs) noexcept;
-
-bool
-operator!=(const RangingConfiguration& lhs, const RangingConfiguration& rhs) noexcept;
 
 } // namespace uwb::protocol::fira
 
