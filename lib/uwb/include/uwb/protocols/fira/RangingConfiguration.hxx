@@ -16,13 +16,15 @@ namespace uwb::protocol::fira
  */
 struct RangingConfiguration
 {
+    constexpr RangingConfiguration() = default;
+
     constexpr RangingConfiguration(RangingMethod method, MeasurementReportMode reportMode) :
         Method(method),
         ReportMode(reportMode)
     {}
 
-    RangingMethod Method;
-    MeasurementReportMode ReportMode;
+    RangingMethod Method{ RangingMethod::OneWay };
+    MeasurementReportMode ReportMode{ MeasurementReportMode::None };
 };
 
 bool
