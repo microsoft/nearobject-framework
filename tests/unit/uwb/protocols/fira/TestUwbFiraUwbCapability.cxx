@@ -229,6 +229,26 @@ TEST_CASE("Encoding into a TlvBer", "[basic]")
     }
 }
 
+TEST_CASE("UwbCapability OOB encoding is stable", "[basic][oob][encoding]")
+{
+    SECTION("default value can be round-tripped")
+    {
+        UwbCapability uwbCapabilityOriginal{};
+        auto uwbCapabilityTlv = uwbCapabilityOriginal.ToOobDataObject();
+        auto uwbCapabilityDecoded = UwbCapability::FromOobDataObject(*uwbCapabilityTlv);
+        REQUIRE(uwbCapabilityOriginal == uwbCapabilityDecoded);
+    }
+
+    SECTION("complex value can be round-tripped")
+    {
+        UwbCapability uwbCapabilityOriginal{};
+        // TODO: set all uwbCapabilityOriginal fields to non-default values
+        auto uwbCapabilityTlv = uwbCapabilityOriginal.ToOobDataObject();
+        auto uwbCapabilityDecoded = UwbCapability::FromOobDataObject(*uwbCapabilityTlv);
+        REQUIRE(uwbCapabilityOriginal == uwbCapabilityDecoded);
+    }
+}
+
 // TODO find better place for this
 template <class T>
 bool
