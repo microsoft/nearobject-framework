@@ -119,27 +119,26 @@ const std::vector<uint8_t> ChannelsExpected{ 0xF };
 const std::vector<uint8_t> BprfParameterSetsExpected{ 0x33 };
 const std::vector<uint8_t> HprfParameterSetsExpected{ 0x4, 0, 0, 0, 0x7F };
 
-const std::vector<std::tuple<UwbCapability::ParameterTag, std::vector<uint8_t>>>
-    tagAndExpected = {
-        std::make_tuple(UwbCapability::ParameterTag::FiraPhyVersionRange, phyRangeExpected),
-        std::make_tuple(UwbCapability::ParameterTag::FiraMacVersionRange, macRangeExpected),
-        std::make_tuple(UwbCapability::ParameterTag::DeviceRoles, DeviceRolesExpected),
-        std::make_tuple(UwbCapability::ParameterTag::RangingMethod, RangingConfigurationsExpected),
-        std::make_tuple(UwbCapability::ParameterTag::StsConfig, StsConfigurationsExpected),
-        std::make_tuple(UwbCapability::ParameterTag::MultiNodeMode, MultiNodeModesExpected),
-        std::make_tuple(UwbCapability::ParameterTag::RangingMode, RangingTimeStructsExpected),
-        std::make_tuple(UwbCapability::ParameterTag::ScheduledMode, SchedulingModeTypesExpected),
-        std::make_tuple(UwbCapability::ParameterTag::HoppingMode, HoppingModeExpected),
-        std::make_tuple(UwbCapability::ParameterTag::BlockStriding, BlockStridingExpected),
-        std::make_tuple(UwbCapability::ParameterTag::UwbInitiationTime, UwbInitiationTimeExpected),
-        std::make_tuple(UwbCapability::ParameterTag::Channels, ChannelsExpected),
-        std::make_tuple(UwbCapability::ParameterTag::RFrameConfig, RFrameConfigurationsExpected),
-        std::make_tuple(UwbCapability::ParameterTag::CcConstraintLength, ConvolutionalCodeConstraintLengthsExpected),
-        std::make_tuple(UwbCapability::ParameterTag::BprfParameterSets, BprfParameterSetsExpected),
-        std::make_tuple(UwbCapability::ParameterTag::HprfParameterSets, HprfParameterSetsExpected),
-        std::make_tuple(UwbCapability::ParameterTag::AoaSupport, AoaSupportExpected),
-        std::make_tuple(UwbCapability::ParameterTag::ExtendedMacAddress, ExtendedMacAddressExpected),
-    };
+const std::unordered_map<UwbCapability::ParameterTag, std::vector<uint8_t>> tagAndExpected = {
+    { UwbCapability::ParameterTag::FiraPhyVersionRange, phyRangeExpected },
+    { UwbCapability::ParameterTag::FiraMacVersionRange, macRangeExpected },
+    { UwbCapability::ParameterTag::DeviceRoles, DeviceRolesExpected },
+    { UwbCapability::ParameterTag::RangingMethod, RangingConfigurationsExpected },
+    { UwbCapability::ParameterTag::StsConfig, StsConfigurationsExpected },
+    { UwbCapability::ParameterTag::MultiNodeMode, MultiNodeModesExpected },
+    { UwbCapability::ParameterTag::RangingMode, RangingTimeStructsExpected },
+    { UwbCapability::ParameterTag::ScheduledMode, SchedulingModeTypesExpected },
+    { UwbCapability::ParameterTag::HoppingMode, HoppingModeExpected },
+    { UwbCapability::ParameterTag::BlockStriding, BlockStridingExpected },
+    { UwbCapability::ParameterTag::UwbInitiationTime, UwbInitiationTimeExpected },
+    { UwbCapability::ParameterTag::Channels, ChannelsExpected },
+    { UwbCapability::ParameterTag::RFrameConfig, RFrameConfigurationsExpected },
+    { UwbCapability::ParameterTag::CcConstraintLength, ConvolutionalCodeConstraintLengthsExpected },
+    { UwbCapability::ParameterTag::BprfParameterSets, BprfParameterSetsExpected },
+    { UwbCapability::ParameterTag::HprfParameterSets, HprfParameterSetsExpected },
+    { UwbCapability::ParameterTag::AoaSupport, AoaSupportExpected },
+    { UwbCapability::ParameterTag::ExtendedMacAddress, ExtendedMacAddressExpected }
+};
 
 const UwbCapability
     testUwbCapability = {
