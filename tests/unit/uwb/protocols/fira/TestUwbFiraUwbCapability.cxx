@@ -170,7 +170,7 @@ TEST_CASE("Encoding into a TlvBer", "[basic]")
     using namespace uwb::protocol::fira;
 
     // Convert a default-constructed UwbCapability object to an OOB data object (tlv).
-    auto tlv = TestUwbCapability::testUwbCapability.ToOobDataObject();
+    const auto tlv = TestUwbCapability::testUwbCapability.ToOobDataObject();
 
     // Validate tag is as expected.
     const auto tag = tlv->GetTag();
