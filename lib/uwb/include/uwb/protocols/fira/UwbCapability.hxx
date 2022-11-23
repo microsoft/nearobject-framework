@@ -178,8 +178,8 @@ struct UwbCapability
     static constexpr std::size_t BlockStridingBit = 0;
     static constexpr std::size_t HoppingModeBit = 0;
 
-    uint32_t FiraPhyVersionRange;
-    uint32_t FiraMacVersionRange;
+    uint32_t FiraPhyVersionRange{ 0 };
+    uint32_t FiraMacVersionRange{ 0 };
     bool ExtendedMacAddress{ false };
     bool UwbInitiationTime{ false };
     bool AngleOfArrivalFom{ false };
@@ -200,16 +200,16 @@ struct UwbCapability
 
     /**
      * @brief Convert this object into a FiRa Data Object (DO).
-     * 
-     * @return encoding::TlvBer 
+     *
+     * @return encoding::TlvBer
      */
     std::unique_ptr<encoding::TlvBer>
     ToOobDataObject() const;
 
     /**
-     * @brief 
-     * 
-     * @return UwbCapability 
+     * @brief
+     *
+     * @return UwbCapability
      */
     static UwbCapability
     FromOobDataObject(const encoding::TlvBer& tlv);
@@ -232,7 +232,7 @@ struct hash<uwb::protocol::fira::UwbCapability>
     operator()(const uwb::protocol::fira::UwbCapability& uwbCapability) const noexcept
     {
         std::size_t hash = 0;
-        notstd::hash_combine(hash, 
+        notstd::hash_combine(hash,
             uwbCapability.FiraPhyVersionRange,
             uwbCapability.FiraMacVersionRange,
             uwbCapability.ExtendedMacAddress,
@@ -250,8 +250,7 @@ struct hash<uwb::protocol::fira::UwbCapability>
             notstd::hash_range(std::cbegin(uwbCapability.ConvolutionalCodeConstraintLengths), std::cend(uwbCapability.ConvolutionalCodeConstraintLengths)),
             notstd::hash_range(std::cbegin(uwbCapability.Channels), std::cend(uwbCapability.Channels)),
             notstd::hash_range(std::cbegin(uwbCapability.BprfParameterSets), std::cend(uwbCapability.BprfParameterSets)),
-            notstd::hash_range(std::cbegin(uwbCapability.HprfParameterSets), std::cend(uwbCapability.HprfParameterSets))
-        );
+            notstd::hash_range(std::cbegin(uwbCapability.HprfParameterSets), std::cend(uwbCapability.HprfParameterSets)));
         return hash;
     }
 };
