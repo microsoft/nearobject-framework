@@ -570,3 +570,16 @@ UwbCapability::FromOobDataObject(const encoding::TlvBer& tlv)
 
     return uwbCapability;
 }
+
+bool
+uwb::protocol::fira::operator==(const UwbCapability& lhs, const UwbCapability& rhs) noexcept
+{
+    return std::tie(lhs.FiraPhyVersionRange, lhs.FiraMacVersionRange, lhs.ExtendedMacAddress, lhs.UwbInitiationTime, lhs.AngleOfArrivalFom, lhs.BlockStriding, lhs.HoppingMode, lhs.MultiNodeModes, lhs.DeviceRoles, lhs.StsConfigurations, lhs.RFrameConfigurations, lhs.AngleOfArrivalTypes, lhs.SchedulingModes, lhs.RangingTimeStructs, lhs.RangingConfigurations, lhs.ConvolutionalCodeConstraintLengths, lhs.Channels, lhs.BprfParameterSets, lhs.HprfParameterSets) ==
+           std::tie(rhs.FiraPhyVersionRange, rhs.FiraMacVersionRange, rhs.ExtendedMacAddress, rhs.UwbInitiationTime, rhs.AngleOfArrivalFom, rhs.BlockStriding, rhs.HoppingMode, rhs.MultiNodeModes, rhs.DeviceRoles, rhs.StsConfigurations, rhs.RFrameConfigurations, rhs.AngleOfArrivalTypes, rhs.SchedulingModes, rhs.RangingTimeStructs, rhs.RangingConfigurations, rhs.ConvolutionalCodeConstraintLengths, rhs.Channels, rhs.BprfParameterSets, rhs.HprfParameterSets);
+}
+
+bool
+uwb::protocol::fira::operator!=(const UwbCapability& lhs, const UwbCapability& rhs) noexcept
+{
+    return !(lhs == rhs);
+}

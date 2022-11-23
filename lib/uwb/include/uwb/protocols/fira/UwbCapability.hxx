@@ -211,6 +211,13 @@ struct UwbCapability
     static UwbCapability
     FromOobDataObject(const encoding::TlvBer& tlv);
 };
+
+bool
+operator==(const UwbCapability& lhs, const UwbCapability& rhs) noexcept;
+
+bool
+operator!=(const UwbCapability& lhs, const UwbCapability& rhs) noexcept;
+
 } // namespace uwb::protocol::fira
 
 #endif // FIRA_UWB_CAPABILITY_HXX
