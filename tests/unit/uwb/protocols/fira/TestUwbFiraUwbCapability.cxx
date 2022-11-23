@@ -98,46 +98,25 @@ const bool BlockStridingDefault{ true };
 const bool HoppingModeDefault{ true };
 
 // TODO this test code is reliant on the bitmaps staying the same
-const std::vector<uint8_t> phyRangeExpected{ 0xAA, 0xBB, 0xCC, 0xDD };
-const std::vector<uint8_t> macRangeExpected{ 0xAA, 0xBB, 0xCC, 0xEE };
-const std::vector<uint8_t> ExtendedMacAddressExpected{ 0 };
-const std::vector<uint8_t> UwbInitiationTimeExpected{ 0 };
-const std::vector<uint8_t> AngleOfArrivalFomExpected{ 0 };
-const std::vector<uint8_t> BlockStridingExpected{ 1 };
-const std::vector<uint8_t> HoppingModeExpected{ 1 };
-const std::vector<uint8_t> MultiNodeModesExpected{ 0x02 };
-const std::vector<uint8_t> DeviceRolesExpected{ 0x2 };
-const std::vector<uint8_t> StsConfigurationsExpected{ 0x5 };
-const std::vector<uint8_t> RFrameConfigurationsExpected{ 0xA };
-const std::vector<uint8_t> AngleOfArrivalTypesExpected{ 0x3 };
-const std::vector<uint8_t> AoaSupportExpected{ 0x3 };
-const std::vector<uint8_t> SchedulingModeTypesExpected{ 0x2 };
-const std::vector<uint8_t> RangingTimeStructsExpected{ 0x1 };
-const std::vector<uint8_t> RangingConfigurationsExpected{ 0x3 };
-const std::vector<uint8_t> ConvolutionalCodeConstraintLengthsExpected{ 0x3 };
-const std::vector<uint8_t> ChannelsExpected{ 0xF };
-const std::vector<uint8_t> BprfParameterSetsExpected{ 0x33 };
-const std::vector<uint8_t> HprfParameterSetsExpected{ 0x4, 0, 0, 0, 0x7F };
-
 const std::unordered_map<UwbCapability::ParameterTag, std::vector<uint8_t>> tagAndExpected = {
-    { UwbCapability::ParameterTag::FiraPhyVersionRange, phyRangeExpected },
-    { UwbCapability::ParameterTag::FiraMacVersionRange, macRangeExpected },
-    { UwbCapability::ParameterTag::DeviceRoles, DeviceRolesExpected },
-    { UwbCapability::ParameterTag::RangingMethod, RangingConfigurationsExpected },
-    { UwbCapability::ParameterTag::StsConfig, StsConfigurationsExpected },
-    { UwbCapability::ParameterTag::MultiNodeMode, MultiNodeModesExpected },
-    { UwbCapability::ParameterTag::RangingMode, RangingTimeStructsExpected },
-    { UwbCapability::ParameterTag::ScheduledMode, SchedulingModeTypesExpected },
-    { UwbCapability::ParameterTag::HoppingMode, HoppingModeExpected },
-    { UwbCapability::ParameterTag::BlockStriding, BlockStridingExpected },
-    { UwbCapability::ParameterTag::UwbInitiationTime, UwbInitiationTimeExpected },
-    { UwbCapability::ParameterTag::Channels, ChannelsExpected },
-    { UwbCapability::ParameterTag::RFrameConfig, RFrameConfigurationsExpected },
-    { UwbCapability::ParameterTag::CcConstraintLength, ConvolutionalCodeConstraintLengthsExpected },
-    { UwbCapability::ParameterTag::BprfParameterSets, BprfParameterSetsExpected },
-    { UwbCapability::ParameterTag::HprfParameterSets, HprfParameterSetsExpected },
-    { UwbCapability::ParameterTag::AoaSupport, AoaSupportExpected },
-    { UwbCapability::ParameterTag::ExtendedMacAddress, ExtendedMacAddressExpected }
+    { UwbCapability::ParameterTag::FiraPhyVersionRange, { 0xAA, 0xBB, 0xCC, 0xDD } },
+    { UwbCapability::ParameterTag::FiraMacVersionRange, { 0xAA, 0xBB, 0xCC, 0xEE } },
+    { UwbCapability::ParameterTag::DeviceRoles, { 0x2 } },
+    { UwbCapability::ParameterTag::RangingMethod, { 0x3 } },
+    { UwbCapability::ParameterTag::StsConfig, { 0x5 } },
+    { UwbCapability::ParameterTag::MultiNodeMode, { 0x02 } },
+    { UwbCapability::ParameterTag::RangingMode, { 0x1 } },
+    { UwbCapability::ParameterTag::ScheduledMode, { 0x2 } },
+    { UwbCapability::ParameterTag::HoppingMode, { 1 } },
+    { UwbCapability::ParameterTag::BlockStriding, { 1 } },
+    { UwbCapability::ParameterTag::UwbInitiationTime, { 0 } },
+    { UwbCapability::ParameterTag::Channels, { 0xF } },
+    { UwbCapability::ParameterTag::RFrameConfig, { 0xA } },
+    { UwbCapability::ParameterTag::CcConstraintLength, { 0x3 } },
+    { UwbCapability::ParameterTag::BprfParameterSets, { 0x33 } },
+    { UwbCapability::ParameterTag::HprfParameterSets, { 0x4, 0, 0, 0, 0x7F } },
+    { UwbCapability::ParameterTag::AoaSupport, { 0x3 } },
+    { UwbCapability::ParameterTag::ExtendedMacAddress, { 0 } }
 };
 
 const UwbCapability
