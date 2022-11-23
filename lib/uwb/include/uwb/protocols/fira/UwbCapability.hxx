@@ -3,9 +3,12 @@
 #define FIRA_UWB_CAPABILITY_HXX
 
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <unordered_map>
 #include <vector>
+
+#include <notstd/hash.hxx>
 
 #include <TlvBer.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
@@ -219,5 +222,39 @@ bool
 operator!=(const UwbCapability& lhs, const UwbCapability& rhs) noexcept;
 
 } // namespace uwb::protocol::fira
+
+namespace std
+{
+template <>
+struct hash<uwb::protocol::fira::UwbCapability>
+{
+    std::size_t
+    operator()(const uwb::protocol::fira::UwbCapability& uwbCapability) const noexcept
+    {
+        std::size_t hash = 0;
+        notstd::hash_combine(hash, 
+            uwbCapability.FiraPhyVersionRange,
+            uwbCapability.FiraMacVersionRange,
+            uwbCapability.ExtendedMacAddress,
+            uwbCapability.UwbInitiationTime,
+            uwbCapability.AngleOfArrivalFom,
+            uwbCapability.BlockStriding,
+            uwbCapability.HoppingMode,
+            notstd::hash_range(std::cbegin(uwbCapability.MultiNodeModes), std::cend(uwbCapability.MultiNodeModes)),
+            notstd::hash_range(std::cbegin(uwbCapability.DeviceRoles), std::cend(uwbCapability.DeviceRoles)),
+            notstd::hash_range(std::cbegin(uwbCapability.StsConfigurations), std::cend(uwbCapability.StsConfigurations)),
+            notstd::hash_range(std::cbegin(uwbCapability.RFrameConfigurations), std::cend(uwbCapability.RFrameConfigurations)),
+            notstd::hash_range(std::cbegin(uwbCapability.AngleOfArrivalTypes), std::cend(uwbCapability.AngleOfArrivalTypes)),
+            notstd::hash_range(std::cbegin(uwbCapability.SchedulingModes), std::cend(uwbCapability.SchedulingModes)),
+            notstd::hash_range(std::cbegin(uwbCapability.RangingTimeStructs), std::cend(uwbCapability.RangingTimeStructs)),
+            notstd::hash_range(std::cbegin(uwbCapability.ConvolutionalCodeConstraintLengths), std::cend(uwbCapability.ConvolutionalCodeConstraintLengths)),
+            notstd::hash_range(std::cbegin(uwbCapability.Channels), std::cend(uwbCapability.Channels)),
+            notstd::hash_range(std::cbegin(uwbCapability.BprfParameterSets), std::cend(uwbCapability.BprfParameterSets)),
+            notstd::hash_range(std::cbegin(uwbCapability.HprfParameterSets), std::cend(uwbCapability.HprfParameterSets))
+        );
+        return hash;
+    }
+};
+} // namespace std
 
 #endif // FIRA_UWB_CAPABILITY_HXX
