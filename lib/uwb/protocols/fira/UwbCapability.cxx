@@ -307,16 +307,17 @@ EncodeValuesAsBytes(const std::vector<T>& valueSet, const std::unordered_map<T, 
  * @param bytes 
  */
 template <class T>
-void
-AssignValuesFromBytes(std::vector<T>& assignee, const std::unordered_map<T, std::size_t>& bitIndexMap, std::span<const uint8_t> bytes)
+std::vector<T>
+AssignValuesFromBytes(const std::unordered_map<T, std::size_t>& bitIndexMap, std::span<const uint8_t> bytes)
 {
+    std::vector<T> assignee;
     auto bitmasks = ReadSizeTFromBytesBigEndian(bytes);
-    assignee.clear();
     for (auto [key, value] : bitIndexMap) {
         if (bitmasks & GetBitMaskFromBitIndex(value)) {
             assignee.push_back(key);
         }
     }
+    return assignee;
 }
 
 // TODO find a better place for this function
@@ -457,42 +458,42 @@ UwbCapability::FromOobDataObject(const encoding::TlvBer& tlv)
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.DeviceRoles, UwbCapability::DeviceRoleBit, object.GetValue());
+            uwbCapability.DeviceRoles = AssignValuesFromBytes(UwbCapability::DeviceRoleBit, object.GetValue());
             break;
         }
         case ParameterTag::RangingMethod: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.RangingConfigurations, UwbCapability::RangingConfigurationBit, object.GetValue());
+            uwbCapability.RangingConfigurations = AssignValuesFromBytes(UwbCapability::RangingConfigurationBit, object.GetValue());
             break;
         }
         case ParameterTag::StsConfig: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.StsConfigurations, UwbCapability::StsConfigurationBit, object.GetValue());
+            uwbCapability.StsConfigurations = AssignValuesFromBytes(UwbCapability::StsConfigurationBit, object.GetValue());
             break;
         }
         case ParameterTag::MultiNodeMode: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.MultiNodeModes, UwbCapability::MultiNodeModeBit, object.GetValue());
+            uwbCapability.MultiNodeModes = AssignValuesFromBytes(UwbCapability::MultiNodeModeBit, object.GetValue());
             break;
         }
         case ParameterTag::RangingMode: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.RangingTimeStructs, UwbCapability::RangingModeBit, object.GetValue());
+            uwbCapability.RangingTimeStructs = AssignValuesFromBytes(UwbCapability::RangingModeBit, object.GetValue());
             break;
         }
         case ParameterTag::ScheduledMode: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.SchedulingModes, UwbCapability::SchedulingModeBit, object.GetValue());
+            uwbCapability.SchedulingModes = AssignValuesFromBytes(UwbCapability::SchedulingModeBit, object.GetValue());
             break;
         }
         case ParameterTag::HoppingMode: {
@@ -520,35 +521,35 @@ UwbCapability::FromOobDataObject(const encoding::TlvBer& tlv)
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.Channels, UwbCapability::ChannelsBit, object.GetValue());
+            uwbCapability.Channels = AssignValuesFromBytes(UwbCapability::ChannelsBit, object.GetValue());
             break;
         }
         case ParameterTag::RFrameConfig: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.RFrameConfigurations, UwbCapability::RFrameConfigurationBit, object.GetValue());
+            uwbCapability.RFrameConfigurations = AssignValuesFromBytes(UwbCapability::RFrameConfigurationBit, object.GetValue());
             break;
         }
         case ParameterTag::CcConstraintLength: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.ConvolutionalCodeConstraintLengths, UwbCapability::ConvolutionalCodeConstraintLengthsBit, object.GetValue());
+            uwbCapability.ConvolutionalCodeConstraintLengths = AssignValuesFromBytes(UwbCapability::ConvolutionalCodeConstraintLengthsBit, object.GetValue());
             break;
         }
         case ParameterTag::BprfParameterSets: {
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.BprfParameterSets, UwbCapability::BprfParameterSetsBit, object.GetValue());
+            uwbCapability.BprfParameterSets = AssignValuesFromBytes(UwbCapability::BprfParameterSetsBit, object.GetValue());
             break;
         }
         case ParameterTag::HprfParameterSets: {
             if (object.GetValue().size() != 5) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            AssignValuesFromBytes(uwbCapability.HprfParameterSets, UwbCapability::HprfParameterSetsBit, object.GetValue());
+            uwbCapability.HprfParameterSets = AssignValuesFromBytes(UwbCapability::HprfParameterSetsBit, object.GetValue());
             break;
         }
         case ParameterTag::AoaSupport: {
@@ -556,7 +557,7 @@ UwbCapability::FromOobDataObject(const encoding::TlvBer& tlv)
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
 
-            AssignValuesFromBytes(uwbCapability.AngleOfArrivalTypes, UwbCapability::AngleOfArrivalBit, object.GetValue());
+            uwbCapability.AngleOfArrivalTypes = AssignValuesFromBytes(UwbCapability::AngleOfArrivalBit, object.GetValue());
             uwbCapability.AngleOfArrivalFom = (object.GetValue()[0] & GetBitMaskFromBitIndex(UwbCapability::AngleOfArrivalFomBit));
             break;
         }
