@@ -284,10 +284,10 @@ unordered_map_lookup(const std::unordered_map<T, std::size_t>& bitIndexMap, cons
  */
 template <class T>
 std::vector<uint8_t>
-EncodeValuesAsBytes(const std::vector<T>& valueSet, const std::unordered_map<T, std::size_t>& bitIndexMap, int desiredLength)
+EncodeValuesAsBytes(const std::vector<T>& valueSet, const std::unordered_map<T, std::size_t>& bitIndexMap, std::size_t desiredLength)
 {
     std::size_t valueSetEncoded = 0;
-    for (auto value : valueSet) {
+    for (const auto& value : valueSet) {
         auto bitIndex = unordered_map_lookup(bitIndexMap, value);
         valueSetEncoded |= GetBitMaskFromBitIndex(bitIndex);
     }
@@ -320,7 +320,7 @@ AssignValuesFromBytes(const std::unordered_map<T, std::size_t>& bitIndexMap, std
 // TODO find a better place for this function
 template <class T>
 void
-ToOobDataObjectHelper(encoding::TlvBer::Builder& builder, encoding::TlvBer::Builder& childbuilder, uint8_t tag, const std::vector<T>& valueSet, const std::unordered_map<T, std::size_t>& bitIndexMap, int desiredLength)
+ToOobDataObjectHelper(encoding::TlvBer::Builder& builder, encoding::TlvBer::Builder& childbuilder, uint8_t tag, const std::vector<T>& valueSet, const std::unordered_map<T, std::size_t>& bitIndexMap, std::size_t desiredLength)
 {
     auto bytes = EncodeValuesAsBytes(valueSet, bitIndexMap, desiredLength);
     auto tlv = childbuilder.Reset()
