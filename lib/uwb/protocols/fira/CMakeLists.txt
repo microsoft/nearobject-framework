@@ -28,6 +28,7 @@ target_link_libraries(uwb-proto-fira
     PRIVATE
         uwb-proto-fira-uci
     PUBLIC
+        notstd
         smartcard
         tlv
         uwb

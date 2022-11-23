@@ -61,7 +61,7 @@ struct ControleePreference
     bool RangingMethodSsTwrNonDeferredMode;
     bool RangingMethodDsTwrNonDeferredMode;
     std::bitset<3> StsConfig;
-    std::vector<uwb::protocol::fira::MultiNodeMode> MulitNodeModes;
+    std::vector<uwb::protocol::fira::MultiNodeMode> MultiNodeModes;
     std::bitset<2> RangingMode;
     bool ScheduledMode{ false };
     bool HoppingMode{ false };

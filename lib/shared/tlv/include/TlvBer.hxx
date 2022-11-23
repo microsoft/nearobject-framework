@@ -196,11 +196,19 @@ public:
     GetTag() const noexcept;
 
     /**
+     * @brief Get the primitive value buffer. Returns empty if this object is Constructed
+     * 
+     * @return std::vector<uint8_t> 
+     */
+    const std::vector<uint8_t>&
+    GetValue() const noexcept;
+
+    /**
      * @brief Get the Values object. Returns empty if this object is Primitive
      * 
      * @return const std::vector<TlvBer> 
      */
-    std::vector<TlvBer>
+    const std::vector<TlvBer>&
     GetValues() const noexcept;
 
     /**
@@ -597,7 +605,8 @@ public:
     };
 
 public:
-    bool operator==(const TlvBer&) const;
+    bool
+    operator==(const TlvBer&) const;
 
 private:
     TlvBer::Class m_class{ TlvBer::Class::Invalid };

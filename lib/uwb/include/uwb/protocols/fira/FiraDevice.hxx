@@ -109,7 +109,7 @@ enum class ConvolutionalCodeConstraintLength {
 /**
  * @brief TODO Add spec reference. 
  * 
- * Note: The spec does not define channel 7 which is why it's missing here.
+ * Note: The spec does not define channel 7 or 11 which is why it's missing here.
  */
 enum class Channel {
     C5,
@@ -117,7 +117,6 @@ enum class Channel {
     C8,
     C9,
     C10,
-    C11,
     C12,
     C13,
     C14,

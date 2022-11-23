@@ -1,8 +1,37 @@
 
+#include <algorithm>
+#include <bit>
+#include <climits>
+#include <iterator>
+#include <stdexcept>
+
+#include <notstd/utility.hxx>
+
 #include <TlvSimple.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
 
 using namespace uwb::protocol::fira;
+
+const std::array<UwbCapability::ParameterTag, 18> UwbCapability::ParameterTags = {
+    UwbCapability::ParameterTag::FiraPhyVersionRange,
+    UwbCapability::ParameterTag::FiraMacVersionRange,
+    UwbCapability::ParameterTag::DeviceRoles,
+    UwbCapability::ParameterTag::RangingMethod,
+    UwbCapability::ParameterTag::StsConfig,
+    UwbCapability::ParameterTag::MultiNodeMode,
+    UwbCapability::ParameterTag::RangingMode,
+    UwbCapability::ParameterTag::ScheduledMode,
+    UwbCapability::ParameterTag::HoppingMode,
+    UwbCapability::ParameterTag::BlockStriding,
+    UwbCapability::ParameterTag::UwbInitiationTime,
+    UwbCapability::ParameterTag::Channels,
+    UwbCapability::ParameterTag::RFrameConfig,
+    UwbCapability::ParameterTag::CcConstraintLength,
+    UwbCapability::ParameterTag::BprfParameterSets,
+    UwbCapability::ParameterTag::HprfParameterSets,
+    UwbCapability::ParameterTag::AoaSupport,
+    UwbCapability::ParameterTag::ExtendedMacAddress
+};
 
 const std::initializer_list<RangingConfiguration> UwbCapability::RangingConfigurationsDefault = {
     RangingConfiguration{ RangingMethod::OneWay, MeasurementReportMode::None },
@@ -71,10 +100,9 @@ const std::unordered_map<Channel, std::size_t> UwbCapability::ChannelsBit = {
     { Channel::C8, 2 },
     { Channel::C9, 3 },
     { Channel::C10, 4 },
-    { Channel::C11, 5 },
-    { Channel::C12, 6 },
-    { Channel::C13, 7 },
-    { Channel::C14, 8 },
+    { Channel::C12, 5 },
+    { Channel::C13, 6 },
+    { Channel::C14, 7 },
 };
 
 const std::unordered_map<BprfParameter, std::size_t> UwbCapability::BprfParameterSetsBit = {
@@ -124,19 +152,476 @@ const std::unordered_map<HprfParameter, std::size_t> UwbCapability::HprfParamete
     { HprfParameter::Set35, 34 },
 };
 
-std::unique_ptr<encoding::Tlv>
+/**
+ * @brief Get the Bytes Big Endian From std::size_t
+ * 
+ * @param value the bitmap to encode
+ * @param desiredLength the desired number of bytes in the encoding, padding with zeros if necessary. 
+ *                      If the value is too large, this will only encode the lowest desiredLength bytes
+ * @return std::vector<uint8_t> 
+ */
+std::vector<uint8_t>
+GetBytesBigEndianFromBitMap(std::size_t value, std::size_t desiredLength)
+{
+    if (desiredLength > sizeof value) {
+        throw std::runtime_error("desired length exceeds std::size_t width, this is a bug!");
+    }
+
+    std::vector<uint8_t> bytes;
+
+    for (auto i = 0; i < desiredLength; i++) {
+        const auto b = static_cast<uint8_t>(value & 0xFFU);
+        bytes.push_back(b);
+        value >>= 8U;
+    }
+
+    return {
+        std::make_move_iterator(std::rbegin(bytes)),
+        std::make_move_iterator(std::rend(bytes))
+    };
+}
+
+/**
+ * @brief Get the Bytes Big Endian From std::size_t
+ * 
+ * @param value the number to encode in big endian
+ * @param desiredLength the desired number of bytes in the encoding, padding with zeros if necessary. 
+ *                      If the value is too large, this will only encode the lowest desiredLength bytes
+ * @return std::vector<uint8_t> 
+ */
+std::vector<uint8_t>
+GetBytesBigEndianFromSizeT(std::size_t value, std::size_t desiredLength)
+{
+    if (std::endian::native != std::endian::big) {
+        value = value & 0x000000FF << 24 | value & 0x0000FF00 << 8 | value & 0x00FF0000 >> 8 | value & 0xFF000000 >> 24;
+    }
+    return GetBytesBigEndianFromBitMap(value, desiredLength);
+}
+
+/**
+ * @brief Parses a span of bytes as a std::size_t number encoded in big endian
+ * 
+ * @param bytes 
+ * @return std::size_t 
+ */
+std::size_t
+ReadSizeTFromBytesBigEndian(std::span<const uint8_t> bytes)
+{
+    std::size_t rvalue = 0;
+
+    if (bytes.size() >= sizeof rvalue)
+        return 0; // TODO throw error? this isn't really part of an interface so may not be necessary
+
+    for (int i = 0; i < bytes.size(); i++) {
+        rvalue *= 0x100;
+        rvalue += bytes[i];
+    }
+    return rvalue;
+}
+
+// TODO find a better place for this function
+/**
+ * @brief Get the Bit Mask From Bit Index object
+ * 
+ * @param bitIndex 
+ * @return std::size_t 
+ */
+std::size_t
+GetBitMaskFromBitIndex(std::size_t bitIndex)
+{
+    if (bitIndex >= sizeof(std::size_t) * CHAR_BIT) {
+        return 0; // TODO throw error? this isn't really part of an interface so may not be necessary
+    }
+    return static_cast<std::size_t>(1UL) << bitIndex;
+}
+
+/**
+ * @brief Get the Bit Index From Bit Mask object. 
+ * 
+ * @param bitMask 
+ * @return std::size_t 
+ */
+std::size_t
+GetBitIndexFromBitMask(std::size_t bitMask)
+{
+    for (int index = 0; index < (sizeof bitMask) * CHAR_BIT; index++) {
+        if (bitMask == GetBitMaskFromBitIndex(index)) {
+            return index;
+        }
+    }
+    throw std::runtime_error("bit index not found");
+}
+
+/**
+ * @brief lookup a value associated with a key from an unordered map. 
+ *          TODO this function only exists because a good hash function has not been agreed upon yet
+ * 
+ * @tparam T 
+ * @param bitIndexMap 
+ * @param keyTarget 
+ * @return std::size_t 
+ */
+template <class T>
+std::size_t
+unordered_map_lookup(const std::unordered_map<T, std::size_t>& bitIndexMap, const T keyTarget)
+{
+    for (auto [key, value] : bitIndexMap) {
+        if (key == keyTarget) {
+            return value;
+        }
+    }
+    throw std::exception();
+}
+
+// TODO find a better place for this function
+/**
+ * @brief helper function to encode a given valueSet into a bitset according to bitIndexMap, using desiredLength bytes
+ * 
+ * @tparam T 
+ * @param valueSet 
+ * @param bitIndexMap 
+ * @param desiredLength 
+ * @return std::vector<uint8_t> 
+ */
+template <class T>
+std::vector<uint8_t>
+EncodeValuesAsBytes(const std::vector<T>& valueSet, const std::unordered_map<T, std::size_t>& bitIndexMap, std::size_t desiredLength)
+{
+    std::size_t valueSetEncoded = 0;
+    for (const auto& value : valueSet) {
+        auto bitIndex = unordered_map_lookup(bitIndexMap, value);
+        valueSetEncoded |= GetBitMaskFromBitIndex(bitIndex);
+    }
+    return GetBytesBigEndianFromBitMap(valueSetEncoded, desiredLength);
+}
+
+// TODO find a better place for this function
+/**
+ * @brief helper function that writes the bitset for a given valueSet according to bitIndexMap, using desiredLength bytes
+ * 
+ * @tparam T 
+ * @param assignee the destination of the bitset
+ * @param bitIndexMap 
+ * @param bytes 
+ */
+template <class T>
+std::vector<T>
+AssignValuesFromBytes(const std::unordered_map<T, std::size_t>& bitIndexMap, std::span<const uint8_t> bytes)
+{
+    std::vector<T> assignee;
+    auto bitmasks = ReadSizeTFromBytesBigEndian(bytes);
+    for (auto [key, value] : bitIndexMap) {
+        if (bitmasks & GetBitMaskFromBitIndex(value)) {
+            assignee.push_back(key);
+        }
+    }
+    return assignee;
+}
+
+// TODO find a better place for this function
+template <class T>
+void
+ToOobDataObjectHelper(encoding::TlvBer::Builder& builder, encoding::TlvBer::Builder& childbuilder, uint8_t tag, const std::vector<T>& valueSet, const std::unordered_map<T, std::size_t>& bitIndexMap, std::size_t desiredLength)
+{
+    auto bytes = EncodeValuesAsBytes(valueSet, bitIndexMap, desiredLength);
+    auto tlv = childbuilder.Reset()
+                   .SetTag(tag)
+                   .SetValue(bytes)
+                   .Build();
+    builder.AddTlv(tlv);
+}
+
+std::unique_ptr<encoding::TlvBer>
 UwbCapability::ToOobDataObject() const
 {
-    std::vector<uint8_t> data{};
-    // TODO: perform actual conversion
-    return std::make_unique<encoding::TlvSimple>(Tag, data);
+    auto returnTlvBer = std::make_unique<encoding::TlvBer>();
+    auto builder = encoding::TlvBer::Builder();
+    builder.SetTag(UwbCapability::Tag);
+    auto childbuilder = encoding::TlvBer::Builder();
+
+    // Encode FiraPhyVersionRange
+    {
+        auto phyRange = GetBytesBigEndianFromSizeT(FiraPhyVersionRange, 4);
+        auto phyRangeTlv = childbuilder.Reset()
+                               .SetTag(notstd::to_underlying(ParameterTag::FiraPhyVersionRange))
+                               .SetValue(phyRange)
+                               .Build();
+        builder.AddTlv(phyRangeTlv);
+    }
+
+    {
+        auto macRange = GetBytesBigEndianFromSizeT(FiraMacVersionRange, 4);
+        auto macRangeTlv = childbuilder.Reset()
+                               .SetTag(std::size_t(ParameterTag::FiraMacVersionRange))
+                               .SetValue(macRange)
+                               .Build();
+        builder.AddTlv(macRangeTlv);
+    }
+
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::DeviceRoles), DeviceRoles, UwbCapability::DeviceRoleBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RangingMethod), RangingConfigurations, UwbCapability::RangingConfigurationBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::StsConfig), StsConfigurations, UwbCapability::StsConfigurationBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::MultiNodeMode), MultiNodeModes, UwbCapability::MultiNodeModeBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RangingMode), RangingTimeStructs, UwbCapability::RangingModeBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::ScheduledMode), SchedulingModes, UwbCapability::SchedulingModeBit, 1);
+    {
+        auto hoppingtlv = childbuilder.Reset()
+                              .SetTag(uint8_t(ParameterTag::HoppingMode))
+                              .SetValue(HoppingMode)
+                              .Build();
+        builder.AddTlv(hoppingtlv);
+    }
+
+    {
+        auto blocktlv = childbuilder.Reset()
+                            .SetTag(uint8_t(ParameterTag::BlockStriding))
+                            .SetValue(BlockStriding)
+                            .Build();
+        builder.AddTlv(blocktlv);
+    }
+
+    {
+        auto uwbtlv = childbuilder.Reset()
+                          .SetTag(uint8_t(ParameterTag::UwbInitiationTime))
+                          .SetValue(UwbInitiationTime)
+                          .Build();
+        builder.AddTlv(uwbtlv);
+    }
+
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::Channels), Channels, UwbCapability::ChannelsBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RFrameConfig), RFrameConfigurations, UwbCapability::RFrameConfigurationBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::CcConstraintLength), ConvolutionalCodeConstraintLengths, UwbCapability::ConvolutionalCodeConstraintLengthsBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::BprfParameterSets), BprfParameterSets, UwbCapability::BprfParameterSetsBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::HprfParameterSets), HprfParameterSets, UwbCapability::HprfParameterSetsBit, 5);
+
+    {
+        std::size_t aoaEncoded = 0;
+        for (auto value : AngleOfArrivalTypes) {
+            // auto bitIndex = UwbCapability::AngleOfArrivalBit.at(value);
+            auto bitIndex = unordered_map_lookup(UwbCapability::AngleOfArrivalBit, value);
+            aoaEncoded |= GetBitMaskFromBitIndex(bitIndex);
+        }
+        if (AngleOfArrivalFom) {
+            aoaEncoded |= GetBitMaskFromBitIndex(UwbCapability::AngleOfArrivalFomBit);
+        }
+
+        auto aoaByte = GetBytesBigEndianFromSizeT(aoaEncoded, 1);
+        auto aoatlv = childbuilder.Reset()
+                          .SetTag(uint8_t(ParameterTag::AoaSupport))
+                          .SetValue(aoaByte)
+                          .Build();
+        builder.AddTlv(aoatlv);
+    }
+
+    {
+        auto mactlv = childbuilder.Reset()
+                          .SetTag(uint8_t(ParameterTag::ExtendedMacAddress))
+                          .SetValue(ExtendedMacAddress)
+                          .Build();
+        builder.AddTlv(mactlv);
+    }
+
+    *returnTlvBer = builder.Build();
+    return returnTlvBer;
 }
 
 /* static */
 UwbCapability
-UwbCapability::FromOobDataObject(const encoding::Tlv& tlv)
+UwbCapability::FromOobDataObject(const encoding::TlvBer& tlv)
 {
     UwbCapability uwbCapability;
-    // TODO: perform actual conversion
+    if (tlv.GetTag().size() != 1 || tlv.GetTag()[0] != UwbCapability::Tag) {
+        throw UwbCapability::IncorrectTlvTag();
+    }
+    for (const auto& object : tlv.GetValues()) {
+        if (object.GetTag().size() != 1) {
+            throw UwbCapability::IncorrectNumberOfBytesInTagError();
+        }
+        switch (ParameterTag(object.GetTag()[0])) {
+        case ParameterTag::FiraPhyVersionRange: {
+            if (object.GetValue().size() != 4) {
+                throw UwbCapability::IncorrectNumberOfBytesInValueError();
+            }
+            uwbCapability.FiraPhyVersionRange = ReadSizeTFromBytesBigEndian(object.GetValue()); // TODO verify that the bytes are indeed big endian
+            break;
+        }
+        case ParameterTag::FiraMacVersionRange: {
+            if (object.GetValue().size() != 4) {
+                throw UwbCapability::IncorrectNumberOfBytesInValueError();
+            }
+            uwbCapability.FiraMacVersionRange = ReadSizeTFromBytesBigEndian(object.GetValue());
+            break;
+        }
+        case ParameterTag::DeviceRoles: {
+            if (object.GetValue().size() != 1) {
+                throw UwbCapability::IncorrectNumberOfBytesInValueError();
+            }
+            uwbCapability.DeviceRoles = AssignValuesFromBytes(UwbCapability::DeviceRoleBit, object.GetValue());
+            break;
+        }
+        case ParameterTag::RangingMethod: {
+            if (object.GetValue().size() != 1) {
+                throw UwbCapability::IncorrectNumberOfBytesInValueError();
+            }
+            uwbCapability.RangingConfigurations = AssignValuesFromBytes(UwbCapability::RangingConfigurationBit, object.GetValue());
+            break;
+        }
+        case ParameterTag::StsConfig: {
+            if (object.GetValue().size() != 1) {
+                throw UwbCapability::IncorrectNumberOfBytesInValueError();
+            }
+            uwbCapability.StsConfigurations = AssignValuesFromBytes(UwbCapability::StsConfigurationBit, object.GetValue());
+            break;
+        }
+        case ParameterTag::MultiNodeMode: {
+            if (object.GetValue().size() != 1) {
+                throw UwbCapability::IncorrectNumberOfBytesInValueError();
+            }
+            uwbCapability.MultiNodeModes = AssignValuesFromBytes(UwbCapability::MultiNodeModeBit, object.GetValue());
+            break;
+        }
+        case ParameterTag::RangingMode: {
+            if (object.GetValue().size() != 1) {
+                throw UwbCapability::IncorrectNumberOfBytesInValueError();
+            }
+            uwbCapability.RangingTimeStructs = AssignValuesFromBytes(UwbCapability::RangingModeBit, object.GetValue());
+            break;
+        }
+        case ParameterTag::ScheduledMode: {
+            if (object.GetValue().size() != 1) {
+                throw UwbCapability::IncorrectNumberOfBytesInValueError();
+            }
+            uwbCapability.SchedulingModes = AssignValuesFromBytes(UwbCapability::SchedulingModeBit, object.GetValue());
+            break;
+        }
+        case ParameterTag::HoppingMode: {
+            if (object.GetValue().size() != 1) {
+                throw UwbCapability::IncorrectNumberOfBytesInValueError();
+            }
+            uwbCapability.HoppingMode = object.GetValue()[0];
+            break;
+        }
+        case ParameterTag::BlockStriding: {
+            if (object.GetValue().size() != 1) {
+                throw UwbCapability::IncorrectNumberOfBytesInValueError();
+            }
+            uwbCapability.BlockStriding = object.GetValue()[0];
+            break;
+        }
+        case ParameterTag::UwbInitiationTime: {
+            if (object.GetValue().size() != 1) {
+                throw UwbCapability::IncorrectNumberOfBytesInValueError();
+            }
+            uwbCapability.UwbInitiationTime = object.GetValue()[0];
+            break;
+        }
+        case ParameterTag::Channels: {
+            if (object.GetValue().size() != 1) {
+                throw UwbCapability::IncorrectNumberOfBytesInValueError();
+            }
+            uwbCapability.Channels = AssignValuesFromBytes(UwbCapability::ChannelsBit, object.GetValue());
+            break;
+        }
+        case ParameterTag::RFrameConfig: {
+            if (object.GetValue().size() != 1) {
+                throw UwbCapability::IncorrectNumberOfBytesInValueError();
+            }
+            uwbCapability.RFrameConfigurations = AssignValuesFromBytes(UwbCapability::RFrameConfigurationBit, object.GetValue());
+            break;
+        }
+        case ParameterTag::CcConstraintLength: {
+            if (object.GetValue().size() != 1) {
+                throw UwbCapability::IncorrectNumberOfBytesInValueError();
+            }
+            uwbCapability.ConvolutionalCodeConstraintLengths = AssignValuesFromBytes(UwbCapability::ConvolutionalCodeConstraintLengthsBit, object.GetValue());
+            break;
+        }
+        case ParameterTag::BprfParameterSets: {
+            if (object.GetValue().size() != 1) {
+                throw UwbCapability::IncorrectNumberOfBytesInValueError();
+            }
+            uwbCapability.BprfParameterSets = AssignValuesFromBytes(UwbCapability::BprfParameterSetsBit, object.GetValue());
+            break;
+        }
+        case ParameterTag::HprfParameterSets: {
+            if (object.GetValue().size() != 5) {
+                throw UwbCapability::IncorrectNumberOfBytesInValueError();
+            }
+            uwbCapability.HprfParameterSets = AssignValuesFromBytes(UwbCapability::HprfParameterSetsBit, object.GetValue());
+            break;
+        }
+        case ParameterTag::AoaSupport: {
+            if (object.GetValue().size() != 1) {
+                throw UwbCapability::IncorrectNumberOfBytesInValueError();
+            }
+
+            uwbCapability.AngleOfArrivalTypes = AssignValuesFromBytes(UwbCapability::AngleOfArrivalBit, object.GetValue());
+            uwbCapability.AngleOfArrivalFom = (object.GetValue()[0] & GetBitMaskFromBitIndex(UwbCapability::AngleOfArrivalFomBit));
+            break;
+        }
+        case ParameterTag::ExtendedMacAddress: {
+            if (object.GetValue().size() != 1) {
+                throw UwbCapability::IncorrectNumberOfBytesInValueError();
+            }
+            uwbCapability.ExtendedMacAddress = object.GetValue()[0];
+            break;
+        }
+        }
+    }
+
     return uwbCapability;
+}
+
+namespace detail
+{
+// TODO: move these to common utility code, possibly notstd lib
+template <class T>
+bool
+leftIsSubset(const std::vector<T>& lhs, const std::vector<T>& rhs)
+{
+    return std::ranges::all_of(lhs, [&rhs](const auto& elem) {
+        return std::ranges::any_of(rhs, [&elem](const auto& elem2) {
+            return elem == elem2;
+        });
+    });
+}
+
+template <class T>
+bool
+leftUnorderedEquals(const std::vector<T>& lhs, const std::vector<T>& rhs)
+{
+    return leftIsSubset(lhs, rhs) and leftIsSubset(rhs, lhs);
+}
+} // namespace detail
+
+bool
+uwb::protocol::fira::operator==(const UwbCapability& lhs, const UwbCapability& rhs) noexcept
+{
+    const auto haveSameContents = [&](const auto& v1, const auto& v2) -> bool {
+        return detail::leftUnorderedEquals(v1, v2);
+    };
+
+    const bool basicFieldsEqual = 
+        std::tie(lhs.FiraPhyVersionRange, lhs.FiraMacVersionRange, lhs.ExtendedMacAddress, lhs.UwbInitiationTime, lhs.AngleOfArrivalFom, lhs.BlockStriding, lhs.HoppingMode) ==
+        std::tie(rhs.FiraPhyVersionRange, rhs.FiraMacVersionRange, rhs.ExtendedMacAddress, rhs.UwbInitiationTime, rhs.AngleOfArrivalFom, rhs.BlockStriding, rhs.HoppingMode);
+
+    return basicFieldsEqual
+        && haveSameContents(lhs.MultiNodeModes, rhs.MultiNodeModes)
+        && haveSameContents(lhs.DeviceRoles, rhs.DeviceRoles)
+        && haveSameContents(lhs.StsConfigurations, rhs.StsConfigurations)
+        && haveSameContents(lhs.RFrameConfigurations, rhs.RFrameConfigurations)
+        && haveSameContents(lhs.AngleOfArrivalTypes, rhs.AngleOfArrivalTypes)
+        && haveSameContents(lhs.SchedulingModes, rhs.SchedulingModes)
+        && haveSameContents(lhs.RangingTimeStructs, rhs.RangingTimeStructs)
+        && haveSameContents(lhs.RangingConfigurations, rhs.RangingConfigurations)
+        && haveSameContents(lhs.ConvolutionalCodeConstraintLengths, rhs.ConvolutionalCodeConstraintLengths)
+        && haveSameContents(lhs.Channels, rhs.Channels)
+        && haveSameContents(lhs.BprfParameterSets, rhs.BprfParameterSets)
+        && haveSameContents(lhs.HprfParameterSets, rhs.HprfParameterSets);
+}
+
+bool
+uwb::protocol::fira::operator!=(const UwbCapability& lhs, const UwbCapability& rhs) noexcept
+{
+    return !(lhs == rhs);
 }

@@ -4,6 +4,9 @@
 
 #include <functional>
 
+#include <notstd/hash.hxx>
+#include <notstd/utility.hxx>
+
 #include <uwb/protocols/fira/FiraDevice.hxx>
 
 namespace uwb::protocol::fira
@@ -13,15 +16,18 @@ namespace uwb::protocol::fira
  */
 struct RangingConfiguration
 {
-    RangingMethod Method;
-    MeasurementReportMode ReportMode;
+    constexpr RangingConfiguration() = default;
+
+    constexpr RangingConfiguration(RangingMethod method, MeasurementReportMode reportMode) :
+        Method(method),
+        ReportMode(reportMode)
+    {}
+
+    RangingMethod Method{ RangingMethod::OneWay };
+    MeasurementReportMode ReportMode{ MeasurementReportMode::None };
+
+    auto operator<=>(const RangingConfiguration& other) const = default;
 };
-
-bool
-operator==(const RangingConfiguration& lhs, const RangingConfiguration& rhs) noexcept;
-
-bool
-operator!=(const RangingConfiguration& lhs, const RangingConfiguration& rhs) noexcept;
 
 } // namespace uwb::protocol::fira
 
@@ -30,10 +36,12 @@ namespace std
 template <>
 struct hash<uwb::protocol::fira::RangingConfiguration>
 {
-    size_t
+    std::size_t
     operator()(const uwb::protocol::fira::RangingConfiguration& rangingConfiguration) const noexcept
     {
-        return (std::size_t)&rangingConfiguration;
+        std::size_t hash = 0;
+        notstd::hash_combine(hash, notstd::to_underlying(rangingConfiguration.Method), notstd::to_underlying(rangingConfiguration.ReportMode));
+        return hash;
     }
 };
 } // namespace std

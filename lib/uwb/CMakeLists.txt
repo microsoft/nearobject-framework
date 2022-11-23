@@ -26,6 +26,7 @@ target_include_directories(uwb
 target_link_libraries(uwb
     PRIVATE
         magic_enum::magic_enum
+        tlv
     PUBLIC
         notstd
         uwb-proto-fira
