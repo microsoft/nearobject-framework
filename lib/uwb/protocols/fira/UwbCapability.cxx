@@ -572,16 +572,33 @@ UwbCapability::FromOobDataObject(const encoding::TlvBer& tlv)
     return uwbCapability;
 }
 
+namespace detail
+{
+// TODO: move these to common utility code, possibly notstd lib
+template <class T>
+bool
+leftIsSubset(const std::vector<T>& lhs, const std::vector<T>& rhs)
+{
+    return std::ranges::all_of(lhs, [&rhs](const auto& elem) {
+        return std::ranges::any_of(rhs, [&elem](const auto& elem2) {
+            return elem == elem2;
+        });
+    });
+}
+
+template <class T>
+bool
+leftUnorderedEquals(const std::vector<T>& lhs, const std::vector<T>& rhs)
+{
+    return leftIsSubset(lhs, rhs) and leftIsSubset(rhs, lhs);
+}
+} // namespace detail
+
 bool
 uwb::protocol::fira::operator==(const UwbCapability& lhs, const UwbCapability& rhs) noexcept
 {
-    // TODO: making copies to sort them is pretty horrible; change this to use a range or view
     const auto haveSameContents = [&](const auto& v1, const auto& v2) -> bool {
-        auto v1Sorted = v1;
-        auto v2Sorted = v2;
-        std::sort(std::begin(v1Sorted), std::end(v1Sorted));
-        std::sort(std::begin(v2Sorted), std::end(v2Sorted));
-        return (v1Sorted == v2Sorted);
+        return detail::leftUnorderedEquals(v1, v2);
     };
 
     const bool basicFieldsEqual = 

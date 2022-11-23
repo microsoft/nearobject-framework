@@ -254,8 +254,8 @@ template <class T>
 bool
 leftIsSubset(const std::vector<T>& lhs, const std::vector<T>& rhs)
 {
-    return std::ranges::all_of(lhs, [&rhs](auto elem) {
-        return std::ranges::any_of(rhs, [elem](auto elem2) {
+    return std::ranges::all_of(lhs, [&rhs](const auto& elem) {
+        return std::ranges::any_of(rhs, [&elem](const auto& elem2) {
             return elem == elem2;
         });
     });
