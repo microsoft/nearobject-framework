@@ -181,24 +181,22 @@ TEST_CASE("Encoding into a TlvBer", "[basic]")
     REQUIRE(tlv->IsConstructed());
 
     // Validate values are as expected.
-    auto values = tlv->GetValues();
+    const auto values = tlv->GetValues();
     REQUIRE(values.size() == TestUwbCapability::tagAndExpected.size());
 
     for (auto [tag, expected] : TestUwbCapability::tagAndExpected) {
         // verify that the tag exists in the values
         bool wefoundit = false;
-        for (auto subtlv : values) {
+        for (const auto& subtlv : values) {
             wefoundit = (subtlv.GetTag().size() == 1) and (subtlv.GetTag()[0] == notstd::to_underlying(tag));
             if (wefoundit) {
                 // validate the value
-                auto tlvValue = subtlv.GetValue();
+                const auto tlvValue = subtlv.GetValue();
                 REQUIRE(std::equal(std::cbegin(expected), std::cend(expected), std::cbegin(tlvValue), std::cend(tlvValue)));
                 break;
             }
         }
-        if (not wefoundit) {
-            REQUIRE(false);
-        }
+        REQUIRE(wefoundit);
     }
 }
 
@@ -209,17 +207,16 @@ TEST_CASE("UwbCapability OOB encoding is stable", "[basic][oob][encoding]")
     SECTION("default value can be round-tripped")
     {
         UwbCapability uwbCapabilityOriginal{};
-        auto uwbCapabilityTlv = uwbCapabilityOriginal.ToOobDataObject();
-        auto uwbCapabilityDecoded = UwbCapability::FromOobDataObject(*uwbCapabilityTlv);
+        const auto uwbCapabilityTlv = uwbCapabilityOriginal.ToOobDataObject();
+        const auto uwbCapabilityDecoded = UwbCapability::FromOobDataObject(*uwbCapabilityTlv);
         REQUIRE(uwbCapabilityOriginal == uwbCapabilityDecoded);
     }
 
     SECTION("complex value can be round-tripped")
     {
         UwbCapability uwbCapabilityOriginal = TestUwbCapability::testUwbCapability;
-        // TODO: set all uwbCapabilityOriginal fields to non-default values
-        auto uwbCapabilityTlv = uwbCapabilityOriginal.ToOobDataObject();
-        auto uwbCapabilityDecoded = UwbCapability::FromOobDataObject(*uwbCapabilityTlv);
+        const auto uwbCapabilityTlv = uwbCapabilityOriginal.ToOobDataObject();
+        const auto uwbCapabilityDecoded = UwbCapability::FromOobDataObject(*uwbCapabilityTlv);
         REQUIRE(uwbCapabilityOriginal == uwbCapabilityDecoded);
     }
 }
@@ -249,7 +246,7 @@ TEST_CASE("Parsing from TlvBer", "[basic][protocol]")
 
     SECTION("FromOobDataObject correctly throws error with an invalid TlvBer tag")
     {
-        auto tlv = TestUwbCapability::testUwbCapability.ToOobDataObject();
+        const auto tlv = TestUwbCapability::testUwbCapability.ToOobDataObject();
 
         encoding::TlvBer::Builder builder;
         auto invalidTlv = builder.SetAsCopyOfTlv(*tlv)
@@ -259,7 +256,7 @@ TEST_CASE("Parsing from TlvBer", "[basic][protocol]")
     }
     SECTION("FromOobDataObject works")
     {
-        auto tlv = TestUwbCapability::testUwbCapability.ToOobDataObject();
+        const auto tlv = TestUwbCapability::testUwbCapability.ToOobDataObject();
         REQUIRE(tlv);
         UwbCapability decodedCapability;
         REQUIRE_NOTHROW(decodedCapability = UwbCapability::FromOobDataObject(*tlv));

@@ -240,6 +240,7 @@ struct hash<uwb::protocol::fira::UwbCapability>
             uwbCapability.AngleOfArrivalFom,
             uwbCapability.BlockStriding,
             uwbCapability.HoppingMode,
+            notstd::hash_range(std::cbegin(uwbCapability.RangingConfigurations), std::cend(uwbCapability.RangingConfigurations)),
             notstd::hash_range(std::cbegin(uwbCapability.MultiNodeModes), std::cend(uwbCapability.MultiNodeModes)),
             notstd::hash_range(std::cbegin(uwbCapability.DeviceRoles), std::cend(uwbCapability.DeviceRoles)),
             notstd::hash_range(std::cbegin(uwbCapability.StsConfigurations), std::cend(uwbCapability.StsConfigurations)),
