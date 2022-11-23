@@ -6,9 +6,12 @@
 #include <algorithm>
 #include <array>
 #include <cstdint>
+#include <initializer_list>
 #include <iomanip>
 #include <iostream>
 #include <memory>
+#include <unordered_map>
+#include <unordered_set>
 
 #include <TlvBer.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
@@ -226,13 +229,33 @@ TEST_CASE("Encoding into a TlvBer", "[basic]")
     }
 }
 
+TEST_CASE("UwbCapability OOB encoding is stable", "[basic][oob][encoding]")
+{
+    SECTION("default value can be round-tripped")
+    {
+        UwbCapability uwbCapabilityOriginal{};
+        auto uwbCapabilityTlv = uwbCapabilityOriginal.ToOobDataObject();
+        auto uwbCapabilityDecoded = UwbCapability::FromOobDataObject(*uwbCapabilityTlv);
+        REQUIRE(uwbCapabilityOriginal == uwbCapabilityDecoded);
+    }
+
+    SECTION("complex value can be round-tripped")
+    {
+        UwbCapability uwbCapabilityOriginal{};
+        // TODO: set all uwbCapabilityOriginal fields to non-default values
+        auto uwbCapabilityTlv = uwbCapabilityOriginal.ToOobDataObject();
+        auto uwbCapabilityDecoded = UwbCapability::FromOobDataObject(*uwbCapabilityTlv);
+        REQUIRE(uwbCapabilityOriginal == uwbCapabilityDecoded);
+    }
+}
+
 // TODO find better place for this
 template <class T>
 bool
 leftIsSubset(const std::vector<T>& lhs, const std::vector<T>& rhs)
 {
-    return std::ranges::all_of(lhs, [&rhs](auto elem) {
-        return std::ranges::any_of(rhs, [elem](auto elem2) {
+    return std::ranges::all_of(lhs, [&rhs](const auto& elem) {
+        return std::ranges::any_of(rhs, [&elem](const auto& elem2) {
             return elem == elem2;
         });
     });
@@ -284,5 +307,57 @@ TEST_CASE("Parsing from TlvBer", "[basic][protocol]")
 
         REQUIRE(decodedCapability.AngleOfArrivalFom == TestUwbCapability::testUwbCapability.AngleOfArrivalFom);
         REQUIRE(decodedCapability.ExtendedMacAddress == TestUwbCapability::testUwbCapability.ExtendedMacAddress);
+    }
+}
+
+TEST_CASE("UwbCapability can be used in unordered_containers", "[basic][container]")
+{
+    UwbCapability uwbCapabilityDeviceRoleInitiator{};
+    uwbCapabilityDeviceRoleInitiator.DeviceRoles = { DeviceRole::Initiator };
+    UwbCapability uwbCapabilityDeviceRoleResponder{};
+    uwbCapabilityDeviceRoleResponder.DeviceRoles = { DeviceRole::Responder };
+    UwbCapability uwbCapabilityDeviceRoleBoth{};
+    uwbCapabilityDeviceRoleBoth.DeviceRoles = { DeviceRole::Initiator, DeviceRole::Responder };
+
+    const std::initializer_list<UwbCapability> UwbCapabilities = {
+        uwbCapabilityDeviceRoleInitiator,
+        uwbCapabilityDeviceRoleResponder,
+        uwbCapabilityDeviceRoleBoth
+    };
+
+    SECTION("can be used in std::unordered_set")
+    {
+        std::unordered_set<UwbCapability> uwbCapabilities{};
+
+        const auto insertCapability = [&](const UwbCapability& uwbCapability) -> bool {
+            auto [_, inserted] = uwbCapabilities.insert(uwbCapability);
+            return inserted;
+        };
+
+        for (const auto& uwbCapability : UwbCapabilities) {
+            REQUIRE(insertCapability(uwbCapability));
+            REQUIRE(!insertCapability(uwbCapability));
+        }
+    }
+
+    SECTION("can be used as std::unordered_map key")
+    {
+        unsigned value = 0;
+        std::unordered_map<UwbCapability, unsigned> uwbCapabilities{};
+
+        // Populate map with initial objects, ensure all were inserted, implying no existing element.
+        for (const auto& uwbCapability : UwbCapabilities) {
+            auto [_, inserted] = uwbCapabilities.insert({ uwbCapability, value++ });
+            REQUIRE(inserted);
+        }
+
+        // Reset value such that insertion sequence matches the one above.
+        value = 0;
+
+        // Populate map with same objects, ensure none were inserted, implying elements already exist.
+        for (const auto& uwbCapability : UwbCapabilities) {
+            auto [_, inserted] = uwbCapabilities.insert({ uwbCapability, value++ });
+            REQUIRE(!inserted);
+        }
     }
 }

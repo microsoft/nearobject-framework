@@ -1,4 +1,5 @@
 
+#include <algorithm>
 #include <bit>
 #include <climits>
 #include <iterator>
@@ -99,9 +100,9 @@ const std::unordered_map<Channel, std::size_t> UwbCapability::ChannelsBit = {
     { Channel::C8, 2 },
     { Channel::C9, 3 },
     { Channel::C10, 4 },
-    { Channel::C12, 6 },
-    { Channel::C13, 7 },
-    { Channel::C14, 8 },
+    { Channel::C12, 5 },
+    { Channel::C13, 6 },
+    { Channel::C14, 7 },
 };
 
 const std::unordered_map<BprfParameter, std::size_t> UwbCapability::BprfParameterSetsBit = {
@@ -228,13 +229,10 @@ ReadSizeTFromBytesBigEndian(std::span<const uint8_t> bytes)
 std::size_t
 GetBitMaskFromBitIndex(std::size_t bitIndex)
 {
-    if (bitIndex == 0) {
-        return 1;
-    }
-    if (bitIndex >= (sizeof bitIndex) * CHAR_BIT) {
+    if (bitIndex >= sizeof(std::size_t) * CHAR_BIT) {
         return 0; // TODO throw error? this isn't really part of an interface so may not be necessary
     }
-    return 1UL << bitIndex;
+    return static_cast<std::size_t>(1UL) << bitIndex;
 }
 
 /**
@@ -287,11 +285,10 @@ unordered_map_lookup(const std::unordered_map<T, std::size_t>& bitIndexMap, cons
  */
 template <class T>
 std::vector<uint8_t>
-EncodeValuesAsBytes(const std::vector<T>& valueSet, const std::unordered_map<T, std::size_t>& bitIndexMap, int desiredLength)
+EncodeValuesAsBytes(const std::vector<T>& valueSet, const std::unordered_map<T, std::size_t>& bitIndexMap, std::size_t desiredLength)
 {
     std::size_t valueSetEncoded = 0;
-    for (auto value : valueSet) {
-        // auto bitIndex = bitIndexMap.at(value);
+    for (const auto& value : valueSet) {
         auto bitIndex = unordered_map_lookup(bitIndexMap, value);
         valueSetEncoded |= GetBitMaskFromBitIndex(bitIndex);
     }
@@ -324,7 +321,7 @@ AssignValuesFromBytes(const std::unordered_map<T, std::size_t>& bitIndexMap, std
 // TODO find a better place for this function
 template <class T>
 void
-ToOobDataObjectHelper(encoding::TlvBer::Builder& builder, encoding::TlvBer::Builder& childbuilder, uint8_t tag, const std::vector<T>& valueSet, const std::unordered_map<T, std::size_t>& bitIndexMap, int desiredLength)
+ToOobDataObjectHelper(encoding::TlvBer::Builder& builder, encoding::TlvBer::Builder& childbuilder, uint8_t tag, const std::vector<T>& valueSet, const std::unordered_map<T, std::size_t>& bitIndexMap, std::size_t desiredLength)
 {
     auto bytes = EncodeValuesAsBytes(valueSet, bitIndexMap, desiredLength);
     auto tlv = childbuilder.Reset()
@@ -573,4 +570,58 @@ UwbCapability::FromOobDataObject(const encoding::TlvBer& tlv)
     }
 
     return uwbCapability;
+}
+
+namespace detail
+{
+// TODO: move these to common utility code, possibly notstd lib
+template <class T>
+bool
+leftIsSubset(const std::vector<T>& lhs, const std::vector<T>& rhs)
+{
+    return std::ranges::all_of(lhs, [&rhs](const auto& elem) {
+        return std::ranges::any_of(rhs, [&elem](const auto& elem2) {
+            return elem == elem2;
+        });
+    });
+}
+
+template <class T>
+bool
+leftUnorderedEquals(const std::vector<T>& lhs, const std::vector<T>& rhs)
+{
+    return leftIsSubset(lhs, rhs) and leftIsSubset(rhs, lhs);
+}
+} // namespace detail
+
+bool
+uwb::protocol::fira::operator==(const UwbCapability& lhs, const UwbCapability& rhs) noexcept
+{
+    const auto haveSameContents = [&](const auto& v1, const auto& v2) -> bool {
+        return detail::leftUnorderedEquals(v1, v2);
+    };
+
+    const bool basicFieldsEqual = 
+        std::tie(lhs.FiraPhyVersionRange, lhs.FiraMacVersionRange, lhs.ExtendedMacAddress, lhs.UwbInitiationTime, lhs.AngleOfArrivalFom, lhs.BlockStriding, lhs.HoppingMode) ==
+        std::tie(rhs.FiraPhyVersionRange, rhs.FiraMacVersionRange, rhs.ExtendedMacAddress, rhs.UwbInitiationTime, rhs.AngleOfArrivalFom, rhs.BlockStriding, rhs.HoppingMode);
+
+    return basicFieldsEqual
+        && haveSameContents(lhs.MultiNodeModes, rhs.MultiNodeModes)
+        && haveSameContents(lhs.DeviceRoles, rhs.DeviceRoles)
+        && haveSameContents(lhs.StsConfigurations, rhs.StsConfigurations)
+        && haveSameContents(lhs.RFrameConfigurations, rhs.RFrameConfigurations)
+        && haveSameContents(lhs.AngleOfArrivalTypes, rhs.AngleOfArrivalTypes)
+        && haveSameContents(lhs.SchedulingModes, rhs.SchedulingModes)
+        && haveSameContents(lhs.RangingTimeStructs, rhs.RangingTimeStructs)
+        && haveSameContents(lhs.RangingConfigurations, rhs.RangingConfigurations)
+        && haveSameContents(lhs.ConvolutionalCodeConstraintLengths, rhs.ConvolutionalCodeConstraintLengths)
+        && haveSameContents(lhs.Channels, rhs.Channels)
+        && haveSameContents(lhs.BprfParameterSets, rhs.BprfParameterSets)
+        && haveSameContents(lhs.HprfParameterSets, rhs.HprfParameterSets);
+}
+
+bool
+uwb::protocol::fira::operator!=(const UwbCapability& lhs, const UwbCapability& rhs) noexcept
+{
+    return !(lhs == rhs);
 }
