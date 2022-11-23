@@ -100,9 +100,9 @@ const std::unordered_map<Channel, std::size_t> UwbCapability::ChannelsBit = {
     { Channel::C8, 2 },
     { Channel::C9, 3 },
     { Channel::C10, 4 },
-    { Channel::C12, 6 },
-    { Channel::C13, 7 },
-    { Channel::C14, 8 },
+    { Channel::C12, 5 },
+    { Channel::C13, 6 },
+    { Channel::C14, 7 },
 };
 
 const std::unordered_map<BprfParameter, std::size_t> UwbCapability::BprfParameterSetsBit = {
