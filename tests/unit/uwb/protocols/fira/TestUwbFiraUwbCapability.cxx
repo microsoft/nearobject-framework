@@ -88,9 +88,6 @@ constexpr auto HprfParameterSetsDefault = {
 
 constexpr uint32_t phyVersionDefault = 0xAABBCCDD;
 constexpr uint32_t macVersionDefault = 0xAABBCCEE;
-
-uint32_t FiraPhyVersionRange{ phyVersionDefault };
-uint32_t FiraMacVersionRange{ macVersionDefault };
 const bool ExtendedMacAddressDefault{ false };
 const bool UwbInitiationTimeDefault{ false };
 const bool AngleOfArrivalFomDefault{ false };
