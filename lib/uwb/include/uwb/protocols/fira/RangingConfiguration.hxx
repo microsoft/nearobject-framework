@@ -4,6 +4,9 @@
 
 #include <functional>
 
+#include <notstd/hash.hxx>
+#include <notstd/utility.hxx>
+
 #include <uwb/protocols/fira/FiraDevice.hxx>
 
 namespace uwb::protocol::fira
@@ -35,11 +38,12 @@ namespace std
 template <>
 struct hash<uwb::protocol::fira::RangingConfiguration>
 {
-    // TODO replace this hash function with something actually usable
-    size_t
+    std::size_t
     operator()(const uwb::protocol::fira::RangingConfiguration& rangingConfiguration) const noexcept
     {
-        return (std::size_t)&rangingConfiguration;
+        std::size_t hash = 0;
+        notstd::hash_combine(hash, notstd::to_underlying(rangingConfiguration.Method), notstd::to_underlying(rangingConfiguration.ReportMode));
+        return hash;
     }
 };
 } // namespace std
