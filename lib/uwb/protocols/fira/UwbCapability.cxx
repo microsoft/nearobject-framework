@@ -1,5 +1,6 @@
 
 #include <bit>
+#include <climits>
 #include <iterator>
 #include <stdexcept>
 
@@ -151,7 +152,7 @@ const std::unordered_map<HprfParameter, std::size_t> UwbCapability::HprfParamete
 };
 
 /**
- * @brief Get the Bytes Big Endian From size_t
+ * @brief Get the Bytes Big Endian From std::size_t
  * 
  * @param value the bitmap to encode
  * @param desiredLength the desired number of bytes in the encoding, padding with zeros if necessary. 
@@ -159,10 +160,10 @@ const std::unordered_map<HprfParameter, std::size_t> UwbCapability::HprfParamete
  * @return std::vector<uint8_t> 
  */
 std::vector<uint8_t>
-GetBytesBigEndianFromBitMap(size_t value, int desiredLength)
+GetBytesBigEndianFromBitMap(std::size_t value, std::size_t desiredLength)
 {
     if (desiredLength > sizeof value) {
-        throw std::runtime_error("desired length exceeds size_t width, this is a bug!");
+        throw std::runtime_error("desired length exceeds std::size_t width, this is a bug!");
     }
 
     std::vector<uint8_t> bytes;
@@ -180,7 +181,7 @@ GetBytesBigEndianFromBitMap(size_t value, int desiredLength)
 }
 
 /**
- * @brief Get the Bytes Big Endian From size_t
+ * @brief Get the Bytes Big Endian From std::size_t
  * 
  * @param value the number to encode in big endian
  * @param desiredLength the desired number of bytes in the encoding, padding with zeros if necessary. 
@@ -188,7 +189,7 @@ GetBytesBigEndianFromBitMap(size_t value, int desiredLength)
  * @return std::vector<uint8_t> 
  */
 std::vector<uint8_t>
-GetBytesBigEndianFromSizeT(size_t value, int desiredLength)
+GetBytesBigEndianFromSizeT(std::size_t value, std::size_t desiredLength)
 {
     if (std::endian::native != std::endian::big) {
         value = value & 0x000000FF << 24 | value & 0x0000FF00 << 8 | value & 0x00FF0000 >> 8 | value & 0xFF000000 >> 24;
@@ -197,17 +198,17 @@ GetBytesBigEndianFromSizeT(size_t value, int desiredLength)
 }
 
 /**
- * @brief Parses a span of bytes as a size_t number encoded in big endian
+ * @brief Parses a span of bytes as a std::size_t number encoded in big endian
  * 
  * @param bytes 
- * @return size_t 
+ * @return std::size_t 
  */
-size_t
+std::size_t
 ReadSizeTFromBytesBigEndian(std::span<const uint8_t> bytes)
 {
-    size_t rvalue = 0;
+    std::size_t rvalue = 0;
 
-    if (bytes.size() >= 8)
+    if (bytes.size() >= sizeof rvalue)
         return 0; // TODO throw error? this isn't really part of an interface so may not be necessary
 
     for (int i = 0; i < bytes.size(); i++) {
@@ -222,15 +223,15 @@ ReadSizeTFromBytesBigEndian(std::span<const uint8_t> bytes)
  * @brief Get the Bit Mask From Bit Index object
  * 
  * @param bitIndex 
- * @return size_t 
+ * @return std::size_t 
  */
-size_t
-GetBitMaskFromBitIndex(size_t bitIndex)
+std::size_t
+GetBitMaskFromBitIndex(std::size_t bitIndex)
 {
     if (bitIndex == 0) {
         return 1;
     }
-    if (bitIndex >= 64) {
+    if (bitIndex >= (sizeof bitIndex) * CHAR_BIT) {
         return 0; // TODO throw error? this isn't really part of an interface so may not be necessary
     }
     return 1UL << bitIndex;
@@ -240,17 +241,17 @@ GetBitMaskFromBitIndex(size_t bitIndex)
  * @brief Get the Bit Index From Bit Mask object. 
  * 
  * @param bitMask 
- * @return size_t 
+ * @return std::size_t 
  */
-size_t
-GetBitIndexFromBitMask(size_t bitMask)
+std::size_t
+GetBitIndexFromBitMask(std::size_t bitMask)
 {
-    for (int index = 0; index < 64; index++) {
+    for (int index = 0; index < (sizeof bitMask) * CHAR_BIT; index++) {
         if (bitMask == GetBitMaskFromBitIndex(index)) {
             return index;
         }
     }
-    throw std::exception();
+    throw std::runtime_error("bit index not found");
 }
 
 /**
@@ -288,7 +289,7 @@ template <class T>
 std::vector<uint8_t>
 EncodeValuesAsBytes(const std::vector<T>& valueSet, const std::unordered_map<T, std::size_t>& bitIndexMap, int desiredLength)
 {
-    size_t valueSetEncoded = 0;
+    std::size_t valueSetEncoded = 0;
     for (auto value : valueSet) {
         // auto bitIndex = bitIndexMap.at(value);
         auto bitIndex = unordered_map_lookup(bitIndexMap, value);
@@ -354,7 +355,7 @@ UwbCapability::ToOobDataObject() const
     {
         auto macRange = GetBytesBigEndianFromSizeT(FiraMacVersionRange, 4);
         auto macRangeTlv = childbuilder.Reset()
-                               .SetTag(size_t(ParameterTag::FiraMacVersionRange))
+                               .SetTag(std::size_t(ParameterTag::FiraMacVersionRange))
                                .SetValue(macRange)
                                .Build();
         builder.AddTlv(macRangeTlv);
@@ -397,7 +398,7 @@ UwbCapability::ToOobDataObject() const
     ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::HprfParameterSets), HprfParameterSets, UwbCapability::HprfParameterSetsBit, 5);
 
     {
-        size_t aoaEncoded = 0;
+        std::size_t aoaEncoded = 0;
         for (auto value : AngleOfArrivalTypes) {
             // auto bitIndex = UwbCapability::AngleOfArrivalBit.at(value);
             auto bitIndex = unordered_map_lookup(UwbCapability::AngleOfArrivalBit, value);
