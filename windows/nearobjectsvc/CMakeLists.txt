@@ -13,3 +13,8 @@ target_link_libraries(nearobjectsvc
 )
 
 set_target_properties(nearobjectsvc PROPERTIES FOLDER linux/service/nearobjectd)
+
+install(
+    TARGETS nearobjectsvc
+    EXPORT nearobject
+)
