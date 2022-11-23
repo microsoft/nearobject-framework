@@ -13,9 +13,13 @@ namespace uwb::protocol::fira
  */
 struct RangingConfiguration
 {
+    constexpr RangingConfiguration(RangingMethod method, MeasurementReportMode reportMode) :
+        Method(method),
+        ReportMode(reportMode)
+    {}
+
     RangingMethod Method;
     MeasurementReportMode ReportMode;
-    // bool operator==(const RangingConfiguration&) const = default;
 };
 
 bool
