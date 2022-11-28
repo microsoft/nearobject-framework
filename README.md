@@ -49,11 +49,53 @@ Both a compiler and standard C++ library supporting C++20 are required. The C++ 
 
 #### Windows
 
-[Visual Studio 2022](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Enterprise&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false) generally satisfies the requirements, however, the full integrated development environment (IDE) is not needed. A much leaner alternative for those using other editors such as Visual Studio Code can instead install [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022). The build tools come with a C++ compatible compiler and standard library.
+[Visual Studio 2022](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Enterprise&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false) generally satisfies the requirements, however, the full integrated development environment (IDE) is not needed. A much leaner alternative for those using other editors such as Visual Studio Code can instead install [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022). The build tools come with a C++ compatible compiler and standard library. Detailed development environment setup instructions can be found in the Windows [`README`](/windows/README.md).
 
 #### Linux
 
 g++ or llvm/clang are suitable, however, some care must be taken to obtain a compatible standard library. A known, working environment is ubuntu 22.04 (jammy) with clang 14.0.0 and LLVM 14.0.0. Both are both provided by the official ubuntu package repository so can be installed using `apt`. Detailed development environment setup instructions can be found in the Linux [`README`](/linux/README.md).
+
+### Obtaining the source
+
+#### Git Configuration
+
+To access the repository, you must configure git with your user name, email, and ssh key. To configure your git user name and email, execute the following commands:
+
+```bash
+git config --global user.name "Andrew Beltrano"
+git config --global user.email anbeltra@microsoft.com
+```
+
+If you do not have a pre-existing key, generate a new key with OpenSSH per your preferences, or a default key per the below command, accepting all of the defaults:
+```bash
+ssh-keygen
+```
+
+This will generate a new RSA key pair, with the private key under the user home directory `~/.ssh/id_rsa` and associated public key at `~/.ssh/id_rsa.pub` (`%HOME%\.ssh` on Windows). The public key must be registered with your GitHub user account to be able to access the repository. Get the contents of the public key:
+```bash
+cat ~/.ssh/id_rsa.pub
+> <key-content>
+```
+
+In a browser, navigate to the GitHub SSH keys page at [https://github.com/settings/keys](https://github.com/settings/keys) and click 'New SSH Key'. Give the key a descriptive name in the `Title` box, ensure the `Key type` is set to `Authentication Key`, then copy + paste the complete output of the above `cat` command in the `Key` box. It should look something like this:
+
+![GitHub Add SSH Key](/assets/github_add_ssh_key.png)
+
+Then click `Add SSH key`. This should pop up a notification indicating the key was added and bring you back to the SSH keys page. Here, find the key that was added, then click `Configure SSO`. This should show `aep-microsoft` under the `Single sign-on organizations`; click the `Authorize` button beside it and complete the authentication procedure. Once completed, you are now able to access the repository:
+
+```bash
+git clone git@github.com:aep-microsoft/nearobject-framework.git
+> Cloning into 'nearobject-framework'...
+```
+
+#### Commit Signing
+
+While not required, it is strongly recommended to configure git with a [GNU Privacy Guard (GPG)](https://gnupg.org/) signing key. This allows GitHub to verify commits were pushed by a specific user and will show a green `Verified` status beside each verified commit. Follow these steps to configure a signing key for commit verification:
+
+1. Install the gpg tools for the target operating system (see the OS-specific `README` files for details).
+2. [Generate a gpg key](https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key)
+3. [Add the gpg key to your github account](https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-gpg-key-to-your-github-account)
+4. [Configure git to use the gpg key](https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key)
 
 ### CMake
 
@@ -96,7 +138,7 @@ The `FetchContent` method works out of the box with no setup required, so is the
 
 #### vcpkg
 
-The `vcpkg` source dependency method is configurable through the CMake build option `USE_VCPKG`. This option defaults to `OFF` since `FetchContent` is much faster for development loop tasks. Set this to `ON` to use `vcpkg` for source dependency resolution (eg. via command line argument such as `cmake -DUSE_VCPKG:BOOL=ON .`, or by editing the CMake cache directly). Note that this is a cache setting, thus it is sticky; once set, the chosen setting will be stored in the CMake variable cache (`CMakeCache.txt`) and so it must be explicitly reset to `OFF` when no longer desired.
+The `vcpkg` source dependency method is configurable through the CMake build option `USE_VCPKG`. This option defaults to `OFF` since `FetchContent` is much faster for development loop tasks. Set this to `ON` to use `vcpkg` for source dependency resolution (eg. via command line argument such as `cmake -DNOF_USE_VCPKG:BOOL=ON .`, or by editing the CMake cache directly). Note that this is a cache setting, thus it is sticky; once set, the chosen setting will be stored in the CMake variable cache (`CMakeCache.txt`) and so it must be explicitly reset to `OFF` when no longer desired.
 
 `vcpkg` has extra dependencies on Linux including curl, zip, unzip, tar, and pkg-config. These can be installed on Debian or Ubuntu distributions using the following command:
 

@@ -27,3 +27,15 @@ The final list with all optional components would look like this:
 ![Visual Studio 2022 Build Tools Components List](/assets/vsbuildtools_finallist.png)
 
 Once installed, the project can be built using CMake as described in the main [`README`](/README.md#cmake).
+
+## 2. Configure Commit signing (optional)
+ 
+Prior to following the generic instructions for configuring a git signing key [here](/README.md#commit-signing), the gpg tools must be installed:
+
+1. Download the latest version of gpg4win from [https://www.gpg4win.org/](https://www.gpg4win.org/).
+2. Run the installer, deselect all optional components, leaving only `GnuPG` selected. Accept all other defaults and complete the installation. 
+3. Configure git with the location of the Windows gpg tools:
+
+```Shell
+git config --global gpg.program "C:\Program Files (x86)\GnuPG\bin\gpg.exe"
+```
