@@ -17,6 +17,11 @@
 
 namespace uwb
 {
+enum class UwbMacAddressFcsType {
+    Crc16,
+    Crc32,
+};
+
 /**
  * @brief The type of uwb device object address.
  */
@@ -335,6 +340,11 @@ public:
     UwbMacAddress&
     operator=(UwbMacAddress other);
 
+    /**
+     * @brief Three-way comparison operator.
+     */
+    auto operator<=>(const UwbMacAddress& other) const noexcept;
+
 private:
     /**
      * @brief Swap the data members of this instance with another one.
@@ -394,9 +404,6 @@ private:
 
 bool
 operator==(const UwbMacAddress&, const UwbMacAddress&) noexcept;
-
-bool
-operator!=(const UwbMacAddress&, const UwbMacAddress&) noexcept;
 
 } // namespace uwb
 

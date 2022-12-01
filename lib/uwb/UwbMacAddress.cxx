@@ -93,8 +93,8 @@ uwb::operator==(const UwbMacAddress& lhs, const UwbMacAddress& rhs) noexcept
     return (lhs.m_value == rhs.m_value);
 }
 
-bool
-uwb::operator!=(const UwbMacAddress& lhs, const UwbMacAddress& rhs) noexcept
+auto 
+uwb::UwbMacAddress::operator<=>(const UwbMacAddress& other) const noexcept
 {
-    return !(lhs == rhs);
+    return this->m_value <=> other.m_value;
 }
