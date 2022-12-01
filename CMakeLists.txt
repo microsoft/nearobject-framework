@@ -117,7 +117,6 @@ endif()
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   # Common options for both gcc and clang
   add_compile_options(
-    -fstack-clash-protection
     -fstack-protector-all
     -fvisibility=hidden
     -fcf-protection
@@ -135,6 +134,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GN
   # gcc specific options
   if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_compile_options(
+      -fstack-clash-protection
       -Wtrampolines
       -Wl,-z,noexecstack
       -Wl,-z,now
