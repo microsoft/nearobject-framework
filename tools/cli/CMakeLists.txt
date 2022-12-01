@@ -8,6 +8,7 @@ target_sources(nocli
 
 target_link_libraries(nocli
     PRIVATE
+        CLI11::CLI11
         nearobject
         nearobject-service
 )
