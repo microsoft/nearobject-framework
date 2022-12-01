@@ -2,6 +2,9 @@
 
 #include <iostream>
 
+#include <nearobject/service/ServiceRuntime.hxx>
+#include <uwb/protocols/fira/UwbConfiguration.hxx>
+
 int
 main(int argc, char **argv)
 {
