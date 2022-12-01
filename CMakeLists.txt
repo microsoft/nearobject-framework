@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.16)
 
 option(NOF_OFFICIAL_BUILD "Configure the project for an official build" OFF)
 
@@ -57,6 +57,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Don't add CTest targets
 set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED 1)
 
+include(CheckPIESupported)
 include(CTest)
 include(GNUInstallDirs)
 include(FetchContent)
@@ -96,6 +97,61 @@ find_package(Threads REQUIRED)
 # projects, where these folders will appear in IDEs that interpret them (eg.
 # Visual Studio).
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+# Enable POSITION_INDEPENDENT_CODE variable to control passing PIE flags to the linker.
+if (POLICY CMP0083)
+  cmake_policy(SET CMP0083 NEW)
+endif()
+
+# Enable position independent executables.
+check_pie_supported(LANGUAGES CXX)
+if (CMAKE_CXX_LINK_PIE_SUPPORTED)
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+endif()
+
+if (WERROR)
+  add_compile_options(-Werror)
+endif()
+
+# Set compiler specific options
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  # Common options for both gcc and clang
+  add_compile_options(
+    -fstack-protector-all
+    -fvisibility=hidden
+    -fcf-protection
+    -fpermissive
+    -mshstk
+    -Wall 
+    -Wshadow
+    -Wformat-security
+    -Wextra
+    -Wpedantic
+    -Wconversion
+    -Walloca
+    -Wvla
+  )
+
+  # gcc specific options
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    add_compile_options(
+      -fstack-clash-protection
+      -Wtrampolines
+      -Wl,-z,noexecstack
+      -Wl,-z,now
+      -Wl,-z,relro
+      -z noexecstack
+    )
+  elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    # clang specific options, presently none
+  endif()
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  # TODO
+endif()
+
+if (CMAKE_BUILD_TYPE MATCHES "(Release|RelWithDebInfo|MinSizeRel)")
+  add_compile_definitions(_FORTIFY_SOURCE=2)
+endif()
 
 # Common source directories
 set(NOF_DIR_LIB ${CMAKE_CURRENT_LIST_DIR}/lib)

@@ -123,6 +123,14 @@ enum class Channel {
 };
 
 /**
+ * @brief TODO Add spec reference.
+ */
+enum class PrfMode {
+    Bprf,
+    Hprf,
+};
+
+/**
  * @brief TODO Add spec reference. 
  */
 enum class BprfParameter {
@@ -173,6 +181,16 @@ enum class HprfParameter {
     Set33,
     Set34,
     Set35,
+};
+
+/**
+ * @brief TODO: Add spec reference.
+ */
+enum class ResultReportConfiguration {
+    TofReport,
+    AoAAzimuthReport,
+    AoAElevationReport,
+    AoAFoMReport,
 };
 
 } // namespace uwb::protocol::fira
