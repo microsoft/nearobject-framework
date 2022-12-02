@@ -3,9 +3,12 @@
 #define FIRA_SECURE_RANGING_INFO_HXX
 
 #include <cstdint>
+#include <iterator>
 #include <vector>
 
-namespace nearobject::protocol::fira
+#include <notstd/hash.hxx>
+
+namespace uwb::protocol::fira
 {
 struct SecureRangingInfo
 {
@@ -32,5 +35,23 @@ struct SecureRangingInfo
     std::vector<uint8_t> SusAdditionalParameters;
 };
 } // namespace nearobject::protocol::fira
+
+namespace std
+{
+template <>
+struct hash<uwb::protocol::fira::SecureRangingInfo>
+{
+    std::size_t
+    operator()(const uwb::protocol::fira::SecureRangingInfo& secureRangingInfo) const noexcept
+    {
+        std::size_t value = 0;
+        notstd::hash_combine(value,
+            notstd::hash_range(std::cbegin(secureRangingInfo.UwbSessionKeyInfo), std::cend(secureRangingInfo.UwbSessionKeyInfo)),
+            notstd::hash_range(std::cbegin(secureRangingInfo.ResponderSpecificSubSessionKeyInfo), std::cend(secureRangingInfo.ResponderSpecificSubSessionKeyInfo)),
+            notstd::hash_range(std::cbegin(secureRangingInfo.SusAdditionalParameters), std::cend(secureRangingInfo.SusAdditionalParameters)));
+        return value;
+    }
+};
+} // namespace std
 
 #endif // FIRA_SECURE_RANGING_INFO_HXX

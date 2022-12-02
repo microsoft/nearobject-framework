@@ -231,8 +231,8 @@ struct hash<uwb::protocol::fira::UwbCapability>
     std::size_t
     operator()(const uwb::protocol::fira::UwbCapability& uwbCapability) const noexcept
     {
-        std::size_t hash = 0;
-        notstd::hash_combine(hash,
+        std::size_t value = 0;
+        notstd::hash_combine(value,
             uwbCapability.FiraPhyVersionRange,
             uwbCapability.FiraMacVersionRange,
             uwbCapability.ExtendedMacAddress,
@@ -252,7 +252,7 @@ struct hash<uwb::protocol::fira::UwbCapability>
             notstd::hash_range(std::cbegin(uwbCapability.Channels), std::cend(uwbCapability.Channels)),
             notstd::hash_range(std::cbegin(uwbCapability.BprfParameterSets), std::cend(uwbCapability.BprfParameterSets)),
             notstd::hash_range(std::cbegin(uwbCapability.HprfParameterSets), std::cend(uwbCapability.HprfParameterSets)));
-        return hash;
+        return value;
     }
 };
 } // namespace std
