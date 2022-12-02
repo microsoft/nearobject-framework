@@ -37,10 +37,10 @@ UwbSession::AddPeer(UwbMacAddress peerMacAddress)
 }
 
 void
-UwbSession::Configure(const uwb::protocol::fira::UwbConfiguration& uwbConfiguration)
+UwbSession::Configure(const uwb::protocol::fira::UwbSessionData& uwbSessionData)
 {
     // TODO: log
-    ConfigureImpl(uwbConfiguration);
+    ConfigureImpl(uwbSessionData);
 }
 
 void

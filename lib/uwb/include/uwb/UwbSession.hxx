@@ -9,7 +9,7 @@
 #include <unordered_set>
 
 #include <uwb/UwbMacAddress.hxx>
-#include <uwb/protocols/fira/UwbConfiguration.hxx>
+#include <uwb/protocols/fira/UwbSessionData.hxx>
 
 namespace uwb
 {
@@ -64,12 +64,16 @@ public:
     GetId() const noexcept;
 
     /**
-     * @brief 
+     * @brief Configure the session for use.
      * 
-     * @param uwbConfiguration 
+     * TODO: This probably needs to return something to indicate whether it was
+     * successful or not.
+     * 
+     * @param uwbSessionData The session configuration to use. This should have
+     * been obtained as a result of out-of-band negotiation.
      */
     void
-    Configure(const uwb::protocol::fira::UwbConfiguration& uwbConfiguration);
+    Configure(const uwb::protocol::fira::UwbSessionData& uwbSessionData);
 
     /**
      * @brief Set the type of mac address to be used for session participants.
@@ -102,7 +106,7 @@ public:
 
 private:
     virtual void
-    ConfigureImpl(const uwb::protocol::fira::UwbConfiguration& uwbConfiguration) = 0;
+    ConfigureImpl(const uwb::protocol::fira::UwbSessionData& uwbSessionData) = 0;
 
     virtual void
     StartRangingImpl() = 0;

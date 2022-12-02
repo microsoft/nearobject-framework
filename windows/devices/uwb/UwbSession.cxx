@@ -15,14 +15,14 @@ UwbSession::UwbSession(std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks, w
 {}
 
 void
-UwbSession::ConfigureImpl(const uwb::protocol::fira::UwbConfiguration& /* uwbConfiguration */)
+UwbSession::ConfigureImpl(const uwb::protocol::fira::UwbSessionData& uwbSessionData)
 {
     // TODO: collect options set from uwbConfiguration, translate them to
     // UWB_APP_CONFIG_PARAM, and send them to the driver.
     
     // Populate the session initialization command argument.
     UWB_SESSION_INIT sessionInit;
-    sessionInit.sessionId = m_sessionId;
+    sessionInit.sessionId = uwbSessionData.UwbSessionId;
     sessionInit.sessionType = UWB_SESSION_TYPE_RANGING_SESSION;
 
     // Request a new session from the driver.
@@ -30,6 +30,8 @@ UwbSession::ConfigureImpl(const uwb::protocol::fira::UwbConfiguration& /* uwbCon
     if (FAILED(hr)) {
         // TODO: handle this
     }
+
+    m_sessionId = uwbSessionData.UwbSessionId;
 }
 
 void

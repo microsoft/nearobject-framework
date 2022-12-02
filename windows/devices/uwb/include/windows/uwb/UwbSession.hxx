@@ -38,7 +38,7 @@ private:
      * @brief TODO
      */
     void
-    ConfigureImpl(const uwb::protocol::fira::UwbConfiguration& uwbConfiguration);
+    ConfigureImpl(const uwb::protocol::fira::UwbSessionData& uwbSessionData) override;
 
     /**
      * @brief TODO
