@@ -10,7 +10,7 @@
 int
 main(int argc, char **argv)
 {
-    CLI::App top{ "nocli, a comand line tool to assist with all things nearobject" };
+    CLI::App top{ "nocli, a command line tool to assist with all things nearobject" };
     top.require_subcommand();
     auto uwbApp = top.add_subcommand("uwb", "commands related to uwb")->require_subcommand()->fallthrough();
 

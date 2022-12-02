@@ -3,7 +3,7 @@
 
 using namespace uwb::protocol::fira;
 
-std::istream& operator>>(std::istream& is, DeviceRole& deviceRole)
+std::istream& uwb::protocol::fira::operator>>(std::istream& is, DeviceRole& deviceRole)
 {
     char c;
     is >> c;
@@ -13,7 +13,7 @@ std::istream& operator>>(std::istream& is, DeviceRole& deviceRole)
     return is;
 }
 
-std::ostream& operator<<(std::ostream& os, const DeviceRole& deviceRole){
+std::ostream& uwb::protocol::fira::operator<<(std::ostream& os, const DeviceRole& deviceRole){
     switch(deviceRole){
         case DeviceRole::Initiator: os << "Initiator"; break;
         case DeviceRole::Responder: os << "Responder"; break;
