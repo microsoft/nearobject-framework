@@ -20,11 +20,10 @@ public:
     /**
      * @brief Creates a new UWB session with no configuration nor peers.
      * 
-     * @param sessionId The unique session identifier to use.
      * @return std::unique_ptr<uwb::UwbSession> 
      */
     virtual std::unique_ptr<UwbSession>
-    CreateSession(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks) = 0;
+    CreateSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks) = 0;
 
     /**
      * @brief Get the FiRa capabilities of the device.

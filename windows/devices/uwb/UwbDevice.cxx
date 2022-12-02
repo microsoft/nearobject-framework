@@ -198,7 +198,7 @@ UwbDevice::Initialize()
 }
 
 std::unique_ptr<uwb::UwbSession>
-UwbDevice::CreateSession(uint32_t sessionId, std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks)
+UwbDevice::CreateSession(std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks)
 {
     // Create a duplicate handle to the driver for use by the session.
     wil::unique_hfile handleDriverForSession;
@@ -206,18 +206,8 @@ UwbDevice::CreateSession(uint32_t sessionId, std::weak_ptr<uwb::UwbSessionEventC
         return nullptr;
     }
 
-    // Populate the session initialization command argument.
-    UWB_SESSION_INIT sessionInit;
-    sessionInit.sessionId = sessionId;
-    sessionInit.sessionType = UWB_SESSION_TYPE_RANGING_SESSION;
 
-    // Request a new session from the driver.
-    HRESULT hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_SESSION_INIT, &sessionInit, sizeof sessionInit, nullptr, 0, nullptr, nullptr);
-    if (FAILED(hr)) {
-        return nullptr;
-    }
-
-    return std::make_unique<UwbSession>(sessionId, std::move(callbacks), std::move(handleDriverForSession));
+    return std::make_unique<UwbSession>(std::move(callbacks), std::move(handleDriverForSession));
 }
 
 uwb::protocol::fira::UwbCapability

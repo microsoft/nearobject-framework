@@ -4,7 +4,7 @@
 using namespace linux::devices;
 
 std::unique_ptr<uwb::UwbSession>
-UwbDevice::CreateSession(uint32_t sessionId, std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks)
+UwbDevice::CreateSession(std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks)
 {
     // TODO
     return nullptr;

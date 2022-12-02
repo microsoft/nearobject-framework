@@ -9,10 +9,28 @@
 
 using namespace windows::devices;
 
-UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks, wil::unique_hfile handleDriver) :
-    uwb::UwbSession(sessionId, std::move(callbacks)),
+UwbSession::UwbSession(std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks, wil::unique_hfile handleDriver) :
+    uwb::UwbSession(std::move(callbacks)),
     m_handleDriver(std::move(handleDriver))
 {}
+
+void
+UwbSession::ConfigureImpl(const uwb::protocol::fira::UwbConfiguration& /* uwbConfiguration */)
+{
+    // TODO: collect options set from uwbConfiguration, translate them to
+    // UWB_APP_CONFIG_PARAM, and send them to the driver.
+    
+    // Populate the session initialization command argument.
+    UWB_SESSION_INIT sessionInit;
+    sessionInit.sessionId = m_sessionId;
+    sessionInit.sessionType = UWB_SESSION_TYPE_RANGING_SESSION;
+
+    // Request a new session from the driver.
+    HRESULT hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_SESSION_INIT, &sessionInit, sizeof sessionInit, nullptr, 0, nullptr, nullptr);
+    if (FAILED(hr)) {
+        // TODO: handle this
+    }
+}
 
 void
 UwbSession::StartRangingImpl()

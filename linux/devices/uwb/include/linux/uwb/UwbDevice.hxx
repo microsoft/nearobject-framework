@@ -24,11 +24,10 @@ public:
     /**
      * @brief Create a new UWB session.
      * 
-     * @param sessionId The unique session identifier to use.
      * @return std::unique_ptr<uwb::UwbSession> 
      */
     std::unique_ptr<uwb::UwbSession>
-    CreateSession(uint32_t sessionId, std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks) override;
+    CreateSession(std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks) override;
 
     /**
      * @brief Get the capabilities of the device.
