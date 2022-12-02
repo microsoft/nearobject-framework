@@ -37,14 +37,14 @@ public:
      *
      * @param deviceName The interface path name.
      */
-    explicit UwbDevice(std::wstring deviceName);
+    explicit UwbDevice(std::string deviceName);
 
     /**
      * @brief Get the name of this device.
      *
-     * @return const std::wstring&
+     * @return const std::string&
      */
-    const std::wstring&
+    const std::string&
     DeviceName() const noexcept;
 
     /**
@@ -83,7 +83,7 @@ public:
     IsEqual(const uwb::UwbDevice& other) const noexcept override;
 
 private:
-    const std::wstring m_deviceName;
+    const std::string m_deviceName;
 
     unique_hcmnotification m_hcmNotificationHandle;
     wil::unique_hfile m_handleDriver;

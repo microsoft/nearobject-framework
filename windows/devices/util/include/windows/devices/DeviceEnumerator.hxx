@@ -14,10 +14,20 @@ namespace windows
 {
 namespace devices
 {
-class DeviceEnumerator
+/**
+ * @brief Enumerates the names of device interface instances belonging to a
+ * specified device interface class.
+ */
+struct DeviceEnumerator
 {
-public:
-    static std::vector<std::wstring>
+    /**
+     * @brief Get a list of device paths for instances of the specified device
+     * interface class.
+     * 
+     * @param deviceInterfaceClassGuid The GUID of the device class to enumerate.
+     * @return std::vector<std::string> A list of device paths.
+     */
+    static std::vector<std::string>
     GetDeviceInterfaceClassInstanceNames(const GUID& deviceInterfaceClassGuid) noexcept;
 };
 } // namespace devices

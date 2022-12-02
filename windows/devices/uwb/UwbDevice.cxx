@@ -167,11 +167,11 @@ FromUwbCx(const UWB_DEVICE_CAPABILITIES& uwbDeviceCapabilities)
 }
 } // namespace detail
 
-UwbDevice::UwbDevice(std::wstring deviceName) :
+UwbDevice::UwbDevice(std::string deviceName) :
     m_deviceName(std::move(deviceName))
 {}
 
-const std::wstring&
+const std::string&
 UwbDevice::DeviceName() const noexcept
 {
     return m_deviceName;
@@ -180,7 +180,7 @@ UwbDevice::DeviceName() const noexcept
 void
 UwbDevice::Initialize()
 {
-    wil::unique_hfile handleDriver(CreateFile(
+    wil::unique_hfile handleDriver(CreateFileA(
         m_deviceName.c_str(),
         GENERIC_READ | GENERIC_WRITE,
         FILE_SHARE_READ | FILE_SHARE_WRITE,

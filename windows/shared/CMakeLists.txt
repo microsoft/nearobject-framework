@@ -14,6 +14,7 @@ target_include_directories(notstd-windows
 target_link_libraries(notstd-windows
     INTERFACE
         rpcrt4.lib
+        WIL::WIL
 )
 
 set_target_properties(notstd-windows PROPERTIES FOLDER windows/shared/notstd)

@@ -7,8 +7,10 @@ set(WINDEVUTIL_DIR_PUBLIC_INCLUDE_PREFIX ${WINDEVUTIL_DIR_PUBLIC_INCLUDE}/window
 target_sources(windevutil
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/DeviceEnumerator.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/DevicePresenceMonitor.cxx
     PUBLIC
         ${WINDEVUTIL_DIR_PUBLIC_INCLUDE_PREFIX}/DeviceEnumerator.hxx
+        ${WINDEVUTIL_DIR_PUBLIC_INCLUDE_PREFIX}/DevicePresenceMonitor.hxx
         ${WINDEVUTIL_DIR_PUBLIC_INCLUDE_PREFIX}/DeviceResource.hxx
 )
 
