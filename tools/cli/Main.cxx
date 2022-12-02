@@ -5,42 +5,46 @@
 #include <nearobject/service/ServiceRuntime.hxx>
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
 
+
+
 int
 main(int argc, char **argv)
 {
-    CLI::App app{ "Geet, a command line git lookalike that does nothing" };
-    app.require_subcommand(1);
-    auto add = app.add_subcommand("add", "Add file(s)");
+    CLI::App top{ "nocli, a comand line tool to assist with all things nearobject" };
+    top.require_subcommand();
+    auto uwbApp = top.add_subcommand("uwb", "commands related to uwb")->require_subcommand()->fallthrough();
 
-    bool add_update;
-    add->add_flag("-u,--update", add_update, "Add updated files only");
+    auto rangeApp = uwbApp->add_subcommand("range", "commands related to ranging")->require_subcommand()->fallthrough();
 
-    std::vector<std::string> add_files;
-    add->add_option("files", add_files, "Files to add");
+    auto startRangingApp = rangeApp->add_subcommand("start", "start ranging")->fallthrough();
 
-    add->callback([&]() {
-        std::cout << "Adding:";
-        if (add_files.empty()) {
-            if (add_update)
-                std::cout << " all updated files";
-            else
-                std::cout << " all files";
-        } else {
-            for (auto file : add_files)
-                std::cout << " " << file;
-        }
+    // option to specify file
+    std::string defaultFile = "default.conf";
+    {
+        rangeApp->add_option("--file", defaultFile, "file to read as the default values, default is " + defaultFile);
+        rangeApp->callback([&]() {
+            if (defaultFile.size()) {
+                std::cout << "reading stuff from this file: " << defaultFile << "\n";
+            }
+        });
+    }
+
+    uwb::protocol::fira::UwbConfiguration defaultConfiguration; // TODO make this parsed from the defaultFile;
+
+    // std::string deviceRole;
+    startRangingApp->add_option("--deviceRole", defaultConfiguration.DeviceRole, "responder/initiator"); // TODO is this really necessary? responder/initiator is strictly for OOB purposes
+    
+    bool controller{false};
+    startRangingApp->add_flag("--controller", controller, "presence of this flag indicates controller, absence means controlee");
+
+    std::string controleeMac;
+    startRangingApp->add_option("--controleeMac", controleeMac, "assigned mac addres of the controlee");
+
+    startRangingApp->callback([&]{
+        std::cout << defaultConfiguration.DeviceRole;
     });
 
-    auto commit = app.add_subcommand("commit", "Commit files");
-
-    std::string commit_message;
-    commit->add_option("-m,--message", commit_message, "A message")->required();
-
-    commit->callback([&]() {
-        std::cout << "Commit message: " << commit_message;
-    });
-
-    CLI11_PARSE(app, argc, argv);
+    CLI11_PARSE(top, argc, argv);
 
     return 0;
 }

@@ -2,6 +2,8 @@
 #ifndef FIRA_DEVICE_HXX
 #define FIRA_DEVICE_HXX
 
+#include <iostream>
+
 namespace uwb::protocol::fira
 {
 /**
@@ -12,6 +14,9 @@ enum class DeviceRole {
     Initiator,
     Responder,
 };
+
+std::istream& operator>>(std::istream& is, DeviceRole& deviceRole);
+std::ostream& operator<<(std::ostream& is, const DeviceRole& deviceRole);
 
 /**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
