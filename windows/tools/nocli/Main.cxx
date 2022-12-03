@@ -13,6 +13,7 @@
 #include <windows/devices/DevicePresenceMonitor.hxx>
 #include <windows/uwb/UwbDevice.hxx>
 #include <windows/uwb/UwbDeviceDriver.hxx>
+#include <nearobject/cli/NearObjectCli.hxx>
 
 using namespace windows::devices;
 
@@ -35,44 +36,35 @@ GetDefaultUwbDeviceName() noexcept
         : std::nullopt;
 }
 
-/**
- * @brief Get an instance of the CLI::App which includes all shared options.
- * This will be implemented in the nocli static library in the shared code
- * tree.
- *
- * @return CLI::App
- */
-CLI::App
-GetCommonCli11App() noexcept
-{
-    // TODO: return an instance from the shared nocli library
-    return CLI::App();
-}
 } // namespace detail
 
 int
 main(int argc, char* argv[])
 {
-    CLI::App app = detail::GetCommonCli11App();
+    nearobject::cli::NearObjectCli cli{};
+    CLI::App& app = cli.GetParser();
 
+    // Configure the cli parsing app with Windows-specific options.
     bool deviceNameProbe{ false };
     std::optional<std::string> deviceName;
+    std::string deviceClassGuid = windows::devices::uwb::InterfaceClassUwbString;
 
     app.add_option("--deviceName", deviceName, "uwb device name (path)");
+    app.add_option("--deviceClass", deviceClassGuid, "uwb device class guid (override)");
     app.add_flag("--probe", deviceNameProbe, "probe for the uwb device name to use");
 
-    // TODO: this will probably be flipped around where main() will request the
-    // common cli App object, modify it as appropriate, then ask the common code
-    // to parse it, invoking a callback we specify here to do additional
-    // processing.
-    CLI11_PARSE(app, argc, argv);
+    // Parse the arguments.
+    int result = cli.Parse(argc, argv);
+    if (result != 0) {
+        return result;
+    }
 
     if (deviceNameProbe) {
         if (deviceName.has_value()) {
             std::cout << "warning: device name '" << deviceName.value() << "' will be ignored due to device name probe request" << std::endl;
         }
 
-        const auto uwbDeviceNames = DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(windows::devices::uwb::InterfaceClassUwb);
+        const auto uwbDeviceNames = DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(deviceClassGuid);
         if (!uwbDeviceNames.empty()) {
             int32_t index = 0;
             for (const auto& uwbDeviceName : uwbDeviceNames) {

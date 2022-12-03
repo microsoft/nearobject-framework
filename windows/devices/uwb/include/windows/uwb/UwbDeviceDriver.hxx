@@ -2,6 +2,8 @@
 #ifndef UWB_DEVICE_DRIVER_HXX
 #define UWB_DEVICE_DRIVER_HXX
 
+#include <string>
+
 #include <initguid.h>
 
 namespace windows
@@ -17,6 +19,7 @@ DEFINE_GUID(GUID_UWB_DEVICE_INTERFACE, 0xa7424370, 0x45e5, 0x49c3, 0xae, 0x35, 0
 #endif
 
 const GUID InterfaceClassUwb = GUID_UWB_DEVICE_INTERFACE;
+const std::string InterfaceClassUwbString = "A7424370-45E5-49C3-AE35-42A3C41B34AD";
 } // namespace uwb
 } // namespace devices
 } // namespace windows

@@ -10,6 +10,7 @@ target_link_libraries(nocli-win
     PRIVATE
         CLI11::CLI11
         magic_enum::magic_enum
+        nocli-core
         notstd-windows
         windevutil
         windevuwb
