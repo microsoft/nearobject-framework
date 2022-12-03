@@ -8,9 +8,13 @@
 
 namespace nearobject::cli
 {
+struct NearObjectCliData;
+
 class NearObjectCli
 {
 public:
+    explicit NearObjectCli(std::shared_ptr<NearObjectCliData> cliData);
+
     /**
      * @brief Get a reference to the parser. The parser will be configured with
      * all common command line interface options and flags, and may be extended
@@ -20,6 +24,14 @@ public:
      */
     CLI::App&
     GetParser();
+
+    /**
+     * @brief Get the Data object
+     * 
+     * @return std::shared_ptr<NearObjectCliData> 
+     */
+    std::shared_ptr<NearObjectCliData>
+    GetData() const noexcept;
 
     /**
      * @brief Parse the specified command line argumenbts. 
@@ -43,6 +55,7 @@ private:
 
 private:
     std::unique_ptr<CLI::App> m_cliApp;
+    std::shared_ptr<NearObjectCliData> m_cliData;
 };
 } // namespace nearobject::cli
 

@@ -4,6 +4,7 @@ add_executable(nocli-win "")
 target_sources(nocli-win
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/Main.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/NearObjectCliDataWindows.hxx
 )
 
 target_link_libraries(nocli-win

@@ -5,6 +5,10 @@
 
 using namespace nearobject::cli;
 
+NearObjectCli::NearObjectCli(std::shared_ptr<NearObjectCliData> cliData) :
+    m_cliData(cliData)
+{}
+
 CLI::App&
 NearObjectCli::GetParser()
 {
@@ -16,6 +20,12 @@ NearObjectCli::GetParser()
     }
 
     return *m_cliApp;
+}
+
+std::shared_ptr<NearObjectCliData>
+NearObjectCli::GetData() const noexcept
+{
+    return m_cliData;
 }
 
 int

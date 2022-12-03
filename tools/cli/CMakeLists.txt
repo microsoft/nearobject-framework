@@ -24,6 +24,7 @@ target_sources(nocli-core
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectCli.cxx
     PUBLIC
         ${NO_CLI_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectCli.hxx
+        ${NO_CLI_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectCliData.hxx
 )
 
 target_include_directories(nocli-core
