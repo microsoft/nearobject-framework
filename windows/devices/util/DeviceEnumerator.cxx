@@ -1,6 +1,7 @@
 
 #include <filesystem>
 
+#include <notstd/guid.hxx>
 #include <windows/devices/DeviceEnumerator.hxx>
 
 #include <cfgmgr32.h>
@@ -53,4 +54,16 @@ DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(const GUID& deviceInterfa
     }
 
     return deviceInterfaceNames;
+}
+
+/* static */
+std::vector<std::string>
+DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(const std::string& deviceInterfaceClassString) noexcept
+{
+    auto deviceClassInterfaceGuid = notstd::GuidFromString(deviceInterfaceClassString);
+    if (!deviceClassInterfaceGuid.has_value()) {
+        return {};
+    }
+
+    return GetDeviceInterfaceClassInstanceNames(deviceClassInterfaceGuid.value());
 }

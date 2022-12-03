@@ -22,6 +22,7 @@ target_include_directories(windevutil
 target_link_libraries(windevutil
     PUBLIC
         cfgmgr32.lib
+        notstd-windows
         WIL::WIL
 )
 

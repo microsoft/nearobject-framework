@@ -29,6 +29,16 @@ struct DeviceEnumerator
      */
     static std::vector<std::string>
     GetDeviceInterfaceClassInstanceNames(const GUID& deviceInterfaceClassGuid) noexcept;
+
+    /**
+     * @brief Get a list of device paths for instances of the specified device
+     * interface class.
+     * 
+     * @param deviceInterfaceClassString 
+     * @return std::vector<std::string> 
+     */
+    static std::vector<std::string>
+    GetDeviceInterfaceClassInstanceNames(const std::string& deviceInterfaceClassString) noexcept;
 };
 } // namespace devices
 } // namespace windows

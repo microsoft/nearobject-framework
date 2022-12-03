@@ -39,7 +39,7 @@ main(int argc, char* argv[])
         deviceGuidString.pop_back();
     }
 
-    const auto deviceGuid = GuidFromString(deviceGuidString);
+    const auto deviceGuid = notstd::GuidFromString(deviceGuidString);
     if (!deviceGuid) {
         std::cerr << "invalid device class guid specified (" << deviceGuidString << ")" << std::endl;
         return -1;

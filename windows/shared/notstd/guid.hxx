@@ -11,6 +11,8 @@
 
 #include <wil/win32_helpers.h>
 
+namespace notstd
+{
 /**
  * @brief Returns a string-representation of a GUID, without enclosing braces.
  * Eg. "FB49FD78-D7EA-4E3E-B3D0-5A19FE5C7EC3"
@@ -124,6 +126,7 @@ GuidFromString(const std::wstring& input) noexcept
 
     return guid;
 }
+} // namespace notstd 
 
 namespace std
 {
