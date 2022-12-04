@@ -5,7 +5,7 @@
 #include <nearobject/service/ServiceRuntime.hxx>
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
 
-
+using namespace uwb::protocol::fira;
 
 int
 main(int argc, char **argv)
