@@ -5,6 +5,9 @@
 #include <memory>
 
 #include <CLI/CLI.hpp>
+#include <nearobject/service/ServiceRuntime.hxx>
+
+#include <uwb/protocols/fira/UwbConfiguration.hxx>
 
 namespace nearobject::cli
 {
