@@ -37,6 +37,9 @@ target_include_directories(nocli-core
 target_link_libraries(nocli-core
     PRIVATE
         CLI11::CLI11
+        nearobject-service
+        PUBLIC
+            uwb-proto-fira
 )
 
 set_target_properties(nocli-core PROPERTIES FOLDER lib/nearobject)
