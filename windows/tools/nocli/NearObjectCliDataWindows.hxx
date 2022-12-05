@@ -11,7 +11,7 @@
 namespace nearobject::cli
 {
 /**
- * @brief Base class for data parsed by NearObjectCli.
+ * @brief Windows-specific parsed CLI data.
  */
 struct NearObjectCliDataWindows :
     public NearObjectCliData
@@ -19,7 +19,7 @@ struct NearObjectCliDataWindows :
     /**
      * @brief Controls whether a probe of the active devices will be done,
      * allowing the caller to select (by console input), the device to use.
-     * 
+     *
      * This will scan for devices with the GUID specified by DeviceClassGuid.
      */
     bool DeviceNameProbe{ false };
@@ -33,10 +33,10 @@ struct NearObjectCliDataWindows :
     /**
      * @brief The class GUID of the device to use. This defaults to the UWB
      * Class Extension (UwbCx) Driver GUID, but can be overriden using this
-     * option. 
+     * option.
      */
     std::string DeviceClassGuid{ windows::devices::uwb::InterfaceClassUwbString };
 };
-} // namespace nearobject::cli::windows
+} // namespace nearobject::cli
 
 #endif // NEAR_OBJECT_CLI_WINDOWS_HXX

@@ -1,3 +1,4 @@
 add_subdirectory(devices)
 add_subdirectory(nearobject)
 add_subdirectory(nearobjectd)
+add_subdirectory(tools)
