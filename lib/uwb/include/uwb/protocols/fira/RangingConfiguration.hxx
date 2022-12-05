@@ -39,9 +39,9 @@ struct hash<uwb::protocol::fira::RangingConfiguration>
     std::size_t
     operator()(const uwb::protocol::fira::RangingConfiguration& rangingConfiguration) const noexcept
     {
-        std::size_t hash = 0;
-        notstd::hash_combine(hash, notstd::to_underlying(rangingConfiguration.Method), notstd::to_underlying(rangingConfiguration.ReportMode));
-        return hash;
+        std::size_t value = 0;
+        notstd::hash_combine(value, notstd::to_underlying(rangingConfiguration.Method), notstd::to_underlying(rangingConfiguration.ReportMode));
+        return value;
     }
 };
 } // namespace std

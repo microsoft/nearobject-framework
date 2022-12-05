@@ -175,8 +175,8 @@ struct hash<uwb::protocol::fira::UwbConfiguration>
     std::size_t
     operator()(const uwb::protocol::fira::UwbConfiguration& uwbConfiguration) const noexcept
     {
-        std::size_t hash = 0;
-        notstd::hash_combine(hash,
+        std::size_t value = 0;
+        notstd::hash_combine(value,
             uwbConfiguration.FiraPhyVersion,
             uwbConfiguration.FiraMacVersion,
             uwbConfiguration.DeviceRole,
@@ -207,7 +207,7 @@ struct hash<uwb::protocol::fira::UwbConfiguration>
             uwbConfiguration.KeyRotationRate,
             uwbConfiguration.MacAddressFcsType,
             uwbConfiguration.MaxRangingRoundRetry);
-        return hash;
+        return value;
     }
 };
 } // namespace std

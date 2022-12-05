@@ -29,7 +29,7 @@ namespace devices
  * UWB DDI. The DDI is to be determined.
  */
 class UwbDevice :
-    public uwb::UwbDevice
+    public ::uwb::UwbDevice
 {
 public:
     /**
@@ -37,14 +37,14 @@ public:
      *
      * @param deviceName The interface path name.
      */
-    explicit UwbDevice(std::wstring deviceName);
+    explicit UwbDevice(std::string deviceName);
 
     /**
      * @brief Get the name of this device.
      *
-     * @return const std::wstring&
+     * @return const std::string&
      */
-    const std::wstring&
+    const std::string&
     DeviceName() const noexcept;
 
     /**
@@ -57,19 +57,18 @@ public:
     /**
      * @brief Create a new UWB session.
      * 
-     * @param sessionId The unique session identifier to use.
      * @param callbacks The event callback instance.
      * @return std::unique_ptr<uwb::UwbSession> 
      */
-    std::unique_ptr<uwb::UwbSession>
-    CreateSession(uint32_t sessionId, std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks) override;
+    std::unique_ptr<::uwb::UwbSession>
+    CreateSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks) override;
 
     /**
      * @brief Get the capabilities of the device.
      * 
      * @return uwb::protocol::fira::UwbCapability 
      */
-    uwb::protocol::fira::UwbCapability
+    ::uwb::protocol::fira::UwbCapability
     GetCapabilities() const override;
 
     /**
@@ -80,10 +79,10 @@ public:
      * @return false 
      */
     bool
-    IsEqual(const uwb::UwbDevice& other) const noexcept override;
+    IsEqual(const ::uwb::UwbDevice& other) const noexcept override;
 
 private:
-    const std::wstring m_deviceName;
+    const std::string m_deviceName;
 
     unique_hcmnotification m_hcmNotificationHandle;
     wil::unique_hfile m_handleDriver;

@@ -179,6 +179,7 @@ elseif (BUILD_FOR_WINDOWS)
 
   # Add Windows-specific global compile definitions.
   add_compile_definitions(
+      _UNICODE
       UNICODE
       NOMINMAX
       WIN32_LEAN_AND_MEAN
@@ -193,4 +194,3 @@ add_subdirectory(tools)
 if (NOT NOF_DISABLE_TESTS)
   add_subdirectory(tests)
 endif()
-

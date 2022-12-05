@@ -1,4 +1,7 @@
 
+#include <filesystem>
+
+#include <notstd/guid.hxx>
 #include <windows/devices/DeviceEnumerator.hxx>
 
 #include <cfgmgr32.h>
@@ -6,7 +9,7 @@
 using namespace windows::devices;
 
 /* static */
-std::vector<std::wstring>
+std::vector<std::string>
 DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(const GUID& deviceInterfaceClassGuidTarget) noexcept
 {
     // Have to copy the GUID since the API oddly requires a non-const reference,
@@ -41,12 +44,26 @@ DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(const GUID& deviceInterfa
         return {};
     }
 
+
     // Pull out individual strings from the double-null terminated list returned above.
-    std::vector<std::wstring> deviceInterfaceNames{};
+    std::vector<std::string> deviceInterfaceNames{};
     for (auto deviceInterfaceName = std::data(deviceInterfaceNamesBuffer); *deviceInterfaceName != L'\0';) {
-        deviceInterfaceNames.emplace_back(deviceInterfaceName);
+        std::filesystem::path deviceInterfaceNamePath{ deviceInterfaceName };
+        deviceInterfaceNames.emplace_back(deviceInterfaceNamePath.string());
         deviceInterfaceName += deviceInterfaceNames.back().size() + 1;
     }
 
     return deviceInterfaceNames;
+}
+
+/* static */
+std::vector<std::string>
+DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(const std::string& deviceInterfaceClassString) noexcept
+{
+    auto deviceClassInterfaceGuid = notstd::GuidFromString(deviceInterfaceClassString);
+    if (!deviceClassInterfaceGuid.has_value()) {
+        return {};
+    }
+
+    return GetDeviceInterfaceClassInstanceNames(deviceClassInterfaceGuid.value());
 }

@@ -1,4 +1,5 @@
 
+#include <filesystem>
 #include <string>
 
 #include <nearobject/service/NearObjectDeviceControllerUwb.hxx>
@@ -14,7 +15,7 @@ using ::nearobject::service::NearObjectDevicePresence;
 
 namespace
 {
-std::shared_ptr<NearObjectDeviceControllerUwb> CreateNearObjectUwbDevice(std::wstring deviceName)
+std::shared_ptr<NearObjectDeviceControllerUwb> CreateNearObjectUwbDevice(std::string deviceName)
 {
     auto uwbDevice = std::make_unique<windows::devices::UwbDevice>(std::move(deviceName));
     return std::make_shared<NearObjectDeviceControllerUwb>(std::move(uwbDevice));
@@ -22,7 +23,7 @@ std::shared_ptr<NearObjectDeviceControllerUwb> CreateNearObjectUwbDevice(std::ws
 }
 
 std::shared_ptr<NearObjectDeviceControllerUwb>
-NearObjectDeviceDiscoveryAgentUwb::AddCachedUwbNearObjectDevice(const std::wstring &deviceName)
+NearObjectDeviceDiscoveryAgentUwb::AddCachedUwbNearObjectDevice(const std::string &deviceName)
 {
     // Note: the exclusive lock must be held for the duration, even during the
     // cache lookup parts to prevent races with concurrent notifications adding
@@ -51,7 +52,7 @@ NearObjectDeviceDiscoveryAgentUwb::AddCachedUwbNearObjectDevice(const std::wstri
 }
 
 std::shared_ptr<NearObjectDeviceControllerUwb>
-NearObjectDeviceDiscoveryAgentUwb::ExtractCachedNearObjectDevice(const std::wstring &deviceName)
+NearObjectDeviceDiscoveryAgentUwb::ExtractCachedNearObjectDevice(const std::string &deviceName)
 {
     auto nearObjectDeviceLock = std::scoped_lock{ m_nearObjectDeviceCacheGate };
     auto nearObjectExtractResult = m_nearObjectDeviceCache.extract(deviceName);
@@ -84,17 +85,20 @@ NearObjectDeviceDiscoveryAgentUwb::UnregisterForUwbDeviceClassNotifications()
 void
 NearObjectDeviceDiscoveryAgentUwb::OnDeviceInterfaceNotification(HCMNOTIFICATION hcmNotificationHandle, CM_NOTIFY_ACTION action, CM_NOTIFY_EVENT_DATA *eventData, DWORD eventDataSize)
 {
-    std::wstring deviceName;
+    std::string deviceName;
+    std::filesystem::path devicePath;
 
     switch (action) {
         case CM_NOTIFY_ACTION_DEVICEINTERFACEARRIVAL: {
-            deviceName = eventData->u.DeviceInterface.SymbolicLink;
+            devicePath = std::filesystem::path(std::wstring(eventData->u.DeviceInterface.SymbolicLink));
+            deviceName = devicePath.string();
             auto nearObjectDeviceControllerUwb = AddCachedUwbNearObjectDevice(deviceName);
             DevicePresenceChanged(NearObjectDevicePresence::Arrived, std::move(nearObjectDeviceControllerUwb));
             break;
         }
         case CM_NOTIFY_ACTION_DEVICEINTERFACEREMOVAL: {
-            deviceName = eventData->u.DeviceInterface.SymbolicLink;
+            devicePath = std::filesystem::path(std::wstring(eventData->u.DeviceInterface.SymbolicLink));
+            deviceName = devicePath.string();
             auto nearObjectDeviceControllerUwb = ExtractCachedNearObjectDevice(deviceName);
             if (nearObjectDeviceControllerUwb) {
                 DevicePresenceChanged(NearObjectDevicePresence::Departed, std::move(nearObjectDeviceControllerUwb));

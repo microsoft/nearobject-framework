@@ -4,6 +4,9 @@
 
 #include <array>
 #include <cstdint>
+#include <iterator>
+
+#include <notstd/hash.hxx>
 
 namespace uwb::protocol::fira
 {
@@ -36,5 +39,22 @@ struct StaticRangingInfo
     std::array<uint8_t, InitializationVectorLength> InitializationVector;
 };
 } // namespace uwb::protocol::fira
+
+namespace std
+{
+template <>
+struct hash<uwb::protocol::fira::StaticRangingInfo>
+{
+    std::size_t
+    operator()(const uwb::protocol::fira::StaticRangingInfo& staticRangingInfo) const noexcept
+    {
+        std::size_t value = 0;
+        notstd::hash_combine(value,
+            staticRangingInfo.VendorId,
+            notstd::hash_range(std::cbegin(staticRangingInfo.InitializationVector), std::cend(staticRangingInfo.InitializationVector)));
+        return value;
+    }
+};
+} // namespace std
 
 #endif // FIRA_STATIC_RANGING_INFO_HXX

@@ -9,6 +9,7 @@
 #include <unordered_set>
 
 #include <uwb/UwbMacAddress.hxx>
+#include <uwb/protocols/fira/UwbSessionData.hxx>
 
 namespace uwb
 {
@@ -50,9 +51,9 @@ public:
     /**
      * @brief Construct a new UwbSession object.
      * 
-     * @param sessionId The associated session id.
+     * @param callbacks The callbacks to invoke for session events.
      */
-    UwbSession(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks);
+    UwbSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks);
 
     /**
      * @brief Get the unique session id.
@@ -61,6 +62,18 @@ public:
      */
     uint32_t
     GetId() const noexcept;
+
+    /**
+     * @brief Configure the session for use.
+     * 
+     * TODO: This probably needs to return something to indicate whether it was
+     * successful or not.
+     * 
+     * @param uwbSessionData The session configuration to use. This should have
+     * been obtained as a result of out-of-band negotiation.
+     */
+    void
+    Configure(const uwb::protocol::fira::UwbSessionData& uwbSessionData);
 
     /**
      * @brief Set the type of mac address to be used for session participants.
@@ -93,6 +106,9 @@ public:
 
 private:
     virtual void
+    ConfigureImpl(const uwb::protocol::fira::UwbSessionData& uwbSessionData) = 0;
+
+    virtual void
     StartRangingImpl() = 0;
 
     virtual void
@@ -102,7 +118,7 @@ private:
     AddPeerImpl(UwbMacAddress peerMacAddress) = 0;
 
 protected:
-    uint32_t m_sessionId;
+    uint32_t m_sessionId{ 0 };
     UwbMacAddressType m_uwbMacAddressType{ UwbMacAddressType::Extended };
     UwbMacAddress m_uwbMacAddressSelf;
     std::atomic<bool> m_rangingActive{ false };

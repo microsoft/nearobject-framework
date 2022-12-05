@@ -7,7 +7,7 @@
 
 namespace nearobject::protocol::fira
 {
-struct RegulatoryInformation
+struct UwbRegulatoryInformation
 {
     /**
      * @brief See FiRa Consortium Common Service Management Layer Technical
