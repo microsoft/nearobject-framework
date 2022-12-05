@@ -10,6 +10,8 @@ target_link_libraries(nocli
     PRIVATE
         nearobject
         nearobject-service
+        PUBLIC
+            uwb-proto-fira
 )
 
 set_target_properties(nocli PROPERTIES FOLDER tools/cli)
