@@ -15,8 +15,10 @@ enum class DeviceRole {
     Responder,
 };
 
-std::istream& operator>>(std::istream& is, DeviceRole& deviceRole);
+// std::istream& operator>>(std::istream& is, DeviceRole& deviceRole);
 std::ostream& operator<<(std::ostream& is, const DeviceRole& deviceRole);
+
+bool lexical_cast(const std::string &input, DeviceRole& dr);
 
 /**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section

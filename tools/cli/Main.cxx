@@ -7,6 +7,20 @@
 
 using namespace uwb::protocol::fira;
 
+bool
+uwb::protocol::fira::lexical_cast(const std::string& input, DeviceRole& dr)
+{
+    std::cout << "called correct lexical_cast function ! val: " << input << std::endl;
+    if (input == "Responder") {
+        dr = DeviceRole::Responder;
+        return true;
+    } else if (input == "Initiator") {
+        dr = DeviceRole::Initiator;
+        return true;
+    }
+    return false;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -23,19 +37,16 @@ main(int argc, char **argv)
     {
         rangeApp->add_option("--file", defaultFile, "file to read as the default values, default is " + defaultFile);
         rangeApp->callback([&]() {
-            if (defaultFile.size()) {
-                std::cout << "reading stuff from this file: " << defaultFile << "\n";
-            }
+            std::cout << "reading stuff from this file: " << defaultFile << "\n";
         });
     }
 
     uwb::protocol::fira::UwbConfiguration defaultConfiguration; // TODO make this parsed from the defaultFile;
 
-    // std::string deviceRole;
-    startRangingApp->add_option("--deviceRole", defaultConfiguration.DeviceRole, "responder/initiator"); // TODO is this really necessary? responder/initiator is strictly for OOB purposes
+    startRangingApp->add_option("--deviceRole", defaultConfiguration.DeviceRole, "Responder/Initiator");
     
     bool controller{false};
-    startRangingApp->add_flag("--controller", controller, "presence of this flag indicates controller, absence means controlee");
+    startRangingApp->add_flag("--controller,!--controlee", controller, "presence of this flag indicates controller, absence means controlee");
 
     std::string controleeMac;
     startRangingApp->add_option("--controleeMac", controleeMac, "assigned mac addres of the controlee");
