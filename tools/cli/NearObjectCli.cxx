@@ -44,8 +44,8 @@ std::unique_ptr<CLI::App>
 NearObjectCli::CreateParser()
 {
     auto app = std::make_unique<CLI::App>();
-    app->name("near object framework command cline interface tool");
-    app->description("a command line tool to assist with all things nearobject");
+    app->name("near object framework command line interface tool");
+    app->description("A command line tool to assist with all things nearobject");
     // TODO shaneguan_microsoft: add common options+flags here from your PR
     app->require_subcommand();
     auto uwbApp = app->add_subcommand("uwb", "commands related to uwb")->require_subcommand()->fallthrough();
