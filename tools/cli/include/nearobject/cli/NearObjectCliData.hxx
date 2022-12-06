@@ -2,6 +2,10 @@
 #ifndef NEAR_OBJECT_CLI_DATA_HXX
 #define NEAR_OBJECT_CLI_DATA_HXX
 
+#include <uwb/protocols/fira/UwbConfiguration.hxx>
+#include <map>
+#include <magic_enum.hpp>
+
 namespace nearobject::cli
 {
 /**
@@ -9,8 +13,13 @@ namespace nearobject::cli
  */
 struct NearObjectCliData
 {
-    virtual ~NearObjectCliData() = default;
+    std::string defaultFile {"default.json"};
+    bool hostIsController {false};
+    uwb::protocol::fira::UwbConfiguration defaultConfiguration {};
 };
+
+// std::map<std::string,uwb::protocol::fira::DeviceRole> deviceRoleMap;
+
 } // namespace nearobject::cli
 
 #endif // NEAR_OBJECT_CLI_HXX

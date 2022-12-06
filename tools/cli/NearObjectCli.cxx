@@ -2,8 +2,23 @@
 #include <stdexcept>
 
 #include <nearobject/cli/NearObjectCli.hxx>
+#include <magic_enum.hpp>
 
 using namespace nearobject::cli;
+
+// bool
+// uwb::protocol::fira::lexical_cast(const std::string& input, DeviceRole& dr)
+// {
+//     std::cout << "called correct lexical_cast function ! val: " << input << std::endl;
+//     if (input == magic_enum::enum_name(DeviceRole::Responder)) {
+//         dr = DeviceRole::Responder;
+//         return true;
+//     } else if (input == "Initiator") {
+//         dr = DeviceRole::Initiator;
+//         return true;
+//     }
+//     return false;
+// }
 
 NearObjectCli::NearObjectCli(std::shared_ptr<NearObjectCliData> cliData) :
     m_cliData(cliData)
@@ -44,9 +59,9 @@ std::unique_ptr<CLI::App>
 NearObjectCli::CreateParser()
 {
     auto app = std::make_unique<CLI::App>();
-    app->name("near object framework command line interface tool");
+    app->name("nocli");
     app->description("A command line tool to assist with all things nearobject");
-    // TODO shaneguan_microsoft: add common options+flags here from your PR
+    
     app->require_subcommand();
     auto uwbApp = app->add_subcommand("uwb", "commands related to uwb")->require_subcommand()->fallthrough();
 
@@ -55,29 +70,26 @@ NearObjectCli::CreateParser()
     auto startRangingApp = rangeApp->add_subcommand("start", "start ranging")->fallthrough();
 
     // option to specify file
-    std::string defaultFile = "default.conf";
     {
-        rangeApp->add_option("--file", defaultFile, "file to read as the default values, default is " + defaultFile);
+        rangeApp->add_option("--file", m_cliData->defaultFile, "file to read as the default values, default is " + m_cliData->defaultFile);
         rangeApp->callback([&]() {
-            if (defaultFile.size()) {
-                std::cout << "reading stuff from this file: " << defaultFile << "\n";
-            }
+            std::cout << "reading stuff from this file: " << m_cliData->defaultFile << "\n";
         });
     }
 
-    uwb::protocol::fira::UwbConfiguration defaultConfiguration; // TODO make this parsed from the defaultFile;
+    // startRangingApp->add_option("--test", m_cliData->defaultConfiguration, "test");
 
-    // std::string deviceRole;
-    startRangingApp->add_option("--deviceRole", defaultConfiguration.DeviceRole, "responder/initiator"); // TODO is this really necessary? responder/initiator is strictly for OOB purposes
     
-    bool controller{false};
-    startRangingApp->add_flag("--controller", controller, "presence of this flag indicates controller, absence means controlee");
 
-    std::string controleeMac;
-    startRangingApp->add_option("--controleeMac", controleeMac, "assigned mac addres of the controlee");
+    startRangingApp->add_option("--deviceRole", m_cliData->defaultConfiguration.DeviceRole, "Responder/Initiator");
+    
+    startRangingApp->add_flag("--controller", m_cliData->hostIsController, "presence of this flag indicates controller, absence means controlee");
+
+    // std::string controleeMac;
+    // startRangingApp->add_option("--controleeMac", controleeMac, "assigned mac addres of the controlee");
 
     startRangingApp->callback([&]{
-        std::cout << defaultConfiguration.DeviceRole;
+        std::cout << m_cliData->defaultConfiguration.DeviceRole << "\n";
     });
     
     return app;

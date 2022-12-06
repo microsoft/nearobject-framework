@@ -4,31 +4,17 @@
 using namespace uwb::protocol::fira;
 
 // std::istream&
-// uwb::protocol::fira::operator>>(std::istream& is, DeviceRole& deviceRole)
+// uwb::protocol::fira::operator>>(std::istream& is, DeviceRole& deviceRole) noexcept
 // {
 //     printf("custom >>\n");
-//     char c;
-//     is >> c;
-//     if (c == 'R')
+//     std::string s;
+//     is >> s;
+//     if (s == "Responder")
 //         deviceRole = DeviceRole::Responder;
 //     else
 //         deviceRole = DeviceRole::Initiator;
 
 //     return is;
-// }
-
-// bool
-// lexical_cast(const std::string& input, DeviceRole& dr)
-// {
-//     std::cout << "called correct lexical_cast function ! val: " << input << std::endl;
-//     if (input == "Responder") {
-//         dr = DeviceRole::Responder;
-//         return true;
-//     } else if (input == "Initiator") {
-//         dr = DeviceRole::Initiator;
-//         return true;
-//     }
-//     return false;
 // }
 
 std::ostream&

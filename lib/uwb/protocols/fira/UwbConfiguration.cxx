@@ -22,3 +22,9 @@ UwbConfiguration::FromDataObject(const encoding::TlvBer& tlv)
 {
     throw std::logic_error("not implemented");
 }
+
+// std::istream& uwb::protocol::fira::operator>>(std::istream& is, UwbConfiguration& deviceRole) noexcept
+// {
+//     printf("HELLO!!!!!\n");
+//     return is;
+// }
