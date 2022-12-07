@@ -26,7 +26,6 @@ struct NearObjectCliData
     std::string defaultFile {"default.json"};
     bool hostIsController {false};
     uwb::protocol::fira::UwbConfiguration defaultConfiguration {};
-
 };
 
 

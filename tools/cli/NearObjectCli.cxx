@@ -93,7 +93,7 @@ NearObjectCli::CreateParser()
 
     // startRangingApp->add_option("--test", m_cliData->defaultConfiguration, "test");
 
-    startRangingApp->add_option("--deviceRole", m_cliData->defaultConfiguration.DeviceRole)->transform(CLI::CheckedTransformer(m_cliData->DeviceRoleMap));
+    startRangingApp->add_option("--DeviceRole", m_cliData->defaultConfiguration.DeviceRole)->transform(CLI::CheckedTransformer(m_cliData->DeviceRoleMap));
     startRangingApp->add_option("--StsConfiguration", m_cliData->defaultConfiguration.StsConfiguration)->transform(CLI::CheckedTransformer(m_cliData->StsConfigurationMap));
     startRangingApp->add_option("--MultiNodeMode", m_cliData->defaultConfiguration.MultiNodeMode)->transform(CLI::CheckedTransformer(m_cliData->MultiNodeModeMap));
     startRangingApp->add_option("--RangingMode", m_cliData->defaultConfiguration.RangingTimeStruct)->transform(CLI::CheckedTransformer(m_cliData->RangingModeMap));
@@ -109,15 +109,22 @@ NearObjectCli::CreateParser()
     // startRangingApp->add_option("--controleeMac", controleeMac, "assigned mac addres of the controlee");
 
     startRangingApp->callback([&]{
-        std::cout << magic_enum::enum_name(m_cliData->defaultConfiguration.DeviceRole) << "\n";
-        std::cout << magic_enum::enum_name(m_cliData->defaultConfiguration.StsConfiguration) << "\n";
-        std::cout << magic_enum::enum_name(m_cliData->defaultConfiguration.MultiNodeMode) << "\n";
-        std::cout << magic_enum::enum_name(m_cliData->defaultConfiguration.RangingTimeStruct) << "\n";
-        std::cout << magic_enum::enum_name(m_cliData->defaultConfiguration.SchedulingMode) << "\n";
-        std::cout << magic_enum::enum_name(m_cliData->defaultConfiguration.Channel) << "\n";
-        std::cout << magic_enum::enum_name(m_cliData->defaultConfiguration.RFrameConfig) << "\n";
-        std::cout << magic_enum::enum_name(m_cliData->defaultConfiguration.ConvolutionalCodeConstraintLength) << "\n";
-        std::cout << magic_enum::enum_name(m_cliData->defaultConfiguration.PrfMode) << "\n";
+        std::cout << "Selected parameters:\n";
+
+        for(auto [optionname,optionselected] : 
+            std::initializer_list<std::tuple<std::string_view,std::string_view>>{
+                {magic_enum::enum_type_name<uwb::protocol::fira::DeviceRole>(),magic_enum::enum_name(m_cliData->defaultConfiguration.DeviceRole)},
+                {magic_enum::enum_type_name<uwb::protocol::fira::StsConfiguration>(),magic_enum::enum_name(m_cliData->defaultConfiguration.StsConfiguration)},
+                {magic_enum::enum_type_name<uwb::protocol::fira::MultiNodeMode>(),magic_enum::enum_name(m_cliData->defaultConfiguration.MultiNodeMode)},
+                {magic_enum::enum_type_name<uwb::protocol::fira::RangingMode>(),magic_enum::enum_name(m_cliData->defaultConfiguration.RangingTimeStruct)},
+                {magic_enum::enum_type_name<uwb::protocol::fira::Channel>(),magic_enum::enum_name(m_cliData->defaultConfiguration.Channel)},
+                {magic_enum::enum_type_name<uwb::protocol::fira::StsPacketConfiguration>(),magic_enum::enum_name(m_cliData->defaultConfiguration.RFrameConfig)},
+                {magic_enum::enum_type_name<uwb::protocol::fira::ConvolutionalCodeConstraintLength>(),magic_enum::enum_name(m_cliData->defaultConfiguration.ConvolutionalCodeConstraintLength)},
+                {magic_enum::enum_type_name<uwb::protocol::fira::PrfMode>(),magic_enum::enum_name(m_cliData->defaultConfiguration.PrfMode)}
+                })
+        {
+            std::cout << optionname << "::" << optionselected << "\n";
+        }
     });
     
     return app;
