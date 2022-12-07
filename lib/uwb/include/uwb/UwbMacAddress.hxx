@@ -7,6 +7,7 @@
 #include <chrono>
 #include <climits>
 #include <cstdint>
+#include <istream>
 #include <random>
 #include <span>
 #include <string>
@@ -271,8 +272,8 @@ private:
      */
     template <size_t Length>
     UwbMacAddress(detail::UwbMacAddressValueWrapper<Length> value) :
-        m_type{ value.address_type },
         m_length{ value.length },
+        m_type{ value.address_type },
         m_value{ value.address },
         m_view{ UwbMacAddressView<Length>(*this) }
     {}
@@ -404,6 +405,12 @@ private:
 
 bool
 operator==(const UwbMacAddress&, const UwbMacAddress&) noexcept;
+
+std::istream&
+operator>>(std::istream& stream, UwbMacAddress& uwbMacAddress) noexcept;
+
+std::ostream&
+operator<<(std::ostream& stream, const UwbMacAddress& uwbMacAddress) noexcept;
 
 } // namespace uwb
 
