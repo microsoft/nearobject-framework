@@ -1,5 +1,6 @@
 
 #include <ios>
+#include <iomanip>
 #include <sstream>
 #include <stdexcept>
 
@@ -14,8 +15,8 @@ UwbMacAddress::UwbMacAddress() :
 {}
 
 UwbMacAddress::UwbMacAddress(const UwbMacAddress& other) :
-    m_type(other.m_type),
     m_length(other.m_length),
+    m_type(other.m_type),
     m_value(other.m_value)
 {
     // Note that the view span (m_view) cannot be directly copied from the other
@@ -52,7 +53,8 @@ UwbMacAddress::Swap(UwbMacAddress& other) noexcept
     std::swap(this->m_type, other.m_type);
     std::swap(this->m_length, other.m_length);
     std::swap(this->m_value, other.m_value);
-    std::swap(this->m_view, other.m_view);
+    InitializeView();
+    other.InitializeView();
 }
 
 UwbMacAddressType
@@ -97,4 +99,51 @@ auto
 uwb::UwbMacAddress::operator<=>(const UwbMacAddress& other) const noexcept
 {
     return this->m_value <=> other.m_value;
+}
+
+std::istream&
+uwb::operator>>(std::istream& stream, UwbMacAddress& uwbMacAddress) noexcept
+{
+    char separator = ':';
+    std::size_t numOctets;
+    std::array<uint16_t, 8> data{};
+
+    // Set stream numeric base to hexadecimal.
+    stream >> std::setbase(16);
+
+    for (numOctets = 0; numOctets < data.size(); numOctets++) {
+        stream >> data[numOctets];
+        if (numOctets != data.size() - 1) {
+            stream >> separator;
+        }
+        if (stream.fail()) {
+            break;
+        }
+    }
+
+    if (numOctets == data.size()) {
+        uwbMacAddress = UwbMacAddress{ std::array<uint8_t, 8>{ 
+            static_cast<uint8_t>(data[0] & 0x000000FFu), 
+            static_cast<uint8_t>(data[1] & 0x000000FFu), 
+            static_cast<uint8_t>(data[2] & 0x000000FFu), 
+            static_cast<uint8_t>(data[3] & 0x000000FFu), 
+            static_cast<uint8_t>(data[4] & 0x000000FFu), 
+            static_cast<uint8_t>(data[5] & 0x000000FFu), 
+            static_cast<uint8_t>(data[6] & 0x000000FFu), 
+            static_cast<uint8_t>(data[7] & 0x000000FFu) } };
+    } else if (numOctets > 0) {
+        stream.clear();
+        uwbMacAddress = UwbMacAddress{ std::array<uint8_t, 2>{ 
+            static_cast<uint8_t>(data[0] & 0x000000FFu), 
+            static_cast<uint8_t>(data[1] & 0x000000FFu) } };
+    }
+
+    return stream;
+}
+
+std::ostream&
+uwb::operator<<(std::ostream& stream, const UwbMacAddress& uwbMacAddress) noexcept
+{
+    stream << uwbMacAddress.ToString();
+    return stream;
 }
