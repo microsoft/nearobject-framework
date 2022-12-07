@@ -60,8 +60,16 @@ NearObjectCli::CreateParser()
 
     // generate the maps
     {
-        m_cliData->deviceRoleMap = populate_map<uwb::protocol::fira::DeviceRole>();
-
+        m_cliData->DeviceRoleMap = populate_map<uwb::protocol::fira::DeviceRole>();
+        // m_cliData->RangingConfigurationMap = populate_map<uwb::protocol::fira::RangingConfiguration>();
+        m_cliData->StsConfigurationMap = populate_map<uwb::protocol::fira::StsConfiguration>();
+        m_cliData->MultiNodeModeMap = populate_map<uwb::protocol::fira::MultiNodeMode>();
+        m_cliData->RangingModeMap = populate_map<uwb::protocol::fira::RangingMode>();
+        m_cliData->SchedulingModeMap = populate_map<uwb::protocol::fira::SchedulingMode>();
+        m_cliData->ChannelMap = populate_map<uwb::protocol::fira::Channel>();
+        m_cliData->StsPacketConfigurationMap = populate_map<uwb::protocol::fira::StsPacketConfiguration>();
+        m_cliData->ConvolutionalCodeConstraintLengthMap = populate_map<uwb::protocol::fira::ConvolutionalCodeConstraintLength>();
+        m_cliData->PrfModeMap = populate_map<uwb::protocol::fira::PrfMode>();
     }
 
 
@@ -86,7 +94,15 @@ NearObjectCli::CreateParser()
 
     // startRangingApp->add_option("--test", m_cliData->defaultConfiguration, "test");
 
-    startRangingApp->add_option("--deviceRole", m_cliData->defaultConfiguration.DeviceRole, "Responder/Initiator")->transform(CLI::CheckedTransformer(m_cliData->deviceRoleMap));
+    startRangingApp->add_option("--deviceRole", m_cliData->defaultConfiguration.DeviceRole, "Responder/Initiator")->transform(CLI::CheckedTransformer(m_cliData->DeviceRoleMap));
+    startRangingApp->add_option("--StsConfiguration", m_cliData->defaultConfiguration.StsConfiguration, "Responder/Initiator")->transform(CLI::CheckedTransformer(m_cliData->StsConfigurationMap));
+    startRangingApp->add_option("--MultiNodeMode", m_cliData->defaultConfiguration.MultiNodeMode, "Responder/Initiator")->transform(CLI::CheckedTransformer(m_cliData->MultiNodeModeMap));
+    startRangingApp->add_option("--RangingMode", m_cliData->defaultConfiguration.RangingTimeStruct, "Responder/Initiator")->transform(CLI::CheckedTransformer(m_cliData->RangingModeMap));
+    startRangingApp->add_option("--SchedulingMode", m_cliData->defaultConfiguration.SchedulingMode, "Responder/Initiator")->transform(CLI::CheckedTransformer(m_cliData->SchedulingModeMap));
+    startRangingApp->add_option("--Channel", m_cliData->defaultConfiguration.Channel, "Responder/Initiator")->transform(CLI::CheckedTransformer(m_cliData->ChannelMap));
+    startRangingApp->add_option("--StsPacketConfiguration", m_cliData->defaultConfiguration.RFrameConfig, "Responder/Initiator")->transform(CLI::CheckedTransformer(m_cliData->StsPacketConfigurationMap));
+    startRangingApp->add_option("--ConvolutionalCodeConstraintLength", m_cliData->defaultConfiguration.ConvolutionalCodeConstraintLength, "Responder/Initiator")->transform(CLI::CheckedTransformer(m_cliData->ConvolutionalCodeConstraintLengthMap));
+    startRangingApp->add_option("--PrfMode", m_cliData->defaultConfiguration.PrfMode, "Responder/Initiator")->transform(CLI::CheckedTransformer(m_cliData->PrfModeMap));
     
     startRangingApp->add_flag("--controller", m_cliData->hostIsController, "presence of this flag indicates controller, absence means controlee");
 
