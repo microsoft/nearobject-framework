@@ -71,6 +71,7 @@ NearObjectCli::CreateParser()
         m_cliData->StsPacketConfigurationMap = populate_map<uwb::protocol::fira::StsPacketConfiguration>();
         m_cliData->ConvolutionalCodeConstraintLengthMap = populate_map<uwb::protocol::fira::ConvolutionalCodeConstraintLength>();
         m_cliData->PrfModeMap = populate_map<uwb::protocol::fira::PrfMode>();
+        m_cliData->UwbMacAddressFcsTypeMap = populate_map<uwb::UwbMacAddressFcsType>();
     }
 
     auto app = std::make_unique<CLI::App>();
@@ -92,9 +93,8 @@ NearObjectCli::CreateParser()
         });
     }
 
-    // startRangingApp->add_option("--test", m_cliData->defaultConfiguration, "test");
-
     // TODO is there a way to put all the enums into a list of [optionName, optionDestination, optionMap] so we don't have to create the initializer list each time
+    // TODO get rid of these strings, instead use a macro to extract the enum name 
     startRangingApp->add_option("--DeviceRole", m_cliData->defaultConfiguration.DeviceRole)->transform(CLI::CheckedTransformer(m_cliData->DeviceRoleMap));
     startRangingApp->add_option("--RangingMethod", m_cliData->defaultConfiguration.RangingConfiguration.Method)->transform(CLI::CheckedTransformer(m_cliData->RangingMethodMap));
     startRangingApp->add_option("--MeasurementReportMode", m_cliData->defaultConfiguration.RangingConfiguration.ReportMode)->transform(CLI::CheckedTransformer(m_cliData->MeasurementReportModeMap));
@@ -106,11 +106,27 @@ NearObjectCli::CreateParser()
     startRangingApp->add_option("--StsPacketConfiguration", m_cliData->defaultConfiguration.RFrameConfig)->transform(CLI::CheckedTransformer(m_cliData->StsPacketConfigurationMap));
     startRangingApp->add_option("--ConvolutionalCodeConstraintLength", m_cliData->defaultConfiguration.ConvolutionalCodeConstraintLength)->transform(CLI::CheckedTransformer(m_cliData->ConvolutionalCodeConstraintLengthMap));
     startRangingApp->add_option("--PrfMode", m_cliData->defaultConfiguration.PrfMode)->transform(CLI::CheckedTransformer(m_cliData->PrfModeMap));
+    startRangingApp->add_option("--UwbMacAddressFcsType", m_cliData->defaultConfiguration.MacAddressFcsType)->transform(CLI::CheckedTransformer(m_cliData->UwbMacAddressFcsTypeMap));
     
+    // booleans
     startRangingApp->add_flag("--controller", m_cliData->hostIsController, "presence of this flag indicates controller, absence means controlee");
-
-    // std::string controleeMac;
-    // startRangingApp->add_option("--controleeMac", controleeMac, "assigned mac addres of the controlee");
+    startRangingApp->add_flag("--HoppingMode", m_cliData->defaultConfiguration.HoppingMode, "presence of this flag indicates HoppingMode on");
+    startRangingApp->add_flag("--BlockStriding", m_cliData->defaultConfiguration.BlockStriding, "presence of this flag indicates BlockStriding on");
+    
+    // TODO check for int sizes when parsing input
+    startRangingApp->add_option("--FiraPhyVersion", m_cliData->defaultConfiguration.FiraPhyVersion, "uint32_t");
+    startRangingApp->add_option("--FiraMacVersion", m_cliData->defaultConfiguration.FiraMacVersion, "uint32_t");
+    startRangingApp->add_option("--UwbInitiationTime", m_cliData->defaultConfiguration.UwbInitiationTime, "uint32_t");
+    startRangingApp->add_option("--Sp0PhySetNumber", m_cliData->defaultConfiguration.Sp0PhySetNumber, "uint8_t");
+    startRangingApp->add_option("--Sp1PhySetNumber", m_cliData->defaultConfiguration.Sp1PhySetNumber, "uint8_t");
+    startRangingApp->add_option("--Sp3PhySetNumber", m_cliData->defaultConfiguration.Sp3PhySetNumber, "uint8_t");
+    startRangingApp->add_option("--PreableCodeIndex", m_cliData->defaultConfiguration.PreableCodeIndex, "uint8_t");
+    startRangingApp->add_option("--SlotsPerRangingRound", m_cliData->defaultConfiguration.SlotsPerRangingRound, "uint8_t");
+    startRangingApp->add_option("--MaxContentionPhaseLength", m_cliData->defaultConfiguration.MaxContentionPhaseLength, "uint8_t");
+    startRangingApp->add_option("--SlotDuration", m_cliData->defaultConfiguration.SlotDuration, "uint8_t");
+    startRangingApp->add_option("--RangingInterval", m_cliData->defaultConfiguration.RangingInterval, "uint16_t");
+    startRangingApp->add_option("--KeyRotationRate", m_cliData->defaultConfiguration.KeyRotationRate, "uint8_t");
+    startRangingApp->add_option("--MaxRangingRoundRetry", m_cliData->defaultConfiguration.MaxRangingRoundRetry, "uint16_t");
 
     startRangingApp->callback([&]{
         std::cout << "Selected parameters:\n";
@@ -126,7 +142,8 @@ NearObjectCli::CreateParser()
                 {magic_enum::enum_type_name<uwb::protocol::fira::Channel>(),magic_enum::enum_name(m_cliData->defaultConfiguration.Channel)},
                 {magic_enum::enum_type_name<uwb::protocol::fira::StsPacketConfiguration>(),magic_enum::enum_name(m_cliData->defaultConfiguration.RFrameConfig)},
                 {magic_enum::enum_type_name<uwb::protocol::fira::ConvolutionalCodeConstraintLength>(),magic_enum::enum_name(m_cliData->defaultConfiguration.ConvolutionalCodeConstraintLength)},
-                {magic_enum::enum_type_name<uwb::protocol::fira::PrfMode>(),magic_enum::enum_name(m_cliData->defaultConfiguration.PrfMode)}
+                {magic_enum::enum_type_name<uwb::protocol::fira::PrfMode>(),magic_enum::enum_name(m_cliData->defaultConfiguration.PrfMode)},
+                {magic_enum::enum_type_name<uwb::UwbMacAddressFcsType>(),magic_enum::enum_name(m_cliData->defaultConfiguration.MacAddressFcsType)}
                 })
         {
             std::cout << optionname << "::" << optionselected << "\n";

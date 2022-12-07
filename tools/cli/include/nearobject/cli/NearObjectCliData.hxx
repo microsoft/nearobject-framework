@@ -24,6 +24,7 @@ struct NearObjectCliData
     std::map<std::string,uwb::protocol::fira::StsPacketConfiguration> StsPacketConfigurationMap;
     std::map<std::string,uwb::protocol::fira::ConvolutionalCodeConstraintLength> ConvolutionalCodeConstraintLengthMap;
     std::map<std::string,uwb::protocol::fira::PrfMode> PrfModeMap;
+    std::map<std::string,uwb::UwbMacAddressFcsType> UwbMacAddressFcsTypeMap;
 
     std::string defaultFile {"default.json"};
     bool hostIsController {false};
