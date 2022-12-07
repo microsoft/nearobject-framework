@@ -72,7 +72,6 @@ NearObjectCli::CreateParser()
         m_cliData->PrfModeMap = populate_map<uwb::protocol::fira::PrfMode>();
     }
 
-
     auto app = std::make_unique<CLI::App>();
     app->name("nocli");
     app->description("A command line tool to assist with all things nearobject");
@@ -94,15 +93,15 @@ NearObjectCli::CreateParser()
 
     // startRangingApp->add_option("--test", m_cliData->defaultConfiguration, "test");
 
-    startRangingApp->add_option("--deviceRole", m_cliData->defaultConfiguration.DeviceRole, "Responder/Initiator")->transform(CLI::CheckedTransformer(m_cliData->DeviceRoleMap));
-    startRangingApp->add_option("--StsConfiguration", m_cliData->defaultConfiguration.StsConfiguration, "Responder/Initiator")->transform(CLI::CheckedTransformer(m_cliData->StsConfigurationMap));
-    startRangingApp->add_option("--MultiNodeMode", m_cliData->defaultConfiguration.MultiNodeMode, "Responder/Initiator")->transform(CLI::CheckedTransformer(m_cliData->MultiNodeModeMap));
-    startRangingApp->add_option("--RangingMode", m_cliData->defaultConfiguration.RangingTimeStruct, "Responder/Initiator")->transform(CLI::CheckedTransformer(m_cliData->RangingModeMap));
-    startRangingApp->add_option("--SchedulingMode", m_cliData->defaultConfiguration.SchedulingMode, "Responder/Initiator")->transform(CLI::CheckedTransformer(m_cliData->SchedulingModeMap));
-    startRangingApp->add_option("--Channel", m_cliData->defaultConfiguration.Channel, "Responder/Initiator")->transform(CLI::CheckedTransformer(m_cliData->ChannelMap));
-    startRangingApp->add_option("--StsPacketConfiguration", m_cliData->defaultConfiguration.RFrameConfig, "Responder/Initiator")->transform(CLI::CheckedTransformer(m_cliData->StsPacketConfigurationMap));
-    startRangingApp->add_option("--ConvolutionalCodeConstraintLength", m_cliData->defaultConfiguration.ConvolutionalCodeConstraintLength, "Responder/Initiator")->transform(CLI::CheckedTransformer(m_cliData->ConvolutionalCodeConstraintLengthMap));
-    startRangingApp->add_option("--PrfMode", m_cliData->defaultConfiguration.PrfMode, "Responder/Initiator")->transform(CLI::CheckedTransformer(m_cliData->PrfModeMap));
+    startRangingApp->add_option("--deviceRole", m_cliData->defaultConfiguration.DeviceRole)->transform(CLI::CheckedTransformer(m_cliData->DeviceRoleMap));
+    startRangingApp->add_option("--StsConfiguration", m_cliData->defaultConfiguration.StsConfiguration)->transform(CLI::CheckedTransformer(m_cliData->StsConfigurationMap));
+    startRangingApp->add_option("--MultiNodeMode", m_cliData->defaultConfiguration.MultiNodeMode)->transform(CLI::CheckedTransformer(m_cliData->MultiNodeModeMap));
+    startRangingApp->add_option("--RangingMode", m_cliData->defaultConfiguration.RangingTimeStruct)->transform(CLI::CheckedTransformer(m_cliData->RangingModeMap));
+    startRangingApp->add_option("--SchedulingMode", m_cliData->defaultConfiguration.SchedulingMode)->transform(CLI::CheckedTransformer(m_cliData->SchedulingModeMap));
+    startRangingApp->add_option("--Channel", m_cliData->defaultConfiguration.Channel)->transform(CLI::CheckedTransformer(m_cliData->ChannelMap));
+    startRangingApp->add_option("--StsPacketConfiguration", m_cliData->defaultConfiguration.RFrameConfig)->transform(CLI::CheckedTransformer(m_cliData->StsPacketConfigurationMap));
+    startRangingApp->add_option("--ConvolutionalCodeConstraintLength", m_cliData->defaultConfiguration.ConvolutionalCodeConstraintLength)->transform(CLI::CheckedTransformer(m_cliData->ConvolutionalCodeConstraintLengthMap));
+    startRangingApp->add_option("--PrfMode", m_cliData->defaultConfiguration.PrfMode)->transform(CLI::CheckedTransformer(m_cliData->PrfModeMap));
     
     startRangingApp->add_flag("--controller", m_cliData->hostIsController, "presence of this flag indicates controller, absence means controlee");
 
@@ -111,6 +110,14 @@ NearObjectCli::CreateParser()
 
     startRangingApp->callback([&]{
         std::cout << magic_enum::enum_name(m_cliData->defaultConfiguration.DeviceRole) << "\n";
+        std::cout << magic_enum::enum_name(m_cliData->defaultConfiguration.StsConfiguration) << "\n";
+        std::cout << magic_enum::enum_name(m_cliData->defaultConfiguration.MultiNodeMode) << "\n";
+        std::cout << magic_enum::enum_name(m_cliData->defaultConfiguration.RangingTimeStruct) << "\n";
+        std::cout << magic_enum::enum_name(m_cliData->defaultConfiguration.SchedulingMode) << "\n";
+        std::cout << magic_enum::enum_name(m_cliData->defaultConfiguration.Channel) << "\n";
+        std::cout << magic_enum::enum_name(m_cliData->defaultConfiguration.RFrameConfig) << "\n";
+        std::cout << magic_enum::enum_name(m_cliData->defaultConfiguration.ConvolutionalCodeConstraintLength) << "\n";
+        std::cout << magic_enum::enum_name(m_cliData->defaultConfiguration.PrfMode) << "\n";
     });
     
     return app;
