@@ -6,20 +6,6 @@
 
 using namespace nearobject::cli;
 
-// bool
-// uwb::protocol::fira::lexical_cast(const std::string& input, DeviceRole& dr)
-// {
-//     std::cout << "called correct lexical_cast function ! val: " << input << std::endl;
-//     if (input == magic_enum::enum_name(DeviceRole::Responder)) {
-//         dr = DeviceRole::Responder;
-//         return true;
-//     } else if (input == "Initiator") {
-//         dr = DeviceRole::Initiator;
-//         return true;
-//     }
-//     return false;
-// }
-
 NearObjectCli::NearObjectCli(std::shared_ptr<NearObjectCliData> cliData) :
     m_cliData(cliData)
 {}
@@ -79,9 +65,7 @@ NearObjectCli::CreateParser()
 
     // startRangingApp->add_option("--test", m_cliData->defaultConfiguration, "test");
 
-    
-
-    startRangingApp->add_option("--deviceRole", m_cliData->defaultConfiguration.DeviceRole, "Responder/Initiator");
+    startRangingApp->add_option("--deviceRole", m_cliData->defaultConfiguration.DeviceRole, "Responder/Initiator")->transform(CLI::CheckedTransformer(NearObjectCliData::deviceRoleMap));
     
     startRangingApp->add_flag("--controller", m_cliData->hostIsController, "presence of this flag indicates controller, absence means controlee");
 

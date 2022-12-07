@@ -4,7 +4,6 @@
 
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
 #include <map>
-#include <magic_enum.hpp>
 
 namespace nearobject::cli
 {
@@ -13,12 +12,15 @@ namespace nearobject::cli
  */
 struct NearObjectCliData
 {
+    static std::map<std::string,uwb::protocol::fira::DeviceRole> deviceRoleMap;
+    
     std::string defaultFile {"default.json"};
     bool hostIsController {false};
     uwb::protocol::fira::UwbConfiguration defaultConfiguration {};
+
 };
 
-// std::map<std::string,uwb::protocol::fira::DeviceRole> deviceRoleMap;
+
 
 } // namespace nearobject::cli
 
