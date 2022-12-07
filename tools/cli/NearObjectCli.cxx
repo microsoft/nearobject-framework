@@ -61,7 +61,8 @@ NearObjectCli::CreateParser()
     // generate the maps
     {
         m_cliData->DeviceRoleMap = populate_map<uwb::protocol::fira::DeviceRole>();
-        // m_cliData->RangingConfigurationMap = populate_map<uwb::protocol::fira::RangingConfiguration>();
+        m_cliData->RangingMethodMap = populate_map<uwb::protocol::fira::RangingMethod>();
+        m_cliData->MeasurementReportModeMap = populate_map<uwb::protocol::fira::MeasurementReportMode>();
         m_cliData->StsConfigurationMap = populate_map<uwb::protocol::fira::StsConfiguration>();
         m_cliData->MultiNodeModeMap = populate_map<uwb::protocol::fira::MultiNodeMode>();
         m_cliData->RangingModeMap = populate_map<uwb::protocol::fira::RangingMode>();
@@ -93,7 +94,10 @@ NearObjectCli::CreateParser()
 
     // startRangingApp->add_option("--test", m_cliData->defaultConfiguration, "test");
 
+    // TODO is there a way to put all the enums into a list of [optionName, optionDestination, optionMap] so we don't have to create the initializer list each time
     startRangingApp->add_option("--DeviceRole", m_cliData->defaultConfiguration.DeviceRole)->transform(CLI::CheckedTransformer(m_cliData->DeviceRoleMap));
+    startRangingApp->add_option("--RangingMethod", m_cliData->defaultConfiguration.RangingConfiguration.Method)->transform(CLI::CheckedTransformer(m_cliData->RangingMethodMap));
+    startRangingApp->add_option("--MeasurementReportMode", m_cliData->defaultConfiguration.RangingConfiguration.ReportMode)->transform(CLI::CheckedTransformer(m_cliData->MeasurementReportModeMap));
     startRangingApp->add_option("--StsConfiguration", m_cliData->defaultConfiguration.StsConfiguration)->transform(CLI::CheckedTransformer(m_cliData->StsConfigurationMap));
     startRangingApp->add_option("--MultiNodeMode", m_cliData->defaultConfiguration.MultiNodeMode)->transform(CLI::CheckedTransformer(m_cliData->MultiNodeModeMap));
     startRangingApp->add_option("--RangingMode", m_cliData->defaultConfiguration.RangingTimeStruct)->transform(CLI::CheckedTransformer(m_cliData->RangingModeMap));
@@ -114,6 +118,8 @@ NearObjectCli::CreateParser()
         for(auto [optionname,optionselected] : 
             std::initializer_list<std::tuple<std::string_view,std::string_view>>{
                 {magic_enum::enum_type_name<uwb::protocol::fira::DeviceRole>(),magic_enum::enum_name(m_cliData->defaultConfiguration.DeviceRole)},
+                {magic_enum::enum_type_name<uwb::protocol::fira::RangingMethod>(),magic_enum::enum_name(m_cliData->defaultConfiguration.RangingConfiguration.Method)},
+                {magic_enum::enum_type_name<uwb::protocol::fira::MeasurementReportMode>(),magic_enum::enum_name(m_cliData->defaultConfiguration.RangingConfiguration.ReportMode)},
                 {magic_enum::enum_type_name<uwb::protocol::fira::StsConfiguration>(),magic_enum::enum_name(m_cliData->defaultConfiguration.StsConfiguration)},
                 {magic_enum::enum_type_name<uwb::protocol::fira::MultiNodeMode>(),magic_enum::enum_name(m_cliData->defaultConfiguration.MultiNodeMode)},
                 {magic_enum::enum_type_name<uwb::protocol::fira::RangingMode>(),magic_enum::enum_name(m_cliData->defaultConfiguration.RangingTimeStruct)},

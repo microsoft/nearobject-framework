@@ -13,6 +13,8 @@ namespace nearobject::cli
 struct NearObjectCliData
 {
     std::map<std::string,uwb::protocol::fira::DeviceRole> DeviceRoleMap;
+    std::map<std::string,uwb::protocol::fira::RangingMethod> RangingMethodMap;
+    std::map<std::string,uwb::protocol::fira::MeasurementReportMode> MeasurementReportModeMap;
     std::map<std::string,uwb::protocol::fira::RangingConfiguration> RangingConfigurationMap;
     std::map<std::string,uwb::protocol::fira::StsConfiguration> StsConfigurationMap;
     std::map<std::string,uwb::protocol::fira::MultiNodeMode> MultiNodeModeMap;
