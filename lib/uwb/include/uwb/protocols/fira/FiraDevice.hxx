@@ -15,8 +15,6 @@ enum class DeviceRole {
     Responder
 };
 
-std::ostream& operator<<(std::ostream& is, const DeviceRole& deviceRole);
-
 /**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
  * 5.1.

@@ -12,7 +12,7 @@ namespace nearobject::cli
  */
 struct NearObjectCliData
 {
-    static std::map<std::string,uwb::protocol::fira::DeviceRole> deviceRoleMap;
+    std::map<std::string,uwb::protocol::fira::DeviceRole> deviceRoleMap;
     
     std::string defaultFile {"default.json"};
     bool hostIsController {false};
