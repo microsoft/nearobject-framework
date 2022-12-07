@@ -7,8 +7,8 @@
 #include <CLI/CLI.hpp>
 // #include <nearobject/service/ServiceRuntime.hxx>
 
-#include <uwb/protocols/fira/UwbConfiguration.hxx>
 #include "NearObjectCliData.hxx"
+#include <uwb/protocols/fira/UwbConfiguration.hxx>
 
 namespace nearobject::cli
 {
@@ -45,7 +45,7 @@ public:
      * @return int 
      */
     int
-    Parse(int argc, char *argv[]);
+    Parse(int argc, char* argv[]);
 
 private:
     /**

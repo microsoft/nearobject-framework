@@ -110,9 +110,9 @@ NearObjectCli::CreateParser()
     startRangingApp->add_option("--UwbMacAddressFcsType", m_cliData->defaultConfiguration.MacAddressFcsType)->transform(CLI::CheckedTransformer(m_cliData->UwbMacAddressFcsTypeMap));
 
     // booleans
-    startRangingApp->add_flag("--controller", m_cliData->hostIsController, "presence of this flag indicates controller, absence means controlee");
-    startRangingApp->add_flag("--HoppingMode", m_cliData->defaultConfiguration.HoppingMode, "presence of this flag indicates HoppingMode on");
-    startRangingApp->add_flag("--BlockStriding", m_cliData->defaultConfiguration.BlockStriding, "presence of this flag indicates BlockStriding on");
+    startRangingApp->add_flag("--controller,!--controlee", m_cliData->hostIsController,"default is controlee");
+    startRangingApp->add_flag("--HoppingMode", m_cliData->defaultConfiguration.HoppingMode);
+    startRangingApp->add_flag("--BlockStriding", m_cliData->defaultConfiguration.BlockStriding);
 
     // TODO check for int sizes when parsing input
     startRangingApp->add_option("--FiraPhyVersion", m_cliData->defaultConfiguration.FiraPhyVersion, "uint32_t");
