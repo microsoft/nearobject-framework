@@ -46,10 +46,6 @@ main(int argc, char* argv[])
     CLI::App& app = cli.GetParser();
 
     // Configure the cli parsing app with Windows-specific options.
-    bool deviceNameProbe{ false };
-    std::optional<std::string> deviceName;
-    std::string deviceClassGuid = windows::devices::uwb::InterfaceClassUwbString;
-
     app.add_option("--deviceName", cliData->DeviceName, "uwb device name (path)");
     app.add_option("--deviceClass", cliData->DeviceClassGuid, "uwb device class guid (override)");
     app.add_flag("--probe", cliData->DeviceNameProbe, "probe for the uwb device name to use");
