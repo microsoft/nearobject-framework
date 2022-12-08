@@ -41,19 +41,25 @@ NearObjectCli::Parse(int argc, char* argv[])
     return 0;
 }
 
-template <typename enumtype>
-std::map<std::string, enumtype>
+/**
+ * @brief Helper function to populate the string-enum mapping
+ * 
+ * @tparam EnumType 
+ * @return std::map<std::string, EnumType> 
+ */
+template <typename EnumType>
+std::unordered_map<std::string, EnumType>
 populate_map()
 {
-    auto reverseMap = magic_enum::enum_entries<enumtype>();
-    std::vector<std::pair<std::string, enumtype>> destvector{ reverseMap.size() };
+    auto reverseMap = magic_enum::enum_entries<EnumType>();
+    std::vector<std::pair<std::string, EnumType>> destvector{ reverseMap.size() };
     std::transform(std::begin(reverseMap),
         std::end(reverseMap),
         std::begin(destvector),
-        [](const std::pair<enumtype, std::string_view>& input) {
+        [](const auto& input) {
             return std::pair{ std::string{ input.second }, input.first };
         });
-    return { std::begin(destvector), std::end(destvector) };
+    return { std::cbegin(destvector), std::cend(destvector) };
 }
 
 std::unique_ptr<CLI::App>
@@ -88,7 +94,7 @@ NearObjectCli::CreateParser()
 
     // option to specify file
     {
-        rangeApp->add_option("--file", m_cliData->defaultFile, "file to read as the default values, default is " + m_cliData->defaultFile);
+        rangeApp->add_option("--file", m_cliData->defaultFile, "file to read as the default values" + m_cliData->defaultFile)->capture_default_str();
         rangeApp->callback([&]() {
             std::cout << "reading stuff from this file: " << m_cliData->defaultFile << "\n";
         });
@@ -96,43 +102,43 @@ NearObjectCli::CreateParser()
 
     // TODO is there a way to put all the enums into a list of [optionName, optionDestination, optionMap] so we don't have to create the initializer list each time
     // TODO get rid of these strings, instead use a macro to extract the enum name
-    startRangingApp->add_option("--DeviceRole", m_cliData->defaultConfiguration.DeviceRole)->transform(CLI::CheckedTransformer(m_cliData->DeviceRoleMap));
-    startRangingApp->add_option("--RangingMethod", m_cliData->defaultConfiguration.RangingConfiguration.Method)->transform(CLI::CheckedTransformer(m_cliData->RangingMethodMap));
-    startRangingApp->add_option("--MeasurementReportMode", m_cliData->defaultConfiguration.RangingConfiguration.ReportMode)->transform(CLI::CheckedTransformer(m_cliData->MeasurementReportModeMap));
-    startRangingApp->add_option("--StsConfiguration", m_cliData->defaultConfiguration.StsConfiguration)->transform(CLI::CheckedTransformer(m_cliData->StsConfigurationMap));
-    startRangingApp->add_option("--MultiNodeMode", m_cliData->defaultConfiguration.MultiNodeMode)->transform(CLI::CheckedTransformer(m_cliData->MultiNodeModeMap));
-    startRangingApp->add_option("--RangingMode", m_cliData->defaultConfiguration.RangingTimeStruct)->transform(CLI::CheckedTransformer(m_cliData->RangingModeMap));
-    startRangingApp->add_option("--SchedulingMode", m_cliData->defaultConfiguration.SchedulingMode)->transform(CLI::CheckedTransformer(m_cliData->SchedulingModeMap));
-    startRangingApp->add_option("--Channel", m_cliData->defaultConfiguration.Channel)->transform(CLI::CheckedTransformer(m_cliData->ChannelMap));
-    startRangingApp->add_option("--StsPacketConfiguration", m_cliData->defaultConfiguration.RFrameConfig)->transform(CLI::CheckedTransformer(m_cliData->StsPacketConfigurationMap));
-    startRangingApp->add_option("--ConvolutionalCodeConstraintLength", m_cliData->defaultConfiguration.ConvolutionalCodeConstraintLength)->transform(CLI::CheckedTransformer(m_cliData->ConvolutionalCodeConstraintLengthMap));
-    startRangingApp->add_option("--PrfMode", m_cliData->defaultConfiguration.PrfMode)->transform(CLI::CheckedTransformer(m_cliData->PrfModeMap));
-    startRangingApp->add_option("--UwbMacAddressFcsType", m_cliData->defaultConfiguration.MacAddressFcsType)->transform(CLI::CheckedTransformer(m_cliData->UwbMacAddressFcsTypeMap));
+    startRangingApp->add_option("--DeviceRole", m_cliData->defaultConfiguration.DeviceRole)->transform(CLI::CheckedTransformer(m_cliData->DeviceRoleMap))->capture_default_str();
+    startRangingApp->add_option("--RangingMethod", m_cliData->defaultConfiguration.RangingConfiguration.Method)->transform(CLI::CheckedTransformer(m_cliData->RangingMethodMap))->capture_default_str();
+    startRangingApp->add_option("--MeasurementReportMode", m_cliData->defaultConfiguration.RangingConfiguration.ReportMode)->transform(CLI::CheckedTransformer(m_cliData->MeasurementReportModeMap))->capture_default_str();
+    startRangingApp->add_option("--StsConfiguration", m_cliData->defaultConfiguration.StsConfiguration)->transform(CLI::CheckedTransformer(m_cliData->StsConfigurationMap))->capture_default_str();
+    startRangingApp->add_option("--MultiNodeMode", m_cliData->defaultConfiguration.MultiNodeMode)->transform(CLI::CheckedTransformer(m_cliData->MultiNodeModeMap))->capture_default_str();
+    startRangingApp->add_option("--RangingMode", m_cliData->defaultConfiguration.RangingTimeStruct)->transform(CLI::CheckedTransformer(m_cliData->RangingModeMap))->capture_default_str();
+    startRangingApp->add_option("--SchedulingMode", m_cliData->defaultConfiguration.SchedulingMode)->transform(CLI::CheckedTransformer(m_cliData->SchedulingModeMap))->capture_default_str();
+    startRangingApp->add_option("--Channel", m_cliData->defaultConfiguration.Channel)->transform(CLI::CheckedTransformer(m_cliData->ChannelMap))->capture_default_str();
+    startRangingApp->add_option("--StsPacketConfiguration", m_cliData->defaultConfiguration.RFrameConfig)->transform(CLI::CheckedTransformer(m_cliData->StsPacketConfigurationMap))->capture_default_str();
+    startRangingApp->add_option("--ConvolutionalCodeConstraintLength", m_cliData->defaultConfiguration.ConvolutionalCodeConstraintLength)->transform(CLI::CheckedTransformer(m_cliData->ConvolutionalCodeConstraintLengthMap))->capture_default_str();
+    startRangingApp->add_option("--PrfMode", m_cliData->defaultConfiguration.PrfMode)->transform(CLI::CheckedTransformer(m_cliData->PrfModeMap))->capture_default_str();
+    startRangingApp->add_option("--UwbMacAddressFcsType", m_cliData->defaultConfiguration.MacAddressFcsType)->transform(CLI::CheckedTransformer(m_cliData->UwbMacAddressFcsTypeMap))->capture_default_str();
 
     // booleans
-    startRangingApp->add_flag("--controller,!--controlee", m_cliData->hostIsController,"default is controlee");
-    startRangingApp->add_flag("--HoppingMode", m_cliData->defaultConfiguration.HoppingMode);
-    startRangingApp->add_flag("--BlockStriding", m_cliData->defaultConfiguration.BlockStriding);
+    startRangingApp->add_flag("--controller,!--controlee", m_cliData->hostIsController,"default is controlee")->capture_default_str();
+    startRangingApp->add_flag("--HoppingMode", m_cliData->defaultConfiguration.HoppingMode)->capture_default_str();
+    startRangingApp->add_flag("--BlockStriding", m_cliData->defaultConfiguration.BlockStriding)->capture_default_str();
 
     // TODO check for int sizes when parsing input
-    startRangingApp->add_option("--FiraPhyVersion", m_cliData->defaultConfiguration.FiraPhyVersion, "uint32_t");
-    startRangingApp->add_option("--FiraMacVersion", m_cliData->defaultConfiguration.FiraMacVersion, "uint32_t");
-    startRangingApp->add_option("--UwbInitiationTime", m_cliData->defaultConfiguration.UwbInitiationTime, "uint32_t");
-    startRangingApp->add_option("--Sp0PhySetNumber", m_cliData->defaultConfiguration.Sp0PhySetNumber, "uint8_t");
-    startRangingApp->add_option("--Sp1PhySetNumber", m_cliData->defaultConfiguration.Sp1PhySetNumber, "uint8_t");
-    startRangingApp->add_option("--Sp3PhySetNumber", m_cliData->defaultConfiguration.Sp3PhySetNumber, "uint8_t");
-    startRangingApp->add_option("--PreableCodeIndex", m_cliData->defaultConfiguration.PreableCodeIndex, "uint8_t");
-    startRangingApp->add_option("--SlotsPerRangingRound", m_cliData->defaultConfiguration.SlotsPerRangingRound, "uint8_t");
-    startRangingApp->add_option("--MaxContentionPhaseLength", m_cliData->defaultConfiguration.MaxContentionPhaseLength, "uint8_t");
-    startRangingApp->add_option("--SlotDuration", m_cliData->defaultConfiguration.SlotDuration, "uint8_t");
-    startRangingApp->add_option("--RangingInterval", m_cliData->defaultConfiguration.RangingInterval, "uint16_t");
-    startRangingApp->add_option("--KeyRotationRate", m_cliData->defaultConfiguration.KeyRotationRate, "uint8_t");
-    startRangingApp->add_option("--MaxRangingRoundRetry", m_cliData->defaultConfiguration.MaxRangingRoundRetry, "uint16_t");
+    startRangingApp->add_option("--FiraPhyVersion", m_cliData->defaultConfiguration.FiraPhyVersion, "uint32_t")->capture_default_str();
+    startRangingApp->add_option("--FiraMacVersion", m_cliData->defaultConfiguration.FiraMacVersion, "uint32_t")->capture_default_str();
+    startRangingApp->add_option("--UwbInitiationTime", m_cliData->defaultConfiguration.UwbInitiationTime, "uint32_t")->capture_default_str();
+    startRangingApp->add_option("--Sp0PhySetNumber", m_cliData->defaultConfiguration.Sp0PhySetNumber, "uint8_t")->capture_default_str();
+    startRangingApp->add_option("--Sp1PhySetNumber", m_cliData->defaultConfiguration.Sp1PhySetNumber, "uint8_t")->capture_default_str();
+    startRangingApp->add_option("--Sp3PhySetNumber", m_cliData->defaultConfiguration.Sp3PhySetNumber, "uint8_t")->capture_default_str();
+    startRangingApp->add_option("--PreableCodeIndex", m_cliData->defaultConfiguration.PreableCodeIndex, "uint8_t")->capture_default_str();
+    startRangingApp->add_option("--SlotsPerRangingRound", m_cliData->defaultConfiguration.SlotsPerRangingRound, "uint8_t")->capture_default_str();
+    startRangingApp->add_option("--MaxContentionPhaseLength", m_cliData->defaultConfiguration.MaxContentionPhaseLength, "uint8_t")->capture_default_str();
+    startRangingApp->add_option("--SlotDuration", m_cliData->defaultConfiguration.SlotDuration, "uint8_t")->capture_default_str();
+    startRangingApp->add_option("--RangingInterval", m_cliData->defaultConfiguration.RangingInterval, "uint16_t")->capture_default_str();
+    startRangingApp->add_option("--KeyRotationRate", m_cliData->defaultConfiguration.KeyRotationRate, "uint8_t")->capture_default_str();
+    startRangingApp->add_option("--MaxRangingRoundRetry", m_cliData->defaultConfiguration.MaxRangingRoundRetry, "uint16_t")->capture_default_str();
 
     startRangingApp->callback([&] {
         std::cout << "Selected parameters:\n";
 
-        for (auto [optionname, optionselected] :
+        for (const auto& [optionname, optionselected] :
             std::initializer_list<std::tuple<std::string_view, std::string_view>>{
                 { magic_enum::enum_type_name<uwb::protocol::fira::DeviceRole>(), magic_enum::enum_name(m_cliData->defaultConfiguration.DeviceRole) },
                 { magic_enum::enum_type_name<uwb::protocol::fira::RangingMethod>(), magic_enum::enum_name(m_cliData->defaultConfiguration.RangingConfiguration.Method) },

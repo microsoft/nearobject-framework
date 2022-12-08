@@ -164,10 +164,8 @@ struct UwbConfiguration
     UwbMacAddressFcsType MacAddressFcsType{ MacFcsTypeDefault };
     uint16_t MaxRangingRoundRetry{ MaxRrRetryDefault };
 
-    // friend std::istream& operator>>(std::istream& is, UwbConfiguration& deviceRole) noexcept;
 };
 
-// std::istream& operator>>(std::istream& is, UwbConfiguration& deviceRole) noexcept;
 
 } // namespace uwb::protocol::fira
 
