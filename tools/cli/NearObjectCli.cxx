@@ -53,8 +53,8 @@ populate_map()
 {
     auto reverseMap = magic_enum::enum_entries<EnumType>();
     std::vector<std::pair<std::string, EnumType>> destvector{ reverseMap.size() };
-    std::transform(std::begin(reverseMap),
-        std::end(reverseMap),
+    std::transform(std::cbegin(reverseMap),
+        std::cend(reverseMap),
         std::begin(destvector),
         [](const auto& input) {
             return std::pair{ std::string{ input.second }, input.first };

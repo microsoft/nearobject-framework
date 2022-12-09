@@ -3,13 +3,12 @@
 #define FIRA_DEVICE_HXX
 
 #include <iostream>
-#include <vector>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
 namespace uwb::protocol::fira
 {
-
 /**
  * @brief Converts the binary representation of the Fira PHY and Mac version to a string
  * 
@@ -214,19 +213,20 @@ enum class ResultReportConfiguration {
 };
 
 /**
- * @brief Converts a vector of ResultReportConfiguration to string
+ * @brief Converts a std::unordered_set of ResultReportConfiguration to string
  * 
  * @return std::string 
  */
-std::string ResultReportConfigurationToString(const std::unordered_set<ResultReportConfiguration>&);
+std::string
+ResultReportConfigurationToString(const std::unordered_set<ResultReportConfiguration>&);
 
 /**
  * @brief Converts a string to vector of ResultReportConfiguration, using the given map
  * 
- * @return std::vector<ResultReportConfiguration> 
+ * @return std::unordered_set<ResultReportConfiguration> 
  */
 std::unordered_set<ResultReportConfiguration>
-StringToResultReportConfiguration(const std::string& input,std::unordered_map<std::string,ResultReportConfiguration> map);
+StringToResultReportConfiguration(const std::string& input, std::unordered_map<std::string, ResultReportConfiguration> map);
 
 } // namespace uwb::protocol::fira
 

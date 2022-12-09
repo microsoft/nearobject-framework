@@ -163,7 +163,6 @@ struct UwbConfiguration
     uint8_t KeyRotationRate{ KeyRotationRateDefault };
     UwbMacAddressFcsType MacAddressFcsType{ MacFcsTypeDefault };
     uint16_t MaxRangingRoundRetry{ MaxRrRetryDefault };
-
 };
 
 
