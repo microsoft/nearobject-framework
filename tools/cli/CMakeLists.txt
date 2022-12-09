@@ -8,7 +8,6 @@ target_sources(nocli-core
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectCli.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectCliData.cxx
-
     PUBLIC
         ${NO_CLI_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectCli.hxx
         ${NO_CLI_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectCliData.hxx
@@ -22,7 +21,6 @@ target_include_directories(nocli-core
 target_link_libraries(nocli-core
     PRIVATE
         CLI11::CLI11
-        nearobject-service
         magic_enum::magic_enum
     PUBLIC
         uwb-proto-fira
