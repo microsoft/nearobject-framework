@@ -26,8 +26,11 @@ struct NearObjectCliData
     std::unordered_map<std::string, uwb::protocol::fira::PrfMode> PrfModeMap;
     std::unordered_map<std::string, uwb::UwbMacAddressFcsType> UwbMacAddressFcsTypeMap;
 
-    bool hostIsController{ false };
-    uwb::protocol::fira::UwbSessionData sessionData{};
+    std::string MacVersionString;
+    std::string PhyVersionString;
+
+    bool HostIsController{ false };
+    uwb::protocol::fira::UwbSessionData SessionData{};
 };
 
 } // namespace nearobject::cli

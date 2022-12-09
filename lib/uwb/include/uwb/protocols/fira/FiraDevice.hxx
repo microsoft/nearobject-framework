@@ -6,6 +6,21 @@
 
 namespace uwb::protocol::fira
 {
+
+/**
+ * @brief Converts the binary representation of the Fira PHY and Mac version to a string
+ * 
+ * @return std::string 
+ */
+std::string VersionToString(uint32_t);
+
+/**
+ * @brief Converts the string representation of the Fira PHY and Mac version to the binary
+ * 
+ * @return uint32_t 
+ */
+uint32_t StringToVersion(std::string);
+
 /**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
  * 5.1.
