@@ -175,7 +175,8 @@ NearObjectCli::CreateParser()
             }
         }
 
-        printf("\nmac: %x\nphy: %x\n", m_cliData->SessionData.UwbConfiguration.FiraMacVersion, m_cliData->SessionData.UwbConfiguration.FiraPhyVersion);
+        std::cout << "FiRa MAC Version: " << std::setfill('0') << std::showbase << std::setw(8) << std::left << std::hex << m_cliData->SessionData.UwbConfiguration.FiraMacVersion << std::endl;
+        std::cout << "FiRa PHY Version: " << std::setfill('0') << std::showbase << std::setw(8) << std::left << std::hex << m_cliData->SessionData.UwbConfiguration.FiraPhyVersion << std::endl;
         std::cout << "ResultReportConfigurations: " << uwb::protocol::fira::ResultReportConfigurationToString(m_cliData->SessionData.UwbConfiguration.ResultReportConfigurations) << "\n";
     });
 
