@@ -29,6 +29,7 @@ struct NearObjectCliData
 
     std::string MacVersionString;
     std::string PhyVersionString;
+    std::string ResultReportConfigurationString;
 
     bool HostIsController{ false };
     uwb::protocol::fira::UwbSessionData SessionData{};

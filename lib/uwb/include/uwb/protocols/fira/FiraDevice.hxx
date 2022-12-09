@@ -3,6 +3,9 @@
 #define FIRA_DEVICE_HXX
 
 #include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
 
 namespace uwb::protocol::fira
 {
@@ -209,6 +212,21 @@ enum class ResultReportConfiguration {
     AoAElevationReport,
     AoAFoMReport,
 };
+
+/**
+ * @brief Converts a vector of ResultReportConfiguration to string
+ * 
+ * @return std::string 
+ */
+std::string ResultReportConfigurationToString(const std::unordered_set<ResultReportConfiguration>&);
+
+/**
+ * @brief Converts a string to vector of ResultReportConfiguration
+ * 
+ * @return std::vector<ResultReportConfiguration> 
+ */
+std::unordered_set<ResultReportConfiguration>
+StringToResultReportConfiguration(const std::string& input,std::unordered_map<std::string,ResultReportConfiguration> map);
 
 } // namespace uwb::protocol::fira
 

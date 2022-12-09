@@ -1,6 +1,8 @@
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
 
+#include <magic_enum.hpp>
+#include <numeric>
 #include <sstream>
 
 using namespace uwb::protocol::fira;
@@ -33,7 +35,7 @@ uwb::protocol::fira::StringToVersion(std::string input)
     } catch (std::exception e) {
         throw std::runtime_error("version string incorrect format");
     }
-    if(first_byte > 0xFFU){
+    if (first_byte > 0xFFU) {
         throw std::runtime_error("version string incorrect format");
     }
     first_byte <<= 8;
@@ -48,8 +50,58 @@ uwb::protocol::fira::StringToVersion(std::string input)
     } catch (std::exception e) {
         throw std::runtime_error("version string incorrect format");
     }
-    if(second_byte > 0xFFU){
+    if (second_byte > 0xFFU) {
         throw std::runtime_error("version string incorrect format");
     }
     return first_byte | second_byte;
+}
+
+std::string
+uwb::protocol::fira::ResultReportConfigurationToString(const std::unordered_set<ResultReportConfiguration>& input)
+{
+    return std::transform_reduce(
+        std::begin(input),
+        std::end(input),
+        std::string{ "" },
+        [](const std::string& a, const std::string& b) {
+            if (a.size() and b.size()) {
+                return a + "," + b;
+            } else {
+                return a + b;
+            }
+        },
+        [](const ResultReportConfiguration& a) {
+            return std::string{ magic_enum::enum_name(a) };
+        });
+}
+
+std::vector<std::string>
+tokenize(const std::string& input, char deliminator)
+{
+    std::vector<std::string> output;
+    std::stringstream ss{ input };
+    while (ss.good()) {
+        std::string a;
+        getline(ss, a, deliminator);
+        output.push_back(a);
+    }
+    return output;
+}
+
+std::unordered_set<ResultReportConfiguration>
+uwb::protocol::fira::StringToResultReportConfiguration(const std::string& input, std::unordered_map<std::string, ResultReportConfiguration> map)
+{
+    auto tokens = tokenize(input, ',');
+    std::unordered_set<ResultReportConfiguration> output{ };
+
+    for(const auto& s : tokens){
+        if (not map.contains(s)) {
+                std::string error_msg{ "not a valid ResultReportConfiguration: " };
+                error_msg = error_msg + s;
+                throw std::runtime_error(error_msg);
+            }
+        output.insert(map.at(s));
+    }
+
+    return output;
 }

@@ -80,7 +80,6 @@ NearObjectCli::CreateParser()
         m_cliData->PrfModeMap = populate_map<uwb::protocol::fira::PrfMode>();
         m_cliData->UwbMacAddressFcsTypeMap = populate_map<uwb::UwbMacAddressFcsType>();
         m_cliData->ResultReportConfigurationMap = populate_map<uwb::protocol::fira::ResultReportConfiguration>();
-        // TODO figure out a way to accept a set via cli
     }
 
     auto app = std::make_unique<CLI::App>();
@@ -115,8 +114,6 @@ NearObjectCli::CreateParser()
     startRangingApp->add_flag("--BlockStriding", m_cliData->SessionData.UwbConfiguration.BlockStriding)->capture_default_str();
 
     // TODO check for int sizes when parsing input
-    startRangingApp->add_option("--FiraPhyVersion", m_cliData->PhyVersionString)->capture_default_str();
-    startRangingApp->add_option("--FiraMacVersion", m_cliData->MacVersionString)->capture_default_str();
     startRangingApp->add_option("--UwbInitiationTime", m_cliData->SessionData.UwbConfiguration.UwbInitiationTime, "uint32_t")->capture_default_str();
     startRangingApp->add_option("--Sp0PhySetNumber", m_cliData->SessionData.UwbConfiguration.Sp0PhySetNumber, "uint8_t")->capture_default_str();
     startRangingApp->add_option("--Sp1PhySetNumber", m_cliData->SessionData.UwbConfiguration.Sp1PhySetNumber, "uint8_t")->capture_default_str();
@@ -128,6 +125,11 @@ NearObjectCli::CreateParser()
     startRangingApp->add_option("--RangingInterval", m_cliData->SessionData.UwbConfiguration.RangingInterval, "uint16_t")->capture_default_str();
     startRangingApp->add_option("--KeyRotationRate", m_cliData->SessionData.UwbConfiguration.KeyRotationRate, "uint8_t")->capture_default_str();
     startRangingApp->add_option("--MaxRangingRoundRetry", m_cliData->SessionData.UwbConfiguration.MaxRangingRoundRetry, "uint16_t")->capture_default_str();
+
+    // strings
+    startRangingApp->add_option("--FiraPhyVersion", m_cliData->PhyVersionString)->capture_default_str();
+    startRangingApp->add_option("--FiraMacVersion", m_cliData->MacVersionString)->capture_default_str();
+    startRangingApp->add_option("--ResultReportConfiguration", m_cliData->ResultReportConfigurationString)->capture_default_str();
 
     startRangingApp->callback([&] {
         std::cout << "Selected parameters:\n";
@@ -153,7 +155,13 @@ NearObjectCli::CreateParser()
         if (m_cliData->PhyVersionString.size()) {
             m_cliData->SessionData.UwbConfiguration.FiraPhyVersion = uwb::protocol::fira::StringToVersion(m_cliData->PhyVersionString);
         }
+
+        if (m_cliData->ResultReportConfigurationString.size()) {
+            m_cliData->SessionData.UwbConfiguration.ResultReportConfigurations = uwb::protocol::fira::StringToResultReportConfiguration(m_cliData->ResultReportConfigurationString,m_cliData->ResultReportConfigurationMap);
+        }
+
         printf("\nmac: %x\nphy: %x\n", m_cliData->SessionData.UwbConfiguration.FiraMacVersion, m_cliData->SessionData.UwbConfiguration.FiraPhyVersion);
+        std::cout << "ResultReportConfigurations: " << uwb::protocol::fira::ResultReportConfigurationToString(m_cliData->SessionData.UwbConfiguration.ResultReportConfigurations)<<"\n";
     });
 
     auto stopRangingApp = rangeApp->add_subcommand("stop", "start ranging")->fallthrough();

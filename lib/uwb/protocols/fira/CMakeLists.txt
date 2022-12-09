@@ -31,6 +31,7 @@ target_include_directories(uwb-proto-fira
 target_link_libraries(uwb-proto-fira
     PRIVATE
         uwb-proto-fira-uci
+        magic_enum::magic_enum
     PUBLIC
         notstd
         smartcard
