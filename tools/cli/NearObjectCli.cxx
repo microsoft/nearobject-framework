@@ -90,7 +90,7 @@ NearObjectCli::CreateParser()
 
     auto rangeApp = uwbApp->add_subcommand("range", "commands related to ranging")->require_subcommand()->fallthrough();
 
-    auto startRangingApp = rangeApp->add_subcommand("start", "start ranging")->fallthrough();
+    auto startRangingApp = rangeApp->add_subcommand("start", "start ranging. Please refer to Table 53 of the FiRa CSML spec for more info on the options")->fallthrough();
 
     // TODO is there a way to put all the enums into a list of [optionName, optionDestination, optionMap] so we don't have to create the initializer list each time
     // TODO get rid of these strings, instead use a macro to extract the enum name
