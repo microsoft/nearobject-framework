@@ -92,14 +92,6 @@ NearObjectCli::CreateParser()
 
     auto startRangingApp = rangeApp->add_subcommand("start", "start ranging")->fallthrough();
 
-    // option to specify file
-    {
-        rangeApp->add_option("--file", m_cliData->defaultFile, "file to read as the default values" + m_cliData->defaultFile)->capture_default_str();
-        rangeApp->callback([&]() {
-            std::cout << "reading stuff from this file: " << m_cliData->defaultFile << "\n";
-        });
-    }
-
     // TODO is there a way to put all the enums into a list of [optionName, optionDestination, optionMap] so we don't have to create the initializer list each time
     // TODO get rid of these strings, instead use a macro to extract the enum name
     startRangingApp->add_option("--DeviceRole", m_cliData->sessionData.UwbConfiguration.DeviceRole)->transform(CLI::CheckedTransformer(m_cliData->DeviceRoleMap))->capture_default_str();

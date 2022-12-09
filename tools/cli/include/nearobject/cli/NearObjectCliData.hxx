@@ -26,7 +26,6 @@ struct NearObjectCliData
     std::unordered_map<std::string, uwb::protocol::fira::PrfMode> PrfModeMap;
     std::unordered_map<std::string, uwb::UwbMacAddressFcsType> UwbMacAddressFcsTypeMap;
 
-    std::string defaultFile{ "default.json" };
     bool hostIsController{ false };
     uwb::protocol::fira::UwbSessionData sessionData{};
 };
