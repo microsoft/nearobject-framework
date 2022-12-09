@@ -7,7 +7,6 @@
 #include <CLI/CLI.hpp>
 
 #include "NearObjectCliData.hxx"
-#include <uwb/protocols/fira/UwbConfiguration.hxx>
 
 namespace nearobject::cli
 {
