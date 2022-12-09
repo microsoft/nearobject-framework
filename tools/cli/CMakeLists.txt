@@ -24,6 +24,7 @@ target_link_libraries(nocli-core
         magic_enum::magic_enum
     PUBLIC
         uwb-proto-fira
+        uwb
 )
 
 set_target_properties(nocli-core PROPERTIES FOLDER lib/nearobject)

@@ -3,7 +3,7 @@
 #define NEAR_OBJECT_CLI_DATA_HXX
 
 #include <map>
-#include <uwb/protocols/fira/UwbConfiguration.hxx>
+#include <uwb/protocols/fira/UwbSessionData.hxx>
 
 namespace nearobject::cli
 {
@@ -28,7 +28,7 @@ struct NearObjectCliData
 
     std::string defaultFile{ "default.json" };
     bool hostIsController{ false };
-    uwb::protocol::fira::UwbConfiguration defaultConfiguration{};
+    uwb::protocol::fira::UwbSessionData sessionData{};
 };
 
 } // namespace nearobject::cli
