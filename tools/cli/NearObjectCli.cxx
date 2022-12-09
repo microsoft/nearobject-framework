@@ -79,6 +79,8 @@ NearObjectCli::CreateParser()
         m_cliData->ConvolutionalCodeConstraintLengthMap = populate_map<uwb::protocol::fira::ConvolutionalCodeConstraintLength>();
         m_cliData->PrfModeMap = populate_map<uwb::protocol::fira::PrfMode>();
         m_cliData->UwbMacAddressFcsTypeMap = populate_map<uwb::UwbMacAddressFcsType>();
+        m_cliData->ResultReportConfigurationMap = populate_map<uwb::protocol::fira::ResultReportConfiguration>();
+        // TODO figure out a way to accept a set via cli
     }
 
     auto app = std::make_unique<CLI::App>();

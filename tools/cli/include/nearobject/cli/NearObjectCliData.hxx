@@ -25,6 +25,7 @@ struct NearObjectCliData
     std::unordered_map<std::string, uwb::protocol::fira::ConvolutionalCodeConstraintLength> ConvolutionalCodeConstraintLengthMap;
     std::unordered_map<std::string, uwb::protocol::fira::PrfMode> PrfModeMap;
     std::unordered_map<std::string, uwb::UwbMacAddressFcsType> UwbMacAddressFcsTypeMap;
+    std::unordered_map<std::string, uwb::protocol::fira::ResultReportConfiguration> ResultReportConfigurationMap;
 
     std::string MacVersionString;
     std::string PhyVersionString;
