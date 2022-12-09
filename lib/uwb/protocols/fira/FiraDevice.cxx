@@ -38,43 +38,24 @@ tokenize(const std::string& input, char delimiter)
     return output;
 }
 
-uint32_t
+std::optional<uint32_t>
 uwb::protocol::fira::StringToVersion(std::string input)
 {
-    auto pos = input.find(".");
-    if (pos == std::string::npos || (pos + 1) >= input.size()) {
-        throw std::runtime_error("version string incorrect format");
-    }
-    auto first_token = input.substr(0, pos);
-    if (first_token.empty()) {
-        throw std::runtime_error("version string incorrect format");
-    }
-    uint32_t first_byte;
+    auto tokens = tokenize(input, '.');
+    if (tokens.size() != 2)
+        return std::nullopt;
+    uint32_t first_byte, second_byte;
     try {
-        std::istringstream ss{ first_token };
+        std::istringstream ss{ tokens[0] }, ss2{ tokens[1] };
         ss >> first_byte;
+        ss2 >> second_byte;
     } catch (const std::exception& e) {
-        throw std::runtime_error("version string incorrect format");
+        return std::nullopt;
     }
-    if (first_byte > 0xFFU) {
-        throw std::runtime_error("version string incorrect format");
+    if (first_byte > 0xFFU or second_byte > 0xFFU) {
+        return std::nullopt;
     }
-    first_byte <<= 8;
-    auto second_token = input.substr(pos + 1);
-    uint32_t second_byte;
-    if (second_token.empty()) {
-        throw std::runtime_error("version string incorrect format");
-    }
-    try {
-        std::istringstream ss{ second_token };
-        ss >> second_byte;
-    } catch (const std::exception& e) {
-        throw std::runtime_error("version string incorrect format");
-    }
-    if (second_byte > 0xFFU) {
-        throw std::runtime_error("version string incorrect format");
-    }
-    return first_byte | second_byte;
+    return (first_byte << 8) | second_byte;
 }
 
 std::string
@@ -86,9 +67,9 @@ uwb::protocol::fira::ResultReportConfigurationToString(const std::unordered_set<
         std::string{ "" },
         [](const std::string& a, const std::string& b) {
             if (a.empty() or b.empty()) {
-                return a + "," + b;
-            } else {
                 return a + b;
+            } else {
+                return a + "," + b;
             }
         },
         [](const ResultReportConfiguration& a) {
@@ -96,9 +77,7 @@ uwb::protocol::fira::ResultReportConfigurationToString(const std::unordered_set<
         });
 }
 
-
-
-std::unordered_set<ResultReportConfiguration>
+std::optional<std::unordered_set<ResultReportConfiguration>>
 uwb::protocol::fira::StringToResultReportConfiguration(const std::string& input, std::unordered_map<std::string, ResultReportConfiguration> map)
 {
     auto tokens = tokenize(input, ',');
@@ -106,9 +85,7 @@ uwb::protocol::fira::StringToResultReportConfiguration(const std::string& input,
 
     for (const auto& s : tokens) {
         if (not map.contains(s)) {
-            std::string error_msg{ "not a valid ResultReportConfiguration: " };
-            error_msg = error_msg + s;
-            throw std::runtime_error(error_msg);
+            return std::nullopt;
         }
         output.insert(map.at(s));
     }

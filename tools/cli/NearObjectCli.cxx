@@ -150,18 +150,33 @@ NearObjectCli::CreateParser()
             std::cout << optionname << "::" << optionselected << "\n";
         }
         if (m_cliData->MacVersionString.size()) {
-            m_cliData->SessionData.UwbConfiguration.FiraMacVersion = uwb::protocol::fira::StringToVersion(m_cliData->MacVersionString);
+            auto result = uwb::protocol::fira::StringToVersion(m_cliData->MacVersionString);
+            if (not result) {
+                std::cout << "could not parse MacVersionString\n";
+            } else {
+                m_cliData->SessionData.UwbConfiguration.FiraMacVersion = result.value();
+            }
         }
         if (m_cliData->PhyVersionString.size()) {
-            m_cliData->SessionData.UwbConfiguration.FiraPhyVersion = uwb::protocol::fira::StringToVersion(m_cliData->PhyVersionString);
+            auto result = uwb::protocol::fira::StringToVersion(m_cliData->PhyVersionString);
+            if (not result) {
+                std::cout << "could not parse PhyVersionString\n";
+            } else {
+                m_cliData->SessionData.UwbConfiguration.FiraPhyVersion = result.value();
+            }
         }
 
         if (m_cliData->ResultReportConfigurationString.size()) {
-            m_cliData->SessionData.UwbConfiguration.ResultReportConfigurations = uwb::protocol::fira::StringToResultReportConfiguration(m_cliData->ResultReportConfigurationString,m_cliData->ResultReportConfigurationMap);
+            auto result = uwb::protocol::fira::StringToResultReportConfiguration(m_cliData->ResultReportConfigurationString, m_cliData->ResultReportConfigurationMap);
+            if (not result) {
+                std::cout << "could not parse ResultReportConfiguration\n";
+            } else {
+                m_cliData->SessionData.UwbConfiguration.ResultReportConfigurations = result.value();
+            }
         }
 
         printf("\nmac: %x\nphy: %x\n", m_cliData->SessionData.UwbConfiguration.FiraMacVersion, m_cliData->SessionData.UwbConfiguration.FiraPhyVersion);
-        std::cout << "ResultReportConfigurations: " << uwb::protocol::fira::ResultReportConfigurationToString(m_cliData->SessionData.UwbConfiguration.ResultReportConfigurations)<<"\n";
+        std::cout << "ResultReportConfigurations: " << uwb::protocol::fira::ResultReportConfigurationToString(m_cliData->SessionData.UwbConfiguration.ResultReportConfigurations) << "\n";
     });
 
     auto stopRangingApp = rangeApp->add_subcommand("stop", "start ranging")->fallthrough();

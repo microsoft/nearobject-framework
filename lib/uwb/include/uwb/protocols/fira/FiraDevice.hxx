@@ -21,7 +21,7 @@ std::string VersionToString(uint32_t);
  * 
  * @return uint32_t 
  */
-uint32_t StringToVersion(std::string);
+std::optional<uint32_t> StringToVersion(std::string);
 
 /**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
@@ -225,7 +225,7 @@ ResultReportConfigurationToString(const std::unordered_set<ResultReportConfigura
  * 
  * @return std::unordered_set<ResultReportConfiguration> 
  */
-std::unordered_set<ResultReportConfiguration>
+std::optional<std::unordered_set<ResultReportConfiguration>>
 StringToResultReportConfiguration(const std::string& input, std::unordered_map<std::string, ResultReportConfiguration> map);
 
 } // namespace uwb::protocol::fira
