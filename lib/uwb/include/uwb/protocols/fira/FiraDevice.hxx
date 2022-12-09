@@ -221,7 +221,7 @@ enum class ResultReportConfiguration {
 std::string ResultReportConfigurationToString(const std::unordered_set<ResultReportConfiguration>&);
 
 /**
- * @brief Converts a string to vector of ResultReportConfiguration
+ * @brief Converts a string to vector of ResultReportConfiguration, using the given map
  * 
  * @return std::vector<ResultReportConfiguration> 
  */

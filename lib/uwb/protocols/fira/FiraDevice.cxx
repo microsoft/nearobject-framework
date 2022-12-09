@@ -75,6 +75,14 @@ uwb::protocol::fira::ResultReportConfigurationToString(const std::unordered_set<
         });
 }
 
+/**
+ * @brief split a string into tokens with the specified deliminator
+ * TODO find better place for this
+ * 
+ * @param input 
+ * @param deliminator 
+ * @return std::vector<std::string> 
+ */
 std::vector<std::string>
 tokenize(const std::string& input, char deliminator)
 {
