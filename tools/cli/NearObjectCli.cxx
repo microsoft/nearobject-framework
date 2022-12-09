@@ -3,6 +3,7 @@
 
 #include <magic_enum.hpp>
 #include <nearobject/cli/NearObjectCli.hxx>
+#include <optional>
 
 using namespace nearobject::cli;
 
