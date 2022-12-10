@@ -6,6 +6,8 @@
 
 #include <CLI/CLI.hpp>
 
+#include "NearObjectCliData.hxx"
+
 namespace nearobject::cli
 {
 struct NearObjectCliData;
@@ -41,7 +43,7 @@ public:
      * @return int 
      */
     int
-    Parse(int argc, char *argv[]);
+    Parse(int argc, char* argv[]);
 
 private:
     /**

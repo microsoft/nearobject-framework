@@ -2,15 +2,35 @@
 #ifndef FIRA_DEVICE_HXX
 #define FIRA_DEVICE_HXX
 
+#include <iostream>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+#include <optional>
+
 namespace uwb::protocol::fira
 {
+/**
+ * @brief Converts the binary representation of the Fira PHY and Mac version to a string
+ * 
+ * @return std::string 
+ */
+std::string VersionToString(uint32_t);
+
+/**
+ * @brief Converts the string representation of the Fira PHY and Mac version to the binary
+ * 
+ * @return uint32_t 
+ */
+std::optional<uint32_t> StringToVersion(std::string);
+
 /**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
  * 5.1.
  */
 enum class DeviceRole {
     Initiator,
-    Responder,
+    Responder
 };
 
 /**
@@ -192,6 +212,22 @@ enum class ResultReportConfiguration {
     AoAElevationReport,
     AoAFoMReport,
 };
+
+/**
+ * @brief Converts a std::unordered_set of ResultReportConfiguration to string
+ * 
+ * @return std::string 
+ */
+std::string
+ResultReportConfigurationToString(const std::unordered_set<ResultReportConfiguration>&);
+
+/**
+ * @brief Converts a string to vector of ResultReportConfiguration, using the given map
+ * 
+ * @return std::unordered_set<ResultReportConfiguration> 
+ */
+std::optional<std::unordered_set<ResultReportConfiguration>>
+StringToResultReportConfiguration(const std::string& input, std::unordered_map<std::string, ResultReportConfiguration> map);
 
 } // namespace uwb::protocol::fira
 

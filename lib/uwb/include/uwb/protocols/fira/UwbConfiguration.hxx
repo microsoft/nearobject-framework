@@ -165,6 +165,7 @@ struct UwbConfiguration
     uint16_t MaxRangingRoundRetry{ MaxRrRetryDefault };
 };
 
+
 } // namespace uwb::protocol::fira
 
 namespace std
