@@ -29,7 +29,7 @@ void
 NearObjectDeviceControllerManager::AddDevice(std::shared_ptr<NearObjectDeviceController> nearObjectDevice)
 {
     const auto nearObjectDevicesLock = std::scoped_lock{ m_nearObjectDeviceGate };
-    const auto nearObjectDeviceExists = std::any_of(std::cbegin(m_nearObjectDevices), std::cend(m_nearObjectDevices), [&](const auto& nearObjectDeviceExisting) {
+    const auto nearObjectDeviceExists = std::any_of(std::cbegin(m_nearObjectDevices), std::cend(m_nearObjectDevices), [&](const auto& /* nearObjectDeviceExisting */) {
         return /* TODO */ false;
     });
 
@@ -130,7 +130,7 @@ NearObjectDeviceControllerManager::AddDiscoveryAgent(std::unique_ptr<NearObjectD
 }
 
 void
-NearObjectDeviceControllerManager::OnDevicePresenceChanged(NearObjectDeviceControllerDiscoveryAgent* discoveryAgent, NearObjectDevicePresence presence, std::shared_ptr<NearObjectDeviceController> deviceChanged)
+NearObjectDeviceControllerManager::OnDevicePresenceChanged(NearObjectDeviceControllerDiscoveryAgent* /* discoveryAgent */, NearObjectDevicePresence presence, std::shared_ptr<NearObjectDeviceController> deviceChanged)
 {
     switch (presence) {
         case NearObjectDevicePresence::Arrived:

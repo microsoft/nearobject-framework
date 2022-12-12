@@ -15,13 +15,13 @@ public:
     ApduCommand(std::byte cla, std::byte ins, std::byte p1, std::byte p2);
     ApduCommand(std::byte cla, std::byte ins, std::byte p1, std::byte p2, const std::vector<std::byte>& data);
 
-    const std::byte
+    std::byte
     Cla() const;
-    const std::byte
+    std::byte
     Ins() const;
-    const std::byte
+    std::byte
     P1() const;
-    const std::byte
+    std::byte
     P2() const;
     std::span<std::byte>
     Data() const;

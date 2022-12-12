@@ -52,7 +52,7 @@ struct NearObjectDeviceTest :
     {}
 
     StartSessionResult
-    StartSessionImpl(const NearObjectProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) override
+    StartSessionImpl(const NearObjectProfile& /* profile */, std::weak_ptr<NearObjectSessionEventCallbacks> /* eventCallbacks */) override
     {
         return { std::nullopt };
     }

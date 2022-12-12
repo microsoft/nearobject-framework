@@ -28,7 +28,7 @@ namespace nearobject::test
  */
 template <std::size_t N, uint8_t... values>
 uwb::UwbMacAddress
-MakeAddressImpl(std::integer_sequence<uint8_t, values...> sequence)
+MakeAddressImpl(std::integer_sequence<uint8_t, values...> /* sequence */)
 {
     return uwb::UwbMacAddress{ std::array<uint8_t, N>{ values... } };
 }

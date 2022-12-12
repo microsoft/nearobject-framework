@@ -12,8 +12,8 @@ using namespace nearobject;
 NearObjectSession::NearObjectSession(uint32_t sessionId, NearObjectCapabilities capabilities, const std::vector<std::shared_ptr<NearObject>>& nearObjects, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) :
     m_sessionId(sessionId),
     m_capabilities(capabilities),
-    m_nearObjects(nearObjects),
-    m_eventCallbacks(std::move(eventCallbacks))
+    m_eventCallbacks(std::move(eventCallbacks)),
+    m_nearObjects(nearObjects)
 {
 }
 

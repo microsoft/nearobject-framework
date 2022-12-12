@@ -18,7 +18,7 @@ UwbConfiguration::ToDataObject() const
 
 /* static */
 UwbConfiguration
-UwbConfiguration::FromDataObject(const encoding::TlvBer& tlv)
+UwbConfiguration::FromDataObject(const encoding::TlvBer& /* tlv */)
 {
     throw std::logic_error("not implemented");
 }

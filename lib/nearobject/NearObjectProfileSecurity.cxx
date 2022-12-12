@@ -10,7 +10,7 @@ NearObjectProfileSecurity::ToString() const noexcept
 }
 
 bool
-NearObjectProfileSecurity::IsSame(const NearObjectProfileSecurity& other) const noexcept
+NearObjectProfileSecurity::IsSame(const NearObjectProfileSecurity& /* other */) const noexcept
 {
     return true;
 }

@@ -9,8 +9,8 @@
 using namespace nearobject::service;
 
 NearObjectService::NearObjectService(NearObjectServiceInjector injector) :
-    DeviceManager(std::move(injector.DeviceManager)),
     ProfileManager(std::move(injector.ProfileManager)),
+    DeviceManager(std::move(injector.DeviceManager)),
     SessionIdGenerator(std::move(injector.SessionIdGenerator))
 {
     if (SessionIdGenerator == nullptr) {

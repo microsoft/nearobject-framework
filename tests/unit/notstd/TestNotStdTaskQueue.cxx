@@ -338,8 +338,8 @@ TEST_CASE("task queue can be explicitly stopped", "[notstd][shared][utility]")
                 // This assumes knowledge of queue implementation details,
                 // however, it is currently the best method available to test
                 // this functionality.
-                for (const auto i : {1,2,3,4,5,6,7,8,9}) {
-                    taskFutures.emplace_back(dispatcher->post([&]{
+                for ([[maybe_unused]] const auto _ : {1,2,3,4,5,6,7,8,9}) {
+                    taskFutures.emplace_back(dispatcher->post([&] {
                         numTasksRan++;
                     }));
                 }

@@ -23,25 +23,25 @@ ApduCommand::ApduCommand(std::byte cla, std::byte ins, std::byte p1, std::byte p
     m_payloadView = std::span<std::byte>{ std::next(std::data(m_payload)), std::size(m_payload) };
 }
 
-const std::byte
+std::byte
 ApduCommand::Cla() const
 {
     return m_payload[0];
 }
 
-const std::byte
+std::byte
 ApduCommand::Ins() const
 {
     return m_payload[1];
 }
 
-const std::byte
+std::byte
 ApduCommand::P1() const
 {
     return m_payload[2];
 }
 
-const std::byte
+std::byte
 ApduCommand::P2() const
 {
     return m_payload[3];
@@ -61,14 +61,14 @@ ApduCommand::Payload() const
 
 /* static */
 ApduCommand
-ApduCommand::FromVector(const std::vector<std::byte>& buffer)
+ApduCommand::FromVector(const std::vector<std::byte>& /* buffer */)
 {
     throw std::logic_error("not implemented");
 }
 
 /* static */
 ApduResponse
-ApduResponse::FromVector(const std::vector<std::byte>& buffer)
+ApduResponse::FromVector(const std::vector<std::byte>& /* buffer */)
 {
     throw std::logic_error("not implemented");
 }

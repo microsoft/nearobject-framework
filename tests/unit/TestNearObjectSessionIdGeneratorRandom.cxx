@@ -37,10 +37,9 @@ TEST_CASE("session id generator can be created and destroyed")
 
     SECTION("destruction following use doesn't cause a crash")
     {
-        uint32_t sessionId = 0;
         auto generator = std::make_unique<NearObjectSessionIdGeneratorRandom>();
         for (auto i = 0; i < test::NumSessionIdsToGenerate; i++) {
-            sessionId = generator->GetNext();
+            REQUIRE_NOTHROW(generator->GetNext());
         }
         verifyNoThrowOnDestruction(std::move(generator));
     }

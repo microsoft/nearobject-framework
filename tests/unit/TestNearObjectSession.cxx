@@ -51,23 +51,23 @@ struct NearObjectSessionEventCallbacksNoop :
     public NearObjectSessionEventCallbacks
 {
     void
-    OnSessionEnded(NearObjectSession *session) override
+    OnSessionEnded(NearObjectSession * /* session */) override
     {}
 
     void
-    OnRangingStarted(NearObjectSession *session) override
+    OnRangingStarted(NearObjectSession * /* session */) override
     {}
 
     void
-    OnRangingStopped(NearObjectSession *session) override
+    OnRangingStopped(NearObjectSession * /* session */) override
     {}
 
     void
-    OnNearObjectPropertiesChanged(NearObjectSession *session, const std::vector<std::shared_ptr<NearObject>> nearObjectsChanged) override
+    OnNearObjectPropertiesChanged(NearObjectSession * /* session */, const std::vector<std::shared_ptr<NearObject>> /* nearObjectsChanged */) override
     {}
 
     void
-    OnSessionMembershipChanged(NearObjectSession *session, const std::vector<std::shared_ptr<NearObject>> nearObjectsAdded, const std::vector<std::shared_ptr<NearObject>> nearObjectsRemoved) override
+    OnSessionMembershipChanged(NearObjectSession * /* session */, const std::vector<std::shared_ptr<NearObject>> /* nearObjectsAdded */, const std::vector<std::shared_ptr<NearObject>> /* nearObjectsRemoved */) override
     {}
 };
 
@@ -328,7 +328,7 @@ TEST_CASE("near object event handlers can be registered", "[basic]")
             }
 
             void
-            OnSessionMembershipChanged(NearObjectSession *session, const std::vector<std::shared_ptr<NearObject>> nearObjectsAdded, const std::vector<std::shared_ptr<NearObject>> nearObjectsRemoved) override
+            OnSessionMembershipChanged(NearObjectSession *session, const std::vector<std::shared_ptr<NearObject>> /* nearObjectsAdded */, const std::vector<std::shared_ptr<NearObject>> /* nearObjectsRemoved */) override
             {
                 REQUIRE(Session == session);
             }

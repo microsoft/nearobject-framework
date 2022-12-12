@@ -12,7 +12,6 @@ main(int argc, char* argv[])
 {
     auto cliData = std::make_shared<nearobject::cli::NearObjectCliDataLinux>();
     nearobject::cli::NearObjectCli cli{ cliData };
-    CLI::App& app = cli.GetParser();
 
     // Parse the arguments.
     int result = cli.Parse(argc, argv);

@@ -126,12 +126,12 @@ TEST_CASE("range can be used in range-based for loops")
     SECTION("range created by c'tor can be used range-base for loop")
     {
         REQUIRE_NOTHROW([&] {
-            for (const auto& value : notstd::iterator_range(ValuesStdArrayBegin, ValuesStdArrayEnd)) {
+            for ([[maybe_unused]] const auto& value : notstd::iterator_range(ValuesStdArrayBegin, ValuesStdArrayEnd)) {
                 ;
             }
         }());
         REQUIRE_NOTHROW([&] {
-            for (const auto& value : notstd::iterator_range(ValuesStdArrayCBegin, ValuesStdArrayCEnd)) {
+            for ([[maybe_unused]] const auto& value : notstd::iterator_range(ValuesStdArrayCBegin, ValuesStdArrayCEnd)) {
                 ;
             }
         }());
@@ -140,12 +140,12 @@ TEST_CASE("range can be used in range-based for loops")
     SECTION("range created by make_range can be used in range-based for loop")
     {
         REQUIRE_NOTHROW([&] {
-            for (const auto& value : notstd::make_range(ValuesStdArrayBegin, ValuesStdArrayCount)) {
+            for ([[maybe_unused]] const auto& value : notstd::make_range(ValuesStdArrayBegin, ValuesStdArrayCount)) {
                 ;
             }
         }());
         REQUIRE_NOTHROW([&] {
-            for (const auto& value : notstd::make_range(ValuesStdArrayCBegin, ValuesStdArrayCount)) {
+            for ([[maybe_unused]] const auto& value : notstd::make_range(ValuesStdArrayCBegin, ValuesStdArrayCount)) {
                 ;
             }
         }());

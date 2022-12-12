@@ -40,7 +40,6 @@ TEST_CASE("test TlvBer", "[basic][infra]")
     static constexpr std::array<uint8_t, 3> tagThreeBytesPrimitive{ 0b11011111, 0x94, 0x17 };
     static constexpr std::array<uint8_t, 2> valueTwoBytes{ 0x91, 0x92 };
     static constexpr std::array<uint8_t, 3> valueThreeBytes{ 0x91, 0x92, 0x93 };
-    static constexpr std::array<uint8_t, 4> valueFourBytes{ 0x91, 0x92, 0x93, 0x94 };
     static constexpr std::array<uint8_t, 5> valueFiveBytes{ 0x91, 0x92, 0x93, 0x94, 0x95 };
 
     static constexpr std::size_t minSizeForTwoLengthOctets = 128;
