@@ -44,23 +44,23 @@ NearObjectCli::Parse(int argc, char* argv[])
 
 /**
  * @brief Helper function to populate the string-enum mapping
- * 
- * @tparam EnumType 
- * @return std::map<std::string, EnumType> 
+ *
+ * @tparam EnumType
+ * @return std::map<std::string, EnumType>
  */
 template <typename EnumType>
 std::unordered_map<std::string, EnumType>
 populate_map()
 {
-    auto reverseMap = magic_enum::enum_entries<EnumType>();
-    std::vector<std::pair<std::string, EnumType>> destvector{ reverseMap.size() };
+    const auto reverseMap = magic_enum::enum_entries<EnumType>();
+    std::vector<std::pair<std::string, EnumType>> destVector{ reverseMap.size() };
     std::transform(std::cbegin(reverseMap),
         std::cend(reverseMap),
-        std::begin(destvector),
+        std::begin(destVector),
         [](const auto& input) {
             return std::pair{ std::string{ input.second }, input.first };
         });
-    return { std::cbegin(destvector), std::cend(destvector) };
+    return { std::cbegin(destVector), std::cend(destVector) };
 }
 
 std::unique_ptr<CLI::App>
@@ -89,9 +89,7 @@ NearObjectCli::CreateParser()
 
     app->require_subcommand();
     auto uwbApp = app->add_subcommand("uwb", "commands related to uwb")->require_subcommand()->fallthrough();
-
     auto rangeApp = uwbApp->add_subcommand("range", "commands related to ranging")->require_subcommand()->fallthrough();
-
     auto startRangingApp = rangeApp->add_subcommand("start", "start ranging. Please refer to Table 53 of the FiRa CSML spec for more info on the options")->fallthrough();
 
     // TODO is there a way to put all the enums into a list of [optionName, optionDestination, optionMap] so we don't have to create the initializer list each time
@@ -133,9 +131,9 @@ NearObjectCli::CreateParser()
     startRangingApp->add_option("--ResultReportConfiguration", m_cliData->ResultReportConfigurationString)->capture_default_str();
 
     startRangingApp->callback([&] {
-        std::cout << "Selected parameters:\n";
+        std::cout << "Selected parameters:" << std::endl;
 
-        for (const auto& [optionname, optionselected] :
+        for (const auto& [optionName, optionSelected] :
             std::initializer_list<std::tuple<std::string_view, std::string_view>>{
                 { magic_enum::enum_type_name<uwb::protocol::fira::DeviceRole>(), magic_enum::enum_name(m_cliData->SessionData.UwbConfiguration.DeviceRole) },
                 { magic_enum::enum_type_name<uwb::protocol::fira::RangingMethod>(), magic_enum::enum_name(m_cliData->SessionData.UwbConfiguration.RangingConfiguration.Method) },
@@ -148,12 +146,12 @@ NearObjectCli::CreateParser()
                 { magic_enum::enum_type_name<uwb::protocol::fira::ConvolutionalCodeConstraintLength>(), magic_enum::enum_name(m_cliData->SessionData.UwbConfiguration.ConvolutionalCodeConstraintLength) },
                 { magic_enum::enum_type_name<uwb::protocol::fira::PrfMode>(), magic_enum::enum_name(m_cliData->SessionData.UwbConfiguration.PrfMode) },
                 { magic_enum::enum_type_name<uwb::UwbMacAddressFcsType>(), magic_enum::enum_name(m_cliData->SessionData.UwbConfiguration.MacAddressFcsType) } }) {
-            std::cout << optionname << "::" << optionselected << "\n";
+            std::cout << optionName << "::" << optionSelected << std::endl;
         }
         if (m_cliData->MacVersionString.size()) {
             auto result = uwb::protocol::fira::StringToVersion(m_cliData->MacVersionString);
             if (not result) {
-                std::cout << "could not parse MacVersionString\n";
+                std::cout << "could not parse MacVersionString" << std::endl;
             } else {
                 m_cliData->SessionData.UwbConfiguration.FiraMacVersion = result.value();
             }
@@ -161,7 +159,7 @@ NearObjectCli::CreateParser()
         if (m_cliData->PhyVersionString.size()) {
             auto result = uwb::protocol::fira::StringToVersion(m_cliData->PhyVersionString);
             if (not result) {
-                std::cout << "could not parse PhyVersionString\n";
+                std::cout << "could not parse PhyVersionString" << std::endl;
             } else {
                 m_cliData->SessionData.UwbConfiguration.FiraPhyVersion = result.value();
             }
@@ -170,7 +168,7 @@ NearObjectCli::CreateParser()
         if (m_cliData->ResultReportConfigurationString.size()) {
             auto result = uwb::protocol::fira::StringToResultReportConfiguration(m_cliData->ResultReportConfigurationString, m_cliData->ResultReportConfigurationMap);
             if (not result) {
-                std::cout << "could not parse ResultReportConfiguration\n";
+                std::cout << "could not parse ResultReportConfiguration" << std::endl;
             } else {
                 m_cliData->SessionData.UwbConfiguration.ResultReportConfigurations = result.value();
             }
@@ -178,12 +176,12 @@ NearObjectCli::CreateParser()
 
         std::cout << "FiRa MAC Version: " << std::setfill('0') << std::showbase << std::setw(8) << std::left << std::hex << m_cliData->SessionData.UwbConfiguration.FiraMacVersion << std::endl;
         std::cout << "FiRa PHY Version: " << std::setfill('0') << std::showbase << std::setw(8) << std::left << std::hex << m_cliData->SessionData.UwbConfiguration.FiraPhyVersion << std::endl;
-        std::cout << "ResultReportConfigurations: " << uwb::protocol::fira::ResultReportConfigurationToString(m_cliData->SessionData.UwbConfiguration.ResultReportConfigurations) << "\n";
+        std::cout << "ResultReportConfigurations: " << uwb::protocol::fira::ResultReportConfigurationToString(m_cliData->SessionData.UwbConfiguration.ResultReportConfigurations) << std::endl;
     });
 
     auto stopRangingApp = rangeApp->add_subcommand("stop", "start ranging")->fallthrough();
     stopRangingApp->callback([&] {
-        std::cout << "stop ranging\n";
+        std::cout << "stop ranging" << std::endl;
     });
 
     return app;

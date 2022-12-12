@@ -4,6 +4,7 @@
 #include <climits>
 #include <iterator>
 #include <stdexcept>
+#include <type_traits>
 
 #include <notstd/utility.hxx>
 
@@ -169,7 +170,7 @@ GetBytesBigEndianFromBitMap(std::size_t value, std::size_t desiredLength)
 
     std::vector<uint8_t> bytes;
 
-    for (auto i = 0; i < desiredLength; i++) {
+    for (std::size_t i = 0; i < desiredLength; i++) {
         const auto b = static_cast<uint8_t>(value & 0xFFU);
         bytes.push_back(b);
         value >>= 8U;
@@ -193,30 +194,34 @@ std::vector<uint8_t>
 GetBytesBigEndianFromSizeT(std::size_t value, std::size_t desiredLength)
 {
     if (std::endian::native != std::endian::big) {
-        value = value & 0x000000FF << 24 | value & 0x0000FF00 << 8 | value & 0x00FF0000 >> 8 | value & 0xFF000000 >> 24;
+        value = (value & 0x000000FF << 24) | (value & 0x0000FF00 << 8) | (value & 0x00FF0000 >> 8) | (value & 0xFF000000 >> 24);
     }
     return GetBytesBigEndianFromBitMap(value, desiredLength);
 }
 
 /**
- * @brief Parses a span of bytes as a std::size_t number encoded in big endian
+ * @brief Parses a span of bytes as a std::size_t number encoded in big endian.
  * 
- * @param bytes 
- * @return std::size_t 
+ * @tparam IntegerT The type of output integer.
+ * @param bytes The buffer to parse.
+ * @return
  */
-std::size_t
+template <typename IntegerT = std::size_t>
+requires std::is_unsigned_v<IntegerT>
+IntegerT
 ReadSizeTFromBytesBigEndian(std::span<const uint8_t> bytes)
 {
     std::size_t rvalue = 0;
 
-    if (bytes.size() >= sizeof rvalue)
+    if (bytes.size() >= sizeof rvalue) {
         return 0; // TODO throw error? this isn't really part of an interface so may not be necessary
+    }
 
-    for (int i = 0; i < bytes.size(); i++) {
+    for (std::size_t i = 0; i < bytes.size(); i++) {
         rvalue *= 0x100;
         rvalue += bytes[i];
     }
-    return rvalue;
+    return static_cast<IntegerT>(rvalue);
 }
 
 // TODO find a better place for this function
@@ -244,7 +249,7 @@ GetBitMaskFromBitIndex(std::size_t bitIndex)
 std::size_t
 GetBitIndexFromBitMask(std::size_t bitMask)
 {
-    for (int index = 0; index < (sizeof bitMask) * CHAR_BIT; index++) {
+    for (std::size_t index = 0; index < (sizeof bitMask) * CHAR_BIT; index++) {
         if (bitMask == GetBitMaskFromBitIndex(index)) {
             return index;
         }
@@ -442,14 +447,14 @@ UwbCapability::FromOobDataObject(const encoding::TlvBer& tlv)
             if (object.GetValue().size() != 4) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            uwbCapability.FiraPhyVersionRange = ReadSizeTFromBytesBigEndian(object.GetValue()); // TODO verify that the bytes are indeed big endian
+            uwbCapability.FiraPhyVersionRange = ReadSizeTFromBytesBigEndian<uint32_t>(object.GetValue()); // TODO verify that the bytes are indeed big endian
             break;
         }
         case ParameterTag::FiraMacVersionRange: {
             if (object.GetValue().size() != 4) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            uwbCapability.FiraMacVersionRange = ReadSizeTFromBytesBigEndian(object.GetValue());
+            uwbCapability.FiraMacVersionRange = ReadSizeTFromBytesBigEndian<uint32_t>(object.GetValue());
             break;
         }
         case ParameterTag::DeviceRoles: {

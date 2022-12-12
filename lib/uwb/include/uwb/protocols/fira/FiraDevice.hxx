@@ -3,26 +3,30 @@
 #define FIRA_DEVICE_HXX
 
 #include <iostream>
+#include <optional>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <optional>
 
 namespace uwb::protocol::fira
 {
 /**
- * @brief Converts the binary representation of the Fira PHY and Mac version to a string
- * 
- * @return std::string 
+ * @brief Converts the binary representation of the Fira PHY and Mac version to a string.
+ *
+ * @param input
+ * @return std::string
  */
-std::string VersionToString(uint32_t);
+std::string
+VersionToString(uint32_t input) noexcept;
 
 /**
  * @brief Converts the string representation of the Fira PHY and Mac version to the binary
- * 
- * @return uint32_t 
+ *
+ * @param input
+ * @return std::optional<uint32_t>
  */
-std::optional<uint32_t> StringToVersion(std::string);
+std::optional<uint32_t>
+StringToVersion(const std::string& input) noexcept;
 
 /**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
@@ -30,7 +34,7 @@ std::optional<uint32_t> StringToVersion(std::string);
  */
 enum class DeviceRole {
     Initiator,
-    Responder
+    Responder,
 };
 
 /**
@@ -43,7 +47,7 @@ enum class DeviceType {
 };
 
 /**
- * @brief TODO Add spec reference. 
+ * @brief TODO Add spec reference.
  */
 enum class StsConfiguration {
     Static,
@@ -92,7 +96,7 @@ enum class SchedulingMode {
 };
 
 /**
- * @brief TODO Add spec reference. 
+ * @brief TODO Add spec reference.
  */
 enum class RangingMode {
     Interval,
@@ -110,7 +114,7 @@ enum class MeasurementReportMode {
 };
 
 /**
- * @brief TODO Add spec reference. 
+ * @brief TODO Add spec reference.
  */
 enum class AngleOfArrival {
     Azimuth90,
@@ -119,7 +123,7 @@ enum class AngleOfArrival {
 };
 
 /**
- * @brief TODO Add spec reference. 
+ * @brief TODO Add spec reference.
  */
 enum class ConvolutionalCodeConstraintLength {
     K3,
@@ -127,8 +131,8 @@ enum class ConvolutionalCodeConstraintLength {
 };
 
 /**
- * @brief TODO Add spec reference. 
- * 
+ * @brief TODO Add spec reference.
+ *
  * Note: The spec does not define channel 7 or 11 which is why it's missing here.
  */
 enum class Channel {
@@ -151,7 +155,7 @@ enum class PrfMode {
 };
 
 /**
- * @brief TODO Add spec reference. 
+ * @brief TODO Add spec reference.
  */
 enum class BprfParameter {
     Set1,
@@ -163,7 +167,7 @@ enum class BprfParameter {
 };
 
 /**
- * @brief TODO Add spec reference. 
+ * @brief TODO Add spec reference.
  */
 enum class HprfParameter {
     Set1,
@@ -215,16 +219,16 @@ enum class ResultReportConfiguration {
 
 /**
  * @brief Converts a std::unordered_set of ResultReportConfiguration to string
- * 
- * @return std::string 
+ *
+ * @return std::string
  */
 std::string
-ResultReportConfigurationToString(const std::unordered_set<ResultReportConfiguration>&);
+ResultReportConfigurationToString(const std::unordered_set<ResultReportConfiguration>& resultReportConfiguration);
 
 /**
  * @brief Converts a string to vector of ResultReportConfiguration, using the given map
- * 
- * @return std::unordered_set<ResultReportConfiguration> 
+ *
+ * @return std::unordered_set<ResultReportConfiguration>
  */
 std::optional<std::unordered_set<ResultReportConfiguration>>
 StringToResultReportConfiguration(const std::string& input, std::unordered_map<std::string, ResultReportConfiguration> map);
