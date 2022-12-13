@@ -4,7 +4,6 @@
 #include <cctype>
 #include <istream>
 #include <ostream>
-#include <ranges>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -294,31 +293,23 @@ TEST_CASE("uwb address can be used with stream operators", "[basic][io]")
 
     SECTION("short addresses can be parsed from an istream")
     {
-        // Create a view of short addresses.
-        auto shortAddresses = UwbMacAddressStringMap | std::views::filter([](const auto& value) {
-            const auto& [_, uwbMacAddress] = value;
-            return (uwbMacAddress.GetType() == uwb::UwbMacAddressType::Short);
-        });
-
-        for (const auto& [uwbMacAddressString, uwbMacAddressExpected] : shortAddresses) {
-            const auto uwbMacAddressStringLower = test::ToLower(uwbMacAddressString);
-            test::ValidateUwbMacAddressParsing(uwbMacAddressString, uwbMacAddressExpected);
-            test::ValidateUwbMacAddressParsing(uwbMacAddressStringLower, uwbMacAddressExpected);
+        for (const auto& [uwbMacAddressString, uwbMacAddressExpected] : UwbMacAddressStringMap) {
+            if (uwbMacAddressExpected.GetType() == uwb::UwbMacAddressType::Short) {
+                const auto uwbMacAddressStringLower = test::ToLower(uwbMacAddressString);
+                test::ValidateUwbMacAddressParsing(uwbMacAddressString, uwbMacAddressExpected);
+                test::ValidateUwbMacAddressParsing(uwbMacAddressStringLower, uwbMacAddressExpected);
+            }
         }
     }
 
     SECTION("extended addresses can be parsed from an istream")
     {
-        // Create a view of extended addresses.
-        auto extendedAddresses = UwbMacAddressStringMap | std::views::filter([](const auto& value) {
-            const auto& [_, uwbMacAddress] = value;
-            return (uwbMacAddress.GetType() == uwb::UwbMacAddressType::Short);
-        });
-
-        for (const auto& [uwbMacAddressString, uwbMacAddressExpected] : extendedAddresses) {
-            const auto uwbMacAddressStringLower = test::ToLower(uwbMacAddressString);
-            test::ValidateUwbMacAddressParsing(uwbMacAddressString, uwbMacAddressExpected);
-            test::ValidateUwbMacAddressParsing(uwbMacAddressStringLower, uwbMacAddressExpected);
+        for (const auto& [uwbMacAddressString, uwbMacAddressExpected] : UwbMacAddressStringMap) {
+            if (uwbMacAddressExpected.GetType() == uwb::UwbMacAddressType::Extended) {
+                const auto uwbMacAddressStringLower = test::ToLower(uwbMacAddressString);
+                test::ValidateUwbMacAddressParsing(uwbMacAddressString, uwbMacAddressExpected);
+                test::ValidateUwbMacAddressParsing(uwbMacAddressStringLower, uwbMacAddressExpected);
+            }
         }
     }
 
