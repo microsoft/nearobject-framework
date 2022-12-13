@@ -16,6 +16,8 @@
 #include <windows/devices/DevicePresenceMonitor.hxx>
 #include <windows/uwb/UwbDevice.hxx>
 
+#include <optional>
+
 using namespace windows::devices;
 
 namespace detail
@@ -37,60 +39,47 @@ GetDefaultUwbDeviceName() noexcept
         : std::nullopt;
 }
 
-} // namespace detail
-
-int
-main(int argc, char* argv[])
-{
-    auto cliData = std::make_shared<nearobject::cli::NearObjectCliDataWindows>();
-    nearobject::cli::NearObjectCli cli{ cliData };
-    CLI::App& app = cli.GetParser();
-
-    // Configure the cli parsing app with Windows-specific options.
-    app.add_option("--deviceName", cliData->DeviceName, "uwb device name (path)");
-    app.add_option("--deviceClass", cliData->DeviceClassGuid, "uwb device class guid (override)");
-    app.add_flag("--probe", cliData->DeviceNameProbe, "probe for the uwb device name to use");
-
-    // Parse the arguments.
-    int result = cli.Parse(argc, argv);
-    if (result != 0) {
-        return result;
+void 
+DeviceNameProbeAction(std::shared_ptr<nearobject::cli::NearObjectCliDataWindows>& cliData){
+    if (cliData->DeviceName.has_value()) {
+        std::cout << "warning: device name '" << cliData->DeviceName.value() << "' will be ignored due to device name probe request" << std::endl;
     }
 
-    if (cliData->DeviceNameProbe) {
-        if (cliData->DeviceName.has_value()) {
-            std::cout << "warning: device name '" << cliData->DeviceName.value() << "' will be ignored due to device name probe request" << std::endl;
+    const auto uwbDeviceNames = DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(cliData->DeviceClassGuid);
+    if (!uwbDeviceNames.empty()) {
+        int32_t index = 0;
+        for (const auto& uwbDeviceName : uwbDeviceNames) {
+            std::cout << "[" << index++ << "] " << uwbDeviceName << std::endl;
         }
 
-        const auto uwbDeviceNames = DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(cliData->DeviceClassGuid);
-        if (!uwbDeviceNames.empty()) {
-            int32_t index = 0;
-            for (const auto& uwbDeviceName : uwbDeviceNames) {
-                std::cout << "[" << index++ << "] " << uwbDeviceName << std::endl;
+        for (index = -1;;) {
+            std::cout << "select the uwb device to use from the list above [0-" << uwbDeviceNames.size() - 1 << "]: ";
+            std::cin >> index;
+            if (index >= 0 && index < uwbDeviceNames.size()) {
+                break;
             }
-
-            for (index = -1;;) {
-                std::cout << "select the uwb device to use from the list above [0-" << uwbDeviceNames.size() - 1 << "]: ";
-                std::cin >> index;
-                if (index >= 0 && index < uwbDeviceNames.size()) {
-                    break;
-                }
-                if (std::cin.fail()) {
-                    std::cin.clear();
-                }
-                std::cout << "invalid device index specified; please enter an index between 0 and " << uwbDeviceNames.size() - 1 << std::endl;
+            if (std::cin.fail()) {
+                std::cin.clear();
             }
-
-            cliData->DeviceName = uwbDeviceNames[static_cast<std::size_t>(index)];
+            std::cout << "invalid device index specified; please enter an index between 0 and " << uwbDeviceNames.size() - 1 << std::endl;
         }
+
+        cliData->DeviceName = uwbDeviceNames[static_cast<std::size_t>(index)];
+    }
+}
+
+std::unique_ptr<windows::devices::UwbDevice>
+ResolveUwbDevice(std::shared_ptr<nearobject::cli::NearObjectCliDataWindows>& cliData){
+    if(cliData->DeviceNameProbe){
+        DeviceNameProbeAction(cliData);
     }
 
     // Ensure a device name was set.
     if (!cliData->DeviceName.has_value()) {
-        cliData->DeviceName = detail::GetDefaultUwbDeviceName();
+        cliData->DeviceName = GetDefaultUwbDeviceName();
         if (!cliData->DeviceName) {
             std::cerr << "error: no uwb device could be found" << std::endl;
-            return -1;
+            return nullptr;
         }
     }
 
@@ -98,12 +87,53 @@ main(int argc, char* argv[])
     auto uwbDevice = std::make_unique<windows::devices::UwbDevice>(cliData->DeviceName.value());
     if (!uwbDevice) {
         std::cerr << "error: failed to create instance of uwb device " << cliData->DeviceName.value() << std::endl;
-        return -1;
+        return nullptr;
     }
+    return uwbDevice;
+}
 
-    auto callbacks = std::make_shared<nearobject::cli::NearObjectCliUwbSessionEventCallbacks>();
-    auto session = uwbDevice->CreateSession(callbacks);
-    session->Configure(cliData->SessionData);
+} // namespace detail
+
+int
+main(int argc, char* argv[])
+{
+    auto cliData = std::make_shared<nearobject::cli::NearObjectCliDataWindows>();
+    nearobject::cli::NearObjectCli cli{ cliData };
+    CLI::App& topApp = cli.GetParser();
+
+    auto uwbApp = topApp.get_subcommands([](CLI::App* app) {
+        return app->get_name() == "uwb";
+    })[0];
+    auto rangeApp = uwbApp->get_subcommands([](CLI::App* app) {
+        return app->get_name() == "range";
+    })[0];
+    auto startRangingApp = rangeApp->get_subcommands([](CLI::App* app) {
+        return app->get_name() == "start";
+    })[0];
+
+    // Configure the cli parsing app with Windows-specific options.
+    uwbApp->add_option("--deviceName", cliData->DeviceName, "uwb device name (path)");
+    uwbApp->add_option("--deviceClass", cliData->DeviceClassGuid, "uwb device class guid (override)");
+    uwbApp->add_flag("--probe", cliData->DeviceNameProbe, "probe for the uwb device name to use");
+
+    startRangingApp->final_callback([&cliData]{
+        auto uwbDevice = detail::ResolveUwbDevice(cliData);
+
+        if(!uwbDevice){
+            return;
+        }
+
+        auto callbacks = std::make_shared<nearobject::cli::NearObjectCliUwbSessionEventCallbacks>();
+        auto session = uwbDevice->CreateSession(callbacks);
+        session->Configure(cliData->SessionData);
+        session->StartRanging();
+    });
+
+    // Parse the arguments.
+    int result = cli.Parse(argc, argv);
+    if (result != 0) {
+        return result;
+    }
 
     return 0;
 }

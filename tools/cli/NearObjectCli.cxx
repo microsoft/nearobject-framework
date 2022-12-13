@@ -130,7 +130,7 @@ NearObjectCli::CreateParser()
     startRangingApp->add_option("--FiraMacVersion", m_cliData->MacVersionString)->capture_default_str();
     startRangingApp->add_option("--ResultReportConfiguration", m_cliData->ResultReportConfigurationString)->capture_default_str();
 
-    startRangingApp->callback([&] {
+    startRangingApp->parse_complete_callback([&] {
         std::cout << "Selected parameters:" << std::endl;
 
         for (const auto& [optionName, optionSelected] :
@@ -180,7 +180,7 @@ NearObjectCli::CreateParser()
     });
 
     auto stopRangingApp = rangeApp->add_subcommand("stop", "start ranging")->fallthrough();
-    stopRangingApp->callback([&] {
+    stopRangingApp->parse_complete_callback([&] {
         std::cout << "stop ranging" << std::endl;
     });
 
