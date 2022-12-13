@@ -39,8 +39,9 @@ GetDefaultUwbDeviceName() noexcept
         : std::nullopt;
 }
 
-void 
-DeviceNameProbeAction(std::shared_ptr<nearobject::cli::NearObjectCliDataWindows>& cliData){
+void
+DeviceNameProbeAction(std::shared_ptr<nearobject::cli::NearObjectCliDataWindows>& cliData)
+{
     if (cliData->DeviceName.has_value()) {
         std::cout << "warning: device name '" << cliData->DeviceName.value() << "' will be ignored due to device name probe request" << std::endl;
     }
@@ -69,8 +70,9 @@ DeviceNameProbeAction(std::shared_ptr<nearobject::cli::NearObjectCliDataWindows>
 }
 
 std::unique_ptr<windows::devices::UwbDevice>
-ResolveUwbDevice(std::shared_ptr<nearobject::cli::NearObjectCliDataWindows>& cliData){
-    if(cliData->DeviceNameProbe){
+ResolveUwbDevice(std::shared_ptr<nearobject::cli::NearObjectCliDataWindows>& cliData)
+{
+    if (cliData->DeviceNameProbe) {
         DeviceNameProbeAction(cliData);
     }
 
@@ -116,10 +118,10 @@ main(int argc, char* argv[])
     uwbApp->add_option("--deviceClass", cliData->DeviceClassGuid, "uwb device class guid (override)");
     uwbApp->add_flag("--probe", cliData->DeviceNameProbe, "probe for the uwb device name to use");
 
-    startRangingApp->final_callback([&cliData]{
+    startRangingApp->final_callback([&cliData] {
         auto uwbDevice = detail::ResolveUwbDevice(cliData);
 
-        if(!uwbDevice){
+        if (!uwbDevice) {
             return;
         }
 
