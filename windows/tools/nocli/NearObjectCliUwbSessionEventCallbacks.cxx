@@ -10,7 +10,9 @@ using namespace nearobject::cli;
  */
 void
 NearObjectCliUwbSessionEventCallbacks::OnSessionEnded(::uwb::UwbSession *session, ::uwb::UwbSessionEndReason reason)
-{}
+{
+    printf("SessionEnded\n");
+}
 
 /**
  * @brief Invoked when active ranging starts.
@@ -19,7 +21,9 @@ NearObjectCliUwbSessionEventCallbacks::OnSessionEnded(::uwb::UwbSession *session
  */
 void
 NearObjectCliUwbSessionEventCallbacks::OnRangingStarted(::uwb::UwbSession *session)
-{}
+{
+    printf("Ranging Started \n");
+}
 
 /**
  * @brief Invoked when active ranging stops.
@@ -28,7 +32,9 @@ NearObjectCliUwbSessionEventCallbacks::OnRangingStarted(::uwb::UwbSession *sessi
  */
 void
 NearObjectCliUwbSessionEventCallbacks::OnRangingStopped(::uwb::UwbSession *session)
-{}
+{
+    printf("Ranging Stopped \n");
+}
 
 /**
  * @brief Invoked when the properties of a peer involved in the session
@@ -39,7 +45,9 @@ NearObjectCliUwbSessionEventCallbacks::OnRangingStopped(::uwb::UwbSession *sessi
  */
 void
 NearObjectCliUwbSessionEventCallbacks::OnPeerPropertiesChanged(::uwb::UwbSession *session, const std::vector<::uwb::UwbPeer> peersChanged)
-{}
+{
+    printf("Peer Properties Changed\n");
+}
 
 /**
  * @brief Invoked when membership of one or more near peers involved in
@@ -52,4 +60,6 @@ NearObjectCliUwbSessionEventCallbacks::OnPeerPropertiesChanged(::uwb::UwbSession
  */
 void
 NearObjectCliUwbSessionEventCallbacks::OnSessionMembershipChanged(::uwb::UwbSession *session, const std::vector<::uwb::UwbPeer> peersAdded, const std::vector<::uwb::UwbPeer> peersRemoved)
-{}
+{
+    printf("Session Membership Changed\n");
+}
