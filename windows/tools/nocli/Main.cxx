@@ -9,8 +9,9 @@
 #include <magic_enum.hpp>
 #include <notstd/guid.hxx>
 
-#include <nearobject/cli/NearObjectCli.hxx>
 #include "NearObjectCliDataWindows.hxx"
+#include "NearObjectCliUwbSessionEventCallbacks.hxx"
+#include <nearobject/cli/NearObjectCli.hxx>
 #include <windows/devices/DeviceEnumerator.hxx>
 #include <windows/devices/DevicePresenceMonitor.hxx>
 #include <windows/uwb/UwbDevice.hxx>
@@ -99,6 +100,10 @@ main(int argc, char* argv[])
         std::cerr << "error: failed to create instance of uwb device " << cliData->DeviceName.value() << std::endl;
         return -1;
     }
+
+    auto callbacks = std::make_shared<nearobject::cli::NearObjectCliUwbSessionEventCallbacks>();
+    auto session = uwbDevice->CreateSession(callbacks);
+    session->Configure(cliData->SessionData);
 
     return 0;
 }
