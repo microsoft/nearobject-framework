@@ -1,4 +1,5 @@
 #include "NearObjectCliUwbSessionEventCallbacks.hxx"
+#include <iostream>
 
 using namespace nearobject::cli;
 
@@ -11,7 +12,7 @@ using namespace nearobject::cli;
 void
 NearObjectCliUwbSessionEventCallbacks::OnSessionEnded(::uwb::UwbSession *session, ::uwb::UwbSessionEndReason reason)
 {
-    printf("SessionEnded\n");
+    std::cout << "Session Ended" << std::endl;
 }
 
 /**
@@ -22,7 +23,7 @@ NearObjectCliUwbSessionEventCallbacks::OnSessionEnded(::uwb::UwbSession *session
 void
 NearObjectCliUwbSessionEventCallbacks::OnRangingStarted(::uwb::UwbSession *session)
 {
-    printf("Ranging Started \n");
+    std::cout << "Ranging Started" << std::endl;
 }
 
 /**
@@ -33,7 +34,7 @@ NearObjectCliUwbSessionEventCallbacks::OnRangingStarted(::uwb::UwbSession *sessi
 void
 NearObjectCliUwbSessionEventCallbacks::OnRangingStopped(::uwb::UwbSession *session)
 {
-    printf("Ranging Stopped \n");
+    std::cout << "Ranging Stopped" << std::endl;
 }
 
 /**
@@ -46,7 +47,7 @@ NearObjectCliUwbSessionEventCallbacks::OnRangingStopped(::uwb::UwbSession *sessi
 void
 NearObjectCliUwbSessionEventCallbacks::OnPeerPropertiesChanged(::uwb::UwbSession *session, const std::vector<::uwb::UwbPeer> peersChanged)
 {
-    printf("Peer Properties Changed\n");
+    std::cout << "Peer Properties Changed" << std::endl;
 }
 
 /**
@@ -61,5 +62,5 @@ NearObjectCliUwbSessionEventCallbacks::OnPeerPropertiesChanged(::uwb::UwbSession
 void
 NearObjectCliUwbSessionEventCallbacks::OnSessionMembershipChanged(::uwb::UwbSession *session, const std::vector<::uwb::UwbPeer> peersAdded, const std::vector<::uwb::UwbPeer> peersRemoved)
 {
-    printf("Session Membership Changed\n");
+    std::cout << "Session Membership Changed" << std::endl;
 }
