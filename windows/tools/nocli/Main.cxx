@@ -40,13 +40,13 @@ GetDefaultUwbDeviceName() noexcept
 }
 
 void
-DeviceNameProbeAction(std::shared_ptr<nearobject::cli::NearObjectCliDataWindows>& cliData)
+DeviceNameProbeAction(nearobject::cli::NearObjectCliDataWindows& cliData)
 {
-    if (cliData->DeviceName.has_value()) {
-        std::cout << "warning: device name '" << cliData->DeviceName.value() << "' will be ignored due to device name probe request" << std::endl;
+    if (cliData.DeviceName.has_value()) {
+        std::cout << "warning: device name '" << cliData.DeviceName.value() << "' will be ignored due to device name probe request" << std::endl;
     }
 
-    const auto uwbDeviceNames = DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(cliData->DeviceClassGuid);
+    const auto uwbDeviceNames = DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(cliData.DeviceClassGuid);
     if (!uwbDeviceNames.empty()) {
         int32_t index = 0;
         for (const auto& uwbDeviceName : uwbDeviceNames) {
@@ -65,30 +65,30 @@ DeviceNameProbeAction(std::shared_ptr<nearobject::cli::NearObjectCliDataWindows>
             std::cout << "invalid device index specified; please enter an index between 0 and " << uwbDeviceNames.size() - 1 << std::endl;
         }
 
-        cliData->DeviceName = uwbDeviceNames[static_cast<std::size_t>(index)];
+        cliData.DeviceName = uwbDeviceNames[static_cast<std::size_t>(index)];
     }
 }
 
 std::unique_ptr<windows::devices::UwbDevice>
-ResolveUwbDevice(std::shared_ptr<nearobject::cli::NearObjectCliDataWindows>& cliData)
+ResolveUwbDevice(nearobject::cli::NearObjectCliDataWindows& cliData)
 {
-    if (cliData->DeviceNameProbe) {
+    if (cliData.DeviceNameProbe) {
         DeviceNameProbeAction(cliData);
     }
 
     // Ensure a device name was set.
-    if (!cliData->DeviceName.has_value()) {
-        cliData->DeviceName = GetDefaultUwbDeviceName();
-        if (!cliData->DeviceName) {
+    if (!cliData.DeviceName.has_value()) {
+        cliData.DeviceName = GetDefaultUwbDeviceName();
+        if (!cliData.DeviceName) {
             std::cerr << "error: no uwb device could be found" << std::endl;
             return nullptr;
         }
     }
 
-    std::cout << "Using UWB device " << cliData->DeviceName.value() << std::endl;
-    auto uwbDevice = std::make_unique<windows::devices::UwbDevice>(cliData->DeviceName.value());
+    std::cout << "Using UWB device " << cliData.DeviceName.value() << std::endl;
+    auto uwbDevice = std::make_unique<windows::devices::UwbDevice>(cliData.DeviceName.value());
     if (!uwbDevice) {
-        std::cerr << "error: failed to create instance of uwb device " << cliData->DeviceName.value() << std::endl;
+        std::cerr << "error: failed to create instance of uwb device " << cliData.DeviceName.value() << std::endl;
         return nullptr;
     }
     return uwbDevice;
@@ -113,7 +113,7 @@ main(int argc, char* argv[])
     uwbApp->add_flag("--probe", cliData->DeviceNameProbe, "probe for the uwb device name to use");
 
     startRangingApp->final_callback([&cliData] {
-        auto uwbDevice = detail::ResolveUwbDevice(cliData);
+        auto uwbDevice = detail::ResolveUwbDevice(*cliData);
 
         if (!uwbDevice) {
             return;
