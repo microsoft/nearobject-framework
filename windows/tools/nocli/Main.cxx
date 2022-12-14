@@ -39,6 +39,11 @@ GetDefaultUwbDeviceName() noexcept
         : std::nullopt;
 }
 
+/**
+ * @brief The action to take when the --probe flag is passed via cli
+ * 
+ * @param cliData 
+ */
 void
 DeviceNameProbeAction(nearobject::cli::NearObjectCliDataWindows& cliData)
 {
@@ -69,6 +74,12 @@ DeviceNameProbeAction(nearobject::cli::NearObjectCliDataWindows& cliData)
     }
 }
 
+/**
+ * @brief tries to resolve the UwbDevice to use for ranging
+ * 
+ * @param cliData 
+ * @return std::unique_ptr<windows::devices::UwbDevice> 
+ */
 std::unique_ptr<windows::devices::UwbDevice>
 ResolveUwbDevice(nearobject::cli::NearObjectCliDataWindows& cliData)
 {
@@ -114,7 +125,6 @@ main(int argc, char* argv[])
 
     startRangingApp->final_callback([&cliData] {
         auto uwbDevice = detail::ResolveUwbDevice(*cliData);
-
         if (!uwbDevice) {
             return;
         }
