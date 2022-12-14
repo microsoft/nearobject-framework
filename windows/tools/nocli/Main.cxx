@@ -103,15 +103,9 @@ main(int argc, char* argv[])
     nearobject::cli::NearObjectCli cli{ cliData };
     CLI::App& topApp = cli.GetParser();
 
-    auto uwbApp = topApp.get_subcommands([](CLI::App* app) {
-        return app->get_name() == "uwb";
-    })[0];
-    auto rangeApp = uwbApp->get_subcommands([](CLI::App* app) {
-        return app->get_name() == "range";
-    })[0];
-    auto startRangingApp = rangeApp->get_subcommands([](CLI::App* app) {
-        return app->get_name() == "start";
-    })[0];
+    auto uwbApp = cli.GetUwbApp();
+    auto rangeApp = cli.GetRangeApp();
+    auto startRangingApp = cli.GetRangeStartApp();
 
     // Configure the cli parsing app with Windows-specific options.
     uwbApp->add_option("--deviceName", cliData->DeviceName, "uwb device name (path)");
