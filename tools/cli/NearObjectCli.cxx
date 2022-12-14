@@ -42,6 +42,30 @@ NearObjectCli::Parse(int argc, char* argv[])
     return 0;
 }
 
+CLI::App*
+NearObjectCli::GetUwbApp()
+{
+    return m_uwbApp;
+}
+
+CLI::App*
+NearObjectCli::GetRangeApp()
+{
+    return m_rangeApp;
+}
+
+CLI::App*
+NearObjectCli::GetRangeStartApp()
+{
+    return m_rangeStartApp;
+}
+
+CLI::App*
+NearObjectCli::GetRangeStopApp()
+{
+    return m_rangeStopApp;
+}
+
 /**
  * @brief Helper function to populate the string-enum mapping
  *
@@ -88,49 +112,53 @@ NearObjectCli::CreateParser()
     app->description("A command line tool to assist with all things nearobject");
 
     app->require_subcommand();
-    auto uwbApp = app->add_subcommand("uwb", "commands related to uwb")->require_subcommand()->fallthrough();
-    auto rangeApp = uwbApp->add_subcommand("range", "commands related to ranging")->require_subcommand()->fallthrough();
-    auto startRangingApp = rangeApp->add_subcommand("start", "start ranging. Please refer to Table 53 of the FiRa CSML spec for more info on the options")->fallthrough();
+    m_uwbApp = app->add_subcommand("uwb", "commands related to uwb")->require_subcommand()->fallthrough();
+    m_rangeApp = m_uwbApp->add_subcommand("range", "commands related to ranging")->require_subcommand()->fallthrough();
+    m_rangeStartApp = m_rangeApp->add_subcommand("start", "start ranging. Please refer to Table 53 of the FiRa CSML spec for more info on the options")->fallthrough();
 
     // TODO is there a way to put all the enums into a list of [optionName, optionDestination, optionMap] so we don't have to create the initializer list each time
     // TODO get rid of these strings, instead use a macro to extract the enum name
-    startRangingApp->add_option("--DeviceRole", m_cliData->SessionData.UwbConfiguration.DeviceRole)->transform(CLI::CheckedTransformer(m_cliData->DeviceRoleMap))->capture_default_str();
-    startRangingApp->add_option("--RangingMethod", m_cliData->SessionData.UwbConfiguration.RangingConfiguration.Method)->transform(CLI::CheckedTransformer(m_cliData->RangingMethodMap))->capture_default_str();
-    startRangingApp->add_option("--MeasurementReportMode", m_cliData->SessionData.UwbConfiguration.RangingConfiguration.ReportMode)->transform(CLI::CheckedTransformer(m_cliData->MeasurementReportModeMap))->capture_default_str();
-    startRangingApp->add_option("--StsConfiguration", m_cliData->SessionData.UwbConfiguration.StsConfiguration)->transform(CLI::CheckedTransformer(m_cliData->StsConfigurationMap))->capture_default_str();
-    startRangingApp->add_option("--MultiNodeMode", m_cliData->SessionData.UwbConfiguration.MultiNodeMode)->transform(CLI::CheckedTransformer(m_cliData->MultiNodeModeMap))->capture_default_str();
-    startRangingApp->add_option("--RangingMode", m_cliData->SessionData.UwbConfiguration.RangingTimeStruct)->transform(CLI::CheckedTransformer(m_cliData->RangingModeMap))->capture_default_str();
-    startRangingApp->add_option("--SchedulingMode", m_cliData->SessionData.UwbConfiguration.SchedulingMode)->transform(CLI::CheckedTransformer(m_cliData->SchedulingModeMap))->capture_default_str();
-    startRangingApp->add_option("--Channel", m_cliData->SessionData.UwbConfiguration.Channel)->transform(CLI::CheckedTransformer(m_cliData->ChannelMap))->capture_default_str();
-    startRangingApp->add_option("--StsPacketConfiguration", m_cliData->SessionData.UwbConfiguration.RFrameConfig)->transform(CLI::CheckedTransformer(m_cliData->StsPacketConfigurationMap))->capture_default_str();
-    startRangingApp->add_option("--ConvolutionalCodeConstraintLength", m_cliData->SessionData.UwbConfiguration.ConvolutionalCodeConstraintLength)->transform(CLI::CheckedTransformer(m_cliData->ConvolutionalCodeConstraintLengthMap))->capture_default_str();
-    startRangingApp->add_option("--PrfMode", m_cliData->SessionData.UwbConfiguration.PrfMode)->transform(CLI::CheckedTransformer(m_cliData->PrfModeMap))->capture_default_str();
-    startRangingApp->add_option("--UwbMacAddressFcsType", m_cliData->SessionData.UwbConfiguration.MacAddressFcsType)->transform(CLI::CheckedTransformer(m_cliData->UwbMacAddressFcsTypeMap))->capture_default_str();
+    m_rangeStartApp->add_option("--DeviceRole", m_cliData->SessionData.UwbConfiguration.DeviceRole)->transform(CLI::CheckedTransformer(m_cliData->DeviceRoleMap))->capture_default_str();
+    m_rangeStartApp->add_option("--RangingMethod", m_cliData->SessionData.UwbConfiguration.RangingConfiguration.Method)->transform(CLI::CheckedTransformer(m_cliData->RangingMethodMap))->capture_default_str();
+    m_rangeStartApp->add_option("--MeasurementReportMode", m_cliData->SessionData.UwbConfiguration.RangingConfiguration.ReportMode)->transform(CLI::CheckedTransformer(m_cliData->MeasurementReportModeMap))->capture_default_str();
+    m_rangeStartApp->add_option("--StsConfiguration", m_cliData->SessionData.UwbConfiguration.StsConfiguration)->transform(CLI::CheckedTransformer(m_cliData->StsConfigurationMap))->capture_default_str();
+    m_rangeStartApp->add_option("--MultiNodeMode", m_cliData->SessionData.UwbConfiguration.MultiNodeMode)->transform(CLI::CheckedTransformer(m_cliData->MultiNodeModeMap))->capture_default_str();
+    m_rangeStartApp->add_option("--RangingMode", m_cliData->SessionData.UwbConfiguration.RangingTimeStruct)->transform(CLI::CheckedTransformer(m_cliData->RangingModeMap))->capture_default_str();
+    m_rangeStartApp->add_option("--SchedulingMode", m_cliData->SessionData.UwbConfiguration.SchedulingMode)->transform(CLI::CheckedTransformer(m_cliData->SchedulingModeMap))->capture_default_str();
+    m_rangeStartApp->add_option("--Channel", m_cliData->SessionData.UwbConfiguration.Channel)->transform(CLI::CheckedTransformer(m_cliData->ChannelMap))->capture_default_str();
+    m_rangeStartApp->add_option("--StsPacketConfiguration", m_cliData->SessionData.UwbConfiguration.RFrameConfig)->transform(CLI::CheckedTransformer(m_cliData->StsPacketConfigurationMap))->capture_default_str();
+    m_rangeStartApp->add_option("--ConvolutionalCodeConstraintLength", m_cliData->SessionData.UwbConfiguration.ConvolutionalCodeConstraintLength)->transform(CLI::CheckedTransformer(m_cliData->ConvolutionalCodeConstraintLengthMap))->capture_default_str();
+    m_rangeStartApp->add_option("--PrfMode", m_cliData->SessionData.UwbConfiguration.PrfMode)->transform(CLI::CheckedTransformer(m_cliData->PrfModeMap))->capture_default_str();
+    m_rangeStartApp->add_option("--UwbMacAddressFcsType", m_cliData->SessionData.UwbConfiguration.MacAddressFcsType)->transform(CLI::CheckedTransformer(m_cliData->UwbMacAddressFcsTypeMap))->capture_default_str();
 
     // booleans
-    startRangingApp->add_flag("--controller,!--controlee", m_cliData->HostIsController, "default is controlee")->capture_default_str();
-    startRangingApp->add_flag("--HoppingMode", m_cliData->SessionData.UwbConfiguration.HoppingMode)->capture_default_str();
-    startRangingApp->add_flag("--BlockStriding", m_cliData->SessionData.UwbConfiguration.BlockStriding)->capture_default_str();
+    m_rangeStartApp->add_flag("--controller,!--controlee", m_cliData->HostIsController, "default is controlee")->capture_default_str();
+    m_rangeStartApp->add_flag("--HoppingMode", m_cliData->SessionData.UwbConfiguration.HoppingMode)->capture_default_str();
+    m_rangeStartApp->add_flag("--BlockStriding", m_cliData->SessionData.UwbConfiguration.BlockStriding)->capture_default_str();
 
     // TODO check for int sizes when parsing input
-    startRangingApp->add_option("--UwbInitiationTime", m_cliData->SessionData.UwbConfiguration.UwbInitiationTime, "uint32_t")->capture_default_str();
-    startRangingApp->add_option("--Sp0PhySetNumber", m_cliData->SessionData.UwbConfiguration.Sp0PhySetNumber, "uint8_t")->capture_default_str();
-    startRangingApp->add_option("--Sp1PhySetNumber", m_cliData->SessionData.UwbConfiguration.Sp1PhySetNumber, "uint8_t")->capture_default_str();
-    startRangingApp->add_option("--Sp3PhySetNumber", m_cliData->SessionData.UwbConfiguration.Sp3PhySetNumber, "uint8_t")->capture_default_str();
-    startRangingApp->add_option("--PreableCodeIndex", m_cliData->SessionData.UwbConfiguration.PreableCodeIndex, "uint8_t")->capture_default_str();
-    startRangingApp->add_option("--SlotsPerRangingRound", m_cliData->SessionData.UwbConfiguration.SlotsPerRangingRound, "uint8_t")->capture_default_str();
-    startRangingApp->add_option("--MaxContentionPhaseLength", m_cliData->SessionData.UwbConfiguration.MaxContentionPhaseLength, "uint8_t")->capture_default_str();
-    startRangingApp->add_option("--SlotDuration", m_cliData->SessionData.UwbConfiguration.SlotDuration, "uint8_t")->capture_default_str();
-    startRangingApp->add_option("--RangingInterval", m_cliData->SessionData.UwbConfiguration.RangingInterval, "uint16_t")->capture_default_str();
-    startRangingApp->add_option("--KeyRotationRate", m_cliData->SessionData.UwbConfiguration.KeyRotationRate, "uint8_t")->capture_default_str();
-    startRangingApp->add_option("--MaxRangingRoundRetry", m_cliData->SessionData.UwbConfiguration.MaxRangingRoundRetry, "uint16_t")->capture_default_str();
+    m_rangeStartApp->add_option("--UwbInitiationTime", m_cliData->SessionData.UwbConfiguration.UwbInitiationTime, "uint32_t")->capture_default_str();
+    m_rangeStartApp->add_option("--Sp0PhySetNumber", m_cliData->SessionData.UwbConfiguration.Sp0PhySetNumber, "uint8_t")->capture_default_str();
+    m_rangeStartApp->add_option("--Sp1PhySetNumber", m_cliData->SessionData.UwbConfiguration.Sp1PhySetNumber, "uint8_t")->capture_default_str();
+    m_rangeStartApp->add_option("--Sp3PhySetNumber", m_cliData->SessionData.UwbConfiguration.Sp3PhySetNumber, "uint8_t")->capture_default_str();
+    m_rangeStartApp->add_option("--PreableCodeIndex", m_cliData->SessionData.UwbConfiguration.PreableCodeIndex, "uint8_t")->capture_default_str();
+    m_rangeStartApp->add_option("--SlotsPerRangingRound", m_cliData->SessionData.UwbConfiguration.SlotsPerRangingRound, "uint8_t")->capture_default_str();
+    m_rangeStartApp->add_option("--MaxContentionPhaseLength", m_cliData->SessionData.UwbConfiguration.MaxContentionPhaseLength, "uint8_t")->capture_default_str();
+    m_rangeStartApp->add_option("--SlotDuration", m_cliData->SessionData.UwbConfiguration.SlotDuration, "uint8_t")->capture_default_str();
+    m_rangeStartApp->add_option("--RangingInterval", m_cliData->SessionData.UwbConfiguration.RangingInterval, "uint16_t")->capture_default_str();
+    m_rangeStartApp->add_option("--KeyRotationRate", m_cliData->SessionData.UwbConfiguration.KeyRotationRate, "uint8_t")->capture_default_str();
+    m_rangeStartApp->add_option("--MaxRangingRoundRetry", m_cliData->SessionData.UwbConfiguration.MaxRangingRoundRetry, "uint16_t")->capture_default_str();
+
+    m_rangeApp->add_option("--SessionDataVersion", m_cliData->SessionData.SessionDataVersion)->capture_default_str();
+    m_rangeApp->add_option("--SessionId", m_cliData->SessionData.SessionId)->capture_default_str();
+    m_rangeApp->add_option("--SubSessionId", m_cliData->SessionData.SubSessionId)->capture_default_str();
 
     // strings
-    startRangingApp->add_option("--FiraPhyVersion", m_cliData->PhyVersionString)->capture_default_str();
-    startRangingApp->add_option("--FiraMacVersion", m_cliData->MacVersionString)->capture_default_str();
-    startRangingApp->add_option("--ResultReportConfiguration", m_cliData->ResultReportConfigurationString)->capture_default_str();
+    m_rangeStartApp->add_option("--FiraPhyVersion", m_cliData->PhyVersionString)->capture_default_str();
+    m_rangeStartApp->add_option("--FiraMacVersion", m_cliData->MacVersionString)->capture_default_str();
+    m_rangeStartApp->add_option("--ResultReportConfiguration", m_cliData->ResultReportConfigurationString)->capture_default_str();
 
-    startRangingApp->callback([&] {
+    m_rangeStartApp->parse_complete_callback([&] {
         std::cout << "Selected parameters:" << std::endl;
 
         for (const auto& [optionName, optionSelected] :
@@ -179,8 +207,8 @@ NearObjectCli::CreateParser()
         std::cout << "ResultReportConfigurations: " << uwb::protocol::fira::ResultReportConfigurationToString(m_cliData->SessionData.UwbConfiguration.ResultReportConfigurations) << std::endl;
     });
 
-    auto stopRangingApp = rangeApp->add_subcommand("stop", "start ranging")->fallthrough();
-    stopRangingApp->callback([&] {
+    m_rangeStopApp = m_rangeApp->add_subcommand("stop", "start ranging")->fallthrough();
+    m_rangeStopApp->parse_complete_callback([&] {
         std::cout << "stop ranging" << std::endl;
     });
 

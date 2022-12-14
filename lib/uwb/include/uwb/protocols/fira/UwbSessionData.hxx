@@ -36,9 +36,9 @@ struct UwbSessionData
      * Table 53, pages 103-107.
      */
     enum class ParameterTag : uint8_t {
-        UwbSessionDataVersion = 0x80,
-        UwbSessionId = 0x81,
-        UwbSubSessionId = 0x82,
+        SessionDataVersion = 0x80,
+        SessionId = 0x81,
+        SubSessionId = 0x82,
         ConfigurationParameters = 0xA3,
         StaticRangingInfo = 0xA4,
         SecureRangingInfo = 0xA5,
@@ -84,9 +84,9 @@ struct UwbSessionData
     static UwbSessionData
     FromDataObject(const encoding::TlvBer& tlv);
 
-    uint16_t UwbSessionDataVersion{ 0 };
-    uint32_t UwbSessionId{ 0 };
-    uint32_t UwbSubSessionId{ 0 };
+    uint16_t SessionDataVersion{ 0 };
+    uint32_t SessionId{ 0 };
+    uint32_t SubSessionId{ 0 };
     UwbConfiguration UwbConfiguration{};
     std::optional<StaticRangingInfo> StaticRangingInfo;
     std::optional<SecureRangingInfo> SecureRangingInfo;
@@ -105,9 +105,9 @@ struct hash<uwb::protocol::fira::UwbSessionData>
     {
         std::size_t value = 0;
         notstd::hash_combine(value,
-            uwbSessionData.UwbSessionDataVersion,
-            uwbSessionData.UwbSessionId,
-            uwbSessionData.UwbSubSessionId,
+            uwbSessionData.SessionDataVersion,
+            uwbSessionData.SessionId,
+            uwbSessionData.SubSessionId,
             uwbSessionData.UwbConfiguration,
             uwbSessionData.StaticRangingInfo,
             uwbSessionData.SecureRangingInfo,
