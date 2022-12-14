@@ -149,9 +149,9 @@ NearObjectCli::CreateParser()
     m_rangeStartApp->add_option("--KeyRotationRate", m_cliData->SessionData.UwbConfiguration.KeyRotationRate, "uint8_t")->capture_default_str();
     m_rangeStartApp->add_option("--MaxRangingRoundRetry", m_cliData->SessionData.UwbConfiguration.MaxRangingRoundRetry, "uint16_t")->capture_default_str();
 
-    m_rangeApp->add_option("--UwbSessionDataVersion", m_cliData->SessionData.UwbSessionDataVersion)->capture_default_str();
-    m_rangeApp->add_option("--UwbSessionId", m_cliData->SessionData.UwbSessionId)->capture_default_str();
-    m_rangeApp->add_option("--UwbSubSessionId", m_cliData->SessionData.UwbSubSessionId)->capture_default_str();
+    m_rangeApp->add_option("--SessionDataVersion", m_cliData->SessionData.SessionDataVersion)->capture_default_str();
+    m_rangeApp->add_option("--SessionId", m_cliData->SessionData.SessionId)->capture_default_str();
+    m_rangeApp->add_option("--SubSessionId", m_cliData->SessionData.SubSessionId)->capture_default_str();
 
     // strings
     m_rangeStartApp->add_option("--FiraPhyVersion", m_cliData->PhyVersionString)->capture_default_str();
