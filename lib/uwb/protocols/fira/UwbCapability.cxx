@@ -13,27 +13,6 @@
 
 using namespace uwb::protocol::fira;
 
-const std::array<UwbCapability::ParameterTag, 18> UwbCapability::ParameterTags = {
-    UwbCapability::ParameterTag::FiraPhyVersionRange,
-    UwbCapability::ParameterTag::FiraMacVersionRange,
-    UwbCapability::ParameterTag::DeviceRoles,
-    UwbCapability::ParameterTag::RangingMethod,
-    UwbCapability::ParameterTag::StsConfig,
-    UwbCapability::ParameterTag::MultiNodeMode,
-    UwbCapability::ParameterTag::RangingMode,
-    UwbCapability::ParameterTag::ScheduledMode,
-    UwbCapability::ParameterTag::HoppingMode,
-    UwbCapability::ParameterTag::BlockStriding,
-    UwbCapability::ParameterTag::UwbInitiationTime,
-    UwbCapability::ParameterTag::Channels,
-    UwbCapability::ParameterTag::RFrameConfig,
-    UwbCapability::ParameterTag::CcConstraintLength,
-    UwbCapability::ParameterTag::BprfParameterSets,
-    UwbCapability::ParameterTag::HprfParameterSets,
-    UwbCapability::ParameterTag::AoaSupport,
-    UwbCapability::ParameterTag::ExtendedMacAddress
-};
-
 const std::initializer_list<RangingConfiguration> UwbCapability::RangingConfigurationsDefault = {
     RangingConfiguration{ RangingMethod::OneWay, MeasurementReportMode::None },
     RangingConfiguration{ RangingMethod::SingleSidedTwoWay, MeasurementReportMode::Deferred },
@@ -169,6 +148,7 @@ GetBytesBigEndianFromBitMap(std::size_t value, std::size_t desiredLength)
     }
 
     std::vector<uint8_t> bytes;
+    bytes.reserve(desiredLength);
 
     for (std::size_t i = 0; i < desiredLength; i++) {
         const auto b = static_cast<uint8_t>(value & 0xFFU);
@@ -176,27 +156,14 @@ GetBytesBigEndianFromBitMap(std::size_t value, std::size_t desiredLength)
         value >>= 8U;
     }
 
-    return {
-        std::make_move_iterator(std::rbegin(bytes)),
-        std::make_move_iterator(std::rend(bytes))
-    };
-}
-
-/**
- * @brief Get the Bytes Big Endian From std::size_t
- * 
- * @param value the number to encode in big endian
- * @param desiredLength the desired number of bytes in the encoding, padding with zeros if necessary. 
- *                      If the value is too large, this will only encode the lowest desiredLength bytes
- * @return std::vector<uint8_t> 
- */
-std::vector<uint8_t>
-GetBytesBigEndianFromSizeT(std::size_t value, std::size_t desiredLength)
-{
-    if (std::endian::native != std::endian::big) {
-        value = (value & 0x000000FF << 24) | (value & 0x0000FF00 << 8) | (value & 0x00FF0000 >> 8) | (value & 0xFF000000 >> 24);
+    if constexpr (std::endian::native != std::endian::big) {
+        return {
+            std::make_move_iterator(std::rbegin(bytes)),
+            std::make_move_iterator(std::rend(bytes))
+        };
     }
-    return GetBytesBigEndianFromBitMap(value, desiredLength);
+
+    return bytes;
 }
 
 /**
@@ -257,27 +224,6 @@ GetBitIndexFromBitMask(std::size_t bitMask)
     throw std::runtime_error("bit index not found");
 }
 
-/**
- * @brief lookup a value associated with a key from an unordered map. 
- *          TODO this function only exists because a good hash function has not been agreed upon yet
- * 
- * @tparam T 
- * @param bitIndexMap 
- * @param keyTarget 
- * @return std::size_t 
- */
-template <class T>
-std::size_t
-unordered_map_lookup(const std::unordered_map<T, std::size_t>& bitIndexMap, const T keyTarget)
-{
-    for (auto [key, value] : bitIndexMap) {
-        if (key == keyTarget) {
-            return value;
-        }
-    }
-    throw std::exception();
-}
-
 // TODO find a better place for this function
 /**
  * @brief helper function to encode a given valueSet into a bitset according to bitIndexMap, using desiredLength bytes
@@ -294,7 +240,7 @@ EncodeValuesAsBytes(const std::vector<T>& valueSet, const std::unordered_map<T, 
 {
     std::size_t valueSetEncoded = 0;
     for (const auto& value : valueSet) {
-        auto bitIndex = unordered_map_lookup(bitIndexMap, value);
+        auto bitIndex = bitIndexMap.at(value);
         valueSetEncoded |= GetBitMaskFromBitIndex(bitIndex);
     }
     return GetBytesBigEndianFromBitMap(valueSetEncoded, desiredLength);
@@ -315,7 +261,7 @@ AssignValuesFromBytes(const std::unordered_map<T, std::size_t>& bitIndexMap, std
 {
     std::vector<T> assignee;
     auto bitmasks = ReadSizeTFromBytesBigEndian(bytes);
-    for (auto [key, value] : bitIndexMap) {
+    for (const auto& [key, value] : bitIndexMap) {
         if (bitmasks & GetBitMaskFromBitIndex(value)) {
             assignee.push_back(key);
         }
@@ -346,7 +292,7 @@ UwbCapability::ToOobDataObject() const
 
     // Encode FiraPhyVersionRange
     {
-        auto phyRange = GetBytesBigEndianFromSizeT(FiraPhyVersionRange, 4);
+        auto phyRange = GetBytesBigEndianFromBitMap(FiraPhyVersionRange, 4);
         auto phyRangeTlv = childbuilder.Reset()
                                .SetTag(notstd::to_underlying(ParameterTag::FiraPhyVersionRange))
                                .SetValue(phyRange)
@@ -355,7 +301,7 @@ UwbCapability::ToOobDataObject() const
     }
 
     {
-        auto macRange = GetBytesBigEndianFromSizeT(FiraMacVersionRange, 4);
+        auto macRange = GetBytesBigEndianFromBitMap(FiraMacVersionRange, 4);
         auto macRangeTlv = childbuilder.Reset()
                                .SetTag(std::size_t(ParameterTag::FiraMacVersionRange))
                                .SetValue(macRange)
@@ -363,15 +309,15 @@ UwbCapability::ToOobDataObject() const
         builder.AddTlv(macRangeTlv);
     }
 
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::DeviceRoles), DeviceRoles, UwbCapability::DeviceRoleBit, 1);
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RangingMethod), RangingConfigurations, UwbCapability::RangingConfigurationBit, 1);
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::StsConfig), StsConfigurations, UwbCapability::StsConfigurationBit, 1);
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::MultiNodeMode), MultiNodeModes, UwbCapability::MultiNodeModeBit, 1);
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RangingMode), RangingTimeStructs, UwbCapability::RangingModeBit, 1);
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::ScheduledMode), SchedulingModes, UwbCapability::SchedulingModeBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, notstd::to_underlying(ParameterTag::DeviceRoles), DeviceRoles, UwbCapability::DeviceRoleBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, notstd::to_underlying(ParameterTag::RangingMethod), RangingConfigurations, UwbCapability::RangingConfigurationBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, notstd::to_underlying(ParameterTag::StsConfig), StsConfigurations, UwbCapability::StsConfigurationBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, notstd::to_underlying(ParameterTag::MultiNodeMode), MultiNodeModes, UwbCapability::MultiNodeModeBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, notstd::to_underlying(ParameterTag::RangingMode), RangingTimeStructs, UwbCapability::RangingModeBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, notstd::to_underlying(ParameterTag::ScheduledMode), SchedulingModes, UwbCapability::SchedulingModeBit, 1);
     {
         auto hoppingtlv = childbuilder.Reset()
-                              .SetTag(uint8_t(ParameterTag::HoppingMode))
+                              .SetTag(notstd::to_underlying(ParameterTag::HoppingMode))
                               .SetValue(HoppingMode)
                               .Build();
         builder.AddTlv(hoppingtlv);
@@ -379,7 +325,7 @@ UwbCapability::ToOobDataObject() const
 
     {
         auto blocktlv = childbuilder.Reset()
-                            .SetTag(uint8_t(ParameterTag::BlockStriding))
+                            .SetTag(notstd::to_underlying(ParameterTag::BlockStriding))
                             .SetValue(BlockStriding)
                             .Build();
         builder.AddTlv(blocktlv);
@@ -387,32 +333,31 @@ UwbCapability::ToOobDataObject() const
 
     {
         auto uwbtlv = childbuilder.Reset()
-                          .SetTag(uint8_t(ParameterTag::UwbInitiationTime))
+                          .SetTag(notstd::to_underlying(ParameterTag::UwbInitiationTime))
                           .SetValue(UwbInitiationTime)
                           .Build();
         builder.AddTlv(uwbtlv);
     }
 
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::Channels), Channels, UwbCapability::ChannelsBit, 1);
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::RFrameConfig), RFrameConfigurations, UwbCapability::RFrameConfigurationBit, 1);
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::CcConstraintLength), ConvolutionalCodeConstraintLengths, UwbCapability::ConvolutionalCodeConstraintLengthsBit, 1);
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::BprfParameterSets), BprfParameterSets, UwbCapability::BprfParameterSetsBit, 1);
-    ToOobDataObjectHelper(builder, childbuilder, uint8_t(ParameterTag::HprfParameterSets), HprfParameterSets, UwbCapability::HprfParameterSetsBit, 5);
+    ToOobDataObjectHelper(builder, childbuilder, notstd::to_underlying(ParameterTag::Channels), Channels, UwbCapability::ChannelsBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, notstd::to_underlying(ParameterTag::RFrameConfig), RFrameConfigurations, UwbCapability::RFrameConfigurationBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, notstd::to_underlying(ParameterTag::CcConstraintLength), ConvolutionalCodeConstraintLengths, UwbCapability::ConvolutionalCodeConstraintLengthsBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, notstd::to_underlying(ParameterTag::BprfParameterSets), BprfParameterSets, UwbCapability::BprfParameterSetsBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, notstd::to_underlying(ParameterTag::HprfParameterSets), HprfParameterSets, UwbCapability::HprfParameterSetsBit, 5);
 
     {
         std::size_t aoaEncoded = 0;
-        for (auto value : AngleOfArrivalTypes) {
-            // auto bitIndex = UwbCapability::AngleOfArrivalBit.at(value);
-            auto bitIndex = unordered_map_lookup(UwbCapability::AngleOfArrivalBit, value);
+        for (const auto& value : AngleOfArrivalTypes) {
+            auto bitIndex = AngleOfArrivalBit.at(value);
             aoaEncoded |= GetBitMaskFromBitIndex(bitIndex);
         }
         if (AngleOfArrivalFom) {
             aoaEncoded |= GetBitMaskFromBitIndex(UwbCapability::AngleOfArrivalFomBit);
         }
 
-        auto aoaByte = GetBytesBigEndianFromSizeT(aoaEncoded, 1);
+        auto aoaByte = GetBytesBigEndianFromBitMap(aoaEncoded, 1);
         auto aoatlv = childbuilder.Reset()
-                          .SetTag(uint8_t(ParameterTag::AoaSupport))
+                          .SetTag(notstd::to_underlying(ParameterTag::AoaSupport))
                           .SetValue(aoaByte)
                           .Build();
         builder.AddTlv(aoatlv);
@@ -420,7 +365,7 @@ UwbCapability::ToOobDataObject() const
 
     {
         auto mactlv = childbuilder.Reset()
-                          .SetTag(uint8_t(ParameterTag::ExtendedMacAddress))
+                          .SetTag(notstd::to_underlying(ParameterTag::ExtendedMacAddress))
                           .SetValue(ExtendedMacAddress)
                           .Build();
         builder.AddTlv(mactlv);

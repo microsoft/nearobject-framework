@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <functional>
+#include <initializer_list>
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -58,7 +59,26 @@ struct UwbCapability
         ExtendedMacAddress = 0x91,
     };
 
-    static const std::array<ParameterTag, 18> ParameterTags;
+    static constexpr std::initializer_list<UwbCapability::ParameterTag> ParameterTags = {
+        UwbCapability::ParameterTag::FiraPhyVersionRange,
+        UwbCapability::ParameterTag::FiraMacVersionRange,
+        UwbCapability::ParameterTag::DeviceRoles,
+        UwbCapability::ParameterTag::RangingMethod,
+        UwbCapability::ParameterTag::StsConfig,
+        UwbCapability::ParameterTag::MultiNodeMode,
+        UwbCapability::ParameterTag::RangingMode,
+        UwbCapability::ParameterTag::ScheduledMode,
+        UwbCapability::ParameterTag::HoppingMode,
+        UwbCapability::ParameterTag::BlockStriding,
+        UwbCapability::ParameterTag::UwbInitiationTime,
+        UwbCapability::ParameterTag::Channels,
+        UwbCapability::ParameterTag::RFrameConfig,
+        UwbCapability::ParameterTag::CcConstraintLength,
+        UwbCapability::ParameterTag::BprfParameterSets,
+        UwbCapability::ParameterTag::HprfParameterSets,
+        UwbCapability::ParameterTag::AoaSupport,
+        UwbCapability::ParameterTag::ExtendedMacAddress
+    };
 
     static constexpr auto MultiNodeModesDefault = {
         MultiNodeMode::Unicast,
