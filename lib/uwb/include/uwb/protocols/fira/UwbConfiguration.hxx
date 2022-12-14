@@ -26,6 +26,9 @@ namespace uwb::protocol::fira
  */
 struct UwbConfiguration
 {
+    class Builder;
+    friend class Builder;
+
     /**
      * @brief See FiRa Consortium Common Service Management Layer Technical
      * Specification v1.0.0, Section 7.5.3.2, 'UWB Session Data structure',
@@ -103,8 +106,17 @@ struct UwbConfiguration
 
     /**
      * @brief Construct UwbConfiguration object with default values and settings.
+     * TODO: make this c'tor private once refactoring is complete.
      */
     UwbConfiguration() = default;
+
+    /**
+     * @brief Creates a new UwbConfiguration builder object.
+     * 
+     * @return UwbConfiguration::Builder 
+     */
+    static UwbConfiguration::Builder
+    Create() noexcept;
 
     /**
      * @brief Default equality operator.
@@ -163,8 +175,129 @@ struct UwbConfiguration
     uint8_t KeyRotationRate{ KeyRotationRateDefault };
     UwbMacAddressFcsType MacAddressFcsType{ MacFcsTypeDefault };
     uint16_t MaxRangingRoundRetry{ MaxRrRetryDefault };
-};
 
+    std::optional<uint32_t>
+    GetFiraPhyVersion() const noexcept;
+
+    std::optional<uint32_t>
+    GetFiraMacVersion() const noexcept;
+
+    std::optional<uwb::protocol::fira::DeviceRole>
+    GetDeviceRole() const noexcept;
+
+    std::optional<uwb::protocol::fira::RangingConfiguration>
+    GetRangingConfiguration() const noexcept;
+
+    std::optional<uwb::protocol::fira::StsConfiguration>
+    GetStsConfiguration() const noexcept;
+
+    std::optional<uwb::protocol::fira::MultiNodeMode>
+    GetMultiNodeMode() const noexcept;
+
+    std::optional<uwb::protocol::fira::RangingMode>
+    GetRangingTimeStruct() const noexcept;
+
+    std::optional<uwb::protocol::fira::SchedulingMode>
+    GetSchedulingMode() const noexcept;
+
+    std::optional<bool>
+    GetHoppingMode() const noexcept;
+
+    std::optional<bool>
+    GetBlockStriding() const noexcept;
+
+    std::optional<uint32_t>
+    GetUwbInitiationTime() const noexcept;
+
+    std::optional<uwb::protocol::fira::Channel>
+    GetChannel() const noexcept;
+
+    std::optional<uwb::protocol::fira::StsPacketConfiguration>
+    GetRFrameConfig() const noexcept;
+
+    std::optional<uwb::protocol::fira::ConvolutionalCodeConstraintLength>
+    GetConvolutionalCodeConstraintLength() const noexcept;
+
+    std::optional<uwb::protocol::fira::PrfMode>
+    GetPrfMode() const noexcept;
+
+    std::optional<uint8_t>
+    GetSp0PhySetNumber() const noexcept;
+
+    std::optional<uint8_t>
+    GetSp1PhySetNumber() const noexcept;
+
+    std::optional<uint8_t>
+    GetSp3PhySetNumber() const noexcept;
+
+    std::optional<uint8_t>
+    GetPreableCodeIndex() const noexcept;
+
+    std::optional<std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>>
+    GetResultReportConfigurations() const noexcept;
+
+    std::optional<uwb::UwbMacAddressType>
+    GetMacAddressMode() const noexcept;
+
+    std::optional<uwb::UwbMacAddress>
+    GetControleeShortMacAddress() const noexcept;
+
+    std::optional<uwb::UwbMacAddress>
+    GetControllerMacAddress() const noexcept;
+
+    std::optional<uint8_t>
+    GetSlotsPerRangingRound() const noexcept;
+
+    std::optional<uint8_t>
+    GetMaxContentionPhaseLength() const noexcept;
+
+    std::optional<uint8_t>
+    GetSlotDuration() const noexcept;
+
+    std::optional<uint16_t>
+    GetRangingInterval() const noexcept;
+
+    std::optional<uint8_t>
+    GetKeyRotationRate() const noexcept;
+
+    std::optional<uwb::UwbMacAddressFcsType>
+    GetMacAddressFcsType() const noexcept;
+
+    std::optional<uint16_t>
+    GetMaxRangingRoundRetry() const noexcept;
+
+private:
+    std::optional<uint32_t> m_firaPhyVersion;
+    std::optional<uint32_t> m_firaMacVersion;
+    std::optional<uwb::protocol::fira::DeviceRole> m_deviceRole;
+    std::optional<uwb::protocol::fira::RangingConfiguration> m_rangingConfiguration;
+    std::optional<uwb::protocol::fira::StsConfiguration> m_stsConfiguration;
+    std::optional<uwb::protocol::fira::MultiNodeMode> m_multiNodeMode;
+    std::optional<uwb::protocol::fira::RangingMode> m_rangingTimeStruct;
+    std::optional<uwb::protocol::fira::SchedulingMode> m_schedulingMode;
+    std::optional<bool> m_hoppingMode;
+    std::optional<bool> m_blockStriding;
+    std::optional<uint32_t> m_uwbInitiationTime;
+    std::optional<uwb::protocol::fira::Channel> m_channel;
+    std::optional<uwb::protocol::fira::StsPacketConfiguration> m_rframeConfig;
+    std::optional<uwb::protocol::fira::ConvolutionalCodeConstraintLength> m_convolutionalCodeConstraintLength;
+    std::optional<uwb::protocol::fira::PrfMode> m_prfMode;
+    std::optional<uint8_t> m_sp0PhySetNumber;
+    std::optional<uint8_t> m_sp1PhySetNumber;
+    std::optional<uint8_t> m_sp3PhySetNumber;
+    std::optional<uint8_t> m_preableCodeIndex;
+    std::optional<std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>> m_resultReportConfigurations;
+    std::optional<uwb::UwbMacAddressType> m_macAddressMode;
+    std::optional<uwb::UwbMacAddress> m_controleeShortMacAddress;
+    std::optional<uwb::UwbMacAddress> m_controllerMacAddress;
+    std::optional<uint8_t> m_slotsPerRangingRound;
+    std::optional<uint8_t> m_maxContentionPhaseLength;
+    std::optional<uint8_t> m_slotDuration;
+    std::optional<uint16_t> m_rangingInterval;
+    std::optional<uint8_t> m_keyRotationRate;
+    std::optional<uwb::UwbMacAddressFcsType> m_macAddressFcsType;
+    std::optional<uint16_t> m_maxRangingRoundRetry;
+};
 
 } // namespace uwb::protocol::fira
 
