@@ -3,9 +3,8 @@
 #define NEAR_OBJECT_CLI_UWB_SESSION_EVENT_CALLBACKS_HXX
 
 #include <uwb/UwbSessionEventCallbacks.hxx>
-namespace nearobject
-{
-namespace cli
+
+namespace nearobject::cli
 {
 /**
  * @brief Windows-specific parsed CLI data.
@@ -60,7 +59,7 @@ struct NearObjectCliUwbSessionEventCallbacks :
     void
     OnSessionMembershipChanged(::uwb::UwbSession *session, const std::vector<::uwb::UwbPeer> peersAdded, const std::vector<::uwb::UwbPeer> peersRemoved);
 };
-} // namespace cli
-} // namespace nearobject
+
+} // namespace nearobject::cli
 
 #endif // NEAR_OBJECT_CLI_UWB_SESSION_EVENT_CALLBACKS_HXX

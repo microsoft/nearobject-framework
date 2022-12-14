@@ -5,8 +5,7 @@ target_sources(nocli-win
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/Main.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectCliDataWindows.hxx
-        ${CMAKE_CURRENT_LIST_DIR}/NearObjectCliUwbSessionEventCallbacks.hxx
-        ${CMAKE_CURRENT_LIST_DIR}/NearObjectCliUwbSessionEventCallbacks.cxx
+
 )
 
 target_link_libraries(nocli-win

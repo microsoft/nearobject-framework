@@ -10,8 +10,8 @@
 #include <notstd/guid.hxx>
 
 #include "NearObjectCliDataWindows.hxx"
-#include "NearObjectCliUwbSessionEventCallbacks.hxx"
 #include <nearobject/cli/NearObjectCli.hxx>
+#include <nearobject/cli/NearObjectCliUwbSessionEventCallbacks.hxx>
 #include <windows/devices/DeviceEnumerator.hxx>
 #include <windows/devices/DevicePresenceMonitor.hxx>
 #include <windows/uwb/UwbDevice.hxx>
@@ -114,16 +114,16 @@ main(int argc, char* argv[])
     nearobject::cli::NearObjectCli cli{ cliData };
     CLI::App& topApp = cli.GetParser();
 
-    auto uwbApp = cli.GetUwbApp();
-    auto rangeApp = cli.GetRangeApp();
-    auto startRangingApp = cli.GetRangeStartApp();
+    auto& uwbApp = cli.GetUwbApp();
+    auto& rangeApp = cli.GetRangeApp();
+    auto& startRangingApp = cli.GetRangeStartApp();
 
     // Configure the cli parsing app with Windows-specific options.
-    uwbApp->add_option("--deviceName", cliData->DeviceName, "uwb device name (path)");
-    uwbApp->add_option("--deviceClass", cliData->DeviceClassGuid, "uwb device class guid (override)");
-    uwbApp->add_flag("--probe", cliData->DeviceNameProbe, "probe for the uwb device name to use");
+    uwbApp.add_option("--deviceName", cliData->DeviceName, "uwb device name (path)");
+    uwbApp.add_option("--deviceClass", cliData->DeviceClassGuid, "uwb device class guid (override)");
+    uwbApp.add_flag("--probe", cliData->DeviceNameProbe, "probe for the uwb device name to use");
 
-    startRangingApp->final_callback([&cliData] {
+    startRangingApp.final_callback([&cliData] {
         auto uwbDevice = detail::ResolveUwbDevice(*cliData);
         if (!uwbDevice) {
             return;

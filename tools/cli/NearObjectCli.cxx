@@ -31,7 +31,7 @@ NearObjectCli::GetData() const noexcept
 }
 
 int
-NearObjectCli::Parse(int argc, char* argv[])
+NearObjectCli::Parse(int argc, char* argv[]) noexcept
 {
     try {
         m_cliApp->parse(argc, argv);
@@ -42,30 +42,32 @@ NearObjectCli::Parse(int argc, char* argv[])
     return 0;
 }
 
-CLI::App*
-NearObjectCli::GetUwbApp()
+CLI::App&
+NearObjectCli::GetUwbApp() noexcept
 {
-    return m_uwbApp;
+    return *m_uwbApp;
 }
 
-CLI::App*
-NearObjectCli::GetRangeApp()
+CLI::App&
+NearObjectCli::GetRangeApp() noexcept
 {
-    return m_rangeApp;
+    return *m_rangeApp;
 }
 
-CLI::App*
-NearObjectCli::GetRangeStartApp()
+CLI::App&
+NearObjectCli::GetRangeStartApp() noexcept
 {
-    return m_rangeStartApp;
+    return *m_rangeStartApp;
 }
 
-CLI::App*
-NearObjectCli::GetRangeStopApp()
+CLI::App&
+NearObjectCli::GetRangeStopApp() noexcept
 {
-    return m_rangeStopApp;
+    return *m_rangeStopApp;
 }
 
+namespace detail
+{
 /**
  * @brief Helper function to populate the string-enum mapping
  *
@@ -86,25 +88,26 @@ populate_map()
         });
     return { std::cbegin(destVector), std::cend(destVector) };
 }
+} // namespace detail
 
 std::unique_ptr<CLI::App>
-NearObjectCli::CreateParser()
+NearObjectCli::CreateParser() noexcept
 {
     // generate the maps
     {
-        m_cliData->DeviceRoleMap = populate_map<uwb::protocol::fira::DeviceRole>();
-        m_cliData->RangingMethodMap = populate_map<uwb::protocol::fira::RangingMethod>();
-        m_cliData->MeasurementReportModeMap = populate_map<uwb::protocol::fira::MeasurementReportMode>();
-        m_cliData->StsConfigurationMap = populate_map<uwb::protocol::fira::StsConfiguration>();
-        m_cliData->MultiNodeModeMap = populate_map<uwb::protocol::fira::MultiNodeMode>();
-        m_cliData->RangingModeMap = populate_map<uwb::protocol::fira::RangingMode>();
-        m_cliData->SchedulingModeMap = populate_map<uwb::protocol::fira::SchedulingMode>();
-        m_cliData->ChannelMap = populate_map<uwb::protocol::fira::Channel>();
-        m_cliData->StsPacketConfigurationMap = populate_map<uwb::protocol::fira::StsPacketConfiguration>();
-        m_cliData->ConvolutionalCodeConstraintLengthMap = populate_map<uwb::protocol::fira::ConvolutionalCodeConstraintLength>();
-        m_cliData->PrfModeMap = populate_map<uwb::protocol::fira::PrfMode>();
-        m_cliData->UwbMacAddressFcsTypeMap = populate_map<uwb::UwbMacAddressFcsType>();
-        m_cliData->ResultReportConfigurationMap = populate_map<uwb::protocol::fira::ResultReportConfiguration>();
+        m_cliData->DeviceRoleMap = detail::populate_map<uwb::protocol::fira::DeviceRole>();
+        m_cliData->RangingMethodMap = detail::populate_map<uwb::protocol::fira::RangingMethod>();
+        m_cliData->MeasurementReportModeMap = detail::populate_map<uwb::protocol::fira::MeasurementReportMode>();
+        m_cliData->StsConfigurationMap = detail::populate_map<uwb::protocol::fira::StsConfiguration>();
+        m_cliData->MultiNodeModeMap = detail::populate_map<uwb::protocol::fira::MultiNodeMode>();
+        m_cliData->RangingModeMap = detail::populate_map<uwb::protocol::fira::RangingMode>();
+        m_cliData->SchedulingModeMap = detail::populate_map<uwb::protocol::fira::SchedulingMode>();
+        m_cliData->ChannelMap = detail::populate_map<uwb::protocol::fira::Channel>();
+        m_cliData->StsPacketConfigurationMap = detail::populate_map<uwb::protocol::fira::StsPacketConfiguration>();
+        m_cliData->ConvolutionalCodeConstraintLengthMap = detail::populate_map<uwb::protocol::fira::ConvolutionalCodeConstraintLength>();
+        m_cliData->PrfModeMap = detail::populate_map<uwb::protocol::fira::PrfMode>();
+        m_cliData->UwbMacAddressFcsTypeMap = detail::populate_map<uwb::UwbMacAddressFcsType>();
+        m_cliData->ResultReportConfigurationMap = detail::populate_map<uwb::protocol::fira::ResultReportConfiguration>();
     }
 
     auto app = std::make_unique<CLI::App>();
@@ -207,7 +210,7 @@ NearObjectCli::CreateParser()
         std::cout << "ResultReportConfigurations: " << uwb::protocol::fira::ResultReportConfigurationToString(m_cliData->SessionData.UwbConfiguration.ResultReportConfigurations) << std::endl;
     });
 
-    m_rangeStopApp = m_rangeApp->add_subcommand("stop", "start ranging")->fallthrough();
+    m_rangeStopApp = m_rangeApp->add_subcommand("stop", "stop ranging")->fallthrough();
     m_rangeStopApp->parse_complete_callback([&] {
         std::cout << "stop ranging" << std::endl;
     });
