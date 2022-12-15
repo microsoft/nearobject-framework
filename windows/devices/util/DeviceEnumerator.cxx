@@ -58,9 +58,9 @@ DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(const GUID& deviceInterfa
 
 /* static */
 std::vector<std::string>
-DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(const std::string& deviceInterfaceClassString) noexcept
+DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(std::string_view deviceInterfaceClassString) noexcept
 {
-    auto deviceClassInterfaceGuid = notstd::GuidFromString(deviceInterfaceClassString);
+    auto deviceClassInterfaceGuid = notstd::GuidFromStringView(deviceInterfaceClassString);
     if (!deviceClassInterfaceGuid.has_value()) {
         return {};
     }
