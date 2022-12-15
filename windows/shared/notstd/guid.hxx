@@ -4,6 +4,7 @@
 #include <iterator>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include <rpc.h>
@@ -77,6 +78,57 @@ GuidToString(const GUID& guid)
 }
 
 /**
+ * @brief Parses a string (_view) for a GUID and returns it, if valid.
+ * 
+ * @tparam TStringView The type of input string view to parse.
+ * @param input The string view to parse.
+ * @return std::optional<GUID> An optional containing a GUID if the input was valid, std::nullopt otherwise.
+ */
+template <typename TStringView>
+inline std::optional<GUID>
+GuidFromStringView(TStringView input) noexcept;
+
+/**
+ * @brief Specialization for parsing a GUID from std::string_view.
+ * 
+ * @tparam TString std::string
+ * @param input 
+ * @return std::optional<GUID> 
+ */
+template <>
+inline std::optional<GUID>
+GuidFromStringView(std::string_view input) noexcept
+{
+    GUID guid{};
+    auto result = UuidFromStringA(reinterpret_cast<RPC_CSTR>(const_cast<std::string_view::value_type*>(std::data(input))), &guid);
+    if (result != NOERROR) {
+        return std::nullopt;
+    }
+
+    return guid;
+}
+
+/**
+ * @brief Specialization for parsing a GUID from std::wstring_view.
+ * 
+ * @tparam TString std::wstring
+ * @param input 
+ * @return std::optional<GUID> 
+ */
+template <>
+inline std::optional<GUID>
+GuidFromStringView(std::wstring_view input) noexcept
+{
+    GUID guid{};
+    auto result = UuidFromStringW(reinterpret_cast<RPC_WSTR>(const_cast<std::wstring_view::value_type*>(std::data(input))), &guid);
+    if (result != NOERROR) {
+        return std::nullopt;
+    }
+
+    return guid;
+}
+
+/**
  * @brief Parses a string for a GUID and returns it, if valid.
  * 
  * @tparam TString The type of input string to parse.
@@ -98,13 +150,7 @@ template <>
 inline std::optional<GUID>
 GuidFromString(const std::string& input) noexcept
 {
-    GUID guid{};
-    auto result = UuidFromStringA(reinterpret_cast<RPC_CSTR>(const_cast<std::string::value_type*>(std::data(input))), &guid);
-    if (result != NOERROR) {
-        return std::nullopt;
-    }
-
-    return guid;
+    return GuidFromStringView(std::string_view{ input });
 }
 
 /**
@@ -118,13 +164,7 @@ template <>
 inline std::optional<GUID>
 GuidFromString(const std::wstring& input) noexcept
 {
-    GUID guid{};
-    auto result = UuidFromStringW(reinterpret_cast<RPC_WSTR>(const_cast<std::wstring::value_type*>(std::data(input))), &guid);
-    if (result != NOERROR) {
-        return std::nullopt;
-    }
-
-    return guid;
+    return GuidFromStringView(std::wstring_view{ input });
 }
 } // namespace notstd 
 
