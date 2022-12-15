@@ -95,7 +95,7 @@ While not required, it is strongly recommended to configure git with a [GNU Priv
 1. Install the gpg tools for the target operating system (see the OS-specific `README` files for details).
 2. [Generate a gpg key](https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key)
 3. [Add the gpg key to your github account](https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-gpg-key-to-your-github-account)
-4. [Configure git to use the gpg key](https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key)
+4. [Configure git to use the gpg key](https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key) This link will also tell you how to use gpg signing with an ssh key. Additionally, if you wish tell git to use a type any type of signing by default, be it gpg, ssh or X.509, you need to run the following command ```git config --global commit.gpgsign true```
 
 ### CMake
 
