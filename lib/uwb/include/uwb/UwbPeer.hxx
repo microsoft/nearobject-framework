@@ -19,6 +19,9 @@ struct UwbPeerSpatialProperties
     std::optional<double> AngleElevation;
     std::optional<double> Elevation;
 
+    std::string
+    ToString() const;
+
     auto
     operator<=>(const UwbPeerSpatialProperties& other) const = default;
 };
@@ -74,6 +77,9 @@ public:
      */
     UwbPeerSpatialProperties
     GetSpatialProperties() const noexcept;
+
+    std::string
+    ToString() const;
 
 private:
     UwbMacAddress m_address;
