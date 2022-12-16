@@ -61,7 +61,7 @@ UwbPeer::ToString() const
     std::ostringstream ss;
     ss << "{" << std::endl;
     ss << "mac: " << m_address << std::endl;
-    ss << m_spatialProperties.ToString() << std::endl;
+    ss << m_spatialProperties << std::endl;
     ss << "}" << std::endl;
     return ss.str();
 }
