@@ -58,7 +58,7 @@ main(int argc, char *argv[])
 
     // Create service.
     auto service = NearObjectService::Create({ std::move(profileManager),
-        std::move(deviceManager) });
+        std::move(deviceManager), nullptr });
 
     // Start service runtime.
     ServiceRuntime nearObjectServiceRuntime{};
