@@ -34,7 +34,7 @@ struct empty_value_provider
  * @tparam ElementT The type which implements a ToString() function returning std::string
  * @param stream 
  * @param ref 
- * @return requires& 
+ * @return std::ostream& 
  */
 template <
     typename CharT,
@@ -60,7 +60,7 @@ operator<<(std::basic_ostream<CharT, Traits>& stream, const ElementT& ref)
  * empty_value_provider
  * @param stream 
  * @param ref 
- * @return requires& 
+ * @return std::ostream& 
  */
 template <
     typename CharT,
