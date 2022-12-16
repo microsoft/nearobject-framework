@@ -409,9 +409,6 @@ operator==(const UwbMacAddress&, const UwbMacAddress&) noexcept;
 std::istream&
 operator>>(std::istream& stream, UwbMacAddress& uwbMacAddress) noexcept;
 
-std::ostream&
-operator<<(std::ostream& stream, const UwbMacAddress& uwbMacAddress) noexcept;
-
 } // namespace uwb
 
 namespace std

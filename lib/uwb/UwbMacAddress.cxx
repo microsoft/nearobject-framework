@@ -140,10 +140,3 @@ uwb::operator>>(std::istream& stream, UwbMacAddress& uwbMacAddress) noexcept
 
     return stream;
 }
-
-std::ostream&
-uwb::operator<<(std::ostream& stream, const UwbMacAddress& uwbMacAddress) noexcept
-{
-    stream << uwbMacAddress.ToString();
-    return stream;
-}
