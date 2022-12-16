@@ -37,6 +37,7 @@ TEST_CASE("near object service can be created", "[basic][service]")
             auto service = NearObjectService::Create({
                 nullptr,
                 NearObjectDeviceControllerManager::Create(),
+                nullptr,
             });
         }
         {
