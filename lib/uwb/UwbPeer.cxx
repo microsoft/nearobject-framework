@@ -1,9 +1,9 @@
 
 #include <tuple>
 
+#include <notstd/tostring.hxx>
 #include <sstream>
 #include <string>
-#include <notstd/tostring.hxx>
 #include <uwb/UwbPeer.hxx>
 
 using namespace uwb;
@@ -12,10 +12,10 @@ using namespace strings::ostream_operators;
 std::string
 UwbPeerSpatialProperties::ToString() const
 {
-    std::initializer_list<std::tuple<std::string, std::optional<double>>> name2value{ { "Distance", Distance }, 
-                                                                                    { "AngleAzimuth", AngleAzimuth }, 
-                                                                                    { "AngleElevation", AngleElevation }, 
-                                                                                    { "Elevation", Elevation } };
+    std::initializer_list<std::tuple<std::string, std::optional<double>>> name2value{ { "Distance", Distance },
+        { "AngleAzimuth", AngleAzimuth },
+        { "AngleElevation", AngleElevation },
+        { "Elevation", Elevation } };
 
     std::ostringstream ss;
 
