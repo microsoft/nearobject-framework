@@ -325,8 +325,8 @@ TlvBer::Builder::Build()
 void
 TlvBer::Builder::ValidateTag()
 {
-    if ((m_type == TlvBer::Type::Constructed) && (!m_data.empty()) ||
-        (m_type == TlvBer::Type::Primitive) && (!m_valuesConstructed.empty())) {
+    if (((m_type == TlvBer::Type::Constructed) && !m_data.empty()) ||
+        ((m_type == TlvBer::Type::Primitive) && !m_valuesConstructed.empty())) {
         throw InvalidTlvBerTagException();
     }
 }
