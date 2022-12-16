@@ -2,44 +2,53 @@
 #include <iostream>
 
 #include <nearobject/cli/NearObjectCliUwbSessionEventCallbacks.hxx>
+#include <notstd/tostring.hxx>
 
 using namespace nearobject::cli;
+using namespace strings::ostream_operators;
 
 void
 NearObjectCliUwbSessionEventCallbacks::OnSessionEnded(::uwb::UwbSession* session, ::uwb::UwbSessionEndReason reason)
 {
-    std::cout << "Session " << session->GetId() << ": Session Ended" << std::endl;
+    std::cout << "Session with id="
+              << "0x" << std::hex << std::setw(8) << std::setfill('0') << session->GetId() << ": Session Ended" << std::endl;
 }
 
 void
 NearObjectCliUwbSessionEventCallbacks::OnRangingStarted(::uwb::UwbSession* session)
 {
-    std::cout << "Session " << session->GetId() << ": Ranging Started" << std::endl;
+    std::cout << "Session with id="
+              << "0x" << std::hex << std::setw(8) << std::setfill('0') << session->GetId() << ": Ranging Started" << std::endl;
 }
 
 void
 NearObjectCliUwbSessionEventCallbacks::OnRangingStopped(::uwb::UwbSession* session)
 {
-    std::cout << "Session " << session->GetId() << ": Ranging Stopped" << std::endl;
+    std::cout << "Session with id="
+              << "0x" << std::hex << std::setw(8) << std::setfill('0') << session->GetId() << ": Ranging Stopped" << std::endl;
 }
 
 void
 NearObjectCliUwbSessionEventCallbacks::OnPeerPropertiesChanged(::uwb::UwbSession* session, const std::vector<::uwb::UwbPeer> peersChanged)
 {
-    std::cout << "Session " << session->GetId() << ": Peer Properties Changed" << std::endl;
+    std::cout << "Session with id="
+              << "0x" << std::hex << std::setw(8) << std::setfill('0') << session->GetId() << ": Peer Properties Changed" << std::endl;
+
     for (const auto& peer : peersChanged) {
-        std::cout << peer.ToString() << std::endl;
+        std::cout << peer << std::endl;
     }
 }
 
 void
 NearObjectCliUwbSessionEventCallbacks::OnSessionMembershipChanged(::uwb::UwbSession* session, const std::vector<::uwb::UwbPeer> peersAdded, const std::vector<::uwb::UwbPeer> peersRemoved)
 {
-    std::cout << "Session " << session->GetId() << ": Membership Changed" << std::endl;
+    std::cout << "Session with id="
+              << "0x" << std::hex << std::setw(8) << std::setfill('0') << session->GetId() << ": Membership Changed" << std::endl;
+
     for (const auto& peer : peersAdded) {
-        std::cout << "+" << peer.GetAddress().ToString() << std::endl;
+        std::cout << "+" << peer.GetAddress() << std::endl;
     }
     for (const auto& peer : peersRemoved) {
-        std::cout << "-" << peer.GetAddress().ToString() << std::endl;
+        std::cout << "-" << peer.GetAddress() << std::endl;
     }
 }

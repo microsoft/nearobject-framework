@@ -3,8 +3,11 @@
 
 #include <sstream>
 #include <string>
+#include <notstd/tostring.hxx>
 #include <uwb/UwbPeer.hxx>
+
 using namespace uwb;
+using namespace strings::ostream_operators;
 
 std::string
 UwbPeerSpatialProperties::ToString() const
@@ -14,7 +17,7 @@ UwbPeerSpatialProperties::ToString() const
                                                                                     { "AngleElevation", AngleElevation }, 
                                                                                     { "Elevation", Elevation } };
 
-    std::stringstream ss;
+    std::ostringstream ss;
 
     for (const auto& [name, value] : name2value) {
         if (value.has_value()) {
@@ -55,9 +58,9 @@ UwbPeer::operator=(const UwbPeer& other)
 std::string
 UwbPeer::ToString() const
 {
-    std::stringstream ss;
+    std::ostringstream ss;
     ss << "{" << std::endl;
-    ss << "mac: " << m_address.ToString() << std::endl;
+    ss << "mac: " << m_address << std::endl;
     ss << m_spatialProperties.ToString() << std::endl;
     ss << "}" << std::endl;
     return ss.str();
