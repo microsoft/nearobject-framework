@@ -84,13 +84,13 @@ struct UwbSessionData
     static UwbSessionData
     FromDataObject(const encoding::TlvBer& tlv);
 
-    uint16_t SessionDataVersion{ 0 };
-    uint32_t SessionId{ 0 };
-    uint32_t SubSessionId{ 0 };
-    UwbConfiguration UwbConfiguration{};
-    std::optional<StaticRangingInfo> StaticRangingInfo;
-    std::optional<SecureRangingInfo> SecureRangingInfo;
-    bool UwbConfigurationAvailable{ false };
+    uint16_t sessionDataVersion{ 0 };
+    uint32_t sessionId{ 0 };
+    uint32_t subSessionId{ 0 };
+    UwbConfiguration uwbConfiguration{};
+    std::optional<StaticRangingInfo> staticRangingInfo;
+    std::optional<SecureRangingInfo> secureRangingInfo;
+    bool uwbConfigurationAvailable{ false };
 };
 
 } // namespace uwb::protocol::fira
@@ -105,13 +105,13 @@ struct hash<uwb::protocol::fira::UwbSessionData>
     {
         std::size_t value = 0;
         notstd::hash_combine(value,
-            uwbSessionData.SessionDataVersion,
-            uwbSessionData.SessionId,
-            uwbSessionData.SubSessionId,
-            uwbSessionData.UwbConfiguration,
-            uwbSessionData.StaticRangingInfo,
-            uwbSessionData.SecureRangingInfo,
-            uwbSessionData.UwbConfigurationAvailable);
+            uwbSessionData.sessionDataVersion,
+            uwbSessionData.sessionId,
+            uwbSessionData.subSessionId,
+            uwbSessionData.uwbConfiguration,
+            uwbSessionData.staticRangingInfo,
+            uwbSessionData.secureRangingInfo,
+            uwbSessionData.uwbConfigurationAvailable);
         return value;
     }
 };

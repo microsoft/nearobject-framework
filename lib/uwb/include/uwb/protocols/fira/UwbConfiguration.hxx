@@ -145,36 +145,36 @@ struct UwbConfiguration
     static UwbConfiguration
     FromDataObject(const encoding::TlvBer& tlv);
 
-    uint32_t FiraPhyVersion{ 0 };
-    uint32_t FiraMacVersion{ 0 };
-    DeviceRole DeviceRole{ DeviceRoleDefault };
-    RangingConfiguration RangingConfiguration{ RangingConfigurationDefault };
-    StsConfiguration StsConfiguration{ StsConfigurationDefault };
-    MultiNodeMode MultiNodeMode{ MultiNodeModeDefault };
-    RangingMode RangingTimeStruct{ RangingTimeStructDefault };
-    SchedulingMode SchedulingMode{ ScheduledModeDefault };
-    bool HoppingMode{ HoppingModeDefault };
-    bool BlockStriding{ BlockStridingDefault };
-    uint32_t UwbInitiationTime{ UwbInitiationTimeDefault };
-    Channel Channel{ Channel::C9 };
-    StsPacketConfiguration RFrameConfig{ RFrameConfigDefault };
-    ConvolutionalCodeConstraintLength ConvolutionalCodeConstraintLength{ CcConstraintLengthDefault };
-    PrfMode PrfMode{ PrfModeDefault };
-    uint8_t Sp0PhySetNumber{ Sp0PhySetNumberDefault };
-    uint8_t Sp1PhySetNumber{ Sp0PhySetNumberDefault };
-    uint8_t Sp3PhySetNumber{ Sp0PhySetNumberDefault };
-    uint8_t PreableCodeIndex{ PreableCodeIndexDefault };
-    std::unordered_set<ResultReportConfiguration> ResultReportConfigurations{ ResultReportConfigurationsDefault };
-    UwbMacAddressType MacAddressMode{ MacAddressModeDefault };
-    std::optional<UwbMacAddress> ControleeShortMacAddress;
-    UwbMacAddress ControllerMacAddress;
-    uint8_t SlotsPerRangingRound{ 0 };
-    uint8_t MaxContentionPhaseLength{ 0 };
-    uint8_t SlotDuration{ 0 };
-    uint16_t RangingInterval{ 0 };
-    uint8_t KeyRotationRate{ KeyRotationRateDefault };
-    UwbMacAddressFcsType MacAddressFcsType{ MacFcsTypeDefault };
-    uint16_t MaxRangingRoundRetry{ MaxRrRetryDefault };
+    uint32_t firaPhyVersion{ 0 };
+    uint32_t firaMacVersion{ 0 };
+    DeviceRole deviceRole{ DeviceRoleDefault };
+    RangingConfiguration rangingConfiguration{ RangingConfigurationDefault };
+    StsConfiguration stsConfiguration{ StsConfigurationDefault };
+    MultiNodeMode multiNodeMode{ MultiNodeModeDefault };
+    RangingMode rangingTimeStruct{ RangingTimeStructDefault };
+    SchedulingMode schedulingMode{ ScheduledModeDefault };
+    bool hoppingMode{ HoppingModeDefault };
+    bool blockStriding{ BlockStridingDefault };
+    uint32_t uwbInitiationTime{ UwbInitiationTimeDefault };
+    Channel channel{ Channel::C9 };
+    StsPacketConfiguration rframeConfig{ RFrameConfigDefault };
+    ConvolutionalCodeConstraintLength convolutionalCodeConstraintLength{ CcConstraintLengthDefault };
+    PrfMode prfMode{ PrfModeDefault };
+    uint8_t sp0PhySetNumber{ Sp0PhySetNumberDefault };
+    uint8_t sp1PhySetNumber{ Sp0PhySetNumberDefault };
+    uint8_t sp3PhySetNumber{ Sp0PhySetNumberDefault };
+    uint8_t preableCodeIndex{ PreableCodeIndexDefault };
+    std::unordered_set<ResultReportConfiguration> resultReportConfigurations{ ResultReportConfigurationsDefault };
+    UwbMacAddressType macAddressMode{ MacAddressModeDefault };
+    std::optional<UwbMacAddress> controleeShortMacAddress;
+    UwbMacAddress controllerMacAddress;
+    uint8_t slotsPerRangingRound{ 0 };
+    uint8_t maxContentionPhaseLength{ 0 };
+    uint8_t slotDuration{ 0 };
+    uint16_t rangingInterval{ 0 };
+    uint8_t keyRotationRate{ KeyRotationRateDefault };
+    UwbMacAddressFcsType macAddressFcsType{ MacFcsTypeDefault };
+    uint16_t maxRangingRoundRetry{ MaxRrRetryDefault };
 
     std::optional<uint32_t>
     GetFiraPhyVersion() const noexcept;
@@ -311,36 +311,36 @@ struct hash<uwb::protocol::fira::UwbConfiguration>
     {
         std::size_t value = 0;
         notstd::hash_combine(value,
-            uwbConfiguration.FiraPhyVersion,
-            uwbConfiguration.FiraMacVersion,
-            uwbConfiguration.DeviceRole,
-            uwbConfiguration.RangingConfiguration,
-            uwbConfiguration.StsConfiguration,
-            uwbConfiguration.MultiNodeMode,
-            uwbConfiguration.RangingTimeStruct,
-            uwbConfiguration.SchedulingMode,
-            uwbConfiguration.HoppingMode,
-            uwbConfiguration.BlockStriding,
-            uwbConfiguration.UwbInitiationTime,
-            uwbConfiguration.Channel,
-            uwbConfiguration.RFrameConfig,
-            uwbConfiguration.ConvolutionalCodeConstraintLength,
-            uwbConfiguration.PrfMode,
-            uwbConfiguration.Sp0PhySetNumber,
-            uwbConfiguration.Sp1PhySetNumber,
-            uwbConfiguration.Sp3PhySetNumber,
-            uwbConfiguration.PreableCodeIndex,
-            notstd::hash_range(std::cbegin(uwbConfiguration.ResultReportConfigurations), std::cend(uwbConfiguration.ResultReportConfigurations)),
-            uwbConfiguration.MacAddressMode,
-            uwbConfiguration.ControleeShortMacAddress,
-            uwbConfiguration.ControllerMacAddress,
-            uwbConfiguration.SlotsPerRangingRound,
-            uwbConfiguration.MaxContentionPhaseLength,
-            uwbConfiguration.SlotDuration,
-            uwbConfiguration.RangingInterval,
-            uwbConfiguration.KeyRotationRate,
-            uwbConfiguration.MacAddressFcsType,
-            uwbConfiguration.MaxRangingRoundRetry);
+            uwbConfiguration.firaPhyVersion,
+            uwbConfiguration.firaMacVersion,
+            uwbConfiguration.deviceRole,
+            uwbConfiguration.rangingConfiguration,
+            uwbConfiguration.stsConfiguration,
+            uwbConfiguration.multiNodeMode,
+            uwbConfiguration.rangingTimeStruct,
+            uwbConfiguration.schedulingMode,
+            uwbConfiguration.hoppingMode,
+            uwbConfiguration.blockStriding,
+            uwbConfiguration.uwbInitiationTime,
+            uwbConfiguration.channel,
+            uwbConfiguration.rframeConfig,
+            uwbConfiguration.convolutionalCodeConstraintLength,
+            uwbConfiguration.prfMode,
+            uwbConfiguration.sp0PhySetNumber,
+            uwbConfiguration.sp1PhySetNumber,
+            uwbConfiguration.sp3PhySetNumber,
+            uwbConfiguration.preableCodeIndex,
+            notstd::hash_range(std::cbegin(uwbConfiguration.resultReportConfigurations), std::cend(uwbConfiguration.resultReportConfigurations)),
+            uwbConfiguration.macAddressMode,
+            uwbConfiguration.controleeShortMacAddress,
+            uwbConfiguration.controllerMacAddress,
+            uwbConfiguration.slotsPerRangingRound,
+            uwbConfiguration.maxContentionPhaseLength,
+            uwbConfiguration.slotDuration,
+            uwbConfiguration.rangingInterval,
+            uwbConfiguration.keyRotationRate,
+            uwbConfiguration.macAddressFcsType,
+            uwbConfiguration.maxRangingRoundRetry);
         return value;
     }
 };

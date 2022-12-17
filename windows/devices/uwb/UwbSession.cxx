@@ -22,7 +22,7 @@ UwbSession::ConfigureImpl(const uwb::protocol::fira::UwbSessionData& uwbSessionD
     
     // Populate the session initialization command argument.
     UWB_SESSION_INIT sessionInit;
-    sessionInit.sessionId = uwbSessionData.SessionId;
+    sessionInit.sessionId = uwbSessionData.sessionId;
     sessionInit.sessionType = UWB_SESSION_TYPE_RANGING_SESSION;
 
     // Request a new session from the driver.
@@ -31,7 +31,7 @@ UwbSession::ConfigureImpl(const uwb::protocol::fira::UwbSessionData& uwbSessionD
         // TODO: handle this
     }
 
-    m_sessionId = uwbSessionData.SessionId;
+    m_sessionId = uwbSessionData.sessionId;
 }
 
 void
