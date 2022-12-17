@@ -35,6 +35,9 @@ struct StaticRangingInfo
         StaticStsIv = 0x81,
     };
 
+    auto
+    operator<=>(const StaticRangingInfo& other) const = default;
+
     uint16_t VendorId;
     std::array<uint8_t, InitializationVectorLength> InitializationVector;
 };
