@@ -159,15 +159,15 @@ TEST_CASE("Encoding into a TlvBer", "[basic]")
     const auto values = tlv->GetValues();
     REQUIRE(values.size() == TestUwbCapability::tagAndExpected.size());
 
-    for (auto [tag, expected] : TestUwbCapability::tagAndExpected) {
+    for (const auto& [tagExpected, valueExpected] : TestUwbCapability::tagAndExpected) {
         // verify that the tag exists in the values
         bool wefoundit = false;
         for (const auto& subtlv : values) {
-            wefoundit = (subtlv.GetTag().size() == 1) and (subtlv.GetTag()[0] == notstd::to_underlying(tag));
+            wefoundit = (subtlv.GetTag().size() == 1) and (subtlv.GetTag()[0] == notstd::to_underlying(tagExpected));
             if (wefoundit) {
                 // validate the value
                 const auto tlvValue = subtlv.GetValue();
-                REQUIRE(std::equal(std::cbegin(expected), std::cend(expected), std::cbegin(tlvValue), std::cend(tlvValue)));
+                REQUIRE(std::equal(std::cbegin(valueExpected), std::cend(valueExpected), std::cbegin(tlvValue), std::cend(tlvValue)));
                 break;
             }
         }
