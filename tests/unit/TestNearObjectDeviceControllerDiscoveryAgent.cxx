@@ -47,7 +47,7 @@ protected:
 struct NearObjectDeviceTest :
     public NearObjectDeviceController
 {
-    explicit NearObjectDeviceTest(uint64_t deviceId) :
+    explicit NearObjectDeviceTest(uint8_t deviceId) :
         DeviceId(deviceId)
     {}
 
@@ -125,6 +125,8 @@ TEST_CASE("near object device discovery agent can be created", "[basic][service]
 
     SECTION("discovery event callback provides correct presence and device for added device")
     {
+        using nearobject::service::NearObjectDevicePresence;
+
         const auto deviceToAdd = std::make_shared<test::NearObjectDeviceTest>(0x1);
         discoveryAgentTest.RegisterDiscoveryEventCallback([&](auto&& presence, auto&& deviceAdded) {
             REQUIRE(*deviceToAdd == *deviceAdded);
@@ -135,6 +137,8 @@ TEST_CASE("near object device discovery agent can be created", "[basic][service]
 
     SECTION("discovery event callback provides correct presence and device for removed device")
     {
+        using nearobject::service::NearObjectDevicePresence;
+
         const auto deviceToRemove = std::make_shared<test::NearObjectDeviceTest>(0x1);
         discoveryAgentTest.RegisterDiscoveryEventCallback([&](auto&& presence, auto&& deviceRemoved) {
             REQUIRE(*deviceToRemove == *deviceRemoved);

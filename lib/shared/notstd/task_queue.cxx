@@ -46,12 +46,12 @@ task_queue::get_dispatcher() const noexcept
 }
 
 void
-task_queue::stop(pending_task_action pending_task_action) noexcept
+task_queue::stop(pending_task_action pending_action) noexcept
 {
     {
         std::scoped_lock runnables_changed_lock{ m_runnables_changed_gate };
 
-        switch (pending_task_action) {
+        switch (pending_action) {
         case pending_task_action::cancel:
             m_state = state::canceling;
             break;

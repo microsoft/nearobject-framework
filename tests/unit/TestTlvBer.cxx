@@ -22,7 +22,7 @@ std::vector<uint8_t>
 getOctets(size_t length)
 {
     std::independent_bits_engine<std::mt19937, CHAR_BIT * sizeof(uint8_t), uint16_t> engine(
-        std::chrono::system_clock::now().time_since_epoch().count());
+        static_cast<uint16_t>(std::chrono::system_clock::now().time_since_epoch().count()));
 
     std::vector<uint8_t> holder(length);
     std::generate(std::begin(holder), std::end(holder), [&engine] {
