@@ -128,9 +128,6 @@ struct UwbConfiguration
     bool
     operator==(const UwbConfiguration& other) const noexcept = default;
 
-    auto
-    operator<=>(const UwbConfiguration& other) const = default;
-
     /**
      * @brief Convert this object into a FiRa Data Object (DO).
      *

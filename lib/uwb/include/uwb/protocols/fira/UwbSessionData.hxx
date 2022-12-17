@@ -52,22 +52,6 @@ struct UwbSessionData
     UwbSessionData() = default;
 
     /**
-     * @brief Default equality operator.
-     *
-     * @param other
-     * @return true
-     * @return false
-     */
-    bool
-    operator==(const UwbSessionData& other) const noexcept = default;
-
-    /**
-     * @brief Default three-way comparison operator. 
-     */
-    auto
-    operator<=>(const UwbSessionData& other) const noexcept = default;
-
-    /**
      * @brief Convert this object into a FiRa Data Object (DO).
      *
      * @return std::unique_ptr<encoding::TlvBer>
