@@ -1,9 +1,32 @@
 
 #include <tuple>
 
+#include <notstd/tostring.hxx>
+#include <sstream>
+#include <string>
 #include <uwb/UwbPeer.hxx>
 
 using namespace uwb;
+using namespace strings::ostream_operators;
+
+std::string
+UwbPeerSpatialProperties::ToString() const
+{
+    std::initializer_list<std::tuple<std::string, std::optional<double>>> name2value{ { "Distance", Distance },
+        { "AngleAzimuth", AngleAzimuth },
+        { "AngleElevation", AngleElevation },
+        { "Elevation", Elevation } };
+
+    std::ostringstream ss;
+
+    for (const auto& [name, value] : name2value) {
+        if (value.has_value()) {
+            ss << name << ": " << std::to_string(*value) << std::endl;
+        }
+    }
+
+    return ss.str();
+}
 
 UwbPeer::UwbPeer(UwbMacAddress address) :
     m_address(std::move(address))
@@ -32,6 +55,17 @@ UwbPeer::operator=(const UwbPeer& other)
     return *this;
 }
 
+std::string
+UwbPeer::ToString() const
+{
+    std::ostringstream ss;
+    ss << "{" << std::endl;
+    ss << "mac: " << m_address << std::endl;
+    ss << m_spatialProperties << std::endl;
+    ss << "}" << std::endl;
+    return ss.str();
+}
+
 UwbMacAddress
 UwbPeer::GetAddress() const noexcept
 {
@@ -56,4 +90,3 @@ uwb::operator!=(const UwbPeer& lhs, const UwbPeer& rhs) noexcept
 {
     return !(lhs == rhs);
 }
-
