@@ -278,7 +278,7 @@ public:
 
         // advance the dataIt to once past the tag
         std::advance(dataIt, 1);
-        bytesParsed = std::distance(std::cbegin(data), dataIt);
+        bytesParsed = static_cast<std::size_t>(std::distance(std::cbegin(data), dataIt));
 
         return Tlv::ParseResult::Succeeded;
     }
@@ -340,7 +340,7 @@ public:
 
         // Advance the dataIt to once passed the length encoding.
         std::advance(dataIt, 1);
-        bytesParsed = std::distance(std::cbegin(data), dataIt);
+        bytesParsed = static_cast<std::size_t>(std::distance(std::cbegin(data), dataIt));
 
         return Tlv::ParseResult::Succeeded;
     }
@@ -365,7 +365,7 @@ public:
             return Tlv::ParseResult::Failed;
         }
 
-        valueOutput = { std::cbegin(data), std::cbegin(data) + length };
+        valueOutput = { std::cbegin(data), std::cbegin(data) + static_cast<long>(length) };
         bytesParsed = length;
 
         return Tlv::ParseResult::Succeeded;

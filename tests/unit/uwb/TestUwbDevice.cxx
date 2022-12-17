@@ -36,7 +36,7 @@ struct UwbDeviceTestBase : public uwb::UwbDevice
 struct UwbDeviceTestDerivedOne : UwbDeviceTestBase
 {
     explicit UwbDeviceTestDerivedOne(uint8_t id) :
-        UwbDeviceTestBase(static_cast<uint16_t>(id) << 8)
+        UwbDeviceTestBase(static_cast<uint16_t>(id << 8UL))
     {}
 
     bool

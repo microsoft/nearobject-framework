@@ -51,11 +51,10 @@ TEST_CASE("session identifiers can be generated", "[basic]")
 
     SECTION("sequence of session ids can be generated")
     {
-        uint32_t sessionId = 0;
         NearObjectSessionIdGeneratorRandom generator{};
 
         for (auto i = 0; i < test::NumSessionIdsToGenerate; i++) {
-            REQUIRE_NOTHROW(sessionId = generator.GetNext());
+            REQUIRE_NOTHROW(generator.GetNext());
         }
     }
 

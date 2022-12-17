@@ -152,7 +152,6 @@ ValidateTokenStabilityExternal(const NearObjectIdentityTokenUwb& identityTokenUw
 {
     const auto tokenValueOne = identityTokenUwbOne.GetToken();
     const auto identityTokenUwbTwo = NearObjectIdentityTokenUwb::FromToken(tokenValueOne);
-    const auto tokenValueTwo = identityTokenUwbTwo.GetToken();
     REQUIRE(identityTokenUwbOne == identityTokenUwbTwo);
 }
 } // namespace nearobject::test
@@ -205,7 +204,6 @@ TEST_CASE("near object uwb identity token binds uwb mac address", "[basic]")
         auto uwbMacAddressShort = MakeAddressShort();
         NearObjectIdentityTokenUwb identityTokenUwb{ uwbMacAddressShort };
         REQUIRE(identityTokenUwb.GetMacAddress() == uwbMacAddressShort);
-        auto token = identityTokenUwb.GetToken();
         REQUIRE(identityTokenUwb.GetMacAddress() == uwbMacAddressShort);
     }
 
@@ -221,7 +219,6 @@ TEST_CASE("near object uwb identity token binds uwb mac address", "[basic]")
         auto uwbMacAddressExtended = MakeAddressExtended();
         NearObjectIdentityTokenUwb identityTokenUwb{ uwbMacAddressExtended };
         REQUIRE(identityTokenUwb.GetMacAddress() == uwbMacAddressExtended);
-        auto token = identityTokenUwb.GetToken();
         REQUIRE(identityTokenUwb.GetMacAddress() == uwbMacAddressExtended);
     }
 }
@@ -236,7 +233,6 @@ TEST_CASE("near object uwb identity token retrieval does not mutate attributes",
         auto uwbMacAddressShort = MakeAddressShort();
         NearObjectIdentityTokenUwb identityTokenUwb{ uwbMacAddressShort };
         REQUIRE(identityTokenUwb.GetMacAddress() == uwbMacAddressShort);
-        auto token = identityTokenUwb.GetToken();
         REQUIRE(identityTokenUwb.GetMacAddress() == uwbMacAddressShort);
     }
 
@@ -245,7 +241,6 @@ TEST_CASE("near object uwb identity token retrieval does not mutate attributes",
         auto uwbMacAddressExtended = MakeAddressExtended();
         NearObjectIdentityTokenUwb identityTokenUwb{ uwbMacAddressExtended };
         REQUIRE(identityTokenUwb.GetMacAddress() == uwbMacAddressExtended);
-        auto token = identityTokenUwb.GetToken();
         REQUIRE(identityTokenUwb.GetMacAddress() == uwbMacAddressExtended);
     }
 }

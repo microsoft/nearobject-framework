@@ -40,7 +40,7 @@ NearObjectIdentityTokenUwb::UniqueFromToken(std::span<const uint8_t> token)
     // copy/move a serialized object into it. nlohmann must support some way of
     // dynamically allocating the object instead. Needs further investigation.
     auto instance = std::make_unique<NearObjectIdentityTokenUwb>();
-    *instance = std::move(NearObjectIdentityTokenUwb::FromToken(token));
+    *instance = NearObjectIdentityTokenUwb::FromToken(token);
     return instance;
 }
 
