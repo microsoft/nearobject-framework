@@ -30,11 +30,11 @@ TEST_CASE("UwbConfiguration can be used in unordered_containers", "[basic][conta
     using namespace uwb::protocol::fira;
 
     UwbConfiguration uwbConfigurationDeviceRoleInitiator{};
-    uwbConfigurationDeviceRoleInitiator.deviceRole = DeviceRole::Initiator;
+    uwbConfigurationDeviceRoleInitiator._deviceRole = DeviceRole::Initiator;
     UwbConfiguration uwbConfigurationDeviceRoleResponder{};
-    uwbConfigurationDeviceRoleResponder.deviceRole = DeviceRole::Responder;
+    uwbConfigurationDeviceRoleResponder._deviceRole = DeviceRole::Responder;
     UwbConfiguration uwbConfigurationHoppingMode{};
-    uwbConfigurationHoppingMode.hoppingMode = true;
+    uwbConfigurationHoppingMode._hoppingMode = true;
 
     const std::initializer_list<UwbConfiguration> UwbConfigurations = {
         uwbConfigurationDeviceRoleInitiator,

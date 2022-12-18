@@ -56,6 +56,11 @@ public:
     UwbSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks);
 
     /**
+     * @brief Destroy the UwbSession object.
+     */
+    virtual ~UwbSession() = default;
+
+    /**
      * @brief Get the unique session id.
      * 
      * @return uint32_t 
