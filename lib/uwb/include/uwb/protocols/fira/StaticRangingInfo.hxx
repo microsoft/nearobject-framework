@@ -5,6 +5,7 @@
 #include <array>
 #include <cstdint>
 #include <iterator>
+#include <string>
 
 #include <notstd/hash.hxx>
 

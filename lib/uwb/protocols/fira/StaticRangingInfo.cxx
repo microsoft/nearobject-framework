@@ -9,8 +9,8 @@ uwb::protocol::fira::StaticRangingInfo::ToString() const {
     ss << "{" << std::endl;
     ss << "VendorId: " << VendorId << std::endl;
     ss << "InitializationVector: " << std::hex << std::setw(2) << std::setfill('0') << std::showbase << std::internal;
-    for(const auto i: InitializationVector) {
-        ss << i << " ";
+    for (const auto i : InitializationVector) {
+        ss << +i << " ";
     }
     ss << std::endl;
     ss << "}" << std::endl;
