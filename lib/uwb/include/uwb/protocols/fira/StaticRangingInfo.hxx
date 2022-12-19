@@ -14,7 +14,7 @@ namespace uwb::protocol::fira
 struct StaticRangingInfo
 {
     /**
-     * @brief See FiRa Consortium MAC Technical Requirements v1.3.0, 
+     * @brief See FiRa Consortium MAC Technical Requirements v1.3.0,
      * Section D.1.8 STS, Figure 19, page 70.
      */
     static constexpr auto InitializationVectorLength = 6;

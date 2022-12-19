@@ -9,8 +9,8 @@
 #include <TlvBer.hxx>
 #include <notstd/hash.hxx>
 
-#include <uwb/protocols/fira/StaticRangingInfo.hxx>
 #include <uwb/protocols/fira/SecureRangingInfo.hxx>
+#include <uwb/protocols/fira/StaticRangingInfo.hxx>
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
 
 namespace uwb::protocol::fira

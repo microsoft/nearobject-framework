@@ -6,8 +6,8 @@
 #include <vector>
 
 #include <magic_enum.hpp>
-#include <notstd/tostring.hxx>
 #include <nearobject/cli/NearObjectCli.hxx>
+#include <notstd/tostring.hxx>
 
 using namespace nearobject::cli;
 using namespace strings::ostream_operators;
@@ -148,7 +148,7 @@ const std::unordered_map<std::string, uwb::protocol::fira::ResultReportConfigura
 } // namespace detail
 
 CLI::App*
-NearObjectCli::AddSubcommandUwb(CLI::App *parent)
+NearObjectCli::AddSubcommandUwb(CLI::App* parent)
 {
     // top-level command
     auto uwbApp = parent->add_subcommand("uwb", "commands related to uwb")->require_subcommand()->fallthrough();
@@ -160,7 +160,7 @@ NearObjectCli::AddSubcommandUwb(CLI::App *parent)
 }
 
 CLI::App*
-NearObjectCli::AddSubcommandUwbRange(CLI::App *parent)
+NearObjectCli::AddSubcommandUwbRange(CLI::App* parent)
 {
     // top-level command
     auto rangeApp = parent->add_subcommand("range", "commands related to ranging")->require_subcommand()->fallthrough();
@@ -178,7 +178,7 @@ NearObjectCli::AddSubcommandUwbRange(CLI::App *parent)
 }
 
 CLI::App*
-NearObjectCli::AddSubcommandUwbRangeStart(CLI::App *parent)
+NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
 {
     auto rangeStartApp = parent->add_subcommand("start", "start ranging. Please refer to Table 53 of the FiRa CSML spec for more info on the options")->fallthrough();
 
@@ -269,7 +269,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App *parent)
         }
 
         m_cliData->SessionData.staticRangingInfo = m_cliData->StaticRanging;
-        std::cout << "DEBUG StaticRangingInfo: " << m_cliData->StaticRanging << std::endl;
+        std::cout << "StaticRangingInfo: " << m_cliData->SessionData.staticRangingInfo << std::endl;
 
         std::cout << "FiRa MAC Version: " << std::setfill('0') << std::showbase << std::setw(8) << std::left << std::hex << m_cliData->SessionData.uwbConfiguration._firaMacVersion << std::endl;
         std::cout << "FiRa PHY Version: " << std::setfill('0') << std::showbase << std::setw(8) << std::left << std::hex << m_cliData->SessionData.uwbConfiguration._firaPhyVersion << std::endl;
@@ -289,7 +289,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App *parent)
 }
 
 CLI::App*
-NearObjectCli::AddSubcommandUwbRangeStop(CLI::App *parent)
+NearObjectCli::AddSubcommandUwbRangeStop(CLI::App* parent)
 {
     // top-level command
     auto rangeStopApp = parent->add_subcommand("stop", "stop ranging")->fallthrough();

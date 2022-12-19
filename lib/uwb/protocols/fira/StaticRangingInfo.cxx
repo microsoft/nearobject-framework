@@ -1,10 +1,11 @@
 
-#include <uwb/protocols/fira/StaticRangingInfo.hxx>
-#include <sstream>
 #include <iomanip>
+#include <sstream>
+#include <uwb/protocols/fira/StaticRangingInfo.hxx>
 
 std::string
-uwb::protocol::fira::StaticRangingInfo::ToString() const {
+uwb::protocol::fira::StaticRangingInfo::ToString() const
+{
     std::ostringstream ss;
     ss << "{" << std::endl;
     ss << "VendorId: " << VendorId << std::endl;
