@@ -217,7 +217,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App *parent)
     rangeStartApp->add_option("--StaticRangingVendorId", m_cliData->StaticRanging.VendorId, "uint16_t. If --SecureRangingInfo* options are used, this option will be overridden")->capture_default_str();
 
     // arrays
-    rangeStartApp->add_option("--StaticRangingInitializationVector", m_cliData->StaticRanging.InitializationVector, "array of uint16_t. If --SecureRangingInfo* options are used, this option will be overridden")->capture_default_str();
+    rangeStartApp->add_option("--StaticRangingInitializationVector", m_cliData->StaticRanging.InitializationVector, "array of uint8_t. If --SecureRangingInfo* options are used, this option will be overridden")->delimiter(':');
 
     // strings
     rangeStartApp->add_option("--FiraPhyVersion", m_cliData->PhyVersionString)->capture_default_str();
@@ -269,13 +269,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App *parent)
         }
 
         m_cliData->SessionData.staticRangingInfo = m_cliData->StaticRanging;
-        std::cout << "StaticRangingInfo: " << m_cliData->StaticRanging;
-        std::cout << "DEBUG: " << m_cliData->StaticRanging.InitializationVector[0] << std::endl;
-        std::cout << "DEBUG: " << m_cliData->StaticRanging.InitializationVector[1] << std::endl;
-        std::cout << "DEBUG: " << m_cliData->StaticRanging.InitializationVector[2] << std::endl;
-        std::cout << "DEBUG: " << m_cliData->StaticRanging.InitializationVector[3] << std::endl;
-        std::cout << "DEBUG: " << m_cliData->StaticRanging.InitializationVector[4] << std::endl;
-        std::cout << "DEBUG: " << m_cliData->StaticRanging.InitializationVector[5] << std::endl;
+        std::cout << "DEBUG StaticRangingInfo: " << m_cliData->StaticRanging << std::endl;
 
         std::cout << "FiRa MAC Version: " << std::setfill('0') << std::showbase << std::setw(8) << std::left << std::hex << m_cliData->SessionData.uwbConfiguration._firaMacVersion << std::endl;
         std::cout << "FiRa PHY Version: " << std::setfill('0') << std::showbase << std::setw(8) << std::left << std::hex << m_cliData->SessionData.uwbConfiguration._firaPhyVersion << std::endl;
