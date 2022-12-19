@@ -214,10 +214,10 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     rangeStartApp->add_option("--RangingInterval", m_cliData->SessionData.uwbConfiguration._rangingInterval, "uint16_t")->capture_default_str();
     rangeStartApp->add_option("--KeyRotationRate", m_cliData->SessionData.uwbConfiguration._keyRotationRate, "uint8_t")->capture_default_str();
     rangeStartApp->add_option("--MaxRangingRoundRetry", m_cliData->SessionData.uwbConfiguration._maxRangingRoundRetry, "uint16_t")->capture_default_str();
-    rangeStartApp->add_option("--StaticRangingVendorId", m_cliData->StaticRanging.VendorId, "uint16_t. If --SecureRangingInfo* options are used, this option will be overridden")->capture_default_str();
+    rangeStartApp->add_option("--StaticRangingInfoVendorId", m_cliData->StaticRanging.VendorId, "uint16_t. If --SecureRangingInfo* options are used, this option will be overridden")->capture_default_str();
 
     // arrays
-    rangeStartApp->add_option("--StaticRangingInitializationVector", m_cliData->StaticRanging.InitializationVector, "array of uint8_t. If --SecureRangingInfo* options are used, this option will be overridden")->delimiter(':');
+    rangeStartApp->add_option("--StaticRangingInfoInitializationVector", m_cliData->StaticRanging.InitializationVector, "array of uint8_t. If --SecureRangingInfo* options are used, this option will be overridden")->delimiter(':');
 
     // strings
     rangeStartApp->add_option("--FiraPhyVersion", m_cliData->PhyVersionString)->capture_default_str();
