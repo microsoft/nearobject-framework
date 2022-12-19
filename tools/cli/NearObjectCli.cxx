@@ -6,9 +6,11 @@
 #include <vector>
 
 #include <magic_enum.hpp>
+#include <notstd/tostring.hxx>
 #include <nearobject/cli/NearObjectCli.hxx>
 
 using namespace nearobject::cli;
+using namespace strings::ostream_operators;
 
 NearObjectCli::NearObjectCli(std::shared_ptr<NearObjectCliData> cliData, std::shared_ptr<NearObjectCliHandler> cliHandler) :
     m_cliData(cliData),
@@ -182,18 +184,18 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App *parent)
 
     // TODO is there a way to put all the enums into a list of [optionName, optionDestination, optionMap] so we don't have to create the initializer list each time
     // TODO get rid of these strings, instead use a macro to extract the enum name
-    rangeStartApp->add_option("--DeviceRole", m_cliData->SessionData.uwbConfiguration._deviceRole)->transform(CLI::CheckedTransformer(detail::DeviceRoleMap))->capture_default_str();
-    rangeStartApp->add_option("--RangingMethod", m_cliData->SessionData.uwbConfiguration._rangingConfiguration.Method)->transform(CLI::CheckedTransformer(detail::RangingMethodMap))->capture_default_str();
-    rangeStartApp->add_option("--MeasurementReportMode", m_cliData->SessionData.uwbConfiguration._rangingConfiguration.ReportMode)->transform(CLI::CheckedTransformer(detail::MeasurementReportModeMap))->capture_default_str();
-    rangeStartApp->add_option("--StsConfiguration", m_cliData->SessionData.uwbConfiguration._stsConfiguration)->transform(CLI::CheckedTransformer(detail::StsConfigurationMap))->capture_default_str();
-    rangeStartApp->add_option("--MultiNodeMode", m_cliData->SessionData.uwbConfiguration._multiNodeMode)->transform(CLI::CheckedTransformer(detail::MultiNodeModeMap))->capture_default_str();
-    rangeStartApp->add_option("--RangingMode", m_cliData->SessionData.uwbConfiguration._rangingTimeStruct)->transform(CLI::CheckedTransformer(detail::RangingModeMap))->capture_default_str();
-    rangeStartApp->add_option("--SchedulingMode", m_cliData->SessionData.uwbConfiguration._schedulingMode)->transform(CLI::CheckedTransformer(detail::SchedulingModeMap))->capture_default_str();
-    rangeStartApp->add_option("--Channel", m_cliData->SessionData.uwbConfiguration._channel)->transform(CLI::CheckedTransformer(detail::ChannelMap))->capture_default_str();
-    rangeStartApp->add_option("--StsPacketConfiguration", m_cliData->SessionData.uwbConfiguration._rframeConfig)->transform(CLI::CheckedTransformer(detail::StsPacketConfigurationMap))->capture_default_str();
-    rangeStartApp->add_option("--ConvolutionalCodeConstraintLength", m_cliData->SessionData.uwbConfiguration._convolutionalCodeConstraintLength)->transform(CLI::CheckedTransformer(detail::ConvolutionalCodeConstraintLengthMap))->capture_default_str();
-    rangeStartApp->add_option("--PrfMode", m_cliData->SessionData.uwbConfiguration._prfMode)->transform(CLI::CheckedTransformer(detail::PrfModeMap))->capture_default_str();
-    rangeStartApp->add_option("--UwbMacAddressFcsType", m_cliData->SessionData.uwbConfiguration._macAddressFcsType)->transform(CLI::CheckedTransformer(detail::UwbMacAddressFcsTypeMap))->capture_default_str();
+    rangeStartApp->add_option("--DeviceRole", m_cliData->SessionData.uwbConfiguration._deviceRole)->transform(CLI::CheckedTransformer(::detail::DeviceRoleMap))->capture_default_str();
+    rangeStartApp->add_option("--RangingMethod", m_cliData->SessionData.uwbConfiguration._rangingConfiguration.Method)->transform(CLI::CheckedTransformer(::detail::RangingMethodMap))->capture_default_str();
+    rangeStartApp->add_option("--MeasurementReportMode", m_cliData->SessionData.uwbConfiguration._rangingConfiguration.ReportMode)->transform(CLI::CheckedTransformer(::detail::MeasurementReportModeMap))->capture_default_str();
+    rangeStartApp->add_option("--StsConfiguration", m_cliData->SessionData.uwbConfiguration._stsConfiguration)->transform(CLI::CheckedTransformer(::detail::StsConfigurationMap))->capture_default_str();
+    rangeStartApp->add_option("--MultiNodeMode", m_cliData->SessionData.uwbConfiguration._multiNodeMode)->transform(CLI::CheckedTransformer(::detail::MultiNodeModeMap))->capture_default_str();
+    rangeStartApp->add_option("--RangingMode", m_cliData->SessionData.uwbConfiguration._rangingTimeStruct)->transform(CLI::CheckedTransformer(::detail::RangingModeMap))->capture_default_str();
+    rangeStartApp->add_option("--SchedulingMode", m_cliData->SessionData.uwbConfiguration._schedulingMode)->transform(CLI::CheckedTransformer(::detail::SchedulingModeMap))->capture_default_str();
+    rangeStartApp->add_option("--Channel", m_cliData->SessionData.uwbConfiguration._channel)->transform(CLI::CheckedTransformer(::detail::ChannelMap))->capture_default_str();
+    rangeStartApp->add_option("--StsPacketConfiguration", m_cliData->SessionData.uwbConfiguration._rframeConfig)->transform(CLI::CheckedTransformer(::detail::StsPacketConfigurationMap))->capture_default_str();
+    rangeStartApp->add_option("--ConvolutionalCodeConstraintLength", m_cliData->SessionData.uwbConfiguration._convolutionalCodeConstraintLength)->transform(CLI::CheckedTransformer(::detail::ConvolutionalCodeConstraintLengthMap))->capture_default_str();
+    rangeStartApp->add_option("--PrfMode", m_cliData->SessionData.uwbConfiguration._prfMode)->transform(CLI::CheckedTransformer(::detail::PrfModeMap))->capture_default_str();
+    rangeStartApp->add_option("--UwbMacAddressFcsType", m_cliData->SessionData.uwbConfiguration._macAddressFcsType)->transform(CLI::CheckedTransformer(::detail::UwbMacAddressFcsTypeMap))->capture_default_str();
 
     // booleans
     rangeStartApp->add_flag("--controller,!--controlee", m_cliData->HostIsController, "default is controlee")->capture_default_str();
@@ -212,28 +214,32 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App *parent)
     rangeStartApp->add_option("--RangingInterval", m_cliData->SessionData.uwbConfiguration._rangingInterval, "uint16_t")->capture_default_str();
     rangeStartApp->add_option("--KeyRotationRate", m_cliData->SessionData.uwbConfiguration._keyRotationRate, "uint8_t")->capture_default_str();
     rangeStartApp->add_option("--MaxRangingRoundRetry", m_cliData->SessionData.uwbConfiguration._maxRangingRoundRetry, "uint16_t")->capture_default_str();
+    rangeStartApp->add_option("--StaticRangingVendorId", m_cliData->StaticRanging.VendorId, "uint16_t. If --SecureRangingInfo* options are used, this option will be overridden")->capture_default_str();
+
+    // arrays
+    rangeStartApp->add_option("--StaticRangingInitializationVector", m_cliData->StaticRanging.InitializationVector, "array of uint16_t. If --SecureRangingInfo* options are used, this option will be overridden")->capture_default_str();
 
     // strings
     rangeStartApp->add_option("--FiraPhyVersion", m_cliData->PhyVersionString)->capture_default_str();
     rangeStartApp->add_option("--FiraMacVersion", m_cliData->MacVersionString)->capture_default_str();
     rangeStartApp->add_option("--ResultReportConfiguration", m_cliData->ResultReportConfigurationString)->capture_default_str();
 
-    rangeStartApp->parse_complete_callback([&] {
+    rangeStartApp->parse_complete_callback([this] {
         std::cout << "Selected parameters:" << std::endl;
 
         for (const auto& [optionName, optionSelected] :
             std::initializer_list<std::tuple<std::string_view, std::string_view>>{
-                detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._deviceRole),
-                detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._rangingConfiguration.Method),
-                detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._rangingConfiguration.ReportMode),
-                detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._stsConfiguration),
-                detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._multiNodeMode),
-                detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._rangingTimeStruct),
-                detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._channel),
-                detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._rframeConfig),
-                detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._convolutionalCodeConstraintLength),
-                detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._prfMode),
-                detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._macAddressFcsType) }) {
+                ::detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._deviceRole),
+                ::detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._rangingConfiguration.Method),
+                ::detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._rangingConfiguration.ReportMode),
+                ::detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._stsConfiguration),
+                ::detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._multiNodeMode),
+                ::detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._rangingTimeStruct),
+                ::detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._channel),
+                ::detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._rframeConfig),
+                ::detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._convolutionalCodeConstraintLength),
+                ::detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._prfMode),
+                ::detail::GetEnumTypeAndValue(m_cliData->SessionData.uwbConfiguration._macAddressFcsType) }) {
             std::cout << optionName << "::" << optionSelected << std::endl;
         }
         if (!m_cliData->MacVersionString.empty()) {
@@ -254,13 +260,22 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App *parent)
         }
 
         if (!m_cliData->ResultReportConfigurationString.empty()) {
-            auto result = uwb::protocol::fira::StringToResultReportConfiguration(m_cliData->ResultReportConfigurationString, detail::ResultReportConfigurationMap);
+            auto result = uwb::protocol::fira::StringToResultReportConfiguration(m_cliData->ResultReportConfigurationString, ::detail::ResultReportConfigurationMap);
             if (not result) {
                 std::cout << "could not parse ResultReportConfiguration" << std::endl;
             } else {
                 m_cliData->SessionData.uwbConfiguration._resultReportConfigurations = result.value();
             }
         }
+
+        m_cliData->SessionData.staticRangingInfo = m_cliData->StaticRanging;
+        std::cout << "StaticRangingInfo: " << m_cliData->StaticRanging;
+        std::cout << "DEBUG: " << m_cliData->StaticRanging.InitializationVector[0] << std::endl;
+        std::cout << "DEBUG: " << m_cliData->StaticRanging.InitializationVector[1] << std::endl;
+        std::cout << "DEBUG: " << m_cliData->StaticRanging.InitializationVector[2] << std::endl;
+        std::cout << "DEBUG: " << m_cliData->StaticRanging.InitializationVector[3] << std::endl;
+        std::cout << "DEBUG: " << m_cliData->StaticRanging.InitializationVector[4] << std::endl;
+        std::cout << "DEBUG: " << m_cliData->StaticRanging.InitializationVector[5] << std::endl;
 
         std::cout << "FiRa MAC Version: " << std::setfill('0') << std::showbase << std::setw(8) << std::left << std::hex << m_cliData->SessionData.uwbConfiguration._firaMacVersion << std::endl;
         std::cout << "FiRa PHY Version: " << std::setfill('0') << std::showbase << std::setw(8) << std::left << std::hex << m_cliData->SessionData.uwbConfiguration._firaPhyVersion << std::endl;

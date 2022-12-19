@@ -38,6 +38,9 @@ struct StaticRangingInfo
     auto
     operator<=>(const StaticRangingInfo& other) const = default;
 
+    std::string
+    ToString() const;
+
     uint16_t VendorId;
     std::array<uint8_t, InitializationVectorLength> InitializationVector;
 };
