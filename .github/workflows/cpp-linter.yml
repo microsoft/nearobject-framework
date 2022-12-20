@@ -16,6 +16,7 @@ jobs:
         with:
           style: file
           lines-changed-only: true
+          ignore: '.github|lib/shared/notstd|windows/shared/notstd'
 
       - name: Compliance check
         if: steps.linter.outputs.checks-failed > 0
