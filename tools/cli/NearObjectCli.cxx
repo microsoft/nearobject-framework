@@ -269,7 +269,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
         }
 
         m_cliData->SessionData.staticRangingInfo = m_cliData->StaticRanging;
-        std::cout << "StaticRangingInfo: " << m_cliData->SessionData.staticRangingInfo << std::endl;
+        std::cout << "StaticRangingInfo: {" << m_cliData->SessionData.staticRangingInfo << "}" << std::endl;
 
         std::cout << "FiRa MAC Version: " << std::setfill('0') << std::showbase << std::setw(8) << std::left << std::hex << m_cliData->SessionData.uwbConfiguration._firaMacVersion << std::endl;
         std::cout << "FiRa PHY Version: " << std::setfill('0') << std::showbase << std::setw(8) << std::left << std::hex << m_cliData->SessionData.uwbConfiguration._firaPhyVersion << std::endl;
