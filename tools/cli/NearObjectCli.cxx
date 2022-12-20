@@ -7,8 +7,10 @@
 
 #include <magic_enum.hpp>
 #include <nearobject/cli/NearObjectCli.hxx>
+#include <notstd/tostring.hxx>
 
 using namespace nearobject::cli;
+using namespace strings::ostream_operators;
 
 NearObjectCli::NearObjectCli(std::shared_ptr<NearObjectCliData> cliData, std::shared_ptr<NearObjectCliHandler> cliHandler) :
     m_cliData(cliData),
@@ -146,7 +148,7 @@ const std::unordered_map<std::string, uwb::protocol::fira::ResultReportConfigura
 } // namespace detail
 
 CLI::App*
-NearObjectCli::AddSubcommandUwb(CLI::App *parent)
+NearObjectCli::AddSubcommandUwb(CLI::App* parent)
 {
     // top-level command
     auto uwbApp = parent->add_subcommand("uwb", "commands related to uwb")->require_subcommand()->fallthrough();
@@ -158,7 +160,7 @@ NearObjectCli::AddSubcommandUwb(CLI::App *parent)
 }
 
 CLI::App*
-NearObjectCli::AddSubcommandUwbRange(CLI::App *parent)
+NearObjectCli::AddSubcommandUwbRange(CLI::App* parent)
 {
     // top-level command
     auto rangeApp = parent->add_subcommand("range", "commands related to ranging")->require_subcommand()->fallthrough();
@@ -176,7 +178,7 @@ NearObjectCli::AddSubcommandUwbRange(CLI::App *parent)
 }
 
 CLI::App*
-NearObjectCli::AddSubcommandUwbRangeStart(CLI::App *parent)
+NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
 {
     auto rangeStartApp = parent->add_subcommand("start", "start ranging. Please refer to Table 53 of the FiRa CSML spec for more info on the options")->fallthrough();
 
@@ -212,13 +214,17 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App *parent)
     rangeStartApp->add_option("--RangingInterval", m_cliData->SessionData.uwbConfiguration._rangingInterval, "uint16_t")->capture_default_str();
     rangeStartApp->add_option("--KeyRotationRate", m_cliData->SessionData.uwbConfiguration._keyRotationRate, "uint8_t")->capture_default_str();
     rangeStartApp->add_option("--MaxRangingRoundRetry", m_cliData->SessionData.uwbConfiguration._maxRangingRoundRetry, "uint16_t")->capture_default_str();
+    rangeStartApp->add_option("--StaticRangingInfoVendorId", m_cliData->StaticRanging.VendorId, "uint16_t. If --SecureRangingInfo* options are used, this option will be overridden")->capture_default_str();
+
+    // arrays
+    rangeStartApp->add_option("--StaticRangingInfoInitializationVector", m_cliData->StaticRanging.InitializationVector, "array of uint8_t. If --SecureRangingInfo* options are used, this option will be overridden")->delimiter(':');
 
     // strings
     rangeStartApp->add_option("--FiraPhyVersion", m_cliData->PhyVersionString)->capture_default_str();
     rangeStartApp->add_option("--FiraMacVersion", m_cliData->MacVersionString)->capture_default_str();
     rangeStartApp->add_option("--ResultReportConfiguration", m_cliData->ResultReportConfigurationString)->capture_default_str();
 
-    rangeStartApp->parse_complete_callback([&] {
+    rangeStartApp->parse_complete_callback([this] {
         std::cout << "Selected parameters:" << std::endl;
 
         for (const auto& [optionName, optionSelected] :
@@ -262,6 +268,9 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App *parent)
             }
         }
 
+        m_cliData->SessionData.staticRangingInfo = m_cliData->StaticRanging;
+        std::cout << "StaticRangingInfo: {" << m_cliData->SessionData.staticRangingInfo << "}" << std::endl;
+
         std::cout << "FiRa MAC Version: " << std::setfill('0') << std::showbase << std::setw(8) << std::left << std::hex << m_cliData->SessionData.uwbConfiguration._firaMacVersion << std::endl;
         std::cout << "FiRa PHY Version: " << std::setfill('0') << std::showbase << std::setw(8) << std::left << std::hex << m_cliData->SessionData.uwbConfiguration._firaPhyVersion << std::endl;
         std::cout << "ResultReportConfigurations: " << uwb::protocol::fira::ResultReportConfigurationToString(m_cliData->SessionData.uwbConfiguration._resultReportConfigurations) << std::endl;
@@ -280,7 +289,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App *parent)
 }
 
 CLI::App*
-NearObjectCli::AddSubcommandUwbRangeStop(CLI::App *parent)
+NearObjectCli::AddSubcommandUwbRangeStop(CLI::App* parent)
 {
     // top-level command
     auto rangeStopApp = parent->add_subcommand("stop", "stop ranging")->fallthrough();

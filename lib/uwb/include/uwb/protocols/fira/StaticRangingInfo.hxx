@@ -5,6 +5,7 @@
 #include <array>
 #include <cstdint>
 #include <iterator>
+#include <string>
 
 #include <notstd/hash.hxx>
 
@@ -13,7 +14,7 @@ namespace uwb::protocol::fira
 struct StaticRangingInfo
 {
     /**
-     * @brief See FiRa Consortium MAC Technical Requirements v1.3.0, 
+     * @brief See FiRa Consortium MAC Technical Requirements v1.3.0,
      * Section D.1.8 STS, Figure 19, page 70.
      */
     static constexpr auto InitializationVectorLength = 6;
@@ -37,6 +38,9 @@ struct StaticRangingInfo
 
     auto
     operator<=>(const StaticRangingInfo& other) const = default;
+
+    std::string
+    ToString() const;
 
     uint16_t VendorId;
     std::array<uint8_t, InitializationVectorLength> InitializationVector;
