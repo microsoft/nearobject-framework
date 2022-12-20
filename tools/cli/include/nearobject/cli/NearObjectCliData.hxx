@@ -2,13 +2,61 @@
 #ifndef NEAR_OBJECT_CLI_DATA_HXX
 #define NEAR_OBJECT_CLI_DATA_HXX
 
+#include <cstdint>
+#include <optional>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
+#include <uwb/UwbMacAddress.hxx>
+#include <uwb/protocols/fira/FiraDevice.hxx>
+#include <uwb/protocols/fira/UwbConfiguration.hxx>
 #include <uwb/protocols/fira/UwbSessionData.hxx>
 
 namespace nearobject::cli
 {
+struct UwbConfigurationData
+{
+    std::optional<uint32_t> firaPhyVersion;
+    std::optional<uint32_t> firaMacVersion;
+    std::optional<uwb::protocol::fira::DeviceRole> deviceRole;
+    std::optional<uwb::protocol::fira::RangingMethod> rangingConfigurationMethod;
+    std::optional<uwb::protocol::fira::MeasurementReportMode> rangingConfigurationReportMode;
+    std::optional<uwb::protocol::fira::StsConfiguration> stsConfiguration;
+    std::optional<uwb::protocol::fira::MultiNodeMode> multiNodeMode;
+    std::optional<uwb::protocol::fira::RangingMode> rangingTimeStruct;
+    std::optional<uwb::protocol::fira::SchedulingMode> schedulingMode;
+    std::optional<bool> hoppingMode;
+    std::optional<bool> blockStriding;
+    std::optional<uint32_t> uwbInitiationTime;
+    std::optional<uwb::protocol::fira::Channel> channel;
+    std::optional<uwb::protocol::fira::StsPacketConfiguration> rframeConfig;
+    std::optional<uwb::protocol::fira::ConvolutionalCodeConstraintLength> convolutionalCodeConstraintLength;
+    std::optional<uwb::protocol::fira::PrfMode> prfMode;
+    std::optional<uint8_t> sp0PhySetNumber;
+    std::optional<uint8_t> sp1PhySetNumber;
+    std::optional<uint8_t> sp3PhySetNumber;
+    std::optional<uint8_t> preableCodeIndex;
+    std::unordered_set<uwb::protocol::fira::ResultReportConfiguration> resultReportConfigurations;
+    std::optional<uwb::UwbMacAddressType> macAddressMode;
+    std::optional<uwb::UwbMacAddress> controleeShortMacAddress;
+    std::optional<uwb::UwbMacAddress> controllerMacAddress;
+    std::optional<uint8_t> slotsPerRangingRound;
+    std::optional<uint8_t> maxContentionPhaseLength;
+    std::optional<uint8_t> slotDuration;
+    std::optional<uint16_t> rangingInterval;
+    std::optional<uint8_t> keyRotationRate;
+    std::optional<uwb::UwbMacAddressFcsType> macAddressFcsType;
+    std::optional<uint16_t> maxRangingRoundRetry;
+
+    std::string firaPhyVersionString;
+    std::string firaMacVersionString;
+    std::string resultReportConfigurationString;
+
+    uwb::protocol::fira::UwbConfiguration
+    ToUwbConfiguration() const;
+};
+
 /**
  * @brief Base class for data parsed by NearObjectCli.
  */
@@ -16,9 +64,7 @@ struct NearObjectCliData
 {
     virtual ~NearObjectCliData() = default;
 
-    std::string MacVersionString;
-    std::string PhyVersionString;
-    std::string ResultReportConfigurationString;
+    UwbConfigurationData uwbConfiguration{};
 
     uwb::protocol::fira::StaticRangingInfo StaticRanging{};
 
