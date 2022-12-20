@@ -68,7 +68,7 @@ struct UwbConfiguration
         SlotsPerRr = 0x97,
         MaxContentionPhaseLength = 0x98,
         SlotDuration = 0x99,
-        RangingInternval = 0x9A,
+        RangingInterval = 0x9A,
         KeyRotationRate = 0x9B,
         MacFcsType = 0x9C,
         MaxRrRetry = 0x9D,
