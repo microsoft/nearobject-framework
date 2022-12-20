@@ -15,8 +15,16 @@
 
 namespace nearobject::cli
 {
+/**
+ * @brief Helper sturcture for staging UwbConfiguration data fields from CLI
+ * input. This is an intermediary structure that allows native use with the
+ * CLI11 parsing library.
+ */
 struct UwbConfigurationData
 {
+    // Mirrored properties from UwbConfiguration data. Any newly added fields
+    // that should be supported from the command-line must also be added here,
+    // along with parsing support in a NearObjectCli instance.
     std::optional<uint32_t> firaPhyVersion;
     std::optional<uint32_t> firaMacVersion;
     std::optional<uwb::protocol::fira::DeviceRole> deviceRole;
@@ -49,10 +57,16 @@ struct UwbConfigurationData
     std::optional<uwb::UwbMacAddressFcsType> macAddressFcsType;
     std::optional<uint16_t> maxRangingRoundRetry;
 
+    // Free-form string arugments that will be manually parsed to their target format(s).
     std::string firaPhyVersionString;
     std::string firaMacVersionString;
     std::string resultReportConfigurationString;
 
+    /**
+     * @brief Convert the staging data to a complete UwbConfiguration object.
+     * 
+     * @return uwb::protocol::fira::UwbConfiguration 
+     */
     uwb::protocol::fira::UwbConfiguration
     ToUwbConfiguration() const;
 };
@@ -64,11 +78,9 @@ struct NearObjectCliData
 {
     virtual ~NearObjectCliData() = default;
 
-    UwbConfigurationData uwbConfiguration{};
-
-    uwb::protocol::fira::StaticRangingInfo StaticRanging{};
-
     bool HostIsController{ false };
+    UwbConfigurationData uwbConfiguration{};
+    uwb::protocol::fira::StaticRangingInfo StaticRanging{};
     uwb::protocol::fira::UwbSessionData SessionData{};
 };
 
