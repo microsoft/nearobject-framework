@@ -12,15 +12,15 @@ TEST_CASE("RangingConfiguration can be used in unordered_containers", "[basic]")
 {
     // Set with all possible combinations of object properties.
     const std::initializer_list<RangingConfiguration> RangingConfigurationsAll = {
-        RangingConfiguration{ RangingMethod::OneWay, MeasurementReportMode::None },
-        RangingConfiguration{ RangingMethod::SingleSidedTwoWay, MeasurementReportMode::None },
-        RangingConfiguration{ RangingMethod::DoubleSidedTwoWay, MeasurementReportMode::None },
-        RangingConfiguration{ RangingMethod::OneWay, MeasurementReportMode::Deferred },
-        RangingConfiguration{ RangingMethod::SingleSidedTwoWay, MeasurementReportMode::Deferred },
-        RangingConfiguration{ RangingMethod::DoubleSidedTwoWay, MeasurementReportMode::Deferred },
-        RangingConfiguration{ RangingMethod::OneWay, MeasurementReportMode::NonDeferred },
-        RangingConfiguration{ RangingMethod::SingleSidedTwoWay, MeasurementReportMode::NonDeferred },
-        RangingConfiguration{ RangingMethod::DoubleSidedTwoWay, MeasurementReportMode::NonDeferred },
+        RangingConfiguration{ RangingDirection::OneWay, MeasurementReportMode::None },
+        RangingConfiguration{ RangingDirection::SingleSidedTwoWay, MeasurementReportMode::None },
+        RangingConfiguration{ RangingDirection::DoubleSidedTwoWay, MeasurementReportMode::None },
+        RangingConfiguration{ RangingDirection::OneWay, MeasurementReportMode::Deferred },
+        RangingConfiguration{ RangingDirection::SingleSidedTwoWay, MeasurementReportMode::Deferred },
+        RangingConfiguration{ RangingDirection::DoubleSidedTwoWay, MeasurementReportMode::Deferred },
+        RangingConfiguration{ RangingDirection::OneWay, MeasurementReportMode::NonDeferred },
+        RangingConfiguration{ RangingDirection::SingleSidedTwoWay, MeasurementReportMode::NonDeferred },
+        RangingConfiguration{ RangingDirection::DoubleSidedTwoWay, MeasurementReportMode::NonDeferred },
     };
 
     SECTION("can be used in std::unordered_set")

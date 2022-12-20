@@ -14,11 +14,11 @@
 using namespace uwb::protocol::fira;
 
 const std::initializer_list<RangingConfiguration> UwbCapability::RangingConfigurationsDefault = {
-    RangingConfiguration{ RangingMethod::OneWay, MeasurementReportMode::None },
-    RangingConfiguration{ RangingMethod::SingleSidedTwoWay, MeasurementReportMode::Deferred },
-    RangingConfiguration{ RangingMethod::DoubleSidedTwoWay, MeasurementReportMode::Deferred },
-    RangingConfiguration{ RangingMethod::SingleSidedTwoWay, MeasurementReportMode::NonDeferred },
-    RangingConfiguration{ RangingMethod::DoubleSidedTwoWay, MeasurementReportMode::NonDeferred },
+    RangingConfiguration{ RangingDirection::OneWay, MeasurementReportMode::None },
+    RangingConfiguration{ RangingDirection::SingleSidedTwoWay, MeasurementReportMode::Deferred },
+    RangingConfiguration{ RangingDirection::DoubleSidedTwoWay, MeasurementReportMode::Deferred },
+    RangingConfiguration{ RangingDirection::SingleSidedTwoWay, MeasurementReportMode::NonDeferred },
+    RangingConfiguration{ RangingDirection::DoubleSidedTwoWay, MeasurementReportMode::NonDeferred },
 };
 
 const std::unordered_map<MultiNodeMode, std::size_t> UwbCapability::MultiNodeModeBit = {
@@ -62,11 +62,11 @@ const std::unordered_map<RangingMode, std::size_t> UwbCapability::RangingModeBit
 };
 
 const std::unordered_map<RangingConfiguration, std::size_t> UwbCapability::RangingConfigurationBit = {
-    { { RangingMethod::OneWay, MeasurementReportMode::None }, 0 },
-    { { RangingMethod::SingleSidedTwoWay, MeasurementReportMode::Deferred }, 1 },
-    { { RangingMethod::DoubleSidedTwoWay, MeasurementReportMode::Deferred }, 2 },
-    { { RangingMethod::SingleSidedTwoWay, MeasurementReportMode::NonDeferred }, 3 },
-    { { RangingMethod::DoubleSidedTwoWay, MeasurementReportMode::NonDeferred }, 4 },
+    { { RangingDirection::OneWay, MeasurementReportMode::None }, 0 },
+    { { RangingDirection::SingleSidedTwoWay, MeasurementReportMode::Deferred }, 1 },
+    { { RangingDirection::DoubleSidedTwoWay, MeasurementReportMode::Deferred }, 2 },
+    { { RangingDirection::SingleSidedTwoWay, MeasurementReportMode::NonDeferred }, 3 },
+    { { RangingDirection::DoubleSidedTwoWay, MeasurementReportMode::NonDeferred }, 4 },
 };
 
 const std::unordered_map<ConvolutionalCodeConstraintLength, std::size_t> UwbCapability::ConvolutionalCodeConstraintLengthsBit = {

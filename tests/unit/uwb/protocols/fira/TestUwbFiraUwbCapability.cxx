@@ -52,8 +52,8 @@ constexpr auto RangingTimeStructsDefault = {
 };
 
 constexpr auto RangingConfigurationsDefault = {
-    RangingConfiguration{ RangingMethod::OneWay, MeasurementReportMode::None },
-    RangingConfiguration{ RangingMethod::SingleSidedTwoWay, MeasurementReportMode::Deferred },
+    RangingConfiguration{ RangingDirection::OneWay, MeasurementReportMode::None },
+    RangingConfiguration{ RangingDirection::SingleSidedTwoWay, MeasurementReportMode::Deferred },
 };
 
 constexpr auto ConvolutionalCodeConstraintLengthsDefault = {

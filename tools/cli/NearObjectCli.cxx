@@ -133,7 +133,7 @@ GetEnumTypeAndValue(const std::optional<EnumT>& value)
 }
 
 const std::unordered_map<std::string, uwb::protocol::fira::DeviceRole> DeviceRoleMap = populateMap<uwb::protocol::fira::DeviceRole>();
-const std::unordered_map<std::string, uwb::protocol::fira::RangingMethod> RangingMethodMap = populateMap<uwb::protocol::fira::RangingMethod>();
+const std::unordered_map<std::string, uwb::protocol::fira::RangingDirection> RangingMethodMap = populateMap<uwb::protocol::fira::RangingDirection>();
 const std::unordered_map<std::string, uwb::protocol::fira::MeasurementReportMode> MeasurementReportModeMap = populateMap<uwb::protocol::fira::MeasurementReportMode>();
 const std::unordered_map<std::string, uwb::protocol::fira::StsConfiguration> StsConfigurationMap = populateMap<uwb::protocol::fira::StsConfiguration>();
 const std::unordered_map<std::string, uwb::protocol::fira::MultiNodeMode> MultiNodeModeMap = populateMap<uwb::protocol::fira::MultiNodeMode>();

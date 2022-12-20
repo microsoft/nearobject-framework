@@ -18,12 +18,12 @@ struct RangingConfiguration
 {
     constexpr RangingConfiguration() = default;
 
-    constexpr RangingConfiguration(RangingMethod method, MeasurementReportMode reportMode) :
+    constexpr RangingConfiguration(RangingDirection method, MeasurementReportMode reportMode) :
         Method(method),
         ReportMode(reportMode)
     {}
 
-    RangingMethod Method{ RangingMethod::OneWay };
+    RangingDirection Method{ RangingDirection::OneWay };
     MeasurementReportMode ReportMode{ MeasurementReportMode::None };
 
     auto operator<=>(const RangingConfiguration& other) const = default;

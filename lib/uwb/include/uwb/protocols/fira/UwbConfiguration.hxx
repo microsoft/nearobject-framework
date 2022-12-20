@@ -83,7 +83,7 @@ struct UwbConfiguration
      * Table 53, pages 103-107.
      */
     static constexpr auto DeviceRoleDefault = DeviceRole::Responder;
-    static constexpr auto RangingConfigurationDefault = RangingConfiguration{ RangingMethod::DoubleSidedTwoWay, MeasurementReportMode::Deferred };
+    static constexpr auto RangingConfigurationDefault = RangingConfiguration{ RangingDirection::DoubleSidedTwoWay, MeasurementReportMode::Deferred };
     static constexpr auto StsConfigurationDefault = StsConfiguration::Static;
     static constexpr auto MultiNodeModeDefault = MultiNodeMode::Unicast;
     static constexpr auto RangingTimeStructDefault = RangingMode::Block;
