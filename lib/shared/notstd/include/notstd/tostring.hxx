@@ -13,7 +13,7 @@ namespace strings
 {
 namespace ostream_operators
 {
-namespace detail
+namespace value_providers 
 {
 struct empty_value_provider
 {
@@ -66,7 +66,7 @@ template <
     typename CharT,
     typename Traits,
     typename ElementT,
-    typename EmptyValueProviderT = detail::empty_value_provider>
+    typename EmptyValueProviderT = value_providers::empty_value_provider>
 requires std::is_member_function_pointer_v<decltype(&ElementT::ToString)>
 std::ostream&
 operator<<(std::basic_ostream<CharT, Traits>& stream, const std::optional<ElementT>& ref)

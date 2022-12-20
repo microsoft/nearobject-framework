@@ -20,6 +20,8 @@ struct NearObjectCliData
     std::string PhyVersionString;
     std::string ResultReportConfigurationString;
 
+    uwb::protocol::fira::StaticRangingInfo StaticRanging{};
+
     bool HostIsController{ false };
     uwb::protocol::fira::UwbSessionData SessionData{};
 };
