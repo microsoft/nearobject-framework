@@ -13,7 +13,7 @@ namespace uwb::protocol::fira
 class UwbConfiguration::Builder
 {
 public:
-    Builder() = default;
+    Builder();
 
     /**
      * @brief Operator which returns the built UwbConfiguration object as an
@@ -248,6 +248,7 @@ public:
 
 private:
     UwbConfiguration m_uwbConfiguration;
+    std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, std::any>& m_values;
 };
 
 } // namespace uwb::protocol::fira
