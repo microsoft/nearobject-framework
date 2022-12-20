@@ -83,7 +83,7 @@ struct UwbConfiguration
      * Table 53, pages 103-107.
      */
     static constexpr auto DeviceRoleDefault = DeviceRole::Responder;
-    static constexpr auto RangingConfigurationDefault = RangingConfiguration{ RangingDirection::DoubleSidedTwoWay, MeasurementReportMode::Deferred };
+    static constexpr auto RangingMethodDefault = RangingMethod{ RangingDirection::DoubleSidedTwoWay, MeasurementReportMode::Deferred };
     static constexpr auto StsConfigurationDefault = StsConfiguration::Static;
     static constexpr auto MultiNodeModeDefault = MultiNodeMode::Unicast;
     static constexpr auto RangingTimeStructDefault = RangingMode::Block;
@@ -157,8 +157,8 @@ struct UwbConfiguration
     std::optional<uwb::protocol::fira::DeviceRole>
     GetDeviceRole() const noexcept;
 
-    std::optional<uwb::protocol::fira::RangingConfiguration>
-    GetRangingConfiguration() const noexcept;
+    std::optional<uwb::protocol::fira::RangingMethod>
+    GetRangingMethod() const noexcept;
 
     std::optional<uwb::protocol::fira::StsConfiguration>
     GetStsConfiguration() const noexcept;
@@ -278,7 +278,7 @@ struct hash<uwb::protocol::fira::UwbConfiguration>
             uwbConfiguration.GetFiraPhyVersion(),
             uwbConfiguration.GetFiraMacVersion(),
             uwbConfiguration.GetDeviceRole(),
-            uwbConfiguration.GetRangingConfiguration(),
+            uwbConfiguration.GetRangingMethod(),
             uwbConfiguration.GetStsConfiguration(),
             uwbConfiguration.GetMultiNodeMode(),
             uwbConfiguration.GetRangingTimeStruct(),

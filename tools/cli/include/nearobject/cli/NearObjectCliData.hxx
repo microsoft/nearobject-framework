@@ -28,8 +28,8 @@ struct UwbConfigurationData
     std::optional<uint32_t> firaPhyVersion;
     std::optional<uint32_t> firaMacVersion;
     std::optional<uwb::protocol::fira::DeviceRole> deviceRole;
-    std::optional<uwb::protocol::fira::RangingDirection> rangingConfigurationMethod;
-    std::optional<uwb::protocol::fira::MeasurementReportMode> rangingConfigurationReportMode;
+    std::optional<uwb::protocol::fira::RangingDirection> rangingDirection;
+    std::optional<uwb::protocol::fira::MeasurementReportMode> rangingMeasurementReportMode;
     std::optional<uwb::protocol::fira::StsConfiguration> stsConfiguration;
     std::optional<uwb::protocol::fira::MultiNodeMode> multiNodeMode;
     std::optional<uwb::protocol::fira::RangingMode> rangingTimeStruct;

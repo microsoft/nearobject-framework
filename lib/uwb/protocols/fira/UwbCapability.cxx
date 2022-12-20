@@ -13,12 +13,12 @@
 
 using namespace uwb::protocol::fira;
 
-const std::initializer_list<RangingConfiguration> UwbCapability::RangingConfigurationsDefault = {
-    RangingConfiguration{ RangingDirection::OneWay, MeasurementReportMode::None },
-    RangingConfiguration{ RangingDirection::SingleSidedTwoWay, MeasurementReportMode::Deferred },
-    RangingConfiguration{ RangingDirection::DoubleSidedTwoWay, MeasurementReportMode::Deferred },
-    RangingConfiguration{ RangingDirection::SingleSidedTwoWay, MeasurementReportMode::NonDeferred },
-    RangingConfiguration{ RangingDirection::DoubleSidedTwoWay, MeasurementReportMode::NonDeferred },
+const std::initializer_list<RangingMethod> UwbCapability::RangingMethodsDefault = {
+    RangingMethod{ RangingDirection::OneWay, MeasurementReportMode::None },
+    RangingMethod{ RangingDirection::SingleSidedTwoWay, MeasurementReportMode::Deferred },
+    RangingMethod{ RangingDirection::DoubleSidedTwoWay, MeasurementReportMode::Deferred },
+    RangingMethod{ RangingDirection::SingleSidedTwoWay, MeasurementReportMode::NonDeferred },
+    RangingMethod{ RangingDirection::DoubleSidedTwoWay, MeasurementReportMode::NonDeferred },
 };
 
 const std::unordered_map<MultiNodeMode, std::size_t> UwbCapability::MultiNodeModeBit = {
@@ -61,7 +61,7 @@ const std::unordered_map<RangingMode, std::size_t> UwbCapability::RangingModeBit
     { RangingMode::Interval, 1 },
 };
 
-const std::unordered_map<RangingConfiguration, std::size_t> UwbCapability::RangingConfigurationBit = {
+const std::unordered_map<RangingMethod, std::size_t> UwbCapability::RangingMethodBit = {
     { { RangingDirection::OneWay, MeasurementReportMode::None }, 0 },
     { { RangingDirection::SingleSidedTwoWay, MeasurementReportMode::Deferred }, 1 },
     { { RangingDirection::DoubleSidedTwoWay, MeasurementReportMode::Deferred }, 2 },
@@ -310,7 +310,7 @@ UwbCapability::ToOobDataObject() const
     }
 
     ToOobDataObjectHelper(builder, childbuilder, notstd::to_underlying(ParameterTag::DeviceRoles), DeviceRoles, UwbCapability::DeviceRoleBit, 1);
-    ToOobDataObjectHelper(builder, childbuilder, notstd::to_underlying(ParameterTag::RangingMethod), RangingConfigurations, UwbCapability::RangingConfigurationBit, 1);
+    ToOobDataObjectHelper(builder, childbuilder, notstd::to_underlying(ParameterTag::RangingMethod), RangingMethods, UwbCapability::RangingMethodBit, 1);
     ToOobDataObjectHelper(builder, childbuilder, notstd::to_underlying(ParameterTag::StsConfig), StsConfigurations, UwbCapability::StsConfigurationBit, 1);
     ToOobDataObjectHelper(builder, childbuilder, notstd::to_underlying(ParameterTag::MultiNodeMode), MultiNodeModes, UwbCapability::MultiNodeModeBit, 1);
     ToOobDataObjectHelper(builder, childbuilder, notstd::to_underlying(ParameterTag::RangingMode), RangingTimeStructs, UwbCapability::RangingModeBit, 1);
@@ -413,7 +413,7 @@ UwbCapability::FromOobDataObject(const encoding::TlvBer& tlv)
             if (object.GetValue().size() != 1) {
                 throw UwbCapability::IncorrectNumberOfBytesInValueError();
             }
-            uwbCapability.RangingConfigurations = AssignValuesFromBytes(UwbCapability::RangingConfigurationBit, object.GetValue());
+            uwbCapability.RangingMethods = AssignValuesFromBytes(UwbCapability::RangingMethodBit, object.GetValue());
             break;
         }
         case ParameterTag::StsConfig: {
@@ -563,7 +563,7 @@ uwb::protocol::fira::operator==(const UwbCapability& lhs, const UwbCapability& r
         && haveSameContents(lhs.AngleOfArrivalTypes, rhs.AngleOfArrivalTypes)
         && haveSameContents(lhs.SchedulingModes, rhs.SchedulingModes)
         && haveSameContents(lhs.RangingTimeStructs, rhs.RangingTimeStructs)
-        && haveSameContents(lhs.RangingConfigurations, rhs.RangingConfigurations)
+        && haveSameContents(lhs.RangingMethods, rhs.RangingMethods)
         && haveSameContents(lhs.ConvolutionalCodeConstraintLengths, rhs.ConvolutionalCodeConstraintLengths)
         && haveSameContents(lhs.Channels, rhs.Channels)
         && haveSameContents(lhs.BprfParameterSets, rhs.BprfParameterSets)

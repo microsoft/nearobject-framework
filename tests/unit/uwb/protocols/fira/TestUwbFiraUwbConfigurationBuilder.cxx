@@ -15,7 +15,7 @@ constexpr uint32_t FiraVersionMacValue{ 0x1234ABCD };
 constexpr uint32_t FiraVersionPhyValue{ 0xDCBA4321 };
 constexpr Channel ChannelValue{ uwb::protocol::fira::Channel::C10 };
 constexpr DeviceRole DeviceRoleValue{ DeviceRole::Initiator };
-constexpr RangingConfiguration RangingConfigurationValue{ RangingDirection::OneWay, MeasurementReportMode::Deferred };
+constexpr RangingMethod RangingMethodValue{ RangingDirection::OneWay, MeasurementReportMode::Deferred };
 constexpr StsConfiguration StsConfigurationValue{ StsConfiguration::Static };
 constexpr MultiNodeMode MultiNodeModeValue{ MultiNodeMode::Unicast };
 constexpr RangingMode RangingTimeStructValue{ RangingMode::Block };
@@ -59,7 +59,7 @@ TEST_CASE("uwb configuration objects can be created with builder", "[basic]")
                     .Mac(test::FiraVersionMacValue)
                     .Phy(test::FiraVersionPhyValue)
                 .DeviceRole(test::DeviceRoleValue)
-                .RangingConfiguration(test::RangingConfigurationValue)
+                .RangingMethod(test::RangingMethodValue)
                 .StsConfiguration(test::StsConfigurationValue)
                 .MultiNodeMode(test::MultiNodeModeValue)
                 .RangingTimeStruct(test::RangingTimeStructValue)
@@ -98,7 +98,7 @@ TEST_CASE("uwb configuration objects can be created with builder", "[basic]")
             REQUIRE(uwbConfiguration.GetFiraMacVersion() == test::FiraVersionMacValue);
             REQUIRE(uwbConfiguration.GetFiraPhyVersion() == test::FiraVersionPhyValue);
             REQUIRE(uwbConfiguration.GetDeviceRole() == test::DeviceRoleValue);
-            REQUIRE(uwbConfiguration.GetRangingConfiguration() == test::RangingConfigurationValue);
+            REQUIRE(uwbConfiguration.GetRangingMethod() == test::RangingMethodValue);
             REQUIRE(uwbConfiguration.GetStsConfiguration() == test::StsConfigurationValue);
             REQUIRE(uwbConfiguration.GetMultiNodeMode() == test::MultiNodeModeValue);
             REQUIRE(uwbConfiguration.GetRangingTimeStruct() == test::RangingTimeStructValue);

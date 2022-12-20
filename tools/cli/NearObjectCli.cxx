@@ -186,8 +186,8 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     // TODO is there a way to put all the enums into a list of [optionName, optionDestination, optionMap] so we don't have to create the initializer list each time
     // TODO get rid of these strings, instead use a macro to extract the enum name
     rangeStartApp->add_option("--DeviceRole", uwbConfig.deviceRole)->transform(CLI::CheckedTransformer(detail::DeviceRoleMap))->capture_default_str();
-    rangeStartApp->add_option("--RangingMethod", uwbConfig.rangingConfigurationMethod)->transform(CLI::CheckedTransformer(detail::RangingMethodMap))->capture_default_str();
-    rangeStartApp->add_option("--MeasurementReportMode", uwbConfig.rangingConfigurationReportMode)->transform(CLI::CheckedTransformer(detail::MeasurementReportModeMap))->capture_default_str();
+    rangeStartApp->add_option("--RangingMethod", uwbConfig.rangingDirection)->transform(CLI::CheckedTransformer(detail::RangingMethodMap))->capture_default_str();
+    rangeStartApp->add_option("--MeasurementReportMode", uwbConfig.rangingMeasurementReportMode)->transform(CLI::CheckedTransformer(detail::MeasurementReportModeMap))->capture_default_str();
     rangeStartApp->add_option("--StsConfiguration", uwbConfig.stsConfiguration)->transform(CLI::CheckedTransformer(detail::StsConfigurationMap))->capture_default_str();
     rangeStartApp->add_option("--MultiNodeMode", uwbConfig.multiNodeMode)->transform(CLI::CheckedTransformer(detail::MultiNodeModeMap))->capture_default_str();
     rangeStartApp->add_option("--RangingMode", uwbConfig.rangingTimeStruct)->transform(CLI::CheckedTransformer(detail::RangingModeMap))->capture_default_str();
@@ -231,8 +231,8 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
         for (const auto& [optionName, optionSelected] :
             std::initializer_list<std::tuple<std::string_view, std::string_view>>{
                 detail::GetEnumTypeAndValue(uwbConfig.deviceRole),
-                detail::GetEnumTypeAndValue(uwbConfig.rangingConfigurationMethod),
-                detail::GetEnumTypeAndValue(uwbConfig.rangingConfigurationReportMode),
+                detail::GetEnumTypeAndValue(uwbConfig.rangingDirection),
+                detail::GetEnumTypeAndValue(uwbConfig.rangingMeasurementReportMode),
                 detail::GetEnumTypeAndValue(uwbConfig.stsConfiguration),
                 detail::GetEnumTypeAndValue(uwbConfig.multiNodeMode),
                 detail::GetEnumTypeAndValue(uwbConfig.rangingTimeStruct),

@@ -54,8 +54,8 @@ FromUwbCx(const UWB_DEVICE_CAPABILITIES& uwbDeviceCapabilities)
         switch (capability.paramType) {
         case UWB_CAPABILITY_PARAM_TYPE_RANGING_METHOD: {
             const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
-            std::bitset<4> rangingConfigurations{ value };
-            detail::ProcessSupportFromBitset(fira::UwbCapability::RangingConfigurationBit, rangingConfigurations, uwbCapability.RangingConfigurations);
+            std::bitset<4> rangingMethods{ value };
+            detail::ProcessSupportFromBitset(fira::UwbCapability::RangingMethodBit, rangingMethods, uwbCapability.RangingMethods);
             break;
         }
         case UWB_CAPABILITY_PARAM_TYPE_DEVICE_ROLES: {

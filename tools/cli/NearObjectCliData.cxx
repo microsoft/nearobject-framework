@@ -19,8 +19,8 @@ UwbConfigurationData::ToUwbConfiguration() const
     if (deviceRole.has_value()) {
         builder.SetDeviceRole(deviceRole.value());
     }
-    if (rangingConfigurationMethod.has_value() && rangingConfigurationReportMode.has_value()) {
-        builder.SetRangingConfiguration({ rangingConfigurationMethod.value(), rangingConfigurationReportMode.value()});
+    if (rangingDirection.has_value() && rangingMeasurementReportMode.has_value()) {
+        builder.SetRangingMethod({ rangingDirection.value(), rangingMeasurementReportMode.value()});
     }
     if (stsConfiguration.has_value()) {
         builder.SetStsConfiguration(stsConfiguration.value());

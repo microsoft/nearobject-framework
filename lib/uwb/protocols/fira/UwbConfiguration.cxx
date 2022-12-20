@@ -50,10 +50,10 @@ UwbConfiguration::GetDeviceRole() const noexcept
     return GetValue<DeviceRole>(ParameterTag::DeviceRole);
 }
 
-std::optional<RangingConfiguration>
-UwbConfiguration::GetRangingConfiguration() const noexcept
+std::optional<RangingMethod>
+UwbConfiguration::GetRangingMethod() const noexcept
 {
-    return GetValue<RangingConfiguration>(ParameterTag::RangingMethod);
+    return GetValue<RangingMethod>(ParameterTag::RangingMethod);
 }
 
 std::optional<StsConfiguration>
@@ -228,7 +228,7 @@ UwbConfiguration::operator==(const UwbConfiguration& other) const noexcept
         GetFiraPhyVersion() == other.GetFiraPhyVersion() &&
         GetFiraMacVersion() == other.GetFiraMacVersion() &&
         GetDeviceRole() == GetDeviceRole() &&
-        GetRangingConfiguration() == other.GetRangingConfiguration() &&
+        GetRangingMethod() == other.GetRangingMethod() &&
         GetStsConfiguration() == other.GetStsConfiguration() &&
         GetMultiNodeMode() == other.GetMultiNodeMode() &&
         GetRangingTimeStruct() == other.GetRangingTimeStruct() &&

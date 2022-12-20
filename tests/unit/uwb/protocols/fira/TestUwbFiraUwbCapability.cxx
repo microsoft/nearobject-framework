@@ -51,9 +51,9 @@ constexpr auto RangingTimeStructsDefault = {
     RangingMode::Block,
 };
 
-constexpr auto RangingConfigurationsDefault = {
-    RangingConfiguration{ RangingDirection::OneWay, MeasurementReportMode::None },
-    RangingConfiguration{ RangingDirection::SingleSidedTwoWay, MeasurementReportMode::Deferred },
+constexpr auto RangingMethodsDefault = {
+    RangingMethod{ RangingDirection::OneWay, MeasurementReportMode::None },
+    RangingMethod{ RangingDirection::SingleSidedTwoWay, MeasurementReportMode::Deferred },
 };
 
 constexpr auto ConvolutionalCodeConstraintLengthsDefault = {
@@ -132,7 +132,7 @@ const UwbCapability
         AngleOfArrivalTypesDefault,
         SchedulingModeTypesDefault,
         RangingTimeStructsDefault,
-        RangingConfigurationsDefault,
+        RangingMethodsDefault,
         ConvolutionalCodeConstraintLengthsDefault,
         ChannelsDefault,
         BprfParameterSetsDefault,
@@ -238,7 +238,7 @@ TEST_CASE("Parsing from TlvBer", "[basic][protocol]")
         REQUIRE(decodedCapability.FiraPhyVersionRange == TestUwbCapability::testUwbCapability.FiraPhyVersionRange);
         REQUIRE(decodedCapability.FiraMacVersionRange == TestUwbCapability::testUwbCapability.FiraMacVersionRange);
         REQUIRE(leftUnorderedEquals(decodedCapability.DeviceRoles, TestUwbCapability::testUwbCapability.DeviceRoles));
-        REQUIRE(leftUnorderedEquals(decodedCapability.RangingConfigurations, TestUwbCapability::testUwbCapability.RangingConfigurations));
+        REQUIRE(leftUnorderedEquals(decodedCapability.RangingMethods, TestUwbCapability::testUwbCapability.RangingMethods));
         REQUIRE(leftUnorderedEquals(decodedCapability.StsConfigurations, TestUwbCapability::testUwbCapability.StsConfigurations));
         REQUIRE(leftUnorderedEquals(decodedCapability.MultiNodeModes, TestUwbCapability::testUwbCapability.MultiNodeModes));
         REQUIRE(leftUnorderedEquals(decodedCapability.RangingTimeStructs, TestUwbCapability::testUwbCapability.RangingTimeStructs));

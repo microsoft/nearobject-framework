@@ -180,7 +180,7 @@ struct UwbCapability
         HprfParameter::Set35,
     };
 
-    static const std::initializer_list<RangingConfiguration> RangingConfigurationsDefault;
+    static const std::initializer_list<RangingMethod> RangingMethodsDefault;
 
     static const std::unordered_map<MultiNodeMode, std::size_t> MultiNodeModeBit;
     static const std::unordered_map<DeviceRole, std::size_t> DeviceRoleBit;
@@ -189,7 +189,7 @@ struct UwbCapability
     static const std::unordered_map<AngleOfArrival, std::size_t> AngleOfArrivalBit;
     static const std::unordered_map<SchedulingMode, std::size_t> SchedulingModeBit;
     static const std::unordered_map<RangingMode, std::size_t> RangingModeBit;
-    static const std::unordered_map<RangingConfiguration, std::size_t> RangingConfigurationBit;
+    static const std::unordered_map<RangingMethod, std::size_t> RangingMethodBit;
     static const std::unordered_map<ConvolutionalCodeConstraintLength, std::size_t> ConvolutionalCodeConstraintLengthsBit;
     static const std::unordered_map<Channel, std::size_t> ChannelsBit;
     static const std::unordered_map<BprfParameter, std::size_t> BprfParameterSetsBit;
@@ -212,7 +212,7 @@ struct UwbCapability
     std::vector<AngleOfArrival> AngleOfArrivalTypes{ AngleOfArrivalTypesDefault };
     std::vector<SchedulingMode> SchedulingModes{ SchedulingModeTypesDefault };
     std::vector<RangingMode> RangingTimeStructs{ RangingTimeStructsDefault };
-    std::vector<RangingConfiguration> RangingConfigurations{ RangingConfigurationsDefault };
+    std::vector<RangingMethod> RangingMethods{ RangingMethodsDefault };
     std::vector<ConvolutionalCodeConstraintLength> ConvolutionalCodeConstraintLengths{ ConvolutionalCodeConstraintLengthsDefault };
     std::vector<Channel> Channels{ ChannelsDefault };
     std::vector<BprfParameter> BprfParameterSets{ BprfParameterSetsDefault };
@@ -260,7 +260,7 @@ struct hash<uwb::protocol::fira::UwbCapability>
             uwbCapability.AngleOfArrivalFom,
             uwbCapability.BlockStriding,
             uwbCapability.HoppingMode,
-            notstd::hash_range(std::cbegin(uwbCapability.RangingConfigurations), std::cend(uwbCapability.RangingConfigurations)),
+            notstd::hash_range(std::cbegin(uwbCapability.RangingMethods), std::cend(uwbCapability.RangingMethods)),
             notstd::hash_range(std::cbegin(uwbCapability.MultiNodeModes), std::cend(uwbCapability.MultiNodeModes)),
             notstd::hash_range(std::cbegin(uwbCapability.DeviceRoles), std::cend(uwbCapability.DeviceRoles)),
             notstd::hash_range(std::cbegin(uwbCapability.StsConfigurations), std::cend(uwbCapability.StsConfigurations)),
