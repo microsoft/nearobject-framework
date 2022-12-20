@@ -106,12 +106,6 @@ struct UwbConfiguration
     static const std::unordered_set<ResultReportConfiguration> ResultReportConfigurationsDefault;
 
     /**
-     * @brief Construct UwbConfiguration object with default values and settings.
-     * TODO: make this c'tor private once refactoring is complete.
-     */
-    UwbConfiguration() = default;
-
-    /**
      * @brief Creates a new UwbConfiguration builder object.
      * 
      * @return UwbConfiguration::Builder 
