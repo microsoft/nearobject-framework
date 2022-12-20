@@ -119,17 +119,16 @@ TEST_CASE("uwb configuration objects can be created with builder", "[basic]")
             REQUIRE(uwbConfiguration.GetSlotDuration() == test::SlotDurationValue);
             REQUIRE(uwbConfiguration.GetRangingInterval() == test::RangingIntervalValue);
             REQUIRE(uwbConfiguration.GetKeyRotationRate() == test::KeyRotationRateValue);
-            REQUIRE(uwbConfiguration.GetResultReportConfigurations().has_value());
             REQUIRE(uwbConfiguration.GetMaxContentionPhaseLength() == test::MaxContentionPhaseLengthValue);
             REQUIRE(uwbConfiguration.GetMaxRangingRoundRetry() == test::MaxRangingRoundRetryValue);
             REQUIRE(uwbConfiguration.GetHoppingMode() == test::HoppingModeValue);
             REQUIRE(uwbConfiguration.GetBlockStriding() == test::BlockStridingValue);
 
             const auto resultReportConfigurations = uwbConfiguration.GetResultReportConfigurations();
-            REQUIRE(resultReportConfigurations.has_value());
-            REQUIRE(resultReportConfigurations->contains(test::ResultReportConfigurationValue1));
-            REQUIRE(resultReportConfigurations->contains(test::ResultReportConfigurationValue2));
-            REQUIRE(resultReportConfigurations->contains(test::ResultReportConfigurationValue3));
-            REQUIRE(resultReportConfigurations->contains(test::ResultReportConfigurationValue4));
+            REQUIRE(resultReportConfigurations.size() == 4);
+            REQUIRE(resultReportConfigurations.contains(test::ResultReportConfigurationValue1));
+            REQUIRE(resultReportConfigurations.contains(test::ResultReportConfigurationValue2));
+            REQUIRE(resultReportConfigurations.contains(test::ResultReportConfigurationValue3));
+            REQUIRE(resultReportConfigurations.contains(test::ResultReportConfigurationValue4));
     }
 }
