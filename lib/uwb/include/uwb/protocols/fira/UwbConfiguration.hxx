@@ -2,6 +2,7 @@
 #ifndef UWB_CONFIGURATION_HXX
 #define UWB_CONFIGURATION_HXX
 
+#include <any>
 #include <compare>
 #include <cstdint>
 #include <functional>
@@ -126,7 +127,7 @@ struct UwbConfiguration
      * @return false
      */
     bool
-    operator==(const UwbConfiguration& other) const noexcept = default;
+    operator==(const UwbConfiguration& other) const noexcept;
 
     /**
      * @brief Convert this object into a FiRa Data Object (DO).
@@ -175,6 +176,14 @@ struct UwbConfiguration
     uint8_t _keyRotationRate{ KeyRotationRateDefault };
     UwbMacAddressFcsType _macAddressFcsType{ MacFcsTypeDefault };
     uint16_t _maxRangingRoundRetry{ MaxRrRetryDefault };
+
+    /**
+     * @brief The map of parameter tags and their values from the configuration object.
+     * 
+     * @return const std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, std::any>& 
+     */
+    const std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, std::any>& 
+    GetValueMap() const noexcept;
 
     std::optional<uint32_t>
     GetFiraPhyVersion() const noexcept;
@@ -297,6 +306,8 @@ private:
     std::optional<uint8_t> m_keyRotationRate;
     std::optional<uwb::UwbMacAddressFcsType> m_macAddressFcsType;
     std::optional<uint16_t> m_maxRangingRoundRetry;
+
+    std::unordered_map<ParameterTag, std::any> m_values{};
 };
 
 } // namespace uwb::protocol::fira

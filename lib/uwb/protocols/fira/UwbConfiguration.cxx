@@ -210,3 +210,16 @@ UwbConfiguration::GetMaxRangingRoundRetry() const noexcept
 {
     return m_maxRangingRoundRetry;
 }
+
+const std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, std::any>& 
+UwbConfiguration::GetValueMap() const noexcept
+{
+    return m_values;
+}
+
+bool
+UwbConfiguration::operator==(const UwbConfiguration& /* other */) const noexcept
+{
+    // TODO
+    return false;
+}
