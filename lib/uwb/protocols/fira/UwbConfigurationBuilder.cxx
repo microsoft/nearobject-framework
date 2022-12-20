@@ -68,7 +68,7 @@ UwbConfiguration::Builder::Mac(uint32_t firaMacVersion) noexcept
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetRangingConfiguration(uwb::protocol::fira::RangingConfiguration rangingConfiguration) noexcept
 {
-    m_values[ParameterTag::RangingMethod] = rangingConfiguration; // TODO: this is probably wrong
+    m_values[ParameterTag::RangingMethod] = rangingConfiguration;
     return *this;
 }
 
