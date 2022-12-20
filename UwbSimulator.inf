@@ -8,14 +8,14 @@ Class=Proximity
 ClassGuid={5630831C-06C9-4856-B327-F5D32586E060}
 Provider=%ManufacturerName%
 CatalogFile=UwbSimulator.cat
-DriverVer= ; TODO: set DriverVer in stampinf property pages
+DriverVer=12/20/2022,0.1.0.0
 PnpLockdown=1
 
 [Manufacturer]
 %ManufacturerName%=Standard,NT$ARCH$
 
 [Standard.NT$ARCH$]
-%DeviceName%=MyDevice_Install, Root\UwbSimulator ; TODO: edit hw-id
+%DeviceName%=MyDevice_Install, Root\UwbSimulator
 
 [SourceDisksFiles]
 UwbSimulator.dll=1
@@ -63,7 +63,7 @@ UwbSimulator.dll
 ; =================== Generic ==================================
 
 [Strings]
-ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
-DiskName = "UwbSimulator Installation Disk"
+ManufacturerName="Windows Near Object Team"
+DiskName = "Uwb Simulator Installation Media"
 WudfRdDisplayName="Windows Driver Foundation - User-mode Driver Framework Reflector"
 DeviceName="Uwb Simulator"
