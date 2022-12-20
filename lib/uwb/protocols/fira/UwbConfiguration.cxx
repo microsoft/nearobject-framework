@@ -1,4 +1,5 @@
 
+#include <tuple>
 #include <stdexcept>
 
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
@@ -221,8 +222,37 @@ UwbConfiguration::GetValueMap() const noexcept
 }
 
 bool
-UwbConfiguration::operator==(const UwbConfiguration& /* other */) const noexcept
+UwbConfiguration::operator==(const UwbConfiguration& other) const noexcept
 {
-    // TODO
-    return false;
+    return 
+        GetFiraPhyVersion() == other.GetFiraPhyVersion() &&
+        GetFiraMacVersion() == other.GetFiraMacVersion() &&
+        GetDeviceRole() == GetDeviceRole() &&
+        GetRangingConfiguration() == other.GetRangingConfiguration() &&
+        GetStsConfiguration() == other.GetStsConfiguration() &&
+        GetMultiNodeMode() == other.GetMultiNodeMode() &&
+        GetRangingTimeStruct() == other.GetRangingTimeStruct() &&
+        GetSchedulingMode() == other.GetSchedulingMode() &&
+        GetHoppingMode() == other.GetHoppingMode() &&
+        GetBlockStriding() == other.GetBlockStriding() &&
+        GetUwbInitiationTime()== other.GetUwbInitiationTime() &&
+        GetChannel() == other.GetChannel() &&
+        GetRFrameConfig() == other.GetRFrameConfig() &&
+        GetConvolutionalCodeConstraintLength() == other.GetConvolutionalCodeConstraintLength() &&
+        GetPrfMode() == other.GetPrfMode() &&
+        GetSp0PhySetNumber() == other.GetSp0PhySetNumber() &&
+        GetSp1PhySetNumber() == other.GetSp1PhySetNumber() &&
+        GetSp3PhySetNumber() == other.GetSp3PhySetNumber() &&
+        GetPreableCodeIndex() == other.GetPreableCodeIndex() &&
+        GetResultReportConfigurations() == other.GetResultReportConfigurations() &&
+        GetMacAddressMode() == other.GetMacAddressMode() &&
+        GetControleeShortMacAddress() == other.GetControleeShortMacAddress() &&
+        GetControllerMacAddress() == other.GetControllerMacAddress() &&
+        GetSlotsPerRangingRound() == other.GetSlotsPerRangingRound() &&
+        GetMaxContentionPhaseLength() == other.GetMaxContentionPhaseLength() &&
+        GetSlotDuration() == other.GetSlotDuration() &&
+        GetRangingInterval() == other.GetRangingInterval() &&
+        GetKeyRotationRate() == other.GetKeyRotationRate() &&
+        GetMacAddressFcsType() == other.GetMacAddressFcsType() &&
+        GetMaxRangingRoundRetry() == other.GetMaxRangingRoundRetry();
 }
