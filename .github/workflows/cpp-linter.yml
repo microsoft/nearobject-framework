@@ -17,6 +17,6 @@ jobs:
           style: file
           lines-changed-only: true
 
-      - name: Fail fast?!
+      - name: Compliance check
         if: steps.linter.outputs.checks-failed > 0
         run: exit 1
