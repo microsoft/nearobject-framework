@@ -273,6 +273,7 @@ struct hash<uwb::protocol::fira::UwbConfiguration>
     operator()(const uwb::protocol::fira::UwbConfiguration& uwbConfiguration) const noexcept
     {
         std::size_t value = 0;
+        auto resultReportConfigurations = uwbConfiguration.GetResultReportConfigurations();
         notstd::hash_combine(value,
             uwbConfiguration.GetFiraPhyVersion(),
             uwbConfiguration.GetFiraMacVersion(),
@@ -293,7 +294,7 @@ struct hash<uwb::protocol::fira::UwbConfiguration>
             uwbConfiguration.GetSp1PhySetNumber(),
             uwbConfiguration.GetSp3PhySetNumber(),
             uwbConfiguration.GetPreableCodeIndex(),
-            notstd::hash_range(std::cbegin(uwbConfiguration.GetResultReportConfigurations()), std::cend(uwbConfiguration.GetResultReportConfigurations())),
+            notstd::hash_range(std::cbegin(resultReportConfigurations), std::cend(resultReportConfigurations)),
             uwbConfiguration.GetMacAddressMode(),
             uwbConfiguration.GetControleeShortMacAddress(),
             uwbConfiguration.GetControllerMacAddress(),
