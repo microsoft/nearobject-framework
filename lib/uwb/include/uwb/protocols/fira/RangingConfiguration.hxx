@@ -26,7 +26,8 @@ struct RangingMethod
     RangingDirection Method{ RangingDirection::OneWay };
     MeasurementReportMode ReportMode{ MeasurementReportMode::None };
 
-    auto operator<=>(const RangingMethod& other) const = default;
+    auto
+    operator<=>(const RangingMethod& other) const = default;
 };
 
 } // namespace uwb::protocol::fira
