@@ -3,8 +3,8 @@
 
 #include <cstdint>
 #include <initializer_list>
-#include <unordered_set>
 #include <unordered_map>
+#include <unordered_set>
 
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
 #include <uwb/protocols/fira/UwbConfigurationBuilder.hxx>
@@ -52,6 +52,7 @@ TEST_CASE("uwb configuration objects can be created with builder", "[basic]")
 
     SECTION("created object reflects values provided to builder")
     {
+        // clang-format off
         UwbConfiguration uwbConfiguration = UwbConfiguration::Create()
             .OnChannel(test::ChannelValue)
             .With()
@@ -93,42 +94,43 @@ TEST_CASE("uwb configuration objects can be created with builder", "[basic]")
             .SetHoppingMode(test::HoppingModeValue)
             .SetBlockStriding(test::BlockStridingValue)
                 ;
+        // clang-format on
 
-            REQUIRE(uwbConfiguration.GetChannel() == test::ChannelValue);
-            REQUIRE(uwbConfiguration.GetFiraMacVersion() == test::FiraVersionMacValue);
-            REQUIRE(uwbConfiguration.GetFiraPhyVersion() == test::FiraVersionPhyValue);
-            REQUIRE(uwbConfiguration.GetDeviceRole() == test::DeviceRoleValue);
-            REQUIRE(uwbConfiguration.GetRangingMethod() == test::RangingMethodValue);
-            REQUIRE(uwbConfiguration.GetStsConfiguration() == test::StsConfigurationValue);
-            REQUIRE(uwbConfiguration.GetMultiNodeMode() == test::MultiNodeModeValue);
-            REQUIRE(uwbConfiguration.GetRangingTimeStruct() == test::RangingTimeStructValue);
-            REQUIRE(uwbConfiguration.GetSchedulingMode() == test::SchedulingModeValue);
-            REQUIRE(uwbConfiguration.GetUwbInitiationTime() == test::UwbInitiationTimeValue);
-            REQUIRE(uwbConfiguration.GetRFrameConfig() == test::StsPacketConfigurationValue);
-            REQUIRE(uwbConfiguration.GetConvolutionalCodeConstraintLength() == test::ConvolutionalCodeConstraintLengthValue);
-            REQUIRE(uwbConfiguration.GetPrfMode() == test::PrfModeValue);
-            REQUIRE(uwbConfiguration.GetSp0PhySetNumber() == test::Sp0Value);
-            REQUIRE(uwbConfiguration.GetSp1PhySetNumber() == test::Sp1Value);
-            REQUIRE(uwbConfiguration.GetSp3PhySetNumber() == test::Sp3Value);
-            REQUIRE(uwbConfiguration.GetPreableCodeIndex() == test::PreableCodeIndexValue);
-            REQUIRE(uwbConfiguration.GetMacAddressMode() == test::UwbMacAddressTypeValue);
-            REQUIRE(uwbConfiguration.GetMacAddressFcsType() == test::UwbMacAddressFcsTypeValue);
-            REQUIRE(uwbConfiguration.GetControleeShortMacAddress() == test::UwbMacAddressControleeShortValue);
-            REQUIRE(uwbConfiguration.GetControllerMacAddress() == test::UwbMacAddressControllerValue);
-            REQUIRE(uwbConfiguration.GetSlotsPerRangingRound() == test::SlotsPerRangingRoundValue);
-            REQUIRE(uwbConfiguration.GetSlotDuration() == test::SlotDurationValue);
-            REQUIRE(uwbConfiguration.GetRangingInterval() == test::RangingIntervalValue);
-            REQUIRE(uwbConfiguration.GetKeyRotationRate() == test::KeyRotationRateValue);
-            REQUIRE(uwbConfiguration.GetMaxContentionPhaseLength() == test::MaxContentionPhaseLengthValue);
-            REQUIRE(uwbConfiguration.GetMaxRangingRoundRetry() == test::MaxRangingRoundRetryValue);
-            REQUIRE(uwbConfiguration.GetHoppingMode() == test::HoppingModeValue);
-            REQUIRE(uwbConfiguration.GetBlockStriding() == test::BlockStridingValue);
+        REQUIRE(uwbConfiguration.GetChannel() == test::ChannelValue);
+        REQUIRE(uwbConfiguration.GetFiraMacVersion() == test::FiraVersionMacValue);
+        REQUIRE(uwbConfiguration.GetFiraPhyVersion() == test::FiraVersionPhyValue);
+        REQUIRE(uwbConfiguration.GetDeviceRole() == test::DeviceRoleValue);
+        REQUIRE(uwbConfiguration.GetRangingMethod() == test::RangingMethodValue);
+        REQUIRE(uwbConfiguration.GetStsConfiguration() == test::StsConfigurationValue);
+        REQUIRE(uwbConfiguration.GetMultiNodeMode() == test::MultiNodeModeValue);
+        REQUIRE(uwbConfiguration.GetRangingTimeStruct() == test::RangingTimeStructValue);
+        REQUIRE(uwbConfiguration.GetSchedulingMode() == test::SchedulingModeValue);
+        REQUIRE(uwbConfiguration.GetUwbInitiationTime() == test::UwbInitiationTimeValue);
+        REQUIRE(uwbConfiguration.GetRFrameConfig() == test::StsPacketConfigurationValue);
+        REQUIRE(uwbConfiguration.GetConvolutionalCodeConstraintLength() == test::ConvolutionalCodeConstraintLengthValue);
+        REQUIRE(uwbConfiguration.GetPrfMode() == test::PrfModeValue);
+        REQUIRE(uwbConfiguration.GetSp0PhySetNumber() == test::Sp0Value);
+        REQUIRE(uwbConfiguration.GetSp1PhySetNumber() == test::Sp1Value);
+        REQUIRE(uwbConfiguration.GetSp3PhySetNumber() == test::Sp3Value);
+        REQUIRE(uwbConfiguration.GetPreableCodeIndex() == test::PreableCodeIndexValue);
+        REQUIRE(uwbConfiguration.GetMacAddressMode() == test::UwbMacAddressTypeValue);
+        REQUIRE(uwbConfiguration.GetMacAddressFcsType() == test::UwbMacAddressFcsTypeValue);
+        REQUIRE(uwbConfiguration.GetControleeShortMacAddress() == test::UwbMacAddressControleeShortValue);
+        REQUIRE(uwbConfiguration.GetControllerMacAddress() == test::UwbMacAddressControllerValue);
+        REQUIRE(uwbConfiguration.GetSlotsPerRangingRound() == test::SlotsPerRangingRoundValue);
+        REQUIRE(uwbConfiguration.GetSlotDuration() == test::SlotDurationValue);
+        REQUIRE(uwbConfiguration.GetRangingInterval() == test::RangingIntervalValue);
+        REQUIRE(uwbConfiguration.GetKeyRotationRate() == test::KeyRotationRateValue);
+        REQUIRE(uwbConfiguration.GetMaxContentionPhaseLength() == test::MaxContentionPhaseLengthValue);
+        REQUIRE(uwbConfiguration.GetMaxRangingRoundRetry() == test::MaxRangingRoundRetryValue);
+        REQUIRE(uwbConfiguration.GetHoppingMode() == test::HoppingModeValue);
+        REQUIRE(uwbConfiguration.GetBlockStriding() == test::BlockStridingValue);
 
-            const auto resultReportConfigurations = uwbConfiguration.GetResultReportConfigurations();
-            REQUIRE(resultReportConfigurations.size() == 4);
-            REQUIRE(resultReportConfigurations.contains(test::ResultReportConfigurationValue1));
-            REQUIRE(resultReportConfigurations.contains(test::ResultReportConfigurationValue2));
-            REQUIRE(resultReportConfigurations.contains(test::ResultReportConfigurationValue3));
-            REQUIRE(resultReportConfigurations.contains(test::ResultReportConfigurationValue4));
+        const auto resultReportConfigurations = uwbConfiguration.GetResultReportConfigurations();
+        REQUIRE(resultReportConfigurations.size() == 4);
+        REQUIRE(resultReportConfigurations.contains(test::ResultReportConfigurationValue1));
+        REQUIRE(resultReportConfigurations.contains(test::ResultReportConfigurationValue2));
+        REQUIRE(resultReportConfigurations.contains(test::ResultReportConfigurationValue3));
+        REQUIRE(resultReportConfigurations.contains(test::ResultReportConfigurationValue4));
     }
 }

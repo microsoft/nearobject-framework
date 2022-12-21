@@ -555,6 +555,7 @@ uwb::protocol::fira::operator==(const UwbCapability& lhs, const UwbCapability& r
         std::tie(lhs.FiraPhyVersionRange, lhs.FiraMacVersionRange, lhs.ExtendedMacAddress, lhs.UwbInitiationTime, lhs.AngleOfArrivalFom, lhs.BlockStriding, lhs.HoppingMode) ==
         std::tie(rhs.FiraPhyVersionRange, rhs.FiraMacVersionRange, rhs.ExtendedMacAddress, rhs.UwbInitiationTime, rhs.AngleOfArrivalFom, rhs.BlockStriding, rhs.HoppingMode);
 
+    // clang-format off
     return basicFieldsEqual
         && haveSameContents(lhs.MultiNodeModes, rhs.MultiNodeModes)
         && haveSameContents(lhs.DeviceRoles, rhs.DeviceRoles)
@@ -568,6 +569,7 @@ uwb::protocol::fira::operator==(const UwbCapability& lhs, const UwbCapability& r
         && haveSameContents(lhs.Channels, rhs.Channels)
         && haveSameContents(lhs.BprfParameterSets, rhs.BprfParameterSets)
         && haveSameContents(lhs.HprfParameterSets, rhs.HprfParameterSets);
+    // clang-format on
 }
 
 bool

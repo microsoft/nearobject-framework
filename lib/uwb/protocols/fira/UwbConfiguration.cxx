@@ -224,6 +224,7 @@ UwbConfiguration::GetValueMap() const noexcept
 bool
 UwbConfiguration::operator==(const UwbConfiguration& other) const noexcept
 {
+    // clang-format off
     return 
         GetFiraPhyVersion() == other.GetFiraPhyVersion() &&
         GetFiraMacVersion() == other.GetFiraMacVersion() &&
@@ -255,4 +256,5 @@ UwbConfiguration::operator==(const UwbConfiguration& other) const noexcept
         GetKeyRotationRate() == other.GetKeyRotationRate() &&
         GetMacAddressFcsType() == other.GetMacAddressFcsType() &&
         GetMaxRangingRoundRetry() == other.GetMaxRangingRoundRetry();
+    // clang-format on
 }

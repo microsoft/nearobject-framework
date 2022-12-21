@@ -107,8 +107,8 @@ struct UwbConfiguration
 
     /**
      * @brief Creates a new UwbConfiguration builder object.
-     * 
-     * @return UwbConfiguration::Builder 
+     *
+     * @return UwbConfiguration::Builder
      */
     static UwbConfiguration::Builder
     Create() noexcept;
@@ -142,10 +142,10 @@ struct UwbConfiguration
 
     /**
      * @brief The map of parameter tags and their values from the configuration object.
-     * 
-     * @return const std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, std::any>& 
+     *
+     * @return const std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, std::any>&
      */
-    const std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, std::any>& 
+    const std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, std::any>&
     GetValueMap() const noexcept;
 
     std::optional<uint32_t>
@@ -242,9 +242,9 @@ private:
     /**
      * @brief Helper function to resolve and obtain a value, given a parameter
      * tag.
-     * 
-     * @tparam T 
-     * @param tag 
+     *
+     * @tparam T
+     * @param tag
      * @return std::optional<T> A constructed value if specified, std::nullopt
      * otherwise.
      */

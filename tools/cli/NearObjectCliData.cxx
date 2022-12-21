@@ -19,7 +19,7 @@ UwbConfigurationData::operator UwbConfiguration() const noexcept
         builder.SetDeviceRole(deviceRole.value());
     }
     if (rangingDirection.has_value() && rangingMeasurementReportMode.has_value()) {
-        builder.SetRangingMethod({ rangingDirection.value(), rangingMeasurementReportMode.value()});
+        builder.SetRangingMethod({ rangingDirection.value(), rangingMeasurementReportMode.value() });
     }
     if (stsConfiguration.has_value()) {
         builder.SetStsConfiguration(stsConfiguration.value());
