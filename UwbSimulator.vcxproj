@@ -34,6 +34,7 @@
     <ClInclude Include="Public.h" />
     <ClInclude Include="Queue.hxx" />
     <ClInclude Include="Trace.h" />
+    <ClInclude Include="UwbCxDependencies.hxx" />
     <ClInclude Include="UwbSimulatorDevice.hxx" />
     <ClInclude Include="UwbSimulatorDeviceFileObject.hxx" />
   </ItemGroup>

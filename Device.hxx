@@ -39,8 +39,6 @@ WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(DEVICE_CONTEXT, DeviceGetContext)
 // Function to initialize the device and its callbacks
 //
 NTSTATUS
-UwbSimulatorCreateDevice(
-    _Inout_ PWDFDEVICE_INIT DeviceInit
-    );
+UwbSimulatorCreateDevice(PWDFDEVICE_INIT deviceInit);
 
 EXTERN_C_END

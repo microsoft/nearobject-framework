@@ -18,9 +18,7 @@ Environment:
 #include "queue.tmh"
 
 NTSTATUS
-UwbSimulatorQueueInitialize(
-    _In_ WDFDEVICE Device
-    )
+UwbSimulatorQueueInitialize(WDFDEVICE device)
 /*++
 
 Routine Description:
@@ -38,29 +36,24 @@ Arguments:
 
 Return Value:
 
-    VOID
+    NTSTATUS
 
 --*/
 {
-    WDFQUEUE queue;
-    NTSTATUS status;
-    WDF_IO_QUEUE_CONFIG queueConfig;
-
     //
     // Configure a default queue so that requests that are not
     // configure-fowarded using WdfDeviceConfigureRequestDispatching to goto
     // other queues get dispatched here.
     //
-    WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(
-         &queueConfig,
-        WdfIoQueueDispatchParallel
-        );
+    WDF_IO_QUEUE_CONFIG queueConfig;
+    WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
 
     queueConfig.EvtIoDeviceControl = UwbSimulatorEvtIoDeviceControl;
     queueConfig.EvtIoStop = UwbSimulatorEvtIoStop;
 
-    status = WdfIoQueueCreate(
-                 Device,
+    WDFQUEUE queue;
+    NTSTATUS status = WdfIoQueueCreate(
+                 device,
                  &queueConfig,
                  WDF_NO_OBJECT_ATTRIBUTES,
                  &queue
@@ -74,14 +67,8 @@ Return Value:
     return status;
 }
 
-VOID
-UwbSimulatorEvtIoDeviceControl(
-    _In_ WDFQUEUE Queue,
-    _In_ WDFREQUEST Request,
-    _In_ size_t OutputBufferLength,
-    _In_ size_t InputBufferLength,
-    _In_ ULONG IoControlCode
-    )
+void
+UwbSimulatorEvtIoDeviceControl(WDFQUEUE queue, WDFREQUEST request, size_t outputBufferLength, size_t inputBufferLength, ULONG ioControlCode)
 /*++
 
 Routine Description:
@@ -103,26 +90,22 @@ Arguments:
 
 Return Value:
 
-    VOID
+    void
 
 --*/
 {
     TraceEvents(TRACE_LEVEL_INFORMATION, 
                 TRACE_QUEUE, 
                 "%!FUNC! Queue 0x%p, Request 0x%p OutputBufferLength %d InputBufferLength %d IoControlCode %d", 
-                Queue, Request, (int) OutputBufferLength, (int) InputBufferLength, IoControlCode);
+                queue, request, (int) outputBufferLength, (int) inputBufferLength, ioControlCode);
 
-    WdfRequestComplete(Request, STATUS_SUCCESS);
+    WdfRequestComplete(request, STATUS_SUCCESS);
 
     return;
 }
 
-VOID
-UwbSimulatorEvtIoStop(
-    _In_ WDFQUEUE Queue,
-    _In_ WDFREQUEST Request,
-    _In_ ULONG ActionFlags
-)
+void
+UwbSimulatorEvtIoStop(WDFQUEUE queue, WDFREQUEST request, ULONG actionFlags)
 /*++
 
 Routine Description:
@@ -142,14 +125,14 @@ Arguments:
 
 Return Value:
 
-    VOID
+    void
 
 --*/
 {
     TraceEvents(TRACE_LEVEL_INFORMATION, 
                 TRACE_QUEUE, 
                 "%!FUNC! Queue 0x%p, Request 0x%p ActionFlags %d", 
-                Queue, Request, ActionFlags);
+                queue, request, actionFlags);
 
     //
     // In most cases, the EvtIoStop callback function completes, cancels, or postpones

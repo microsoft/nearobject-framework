@@ -18,10 +18,7 @@ Environment:
 #include "driver.tmh"
 
 NTSTATUS
-DriverEntry(
-    _In_ PDRIVER_OBJECT  DriverObject,
-    _In_ PUNICODE_STRING RegistryPath
-    )
+DriverEntry(PDRIVER_OBJECT driverObject, UNICODE_STRING *registryPath)
 /*++
 
 Routine Description:
@@ -48,17 +45,13 @@ Return Value:
 
 --*/
 {
-    WDF_DRIVER_CONFIG config;
-    NTSTATUS status;
-    WDF_OBJECT_ATTRIBUTES attributes;
-
     //
     // Initialize WPP Tracing
     //
 #if UMDF_VERSION_MAJOR == 2 && UMDF_VERSION_MINOR == 0
-    WPP_INIT_TRACING(MYDRIVER_TRACING_ID);
+    WPP_INIT_TRACING(UWB_SIMULATOR_TRACING_ID);
 #else
-    WPP_INIT_TRACING( DriverObject, RegistryPath );
+    WPP_INIT_TRACING( driverObject, registryPath );
 #endif
 
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
@@ -67,26 +60,19 @@ Return Value:
     // Register a cleanup callback so that we can call WPP_CLEANUP when
     // the framework driver object is deleted during driver unload.
     //
+    WDF_OBJECT_ATTRIBUTES attributes;
     WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
     attributes.EvtCleanupCallback = UwbSimulatorEvtDriverContextCleanup;
 
-    WDF_DRIVER_CONFIG_INIT(&config,
-                           UwbSimulatorEvtDeviceAdd
-                           );
-
-    status = WdfDriverCreate(DriverObject,
-                             RegistryPath,
-                             &attributes,
-                             &config,
-                             WDF_NO_HANDLE
-                             );
-
+    WDF_DRIVER_CONFIG config;
+    WDF_DRIVER_CONFIG_INIT(&config, UwbSimulatorEvtDeviceAdd);
+    NTSTATUS status = WdfDriverCreate(driverObject, registryPath, &attributes, &config, WDF_NO_HANDLE);
     if (!NT_SUCCESS(status)) {
         TraceEvents(TRACE_LEVEL_ERROR, TRACE_DRIVER, "WdfDriverCreate failed %!STATUS!", status);
 #if UMDF_VERSION_MAJOR == 2 && UMDF_VERSION_MINOR == 0
         WPP_CLEANUP();
 #else
-        WPP_CLEANUP(DriverObject);
+        WPP_CLEANUP(driverObject);
 #endif
         return status;
     }
@@ -97,10 +83,7 @@ Return Value:
 }
 
 NTSTATUS
-UwbSimulatorEvtDeviceAdd(
-    _In_    WDFDRIVER       Driver,
-    _Inout_ PWDFDEVICE_INIT DeviceInit
-    )
+UwbSimulatorEvtDeviceAdd(WDFDRIVER /* driver */, WDFDEVICE_INIT *deviceInit)
 /*++
 Routine Description:
 
@@ -120,23 +103,17 @@ Return Value:
 
 --*/
 {
-    NTSTATUS status;
-
-    UNREFERENCED_PARAMETER(Driver);
-
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
 
-    status = UwbSimulatorCreateDevice(DeviceInit);
+    NTSTATUS status = UwbSimulatorCreateDevice(deviceInit);
 
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Exit");
 
     return status;
 }
 
-VOID
-UwbSimulatorEvtDriverContextCleanup(
-    _In_ WDFOBJECT DriverObject
-    )
+void
+UwbSimulatorEvtDriverContextCleanup(WDFOBJECT /* driverObject */)
 /*++
 Routine Description:
 
@@ -148,12 +125,10 @@ Arguments:
 
 Return Value:
 
-    VOID.
+    void.
 
 --*/
 {
-    UNREFERENCED_PARAMETER(DriverObject);
-
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
 
     //
@@ -162,6 +137,6 @@ Return Value:
 #if UMDF_VERSION_MAJOR == 2 && UMDF_VERSION_MINOR == 0
     WPP_CLEANUP();
 #else
-    WPP_CLEANUP(WdfDriverWdmGetDriverObject((WDFDRIVER)DriverObject));
+    WPP_CLEANUP(WdfDriverWdmGetDriverObject((WDFDRIVER)driverObject));
 #endif
 }

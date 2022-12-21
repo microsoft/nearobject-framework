@@ -29,9 +29,7 @@ typedef struct _QUEUE_CONTEXT {
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(QUEUE_CONTEXT, QueueGetContext)
 
 NTSTATUS
-UwbSimulatorQueueInitialize(
-    _In_ WDFDEVICE Device
-    );
+UwbSimulatorQueueInitialize(WDFDEVICE device);
 
 //
 // Events from the IoQueue object
