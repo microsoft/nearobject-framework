@@ -1,5 +1,4 @@
 
-#include <tuple>
 #include <stdexcept>
 
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
@@ -215,7 +214,7 @@ UwbConfiguration::GetMaxRangingRoundRetry() const noexcept
     return GetValue<uint16_t>(ParameterTag::MaxRrRetry);
 }
 
-const std::unordered_map<UwbConfiguration::ParameterTag, std::any>& 
+const std::unordered_map<UwbConfiguration::ParameterTag, std::any>&
 UwbConfiguration::GetValueMap() const noexcept
 {
     return m_values;
