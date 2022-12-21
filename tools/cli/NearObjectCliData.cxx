@@ -5,8 +5,7 @@
 using namespace nearobject::cli;
 using uwb::protocol::fira::UwbConfiguration;
 
-UwbConfiguration
-UwbConfigurationData::ToUwbConfiguration() const
+UwbConfigurationData::operator UwbConfiguration() const noexcept
 {
     UwbConfiguration::Builder builder{};
 

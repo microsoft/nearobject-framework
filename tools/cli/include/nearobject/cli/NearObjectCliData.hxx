@@ -67,8 +67,7 @@ struct UwbConfigurationData
      * 
      * @return uwb::protocol::fira::UwbConfiguration 
      */
-    uwb::protocol::fira::UwbConfiguration
-    ToUwbConfiguration() const;
+    operator uwb::protocol::fira::UwbConfiguration() const noexcept;
 };
 
 /**
