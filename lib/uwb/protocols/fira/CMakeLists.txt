@@ -16,7 +16,7 @@ target_sources(uwb-proto-fira
     PUBLIC
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/ControleePreference.hxx
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/FiraDevice.hxx
-        ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/RangingConfiguration.hxx
+        ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/RangingMethod.hxx
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/SecureRangingInfo.hxx
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/StaticRangingInfo.hxx
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCapability.hxx
