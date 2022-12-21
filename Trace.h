@@ -1,19 +1,7 @@
-/*++
-
-Module Name:
-
-    Internal.h
-
-Abstract:
-
-    This module contains the local type definitions for the
-    driver.
-
-Environment:
-
-    Windows User-Mode Driver Framework 2
-
---*/
+/**
+ * @brief This module contains the local type definitions for the
+ * driver.
+ */
 
 //
 // Define the tracing flags.

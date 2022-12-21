@@ -1,18 +1,9 @@
-/*++
-
-Module Name:
-
-    driver.c
-
-Abstract:
-
-    This file contains the driver entry points and callbacks.
-
-Environment:
-
-    User-mode Driver Framework 2
-
---*/
+/**
+ * @file Driver.cxx
+ * @brief This file contains the driver entry points and callbacks.
+ * 
+ * @copyright Copyright (c) 2022
+ */
 
 #include "driver.hxx"
 #include "driver.tmh"

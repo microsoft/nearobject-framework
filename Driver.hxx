@@ -1,18 +1,10 @@
-/*++
-
-Module Name:
-
-    driver.h
-
-Abstract:
-
-    This file contains the driver definitions.
-
-Environment:
-
-    User-mode Driver Framework 2
-
---*/
+/**
+ * @file Driver.hxx
+ * @brief This file contains the driver definitions.
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 
 #include <windows.h>
 #include <wdf.h>

@@ -1,18 +1,9 @@
-/*++
-
-Module Name:
-
-    queue.h
-
-Abstract:
-
-    This file contains the queue definitions.
-
-Environment:
-
-    User-mode Driver Framework 2
-
---*/
+/**
+ * @file Queue.hxx
+ * @brief This file contains the queue entry points and callbacks.
+ * 
+ * @copyright Copyright (c) 2022
+ */
 
 EXTERN_C_START
 

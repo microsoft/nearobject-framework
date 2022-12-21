@@ -1,18 +1,9 @@
-/*++
-
-Module Name:
-
-    device.c - Device handling events for example driver.
-
-Abstract:
-
-   This file contains the device entry points and callbacks.
-    
-Environment:
-
-    User-mode Driver Framework 2
-
---*/
+/**
+ * @file Device.cxx
+ * @brief This file contains the device entry points and callbacks. 
+ * 
+ * @copyright Copyright (c) 2022
+ */
 
 #include "driver.hxx"
 #include "device.tmh"

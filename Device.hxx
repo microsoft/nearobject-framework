@@ -1,18 +1,9 @@
-/*++
-
-Module Name:
-
-    device.h
-
-Abstract:
-
-    This file contains the device definitions.
-
-Environment:
-
-    User-mode Driver Framework 2
-
---*/
+/**
+ * @file Device.hxx
+ * @brief This file contains the device definitions.
+ * 
+ * @copyright Copyright (c) 2022
+ */
 
 #include "public.h"
 
