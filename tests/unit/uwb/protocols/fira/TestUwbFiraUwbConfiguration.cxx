@@ -6,6 +6,7 @@
 #include <unordered_map>
 
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
+#include <uwb/protocols/fira/UwbConfigurationBuilder.hxx>
 
 TEST_CASE("uwb configuration objects can be created", "[basic]")
 {
@@ -29,12 +30,9 @@ TEST_CASE("UwbConfiguration can be used in unordered_containers", "[basic][conta
 {
     using namespace uwb::protocol::fira;
 
-    UwbConfiguration uwbConfigurationDeviceRoleInitiator{};
-    uwbConfigurationDeviceRoleInitiator._deviceRole = DeviceRole::Initiator;
-    UwbConfiguration uwbConfigurationDeviceRoleResponder{};
-    uwbConfigurationDeviceRoleResponder._deviceRole = DeviceRole::Responder;
-    UwbConfiguration uwbConfigurationHoppingMode{};
-    uwbConfigurationHoppingMode._hoppingMode = true;
+    UwbConfiguration uwbConfigurationDeviceRoleInitiator = UwbConfiguration::Builder().SetDeviceRole(DeviceRole::Initiator);
+    UwbConfiguration uwbConfigurationDeviceRoleResponder = UwbConfiguration::Builder().SetDeviceRole(DeviceRole::Responder);
+    UwbConfiguration uwbConfigurationHoppingMode = UwbConfiguration::Builder().SetHoppingMode(true);
 
     const std::initializer_list<UwbConfiguration> UwbConfigurations = {
         uwbConfigurationDeviceRoleInitiator,
