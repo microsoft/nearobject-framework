@@ -270,6 +270,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
         }
 
         m_cliData->SessionData.staticRangingInfo = m_cliData->StaticRanging;
+        m_cliData->SessionData.uwbConfiguration = m_cliData->uwbConfiguration;
         std::cout << "StaticRangingInfo: {" << m_cliData->SessionData.staticRangingInfo << "}" << std::endl;
         std::cout << "ResultReportConfigurations: " << uwb::protocol::fira::ResultReportConfigurationToString(uwbConfig.resultReportConfigurations) << std::endl;
     });
