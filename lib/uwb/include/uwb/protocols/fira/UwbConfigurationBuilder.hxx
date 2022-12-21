@@ -13,7 +13,7 @@ namespace uwb::protocol::fira
 class UwbConfiguration::Builder
 {
 public:
-    Builder() = default;
+    Builder();
 
     /**
      * @brief Operator which returns the built UwbConfiguration object as an
@@ -34,7 +34,7 @@ public:
     SetDeviceRole(uwb::protocol::fira::DeviceRole deviceRole) noexcept;
 
     UwbConfiguration::Builder&
-    SetRangingConfiguration(uwb::protocol::fira::RangingConfiguration rangingConfiguration) noexcept;
+    SetRangingMethod(uwb::protocol::fira::RangingMethod rangingMethod) noexcept;
 
     UwbConfiguration::Builder&
     SetStsConfiguration(uwb::protocol::fira::StsConfiguration stsConfiguration) noexcept;
@@ -140,7 +140,7 @@ public:
     DeviceRole(uwb::protocol::fira::DeviceRole deviceRole) noexcept;
 
     UwbConfiguration::Builder&
-    RangingConfiguration(uwb::protocol::fira::RangingConfiguration rangingConfiguration) noexcept;
+    RangingMethod(uwb::protocol::fira::RangingMethod rangingMethod) noexcept;
 
     UwbConfiguration::Builder&
     StsConfiguration(uwb::protocol::fira::StsConfiguration stsConfiguration) noexcept;
@@ -248,6 +248,7 @@ public:
 
 private:
     UwbConfiguration m_uwbConfiguration;
+    std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, std::any>& m_values;
 };
 
 } // namespace uwb::protocol::fira

@@ -34,179 +34,226 @@ UwbConfiguration::FromDataObject(const encoding::TlvBer& /* tlv */)
 std::optional<uint32_t>
 UwbConfiguration::GetFiraPhyVersion() const noexcept
 {
-    return m_firaPhyVersion;
+    return GetValue<uint32_t>(ParameterTag::FiraPhyVersion);
 }
 
 std::optional<uint32_t>
 UwbConfiguration::GetFiraMacVersion() const noexcept
 {
-    return m_firaMacVersion;
+    return GetValue<uint32_t>(ParameterTag::FiraMacVersion);
 }
 
-std::optional<uwb::protocol::fira::DeviceRole>
+std::optional<DeviceRole>
 UwbConfiguration::GetDeviceRole() const noexcept
 {
-    return m_deviceRole;
+    return GetValue<DeviceRole>(ParameterTag::DeviceRole);
 }
 
-std::optional<uwb::protocol::fira::RangingConfiguration>
-UwbConfiguration::GetRangingConfiguration() const noexcept
+std::optional<RangingMethod>
+UwbConfiguration::GetRangingMethod() const noexcept
 {
-    return m_rangingConfiguration;
+    return GetValue<RangingMethod>(ParameterTag::RangingMethod);
 }
 
-std::optional<uwb::protocol::fira::StsConfiguration>
+std::optional<StsConfiguration>
 UwbConfiguration::GetStsConfiguration() const noexcept
 {
-    return m_stsConfiguration;
+    return GetValue<StsConfiguration>(ParameterTag::StsConfig);
 }
 
-std::optional<uwb::protocol::fira::MultiNodeMode>
+std::optional<MultiNodeMode>
 UwbConfiguration::GetMultiNodeMode() const noexcept
 {
-    return m_multiNodeMode;
+    return GetValue<MultiNodeMode>(ParameterTag::MultiNodeMode);
 }
 
-std::optional<uwb::protocol::fira::RangingMode>
+std::optional<RangingMode>
 UwbConfiguration::GetRangingTimeStruct() const noexcept
 {
-    return m_rangingTimeStruct;
+    return GetValue<RangingMode>(ParameterTag::RangingTimeStruct);
 }
 
-std::optional<uwb::protocol::fira::SchedulingMode>
+std::optional<SchedulingMode>
 UwbConfiguration::GetSchedulingMode() const noexcept
 {
-    return m_schedulingMode;
+    return GetValue<SchedulingMode>(ParameterTag::ScheduledMode);
 }
 
 std::optional<bool>
 UwbConfiguration::GetHoppingMode() const noexcept
 {
-    return m_hoppingMode;
+    return GetValue<bool>(ParameterTag::HoppingMode);
 }
 
 std::optional<bool>
 UwbConfiguration::GetBlockStriding() const noexcept
 {
-    return m_blockStriding;
+    return GetValue<bool>(ParameterTag::BlockStriding);
 }
 
 std::optional<uint32_t>
 UwbConfiguration::GetUwbInitiationTime() const noexcept
 {
-    return m_uwbInitiationTime;
+    return GetValue<uint32_t>(ParameterTag::UwbInitiationTime);
 }
 
-std::optional<uwb::protocol::fira::Channel>
+std::optional<Channel>
 UwbConfiguration::GetChannel() const noexcept
 {
-    return m_channel;
+    return GetValue<Channel>(ParameterTag::ChannelNumber);
 }
 
-std::optional<uwb::protocol::fira::StsPacketConfiguration>
+std::optional<StsPacketConfiguration>
 UwbConfiguration::GetRFrameConfig() const noexcept
 {
-    return m_rframeConfig;
+    return GetValue<StsPacketConfiguration>(ParameterTag::RFrameConfig);
 }
 
-std::optional<uwb::protocol::fira::ConvolutionalCodeConstraintLength>
+std::optional<ConvolutionalCodeConstraintLength>
 UwbConfiguration::GetConvolutionalCodeConstraintLength() const noexcept
 {
-    return m_convolutionalCodeConstraintLength;
+    return GetValue<ConvolutionalCodeConstraintLength>(ParameterTag::CcConstraintLength);
 }
 
-std::optional<uwb::protocol::fira::PrfMode>
+std::optional<PrfMode>
 UwbConfiguration::GetPrfMode() const noexcept
 {
-    return m_prfMode;
+    return GetValue<PrfMode>(ParameterTag::PrfMode);
 }
 
 std::optional<uint8_t>
 UwbConfiguration::GetSp0PhySetNumber() const noexcept
 {
-    return m_sp0PhySetNumber;
+    return GetValue<uint8_t>(ParameterTag::Sp0PhySetNumber);
 }
 
 std::optional<uint8_t>
 UwbConfiguration::GetSp1PhySetNumber() const noexcept
 {
-    return m_sp1PhySetNumber;
+    return GetValue<uint8_t>(ParameterTag::Sp1PhySetNumber);
 }
 
 std::optional<uint8_t>
 UwbConfiguration::GetSp3PhySetNumber() const noexcept
 {
-    return m_sp3PhySetNumber;
+    return GetValue<uint8_t>(ParameterTag::Sp3PhySetNumber);
 }
 
 std::optional<uint8_t>
 UwbConfiguration::GetPreableCodeIndex() const noexcept
 {
-    return m_preableCodeIndex;
+    return GetValue<uint8_t>(ParameterTag::PreableCodeIndex);
 }
 
-std::optional<std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>>
+std::unordered_set<ResultReportConfiguration>
 UwbConfiguration::GetResultReportConfigurations() const noexcept
 {
-    return m_resultReportConfigurations;
+    auto it = m_values.find(ParameterTag::ResultReportConfig);
+    return (it != std::cend(m_values))
+        ? std::any_cast<std::unordered_set<ResultReportConfiguration>>(it->second)
+        : std::unordered_set<ResultReportConfiguration>{};
 }
 
 std::optional<uwb::UwbMacAddressType>
 UwbConfiguration::GetMacAddressMode() const noexcept
 {
-    return m_macAddressMode;
+    return GetValue<uwb::UwbMacAddressType>(ParameterTag::MacAddressMode);
 }
 
 std::optional<uwb::UwbMacAddress>
 UwbConfiguration::GetControleeShortMacAddress() const noexcept
 {
-    return m_controleeShortMacAddress;
+    return GetValue<uwb::UwbMacAddress>(ParameterTag::ControleeShortMacAddress);
 }
 
 std::optional<uwb::UwbMacAddress>
 UwbConfiguration::GetControllerMacAddress() const noexcept
 {
-    return m_controllerMacAddress;
+    return GetValue<uwb::UwbMacAddress>(ParameterTag::ControllerMacAddress);
 }
 
 std::optional<uint8_t>
 UwbConfiguration::GetSlotsPerRangingRound() const noexcept
 {
-    return m_slotsPerRangingRound;
+    return GetValue<uint8_t>(ParameterTag::SlotsPerRr);
 }
 
 std::optional<uint8_t>
 UwbConfiguration::GetMaxContentionPhaseLength() const noexcept
 {
-    return m_maxContentionPhaseLength;
+    return GetValue<uint8_t>(ParameterTag::MaxContentionPhaseLength);
 }
 
 std::optional<uint8_t>
 UwbConfiguration::GetSlotDuration() const noexcept
 {
-    return m_slotDuration;
+    return GetValue<uint8_t>(ParameterTag::SlotDuration);
 }
 
 std::optional<uint16_t>
 UwbConfiguration::GetRangingInterval() const noexcept
 {
-    return m_rangingInterval;
+    return GetValue<uint16_t>(ParameterTag::RangingInterval);
 }
 
 std::optional<uint8_t>
 UwbConfiguration::GetKeyRotationRate() const noexcept
 {
-    return m_keyRotationRate;
+    return GetValue<uint8_t>(ParameterTag::KeyRotationRate);
 }
 
 std::optional<uwb::UwbMacAddressFcsType>
 UwbConfiguration::GetMacAddressFcsType() const noexcept
 {
-    return m_macAddressFcsType;
+    return GetValue<uwb::UwbMacAddressFcsType>(ParameterTag::MacFcsType);
 }
 
 std::optional<uint16_t>
 UwbConfiguration::GetMaxRangingRoundRetry() const noexcept
 {
-    return m_maxRangingRoundRetry;
+    return GetValue<uint16_t>(ParameterTag::MaxRrRetry);
+}
+
+const std::unordered_map<UwbConfiguration::ParameterTag, std::any>&
+UwbConfiguration::GetValueMap() const noexcept
+{
+    return m_values;
+}
+
+bool
+UwbConfiguration::operator==(const UwbConfiguration& other) const noexcept
+{
+    // clang-format off
+    return 
+        GetFiraPhyVersion() == other.GetFiraPhyVersion() &&
+        GetFiraMacVersion() == other.GetFiraMacVersion() &&
+        GetDeviceRole() == GetDeviceRole() &&
+        GetRangingMethod() == other.GetRangingMethod() &&
+        GetStsConfiguration() == other.GetStsConfiguration() &&
+        GetMultiNodeMode() == other.GetMultiNodeMode() &&
+        GetRangingTimeStruct() == other.GetRangingTimeStruct() &&
+        GetSchedulingMode() == other.GetSchedulingMode() &&
+        GetHoppingMode() == other.GetHoppingMode() &&
+        GetBlockStriding() == other.GetBlockStriding() &&
+        GetUwbInitiationTime()== other.GetUwbInitiationTime() &&
+        GetChannel() == other.GetChannel() &&
+        GetRFrameConfig() == other.GetRFrameConfig() &&
+        GetConvolutionalCodeConstraintLength() == other.GetConvolutionalCodeConstraintLength() &&
+        GetPrfMode() == other.GetPrfMode() &&
+        GetSp0PhySetNumber() == other.GetSp0PhySetNumber() &&
+        GetSp1PhySetNumber() == other.GetSp1PhySetNumber() &&
+        GetSp3PhySetNumber() == other.GetSp3PhySetNumber() &&
+        GetPreableCodeIndex() == other.GetPreableCodeIndex() &&
+        GetResultReportConfigurations() == other.GetResultReportConfigurations() &&
+        GetMacAddressMode() == other.GetMacAddressMode() &&
+        GetControleeShortMacAddress() == other.GetControleeShortMacAddress() &&
+        GetControllerMacAddress() == other.GetControllerMacAddress() &&
+        GetSlotsPerRangingRound() == other.GetSlotsPerRangingRound() &&
+        GetMaxContentionPhaseLength() == other.GetMaxContentionPhaseLength() &&
+        GetSlotDuration() == other.GetSlotDuration() &&
+        GetRangingInterval() == other.GetRangingInterval() &&
+        GetKeyRotationRate() == other.GetKeyRotationRate() &&
+        GetMacAddressFcsType() == other.GetMacAddressFcsType() &&
+        GetMaxRangingRoundRetry() == other.GetMaxRangingRoundRetry();
+    // clang-format on
 }

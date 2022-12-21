@@ -2,6 +2,7 @@
 #ifndef UWB_CONFIGURATION_HXX
 #define UWB_CONFIGURATION_HXX
 
+#include <any>
 #include <compare>
 #include <cstdint>
 #include <functional>
@@ -14,7 +15,7 @@
 
 #include <uwb/UwbMacAddress.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
-#include <uwb/protocols/fira/RangingConfiguration.hxx>
+#include <uwb/protocols/fira/RangingMethod.hxx>
 
 namespace uwb::protocol::fira
 {
@@ -68,7 +69,7 @@ struct UwbConfiguration
         SlotsPerRr = 0x97,
         MaxContentionPhaseLength = 0x98,
         SlotDuration = 0x99,
-        RangingInternval = 0x9A,
+        RangingInterval = 0x9A,
         KeyRotationRate = 0x9B,
         MacFcsType = 0x9C,
         MaxRrRetry = 0x9D,
@@ -82,7 +83,7 @@ struct UwbConfiguration
      * Table 53, pages 103-107.
      */
     static constexpr auto DeviceRoleDefault = DeviceRole::Responder;
-    static constexpr auto RangingConfigurationDefault = RangingConfiguration{ RangingMethod::DoubleSidedTwoWay, MeasurementReportMode::Deferred };
+    static constexpr auto RangingMethodDefault = RangingMethod{ RangingDirection::DoubleSidedTwoWay, MeasurementReportMode::Deferred };
     static constexpr auto StsConfigurationDefault = StsConfiguration::Static;
     static constexpr auto MultiNodeModeDefault = MultiNodeMode::Unicast;
     static constexpr auto RangingTimeStructDefault = RangingMode::Block;
@@ -105,15 +106,9 @@ struct UwbConfiguration
     static const std::unordered_set<ResultReportConfiguration> ResultReportConfigurationsDefault;
 
     /**
-     * @brief Construct UwbConfiguration object with default values and settings.
-     * TODO: make this c'tor private once refactoring is complete.
-     */
-    UwbConfiguration() = default;
-
-    /**
      * @brief Creates a new UwbConfiguration builder object.
-     * 
-     * @return UwbConfiguration::Builder 
+     *
+     * @return UwbConfiguration::Builder
      */
     static UwbConfiguration::Builder
     Create() noexcept;
@@ -126,7 +121,7 @@ struct UwbConfiguration
      * @return false
      */
     bool
-    operator==(const UwbConfiguration& other) const noexcept = default;
+    operator==(const UwbConfiguration& other) const noexcept;
 
     /**
      * @brief Convert this object into a FiRa Data Object (DO).
@@ -145,36 +140,13 @@ struct UwbConfiguration
     static UwbConfiguration
     FromDataObject(const encoding::TlvBer& tlv);
 
-    uint32_t _firaPhyVersion{ 0 };
-    uint32_t _firaMacVersion{ 0 };
-    DeviceRole _deviceRole{ DeviceRoleDefault };
-    RangingConfiguration _rangingConfiguration{ RangingConfigurationDefault };
-    StsConfiguration _stsConfiguration{ StsConfigurationDefault };
-    MultiNodeMode _multiNodeMode{ MultiNodeModeDefault };
-    RangingMode _rangingTimeStruct{ RangingTimeStructDefault };
-    SchedulingMode _schedulingMode{ ScheduledModeDefault };
-    bool _hoppingMode{ HoppingModeDefault };
-    bool _blockStriding{ BlockStridingDefault };
-    uint32_t _uwbInitiationTime{ UwbInitiationTimeDefault };
-    Channel _channel{ Channel::C9 };
-    StsPacketConfiguration _rframeConfig{ RFrameConfigDefault };
-    ConvolutionalCodeConstraintLength _convolutionalCodeConstraintLength{ CcConstraintLengthDefault };
-    PrfMode _prfMode{ PrfModeDefault };
-    uint8_t _sp0PhySetNumber{ Sp0PhySetNumberDefault };
-    uint8_t _sp1PhySetNumber{ Sp0PhySetNumberDefault };
-    uint8_t _sp3PhySetNumber{ Sp0PhySetNumberDefault };
-    uint8_t _preableCodeIndex{ PreableCodeIndexDefault };
-    std::unordered_set<ResultReportConfiguration> _resultReportConfigurations{ ResultReportConfigurationsDefault };
-    UwbMacAddressType _macAddressMode{ MacAddressModeDefault };
-    std::optional<UwbMacAddress> _controleeShortMacAddress;
-    UwbMacAddress _controllerMacAddress;
-    uint8_t _slotsPerRangingRound{ 0 };
-    uint8_t _maxContentionPhaseLength{ 0 };
-    uint8_t _slotDuration{ 0 };
-    uint16_t _rangingInterval{ 0 };
-    uint8_t _keyRotationRate{ KeyRotationRateDefault };
-    UwbMacAddressFcsType _macAddressFcsType{ MacFcsTypeDefault };
-    uint16_t _maxRangingRoundRetry{ MaxRrRetryDefault };
+    /**
+     * @brief The map of parameter tags and their values from the configuration object.
+     *
+     * @return const std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, std::any>&
+     */
+    const std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, std::any>&
+    GetValueMap() const noexcept;
 
     std::optional<uint32_t>
     GetFiraPhyVersion() const noexcept;
@@ -185,8 +157,8 @@ struct UwbConfiguration
     std::optional<uwb::protocol::fira::DeviceRole>
     GetDeviceRole() const noexcept;
 
-    std::optional<uwb::protocol::fira::RangingConfiguration>
-    GetRangingConfiguration() const noexcept;
+    std::optional<uwb::protocol::fira::RangingMethod>
+    GetRangingMethod() const noexcept;
 
     std::optional<uwb::protocol::fira::StsConfiguration>
     GetStsConfiguration() const noexcept;
@@ -233,7 +205,7 @@ struct UwbConfiguration
     std::optional<uint8_t>
     GetPreableCodeIndex() const noexcept;
 
-    std::optional<std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>>
+    std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>
     GetResultReportConfigurations() const noexcept;
 
     std::optional<uwb::UwbMacAddressType>
@@ -267,36 +239,27 @@ struct UwbConfiguration
     GetMaxRangingRoundRetry() const noexcept;
 
 private:
-    std::optional<uint32_t> m_firaPhyVersion;
-    std::optional<uint32_t> m_firaMacVersion;
-    std::optional<uwb::protocol::fira::DeviceRole> m_deviceRole;
-    std::optional<uwb::protocol::fira::RangingConfiguration> m_rangingConfiguration;
-    std::optional<uwb::protocol::fira::StsConfiguration> m_stsConfiguration;
-    std::optional<uwb::protocol::fira::MultiNodeMode> m_multiNodeMode;
-    std::optional<uwb::protocol::fira::RangingMode> m_rangingTimeStruct;
-    std::optional<uwb::protocol::fira::SchedulingMode> m_schedulingMode;
-    std::optional<bool> m_hoppingMode;
-    std::optional<bool> m_blockStriding;
-    std::optional<uint32_t> m_uwbInitiationTime;
-    std::optional<uwb::protocol::fira::Channel> m_channel;
-    std::optional<uwb::protocol::fira::StsPacketConfiguration> m_rframeConfig;
-    std::optional<uwb::protocol::fira::ConvolutionalCodeConstraintLength> m_convolutionalCodeConstraintLength;
-    std::optional<uwb::protocol::fira::PrfMode> m_prfMode;
-    std::optional<uint8_t> m_sp0PhySetNumber;
-    std::optional<uint8_t> m_sp1PhySetNumber;
-    std::optional<uint8_t> m_sp3PhySetNumber;
-    std::optional<uint8_t> m_preableCodeIndex;
-    std::optional<std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>> m_resultReportConfigurations;
-    std::optional<uwb::UwbMacAddressType> m_macAddressMode;
-    std::optional<uwb::UwbMacAddress> m_controleeShortMacAddress;
-    std::optional<uwb::UwbMacAddress> m_controllerMacAddress;
-    std::optional<uint8_t> m_slotsPerRangingRound;
-    std::optional<uint8_t> m_maxContentionPhaseLength;
-    std::optional<uint8_t> m_slotDuration;
-    std::optional<uint16_t> m_rangingInterval;
-    std::optional<uint8_t> m_keyRotationRate;
-    std::optional<uwb::UwbMacAddressFcsType> m_macAddressFcsType;
-    std::optional<uint16_t> m_maxRangingRoundRetry;
+    /**
+     * @brief Helper function to resolve and obtain a value, given a parameter
+     * tag.
+     *
+     * @tparam T
+     * @param tag
+     * @return std::optional<T> A constructed value if specified, std::nullopt
+     * otherwise.
+     */
+    template <typename T>
+    std::optional<T>
+    GetValue(ParameterTag tag) const noexcept
+    {
+        auto it = m_values.find(tag);
+        return (it != std::cend(m_values))
+            ? std::optional<T>(std::any_cast<T>(it->second))
+            : std::nullopt;
+    }
+
+private:
+    std::unordered_map<ParameterTag, std::any> m_values{};
 };
 
 } // namespace uwb::protocol::fira
@@ -310,37 +273,38 @@ struct hash<uwb::protocol::fira::UwbConfiguration>
     operator()(const uwb::protocol::fira::UwbConfiguration& uwbConfiguration) const noexcept
     {
         std::size_t value = 0;
+        auto resultReportConfigurations = uwbConfiguration.GetResultReportConfigurations();
         notstd::hash_combine(value,
-            uwbConfiguration._firaPhyVersion,
-            uwbConfiguration._firaMacVersion,
-            uwbConfiguration._deviceRole,
-            uwbConfiguration._rangingConfiguration,
-            uwbConfiguration._stsConfiguration,
-            uwbConfiguration._multiNodeMode,
-            uwbConfiguration._rangingTimeStruct,
-            uwbConfiguration._schedulingMode,
-            uwbConfiguration._hoppingMode,
-            uwbConfiguration._blockStriding,
-            uwbConfiguration._uwbInitiationTime,
-            uwbConfiguration._channel,
-            uwbConfiguration._rframeConfig,
-            uwbConfiguration._convolutionalCodeConstraintLength,
-            uwbConfiguration._prfMode,
-            uwbConfiguration._sp0PhySetNumber,
-            uwbConfiguration._sp1PhySetNumber,
-            uwbConfiguration._sp3PhySetNumber,
-            uwbConfiguration._preableCodeIndex,
-            notstd::hash_range(std::cbegin(uwbConfiguration._resultReportConfigurations), std::cend(uwbConfiguration._resultReportConfigurations)),
-            uwbConfiguration._macAddressMode,
-            uwbConfiguration._controleeShortMacAddress,
-            uwbConfiguration._controllerMacAddress,
-            uwbConfiguration._slotsPerRangingRound,
-            uwbConfiguration._maxContentionPhaseLength,
-            uwbConfiguration._slotDuration,
-            uwbConfiguration._rangingInterval,
-            uwbConfiguration._keyRotationRate,
-            uwbConfiguration._macAddressFcsType,
-            uwbConfiguration._maxRangingRoundRetry);
+            uwbConfiguration.GetFiraPhyVersion(),
+            uwbConfiguration.GetFiraMacVersion(),
+            uwbConfiguration.GetDeviceRole(),
+            uwbConfiguration.GetRangingMethod(),
+            uwbConfiguration.GetStsConfiguration(),
+            uwbConfiguration.GetMultiNodeMode(),
+            uwbConfiguration.GetRangingTimeStruct(),
+            uwbConfiguration.GetSchedulingMode(),
+            uwbConfiguration.GetHoppingMode(),
+            uwbConfiguration.GetBlockStriding(),
+            uwbConfiguration.GetUwbInitiationTime(),
+            uwbConfiguration.GetChannel(),
+            uwbConfiguration.GetRFrameConfig(),
+            uwbConfiguration.GetConvolutionalCodeConstraintLength(),
+            uwbConfiguration.GetPrfMode(),
+            uwbConfiguration.GetSp0PhySetNumber(),
+            uwbConfiguration.GetSp1PhySetNumber(),
+            uwbConfiguration.GetSp3PhySetNumber(),
+            uwbConfiguration.GetPreableCodeIndex(),
+            notstd::hash_range(std::cbegin(resultReportConfigurations), std::cend(resultReportConfigurations)),
+            uwbConfiguration.GetMacAddressMode(),
+            uwbConfiguration.GetControleeShortMacAddress(),
+            uwbConfiguration.GetControllerMacAddress(),
+            uwbConfiguration.GetSlotsPerRangingRound(),
+            uwbConfiguration.GetMaxContentionPhaseLength(),
+            uwbConfiguration.GetSlotDuration(),
+            uwbConfiguration.GetRangingInterval(),
+            uwbConfiguration.GetKeyRotationRate(),
+            uwbConfiguration.GetMacAddressFcsType(),
+            uwbConfiguration.GetMaxRangingRoundRetry());
         return value;
     }
 };

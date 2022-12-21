@@ -14,19 +14,20 @@ namespace uwb::protocol::fira
 /**
  * @brief Effective ranging configuration.
  */
-struct RangingConfiguration
+struct RangingMethod
 {
-    constexpr RangingConfiguration() = default;
+    constexpr RangingMethod() = default;
 
-    constexpr RangingConfiguration(RangingMethod method, MeasurementReportMode reportMode) :
+    constexpr RangingMethod(RangingDirection method, MeasurementReportMode reportMode) :
         Method(method),
         ReportMode(reportMode)
     {}
 
-    RangingMethod Method{ RangingMethod::OneWay };
+    RangingDirection Method{ RangingDirection::OneWay };
     MeasurementReportMode ReportMode{ MeasurementReportMode::None };
 
-    auto operator<=>(const RangingConfiguration& other) const = default;
+    auto
+    operator<=>(const RangingMethod& other) const = default;
 };
 
 } // namespace uwb::protocol::fira
@@ -34,13 +35,13 @@ struct RangingConfiguration
 namespace std
 {
 template <>
-struct hash<uwb::protocol::fira::RangingConfiguration>
+struct hash<uwb::protocol::fira::RangingMethod>
 {
     std::size_t
-    operator()(const uwb::protocol::fira::RangingConfiguration& rangingConfiguration) const noexcept
+    operator()(const uwb::protocol::fira::RangingMethod& rangingMethod) const noexcept
     {
         std::size_t value = 0;
-        notstd::hash_combine(value, notstd::to_underlying(rangingConfiguration.Method), notstd::to_underlying(rangingConfiguration.ReportMode));
+        notstd::hash_combine(value, notstd::to_underlying(rangingMethod.Method), notstd::to_underlying(rangingMethod.ReportMode));
         return value;
     }
 };
