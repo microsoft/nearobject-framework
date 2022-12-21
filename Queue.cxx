@@ -14,7 +14,7 @@ Environment:
 
 --*/
 
-#include "driver.h"
+#include "driver.hxx"
 #include "queue.tmh"
 
 NTSTATUS

@@ -18,8 +18,8 @@ Environment:
 #include <wdf.h>
 #include <initguid.h>
 
-#include "device.h"
-#include "queue.h"
+#include "device.hxx"
+#include "queue.hxx"
 #include "trace.h"
 
 EXTERN_C_START

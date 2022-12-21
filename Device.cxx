@@ -14,8 +14,10 @@ Environment:
 
 --*/
 
-#include "driver.h"
+#include "driver.hxx"
 #include "device.tmh"
+#include "UwbSimulatorDevice.hxx"
+#include "UwbSimulatorDeviceFileObject.hxx"
 
 NTSTATUS
 UwbSimulatorCreateDevice(
@@ -44,6 +46,11 @@ Return Value:
     WDFDEVICE device;
     NTSTATUS status;
 
+    WDF_FILEOBJECT_CONFIG fileConfiguration;
+    WDF_FILEOBJECT_CONFIG_INIT(&fileConfiguration, &UwbSimulatorDevice::OnFileCreate, &UwbSimulatorDevice::OnFileClose, WDF_NO_EVENT_CALLBACK);
+
+    WDF_OBJECT_ATTRIBUTES fileAttributes;
+    WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&fileAttributes, UwbSimulatorDeviceFileObject);
     WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&deviceAttributes, DEVICE_CONTEXT);
 
     status = WdfDeviceCreate(&DeviceInit, &deviceAttributes, &device);
