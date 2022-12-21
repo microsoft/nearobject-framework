@@ -115,6 +115,7 @@ enum UWB_STATUS {
 #pragma region UciCoreGroup
 
 typedef struct _UWB_DEVICE_INFO {
+    UINT32 size;
     UWB_STATUS status;
     BYTE uciGenericVersionMajor;
     BYTE uciGenericVersionMinorAndMaintenance;
@@ -150,15 +151,17 @@ enum UWB_CAPABILITY_PARAM_TYPE {
 };
 
 typedef struct _UWB_CAPABILITY_PARAM {
+    UINT32 size;
     UWB_CAPABILITY_PARAM_TYPE paramType;
     UINT32 paramLength;
     _Field_size_bytes_(paramLength) BYTE paramValue[ANYSIZE_ARRAY];
 } UWB_CAPABILITY_PARAM, *PUWB_CAPABILITY_PARAM;
 
 typedef struct _UWB_DEVICE_CAPABILITIES {
+    UINT32 size;
     UWB_STATUS status;
-    UINT32 numberOfCapabilityParams;
-    _Field_size_(numberOfCapabilityParams) UWB_CAPABILITY_PARAM capabilityParams[ANYSIZE_ARRAY];
+    UINT32 capabilityParamsCount;
+    _Field_size_(capabilityParamsCount) UWB_CAPABILITY_PARAM capabilityParams[ANYSIZE_ARRAY];
 } UWB_DEVICE_CAPABILITIES, *PUWB_DEVICE_CAPABILITIES;
 
 enum UWB_DEVICE_CONFIG_PARAM_TYPE {
@@ -167,34 +170,40 @@ enum UWB_DEVICE_CONFIG_PARAM_TYPE {
 };
 
 typedef struct _UWB_DEVICE_CONFIG_PARAM {
+    UINT32 size;
     UWB_DEVICE_CONFIG_PARAM_TYPE paramType;
     UINT32 paramLength;
     _Field_size_bytes_(paramLength) BYTE paramValue[ANYSIZE_ARRAY];
 } UWB_DEVICE_CONFIG_PARAM, *PUWB_DEVICE_CONFIG_PARAM;
 
 typedef struct _UWB_SET_DEVICE_CONFIG_PARAMS {
+    UINT32 size;
     UINT32 deviceConfigParamsCount;
     _Field_size_(deviceConfigParamsCount) UWB_DEVICE_CONFIG_PARAM deviceConfigParams[ANYSIZE_ARRAY];
 } UWB_SET_DEVICE_CONFIG_PARAMS, *PUWB_SET_DEVICE_CONFIG_PARAMS;
 
 typedef struct _UWB_DEVICE_CONFIG_PARAM_STATUS {
+    UINT32 size;
     UWB_DEVICE_CONFIG_PARAM_TYPE paramType;
     UWB_STATUS status;
 } UWB_DEVICE_CONFIG_PARAM_STATUS, *PUWB_DEVICE_CONFIG_PARAM_STATUS;
 
 typedef struct _UWB_SET_DEVICE_CONFIG_PARAMS_STATUS {
+    UINT32 size;
     UWB_STATUS status;
     UINT32 deviceConfigParamsCount;
     _Field_size_(deviceConfigParamsCount) UWB_DEVICE_CONFIG_PARAM_STATUS deviceConfigParamsStatus[ANYSIZE_ARRAY];
 } UWB_SET_DEVICE_CONFIG_PARAMS_STATUS, *PUWB_SET_DEVICE_CONFIG_PARAMS_STATUS;
 
 typedef struct _UWB_GET_DEVICE_CONFIG_PARAMS {
+    UINT32 size;
     UINT32 deviceConfigParamsCount;
     _Field_size_(deviceConfigParamsCount) UWB_DEVICE_CONFIG_PARAM_TYPE deviceConfigParams[ANYSIZE_ARRAY];
 } UWB_GET_DEVICE_CONFIG_PARAMS, *PUWB_GET_DEVICE_CONFIG_PARAMS;
 
 typedef struct _UWB_DEVICE_CONFIG_PARAMS {
-    UINT32 status;
+    UINT32 size;
+    UWB_STATUS status;
     UINT32 deviceConfigParamsCount;
     _Field_size_(deviceConfigParamsCount) UWB_DEVICE_CONFIG_PARAM deviceConfigParams[ANYSIZE_ARRAY];
 } UWB_DEVICE_CONFIG_PARAMS, *PUWB_DEVICE_CONFIG_PARAMS;
@@ -211,6 +220,7 @@ enum UWB_DEVICE_STATE {
 
 // Device Status Notification
 typedef struct _UWB_DEVICE_STATUS {
+    UINT32 size;
     // UWBS device state
     UWB_DEVICE_STATE deviceState;
 } UWB_DEVICE_STATUS, * PUWB_DEVICE_STATUS;
@@ -221,6 +231,7 @@ enum UWB_RESET_CONFIG {
 };
 
 typedef struct _UWB_DEVICE_RESET {
+    UINT32 size;
     UWB_RESET_CONFIG resetConfig;
 } UWB_DEVICE_RESET, * PUWB_DEVICE_RESET;
 
@@ -234,11 +245,13 @@ enum UWB_SESSION_TYPE {
 };
 
 typedef struct _UWB_SESSION_INIT {
+    UINT32 size;
     UINT32 sessionId;
     UWB_SESSION_TYPE sessionType;
 } UWB_SESSION_INIT, *PUWB_SESSION_INIT;
 
 typedef struct _UWB_SESSION_DEINIT {
+    UINT32 size;
     UINT32 sessionId;
 } UWB_SESSION_DEINIT, *PUWB_SESSION_DEINIT;
 
@@ -292,36 +305,42 @@ enum UWB_APP_CONFIG_PARAM_TYPE {
 };
 
 typedef struct _UWB_APP_CONFIG_PARAM {
+    UINT32 size;
     UWB_APP_CONFIG_PARAM_TYPE paramType;
     UINT32 paramLength;
     _Field_size_bytes_(paramLength) BYTE paramValue[ANYSIZE_ARRAY];
 } UWB_APP_CONFIG_PARAM, *PUWB_APP_CONFIG_PARAM;
 
 typedef struct _UWB_SET_APP_CONFIG_PARAMS {
+    UINT32 size;
     UINT32 sessionId;
     UINT32 appConfigParamsCount;
     _Field_size_(appConfigParamsCount) UWB_APP_CONFIG_PARAM appConfigParams[ANYSIZE_ARRAY];
 } UWB_SET_APP_CONFIG_PARAMS, *PUWB_SET_APP_CONFIG_PARAMS;
 
 typedef struct _UWB_APP_CONFIG_PARAM_STATUS {
+    UINT32 size;
     UWB_APP_CONFIG_PARAM_TYPE paramType;
     UWB_STATUS status;
 } UWB_APP_CONFIG_PARAM_STATUS, *PUWB_APP_CONFIG_PARAM_STATUS;
 
 typedef struct _UWB_SET_APP_CONFIG_PARAMS_STATUS {
+    UINT32 size;
     UWB_STATUS status;
     UINT32 appConfigParamsCount;
     _Field_size_(appConfigParamsCount) UWB_APP_CONFIG_PARAM_STATUS appConfigParamsStatus[ANYSIZE_ARRAY];
 } UWB_SET_APP_CONFIG_PARAMS_STATUS, *PUWB_SET_APP_CONFIG_PARAMS_STATUS;
 
 typedef struct _UWB_GET_APP_CONFIG_PARAMS {
+    UINT32 size;
     UINT32 sessionId;
     UINT32 appConfigParamsCount;
     _Field_size_(appConfigParamsCount) UWB_APP_CONFIG_PARAM_TYPE appConfigParams[ANYSIZE_ARRAY];
 } UWB_GET_APP_CONFIG_PARAMS, *PUWB_GET_APP_CONFIG_PARAMS;
 
 typedef struct _UWB_APP_CONFIG_PARAMS {
-    UINT32 status;
+    UINT32 size;
+    UWB_STATUS status;
     UINT32 appConfigParamsCount;
     _Field_size_(appConfigParamsCount) UWB_APP_CONFIG_PARAM appConfigParams[ANYSIZE_ARRAY];
 } UWB_APP_CONFIG_PARAMS, *PUWB_APP_CONFIG_PARAMS;
@@ -346,15 +365,18 @@ enum UWB_SESSION_REASON_CODE {
 };
 
 typedef struct _UWB_SESSION_COUNT {
+    UINT32 size;
     UWB_STATUS status;
     UINT32 sessionCount;
 } UWB_GET_SESSION_COUNT, * PUWB_GET_SESSION_COUNT;
 
 typedef struct _UWB_GET_SESSION_STATE {
+    UINT32 size;
     UINT32 sessionId;
 } UWB_GET_SESSION_STATE, * PUWB_GET_SESSION_STATE;
 
 typedef struct _UWB_SESSION_STATE_STATUS {
+    UINT32 size;
     UWB_STATUS status;
     UWB_SESSION_STATE sessionState;
 } UWB_SESSION_STATE_STATUS, * PUWB_SESSION_STATE_STATUS;
@@ -365,18 +387,21 @@ enum UWB_MULTICAST_ACTION {
 };
 
 typedef struct _UWB_MULTICAST_CONTROLEE_LIST_ENTRY {
+    UINT32 size;
     USHORT shortAddress;
     UINT32 subSessionId;
 } UWB_MULTICAST_CONTROLEE_LIST_ENTRY, * PUWB_MULTICAST_CONTROLEE_LIST_ENTRY;
 
 // Session Status Notification
 typedef struct _UWB_SESSION_STATUS {
+    UINT32 size;
     UINT32 sessionId;
     UWB_SESSION_STATE state;
     UWB_SESSION_REASON_CODE reasonCode;
 } UWB_SESSION_STATUS, *PUWB_SESSION_STATUS;
 
 typedef struct _UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST {
+    UINT32 size;
     UINT32 sessionId;
     UWB_MULTICAST_ACTION action;
     UINT32 numberOfControlees;
@@ -391,6 +416,7 @@ enum UWB_MULTICAST_STATUS {
 };
 
 typedef struct _UWB_MULTICAST_LIST_STATUS {
+    UINT32 size;
     USHORT controleeMacAddress;
     UINT32 subSessionId;
     UWB_MULTICAST_STATUS status;
@@ -398,6 +424,7 @@ typedef struct _UWB_MULTICAST_LIST_STATUS {
 
 // Session Update Controller Multicast List Notification
 typedef struct _UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF {
+    UINT32 size;
     UINT32 sessionId;
     UINT32 remainingMulticastListSize;
     UINT32 numberOfControlees;
@@ -409,18 +436,22 @@ typedef struct _UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF {
 #pragma region UwbRangingSessionControlGroup
 
 typedef struct _UWB_START_RANGING_SESSION {
+    UINT32 size;
     UINT32 sessionId;
 } UWB_START_RANGING_SESSION, *PUWB_START_RANGING_SESSION;
 
 typedef struct _UWB_STOP_RANGING_SESSION {
+    UINT32 size;
     UINT32 sessionId;
 } UWB_STOP_RANGING_SESSION, *PUWB_STOP_RANGING_SESSION;
 
 typedef struct _UWB_GET_RANGING_COUNT {
+    UINT32 size;
     UINT32 sessionId;
 } UWB_GET_RANGING_COUNT, * PUWB_GET_RANGING_COUNT;
 
 typedef struct _UWB_RANGING_COUNT {
+    UINT32 size;
     UWB_STATUS status;
     UINT32 count;
 } UWB_RANGING_COUNT, * PUWB_RANGING_COUNT;
@@ -439,6 +470,7 @@ enum UWB_MAC_ADDRESS_MODE_INDICATOR {
 
 typedef struct _UWB_MAC_ADDRESS
 {
+    UINT32 size;
     UWB_MAC_ADDRESS_MODE_INDICATOR addressType;
     union
     {
@@ -454,6 +486,7 @@ enum UWB_LINE_OF_SIGHT_INDICATOR {
 };
 
 typedef struct _UWB_RANGING_MEASUREMENT {
+    UINT32 size;
     UWB_MAC_ADDRESS macAddrPeer;
     UWB_STATUS status;
     UWB_LINE_OF_SIGHT_INDICATOR lineOfSightIndicator;
@@ -461,23 +494,23 @@ typedef struct _UWB_RANGING_MEASUREMENT {
     USHORT distance;
     // AoA Azimuth in degrees
     // Allowed values range from -180 to +180
-    SHORT aoaAzimuth;
+    BYTE aoaAzimuth[2];
     // IEEE 802.15.4z-2020, Section 6.9.1.7: Ranging FoM
     // Figure of Merit goes from 0 to 100
     BYTE aoaAzimuthFigureOfMerit;
     // AoA Elevation in degrees
     // Allowed values range from -90 to +90
-    SHORT aoaElevation;
+    BYTE aoaElevation[2];
     // Figure of Merit goes from 0 to 100
     BYTE aoaElevationFigureOfMerit;
     // AoA Destination Azimuth in degrees
     // Allowed values range from -180 to +180
-    SHORT aoaDestinationAzimuth;
+    BYTE aoaDestinationAzimuth[2];
     // Figure of Merit goes from 0 to 100
     BYTE aoaDestinationAzimuthFigureOfMerit;
     // AoA Destination Elevation in degrees
     // Allowed values range from -90 to +90
-    SHORT aoaDestinationElevation;
+    BYTE aoaDestinationElevation[2];
     // Figure of Merit goes from 0 to 100
     BYTE aoaDestinationElevationFigureOfMerit;
     // Slot number starts from 0
@@ -486,6 +519,7 @@ typedef struct _UWB_RANGING_MEASUREMENT {
 
 // Ranging Data Notification
 typedef struct _UWB_RANGING_DATA {
+    UINT32 size;
     UINT32 sequenceNumber;
     UINT32 sessionId;
     UINT32 currentRangingInterval;
@@ -506,6 +540,7 @@ enum UWB_NOTIFICATION_TYPE {
 
 typedef struct _UWB_NOTIFICATION_DATA
 {
+    UINT32 size;
     UWB_NOTIFICATION_TYPE notificationType;
     union
     {

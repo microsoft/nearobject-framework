@@ -50,7 +50,7 @@ FromUwbCx(const UWB_DEVICE_CAPABILITIES& uwbDeviceCapabilities)
 {
     fira::UwbCapability uwbCapability;
 
-    for (const auto capability : wil::make_range(&uwbDeviceCapabilities.capabilityParams[0], uwbDeviceCapabilities.numberOfCapabilityParams)) {
+    for (const auto capability : wil::make_range(&uwbDeviceCapabilities.capabilityParams[0], uwbDeviceCapabilities.capabilityParamsCount)) {
         switch (capability.paramType) {
         case UWB_CAPABILITY_PARAM_TYPE_RANGING_METHOD: {
             const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
