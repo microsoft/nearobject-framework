@@ -276,11 +276,8 @@ UwbConfiguration::Builder::Supports() noexcept
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::AddResultReportConfiguration(uwb::protocol::fira::ResultReportConfiguration resultReportConfiguration) noexcept
 {
-    if (!m_values[ParameterTag::ResultReportConfig].has_value()) {
-        m_values[ParameterTag::ResultReportConfig].emplace<std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>>();
-    }
-
-    auto& resultReportConfigurations = std::any_cast<std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>&>(m_values[ParameterTag::ResultReportConfig]);
+    auto [it, _] = m_values.insert( { ParameterTag::ResultReportConfig, std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>{} });
+    auto& resultReportConfigurations = std::get<std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>>(it->second);
     resultReportConfigurations.insert(std::move(resultReportConfiguration));
 
     return *this;

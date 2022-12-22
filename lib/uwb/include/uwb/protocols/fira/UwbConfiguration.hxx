@@ -2,13 +2,13 @@
 #ifndef UWB_CONFIGURATION_HXX
 #define UWB_CONFIGURATION_HXX
 
-#include <any>
 #include <compare>
 #include <cstdint>
 #include <functional>
 #include <memory>
 #include <optional>
 #include <unordered_set>
+#include <variant>
 
 #include <TlvBer.hxx>
 #include <notstd/hash.hxx>
@@ -106,6 +106,31 @@ struct UwbConfiguration
     static const std::unordered_set<ResultReportConfiguration> ResultReportConfigurationsDefault;
 
     /**
+     * @brief Variant for all possible property types. 
+     */
+    using ParameterTypesVariant = std::variant<
+        bool,
+        uint8_t,
+        uint16_t,
+        uint32_t,
+        uwb::protocol::fira::Channel,
+        uwb::protocol::fira::ConvolutionalCodeConstraintLength,
+        uwb::protocol::fira::DeviceRole,
+        uwb::protocol::fira::MultiNodeMode,
+        uwb::protocol::fira::PrfMode,
+        uwb::protocol::fira::RangingMethod,
+        uwb::protocol::fira::RangingMode,
+        uwb::protocol::fira::ResultReportConfiguration,
+        uwb::protocol::fira::SchedulingMode,
+        uwb::protocol::fira::StsConfiguration,
+        uwb::protocol::fira::StsPacketConfiguration,
+        uwb::UwbMacAddress,
+        uwb::UwbMacAddressFcsType,
+        uwb::UwbMacAddressType,
+        std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>
+    >;
+
+    /**
      * @brief Creates a new UwbConfiguration builder object.
      *
      * @return UwbConfiguration::Builder
@@ -121,7 +146,7 @@ struct UwbConfiguration
      * @return false
      */
     bool
-    operator==(const UwbConfiguration& other) const noexcept;
+    operator==(const UwbConfiguration& other) const noexcept = default;
 
     /**
      * @brief Convert this object into a FiRa Data Object (DO).
@@ -142,10 +167,10 @@ struct UwbConfiguration
 
     /**
      * @brief The map of parameter tags and their values from the configuration object.
-     *
-     * @return const std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, std::any>&
+     * 
+     * @return const std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, ParameterTypesVariant>& 
      */
-    const std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, std::any>&
+    const std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, ParameterTypesVariant>&
     GetValueMap() const noexcept;
 
     std::optional<uint32_t>
@@ -254,12 +279,13 @@ private:
     {
         auto it = m_values.find(tag);
         return (it != std::cend(m_values))
-            ? std::optional<T>(std::any_cast<T>(it->second))
+            ? std::optional<T>(std::get<T>(it->second))
             : std::nullopt;
     }
 
+
 private:
-    std::unordered_map<ParameterTag, std::any> m_values{};
+    std::unordered_map<ParameterTag, ParameterTypesVariant> m_values{};
 };
 
 } // namespace uwb::protocol::fira
