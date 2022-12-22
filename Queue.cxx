@@ -5,8 +5,9 @@
  * @copyright Copyright (c) 2022
  */
 
-#include "queue.tmh"
 #include "driver.hxx"
+
+#include "queue.tmh"
 
 NTSTATUS
 UwbSimulatorQueueInitialize(WDFDEVICE device)
@@ -89,8 +90,8 @@ Return Value:
         "%!FUNC! Queue 0x%p, Request 0x%p OutputBufferLength %d InputBufferLength %d IoControlCode %d",
         queue,
         request,
-        (int)outputBufferLength,
-        (int)inputBufferLength,
+        static_cast<int>(outputBufferLength),
+        static_cast<int>(inputBufferLength),
         ioControlCode);
 
     WdfRequestComplete(request, STATUS_SUCCESS);

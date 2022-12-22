@@ -4,11 +4,11 @@
  *
  * @copyright Copyright (c) 2022
  */
-
+#include "driver.hxx"
 #include "device.tmh"
+
 #include "UwbSimulatorDevice.hxx"
 #include "UwbSimulatorDeviceFileObject.hxx"
-#include "driver.hxx"
 
 NTSTATUS
 UwbSimulatorCreateDevice(WDFDEVICE_INIT *deviceInit)
