@@ -106,7 +106,7 @@ struct UwbConfiguration
     static const std::unordered_set<ResultReportConfiguration> ResultReportConfigurationsDefault;
 
     /**
-     * @brief Variant for all possible property types. 
+     * @brief Variant for all possible property types.
      */
     using ParameterTypesVariant = std::variant<
         bool,
@@ -127,8 +127,7 @@ struct UwbConfiguration
         uwb::UwbMacAddress,
         uwb::UwbMacAddressFcsType,
         uwb::UwbMacAddressType,
-        std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>
-    >;
+        std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>>;
 
     /**
      * @brief Creates a new UwbConfiguration builder object.
@@ -167,8 +166,8 @@ struct UwbConfiguration
 
     /**
      * @brief The map of parameter tags and their values from the configuration object.
-     * 
-     * @return const std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, ParameterTypesVariant>& 
+     *
+     * @return const std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, ParameterTypesVariant>&
      */
     const std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, ParameterTypesVariant>&
     GetValueMap() const noexcept;
@@ -282,7 +281,6 @@ private:
             ? std::optional<T>(std::get<T>(it->second))
             : std::nullopt;
     }
-
 
 private:
     std::unordered_map<ParameterTag, ParameterTypesVariant> m_values{};
