@@ -19,19 +19,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ReadMe.txt" />
+    <ClCompile Include="Device.cxx" />
+    <ClCompile Include="Driver.cxx" />
+    <ClCompile Include="Queue.cxx" />
+    <ClCompile Include="UwbSimulatorDevice.cxx" />
+    <ClCompile Include="UwbSimulatorDeviceFileObject.cxx" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Device.c" />
-    <ClCompile Include="Driver.c" />
-    <ClCompile Include="Queue.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Device.h" />
-    <ClInclude Include="Driver.h" />
+    <ClInclude Include="Device.hxx" />
+    <ClInclude Include="Driver.hxx" />
     <ClInclude Include="Public.h" />
-    <ClInclude Include="Queue.h" />
+    <ClInclude Include="Queue.hxx" />
     <ClInclude Include="Trace.h" />
+    <ClInclude Include="UwbCxDependencies.hxx" />
+    <ClInclude Include="UwbSimulatorDevice.hxx" />
+    <ClInclude Include="UwbSimulatorDeviceFileObject.hxx" />
   </ItemGroup>
   <ItemGroup>
     <Inf Include="UwbSimulator.inf" />
@@ -112,6 +114,7 @@
       <WppScanConfigurationData Condition="'%(ClCompile.ScanConfigurationData)' == ''">trace.h</WppScanConfigurationData>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <ConformanceMode>false</ConformanceMode>
     </ClCompile>
     <DriverSign>
       <FileDigestAlgorithm>sha256</FileDigestAlgorithm>

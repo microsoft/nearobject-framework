@@ -1,18 +1,9 @@
-/*++
-
-Module Name:
-
-    queue.h
-
-Abstract:
-
-    This file contains the queue definitions.
-
-Environment:
-
-    User-mode Driver Framework 2
-
---*/
+/**
+ * @file Queue.hxx
+ * @brief This file contains the queue entry points and callbacks.
+ * 
+ * @copyright Copyright (c) 2022
+ */
 
 EXTERN_C_START
 
@@ -29,9 +20,7 @@ typedef struct _QUEUE_CONTEXT {
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(QUEUE_CONTEXT, QueueGetContext)
 
 NTSTATUS
-UwbSimulatorQueueInitialize(
-    _In_ WDFDEVICE Device
-    );
+UwbSimulatorQueueInitialize(WDFDEVICE device);
 
 //
 // Events from the IoQueue object

@@ -1,19 +1,7 @@
-/*++
-
-Module Name:
-
-    Internal.h
-
-Abstract:
-
-    This module contains the local type definitions for the
-    driver.
-
-Environment:
-
-    Windows User-Mode Driver Framework 2
-
---*/
+/**
+ * @brief This module contains the local type definitions for the
+ * driver.
+ */
 
 //
 // Define the tracing flags.
@@ -23,7 +11,7 @@ Environment:
 
 #define WPP_CONTROL_GUIDS                                              \
     WPP_DEFINE_CONTROL_GUID(                                           \
-        MyDriver1TraceGuid, (f77bb915,7f8f,43b4,a2b9,cb00d7ae55a5),                  \
+        UwbSimulatorTraceGuid, (f77bb915,7f8f,43b4,a2b9,cb00d7ae55a5), \
                                                                        \
         WPP_DEFINE_BIT(MYDRIVER_ALL_INFO)                              \
         WPP_DEFINE_BIT(TRACE_DRIVER)                                   \
@@ -58,5 +46,5 @@ Environment:
 // Driver specific #defines
 //
 #if UMDF_VERSION_MAJOR == 2 && UMDF_VERSION_MINOR == 0
-    #define MYDRIVER_TRACING_ID      L"Microsoft\\UMDF2.0\\UwbSimulator V1.0"
+    #define UWB_SIMULATOR_TRACING_ID L"UwbSimulator"
 #endif
