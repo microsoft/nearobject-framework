@@ -5,10 +5,10 @@
  * @copyright Copyright (c) 2022
  */
 
-#include "driver.hxx"
 #include "device.tmh"
 #include "UwbSimulatorDevice.hxx"
 #include "UwbSimulatorDeviceFileObject.hxx"
+#include "driver.hxx"
 
 NTSTATUS
 UwbSimulatorCreateDevice(WDFDEVICE_INIT *deviceInit)
@@ -41,8 +41,7 @@ Return Value:
 
     WDFDEVICE device;
     NTSTATUS status = WdfDeviceCreate(&deviceInit, &deviceAttributes, &device);
-    if (!NT_SUCCESS(status))
-    {
+    if (!NT_SUCCESS(status)) {
         // TODO: log
         return status;
     }
@@ -68,8 +67,7 @@ Return Value:
     // to us.
     //
     status = WdfDeviceCreateDeviceInterface(device, &GUID_DEVINTERFACE_UwbSimulator, nullptr);
-    if (!NT_SUCCESS(status))
-    {
+    if (!NT_SUCCESS(status)) {
         return status;
     }
 

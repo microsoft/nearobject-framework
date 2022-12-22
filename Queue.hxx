@@ -1,7 +1,7 @@
 /**
  * @file Queue.hxx
  * @brief This file contains the queue entry points and callbacks.
- * 
+ *
  * @copyright Copyright (c) 2022
  */
 
@@ -11,9 +11,9 @@ EXTERN_C_START
 // This is the context that can be placed per queue
 // and would contain per queue information.
 //
-typedef struct _QUEUE_CONTEXT {
-
-    ULONG PrivateDeviceData;  // just a placeholder
+typedef struct _QUEUE_CONTEXT
+{
+    ULONG PrivateDeviceData;
 
 } QUEUE_CONTEXT, *PQUEUE_CONTEXT;
 

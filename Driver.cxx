@@ -1,7 +1,7 @@
 /**
  * @file Driver.cxx
  * @brief This file contains the driver entry points and callbacks.
- * 
+ *
  * @copyright Copyright (c) 2022
  */
 
@@ -42,7 +42,7 @@ Return Value:
 #if UMDF_VERSION_MAJOR == 2 && UMDF_VERSION_MINOR == 0
     WPP_INIT_TRACING(UWB_SIMULATOR_TRACING_ID);
 #else
-    WPP_INIT_TRACING( driverObject, registryPath );
+    WPP_INIT_TRACING(driverObject, registryPath);
 #endif
 
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");

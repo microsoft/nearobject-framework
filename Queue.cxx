@@ -5,8 +5,8 @@
  * @copyright Copyright (c) 2022
  */
 
-#include "driver.hxx"
 #include "queue.tmh"
+#include "driver.hxx"
 
 NTSTATUS
 UwbSimulatorQueueInitialize(WDFDEVICE device)
@@ -49,8 +49,7 @@ Return Value:
         WDF_NO_OBJECT_ATTRIBUTES,
         &queue);
 
-    if (!NT_SUCCESS(status))
-    {
+    if (!NT_SUCCESS(status)) {
         TraceEvents(TRACE_LEVEL_ERROR, TRACE_QUEUE, "WdfIoQueueCreate failed %!STATUS!", status);
         return status;
     }
@@ -58,7 +57,8 @@ Return Value:
     return status;
 }
 
-void UwbSimulatorEvtIoDeviceControl(WDFQUEUE queue, WDFREQUEST request, size_t outputBufferLength, size_t inputBufferLength, ULONG ioControlCode)
+void
+UwbSimulatorEvtIoDeviceControl(WDFQUEUE queue, WDFREQUEST request, size_t outputBufferLength, size_t inputBufferLength, ULONG ioControlCode)
 /*++
 
 Routine Description:
@@ -85,16 +85,21 @@ Return Value:
 --*/
 {
     TraceEvents(TRACE_LEVEL_INFORMATION,
-                TRACE_QUEUE,
-                "%!FUNC! Queue 0x%p, Request 0x%p OutputBufferLength %d InputBufferLength %d IoControlCode %d",
-                queue, request, (int)outputBufferLength, (int)inputBufferLength, ioControlCode);
+        TRACE_QUEUE,
+        "%!FUNC! Queue 0x%p, Request 0x%p OutputBufferLength %d InputBufferLength %d IoControlCode %d",
+        queue,
+        request,
+        (int)outputBufferLength,
+        (int)inputBufferLength,
+        ioControlCode);
 
     WdfRequestComplete(request, STATUS_SUCCESS);
 
     return;
 }
 
-void UwbSimulatorEvtIoStop(WDFQUEUE queue, WDFREQUEST request, ULONG actionFlags)
+void
+UwbSimulatorEvtIoStop(WDFQUEUE queue, WDFREQUEST request, ULONG actionFlags)
 /*++
 
 Routine Description:
@@ -119,9 +124,11 @@ Return Value:
 --*/
 {
     TraceEvents(TRACE_LEVEL_INFORMATION,
-                TRACE_QUEUE,
-                "%!FUNC! Queue 0x%p, Request 0x%p ActionFlags %d",
-                queue, request, actionFlags);
+        TRACE_QUEUE,
+        "%!FUNC! Queue 0x%p, Request 0x%p ActionFlags %d",
+        queue,
+        request,
+        actionFlags);
 
     //
     // In most cases, the EvtIoStop callback function completes, cancels, or postpones

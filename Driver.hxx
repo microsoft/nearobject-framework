@@ -1,14 +1,15 @@
 /**
  * @file Driver.hxx
  * @brief This file contains the driver definitions.
- * 
+ *
  * @copyright Copyright (c) 2022
- * 
+ *
  */
 
 #include <windows.h>
-#include <wdf.h>
+
 #include <initguid.h>
+#include <wdf.h>
 
 #include "device.hxx"
 #include "queue.hxx"
