@@ -1,7 +1,7 @@
 /**
  * @file Device.cxx
- * @brief This file contains the device entry points and callbacks. 
- * 
+ * @brief This file contains the device entry points and callbacks.
+ *
  * @copyright Copyright (c) 2022
  */
 
@@ -29,19 +29,20 @@ Return Value:
     NTSTATUS
 
 --*/
-{ 
+{
     WDF_FILEOBJECT_CONFIG fileConfiguration;
     WDF_FILEOBJECT_CONFIG_INIT(&fileConfiguration, &UwbSimulatorDevice::OnFileCreate, &UwbSimulatorDevice::OnFileClose, WDF_NO_EVENT_CALLBACK);
 
     WDF_OBJECT_ATTRIBUTES fileAttributes;
     WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&fileAttributes, UwbSimulatorDeviceFileObject);
-    
+
     WDF_OBJECT_ATTRIBUTES deviceAttributes;
     WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&deviceAttributes, DEVICE_CONTEXT);
 
     WDFDEVICE device;
     NTSTATUS status = WdfDeviceCreate(&deviceInit, &deviceAttributes, &device);
-    if (!NT_SUCCESS(status)) {
+    if (!NT_SUCCESS(status))
+    {
         // TODO: log
         return status;
     }
@@ -67,7 +68,8 @@ Return Value:
     // to us.
     //
     status = WdfDeviceCreateDeviceInterface(device, &GUID_DEVINTERFACE_UwbSimulator, nullptr);
-    if (!NT_SUCCESS(status)) {
+    if (!NT_SUCCESS(status))
+    {
         return status;
     }
 
@@ -75,6 +77,6 @@ Return Value:
     // Initialize the I/O Package and any Queues
     //
     status = UwbSimulatorQueueInitialize(device);
-    
+
     return status;
 }
