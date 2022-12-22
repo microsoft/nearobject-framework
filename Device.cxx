@@ -10,25 +10,16 @@
 #include "UwbSimulatorDevice.hxx"
 #include "UwbSimulatorDeviceFileObject.hxx"
 
+/**
+ * @brief Worker routine called to create a device and its software resources.
+ * 
+ * @param deviceInit Pointer to an opaque init structure. Memory for this
+ * structure will be freed by the framework when the WdfDeviceCreate succeeds.
+ * So don't access the structure after that point.
+ * @return NTSTATUS 
+ */
 NTSTATUS
 UwbSimulatorCreateDevice(WDFDEVICE_INIT *deviceInit)
-/*++
-
-Routine Description:
-
-    Worker routine called to create a device and its software resources.
-
-Arguments:
-
-    DeviceInit - Pointer to an opaque init structure. Memory for this
-                    structure will be freed by the framework when the WdfDeviceCreate
-                    succeeds. So don't access the structure after that point.
-
-Return Value:
-
-    NTSTATUS
-
---*/
 {
     WDF_FILEOBJECT_CONFIG fileConfiguration;
     WDF_FILEOBJECT_CONFIG_INIT(&fileConfiguration, &UwbSimulatorDevice::OnFileCreate, &UwbSimulatorDevice::OnFileClose, WDF_NO_EVENT_CALLBACK);

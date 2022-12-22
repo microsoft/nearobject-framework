@@ -19,6 +19,17 @@ typedef struct _QUEUE_CONTEXT
 
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(QUEUE_CONTEXT, QueueGetContext)
 
+/**
+ * @brief The I/O dispatch callbacks for the frameworks device object
+ * are configured in this function.
+ * 
+ * A single default I/O Queue is configured for parallel request
+ * processing, and a driver context memory allocation is created
+ * to hold our structure QUEUE_CONTEXT.
+ * 
+ * @param device Handle to a framework device object.
+ * @return NTSTATUS 
+ */
 NTSTATUS
 UwbSimulatorQueueInitialize(WDFDEVICE device);
 
