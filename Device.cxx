@@ -1,41 +1,32 @@
 /**
  * @file Device.cxx
- * @brief This file contains the device entry points and callbacks. 
- * 
+ * @brief This file contains the device entry points and callbacks.
+ *
  * @copyright Copyright (c) 2022
  */
-
 #include "driver.hxx"
 #include "device.tmh"
+
 #include "UwbSimulatorDevice.hxx"
 #include "UwbSimulatorDeviceFileObject.hxx"
 
+/**
+ * @brief Worker routine called to create a device and its software resources.
+ * 
+ * @param deviceInit Pointer to an opaque init structure. Memory for this
+ * structure will be freed by the framework when the WdfDeviceCreate succeeds.
+ * So don't access the structure after that point.
+ * @return NTSTATUS 
+ */
 NTSTATUS
 UwbSimulatorCreateDevice(WDFDEVICE_INIT *deviceInit)
-/*++
-
-Routine Description:
-
-    Worker routine called to create a device and its software resources.
-
-Arguments:
-
-    DeviceInit - Pointer to an opaque init structure. Memory for this
-                    structure will be freed by the framework when the WdfDeviceCreate
-                    succeeds. So don't access the structure after that point.
-
-Return Value:
-
-    NTSTATUS
-
---*/
-{ 
+{
     WDF_FILEOBJECT_CONFIG fileConfiguration;
     WDF_FILEOBJECT_CONFIG_INIT(&fileConfiguration, &UwbSimulatorDevice::OnFileCreate, &UwbSimulatorDevice::OnFileClose, WDF_NO_EVENT_CALLBACK);
 
     WDF_OBJECT_ATTRIBUTES fileAttributes;
     WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&fileAttributes, UwbSimulatorDeviceFileObject);
-    
+
     WDF_OBJECT_ATTRIBUTES deviceAttributes;
     WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&deviceAttributes, DEVICE_CONTEXT);
 
@@ -75,6 +66,6 @@ Return Value:
     // Initialize the I/O Package and any Queues
     //
     status = UwbSimulatorQueueInitialize(device);
-    
+
     return status;
 }

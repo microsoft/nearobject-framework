@@ -1,7 +1,7 @@
 /**
  * @file Device.hxx
  * @brief This file contains the device definitions.
- * 
+ *
  * @copyright Copyright (c) 2022
  */
 
@@ -15,7 +15,7 @@ EXTERN_C_START
 //
 typedef struct _DEVICE_CONTEXT
 {
-    ULONG PrivateDeviceData;  // just a placeholder
+    ULONG PrivateDeviceData;
 
 } DEVICE_CONTEXT, *PDEVICE_CONTEXT;
 
