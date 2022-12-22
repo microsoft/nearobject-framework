@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <magic_enum.hpp>
 
 #include <windows/uwb/UwbSession.hxx>
 
@@ -13,6 +14,19 @@ UwbSession::UwbSession(std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks, w
     uwb::UwbSession(std::move(callbacks)),
     m_handleDriver(std::move(handleDriver))
 {}
+
+template <class T>
+std::unique_ptr<UWB_APP_CONFIG_PARAM>
+GetUWB_APP_CONFIG_PARAM(const T& value){
+    auto pdata = std::make_unique<uint8_t>(FIELD_OFFSET(UWB_APP_CONFIG_PARAM,paramValue[sizeof T]));
+
+}
+
+template <class T>
+UWB_SET_APP_CONFIG_PARAMS
+GetUWB_SET_APP_CONFIG_PARAMS(){
+
+}
 
 void
 UwbSession::ConfigureImpl(const uwb::protocol::fira::UwbSessionData& uwbSessionData)
@@ -32,6 +46,24 @@ UwbSession::ConfigureImpl(const uwb::protocol::fira::UwbSessionData& uwbSessionD
     }
 
     m_sessionId = uwbSessionData.sessionId;
+
+    // Populate the PUWB_SET_APP_CONFIG_PARAMS
+    std::vector<uint8_t> dataHolder;
+    dataHolder.reserve(FIELD_OFFSET(UWB_SET_APP_CONFIG_PARAMS,appConfigParams[magic_enum::enum_count<UWB_APP_CONFIG_PARAM_TYPE>()])); // TODO minimum number of bytes needed
+
+    auto tmpHolder = std::make_shared<uint8_t>(dataHolder.size());
+    memcpy(tmpHolder.get(),dataHolder.data(),dataHolder.size());
+    auto paramHolder = std::reinterpret_pointer_cast<UWB_SET_APP_CONFIG_PARAMS,uint8_t>(tmpHolder);
+
+    // Allocate memory for the PUWB_SET_APP_CONFIG_PARAMS_STATUS
+    auto statusSize = dataHolder.size(); // TODO actually calculate the size
+    tmpHolder = std::make_shared<uint8_t>(statusSize); 
+    auto statusHolder = std::reinterpret_pointer_cast<UWB_SET_APP_CONFIG_PARAMS_STATUS,uint8_t>(tmpHolder);
+
+    hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_SET_APP_CONFIG_PARAMS, paramHolder.get(), dataHolder.size(), statusHolder.get(), statusSize, nullptr, nullptr);
+    if (FAILED(hr)) {
+        // TODO: handle this
+    }
 }
 
 void

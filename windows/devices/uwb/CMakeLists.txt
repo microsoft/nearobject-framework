@@ -23,6 +23,7 @@ target_link_libraries(windevuwb
     PRIVATE
         uwbcx
         windevutil
+        magic_enum::magic_enum
     PUBLIC
         cfgmgr32.lib
         uwb
