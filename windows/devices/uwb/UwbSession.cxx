@@ -131,7 +131,7 @@ std::unordered_map<
     UWB_APP_CONFIG_PARAM_TYPE,
     std::tuple<uwb::protocol::fira::UwbConfiguration::ParameterTag,
         std::function<uint8_t *(std::any, std::size_t, uint8_t *)>>>
-    UwbConfiguration2APP_CONFIG{
+    ddi_service_map{
         { UWB_APP_CONFIG_PARAM_TYPE_DEVICE_ROLE,
             { uwb::protocol::fira::UwbConfiguration::ParameterTag::DeviceRole,
                 [](std::any arg, std::size_t size, uint8_t *dst) {
@@ -151,7 +151,7 @@ WriteUWB_APP_CONFIG_PARAM(UWB_APP_CONFIG_PARAM_TYPE dditype, std::any arg)
     param->size = size;
     param->paramType = dditype;
     param->paramLength = paramLength;
-    auto [_, fn] = UwbConfiguration2APP_CONFIG[dditype];
+    auto [_, fn] = ddi_service_map[dditype];
     fn(arg, paramLength, param->paramValue);
     return result;
 }
@@ -178,10 +178,10 @@ UwbSession::ConfigureImpl(const uwb::protocol::fira::UwbSessionData &uwbSessionD
     // Populate the PUWB_SET_APP_CONFIG_PARAMS
     auto sessionUwbMap = uwbSessionData.uwbConfiguration.GetValueMap();
 
-    std::vector<std::shared_ptr<uint8_t>> datavector(UwbConfiguration2APP_CONFIG.size());
+    std::vector<std::shared_ptr<uint8_t>> datavector(ddi_service_map.size());
 
-    std::transform(std::cbegin(UwbConfiguration2APP_CONFIG),
-        std::cend(UwbConfiguration2APP_CONFIG),
+    std::transform(std::cbegin(ddi_service_map),
+        std::cend(ddi_service_map),
         std::cbegin(datavector),
         [&sessionUwbMap](const auto &it) {
             const auto &[dditype, t] = it;
