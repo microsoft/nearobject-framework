@@ -6,6 +6,7 @@ target_sources(nearobject-test-windows
         ${CMAKE_CURRENT_LIST_DIR}/Main.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNearObjectDeviceDiscoveryAgentUwb.cxx 
         ${CMAKE_CURRENT_LIST_DIR}/TestNotStd.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/TestUwbAppConfiguration.cxx
 )
 
 target_link_libraries(nearobject-test-windows
