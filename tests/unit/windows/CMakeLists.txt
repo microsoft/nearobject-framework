@@ -14,6 +14,8 @@ target_link_libraries(nearobject-test-windows
         Catch2::Catch2WithMain
         nearobject-service-windows
         notstd-windows
+        uwb
+        windevuwb
 )
 
 catch_discover_tests(nearobject-test-windows)
