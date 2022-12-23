@@ -4,6 +4,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <memory>
 #include <tuple>
 
@@ -97,5 +98,11 @@ private:
     PropertyT& m_value;
 };
 } // namespace windows::devices
+
+bool
+operator==(const UWB_APP_CONFIG_PARAM& lhs, const UWB_APP_CONFIG_PARAM& rhs) noexcept
+{
+    return (lhs.size == rhs.size) && (std::memcmp(&lhs, &rhs, lhs.size) == 0);
+}
 
 #endif // UWB_APP_CONFIGURATION_HXX
