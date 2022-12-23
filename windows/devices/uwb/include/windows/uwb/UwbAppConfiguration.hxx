@@ -22,7 +22,7 @@ public:
         m_value(reinterpret_cast<PropertyT&>(m_parameter.paramValue))
     {
         m_parameter.size = m_size;
-        m_parameter.paramLength = sizeof(PropertyT);
+        m_parameter.paramLength = parameterSize;
         m_value = value; // set value contents 
     } 
 
