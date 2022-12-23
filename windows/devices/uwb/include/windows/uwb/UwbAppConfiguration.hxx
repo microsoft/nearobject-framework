@@ -23,7 +23,7 @@ public:
     {
         m_parameter.size = m_size;
         m_parameter.paramLength = parameterSize;
-        m_value = value; // set value contents 
+        m_value = value;
     } 
 
     std::size_t
