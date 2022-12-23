@@ -53,7 +53,7 @@ public:
     uint8_t*
     Buffer() noexcept
     {
-        return m_buffer;
+        return m_buffer.get();
     }
 
     /**
