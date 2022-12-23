@@ -150,7 +150,7 @@ UwbConfiguration::GetResultReportConfigurations() const noexcept
 {
     auto it = m_values.find(ParameterTag::ResultReportConfig);
     return (it != std::cend(m_values))
-        ? std::any_cast<std::unordered_set<ResultReportConfiguration>>(it->second)
+        ? std::get<std::unordered_set<ResultReportConfiguration>>(it->second)
         : std::unordered_set<ResultReportConfiguration>{};
 }
 
@@ -214,46 +214,8 @@ UwbConfiguration::GetMaxRangingRoundRetry() const noexcept
     return GetValue<uint16_t>(ParameterTag::MaxRrRetry);
 }
 
-const std::unordered_map<UwbConfiguration::ParameterTag, std::any>&
+const std::unordered_map<UwbConfiguration::ParameterTag, UwbConfiguration::ParameterTypesVariant>&
 UwbConfiguration::GetValueMap() const noexcept
 {
     return m_values;
-}
-
-bool
-UwbConfiguration::operator==(const UwbConfiguration& other) const noexcept
-{
-    // clang-format off
-    return 
-        GetFiraPhyVersion() == other.GetFiraPhyVersion() &&
-        GetFiraMacVersion() == other.GetFiraMacVersion() &&
-        GetDeviceRole() == GetDeviceRole() &&
-        GetRangingMethod() == other.GetRangingMethod() &&
-        GetStsConfiguration() == other.GetStsConfiguration() &&
-        GetMultiNodeMode() == other.GetMultiNodeMode() &&
-        GetRangingTimeStruct() == other.GetRangingTimeStruct() &&
-        GetSchedulingMode() == other.GetSchedulingMode() &&
-        GetHoppingMode() == other.GetHoppingMode() &&
-        GetBlockStriding() == other.GetBlockStriding() &&
-        GetUwbInitiationTime()== other.GetUwbInitiationTime() &&
-        GetChannel() == other.GetChannel() &&
-        GetRFrameConfig() == other.GetRFrameConfig() &&
-        GetConvolutionalCodeConstraintLength() == other.GetConvolutionalCodeConstraintLength() &&
-        GetPrfMode() == other.GetPrfMode() &&
-        GetSp0PhySetNumber() == other.GetSp0PhySetNumber() &&
-        GetSp1PhySetNumber() == other.GetSp1PhySetNumber() &&
-        GetSp3PhySetNumber() == other.GetSp3PhySetNumber() &&
-        GetPreableCodeIndex() == other.GetPreableCodeIndex() &&
-        GetResultReportConfigurations() == other.GetResultReportConfigurations() &&
-        GetMacAddressMode() == other.GetMacAddressMode() &&
-        GetControleeShortMacAddress() == other.GetControleeShortMacAddress() &&
-        GetControllerMacAddress() == other.GetControllerMacAddress() &&
-        GetSlotsPerRangingRound() == other.GetSlotsPerRangingRound() &&
-        GetMaxContentionPhaseLength() == other.GetMaxContentionPhaseLength() &&
-        GetSlotDuration() == other.GetSlotDuration() &&
-        GetRangingInterval() == other.GetRangingInterval() &&
-        GetKeyRotationRate() == other.GetKeyRotationRate() &&
-        GetMacAddressFcsType() == other.GetMacAddressFcsType() &&
-        GetMaxRangingRoundRetry() == other.GetMaxRangingRoundRetry();
-    // clang-format on
 }
