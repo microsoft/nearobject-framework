@@ -12,14 +12,14 @@ TEST_CASE("UwbAppConfiguration performs allocation for contained value correctly
     SECTION("parameter with POD-type works")
     {
         constexpr DeviceRole roleExpected{ DeviceRole::Initiator };
-        UwbAppConfigurationParameter<DeviceRole> appConfiguration{ roleExpected };
+        UwbAppConfigurationParameter<DeviceRole> appConfiguration{ roleExpected, UWB_APP_CONFIG_PARAM_TYPE_DEVICE_ROLE };
+
+        auto& appConfigurationDdi = appConfiguration.DdiParameter(); 
         auto& roleActual = appConfiguration.Value();
         REQUIRE(roleActual == roleExpected);
 
-        std::size_t sizeExpected = sizeof roleExpected + 0;
+        std::size_t sizeExpected = sizeof roleExpected + sizeof appConfigurationDdi - sizeof appConfigurationDdi.paramValue;
         auto sizeActual = appConfiguration.Size();
-        // REQUIRE(sizeActual == sizeExpected);
-
-        auto appConfigurationDdi = appConfiguration.DdiParameter();
+        REQUIRE(sizeActual == sizeExpected);
     }
 }

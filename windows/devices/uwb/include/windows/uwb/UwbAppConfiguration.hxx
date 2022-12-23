@@ -21,13 +21,14 @@ template <typename PropertyT>
 class UwbAppConfigurationParameter
 {
 public:
-    explicit UwbAppConfigurationParameter(const PropertyT& value, size_t parameterSize = sizeof(PropertyT)) :
-        m_size(offsetof(UWB_APP_CONFIG_PARAM, paramValue[sizeof(PropertyT)])),
+    explicit UwbAppConfigurationParameter(const PropertyT& value, UWB_APP_CONFIG_PARAM_TYPE parameterType, size_t parameterSize = sizeof(PropertyT)) :
+        m_size(offsetof(UWB_APP_CONFIG_PARAM, paramValue[parameterSize])),
         m_buffer(std::make_unique<uint8_t[]>(m_size)),
         m_parameter(*reinterpret_cast<UWB_APP_CONFIG_PARAM*>(m_buffer.get())),
         m_value(reinterpret_cast<PropertyT&>(m_parameter.paramValue))
     {
         m_parameter.size = m_size;
+        m_parameter.paramType = parameterType;
         m_parameter.paramLength = parameterSize;
         m_value = value;
     }
