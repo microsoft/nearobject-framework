@@ -48,7 +48,7 @@ TEST_CASE("UwbAppConfiguration performs allocation for contained value correctly
         constexpr DeviceRole roleExpected{ DeviceRole::Initiator };
         UwbAppConfigurationParameter appConfiguration{ roleExpected, UWB_APP_CONFIG_PARAM_TYPE_DEVICE_ROLE };
 
-        auto& appConfigurationDdi = appConfiguration.DdiParameter(); 
+        auto& appConfigurationDdi = appConfiguration.DdiParameter();
         auto& roleActual = appConfiguration.Value();
         REQUIRE(roleActual == roleExpected);
 
@@ -107,8 +107,8 @@ TEST_CASE("UwbAppConfiguration performs allocation for contained value correctly
 
     SECTION("parameter with aggregate array type (std::array<std::array<T,N>,M>) works")
     {
-        constexpr std::array<std::array<uint8_t, 2>, 3> dstMacAddressExpected{ 
-            std::array<uint8_t, 2>{ 0xAAU, 0xBBU },  
+        constexpr std::array<std::array<uint8_t, 2>, 3> dstMacAddressExpected{
+            std::array<uint8_t, 2>{ 0xAAU, 0xBBU },
             std::array<uint8_t, 2>{ 0xCCU, 0xDDU },
             std::array<uint8_t, 2>{ 0xEEU, 0xFFU },
         };
