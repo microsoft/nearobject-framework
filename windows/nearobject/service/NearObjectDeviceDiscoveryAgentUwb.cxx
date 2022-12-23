@@ -3,9 +3,9 @@
 #include <string>
 
 #include <nearobject/service/NearObjectDeviceControllerUwb.hxx>
-#include <windows/uwb/UwbDevice.hxx>
-#include <windows/uwb/UwbDeviceDriver.hxx>
 #include <windows/devices/DeviceEnumerator.hxx>
+#include <windows/devices/uwb/UwbDevice.hxx>
+#include <windows/devices/uwb/UwbDeviceDriver.hxx>
 #include <windows/nearobject/service/NearObjectDeviceDiscoveryAgentUwb.hxx>
 
 using namespace windows::nearobject::service;
@@ -13,14 +13,15 @@ using ::nearobject::service::NearObjectDeviceController;
 using ::nearobject::service::NearObjectDeviceControllerUwb;
 using ::nearobject::service::NearObjectDevicePresence;
 
-namespace
+namespace detail
 {
-std::shared_ptr<NearObjectDeviceControllerUwb> CreateNearObjectUwbDevice(std::string deviceName)
+std::shared_ptr<NearObjectDeviceControllerUwb>
+CreateNearObjectUwbDevice(std::string deviceName)
 {
-    auto uwbDevice = std::make_unique<windows::devices::UwbDevice>(std::move(deviceName));
+    auto uwbDevice = std::make_unique<windows::devices::uwb::UwbDevice>(std::move(deviceName));
     return std::make_shared<NearObjectDeviceControllerUwb>(std::move(uwbDevice));
 }
-}
+} // namespace detail
 
 std::shared_ptr<NearObjectDeviceControllerUwb>
 NearObjectDeviceDiscoveryAgentUwb::AddCachedUwbNearObjectDevice(const std::string &deviceName)
@@ -45,7 +46,7 @@ NearObjectDeviceDiscoveryAgentUwb::AddCachedUwbNearObjectDevice(const std::strin
     }
 
     // Create a new instance and add it to the cache.
-    auto nearObjectDevice = CreateNearObjectUwbDevice(deviceName);
+    auto nearObjectDevice = detail::CreateNearObjectUwbDevice(deviceName);
     m_nearObjectDeviceCache[deviceName] = nearObjectDevice;
 
     return nearObjectDevice;
@@ -89,24 +90,24 @@ NearObjectDeviceDiscoveryAgentUwb::OnDeviceInterfaceNotification(HCMNOTIFICATION
     std::filesystem::path devicePath;
 
     switch (action) {
-        case CM_NOTIFY_ACTION_DEVICEINTERFACEARRIVAL: {
-            devicePath = std::filesystem::path(std::wstring(eventData->u.DeviceInterface.SymbolicLink));
-            deviceName = devicePath.string();
-            auto nearObjectDeviceControllerUwb = AddCachedUwbNearObjectDevice(deviceName);
-            DevicePresenceChanged(NearObjectDevicePresence::Arrived, std::move(nearObjectDeviceControllerUwb));
-            break;
+    case CM_NOTIFY_ACTION_DEVICEINTERFACEARRIVAL: {
+        devicePath = std::filesystem::path(std::wstring(eventData->u.DeviceInterface.SymbolicLink));
+        deviceName = devicePath.string();
+        auto nearObjectDeviceControllerUwb = AddCachedUwbNearObjectDevice(deviceName);
+        DevicePresenceChanged(NearObjectDevicePresence::Arrived, std::move(nearObjectDeviceControllerUwb));
+        break;
+    }
+    case CM_NOTIFY_ACTION_DEVICEINTERFACEREMOVAL: {
+        devicePath = std::filesystem::path(std::wstring(eventData->u.DeviceInterface.SymbolicLink));
+        deviceName = devicePath.string();
+        auto nearObjectDeviceControllerUwb = ExtractCachedNearObjectDevice(deviceName);
+        if (nearObjectDeviceControllerUwb) {
+            DevicePresenceChanged(NearObjectDevicePresence::Departed, std::move(nearObjectDeviceControllerUwb));
         }
-        case CM_NOTIFY_ACTION_DEVICEINTERFACEREMOVAL: {
-            devicePath = std::filesystem::path(std::wstring(eventData->u.DeviceInterface.SymbolicLink));
-            deviceName = devicePath.string();
-            auto nearObjectDeviceControllerUwb = ExtractCachedNearObjectDevice(deviceName);
-            if (nearObjectDeviceControllerUwb) {
-                DevicePresenceChanged(NearObjectDevicePresence::Departed, std::move(nearObjectDeviceControllerUwb));
-            }
-            break;
-        }
-        default:
-            break;
+        break;
+    }
+    default:
+        break;
     }
 }
 
@@ -126,7 +127,7 @@ NearObjectDeviceDiscoveryAgentUwb::Probe()
     const auto deviceInterfaceNames = windows::devices::DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(windows::devices::uwb::InterfaceClassUwb);
 
     std::vector<std::shared_ptr<::nearobject::service::NearObjectDeviceController>> nearObjectDevices;
-    for (const auto& deviceInterfaceName : deviceInterfaceNames) {
+    for (const auto &deviceInterfaceName : deviceInterfaceNames) {
         auto nearObjectDevice = AddCachedUwbNearObjectDevice(deviceInterfaceName);
         if (nearObjectDevice) {
             nearObjectDevices.push_back(std::move(nearObjectDevice));
@@ -153,7 +154,7 @@ NearObjectDeviceDiscoveryAgentUwb::ProbeAsyncImpl()
 {
     // TODO: this instance must be kept alive/valid until the async operation is
     // complete since it accesses members.
-    return std::async(std::launch::async, [&](){
-        return Probe(); 
+    return std::async(std::launch::async, [&]() {
+        return Probe();
     });
 }

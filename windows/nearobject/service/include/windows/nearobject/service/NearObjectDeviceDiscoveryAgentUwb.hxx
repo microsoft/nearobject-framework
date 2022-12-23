@@ -28,13 +28,12 @@ class NearObjectDeviceControllerUwb;
 
 namespace windows
 {
-namespace devices
+namespace devices::uwb
 {
 class UwbDevice;
-}
-namespace nearobject
-{
-namespace service
+} // namespace devices::uwb
+
+namespace nearobject::service
 {
 class NearObjectDeviceDiscoveryAgentUwb :
     public ::nearobject::service::NearObjectDeviceControllerDiscoveryAgent
@@ -115,8 +114,7 @@ private:
     std::mutex m_nearObjectDeviceCacheGate;
     std::unordered_map<std::string, std::weak_ptr<::nearobject::service::NearObjectDeviceControllerUwb>> m_nearObjectDeviceCache;
 };
-} // namespace service
-} // namespace nearobject
+} // namespace nearobject::service
 } // namespace windows
 
 #endif // NEAR_OBJECT_DEVICE_DISCOVERY_AGENT_UWB
