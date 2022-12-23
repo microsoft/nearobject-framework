@@ -22,12 +22,12 @@ target_include_directories(windevuwb
 
 target_link_libraries(windevuwb
     PRIVATE
-        uwbcx
         windevutil
     PUBLIC
         cfgmgr32.lib
         uwb
         uwb-proto-fira
+        uwbcx
         WIL::WIL
 )
 
