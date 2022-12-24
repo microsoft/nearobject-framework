@@ -5,10 +5,10 @@
 
 #include <UwbCxLrpDeviceGlue.h>
 
-#include <windows/uwb/UwbDevice.hxx>
-#include <windows/uwb/UwbSession.hxx>
+#include <windows/devices/uwb/UwbDevice.hxx>
+#include <windows/devices/uwb/UwbSession.hxx>
 
-using namespace windows::devices;
+using namespace windows::devices::uwb;
 
 namespace detail
 {
@@ -20,7 +20,7 @@ namespace detail
  * @brief Helper to process supported parameters from a given map which
  * associates a value with a bit position. If the specified bitmap contains
  * support for the value, the value is added to the result container.
- * 
+ *
  * @tparam N The size of the bitset.
  * @tparam T The type of the value.
  * @param map The map associating values with bit positions in the bitset.
@@ -40,10 +40,10 @@ ProcessSupportFromBitset(std::unordered_map<T, std::size_t> map, const std::bits
 } // namespace detail
 
 /**
- * @brief Converts a UwbCx UWB_DEVICE_CAPABILTIIES structure to the service C++ FiRa equivalent. 
- * 
+ * @brief Converts a UwbCx UWB_DEVICE_CAPABILTIIES structure to the service C++ FiRa equivalent.
+ *
  * @param uwbDeviceCapabilities The device capabilities obtained from the UwbCx driver.
- * @return fira::UwbCapability 
+ * @return fira::UwbCapability
  */
 fira::UwbCapability
 FromUwbCx(const UWB_DEVICE_CAPABILITIES& uwbDeviceCapabilities)
@@ -198,14 +198,13 @@ UwbDevice::Initialize()
 }
 
 std::unique_ptr<uwb::UwbSession>
-UwbDevice::CreateSession(std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks)
+UwbDevice::CreateSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
 {
     // Create a duplicate handle to the driver for use by the session.
     wil::unique_hfile handleDriverForSession;
     if (!DuplicateHandle(GetCurrentProcess(), m_handleDriver.get(), GetCurrentProcess(), &handleDriverForSession, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
         return nullptr;
     }
-
 
     return std::make_unique<UwbSession>(std::move(callbacks), std::move(handleDriverForSession));
 }
@@ -235,9 +234,9 @@ UwbDevice::GetCapabilities() const
 }
 
 bool
-UwbDevice::IsEqual(const uwb::UwbDevice& other) const noexcept
+UwbDevice::IsEqual(const ::uwb::UwbDevice& other) const noexcept
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast)
-    const auto& rhs = static_cast<const windows::devices::UwbDevice&>(other);
+    const auto& rhs = static_cast<const windows::devices::uwb::UwbDevice&>(other);
     return (this->DeviceName() == rhs.DeviceName());
 }

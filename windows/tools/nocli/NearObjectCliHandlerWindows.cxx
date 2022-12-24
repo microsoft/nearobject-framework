@@ -7,10 +7,10 @@
 
 #include <windows/devices/DeviceEnumerator.hxx>
 #include <windows/devices/DevicePresenceMonitor.hxx>
-#include <windows/uwb/UwbDevice.hxx>
+#include <windows/devices/uwb/UwbDevice.hxx>
 
-#include "NearObjectCliHandlerWindows.hxx"
 #include "NearObjectCliDataWindows.hxx"
+#include "NearObjectCliHandlerWindows.hxx"
 
 using namespace nearobject::cli;
 
@@ -23,8 +23,8 @@ using namespace windows::devices;
  *
  * This enumerates all the UWB devices on the system and returns the name of the
  * first one.
- * 
- * @return std::string 
+ *
+ * @return std::string
  */
 std::string
 GetUwbDeviceNameDefault() noexcept
@@ -35,9 +35,9 @@ GetUwbDeviceNameDefault() noexcept
 
 /**
  * @brief Probes for uwb devices and prompts the user to select one.
- * 
- * @param deviceClassGuid 
- * @return std::string 
+ *
+ * @param deviceClassGuid
+ * @return std::string
  */
 std::string
 GetUwbDeviceNameFromProbe(std::string_view deviceClassGuid = windows::devices::uwb::InterfaceClassUwbString)
@@ -69,11 +69,11 @@ GetUwbDeviceNameFromProbe(std::string_view deviceClassGuid = windows::devices::u
 
 /**
  * @brief Tries to resolve the UwbDevice to use for ranging.
- * 
- * @param cliData 
- * @return std::shared_ptr<windows::devices::UwbDevice> 
+ *
+ * @param cliData
+ * @return std::shared_ptr<windows::devices::UwbDevice>
  */
-std::shared_ptr<windows::devices::UwbDevice>
+std::shared_ptr<windows::devices::uwb::UwbDevice>
 ResolveUwbDevice(const nearobject::cli::NearObjectCliDataWindows& cliData)
 {
     std::string deviceName = cliData.DeviceNameProbe
@@ -81,11 +81,11 @@ ResolveUwbDevice(const nearobject::cli::NearObjectCliDataWindows& cliData)
         : cliData.DeviceName.value_or(GetUwbDeviceNameDefault());
 
     // Ensure a device name was set.
-    if (deviceName.empty())  {
+    if (deviceName.empty()) {
         return nullptr;
     }
 
-    return std::make_unique<windows::devices::UwbDevice>(deviceName);
+    return std::make_unique<windows::devices::uwb::UwbDevice>(deviceName);
 }
 } // namespace detail
 

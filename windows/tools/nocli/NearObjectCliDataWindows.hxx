@@ -6,7 +6,7 @@
 #include <string>
 
 #include <nearobject/cli/NearObjectCliData.hxx>
-#include <windows/uwb/UwbDeviceDriver.hxx>
+#include <windows/devices/uwb/UwbDeviceDriver.hxx>
 
 namespace nearobject::cli
 {

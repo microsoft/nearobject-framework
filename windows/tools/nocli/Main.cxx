@@ -6,14 +6,14 @@
 
 #include <CLI/CLI.hpp>
 
-#include "NearObjectCliHandlerWindows.hxx"
 #include "NearObjectCliDataWindows.hxx"
+#include "NearObjectCliHandlerWindows.hxx"
 
 #include <nearobject/cli/NearObjectCli.hxx>
 #include <nearobject/cli/NearObjectCliUwbSessionEventCallbacks.hxx>
 #include <windows/devices/DeviceEnumerator.hxx>
 #include <windows/devices/DevicePresenceMonitor.hxx>
-#include <windows/uwb/UwbDevice.hxx>
+#include <windows/devices/uwb/UwbDevice.hxx>
 
 int
 main(int argc, char* argv[])
