@@ -5,7 +5,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
-#include <windows/uwb/UwbAppConfiguration.hxx>
+#include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
 TEST_CASE("UwbAppConfiguration performs allocation for contained value correctly", "[basic]")
 {
