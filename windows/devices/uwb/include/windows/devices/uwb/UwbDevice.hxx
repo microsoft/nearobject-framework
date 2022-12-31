@@ -20,9 +20,7 @@ namespace uwb
 class UwbSession;
 }
 
-namespace windows
-{
-namespace devices
+namespace windows::devices::uwb
 {
 /**
  * @brief Helper class to interact with Windows UWB devices using the Windows
@@ -48,7 +46,7 @@ public:
     DeviceName() const noexcept;
 
     /**
-     * @brief Initialize the device. 
+     * @brief Initialize the device.
      * TODO: return type needs to convey whether this worked.
      */
     void
@@ -56,27 +54,27 @@ public:
 
     /**
      * @brief Create a new UWB session.
-     * 
+     *
      * @param callbacks The event callback instance.
-     * @return std::unique_ptr<uwb::UwbSession> 
+     * @return std::unique_ptr<uwb::UwbSession>
      */
     std::unique_ptr<::uwb::UwbSession>
     CreateSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks) override;
 
     /**
      * @brief Get the capabilities of the device.
-     * 
-     * @return uwb::protocol::fira::UwbCapability 
+     *
+     * @return uwb::protocol::fira::UwbCapability
      */
     ::uwb::protocol::fira::UwbCapability
     GetCapabilities() const override;
 
     /**
      * @brief Determine if this device is the same as another.
-     * 
-     * @param other 
-     * @return true 
-     * @return false 
+     *
+     * @param other
+     * @return true
+     * @return false
      */
     bool
     IsEqual(const ::uwb::UwbDevice& other) const noexcept override;
@@ -87,8 +85,6 @@ private:
     unique_hcmnotification m_hcmNotificationHandle;
     wil::unique_hfile m_handleDriver;
 };
-
-} // namespace devices
-} // namespace windows
+} // namespace windows::devices::uwb
 
 #endif // WINDOWS_DEVICE_UWB_HXX

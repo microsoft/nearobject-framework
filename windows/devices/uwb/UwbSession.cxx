@@ -7,12 +7,12 @@
 #include <memory>
 #include <numeric>
 
-#include <windows/uwb/UwbSession.hxx>
+#include <windows/devices/uwb/UwbSession.hxx>
 
-using namespace windows::devices;
+using namespace windows::devices::uwb;
 
-UwbSession::UwbSession(std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks, wil::unique_hfile handleDriver) :
-    uwb::UwbSession(std::move(callbacks)),
+UwbSession::UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, wil::unique_hfile handleDriver) :
+    ::uwb::UwbSession(std::move(callbacks)),
     m_handleDriver(std::move(handleDriver))
 {}
 
@@ -157,7 +157,7 @@ WriteUWB_APP_CONFIG_PARAM(UWB_APP_CONFIG_PARAM_TYPE dditype, std::any arg)
 }
 
 void
-UwbSession::ConfigureImpl(const uwb::protocol::fira::UwbSessionData &uwbSessionData)
+UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData &uwbSessionData)
 {
     // TODO: collect options set from uwbConfiguration, translate them to
     // UWB_APP_CONFIG_PARAM, and send them to the driver.
@@ -250,7 +250,7 @@ UwbSession::StopRangingImpl()
 }
 
 void
-UwbSession::AddPeerImpl(uwb::UwbMacAddress /* peerMacAddress */)
+    UwbSession::AddPeerImpl(::uwb::UwbMacAddress /* peerMacAddress */)
 {
     // TODO: two main options for updating the UWB-CLX peer list:
     //  1) Every time a peer is added (on-demand)
