@@ -141,12 +141,12 @@ std::unordered_map<
                 } } }
     };
 
-std::shared_ptr<uint8_t>
+std::unique_ptr<uint8_t>
 WriteUWB_APP_CONFIG_PARAM(UWB_APP_CONFIG_PARAM_TYPE dditype, std::any arg)
 {
     auto paramLength = appConfigParamLengths[dditype];
     auto size = FIELD_OFFSET(UWB_APP_CONFIG_PARAM, paramValue[paramLength]);
-    auto result = std::make_shared<uint8_t>(size);
+    auto result = std::make_unique<uint8_t>(size);
     auto param = std::reinterpret_pointer_cast<UWB_APP_CONFIG_PARAM, uint8_t>(result);
     param->size = size;
     param->paramType = dditype;
@@ -178,7 +178,7 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData &uwbSessio
     // Populate the PUWB_SET_APP_CONFIG_PARAMS
     auto sessionUwbMap = uwbSessionData.uwbConfiguration.GetValueMap();
 
-    std::vector<std::shared_ptr<uint8_t>> datavector(ddi_service_map.size());
+    std::vector<std::unique_ptr<uint8_t>> datavector(ddi_service_map.size());
 
     std::transform(std::cbegin(ddi_service_map),
         std::cend(ddi_service_map),
@@ -197,18 +197,18 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData &uwbSessio
         [](const int a, const int b) {
             return a + b;
         },
-        [](std::shared_ptr<uint8_t> data) {
+        [](std::unique_ptr<uint8_t> data) {
             auto paramStruct = std::reinterpret_pointer_cast<UWB_APP_CONFIG_PARAM, uint8_t>(data);
             return paramStruct->size;
         });
 
-    auto asdf = std::make_shared<uint8_t>(overallSize);
+    auto asdf = std::make_unique<uint8_t>(overallSize);
     auto paramHolder = std::reinterpret_pointer_cast<UWB_SET_APP_CONFIG_PARAMS, uint8_t>(asdf);
     paramHolder->size = overallSize;
     paramHolder->sessionId = uwbSessionData.sessionId;
     paramHolder->appConfigParamsCount = datavector.size();
     uint8_t *dst = (uint8_t *)(paramHolder->appConfigParams);
-    for (std::shared_ptr<uint8_t> p : datavector) {
+    for (std::unique_ptr<uint8_t> p : datavector) {
         auto data = std::reinterpret_pointer_cast<UWB_APP_CONFIG_PARAM, uint8_t>(p);
         memcpy(dst, p.get(), data->size);
         dst += data->size;
@@ -216,7 +216,7 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData &uwbSessio
 
     // Allocate memory for the PUWB_SET_APP_CONFIG_PARAMS_STATUS
     auto statusSize = FIELD_OFFSET(UWB_SET_APP_CONFIG_PARAMS_STATUS, appConfigParamsStatus[datavector.size()]);
-    auto tmpHolder = std::make_shared<uint8_t>(statusSize);
+    auto tmpHolder = std::make_unique<uint8_t>(statusSize);
     auto statusHolder = std::reinterpret_pointer_cast<UWB_SET_APP_CONFIG_PARAMS_STATUS, uint8_t>(tmpHolder);
     statusHolder->size = statusSize;
     statusHolder->appConfigParamsCount = datavector.size();

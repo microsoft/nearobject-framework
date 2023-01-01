@@ -46,3 +46,45 @@ install(
     EXPORT uwb
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/windows/uwb
 )
+
+add_library(libuwbcxadapter STATIC "")
+
+set(LIBUWBCXADAPTER_DIR_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
+set(LIBUWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX ${LIBUWBCXADAPTER_DIR_PUBLIC_INCLUDE}/windows/devices/uwb)
+
+target_sources(libuwbcxadapter
+    PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/UwbCxAdapter.cxx
+    PUBLIC
+        ${LIBUWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCxAdapter.hxx
+)
+
+target_include_directories(libuwbcxadapter
+    PUBLIC
+        ${LIBUWBCXADAPTER_DIR_PUBLIC_INCLUDE}
+)
+
+target_link_libraries(libuwbcxadapter
+    PRIVATE
+        windevutil
+        magic_enum::magic_enum
+    PUBLIC
+        cfgmgr32.lib
+        uwb
+        uwb-proto-fira
+        uwbcx
+        WIL::WIL
+)
+
+list(APPEND LIBUWBCXADAPTER_PUBLIC_HEADERS
+    ${LIBUWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCxAdapter.hxx
+)
+
+set_target_properties(libuwbcxadapter PROPERTIES FOLDER windows/devices)
+set_target_properties(libuwbcxadapter PROPERTIES PUBLIC_HEADER "${WINDEVUWB_PUBLIC_HEADERS}")
+
+install(
+    TARGETS libuwbcxadapter 
+    EXPORT uwb
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/windows/uwb
+)
