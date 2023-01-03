@@ -28,6 +28,9 @@ struct RangingMethod
 
     auto
     operator<=>(const RangingMethod& other) const = default;
+
+    uint8_t 
+    ToByte();
 };
 
 } // namespace uwb::protocol::fira
