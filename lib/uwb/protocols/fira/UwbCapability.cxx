@@ -41,7 +41,6 @@ const std::unordered_map<StsConfiguration, std::size_t> UwbCapability::StsConfig
 const std::unordered_map<StsPacketConfiguration, std::size_t> UwbCapability::RFrameConfigurationBit = {
     { StsPacketConfiguration::SP0, 0 },
     { StsPacketConfiguration::SP1, 1 },
-    { StsPacketConfiguration::SP2, 2 },
     { StsPacketConfiguration::SP3, 3 },
 };
 

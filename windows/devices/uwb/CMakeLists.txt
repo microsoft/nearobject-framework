@@ -20,7 +20,6 @@ target_include_directories(libuwbcxadapter
 target_link_libraries(libuwbcxadapter
     PRIVATE
         windevutil
-        magic_enum::magic_enum
     PUBLIC
         cfgmgr32.lib
         uwb

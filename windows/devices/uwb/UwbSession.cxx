@@ -8,6 +8,7 @@
 #include <numeric>
 
 #include <windows/devices/uwb/UwbSession.hxx>
+#include <windows/devices/uwb/UwbCxAdapter.hxx>
 
 using namespace windows::devices::uwb;
 
@@ -15,146 +16,6 @@ UwbSession::UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks,
     ::uwb::UwbSession(std::move(callbacks)),
     m_handleDriver(std::move(handleDriver))
 {}
-
-template <class T>
-std::unique_ptr<UWB_APP_CONFIG_PARAM>
-GetUWB_APP_CONFIG_PARAM(const T &value)
-{
-    auto pdata = std::make_unique<uint8_t>(FIELD_OFFSET(UWB_APP_CONFIG_PARAM, paramValue[sizeof T]));
-}
-
-template <class T>
-UWB_SET_APP_CONFIG_PARAMS
-GetUWB_SET_APP_CONFIG_PARAMS()
-{
-}
-
-/**
- * @brief This function only works for integer types, aka uint8_t, uint16_t, uint32_t, uint64_t
- *
- * @param value
- * @param size
- * @param dst
- * @return uint8_t*
- */
-uint8_t *
-WriteBytes(uint64_t value, std::size_t size, uint8_t *dst)
-{
-    switch (size) {
-    case 1: {
-        dst[0] = (uint8_t)value;
-        return &dst[1];
-    }
-    case 2: {
-        auto asdf = (uint16_t *)dst;
-        asdf[0] = (uint16_t)value;
-        return (uint8_t *)(&asdf[1]);
-    }
-    case 4: {
-        auto asdf = (uint32_t *)dst;
-        asdf[0] = (uint32_t)value;
-        return (uint8_t *)(&asdf[1]);
-    }
-    case 8: {
-        auto asdf = (uint64_t *)dst;
-        asdf[0] = (uint64_t)value;
-        return (uint8_t *)(&asdf[1]);
-    }
-    default:
-        throw std::runtime_error("wrong number of bytes requested");
-    };
-}
-
-template <int N>
-uint8_t *
-WriteBytes(std::array<uint8_t, N> value, unsigned int size, uint8_t *dst)
-{
-    memcpy(dst, value.data(), size);
-    return dst + size;
-}
-
-/**
- * @brief Maps the param to the length of the value. If the value is 0, means a variable length and special code to handle.
- * Taken from the FiRa UCI spec Table 29:APP Configuration IDs.
- * TODO put this somewhere more appropriate.
- */
-std::unordered_map<UWB_APP_CONFIG_PARAM_TYPE, unsigned int> appConfigParamLengths{
-    { UWB_APP_CONFIG_PARAM_TYPE_DEVICE_TYPE, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_RANGING_ROUND_USAGE, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_STS_CONFIG, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_MULTI_NODE_MODE, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_CHANNEL_NUMBER, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_NUMBER_OF_CONTROLEES, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_DEVICE_MAC_ADDRESS, 0 },
-    { UWB_APP_CONFIG_PARAM_TYPE_DST_MAC_ADDRESS, 0 },
-    { UWB_APP_CONFIG_PARAM_TYPE_SLOT_DURATION, 2 },
-    { UWB_APP_CONFIG_PARAM_TYPE_RANGING_INTERVAL, 4 },
-    { UWB_APP_CONFIG_PARAM_TYPE_STS_INDEX, 4 },
-    { UWB_APP_CONFIG_PARAM_TYPE_MAC_FCS_TYPE, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_RANGING_ROUND_CONTROL, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_AOA_RESULT_REQ, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_RANGE_DATA_NTF_CONFIG, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_RANGE_DATA_NTF_PROXIMITY_NEAR, 2 },
-    { UWB_APP_CONFIG_PARAM_TYPE_RANGE_DATA_NTF_PROXIMITY_FAR, 2 },
-    { UWB_APP_CONFIG_PARAM_TYPE_DEVICE_ROLE, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_RFRAME_CONFIG, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_PREAMBLE_CODE_INDEX, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_SFD_ID, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_PSDU_DATA_RATE, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_PREAMBLE_DURATION, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_RANGING_TIME_STRUCT, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_SLOTS_PER_RR, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_TX_ADAPTIVE_PAYLOAD_POWER, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_RESPONDER_SLOT_INDEX, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_PRF_MODE, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_SCHEDULED_MODE, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_KEY_ROTATION, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_KEY_ROTATION_RATE, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_SESSION_PRIORITY, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_MAC_ADDRESS_MODE, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_VENDOR_ID, 2 },
-    { UWB_APP_CONFIG_PARAM_TYPE_STATIC_STS_IV, 6 },
-    { UWB_APP_CONFIG_PARAM_TYPE_NUMBER_OF_STS_SEGMENTS, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_MAX_RR_RETRY, 2 },
-    { UWB_APP_CONFIG_PARAM_TYPE_UWB_INITIATION_TIME, 4 },
-    { UWB_APP_CONFIG_PARAM_TYPE_HOPPING_MODE, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_BLOCK_STRIDE_LENGTH, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_RESULT_REPORT_CONFIG, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_IN_BAND_TERMINATION_ATTEMPT_COUNT, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_SUB_SESSION_ID, 4 },
-    { UWB_APP_CONFIG_PARAM_TYPE_BPRF_PHR_DATA_RATE, 1 },
-    { UWB_APP_CONFIG_PARAM_TYPE_MAX_NUMBER_OF_MEASUREMENTS, 2 },
-    { UWB_APP_CONFIG_PARAM_TYPE_STS_LENGTH, 1 }
-};
-
-std::unordered_map<
-    UWB_APP_CONFIG_PARAM_TYPE,
-    std::tuple<uwb::protocol::fira::UwbConfiguration::ParameterTag,
-        std::function<uint8_t *(std::any, std::size_t, uint8_t *)>>>
-    ddi_service_map{
-        { UWB_APP_CONFIG_PARAM_TYPE_DEVICE_ROLE,
-            { uwb::protocol::fira::UwbConfiguration::ParameterTag::DeviceRole,
-                [](std::any arg, std::size_t size, uint8_t *dst) {
-                    auto role = std::any_cast<uwb::protocol::fira::DeviceRole>(arg);
-                    auto index = magic_enum::enum_index<uwb::protocol::fira::DeviceRole>(role).value();
-                    return WriteBytes(index, appConfigParamLengths[UWB_APP_CONFIG_PARAM_TYPE_DEVICE_ROLE], dst);
-                } } }
-    };
-
-std::unique_ptr<uint8_t>
-WriteUWB_APP_CONFIG_PARAM(UWB_APP_CONFIG_PARAM_TYPE dditype, std::any arg)
-{
-    auto paramLength = appConfigParamLengths[dditype];
-    auto size = FIELD_OFFSET(UWB_APP_CONFIG_PARAM, paramValue[paramLength]);
-    auto result = std::make_unique<uint8_t>(size);
-    auto param = std::reinterpret_pointer_cast<UWB_APP_CONFIG_PARAM, uint8_t>(result);
-    param->size = size;
-    param->paramType = dditype;
-    param->paramLength = paramLength;
-    auto [_, fn] = ddi_service_map[dditype];
-    fn(arg, paramLength, param->paramValue);
-    return result;
-}
 
 void
 UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData &uwbSessionData)
@@ -176,52 +37,19 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData &uwbSessio
     m_sessionId = uwbSessionData.sessionId;
 
     // Populate the PUWB_SET_APP_CONFIG_PARAMS
-    auto sessionUwbMap = uwbSessionData.uwbConfiguration.GetValueMap();
+    const auto sessionUwbMap = uwbSessionData.uwbConfiguration.GetValueMap();
 
-    std::vector<std::unique_ptr<uint8_t>> datavector(ddi_service_map.size());
-
-    std::transform(std::cbegin(ddi_service_map),
-        std::cend(ddi_service_map),
-        std::cbegin(datavector),
-        [&sessionUwbMap](const auto &it) {
-            const auto &[dditype, t] = it;
-            const auto &[ptag, fn] = t;
-            auto data = WriteUWB_APP_CONFIG_PARAM(dditype, sessionUwbMap[ptag]);
-            return data;
-        });
-
-    auto overallSize = std::transform_reduce(
-        std::cbegin(datavector),
-        std::cend(datavector),
-        FIELD_OFFSET(UWB_SET_APP_CONFIG_PARAMS, appConfigParams),
-        [](const int a, const int b) {
-            return a + b;
-        },
-        [](std::unique_ptr<uint8_t> data) {
-            auto paramStruct = std::reinterpret_pointer_cast<UWB_APP_CONFIG_PARAM, uint8_t>(data);
-            return paramStruct->size;
-        });
-
-    auto asdf = std::make_unique<uint8_t>(overallSize);
-    auto paramHolder = std::reinterpret_pointer_cast<UWB_SET_APP_CONFIG_PARAMS, uint8_t>(asdf);
-    paramHolder->size = overallSize;
-    paramHolder->sessionId = uwbSessionData.sessionId;
-    paramHolder->appConfigParamsCount = datavector.size();
-    uint8_t *dst = (uint8_t *)(paramHolder->appConfigParams);
-    for (std::unique_ptr<uint8_t> p : datavector) {
-        auto data = std::reinterpret_pointer_cast<UWB_APP_CONFIG_PARAM, uint8_t>(p);
-        memcpy(dst, p.get(), data->size);
-        dst += data->size;
-    }
+    auto setParamsBuffer = ::windows::devices::uwb::detail::GenerateUwbSetAppConfigParameterDdi(uwbSessionData);
+    auto& setParams = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS*>(setParamsBuffer.get());
 
     // Allocate memory for the PUWB_SET_APP_CONFIG_PARAMS_STATUS
-    auto statusSize = FIELD_OFFSET(UWB_SET_APP_CONFIG_PARAMS_STATUS, appConfigParamsStatus[datavector.size()]);
-    auto tmpHolder = std::make_unique<uint8_t>(statusSize);
-    auto statusHolder = std::reinterpret_pointer_cast<UWB_SET_APP_CONFIG_PARAMS_STATUS, uint8_t>(tmpHolder);
-    statusHolder->size = statusSize;
-    statusHolder->appConfigParamsCount = datavector.size();
+    auto statusSize = offsetof(UWB_SET_APP_CONFIG_PARAMS_STATUS, appConfigParamsStatus[setParams.appConfigParamsCount]);
+    auto statusBuffer = std::make_unique<uint8_t[]>(statusSize);
+    auto& statusHolder = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS_STATUS*>(statusBuffer.get());
+    statusHolder.size = statusSize;
+    statusHolder.appConfigParamsCount = setParams.appConfigParamsCount;
 
-    hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_SET_APP_CONFIG_PARAMS, paramHolder.get(), overallSize, statusHolder.get(), statusSize, nullptr, nullptr);
+    hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_SET_APP_CONFIG_PARAMS, setParamsBuffer.get(), setParams.size, statusBuffer.get(), statusSize, nullptr, nullptr);
     if (FAILED(hr)) {
         // TODO: handle this
     }
