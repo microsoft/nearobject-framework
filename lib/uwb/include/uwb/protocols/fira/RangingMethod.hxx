@@ -29,7 +29,7 @@ struct RangingMethod
     auto
     operator<=>(const RangingMethod& other) const = default;
 
-    uint8_t 
+    uint8_t
     ToByte();
 };
 
