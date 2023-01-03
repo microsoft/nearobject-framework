@@ -7,6 +7,12 @@
 
 #include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
+bool
+operator==(const UWB_APP_CONFIG_PARAM& lhs, const UWB_APP_CONFIG_PARAM& rhs) noexcept
+{
+    return (lhs.size == rhs.size) && (std::memcmp(&lhs, &rhs, lhs.size) == 0);
+}
+
 windows::devices::UwbSetAppConfigurationParametersBuilder::UwbSetAppConfigurationParametersBuilder(uint32_t sessionId) :
     m_sessionId{ sessionId }
 {}
