@@ -29,7 +29,7 @@ public:
         m_size(offsetof(UWB_APP_CONFIG_PARAM, paramValue[parameterSize])),
         m_buffer(std::make_unique<uint8_t[]>(m_size)),
         m_parameter(*reinterpret_cast<UWB_APP_CONFIG_PARAM*>(m_buffer.get())),
-        m_value(reinterpret_cast<PropertyT&>(m_parameter.paramValue))
+        m_value(reinterpret_cast<PropertyT&>(m_parameter.paramValue)) // TODO verify that this assignment of bytes indeed works for all the parameters (what if the enum is a strange number, like 5 choices or something)
     {
         m_parameter.size = m_size;
         m_parameter.paramType = parameterType;

@@ -120,7 +120,6 @@ struct UwbConfiguration
         uwb::protocol::fira::PrfMode,
         uwb::protocol::fira::RangingMethod,
         uwb::protocol::fira::RangingMode,
-        uwb::protocol::fira::ResultReportConfiguration,
         uwb::protocol::fira::SchedulingMode,
         uwb::protocol::fira::StsConfiguration,
         uwb::protocol::fira::StsPacketConfiguration,

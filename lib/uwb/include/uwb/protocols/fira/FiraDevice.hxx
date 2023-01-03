@@ -62,6 +62,7 @@ enum class StsConfiguration {
 enum class StsPacketConfiguration {
     SP0,
     SP1,
+    SP2,
     SP3,
 };
 
