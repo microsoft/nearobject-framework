@@ -37,8 +37,6 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData &uwbSessio
     m_sessionId = uwbSessionData.sessionId;
 
     // Populate the PUWB_SET_APP_CONFIG_PARAMS
-    const auto sessionUwbMap = uwbSessionData.uwbConfiguration.GetValueMap();
-
     auto setParamsBuffer = ::windows::devices::uwb::GenerateUwbSetAppConfigParameterDdi(uwbSessionData);
     auto& setParams = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS*>(setParamsBuffer.get());
 
