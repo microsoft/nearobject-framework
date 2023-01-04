@@ -33,8 +33,8 @@ StringToVersion(const std::string& input) noexcept;
  * 5.1.
  */
 enum class DeviceRole {
-    Initiator,
     Responder,
+    Initiator,
 };
 
 /**

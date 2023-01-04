@@ -7,7 +7,7 @@ target_sources(uwb-proto-fira
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/ControleePreference.cxx
         ${CMAKE_CURRENT_LIST_DIR}/FiraDevice.cxx
-        ${CMAKE_CURRENT_LIST_DIR}/RangingConfiguration.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/RangingMethod.cxx
         ${CMAKE_CURRENT_LIST_DIR}/StaticRangingInfo.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbCapability.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbConfiguration.cxx

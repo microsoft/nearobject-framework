@@ -61,7 +61,7 @@ struct UwbConfiguration
         Sp0PhySetNumber = 0x8F,
         Sp1PhySetNumber = 0x90,
         Sp3PhySetNumber = 0x91,
-        PreableCodeIndex = 0x92,
+        PreableCodeIndex = 0x92, // TODO fix the typo here
         ResultReportConfig = 0x93,
         MacAddressMode = 0x94,
         ControleeShortMacAddress = 0x95,
@@ -120,7 +120,6 @@ struct UwbConfiguration
         uwb::protocol::fira::PrfMode,
         uwb::protocol::fira::RangingMethod,
         uwb::protocol::fira::RangingMode,
-        uwb::protocol::fira::ResultReportConfiguration,
         uwb::protocol::fira::SchedulingMode,
         uwb::protocol::fira::StsConfiguration,
         uwb::protocol::fira::StsPacketConfiguration,
