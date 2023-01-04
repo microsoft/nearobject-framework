@@ -40,11 +40,3 @@
 // FUNC Trace{FLAG=MYDRIVER_ALL_INFO}(LEVEL, MSG, ...);
 // FUNC TraceEvents(LEVEL, FLAGS, MSG, ...);
 // end_wpp
-
-//
-//
-// Driver specific #defines
-//
-#if UMDF_VERSION_MAJOR == 2 && UMDF_VERSION_MINOR == 0
-    #define UWB_SIMULATOR_TRACING_ID L"UwbSimulator"
-#endif

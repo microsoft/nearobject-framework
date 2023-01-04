@@ -24,16 +24,12 @@
  * @return NTSTATUS STATUS_SUCCESS if successful, STATUS_UNSUCCESSFUL otherwise.
  */
 NTSTATUS
-DriverEntry(PDRIVER_OBJECT driverObject, UNICODE_STRING *registryPath)
+DriverEntry(PDRIVER_OBJECT driverObject, PUNICODE_STRING registryPath)
 {
     //
     // Initialize WPP Tracing
     //
-#if UMDF_VERSION_MAJOR == 2 && UMDF_VERSION_MINOR == 0
-    WPP_INIT_TRACING(UWB_SIMULATOR_TRACING_ID);
-#else
     WPP_INIT_TRACING(driverObject, registryPath);
-#endif
 
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
 
@@ -50,11 +46,7 @@ DriverEntry(PDRIVER_OBJECT driverObject, UNICODE_STRING *registryPath)
     NTSTATUS status = WdfDriverCreate(driverObject, registryPath, &attributes, &config, WDF_NO_HANDLE);
     if (!NT_SUCCESS(status)) {
         TraceEvents(TRACE_LEVEL_ERROR, TRACE_DRIVER, "WdfDriverCreate failed %!STATUS!", status);
-#if UMDF_VERSION_MAJOR == 2 && UMDF_VERSION_MINOR == 0
-        WPP_CLEANUP();
-#else
         WPP_CLEANUP(driverObject);
-#endif
         return status;
     }
 
@@ -97,9 +89,5 @@ UwbSimulatorEvtDriverContextCleanup(WDFOBJECT /* driverObject */)
     //
     // Stop WPP Tracing
     //
-#if UMDF_VERSION_MAJOR == 2 && UMDF_VERSION_MINOR == 0
-    WPP_CLEANUP();
-#else
     WPP_CLEANUP(WdfDriverWdmGetDriverObject((WDFDRIVER)driverObject));
-#endif
 }
