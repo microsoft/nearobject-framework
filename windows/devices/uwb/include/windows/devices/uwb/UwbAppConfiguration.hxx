@@ -2,11 +2,13 @@
 #ifndef UWB_APP_CONFIGURATION_HXX
 #define UWB_APP_CONFIGURATION_HXX
 
+#include <concepts>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <memory>
 #include <tuple>
+#include <type_traits>
 
 #include <UwbCxLrpDeviceGlue.h>
 
@@ -19,6 +21,7 @@ namespace windows::devices
  * holds as its flexible array member.
  */
 template <typename PropertyT>
+requires std::is_standard_layout_v<PropertyT>
 class UwbAppConfigurationParameter
 {
 public:
