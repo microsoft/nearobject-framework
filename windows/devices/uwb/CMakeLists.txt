@@ -1,23 +1,23 @@
-add_library(libuwbcxadapter STATIC "")
+add_library(uwbcxadapter STATIC "")
 
-set(LIBUWBCXADAPTER_DIR_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
-set(LIBUWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX ${LIBUWBCXADAPTER_DIR_PUBLIC_INCLUDE}/windows/devices/uwb)
+set(uwbcxadapter_DIR_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
+set(uwbcxadapter_DIR_PUBLIC_INCLUDE_PREFIX ${uwbcxadapter_DIR_PUBLIC_INCLUDE}/windows/devices/uwb)
 
-target_sources(libuwbcxadapter
+target_sources(uwbcxadapter
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/UwbCxAdapter.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbAppConfiguration.cxx
     PUBLIC
-        ${LIBUWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCxAdapter.hxx
-        ${LIBUWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbAppConfiguration.hxx
+        ${uwbcxadapter_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCxAdapter.hxx
+        ${uwbcxadapter_DIR_PUBLIC_INCLUDE_PREFIX}/UwbAppConfiguration.hxx
 )
 
-target_include_directories(libuwbcxadapter
+target_include_directories(uwbcxadapter
     PUBLIC
-        ${LIBUWBCXADAPTER_DIR_PUBLIC_INCLUDE}
+        ${uwbcxadapter_DIR_PUBLIC_INCLUDE}
 )
 
-target_link_libraries(libuwbcxadapter
+target_link_libraries(uwbcxadapter
     PRIVATE
         windevutil
     PUBLIC
@@ -28,15 +28,15 @@ target_link_libraries(libuwbcxadapter
         WIL::WIL
 )
 
-list(APPEND LIBUWBCXADAPTER_PUBLIC_HEADERS
-    ${LIBUWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCxAdapter.hxx
+list(APPEND uwbcxadapter_PUBLIC_HEADERS
+    ${uwbcxadapter_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCxAdapter.hxx
 )
 
-set_target_properties(libuwbcxadapter PROPERTIES FOLDER windows/devices)
-set_target_properties(libuwbcxadapter PROPERTIES PUBLIC_HEADER "${WINDEVUWB_PUBLIC_HEADERS}")
+set_target_properties(uwbcxadapter PROPERTIES FOLDER windows/devices)
+set_target_properties(uwbcxadapter PROPERTIES PUBLIC_HEADER "${WINDEVUWB_PUBLIC_HEADERS}")
 
 install(
-    TARGETS libuwbcxadapter 
+    TARGETS uwbcxadapter 
     EXPORT uwb
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/windows/uwb
 )
@@ -67,11 +67,11 @@ target_link_libraries(windevuwb
         windevutil
         magic_enum::magic_enum
     PUBLIC
-        libuwbcxadapter
         cfgmgr32.lib
         uwb
         uwb-proto-fira
         uwbcx
+        uwbcxadapter
         WIL::WIL
 )
 

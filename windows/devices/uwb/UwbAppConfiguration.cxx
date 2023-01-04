@@ -18,7 +18,8 @@ windows::devices::UwbSetAppConfigurationParametersBuilder::UwbSetAppConfiguratio
 {}
 
 std::unique_ptr<uint8_t[]>
-windows::devices::UwbSetAppConfigurationParametersBuilder::Publish(){
+windows::devices::UwbSetAppConfigurationParametersBuilder::Publish()
+{
     auto desiredSize = offsetof(UWB_SET_APP_CONFIG_PARAMS, appConfigParams[0]) + m_paramsLengthSum;
     auto buffer = std::make_unique<uint8_t[]>(desiredSize);
     UWB_SET_APP_CONFIG_PARAMS& setParams = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS*>(buffer.get());
@@ -27,11 +28,11 @@ windows::devices::UwbSetAppConfigurationParametersBuilder::Publish(){
     setParams.sessionId = m_sessionId;
     setParams.appConfigParamsCount = m_params.size();
 
-    uint8_t *dstBuffer = reinterpret_cast<uint8_t*>(setParams.appConfigParams);
+    uint8_t* dstBuffer = reinterpret_cast<uint8_t*>(setParams.appConfigParams);
 
-    for(const auto& paramBuffer : m_params){
+    for (const auto& paramBuffer : m_params) {
         auto& param = *reinterpret_cast<UWB_APP_CONFIG_PARAM*>(paramBuffer.get());
-        memcpy(dstBuffer,paramBuffer.get(),param.size);
+        memcpy(dstBuffer, paramBuffer.get(), param.size);
         dstBuffer = &dstBuffer[param.size];
     }
     return buffer;

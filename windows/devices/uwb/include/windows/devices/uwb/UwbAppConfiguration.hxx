@@ -111,17 +111,18 @@ public:
 
     /**
      * Push a UwbAppConfigurationParameter into the collection
-    */
+     */
     template <typename PropertyT>
     void
-    Push(UwbAppConfigurationParameter<PropertyT> param){
-       m_params.push_back(std::move(param.m_buffer));
-       m_paramsLengthSum += param.Size();
+    Push(UwbAppConfigurationParameter<PropertyT> param)
+    {
+        m_params.push_back(std::move(param.m_buffer));
+        m_paramsLengthSum += param.Size();
     }
 
     /**
      * Writes all the params and returns a buffer that can be reinterpreted as a UWB_SET_APP_CONFIG_PARAMS
-    */
+     */
     std::unique_ptr<uint8_t[]>
     Publish();
 
