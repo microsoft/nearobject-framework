@@ -2,11 +2,13 @@
 #ifndef UWB_APP_CONFIGURATION_HXX
 #define UWB_APP_CONFIGURATION_HXX
 
+#include <concepts>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <memory>
 #include <tuple>
+#include <type_traits>
 
 #include <UwbCxLrpDeviceGlue.h>
 
@@ -19,10 +21,18 @@ namespace windows::devices
  * holds as its flexible array member.
  */
 template <typename PropertyT>
+requires std::is_standard_layout_v<PropertyT>
 class UwbAppConfigurationParameter
 {
 public:
-    explicit UwbAppConfigurationParameter(const PropertyT& value, UWB_APP_CONFIG_PARAM_TYPE parameterType, size_t parameterSize = sizeof(PropertyT)) :
+    /**
+     * @brief Construct a new UwbAppConfigurationParameter object.
+     * 
+     * @param value The value to pack into the UWB_APP_CONFIG_PARAM paramValue flex-array member.
+     * @param parameterType The corresponding UwbCx parameter type value.
+     * @param parameterSize The size of the value to pack, in bytes.
+     */
+    explicit UwbAppConfigurationParameter(const PropertyT& value, UWB_APP_CONFIG_PARAM_TYPE parameterType, std::size_t parameterSize = sizeof(PropertyT)) :
         m_size(offsetof(UWB_APP_CONFIG_PARAM, paramValue[parameterSize])),
         m_buffer(std::make_unique<uint8_t[]>(m_size)),
         m_parameter(*reinterpret_cast<UWB_APP_CONFIG_PARAM*>(m_buffer.get())),
