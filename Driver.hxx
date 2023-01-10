@@ -13,7 +13,6 @@
 
 #include "device.hxx"
 #include "queue.hxx"
-#include "trace.h"
 
 EXTERN_C_START
 

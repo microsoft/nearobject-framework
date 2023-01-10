@@ -5,20 +5,19 @@
  * @copyright Copyright (c) 2022
  */
 
+#include "UwbSimulatorTracelogging.hxx"
 #include "driver.hxx"
-
-#include "queue.tmh"
 
 /**
  * @brief The I/O dispatch callbacks for the frameworks device object
  * are configured in this function.
- * 
+ *
  * A single default I/O Queue is configured for parallel request
  * processing, and a driver context memory allocation is created
  * to hold our structure QUEUE_CONTEXT.
- * 
+ *
  * @param device Handle to a framework device object.
- * @return NTSTATUS 
+ * @return NTSTATUS
  */
 NTSTATUS
 UwbSimulatorQueueInitialize(WDFDEVICE device)
@@ -42,7 +41,7 @@ UwbSimulatorQueueInitialize(WDFDEVICE device)
         &queue);
 
     if (!NT_SUCCESS(status)) {
-        TraceEvents(TRACE_LEVEL_ERROR, TRACE_QUEUE, "WdfIoQueueCreate failed %!STATUS!", status);
+        TraceLoggingWrite(UwbSimulatorTraceloggingProvider, "WdfIoQueueCreate failed", TraceLoggingNTStatus(status));
         return status;
     }
 
@@ -52,9 +51,9 @@ UwbSimulatorQueueInitialize(WDFDEVICE device)
 /**
  * @brief This event is invoked when the framework receives
  * IRP_MJ_DEVICE_CONTROL request.
- * 
+ *
  * @param queue Handle to the framework queue object that is associated with
- * the I/O request. 
+ * the I/O request.
  * @param request Handle to a framework request object.
  * @param outputBufferLength Size of the output buffer in bytes.
  * @param inputBufferLength Size of the input buffer in bytes.
@@ -63,14 +62,15 @@ UwbSimulatorQueueInitialize(WDFDEVICE device)
 void
 UwbSimulatorEvtIoDeviceControl(WDFQUEUE queue, WDFREQUEST request, size_t outputBufferLength, size_t inputBufferLength, ULONG ioControlCode)
 {
-    TraceEvents(TRACE_LEVEL_INFORMATION,
-        TRACE_QUEUE,
-        "%!FUNC! Queue 0x%p, Request 0x%p OutputBufferLength %d InputBufferLength %d IoControlCode %d",
-        queue,
-        request,
-        static_cast<int>(outputBufferLength),
-        static_cast<int>(inputBufferLength),
-        ioControlCode);
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "Queue Request",
+        TraceLoggingLevel(TRACE_LEVEL_VERBOSE),
+        TraceLoggingPointer(queue, "Queue"),
+        TraceLoggingPointer(request, "Request"),
+        TraceLoggingHexInt32(ioControlCode, "IoControlCode"),
+        TraceLoggingUInt64(outputBufferLength, "OutputBufferLength"),
+        TraceLoggingUInt64(inputBufferLength, "InputBufferLength"));
 
     WdfRequestComplete(request, STATUS_SUCCESS);
 
@@ -80,7 +80,7 @@ UwbSimulatorEvtIoDeviceControl(WDFQUEUE queue, WDFREQUEST request, size_t output
 /**
  * @brief This event is invoked for a power-managed queue before the device
  * leaves the working state (D0).
- * 
+ *
  * @param queue Handle to the framework queue object that is associated with the
  * I/O request.
  * @param request Handle to a framework request object.
@@ -91,12 +91,13 @@ UwbSimulatorEvtIoDeviceControl(WDFQUEUE queue, WDFREQUEST request, size_t output
 void
 UwbSimulatorEvtIoStop(WDFQUEUE queue, WDFREQUEST request, ULONG actionFlags)
 {
-    TraceEvents(TRACE_LEVEL_INFORMATION,
-        TRACE_QUEUE,
-        "%!FUNC! Queue 0x%p, Request 0x%p ActionFlags %d",
-        queue,
-        request,
-        actionFlags);
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "I/O Stop",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingPointer(queue, "Queue"),
+        TraceLoggingPointer(request, "Request"),
+        TraceLoggingHexULong(actionFlags, "ActionFlags"));
 
     //
     // In most cases, the EvtIoStop callback function completes, cancels, or postpones
