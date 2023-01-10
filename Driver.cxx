@@ -6,13 +6,14 @@
  */
 
 #include "driver.hxx"
-#include "driver.tmh"
+
+#include "UwbSimulatorTracelogging.hxx"
 
 /**
  * @brief DriverEntry initializes the driver and is the first routine called by
  * the system after the driver is loaded. DriverEntry specifies the other entry
  * points in the function driver, such as EvtDevice and DriverUnload.
- * 
+ *
  * @param driverObject Represents the instance of the function driver that is
  * loaded into memory. DriverEntry must initialize members of DriverObject
  * before it returns to the caller. DriverObject is allocated by the system
@@ -26,17 +27,11 @@
 NTSTATUS
 DriverEntry(PDRIVER_OBJECT driverObject, PUNICODE_STRING registryPath)
 {
-    //
-    // Initialize WPP Tracing
-    //
-    WPP_INIT_TRACING(driverObject, registryPath);
+    TraceLoggingRegister(UwbSimulatorTraceloggingProvider);
+    TraceLoggingWrite(UwbSimulatorTraceloggingProvider, "DriverEntry");
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
-
-    //
-    // Register a cleanup callback so that we can call WPP_CLEANUP when
-    // the framework driver object is deleted during driver unload.
-    //
+    // Register a cleanup callback so that we can call TraceLoggingUnregister
+    // when the framework driver object is deleted during driver unload.
     WDF_OBJECT_ATTRIBUTES attributes;
     WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
     attributes.EvtCleanupCallback = UwbSimulatorEvtDriverContextCleanup;
@@ -45,12 +40,10 @@ DriverEntry(PDRIVER_OBJECT driverObject, PUNICODE_STRING registryPath)
     WDF_DRIVER_CONFIG_INIT(&config, UwbSimulatorEvtDeviceAdd);
     NTSTATUS status = WdfDriverCreate(driverObject, registryPath, &attributes, &config, WDF_NO_HANDLE);
     if (!NT_SUCCESS(status)) {
-        TraceEvents(TRACE_LEVEL_ERROR, TRACE_DRIVER, "WdfDriverCreate failed %!STATUS!", status);
-        WPP_CLEANUP(driverObject);
+        TraceLoggingWrite(UwbSimulatorTraceloggingProvider, "WdfDriverCreate failed", TraceLoggingLevel(TRACE_LEVEL_ERROR), TraceLoggingNTStatus(status));
+        TraceLoggingUnregister(UwbSimulatorTraceloggingProvider);
         return status;
     }
-
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Exit");
 
     return status;
 }
@@ -59,35 +52,27 @@ DriverEntry(PDRIVER_OBJECT driverObject, PUNICODE_STRING registryPath)
  * @brief EvtDeviceAdd is called by the framework in response to AddDevice call
  * from the PnP manager. We create and initialize a device object to represent a
  * new instance of the device.
- * 
+ *
  * @param driver Handle to a framework driver object created in DriverEntry.
  * @param deviceInit Pointer to a framework-allocated WDFDEVICE_INIT structure.
- * @return NTSTATUS 
+ * @return NTSTATUS
  */
 NTSTATUS
 UwbSimulatorEvtDeviceAdd(WDFDRIVER /* driver */, WDFDEVICE_INIT *deviceInit)
 {
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
+    TraceLoggingWrite(UwbSimulatorTraceloggingProvider, "AddDevice", TraceLoggingLevel(TRACE_LEVEL_INFORMATION));
 
     NTSTATUS status = UwbSimulatorCreateDevice(deviceInit);
-
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Exit");
-
     return status;
 }
 
 /**
  * @brief Free all the resources allocated in DriverEntry.
- * 
+ *
  * @param driverObject  Handle to a WDF Driver object.
  */
 void
 UwbSimulatorEvtDriverContextCleanup(WDFOBJECT /* driverObject */)
 {
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
-
-    //
-    // Stop WPP Tracing
-    //
-    WPP_CLEANUP(WdfDriverWdmGetDriverObject((WDFDRIVER)driverObject));
+    TraceLoggingUnregister(UwbSimulatorTraceloggingProvider);
 }

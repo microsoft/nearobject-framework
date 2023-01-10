@@ -5,18 +5,17 @@
  * @copyright Copyright (c) 2022
  */
 #include "driver.hxx"
-#include "device.tmh"
 
 #include "UwbSimulatorDevice.hxx"
 #include "UwbSimulatorDeviceFileObject.hxx"
 
 /**
  * @brief Worker routine called to create a device and its software resources.
- * 
+ *
  * @param deviceInit Pointer to an opaque init structure. Memory for this
  * structure will be freed by the framework when the WdfDeviceCreate succeeds.
  * So don't access the structure after that point.
- * @return NTSTATUS 
+ * @return NTSTATUS
  */
 NTSTATUS
 UwbSimulatorCreateDevice(WDFDEVICE_INIT *deviceInit)
