@@ -5,8 +5,6 @@
  * @copyright Copyright (c) 2022
  */
 
-#include "public.h"
-
 EXTERN_C_START
 
 //

@@ -7,6 +7,7 @@
 #include "driver.hxx"
 
 #include "UwbSimulatorDevice.hxx"
+#include "UwbSimulatorDdi.h"
 #include "UwbSimulatorDeviceFileObject.hxx"
 
 /**
@@ -56,7 +57,7 @@ UwbSimulatorCreateDevice(WDFDEVICE_INIT *deviceInit)
     // Create a device interface so that applications can find and talk
     // to us.
     //
-    status = WdfDeviceCreateDeviceInterface(device, &GUID_DEVINTERFACE_UwbSimulator, nullptr);
+    status = WdfDeviceCreateDeviceInterface(device, &GUID_DEVINTERFACE_UWB_SIMULATOR, nullptr);
     if (!NT_SUCCESS(status)) {
         return status;
     }

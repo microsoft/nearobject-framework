@@ -29,9 +29,9 @@
   <ItemGroup>
     <ClInclude Include="Device.hxx" />
     <ClInclude Include="Driver.hxx" />
-    <ClInclude Include="Public.h" />
     <ClInclude Include="Queue.hxx" />
     <ClInclude Include="UwbCxDependencies.hxx" />
+    <ClInclude Include="UwbSimulatorDdi.h" />
     <ClInclude Include="UwbSimulatorDevice.hxx" />
     <ClInclude Include="UwbSimulatorDeviceFileObject.hxx" />
     <ClInclude Include="UwbSimulatorTracelogging.hxx" />
