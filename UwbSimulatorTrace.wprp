@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WindowsPerformanceRecorder 
+    Version="1.0" 
+    Author="Windows Near Object Team" 
+    Copyright="Microsoft Corporation" 
+    Company="Microsoft Corporation">
+
+  <Profiles>
+    <EventCollector Id="Collector" Name="UwbSimulatorTraceLoggingProvider">
+      <BufferSize Value="64" />
+      <Buffers Value="4" />
+    </EventCollector>
+
+    <EventProvider Id="UwbSimulatorDriver" Name="55b90fb3-a893-49b4-8a57-19cb17c9e31e" />
+
+    <Profile 
+        Id="UwbSimulatorTraceLoggingProvider.Verbose.File" 
+        Name="UwbSimulatorTraceLoggingProvider" 
+        Description="UwbSimulatorTraceLoggingProvider" 
+        LoggingMode="File" 
+        DetailLevel="Verbose">
+      <Collectors>
+        <EventCollectorId Value="Collector">
+          <EventProviders>
+            <EventProviderId Value="UwbSimulatorDriver" />
+          </EventProviders>
+        </EventCollectorId>
+      </Collectors>
+    </Profile>
+
+    <Profile 
+        Id="UwbSimulatorTraceLoggingProvider.Light.File" 
+        Name="UwbSimulatorTraceLoggingProvider" 
+        Description="UwbSimulatorTraceLoggingProvider" 
+        Base="UwbSimulatorTraceLoggingProvider.Verbose.File" 
+        LoggingMode="File" 
+        DetailLevel="Light" 
+    />
+    <Profile 
+        Id="UwbSimulatorTraceLoggingProvider.Verbose.Memory" 
+        Name="UwbSimulatorTraceLoggingProvider" 
+        Description="UwbSimulatorTraceLoggingProvider" 
+        Base="UwbSimulatorTraceLoggingProvider.Verbose.File" 
+        LoggingMode="Memory" 
+        DetailLevel="Verbose" 
+    />
+    <Profile 
+        Id="UwbSimulatorTraceLoggingProvider.Light.Memory" 
+        Name="UwbSimulatorTraceLoggingProvider" 
+        Description="UwbSimulatorTraceLoggingProvider" 
+        Base="UwbSimulatorTraceLoggingProvider.Verbose.File" 
+        LoggingMode="Memory" 
+        DetailLevel="Light"
+    />
+    
+  </Profiles>
+</WindowsPerformanceRecorder>
