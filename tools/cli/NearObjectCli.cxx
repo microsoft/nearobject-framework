@@ -2,10 +2,10 @@
 #include <optional>
 #include <stdexcept>
 #include <string>
-#include <type_traits>
 #include <tuple>
-#include <vector>
+#include <type_traits>
 #include <variant>
+#include <vector>
 
 #include <magic_enum.hpp>
 #include <nearobject/cli/NearObjectCli.hxx>
@@ -217,15 +217,16 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
 
         std::cout << "Selected parameters:" << std::endl;
 
-        for (const auto& [parameterTag, parameterValue]: m_cliData->SessionData.uwbConfiguration.GetValueMap()) {
+        for (const auto& [parameterTag, parameterValue] : m_cliData->SessionData.uwbConfiguration.GetValueMap()) {
             std::visit([](auto&& arg) {
                 using ParameterValueT = std::decay_t<decltype(arg)>;
                 if constexpr (std::is_enum_v<ParameterValueT>) {
-                    std::cout << magic_enum::enum_type_name<ParameterValueT>() << "::" <<  magic_enum::enum_name(arg) << std::endl;
+                    std::cout << magic_enum::enum_type_name<ParameterValueT>() << "::" << magic_enum::enum_name(arg) << std::endl;
                 } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>>) {
                     std::cout << "ResultReportConfigurations: " << uwb::protocol::fira::ResultReportConfigurationToString(arg) << std::endl;
                 }
-            }, parameterValue);
+            },
+                parameterValue);
         }
 
         std::cout << "StaticRangingInfo: {" << m_cliData->SessionData.staticRangingInfo << "}" << std::endl;
