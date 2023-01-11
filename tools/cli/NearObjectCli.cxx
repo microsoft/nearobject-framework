@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include <string>
 #include <tuple>
+#include <type_traits>
+#include <variant>
 #include <vector>
 
 #include <magic_enum.hpp>
@@ -117,21 +119,6 @@ populateMap() noexcept
     return { std::cbegin(destVector), std::cend(destVector) };
 }
 
-/**
- * @brief Helper function to return a tuple containing the string
- * representations of an enum type and the value.
- *
- * @tparam EnumT The type of the enumeration.
- * @param value The enumeration value.
- * @return std::tuple<std::string_view, std::string_view>
- */
-template <typename EnumT>
-std::tuple<std::string_view, std::string_view>
-GetEnumTypeAndValue(const std::optional<EnumT>& value)
-{
-    return std::make_tuple(magic_enum::enum_type_name<EnumT>(), magic_enum::enum_name(*value));
-}
-
 const std::unordered_map<std::string, uwb::protocol::fira::DeviceRole> DeviceRoleMap = populateMap<uwb::protocol::fira::DeviceRole>();
 const std::unordered_map<std::string, uwb::protocol::fira::RangingDirection> RangingMethodMap = populateMap<uwb::protocol::fira::RangingDirection>();
 const std::unordered_map<std::string, uwb::protocol::fira::MeasurementReportMode> MeasurementReportModeMap = populateMap<uwb::protocol::fira::MeasurementReportMode>();
@@ -144,7 +131,6 @@ const std::unordered_map<std::string, uwb::protocol::fira::StsPacketConfiguratio
 const std::unordered_map<std::string, uwb::protocol::fira::ConvolutionalCodeConstraintLength> ConvolutionalCodeConstraintLengthMap = populateMap<uwb::protocol::fira::ConvolutionalCodeConstraintLength>();
 const std::unordered_map<std::string, uwb::protocol::fira::PrfMode> PrfModeMap = populateMap<uwb::protocol::fira::PrfMode>();
 const std::unordered_map<std::string, uwb::UwbMacAddressFcsType> UwbMacAddressFcsTypeMap = populateMap<uwb::UwbMacAddressFcsType>();
-const std::unordered_map<std::string, uwb::protocol::fira::ResultReportConfiguration> ResultReportConfigurationMap = populateMap<uwb::protocol::fira::ResultReportConfiguration>();
 } // namespace detail
 
 CLI::App*
@@ -226,53 +212,24 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     rangeStartApp->add_option("--ResultReportConfiguration", uwbConfig.resultReportConfigurationString)->capture_default_str();
 
     rangeStartApp->parse_complete_callback([this, &uwbConfig] {
+        m_cliData->SessionData.uwbConfiguration = m_cliData->uwbConfiguration;
+        m_cliData->SessionData.staticRangingInfo = m_cliData->StaticRanging;
+
         std::cout << "Selected parameters:" << std::endl;
 
-        for (const auto& [optionName, optionSelected] :
-            std::initializer_list<std::tuple<std::string_view, std::string_view>>{
-                detail::GetEnumTypeAndValue(uwbConfig.deviceRole),
-                detail::GetEnumTypeAndValue(uwbConfig.rangingDirection),
-                detail::GetEnumTypeAndValue(uwbConfig.rangingMeasurementReportMode),
-                detail::GetEnumTypeAndValue(uwbConfig.stsConfiguration),
-                detail::GetEnumTypeAndValue(uwbConfig.multiNodeMode),
-                detail::GetEnumTypeAndValue(uwbConfig.rangingTimeStruct),
-                detail::GetEnumTypeAndValue(uwbConfig.channel),
-                detail::GetEnumTypeAndValue(uwbConfig.rframeConfig),
-                detail::GetEnumTypeAndValue(uwbConfig.convolutionalCodeConstraintLength),
-                detail::GetEnumTypeAndValue(uwbConfig.prfMode),
-                detail::GetEnumTypeAndValue(uwbConfig.macAddressFcsType) }) {
-            std::cout << optionName << "::" << optionSelected << std::endl;
-        }
-        if (!uwbConfig.firaMacVersionString.empty()) {
-            auto result = uwb::protocol::fira::StringToVersion(uwbConfig.firaMacVersionString);
-            if (not result) {
-                std::cout << "could not parse MacVersionString" << std::endl;
-            } else {
-                uwbConfig.firaMacVersion = result.value();
-            }
-        }
-        if (!uwbConfig.firaPhyVersionString.empty()) {
-            auto result = uwb::protocol::fira::StringToVersion(uwbConfig.firaPhyVersionString);
-            if (not result) {
-                std::cout << "could not parse PhyVersionString" << std::endl;
-            } else {
-                uwbConfig.firaPhyVersion = result.value();
-            }
+        for (const auto& [parameterTag, parameterValue] : m_cliData->SessionData.uwbConfiguration.GetValueMap()) {
+            std::visit([](auto&& arg) {
+                using ParameterValueT = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_enum_v<ParameterValueT>) {
+                    std::cout << magic_enum::enum_type_name<ParameterValueT>() << "::" << magic_enum::enum_name(arg) << std::endl;
+                } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>>) {
+                    std::cout << "ResultReportConfigurations: " << uwb::protocol::fira::ResultReportConfigurationToString(arg) << std::endl;
+                }
+            },
+                parameterValue);
         }
 
-        if (!uwbConfig.resultReportConfigurationString.empty()) {
-            auto result = uwb::protocol::fira::StringToResultReportConfiguration(uwbConfig.resultReportConfigurationString, detail::ResultReportConfigurationMap);
-            if (not result) {
-                std::cout << "could not parse ResultReportConfiguration" << std::endl;
-            } else {
-                uwbConfig.resultReportConfigurations = result.value();
-            }
-        }
-
-        m_cliData->SessionData.staticRangingInfo = m_cliData->StaticRanging;
-        m_cliData->SessionData.uwbConfiguration = m_cliData->uwbConfiguration;
         std::cout << "StaticRangingInfo: {" << m_cliData->SessionData.staticRangingInfo << "}" << std::endl;
-        std::cout << "ResultReportConfigurations: " << uwb::protocol::fira::ResultReportConfigurationToString(uwbConfig.resultReportConfigurations) << std::endl;
     });
 
     rangeStartApp->final_callback([this] {

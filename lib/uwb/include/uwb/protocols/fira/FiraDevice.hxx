@@ -226,12 +226,13 @@ std::string
 ResultReportConfigurationToString(const std::unordered_set<ResultReportConfiguration>& resultReportConfiguration);
 
 /**
- * @brief Converts a string to vector of ResultReportConfiguration, using the given map
- *
- * @return std::unordered_set<ResultReportConfiguration>
+ * @brief Converts a string to vector of ResultReportConfiguration.
+ * 
+ * @param input The string input to convert.
+ * @return std::optional<std::unordered_set<ResultReportConfiguration>> 
  */
 std::optional<std::unordered_set<ResultReportConfiguration>>
-StringToResultReportConfiguration(const std::string& input, std::unordered_map<std::string, ResultReportConfiguration> map);
+StringToResultReportConfiguration(const std::string& input);
 
 } // namespace uwb::protocol::fira
 
