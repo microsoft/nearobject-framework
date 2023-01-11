@@ -5,8 +5,6 @@
 #include <cstdint>
 #include <optional>
 #include <string>
-#include <unordered_map>
-#include <unordered_set>
 
 #include <uwb/UwbMacAddress.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
@@ -25,8 +23,6 @@ struct UwbConfigurationData
     // Mirrored properties from UwbConfiguration data. Any newly added fields
     // that should be supported from the command-line must also be added here,
     // along with parsing support in a NearObjectCli instance.
-    std::optional<uint32_t> firaPhyVersion;
-    std::optional<uint32_t> firaMacVersion;
     std::optional<uwb::protocol::fira::DeviceRole> deviceRole;
     std::optional<uwb::protocol::fira::RangingDirection> rangingDirection;
     std::optional<uwb::protocol::fira::MeasurementReportMode> rangingMeasurementReportMode;
@@ -45,7 +41,6 @@ struct UwbConfigurationData
     std::optional<uint8_t> sp1PhySetNumber;
     std::optional<uint8_t> sp3PhySetNumber;
     std::optional<uint8_t> preableCodeIndex;
-    std::unordered_set<uwb::protocol::fira::ResultReportConfiguration> resultReportConfigurations;
     std::optional<uwb::UwbMacAddressType> macAddressMode;
     std::optional<uwb::UwbMacAddress> controleeShortMacAddress;
     std::optional<uwb::UwbMacAddress> controllerMacAddress;
