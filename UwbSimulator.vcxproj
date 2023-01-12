@@ -29,9 +29,9 @@
   <ItemGroup>
     <ClInclude Include="Device.hxx" />
     <ClInclude Include="Driver.hxx" />
+    <ClInclude Include="include\UwbSimulatorDdi.h" />
     <ClInclude Include="Queue.hxx" />
     <ClInclude Include="UwbCxDependencies.hxx" />
-    <ClInclude Include="UwbSimulatorDdi.h" />
     <ClInclude Include="UwbSimulatorDevice.hxx" />
     <ClInclude Include="UwbSimulatorDeviceFileObject.hxx" />
     <ClInclude Include="UwbSimulatorTracelogging.hxx" />
@@ -98,6 +98,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DebuggerFlavor>DbgengRemoteDebugger</DebuggerFlavor>
+    <PublicIncludeDirectories>D:\src\uwbsimulator\include;$(PublicIncludeDirectories)</PublicIncludeDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DebuggerFlavor>DbgengRemoteDebugger</DebuggerFlavor>
@@ -113,6 +114,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <ConformanceMode>false</ConformanceMode>
+      <AdditionalIncludeDirectories>D:\src\uwbsimulator\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <DriverSign>
       <FileDigestAlgorithm>sha256</FileDigestAlgorithm>
