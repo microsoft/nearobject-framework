@@ -5,6 +5,7 @@
 // NB: This must come before any other Windows include
 #include <windows.h>
 #include <winioctl.h>
+#include <stdint.h>
 
 #include <UwbCxLrpDevice.h>
 
