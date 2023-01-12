@@ -99,38 +99,54 @@ NearObjectCli::CreateParser() noexcept
 namespace detail
 {
 /**
- * @brief Helper function to populate the string-enum mapping
+ * @brief Helper function to produce a mapping of enumeration strings to their
+ * corresponding field names.
  *
- * @tparam EnumType
+ * This is used for CLI11 CheckedTransformer which validates string inputs and
+ * maps them to their corresponding enumeration value.
+ *
+ * @tparam EnumType The type of the enumeration.
  * @return std::map<std::string, EnumType>
  */
 template <typename EnumType>
+requires std::is_enum_v<EnumType>
 const std::unordered_map<std::string, EnumType>
-populateMap() noexcept
+CreateEnumerationStringMap() noexcept
 {
-    const auto reverseMap = magic_enum::enum_entries<EnumType>();
-    std::vector<std::pair<std::string, EnumType>> destVector{ reverseMap.size() };
-    std::transform(std::cbegin(reverseMap),
-        std::cend(reverseMap),
-        std::begin(destVector),
-        [](const auto& input) {
-            return std::pair{ std::string{ input.second }, input.first };
-        });
-    return { std::cbegin(destVector), std::cend(destVector) };
+    const auto& reverseMap = magic_enum::enum_entries<EnumType>();
+    std::unordered_map<std::string, EnumType> map;
+
+    for (const auto& [enumValue, enumName] : reverseMap) {
+        map.emplace(enumName, enumValue);
+    }
+
+    return map;
 }
 
-const std::unordered_map<std::string, uwb::protocol::fira::DeviceRole> DeviceRoleMap = populateMap<uwb::protocol::fira::DeviceRole>();
-const std::unordered_map<std::string, uwb::protocol::fira::RangingDirection> RangingMethodMap = populateMap<uwb::protocol::fira::RangingDirection>();
-const std::unordered_map<std::string, uwb::protocol::fira::MeasurementReportMode> MeasurementReportModeMap = populateMap<uwb::protocol::fira::MeasurementReportMode>();
-const std::unordered_map<std::string, uwb::protocol::fira::StsConfiguration> StsConfigurationMap = populateMap<uwb::protocol::fira::StsConfiguration>();
-const std::unordered_map<std::string, uwb::protocol::fira::MultiNodeMode> MultiNodeModeMap = populateMap<uwb::protocol::fira::MultiNodeMode>();
-const std::unordered_map<std::string, uwb::protocol::fira::RangingMode> RangingModeMap = populateMap<uwb::protocol::fira::RangingMode>();
-const std::unordered_map<std::string, uwb::protocol::fira::SchedulingMode> SchedulingModeMap = populateMap<uwb::protocol::fira::SchedulingMode>();
-const std::unordered_map<std::string, uwb::protocol::fira::Channel> ChannelMap = populateMap<uwb::protocol::fira::Channel>();
-const std::unordered_map<std::string, uwb::protocol::fira::StsPacketConfiguration> StsPacketConfigurationMap = populateMap<uwb::protocol::fira::StsPacketConfiguration>();
-const std::unordered_map<std::string, uwb::protocol::fira::ConvolutionalCodeConstraintLength> ConvolutionalCodeConstraintLengthMap = populateMap<uwb::protocol::fira::ConvolutionalCodeConstraintLength>();
-const std::unordered_map<std::string, uwb::protocol::fira::PrfMode> PrfModeMap = populateMap<uwb::protocol::fira::PrfMode>();
-const std::unordered_map<std::string, uwb::UwbMacAddressFcsType> UwbMacAddressFcsTypeMap = populateMap<uwb::UwbMacAddressFcsType>();
+/**
+ * @brief Adds a cli option based on an enumeration.
+ *
+ * This uses the name of the enumeration as the option name and configures to
+ * ignore case. For example, if the enum type MyEnum is used, then an option is
+ * added with name --MyEnum and it can be specified with any case.
+ *
+ * @tparam EnumType The enumeration type to add as an option.
+ * @param app The target CLI11 application to add the option to.
+ * @param assignTo The destination variable to store the parsed option in.
+ * @return The added option, which additional configuration can be applied to.
+ */
+template <typename EnumType>
+requires std::is_enum_v<EnumType>
+CLI::Option*
+AddEnumOption(CLI::App* app, std::optional<EnumType>& assignTo)
+{
+    std::string optionName{ std::string("--").append(magic_enum::enum_type_name<EnumType>()) };
+
+    return app->add_option(std::move(optionName), assignTo)
+        ->transform(CLI::CheckedTransformer(CreateEnumerationStringMap<EnumType>(), CLI::ignore_case))
+        ->capture_default_str();
+}
+
 } // namespace detail
 
 CLI::App*
@@ -170,19 +186,20 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     auto rangeStartApp = parent->add_subcommand("start", "start ranging. Please refer to Table 53 of the FiRa CSML spec for more info on the options")->fallthrough();
 
     // TODO is there a way to put all the enums into a list of [optionName, optionDestination, optionMap] so we don't have to create the initializer list each time
-    // TODO get rid of these strings, instead use a macro to extract the enum name
-    rangeStartApp->add_option("--DeviceRole", uwbConfig.deviceRole)->transform(CLI::CheckedTransformer(detail::DeviceRoleMap))->capture_default_str();
-    rangeStartApp->add_option("--RangingMethod", uwbConfig.rangingDirection)->transform(CLI::CheckedTransformer(detail::RangingMethodMap))->capture_default_str();
-    rangeStartApp->add_option("--MeasurementReportMode", uwbConfig.rangingMeasurementReportMode)->transform(CLI::CheckedTransformer(detail::MeasurementReportModeMap))->capture_default_str();
-    rangeStartApp->add_option("--StsConfiguration", uwbConfig.stsConfiguration)->transform(CLI::CheckedTransformer(detail::StsConfigurationMap))->capture_default_str();
-    rangeStartApp->add_option("--MultiNodeMode", uwbConfig.multiNodeMode)->transform(CLI::CheckedTransformer(detail::MultiNodeModeMap))->capture_default_str();
-    rangeStartApp->add_option("--RangingMode", uwbConfig.rangingTimeStruct)->transform(CLI::CheckedTransformer(detail::RangingModeMap))->capture_default_str();
-    rangeStartApp->add_option("--SchedulingMode", uwbConfig.schedulingMode)->transform(CLI::CheckedTransformer(detail::SchedulingModeMap))->capture_default_str();
-    rangeStartApp->add_option("--Channel", uwbConfig.channel)->transform(CLI::CheckedTransformer(detail::ChannelMap))->capture_default_str();
-    rangeStartApp->add_option("--StsPacketConfiguration", uwbConfig.rframeConfig)->transform(CLI::CheckedTransformer(detail::StsPacketConfigurationMap))->capture_default_str();
-    rangeStartApp->add_option("--ConvolutionalCodeConstraintLength", uwbConfig.convolutionalCodeConstraintLength)->transform(CLI::CheckedTransformer(detail::ConvolutionalCodeConstraintLengthMap))->capture_default_str();
-    rangeStartApp->add_option("--PrfMode", uwbConfig.prfMode)->transform(CLI::CheckedTransformer(detail::PrfModeMap))->capture_default_str();
-    rangeStartApp->add_option("--UwbMacAddressFcsType", uwbConfig.macAddressFcsType)->transform(CLI::CheckedTransformer(detail::UwbMacAddressFcsTypeMap))->capture_default_str();
+
+    // enumerations
+    detail::AddEnumOption(rangeStartApp, uwbConfig.deviceRole);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingDirection);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingMeasurementReportMode);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.stsConfiguration);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.multiNodeMode);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingTimeStruct);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.schedulingMode);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.channel);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.rframeConfig);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.convolutionalCodeConstraintLength);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.prfMode);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.macAddressFcsType);
 
     // booleans
     rangeStartApp->add_flag("--controller,!--controlee", m_cliData->HostIsController, "default is controlee")->capture_default_str();
@@ -211,7 +228,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     rangeStartApp->add_option("--FiraMacVersion", uwbConfig.firaMacVersionString)->capture_default_str();
     rangeStartApp->add_option("--ResultReportConfiguration", uwbConfig.resultReportConfigurationString)->capture_default_str();
 
-    rangeStartApp->parse_complete_callback([this, &uwbConfig] {
+    rangeStartApp->parse_complete_callback([this] {
         m_cliData->SessionData.uwbConfiguration = m_cliData->uwbConfiguration;
         m_cliData->SessionData.staticRangingInfo = m_cliData->StaticRanging;
 
