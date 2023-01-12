@@ -109,9 +109,11 @@ namespace detail
  * @return std::map<std::string, EnumType>
  */
 template <typename EnumType>
+// clang-format off
 requires std::is_enum_v<EnumType>
 const std::unordered_map<std::string, EnumType>
 CreateEnumerationStringMap() noexcept
+// clang-format on
 {
     const auto& reverseMap = magic_enum::enum_entries<EnumType>();
     std::unordered_map<std::string, EnumType> map;
@@ -136,9 +138,11 @@ CreateEnumerationStringMap() noexcept
  * @return The added option, which additional configuration can be applied to.
  */
 template <typename EnumType>
+// clang-format off
 requires std::is_enum_v<EnumType>
 CLI::Option*
 AddEnumOption(CLI::App* app, std::optional<EnumType>& assignTo)
+// clang-format on
 {
     std::string optionName{ std::string("--").append(magic_enum::enum_type_name<EnumType>()) };
 
