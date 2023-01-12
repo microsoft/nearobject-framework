@@ -20,7 +20,6 @@ target_link_libraries(nearobject-service-windows
     PRIVATE
         windevuwb
     PUBLIC
-        cfgmgr32.lib
         nearobject-service
         WIL::WIL
         windevutil
