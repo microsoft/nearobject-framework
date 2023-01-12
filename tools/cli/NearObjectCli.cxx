@@ -246,7 +246,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
                 parameterValue);
         }
 
-        std::cout << "StaticRangingInfo: {" << m_cliData->SessionData.staticRangingInfo << "}" << std::endl;
+        std::cout << "StaticRangingInfo: { " << m_cliData->SessionData.staticRangingInfo << " }" << std::endl;
     });
 
     rangeStartApp->final_callback([this] {
