@@ -24,7 +24,6 @@ target_link_libraries(windevuwb
     PRIVATE
         windevutil
     PUBLIC
-        cfgmgr32.lib
         uwb
         uwb-proto-fira
         uwbcx
