@@ -7,7 +7,7 @@ std::string
 uwb::protocol::fira::StaticRangingInfo::ToString() const
 {
     std::ostringstream staticRangingInfoString{};
-    staticRangingInfoString 
+    staticRangingInfoString
         << "VendorId " << VendorId
         << ", InitializationVector 0x";
     for (const auto& i : InitializationVector) {
