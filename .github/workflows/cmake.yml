@@ -1,6 +1,7 @@
 name: Build Release [CMake]
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "develop", "main" ]
   pull_request:
