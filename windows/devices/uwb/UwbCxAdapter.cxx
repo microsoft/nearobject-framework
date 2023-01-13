@@ -101,9 +101,6 @@ struct overloaded : Ts...
 {
     using Ts::operator()...;
 };
-// explicit deduction guide (not needed as of C++20)
-template <class... Ts>
-overloaded(Ts...) -> overloaded<Ts...>;
 
 std::unique_ptr<uint8_t[]>
 windows::devices::uwb::GenerateUwbSetAppConfigParameterDdi(const ::uwb::protocol::fira::UwbSessionData& uwbSessionData)

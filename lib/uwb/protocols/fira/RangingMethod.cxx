@@ -1,6 +1,4 @@
 
-#include <tuple>
-
 #include <uwb/protocols/fira/RangingMethod.hxx>
 
 uint8_t
