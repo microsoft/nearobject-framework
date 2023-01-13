@@ -14,6 +14,8 @@ UwbSimulatorDevice::OnFileCreate(WDFDEVICE device, WDFREQUEST request, WDFFILEOB
         TraceLoggingPointer(request, "Request"),
         TraceLoggingPointer(file, "File")
     );
+
+    WdfRequestComplete(request, STATUS_SUCCESS);
 }
 
 void

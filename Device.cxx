@@ -27,6 +27,8 @@ UwbSimulatorCreateDevice(WDFDEVICE_INIT *deviceInit)
     WDF_OBJECT_ATTRIBUTES fileAttributes;
     WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&fileAttributes, UwbSimulatorDeviceFileObject);
 
+    WdfDeviceInitSetFileObjectConfig(deviceInit, &fileConfiguration, &fileAttributes);
+
     WDF_OBJECT_ATTRIBUTES deviceAttributes;
     WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&deviceAttributes, DEVICE_CONTEXT);
 
