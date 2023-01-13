@@ -43,7 +43,7 @@ main(int argc, char* argv[])
     }
 
     std::cout << "creating uwb simulator device " << deviceName << std::endl;
-    
+
     auto uwbDeviceSimulator = std::make_unique<uwb::simulator::UwbDeviceSimulator>(deviceName);
     if (!uwbDeviceSimulator) {
         std::cerr << "failed to create uwb simulator device instance" << std::endl;

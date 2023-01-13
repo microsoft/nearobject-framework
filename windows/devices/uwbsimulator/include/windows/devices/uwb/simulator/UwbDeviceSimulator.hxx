@@ -9,8 +9,8 @@
 #include <windows.h>
 
 #include <cfgmgr32.h>
-#include <windows/devices/DeviceResource.hxx>
 #include <wil/resource.h>
+#include <windows/devices/DeviceResource.hxx>
 
 namespace windows::devices::uwb::simulator
 {
@@ -19,7 +19,7 @@ class UwbDeviceSimulator
 public:
     /**
      * @brief Construct a new UwbDeviceSimulator object.
-     * 
+     *
      * @param deviceName The device name (path).
      */
     explicit UwbDeviceSimulator(std::string deviceName);
