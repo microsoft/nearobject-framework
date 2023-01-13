@@ -5,68 +5,64 @@
  * @copyright Copyright (c) 2022
  */
 
+#include <memory>
+
+#include <windows.h>
+
+#include "UwbSimulatorDdi.h"
+#include "UwbSimulatorIoQueue.hxx"
 #include "UwbSimulatorTracelogging.hxx"
-#include "driver.hxx"
 
-/**
- * @brief The I/O dispatch callbacks for the frameworks device object
- * are configured in this function.
- *
- * A single default I/O Queue is configured for parallel request
- * processing, and a driver context memory allocation is created
- * to hold our structure QUEUE_CONTEXT.
- *
- * @param device Handle to a framework device object.
- * @return NTSTATUS
- */
-NTSTATUS
-UwbSimulatorQueueInitialize(WDFDEVICE device)
+UwbSimulatorIoQueue::UwbSimulatorIoQueue(WDFQUEUE wdfQueue) :
+    m_wdfQueue(wdfQueue)
+{}
+
+VOID
+UwbSimulatorIoQueue::OnWdfIoDeviceControl(WDFQUEUE queue, WDFREQUEST request, size_t outputBufferLength, size_t inputBufferLength, ULONG ioControlCode)
 {
-    //
-    // Configure a default queue so that requests that are not
-    // configure-fowarded using WdfDeviceConfigureRequestDispatching to goto
-    // other queues get dispatched here.
-    //
-    WDF_IO_QUEUE_CONFIG queueConfig;
-    WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
+    auto instance = GetUwbSimulatorIoQueue(queue);
+    instance->OnIoDeviceControl(request, outputBufferLength, inputBufferLength, ioControlCode);
+}
 
-    queueConfig.EvtIoDeviceControl = UwbSimulatorEvtIoDeviceControl;
-    queueConfig.EvtIoStop = UwbSimulatorEvtIoStop;
+VOID
+OnWdfIoStop(WDFQUEUE queue, WDFREQUEST request, ULONG actionFlags)
+{
+    auto instance = GetUwbSimulatorIoQueue(queue);
+    instance->OnIoStop(request, actionFlags);
+}
 
-    WDFQUEUE queue;
-    NTSTATUS status = WdfIoQueueCreate(
-        device,
-        &queueConfig,
-        WDF_NO_OBJECT_ATTRIBUTES,
-        &queue);
+NTSTATUS
+UwbSimulatorIoQueue::Initialize()
+{
+    auto wdfDevice = WdfIoQueueGetDevice(m_wdfQueue);
 
+    NTSTATUS status = WdfDeviceCreateDeviceInterface(wdfDevice, &GUID_DEVINTERFACE_UWB_SIMULATOR, nullptr);
     if (!NT_SUCCESS(status)) {
-        TraceLoggingWrite(UwbSimulatorTraceloggingProvider, "WdfIoQueueCreate failed", TraceLoggingNTStatus(status));
+        TraceLoggingWrite(
+            UwbSimulatorTraceloggingProvider,
+            "Queue WdfDeviceCreateDeviceInterface failed",
+            TraceLoggingLevel(TRACE_LEVEL_ERROR),
+            TraceLoggingNTStatus(status, "Status"));
         return status;
     }
 
-    return status;
+    return STATUS_SUCCESS;
 }
 
-/**
- * @brief This event is invoked when the framework receives
- * IRP_MJ_DEVICE_CONTROL request.
- *
- * @param queue Handle to the framework queue object that is associated with
- * the I/O request.
- * @param request Handle to a framework request object.
- * @param outputBufferLength Size of the output buffer in bytes.
- * @param inputBufferLength Size of the input buffer in bytes.
- * @param ioControlCode I/O control code.
- */
+NTSTATUS
+UwbSimulatorIoQueue::Uninitialize()
+{
+    return STATUS_SUCCESS;
+}
+
 void
-UwbSimulatorEvtIoDeviceControl(WDFQUEUE queue, WDFREQUEST request, size_t outputBufferLength, size_t inputBufferLength, ULONG ioControlCode)
+UwbSimulatorIoQueue::OnIoDeviceControl(WDFREQUEST request, size_t outputBufferLength, size_t inputBufferLength, ULONG ioControlCode)
 {
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
         "Queue Request",
         TraceLoggingLevel(TRACE_LEVEL_VERBOSE),
-        TraceLoggingPointer(queue, "Queue"),
+        TraceLoggingPointer(m_wdfQueue, "Queue"),
         TraceLoggingPointer(request, "Request"),
         TraceLoggingHexInt32(ioControlCode, "IoControlCode"),
         TraceLoggingUInt64(outputBufferLength, "OutputBufferLength"),
@@ -77,29 +73,17 @@ UwbSimulatorEvtIoDeviceControl(WDFQUEUE queue, WDFREQUEST request, size_t output
     return;
 }
 
-/**
- * @brief This event is invoked for a power-managed queue before the device
- * leaves the working state (D0).
- *
- * @param queue Handle to the framework queue object that is associated with the
- * I/O request.
- * @param request Handle to a framework request object.
- * @param actionFlags A bitwise OR of one or more
- * WDF_REQUEST_STOP_ACTION_FLAGS-typed flags that identify the reason that the
- * callback function is being called and whether the request is cancelable.
- */
 void
-UwbSimulatorEvtIoStop(WDFQUEUE queue, WDFREQUEST request, ULONG actionFlags)
+UwbSimulatorIoQueue::OnIoStop(WDFREQUEST request, ULONG actionFlags)
 {
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
         "I/O Stop",
         TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
-        TraceLoggingPointer(queue, "Queue"),
+        TraceLoggingPointer(m_wdfQueue, "Queue"),
         TraceLoggingPointer(request, "Request"),
         TraceLoggingHexULong(actionFlags, "ActionFlags"));
 
-    //
     // In most cases, the EvtIoStop callback function completes, cancels, or postpones
     // further processing of the I/O request.
     //
@@ -135,7 +119,4 @@ UwbSimulatorEvtIoStop(WDFQUEUE queue, WDFREQUEST request, ULONG actionFlags)
     // Potentially, this inaction can prevent a system from entering its hibernation state
     // or another low system power state. In extreme cases, it can cause the system
     // to crash with bugcheck code 9F.
-    //
-
-    return;
 }

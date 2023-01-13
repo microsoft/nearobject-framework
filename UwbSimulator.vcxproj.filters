@@ -20,6 +20,9 @@
     <Filter Include="Scripts">
       <UniqueIdentifier>{066bd1f5-105d-44f9-856b-9c544fe8b61d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Public">
+      <UniqueIdentifier>{59b3c401-38e4-46ba-8081-5bf6a82229ff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Inf Include="UwbSimulator.inf">
@@ -27,16 +30,10 @@
     </Inf>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Public.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Device.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Driver.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Queue.hxx">
+    <ClInclude Include="UwbSimulatorIoQueue.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UwbCxDependencies.hxx">
@@ -45,27 +42,27 @@
     <ClInclude Include="UwbSimulatorDevice.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UwbSimulatorDeviceFileObject.hxx">
+    <ClInclude Include="UwbSimulatorDeviceFile.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UwbSimulatorTracelogging.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\UwbSimulatorDdi.h">
+      <Filter>Header Files\Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Device.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Driver.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Queue.cxx">
+    <ClCompile Include="UwbSimulatorIoQueue.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UwbSimulatorDevice.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UwbSimulatorDeviceFileObject.cxx">
+    <ClCompile Include="UwbSimulatorDeviceFile.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UwbSimulatorTracelogging.cxx">
