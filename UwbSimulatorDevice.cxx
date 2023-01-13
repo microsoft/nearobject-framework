@@ -148,6 +148,7 @@ UwbSimulatorDevice::Uninitialize()
     if (m_ioQueue != nullptr) {
         m_ioQueue->Uninitialize();
         m_ioQueue->~UwbSimulatorIoQueue();
+        m_ioQueue = nullptr;
     }
 
     return STATUS_SUCCESS;
