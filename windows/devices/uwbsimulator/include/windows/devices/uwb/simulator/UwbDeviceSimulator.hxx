@@ -34,9 +34,8 @@ public:
 
     /**
      * @brief Initialize the device.
-     * TODO: return type needs to convey whether this worked.
      */
-    void
+    bool
     Initialize();
 
 private:
