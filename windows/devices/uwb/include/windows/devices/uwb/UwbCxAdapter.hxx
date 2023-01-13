@@ -16,8 +16,10 @@
 namespace windows::devices::uwb
 {
 /**
- * Given the uwbSessionData object,
- * returns a byte array that is interpretable as a UWB_SET_APP_CONFIG_PARAMS
+ * @brief returns a byte array that is interpretable as a UWB_SET_APP_CONFIG_PARAMS
+ * 
+ * @param uwbSessionData 
+ * @return std::unique_ptr<uint8_t[]> 
  */
 std::unique_ptr<uint8_t[]>
 GenerateUwbSetAppConfigParameterDdi(const ::uwb::protocol::fira::UwbSessionData& uwbSessionData);

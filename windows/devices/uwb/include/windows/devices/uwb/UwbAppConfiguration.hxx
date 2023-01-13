@@ -110,7 +110,10 @@ public:
     UwbSetAppConfigurationParametersBuilder(uint32_t sessionId);
 
     /**
-     * Push a UwbAppConfigurationParameter into the collection
+     * @brief Push a UwbAppConfigurationParameter into the collection
+     * 
+     * @tparam PropertyT 
+     * @param param 
      */
     template <typename PropertyT>
     void
@@ -121,7 +124,9 @@ public:
     }
 
     /**
-     * Writes all the params and returns a buffer that can be reinterpreted as a UWB_SET_APP_CONFIG_PARAMS
+     * @brief Writes all the params and returns a buffer that can be reinterpreted as a UWB_SET_APP_CONFIG_PARAMS
+     * 
+     * @return std::unique_ptr<uint8_t[]> 
      */
     std::unique_ptr<uint8_t[]>
     Publish();
