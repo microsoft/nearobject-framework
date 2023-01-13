@@ -17,7 +17,7 @@ target_link_libraries(nocli-win
         nocli-core
         notstd-windows
         windevutil
-        windevuwb
+        windev-uwb
 )
 
 set_target_properties(nocli-win PROPERTIES OUTPUT_NAME nocli)
