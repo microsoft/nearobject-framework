@@ -16,9 +16,7 @@
 
 #include <windows/devices/DeviceResource.hxx>
 
-namespace windows
-{
-namespace devices
+namespace windows::devices
 {
 /**
  * @brief A device presence (change) event.
@@ -141,7 +139,6 @@ private:
     unique_hcmnotification m_hcmNotificationHandle;
     std::function<void(DevicePresenceEvent presenceEvent, std::string deviceName)> m_callback;
 };
-} // namespace devices
-} // namespace windows
+} // namespace windows::devices
 
 #endif // WINDOWS_DEVICE_PRESENCE_MONITOR

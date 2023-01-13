@@ -18,7 +18,7 @@ target_include_directories(nearobject-service-windows
 
 target_link_libraries(nearobject-service-windows
     PRIVATE
-        windevuwb
+        windev-uwb
     PUBLIC
         nearobject-service
         WIL::WIL
