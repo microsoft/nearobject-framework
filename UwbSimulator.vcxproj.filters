@@ -30,13 +30,10 @@
     </Inf>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Device.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Driver.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Queue.hxx">
+    <ClInclude Include="UwbSimulatorIoQueue.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UwbCxDependencies.hxx">
@@ -45,7 +42,7 @@
     <ClInclude Include="UwbSimulatorDevice.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UwbSimulatorDeviceFileObject.hxx">
+    <ClInclude Include="UwbSimulatorDeviceFile.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UwbSimulatorTracelogging.hxx">
@@ -56,19 +53,16 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Device.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Driver.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Queue.cxx">
+    <ClCompile Include="UwbSimulatorIoQueue.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UwbSimulatorDevice.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UwbSimulatorDeviceFileObject.cxx">
+    <ClCompile Include="UwbSimulatorDeviceFile.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UwbSimulatorTracelogging.cxx">

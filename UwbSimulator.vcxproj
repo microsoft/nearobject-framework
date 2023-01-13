@@ -19,21 +19,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Device.cxx" />
     <ClCompile Include="Driver.cxx" />
-    <ClCompile Include="Queue.cxx" />
+    <ClCompile Include="UwbSimulatorIoQueue.cxx" />
     <ClCompile Include="UwbSimulatorDevice.cxx" />
-    <ClCompile Include="UwbSimulatorDeviceFileObject.cxx" />
+    <ClCompile Include="UwbSimulatorDeviceFile.cxx" />
     <ClCompile Include="UwbSimulatorTracelogging.cxx" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Device.hxx" />
     <ClInclude Include="Driver.hxx" />
     <ClInclude Include="include\UwbSimulatorDdi.h" />
-    <ClInclude Include="Queue.hxx" />
+    <ClInclude Include="UwbSimulatorIoQueue.hxx" />
     <ClInclude Include="UwbCxDependencies.hxx" />
     <ClInclude Include="UwbSimulatorDevice.hxx" />
-    <ClInclude Include="UwbSimulatorDeviceFileObject.hxx" />
+    <ClInclude Include="UwbSimulatorDeviceFile.hxx" />
     <ClInclude Include="UwbSimulatorTracelogging.hxx" />
   </ItemGroup>
   <ItemGroup>

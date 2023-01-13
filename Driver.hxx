@@ -8,20 +8,11 @@
 
 #include <windows.h>
 
-#include <initguid.h>
 #include <wdf.h>
-
-#include "device.hxx"
-#include "queue.hxx"
 
 EXTERN_C_START
 
-//
-// WDFDRIVER Events
-//
-
 DRIVER_INITIALIZE DriverEntry;
-EVT_WDF_DRIVER_DEVICE_ADD UwbSimulatorEvtDeviceAdd;
-EVT_WDF_OBJECT_CONTEXT_CLEANUP UwbSimulatorEvtDriverContextCleanup;
+EVT_WDF_OBJECT_CONTEXT_CLEANUP OnWdfDriverUnload;
 
 EXTERN_C_END
