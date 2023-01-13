@@ -26,7 +26,7 @@ target_link_libraries(windevuwb
     PUBLIC
         uwb
         uwb-proto-fira
-        uwbcx
+        uwbcx-driver
         WIL::WIL
 )
 
