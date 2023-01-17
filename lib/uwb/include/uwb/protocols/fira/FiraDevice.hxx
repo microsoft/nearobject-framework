@@ -11,7 +11,8 @@
 namespace uwb::protocol::fira
 {
 /**
- * @brief Converts the binary representation of the Fira PHY and Mac version to a string.
+ * @brief Converts the binary representation of the Fira PHY and Mac version to
+ * a string.
  *
  * @param input
  * @return std::string
@@ -20,7 +21,8 @@ std::string
 VersionToString(uint32_t input) noexcept;
 
 /**
- * @brief Converts the string representation of the Fira PHY and Mac version to the binary
+ * @brief Converts the string representation of the Fira PHY and Mac version to
+ * the binary.
  *
  * @param input
  * @return std::optional<uint32_t>
@@ -32,9 +34,9 @@ StringToVersion(const std::string& input) noexcept;
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
  * 5.1.
  */
-enum class DeviceRole {
-    Responder,
-    Initiator,
+enum class DeviceRole : uint8_t {
+    Responder = 0,
+    Initiator = 1,
 };
 
 /**
@@ -49,41 +51,41 @@ enum class DeviceType {
 /**
  * @brief TODO Add spec reference.
  */
-enum class StsConfiguration {
-    Static,
-    Dynamic,
-    DynamicWithResponderSubSessionKey,
+enum class StsConfiguration : uint8_t {
+    Static = 0,
+    Dynamic = 1,
+    DynamicWithResponderSubSessionKey = 2,
 };
 
 /**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
  * 5.3.
  */
-enum class StsPacketConfiguration {
-    SP0,
-    SP1,
-    SP2,
-    SP3,
+enum class StsPacketConfiguration : uint8_t {
+    SP0 = 0,
+    SP1 = 1,
+    SP2 = 2,
+    SP3 = 3,
 };
 
 /**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
  * 5.4.
  */
-enum class RangingDirection {
-    OneWay,
-    SingleSidedTwoWay,
-    DoubleSidedTwoWay,
+enum class RangingDirection : uint8_t {
+    OneWay = 0,
+    SingleSidedTwoWay = 1,
+    DoubleSidedTwoWay = 2,
 };
 
 /**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
  * 5.5.
  */
-enum class MultiNodeMode {
-    Unicast,
-    OneToMany,
-    ManyToMany,
+enum class MultiNodeMode : uint8_t {
+    Unicast = 0,
+    OneToMany = 1,
+    ManyToMany = 2,
 };
 
 /**
@@ -91,16 +93,17 @@ enum class MultiNodeMode {
  * 5.6.
  */
 enum class SchedulingMode {
-    Contention,
-    Time,
+    Contention = 0,
+    Time = 1,
 };
 
 /**
- * @brief TODO Add spec reference.
+ * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
+ * 7.5.3.3, Table 53.
  */
-enum class RangingMode {
-    Interval,
-    Block,
+enum class RangingMode : uint8_t {
+    Interval = 0,
+    Block = 1,
 };
 
 /**
@@ -123,35 +126,39 @@ enum class AngleOfArrival {
 };
 
 /**
- * @brief TODO Add spec reference.
+ * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
+ * 7.5.3.3, Table 53.
  */
 enum class ConvolutionalCodeConstraintLength {
-    K3,
-    K7,
+    K3 = 0,
+    K7 = 1,
 };
 
 /**
- * @brief TODO Add spec reference.
+ * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
+ * 7.5.3.3, Table 53.
  *
- * Note: The spec does not define channel 7 or 11 which is why it's missing here.
+ * Note: The spec does not define channels 7 nor 11 which is why they're missing
+ * here.
  */
 enum class Channel {
-    C5,
-    C6,
-    C8,
-    C9,
-    C10,
-    C12,
-    C13,
-    C14,
+    C5 = 5,
+    C6 = 6,
+    C8 = 8,
+    C9 = 9,
+    C10 = 10,
+    C12 = 12,
+    C13 = 13,
+    C14 = 14,
 };
 
 /**
- * @brief TODO Add spec reference.
+ * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
+ * 7.5.3.3, Table 53.
  */
 enum class PrfMode {
-    Bprf,
-    Hprf,
+    Bprf = 0,
+    Hprf = 1,
 };
 
 /**
@@ -208,13 +215,14 @@ enum class HprfParameter {
 };
 
 /**
- * @brief TODO: Add spec reference.
+ * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
+ * 7.5.3.3, Table 53.
  */
-enum class ResultReportConfiguration {
-    TofReport,
-    AoAAzimuthReport,
-    AoAElevationReport,
-    AoAFoMReport,
+enum class ResultReportConfiguration : uint8_t {
+    TofReport = 0b00000001,
+    AoAAzimuthReport = 0b00000010,
+    AoAElevationReport = 0b00000100,
+    AoAFoMReport = 0b00001000,
 };
 
 /**
@@ -226,12 +234,13 @@ std::string
 ResultReportConfigurationToString(const std::unordered_set<ResultReportConfiguration>& resultReportConfiguration);
 
 /**
- * @brief Converts a string to vector of ResultReportConfiguration, using the given map
+ * @brief Converts a string to vector of ResultReportConfiguration.
  *
- * @return std::unordered_set<ResultReportConfiguration>
+ * @param input The string input to convert.
+ * @return std::optional<std::unordered_set<ResultReportConfiguration>>
  */
 std::optional<std::unordered_set<ResultReportConfiguration>>
-StringToResultReportConfiguration(const std::string& input, std::unordered_map<std::string, ResultReportConfiguration> map);
+StringToResultReportConfiguration(const std::string& input);
 
 } // namespace uwb::protocol::fira
 

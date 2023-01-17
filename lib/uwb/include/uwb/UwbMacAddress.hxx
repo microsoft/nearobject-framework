@@ -18,17 +18,27 @@
 
 namespace uwb
 {
-enum class UwbMacAddressFcsType {
-    Crc16,
-    Crc32,
+/**
+ * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
+ * 7.5.3.3, Table 53.
+ */
+enum class UwbMacAddressFcsType : uint8_t {
+    Crc16 = 0,
+    Crc32 = 1,
 };
 
 /**
  * @brief The type of uwb device object address.
+ *
+ * See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section 7.5.3.3,
+ * Table 53.
+ *
+ * Skipping the value '1' below is intentional, as that value corresponds to an
+ * unsupported uwb mac address type.
  */
-enum class UwbMacAddressType {
-    Short,
-    Extended,
+enum class UwbMacAddressType : uint8_t {
+    Short = 0,
+    Extended = 2,
 };
 
 /**
@@ -43,7 +53,7 @@ struct UwbMacAddressLength final
 
 /**
  * @brief Concept to encode valid address lengths.
- * 
+ *
  * @tparam UwbMacAddessLength
  */
 template <size_t UwbMacAddessLength>
@@ -55,7 +65,7 @@ namespace detail
 {
 /**
  * @brief Compile-time address length lookup, given type.
- * 
+ *
  * @tparam AddressType
  */
 template <UwbMacAddressType AddressType>
@@ -64,7 +74,7 @@ struct UwbMacAddressSizeImpl
 
 /**
  * @brief Address length lookup full specialization for short addresses.
- * 
+ *
  * @tparam
  */
 template <>
@@ -75,7 +85,7 @@ struct UwbMacAddressSizeImpl<UwbMacAddressType::Short>
 
 /**
  * @brief Address length lookup full specialization for extended addresses.
- * 
+ *
  * @tparam
  */
 template <>
@@ -86,7 +96,7 @@ struct UwbMacAddressSizeImpl<UwbMacAddressType::Extended>
 
 /**
  * @brief Compile-time address type lookup helper, given length.
- * 
+ *
  * @tparam Length
  */
 template <size_t Length>
@@ -95,7 +105,7 @@ struct UwbMacAddressTypeImpl
 
 /**
  * @brief Address type lookup full specialization for short addresses.
- * 
+ *
  * @tparam
  */
 template <>
@@ -106,7 +116,7 @@ struct UwbMacAddressTypeImpl<UwbMacAddressLength::Short>
 
 /**
  * @brief Address type lookup full specialization for extended addresses.
- * 
+ *
  * @tparam
  */
 template <>
@@ -118,7 +128,7 @@ struct UwbMacAddressTypeImpl<UwbMacAddressLength::Extended>
 /**
  * @brief Helper providing compile-time lookup of UwbMacAddressType for the
  * supported address lengths.
- * 
+ *
  * @tparam Length The compile-time address length, typically from an array extent.
  */
 template <size_t Length>
@@ -127,7 +137,7 @@ inline constexpr UwbMacAddressType UwbMacAddressTypeV = UwbMacAddressTypeImpl<Le
 /**
  * @brief Helper providing compile-time lookup of UwbMacAddress size for the
  * supported address types.
- * 
+ *
  * @tparam AddressType The compile-time address type to get the size for.
  */
 template <UwbMacAddressType AddressType>
@@ -135,12 +145,12 @@ inline constexpr std::size_t UwbMacAddressSizeV = UwbMacAddressSizeImpl<AddressT
 
 /**
  * @brief Type traits for uwb mac addresses.
- * 
+ *
  * This collects traits of uwb mac addresses for compile-time usage, based
  * on the address length. This maps from address length to mac address type,
  * value type (eg. std::array<> with correct extent), and their
  * corresponding types.
- * 
+ *
  * @tparam Length
  */
 template <std::size_t Length>
@@ -155,9 +165,9 @@ struct UwbMacAddressTraits
 
 /**
  * @brief Helper which generically wraps a uwb mac address value.
- * 
+ *
  * This is used later in a templated constructor to allow a single declaration.
- * 
+ *
  * @tparam Length The length of the address.
  */
 template <std::size_t Length>
@@ -196,37 +206,37 @@ public:
 
     /**
      * @brief Get the address type.
-     * 
-     * @return UwbMacAddressType 
+     *
+     * @return UwbMacAddressType
      */
     UwbMacAddressType
     GetType() const noexcept;
 
     /**
      * @brief Get the length of the address, in bytes.
-     * 
-     * @return std::size_t 
+     *
+     * @return std::size_t
      */
     std::size_t
     GetLength() const noexcept;
 
     /**
      * @brief Get a view of the underlying value.
-     * 
-     * @return std::span<const uint8_t> 
+     *
+     * @return std::span<const uint8_t>
      */
     std::span<const uint8_t>
     GetValue() const noexcept;
 
     /**
      * @brief Return a string representation of the address.
-     * 
+     *
      * The address is output as hexadecimal values, separated by colons, eg.
-     *  
+     *
      *     ab (short address)
      *     1a:2f:3e:4d (extended address)
-     * 
-     * @return std::string 
+     *
+     * @return std::string
      */
     std::string
     ToString() const;
@@ -235,10 +245,10 @@ private:
     /**
      * @brief Compile-time helper to retrieve a reference to the active value of
      * the variant holding the mac address.
-     * 
-     * @tparam Length 
-     * @param uwbMacAddress 
-     * @return std::array<uint8_t, Length>& 
+     *
+     * @tparam Length
+     * @param uwbMacAddress
+     * @return std::array<uint8_t, Length>&
      */
     template <size_t Length>
     std::array<uint8_t, Length>&
@@ -250,10 +260,10 @@ private:
     /**
      * @brief Compile-time helper to generate a view of the address based on the
      * selected type.
-     * 
-     * @tparam Length 
-     * @param uwbMacAddress 
-     * @return std::span<const uint8_t> 
+     *
+     * @tparam Length
+     * @param uwbMacAddress
+     * @return std::span<const uint8_t>
      */
     template <size_t Length>
     std::span<const uint8_t>
@@ -266,7 +276,7 @@ private:
     /**
      * @brief Construct a new UwbMacAddress object based on compile-time deduced
      * arguments from a value wrapper.
-     * 
+     *
      * @tparam Length The length of the address.
      * @param value The address value.
      */
@@ -282,9 +292,9 @@ public:
     /**
      * @brief Construct a new UwbMacAddress object based on compile-time deduced
      * arguments.
-     * 
+     *
      * This constructor should be preferred when possible.
-     * 
+     *
      * @tparam Length The length of the address.
      * @param address The address value.
      */
@@ -295,8 +305,8 @@ public:
 
     /**
      * @brief Construct a new, randomly generated UwbMacAddress object based on
-     * compile-time deduced arguments. 
-     * 
+     * compile-time deduced arguments.
+     *
      * @tparam AddressType The type of address to generate.
      * @return UwbMacAddress The randomly generated address value.
      */
@@ -327,29 +337,30 @@ public:
 
     /**
      * @brief Copy constructor.
-     * 
-     * @param other 
+     *
+     * @param other
      */
     UwbMacAddress(const UwbMacAddress& other);
 
     /**
      * @brief Copy assignment operator.
-     * 
+     *
      * @param other
-     * @return UwbMacAddress& 
-      */
+     * @return UwbMacAddress&
+     */
     UwbMacAddress&
     operator=(UwbMacAddress other);
 
     /**
      * @brief Three-way comparison operator.
      */
-    auto operator<=>(const UwbMacAddress& other) const noexcept;
+    auto
+    operator<=>(const UwbMacAddress& other) const noexcept;
 
 private:
     /**
      * @brief Swap the data members of this instance with another one.
-     * 
+     *
      * @param other The other instance to swap with.
      */
     void
@@ -357,11 +368,11 @@ private:
 
     /**
      * @brief Initialize the address view.
-     * 
+     *
      * This is the runtime version that must be used for the copy-constructor,
      * since the other object being copied does not have compile-time address
      * length information available.
-     * 
+     *
      * Note that the assigned view will reflect whatever is in the m_value
      * variant at the time of the call. Thus, m_value must be appropriately
      * initialized prior to invoking this function for the view to be assigned
@@ -372,9 +383,9 @@ private:
 
     /**
      * @brief Allow global equality function to access private members.
-     * 
-     * @return true 
-     * @return false 
+     *
+     * @return true
+     * @return false
      */
     friend bool
     operator==(const UwbMacAddress&, const UwbMacAddress&) noexcept;
@@ -383,14 +394,14 @@ private:
     /**
      * @brief Note: the order of variable declarations here is critical. The
      * m_view member must be declared after m_value since it is a read-only view
-     * of its contents. 
+     * of its contents.
      */
     std::size_t m_length{ UwbMacAddressLength::Short };
     UwbMacAddressType m_type{ UwbMacAddressType::Short };
 
     /**
      * @brief The address value, which depends on the 'm_type' field.
-     * 
+     *
      * Despite the 'm_type' field driving this value, the std::variant is the
      * ultimate ground-truth for the value, and the appropriate methods from
      * that class should be used to obtain it.
@@ -398,7 +409,7 @@ private:
     std::variant<ShortType, ExtendedType> m_value{ ShortType{ 0xBE, 0xEF } };
 
     /**
-     * @brief Read-only view of the address data. 
+     * @brief Read-only view of the address data.
      */
     std::span<const uint8_t> m_view;
 };

@@ -16,7 +16,7 @@ target_link_libraries(nearobject-test-windows
         notstd-windows
         uwb
         uwbcxadapter
-        windevuwb
+        windev-uwb
 )
 
 catch_discover_tests(nearobject-test-windows)

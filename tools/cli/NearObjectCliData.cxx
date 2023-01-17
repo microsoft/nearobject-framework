@@ -9,12 +9,27 @@ UwbConfigurationData::operator UwbConfiguration() const noexcept
 {
     UwbConfiguration::Builder builder{};
 
-    if (firaPhyVersion.has_value()) {
-        builder.SetFiraVersionPhy(firaMacVersion.value());
+    // Handle inputs that require parsing from string type.
+    if (!firaPhyVersionString.empty()) {
+        auto firaPhyVersion = uwb::protocol::fira::StringToVersion(firaPhyVersionString);
+        if (firaPhyVersion.has_value()) {
+            builder.SetFiraVersionPhy(firaPhyVersion.value());
+        }
     }
-    if (firaMacVersion.has_value()) {
-        builder.SetFiraVersionMac(firaMacVersion.value());
+    if (!firaMacVersionString.empty()) {
+        auto firaMacVersion = uwb::protocol::fira::StringToVersion(firaMacVersionString);
+        if (firaMacVersion.has_value()) {
+            builder.SetFiraVersionMac(firaMacVersion.value());
+        }
     }
+    if (!resultReportConfigurationString.empty()) {
+        auto resultReportConfigurations = uwb::protocol::fira::StringToResultReportConfiguration(resultReportConfigurationString);
+        for (const auto& resultReportConfiguration : resultReportConfigurations.value_or(std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>{})) {
+            builder.AddResultReportConfiguration(resultReportConfiguration);
+        }
+    }
+
+    // Handle other inputs which have already been parsed.
     if (deviceRole.has_value()) {
         builder.SetDeviceRole(deviceRole.value());
     }
@@ -65,9 +80,6 @@ UwbConfigurationData::operator UwbConfiguration() const noexcept
     }
     if (preableCodeIndex.has_value()) {
         builder.SetPreableCodeIndex(preableCodeIndex.value());
-    }
-    for (const auto& resultReportConfiguration : resultReportConfigurations) {
-        builder.AddResultReportConfiguration(resultReportConfiguration);
     }
     if (macAddressMode.has_value()) {
         builder.SetMacAddressType(macAddressMode.value());

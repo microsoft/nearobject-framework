@@ -18,9 +18,8 @@ target_include_directories(nearobject-service-windows
 
 target_link_libraries(nearobject-service-windows
     PRIVATE
-        windevuwb
+        windev-uwb
     PUBLIC
-        cfgmgr32.lib
         nearobject-service
         WIL::WIL
         windevutil

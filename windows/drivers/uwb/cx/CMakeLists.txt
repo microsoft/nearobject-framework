@@ -1,13 +1,13 @@
 
-add_library(uwbcx INTERFACE)
+add_library(uwbcx-driver INTERFACE)
 
-target_sources(uwbcx
+target_sources(uwbcx-driver
     INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}/include/UwbCxLrpDevice.h
         ${CMAKE_CURRENT_LIST_DIR}/include/UwbCxLrpDeviceGlue.h
 )
 
-target_include_directories(uwbcx
+target_include_directories(uwbcx-driver
     INTERFACE 
         ${CMAKE_CURRENT_LIST_DIR}/include
 )

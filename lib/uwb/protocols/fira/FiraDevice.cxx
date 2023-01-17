@@ -81,16 +81,15 @@ uwb::protocol::fira::ResultReportConfigurationToString(const std::unordered_set<
 }
 
 std::optional<std::unordered_set<ResultReportConfiguration>>
-uwb::protocol::fira::StringToResultReportConfiguration(const std::string& input, std::unordered_map<std::string, ResultReportConfiguration> map)
+uwb::protocol::fira::StringToResultReportConfiguration(const std::string& input)
 {
-    auto tokens = tokenize(input, ',');
     std::unordered_set<ResultReportConfiguration> output{};
 
-    for (const auto& s : tokens) {
-        if (not map.contains(s)) {
-            return std::nullopt;
+    for (const auto& token : tokenize(input, ',')) {
+        auto resultReportConfiguration = magic_enum::enum_cast<ResultReportConfiguration>(token);
+        if (resultReportConfiguration.has_value()) {
+            output.insert(resultReportConfiguration.value());
         }
-        output.insert(map.at(s));
     }
 
     return output;
