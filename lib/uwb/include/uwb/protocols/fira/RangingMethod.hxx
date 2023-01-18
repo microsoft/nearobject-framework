@@ -30,7 +30,7 @@ struct RangingMethod
     operator<=>(const RangingMethod& other) const = default;
 
     uint8_t
-    ToByte();
+    ToByte() const noexcept;
 };
 
 } // namespace uwb::protocol::fira

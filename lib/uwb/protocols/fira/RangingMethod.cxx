@@ -2,7 +2,7 @@
 #include <uwb/protocols/fira/RangingMethod.hxx>
 
 uint8_t
-uwb::protocol::fira::RangingMethod::ToByte()
+uwb::protocol::fira::RangingMethod::ToByte() const noexcept
 {
     if (Method == RangingDirection::SingleSidedTwoWay and ReportMode == MeasurementReportMode::Deferred) {
         return 1;
