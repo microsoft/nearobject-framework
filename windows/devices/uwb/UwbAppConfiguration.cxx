@@ -15,26 +15,14 @@ operator==(const UWB_APP_CONFIG_PARAM& lhs, const UWB_APP_CONFIG_PARAM& rhs) noe
 
 using namespace windows::devices;
 
-IUwbAppConfigurationParameter::IUwbAppConfigurationParameter(UWB_APP_CONFIG_PARAM_TYPE parameterType, std::size_t parameterSize) :
-    m_size(offsetof(UWB_APP_CONFIG_PARAM, paramValue[parameterSize])),
-    m_buffer(std::make_unique<uint8_t[]>(m_size)),
-    m_parameter(*reinterpret_cast<UWB_APP_CONFIG_PARAM*>(m_buffer.get()))
+IUwbAppConfigurationParameter::IUwbAppConfigurationParameter(UWB_APP_CONFIG_PARAM_TYPE parameterType, std::span<const uint8_t> parameterValue) :
+    m_buffer(offsetof(UWB_APP_CONFIG_PARAM, paramValue[parameterValue.size()])),
+    m_parameter(*reinterpret_cast<UWB_APP_CONFIG_PARAM*>(m_buffer.data()))
 {
-    m_parameter.size = m_size;
+    m_parameter.size = std::size(m_buffer);
     m_parameter.paramType = parameterType;
-    m_parameter.paramLength = parameterSize;
-}
-
-std::size_t
-IUwbAppConfigurationParameter::Size() noexcept
-{
-    return m_size;
-}
-
-uint8_t*
-IUwbAppConfigurationParameter::Buffer() noexcept
-{
-    return m_buffer.get();
+    m_parameter.paramLength = parameterValue.size();
+    std::memcpy(&m_parameter.paramValue, parameterValue.data(), parameterValue.size());
 }
 
 UWB_APP_CONFIG_PARAM&
@@ -43,10 +31,10 @@ IUwbAppConfigurationParameter::DdiParameter() noexcept
     return m_parameter;
 }
 
-std::tuple<uint8_t*, std::size_t>
+const std::vector<uint8_t>&
 IUwbAppConfigurationParameter::DdiBuffer() noexcept
 {
-    return { m_buffer.get(), m_size };
+    return m_buffer;
 }
 
 UwbSetAppConfigurationParametersBuilder::UwbSetAppConfigurationParametersBuilder(uint32_t sessionId) :

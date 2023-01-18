@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <cstring>
 #include <memory>
+#include <span>
 #include <tuple>
 #include <vector>
 #include <type_traits>
@@ -27,29 +28,12 @@ public:
     virtual ~IUwbAppConfigurationParameter() = default;
 
     /**
-     * @brief Construct a new IUwbAppConfigutationParameter object.
+     * @brief Construct a new IUwbAppConfigurationParameter object
      * 
      * @param parameterType The DDI application configuration parameter type.
-     * @param parameterSize The parameter value size, in bytes.
+     * @param parameterValue The parameter value.
      */
-    explicit IUwbAppConfigurationParameter(UWB_APP_CONFIG_PARAM_TYPE parameterType, std::size_t parameterSize);
-
-    /**
-     * @brief The total size of the UWB_APP_CONFIG_PARAM structure.
-     *
-     * @return std::size_t
-     */
-    std::size_t
-    Size() noexcept;
-
-    /**
-     * @brief The buffer containing the complete UWB_APP_CONFIG_PARAM structure,
-     * along with the trailing parameter value.
-     *
-     * @return uint8_t*
-     */
-    uint8_t*
-    Buffer() noexcept;
+    explicit IUwbAppConfigurationParameter(UWB_APP_CONFIG_PARAM_TYPE parameterType, std::span<const uint8_t> parameterValue);
 
     /**
      * @brief Reference to the UwbCx DDI structure.
@@ -60,17 +44,17 @@ public:
     DdiParameter() noexcept;
 
     /**
-     * @brief The buffer and associated size that is suitable for passing to the UwbCx DDI.
-     *
-     * @return std::tuple<uint8_t*, std::size_t>
+     * @brief The buffer and associated size that is suitable for passing to the
+     * UwbCx DDI.
+     * 
+     * @return const std::vector<uint8_t>& 
      */
-    std::tuple<uint8_t*, std::size_t>
+    const std::vector<uint8_t>&
     DdiBuffer() noexcept;
 
 protected:
     // order of members here is important to enforce proper initialization order.
-    std::size_t m_size;
-    std::unique_ptr<uint8_t[]> m_buffer{ nullptr };
+    std::vector<uint8_t> m_buffer;
     UWB_APP_CONFIG_PARAM& m_parameter;
 };
 
@@ -135,10 +119,9 @@ public:
      * @param parameterSize The size of the value to pack, in bytes.
      */
     explicit UwbAppConfigurationParameter(const PropertyT& value, UWB_APP_CONFIG_PARAM_TYPE parameterType, std::size_t parameterSize = sizeof(PropertyT)) :
-        IUwbAppConfigurationParameter(parameterType, parameterSize),
+        IUwbAppConfigurationParameter(parameterType, std::span<const uint8_t>(reinterpret_cast<const uint8_t*>(&value), parameterSize)),
         m_value(reinterpret_cast<PropertyT&>(m_parameter.paramValue)) // TODO verify that this assignment of bytes indeed works for all the parameters (what if the enum is a strange number, like 5 choices or something)
     {
-        m_value = value;
     }
 
     /**
