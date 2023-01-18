@@ -32,7 +32,7 @@ windows::devices::UwbSetAppConfigurationParametersBuilder::Publish()
 
     for (const auto& paramBuffer : m_params) {
         auto& param = *reinterpret_cast<UWB_APP_CONFIG_PARAM*>(paramBuffer.get());
-        memcpy(dstBuffer, paramBuffer.get(), param.size);
+        std::memcpy(dstBuffer, paramBuffer.get(), param.size);
         dstBuffer = &dstBuffer[param.size];
     }
     return buffer;
