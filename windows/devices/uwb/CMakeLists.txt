@@ -24,7 +24,7 @@ target_link_libraries(uwbcxadapter
         cfgmgr32.lib
         uwb
         uwb-proto-fira
-        uwbcx
+        uwbcx-driver
         WIL::WIL
 )
 
@@ -40,7 +40,6 @@ install(
     EXPORT uwb
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/windows/uwb
 )
-
 
 add_library(windev-uwb STATIC "")
 
@@ -64,12 +63,11 @@ target_include_directories(windev-uwb
 
 target_link_libraries(windev-uwb
     PRIVATE
+        uwbcxadapter
         windevutil
-        magic_enum::magic_enum
     PUBLIC
         uwb
         uwb-proto-fira
-        uwbcxadapter
         uwbcx-driver
         WIL::WIL
 )

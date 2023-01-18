@@ -3,7 +3,6 @@
 #include <wil/result.h>
 
 #include <algorithm>
-#include <magic_enum.hpp>
 #include <memory>
 #include <numeric>
 
