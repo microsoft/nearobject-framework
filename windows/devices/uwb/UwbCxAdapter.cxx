@@ -59,122 +59,71 @@ windows::devices::uwb::GenerateUwbSetAppConfigParameterDdi(const ::uwb::protocol
     // TODO DEVICE_TYPE
     const auto sessionUwbMap = uwbSessionData.uwbConfiguration.GetValueMap();
 
-    for (const auto [ptag, value] : sessionUwbMap) {
+    for (const auto& [parameterTag, value] : sessionUwbMap) {
         std::visit(overloaded{
-                       [&builder, ptag](bool arg) {
-                           builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg), service_ddi_map.at(ptag) }));
-                       },
-                       [&builder, ptag](uint8_t arg) {
-                           builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg), service_ddi_map.at(ptag) }));
-                       },
-                       [&builder, ptag](uint16_t arg) {
-                           builder.Push(std::move(UwbAppConfigurationParameter{ uint16_t(arg), service_ddi_map.at(ptag) }));
-                       },
-                       [&builder, ptag](uint32_t arg) {
-                           builder.Push(std::move(UwbAppConfigurationParameter{ uint32_t(arg), service_ddi_map.at(ptag) }));
-                       },
-                       [&builder, ptag](::uwb::protocol::fira::Channel arg) {
-                           uint8_t data = 9;
-                           switch (arg) {
-                           case (::uwb::protocol::fira::Channel::C5): {
-                               data = 5;
-                               break;
-                           }
-                           case (::uwb::protocol::fira::Channel::C6): {
-                               data = 6;
-                               break;
-                           }
-                           case (::uwb::protocol::fira::Channel::C8): {
-                               data = 8;
-                               break;
-                           }
-                           case (::uwb::protocol::fira::Channel::C9): {
-                               data = 9;
-                               break;
-                           }
-                           case (::uwb::protocol::fira::Channel::C10): {
-                               data = 10;
-                               break;
-                           }
-                           case (::uwb::protocol::fira::Channel::C12): {
-                               data = 12;
-                               break;
-                           }
-                           case (::uwb::protocol::fira::Channel::C13): {
-                               data = 13;
-                               break;
-                           }
-                           case (::uwb::protocol::fira::Channel::C14): {
-                               data = 14;
-                               break;
-                           }
-                           }
-                           builder.Push(std::move(UwbAppConfigurationParameter{ data, service_ddi_map.at(ptag) }));
-                       },
-                       [&builder, ptag](::uwb::protocol::fira::ConvolutionalCodeConstraintLength arg) {
-                           // TODO
-                       },
-                       [&builder, ptag](::uwb::protocol::fira::DeviceRole arg) {
-                           builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg), service_ddi_map.at(ptag) }));
-                       },
-                       [&builder, ptag](::uwb::protocol::fira::MultiNodeMode arg) {
-                           builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg), service_ddi_map.at(ptag) }));
-                       },
-                       [&builder, ptag](::uwb::protocol::fira::PrfMode arg) {
-                           builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg), service_ddi_map.at(ptag) }));
-                       },
-                       [&builder, ptag](::uwb::protocol::fira::RangingMethod arg) {
-                           builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg.ToByte()), service_ddi_map.at(ptag) }));
-                       },
-                       [&builder, ptag](::uwb::protocol::fira::RangingMode arg) {
-                           builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg), service_ddi_map.at(ptag) }));
-                       },
-                       [&builder, ptag](::uwb::protocol::fira::SchedulingMode arg) {
-                           builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg), service_ddi_map.at(ptag) }));
-                       },
-                       [&builder, ptag](::uwb::protocol::fira::StsConfiguration arg) {
-                           builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg), service_ddi_map.at(ptag) }));
-                       },
-                       [&builder, ptag](::uwb::protocol::fira::StsPacketConfiguration arg) {
-                           builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg), service_ddi_map.at(ptag) }));
-                       },
-                       [&builder, ptag](::uwb::UwbMacAddress arg) {
-                           builder.Push(std::move(UwbAppConfigurationParameter{ arg.GetValue(), service_ddi_map.at(ptag) }));
-                           //    if (ptag == ::uwb::protocol::fira::UwbConfiguration::ParameterTag::ControllerMacAddress) {
-                           //        builder.Push(std::move(UwbAppConfigurationParameter{ arg.GetValue(), service_ddi_map.at(ptag) }));
-                           //    } else if(ptag == ::uwb::protocol::fira::UwbConfiguration::ParameterTag::ControleeShortMacAddress){
-                           //        builder.Push(std::move(UwbAppConfigurationParameter{ arg.GetValue(), service_ddi_map.at(ptag) }));
-                           //    }
-                       },
-                       [&builder, ptag](::uwb::UwbMacAddressFcsType arg) {
-                           builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg), service_ddi_map.at(ptag) }));
-                       },
-                       [&builder, ptag](::uwb::UwbMacAddressType arg) {
-                       },
-                       [&builder, ptag](std::unordered_set<::uwb::protocol::fira::ResultReportConfiguration> arg) {
-                           uint8_t result = 0;
-                           for (auto config : arg) {
-                               switch (config) {
-                               case ::uwb::protocol::fira::ResultReportConfiguration::TofReport: {
-                                   result |= 0x1;
-                                   break;
-                               }
-                               case ::uwb::protocol::fira::ResultReportConfiguration::AoAAzimuthReport: {
-                                   result |= 0x2;
-                                   break;
-                               }
-                               case ::uwb::protocol::fira::ResultReportConfiguration::AoAElevationReport: {
-                                   result |= 0x4;
-                                   break;
-                               }
-                               default: {
-                                   result |= 0x8;
-                                   break;
-                               }
-                               }
-                           }
-                           builder.Push(std::move(UwbAppConfigurationParameter{ result, service_ddi_map.at(ptag) }));
-                       } },
+            [&builder, parameterTag](bool arg) {
+                builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg), parameterTag }));
+            },
+            [&builder, parameterTag](uint8_t arg) {
+                builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg), parameterTag }));
+            },
+            [&builder, parameterTag](uint16_t arg) {
+                builder.Push(std::move(UwbAppConfigurationParameter{ uint16_t(arg), parameterTag }));
+            },
+            [&builder, parameterTag](uint32_t arg) {
+                builder.Push(std::move(UwbAppConfigurationParameter{ uint32_t(arg), parameterTag }));
+            },
+            [&builder, parameterTag](::uwb::protocol::fira::Channel arg) {
+                uint8_t data = notstd::to_underlying(arg);
+                builder.Push(std::move(UwbAppConfigurationParameter{ data, parameterTag }));
+            },
+            [&builder, parameterTag](::uwb::protocol::fira::ConvolutionalCodeConstraintLength arg) {
+                // TODO
+            },
+            [&builder, parameterTag](::uwb::protocol::fira::DeviceRole arg) {
+                builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg), parameterTag }));
+            },
+            [&builder, parameterTag](::uwb::protocol::fira::MultiNodeMode arg) {
+                builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg), parameterTag }));
+            },
+            [&builder, parameterTag](::uwb::protocol::fira::PrfMode arg) {
+                builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg), parameterTag }));
+            },
+            [&builder, parameterTag](::uwb::protocol::fira::RangingMethod arg) {
+                builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg.ToByte()), parameterTag }));
+            },
+            [&builder, parameterTag](::uwb::protocol::fira::RangingMode arg) {
+                builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg), parameterTag }));
+            },
+            [&builder, parameterTag](::uwb::protocol::fira::SchedulingMode arg) {
+                builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg), parameterTag }));
+            },
+            [&builder, parameterTag](::uwb::protocol::fira::StsConfiguration arg) {
+                builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg), parameterTag }));
+            },
+            [&builder, parameterTag](::uwb::protocol::fira::StsPacketConfiguration arg) {
+                builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg), parameterTag }));
+            },
+            [&builder, parameterTag](::uwb::UwbMacAddress arg) {
+                builder.Push(std::move(UwbAppConfigurationParameter{ arg.GetValue(), parameterTag }));
+                //    if (parameterTag == ::uwb::protocol::fira::UwbConfiguration::ParameterTag::ControllerMacAddress) {
+                //        builder.Push(std::move(UwbAppConfigurationParameter{ arg.GetValue(), parameterTag }));
+                //    } else if(parameterTag == ::uwb::protocol::fira::UwbConfiguration::ParameterTag::ControleeShortMacAddress){
+                //        builder.Push(std::move(UwbAppConfigurationParameter{ arg.GetValue(), parameterTag }));
+                //    }
+            },
+            [&builder, parameterTag](::uwb::UwbMacAddressFcsType arg) {
+                builder.Push(std::move(UwbAppConfigurationParameter{ uint8_t(arg), parameterTag }));
+            },
+            [&builder, parameterTag](::uwb::UwbMacAddressType arg) {
+            },
+            [&builder, parameterTag](std::unordered_set<::uwb::protocol::fira::ResultReportConfiguration> arg) {
+                uint8_t result = 0;
+                for (const auto& config : arg) {
+                    result |= notstd::to_underlying(config);
+                }
+                builder.Push(std::move(UwbAppConfigurationParameter{ result, parameterTag }));
+            } },
             value);
     }
 
