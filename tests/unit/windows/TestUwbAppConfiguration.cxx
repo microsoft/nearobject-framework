@@ -5,6 +5,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
+#include <uwb/protocols/fira/UwbConfiguration.hxx>
 #include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
 TEST_CASE("UwbAppConfiguration performs allocation for contained value correctly", "[basic]")
@@ -16,6 +17,24 @@ TEST_CASE("UwbAppConfiguration performs allocation for contained value correctly
     {
         constexpr DeviceType deviceTypeExpected = DeviceType::Controller;
         UwbAppConfigurationParameter appConfiguration{ deviceTypeExpected, UWB_APP_CONFIG_PARAM_TYPE_DEVICE_TYPE };
+
+        auto& appConfigurationDdi = appConfiguration.DdiParameter();
+        auto* appConfigurationBuffer = appConfiguration.Buffer();
+        auto& appConfigurationRaw = *reinterpret_cast<UWB_APP_CONFIG_PARAM*>(appConfigurationBuffer);
+
+        // Validate fields as referenced through the getter and raw buffer all match.
+        REQUIRE(appConfigurationDdi.size == appConfigurationRaw.size);
+        REQUIRE(appConfigurationDdi.paramType == appConfigurationRaw.paramType);
+        REQUIRE(appConfigurationDdi.paramLength == appConfigurationRaw.paramLength);
+        REQUIRE(std::memcmp(appConfigurationDdi.paramValue, appConfigurationRaw.paramValue, appConfigurationDdi.paramLength) == 0);
+
+        REQUIRE(appConfigurationDdi == appConfigurationRaw);
+    }
+
+    SECTION("DDI type is correctly reflected when using UwbConfiguration parameter tag input")
+    {
+        constexpr DeviceRole deviceRoleExpected = DeviceRole::Initiator;
+        UwbAppConfigurationParameter appConfiguration{ deviceRoleExpected, UwbConfiguration::ParameterTag::DeviceRole };
 
         auto& appConfigurationDdi = appConfiguration.DdiParameter();
         auto* appConfigurationBuffer = appConfiguration.Buffer();
