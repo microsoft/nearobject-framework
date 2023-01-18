@@ -9,9 +9,9 @@
 #include <memory>
 #include <span>
 #include <tuple>
-#include <vector>
 #include <type_traits>
 #include <unordered_map>
+#include <vector>
 
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
 
@@ -29,18 +29,18 @@ public:
 
     /**
      * @brief Construct a new IUwbAppConfigurationParameter object
-     * 
+     *
      * @param parameterType The DDI application configuration parameter type.
      * @param parameterValue The parameter value.
      */
     explicit IUwbAppConfigurationParameter(UWB_APP_CONFIG_PARAM_TYPE parameterType, std::span<const uint8_t> parameterValue);
 
     /**
-     * @brief Returns the total size of the DDI structure. 
-     * 
-     * @return std::size_t 
+     * @brief Returns the total size of the DDI structure.
+     *
+     * @return std::size_t
      */
-    std::size_t 
+    std::size_t
     DdiSize() const noexcept;
 
     /**
@@ -54,8 +54,8 @@ public:
     /**
      * @brief The buffer and associated size that is suitable for passing to the
      * UwbCx DDI.
-     * 
-     * @return const std::vector<uint8_t>& 
+     *
+     * @return const std::vector<uint8_t>&
      */
     std::vector<uint8_t>&
     DdiBuffer() noexcept;
@@ -72,7 +72,7 @@ namespace detail
  * @brief Mapping of UwbConfiguration parameter tags to their association UwbCx
  * DDI application configuration parameter type enumeration value.
  */
-const std::unordered_map<::uwb::protocol::fira::UwbConfiguration::ParameterTag, UWB_APP_CONFIG_PARAM_TYPE> AppConfigUwbConfigurationTagMap {
+const std::unordered_map<::uwb::protocol::fira::UwbConfiguration::ParameterTag, UWB_APP_CONFIG_PARAM_TYPE> AppConfigUwbConfigurationTagMap{
     { ::uwb::protocol::fira::UwbConfiguration::ParameterTag::DeviceRole, UWB_APP_CONFIG_PARAM_TYPE_DEVICE_ROLE },
     { ::uwb::protocol::fira::UwbConfiguration::ParameterTag::RangingMethod, UWB_APP_CONFIG_PARAM_TYPE_RANGING_ROUND_USAGE },
     { ::uwb::protocol::fira::UwbConfiguration::ParameterTag::StsConfig, UWB_APP_CONFIG_PARAM_TYPE_STS_CONFIG },
@@ -111,14 +111,16 @@ const std::unordered_map<::uwb::protocol::fira::UwbConfiguration::ParameterTag, 
  * holds as its flexible array member.
  */
 template <typename PropertyT>
+// clang-format off
 requires std::is_standard_layout_v<PropertyT>
+// clang-format on
 class UwbAppConfigurationParameter :
     public IUwbAppConfigurationParameter
 {
 public:
     /**
      * @brief Construct a new UwbAppConfigurationParameter object.
-     * 
+     *
      * @param value The value to pack into the UWB_APP_CONFIG_PARAM paramValue flex-array member.
      * @param parameterType The corresponding UwbCx parameter type value.
      * @param parameterSize The size of the value to pack, in bytes.
@@ -131,7 +133,7 @@ public:
 
     /**
      * @brief Construct a new Uwb App Configuration Parameter object
-     * 
+     *
      * @param value The value to pack into the UWB_APP_CONFIG_PARAM paramValue flex-array member.
      * @param parameterTag The FiRa parameter tag for UWB_CONFIGURATION.
      * @param parameterSize The size of the value to pack, in bytes.
@@ -160,7 +162,7 @@ class UwbSetAppConfigurationParameters
 public:
     explicit UwbSetAppConfigurationParameters(const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>>& parameters);
 
-    UWB_APP_CONFIG_PARAMS& 
+    UWB_APP_CONFIG_PARAMS&
     DdiParameters() noexcept;
 
     std::vector<uint8_t>&

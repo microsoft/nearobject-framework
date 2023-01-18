@@ -12,9 +12,9 @@ namespace windows::devices::uwb
 {
 /**
  * @brief TODO
- * 
- * @param uwbSessionData 
- * @return UwbSetAppConfigurationParameters 
+ *
+ * @param uwbSessionData
+ * @return UwbSetAppConfigurationParameters
  */
 UwbSetAppConfigurationParameters
 GenerateUwbSetAppConfigParameterDdi(const ::uwb::protocol::fira::UwbSessionData& uwbSessionData);
