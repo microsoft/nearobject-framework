@@ -4,24 +4,19 @@
 
 #include <cstdint>
 
-// NB: This must come before any other Windows include
-#include <UwbCxLrpDeviceGlue.h>
-#include <wil/resource.h>
+#include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
-#include <uwb/UwbMacAddress.hxx>
 #include <uwb/UwbSession.hxx>
-#include <uwb/UwbSessionEventCallbacks.hxx>
-#include <uwb/protocols/fira/UwbConfiguration.hxx>
 
 namespace windows::devices::uwb
 {
 /**
- * @brief returns a byte array that is interpretable as a UWB_SET_APP_CONFIG_PARAMS
+ * @brief TODO
  * 
  * @param uwbSessionData 
- * @return std::unique_ptr<uint8_t[]> 
+ * @return UwbSetAppConfigurationParameters 
  */
-std::unique_ptr<uint8_t[]>
+UwbSetAppConfigurationParameters
 GenerateUwbSetAppConfigParameterDdi(const ::uwb::protocol::fira::UwbSessionData& uwbSessionData);
 } // namespace windows::devices::uwb
 

@@ -49,7 +49,7 @@ public:
      * 
      * @return const std::vector<uint8_t>& 
      */
-    const std::vector<uint8_t>&
+    std::vector<uint8_t>&
     DdiBuffer() noexcept;
 
 protected:
@@ -96,8 +96,6 @@ const std::unordered_map<::uwb::protocol::fira::UwbConfiguration::ParameterTag, 
 };
 } // namespace detail
 
-class UwbSetAppConfigurationParametersBuilder;
-
 /**
  * @brief Adaptor for using UWB_APP_CONFIG_PARAM UwbCx DDI structure in a nicer way.
  *
@@ -109,7 +107,6 @@ requires std::is_standard_layout_v<PropertyT>
 class UwbAppConfigurationParameter :
     public IUwbAppConfigurationParameter
 {
-    friend class UwbSetAppConfigurationParametersBuilder; // friend class so the unique buffer ptr can be moved out
 public:
     /**
      * @brief Construct a new UwbAppConfigurationParameter object.
@@ -150,40 +147,20 @@ private:
     PropertyT& m_value;
 };
 
-/**
- * Builder class that takes in a collection of UwbAppConfigurationParameter and outputs a UWB_SET_APP_CONFIG_PARAMS
- */
-class UwbSetAppConfigurationParametersBuilder
+class UwbSetAppConfigurationParameters
 {
 public:
-    UwbSetAppConfigurationParametersBuilder(uint32_t sessionId);
+    explicit UwbSetAppConfigurationParameters(const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>>& parameters);
 
-    /**
-     * @brief Push a UwbAppConfigurationParameter into the collection
-     * 
-     * @tparam PropertyT 
-     * @param param 
-     */
-    template <typename PropertyT>
-    void
-    Push(UwbAppConfigurationParameter<PropertyT> param)
-    {
-        m_params.push_back(std::move(param.m_buffer));
-        m_paramsLengthSum += param.Size();
-    }
+    UWB_APP_CONFIG_PARAMS& 
+    DdiParameters() noexcept;
 
-    /**
-     * @brief Writes all the params and returns a buffer that can be reinterpreted as a UWB_SET_APP_CONFIG_PARAMS
-     * 
-     * @return std::unique_ptr<uint8_t[]> 
-     */
-    std::unique_ptr<uint8_t[]>
-    Publish();
+    std::vector<uint8_t>&
+    DdiBuffer() noexcept;
 
 private:
-    uint32_t m_sessionId;
-    std::size_t m_paramsLengthSum;
-    std::vector<std::unique_ptr<uint8_t[]>> m_params;
+    std::vector<uint8_t> m_buffer;
+    UWB_APP_CONFIG_PARAMS& m_parameters;
 };
 } // namespace windows::devices
 
