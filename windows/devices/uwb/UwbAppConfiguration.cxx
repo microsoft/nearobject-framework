@@ -25,6 +25,12 @@ IUwbAppConfigurationParameter::IUwbAppConfigurationParameter(UWB_APP_CONFIG_PARA
     std::memcpy(&m_parameter.paramValue, parameterValue.data(), parameterValue.size());
 }
 
+std::size_t 
+IUwbAppConfigurationParameter::DdiSize() const noexcept
+{
+    return std::size(m_buffer);
+}
+
 UWB_APP_CONFIG_PARAM&
 IUwbAppConfigurationParameter::DdiParameter() noexcept
 {

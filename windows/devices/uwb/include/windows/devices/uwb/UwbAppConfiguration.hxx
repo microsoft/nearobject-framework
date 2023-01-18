@@ -36,6 +36,14 @@ public:
     explicit IUwbAppConfigurationParameter(UWB_APP_CONFIG_PARAM_TYPE parameterType, std::span<const uint8_t> parameterValue);
 
     /**
+     * @brief Returns the total size of the DDI structure. 
+     * 
+     * @return std::size_t 
+     */
+    std::size_t 
+    DdiSize() const noexcept;
+
+    /**
      * @brief Reference to the UwbCx DDI structure.
      *
      * @return UWB_APP_CONFIG_PARAM&
