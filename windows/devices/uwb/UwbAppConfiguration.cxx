@@ -58,7 +58,7 @@ UwbSetAppConfigurationParameters::UwbSetAppConfigurationParameters(const std::ve
     m_buffer(offsetof(UWB_APP_CONFIG_PARAMS, appConfigParamsCount) + ::detail::CalculateTotalUwbAppConfigurationBufferSize(parameters)), // TOOD: verify this is correct
     m_parameters(*reinterpret_cast<UWB_APP_CONFIG_PARAMS*>(std::data(m_buffer)))
 {
-    auto it = std::end(m_buffer);
+    auto it = std::next(std::begin(m_buffer), offsetof(UWB_APP_CONFIG_PARAMS, appConfigParamsCount));
 
     for (const auto& parameter : parameters) {
         const auto& parameterBuffer = parameter->DdiBuffer();
