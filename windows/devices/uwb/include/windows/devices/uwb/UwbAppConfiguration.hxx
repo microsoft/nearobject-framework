@@ -18,8 +18,68 @@
 
 namespace windows::devices
 {
+/**
+ * @brief Interface for UWB_APP_CONFIG_PARAM UwbCx DDI structure adaptor.
+ */
+class IUwbAppConfigurationParameter
+{
+public:
+    virtual ~IUwbAppConfigurationParameter() = default;
+
+    /**
+     * @brief Construct a new IUwbAppConfigutationParameter object.
+     * 
+     * @param parameterType The DDI application configuration parameter type.
+     * @param parameterSize The parameter value size, in bytes.
+     */
+    explicit IUwbAppConfigurationParameter(UWB_APP_CONFIG_PARAM_TYPE parameterType, std::size_t parameterSize);
+
+    /**
+     * @brief The total size of the UWB_APP_CONFIG_PARAM structure.
+     *
+     * @return std::size_t
+     */
+    std::size_t
+    Size() noexcept;
+
+    /**
+     * @brief The buffer containing the complete UWB_APP_CONFIG_PARAM structure,
+     * along with the trailing parameter value.
+     *
+     * @return uint8_t*
+     */
+    uint8_t*
+    Buffer() noexcept;
+
+    /**
+     * @brief Reference to the UwbCx DDI structure.
+     *
+     * @return UWB_APP_CONFIG_PARAM&
+     */
+    UWB_APP_CONFIG_PARAM&
+    DdiParameter() noexcept;
+
+    /**
+     * @brief The buffer and associated size that is suitable for passing to the UwbCx DDI.
+     *
+     * @return std::tuple<uint8_t*, std::size_t>
+     */
+    std::tuple<uint8_t*, std::size_t>
+    DdiBuffer() noexcept;
+
+protected:
+    // order of members here is important to enforce proper initialization order.
+    std::size_t m_size;
+    std::unique_ptr<uint8_t[]> m_buffer{ nullptr };
+    UWB_APP_CONFIG_PARAM& m_parameter;
+};
+
 namespace detail
 {
+/**
+ * @brief Mapping of UwbConfiguration parameter tags to their association UwbCx
+ * DDI application configuration parameter type enumeration value.
+ */
 const std::unordered_map<::uwb::protocol::fira::UwbConfiguration::ParameterTag, UWB_APP_CONFIG_PARAM_TYPE> AppConfigUwbConfigurationTagMap {
     { ::uwb::protocol::fira::UwbConfiguration::ParameterTag::DeviceRole, UWB_APP_CONFIG_PARAM_TYPE_DEVICE_ROLE },
     { ::uwb::protocol::fira::UwbConfiguration::ParameterTag::RangingMethod, UWB_APP_CONFIG_PARAM_TYPE_RANGING_ROUND_USAGE },
@@ -53,6 +113,7 @@ const std::unordered_map<::uwb::protocol::fira::UwbConfiguration::ParameterTag, 
 } // namespace detail
 
 class UwbSetAppConfigurationParametersBuilder;
+
 /**
  * @brief Adaptor for using UWB_APP_CONFIG_PARAM UwbCx DDI structure in a nicer way.
  *
@@ -61,7 +122,8 @@ class UwbSetAppConfigurationParametersBuilder;
  */
 template <typename PropertyT>
 requires std::is_standard_layout_v<PropertyT>
-class UwbAppConfigurationParameter
+class UwbAppConfigurationParameter :
+    public IUwbAppConfigurationParameter
 {
     friend class UwbSetAppConfigurationParametersBuilder; // friend class so the unique buffer ptr can be moved out
 public:
@@ -73,14 +135,9 @@ public:
      * @param parameterSize The size of the value to pack, in bytes.
      */
     explicit UwbAppConfigurationParameter(const PropertyT& value, UWB_APP_CONFIG_PARAM_TYPE parameterType, std::size_t parameterSize = sizeof(PropertyT)) :
-        m_size(offsetof(UWB_APP_CONFIG_PARAM, paramValue[parameterSize])),
-        m_buffer(std::make_unique<uint8_t[]>(m_size)),
-        m_parameter(*reinterpret_cast<UWB_APP_CONFIG_PARAM*>(m_buffer.get())),
+        IUwbAppConfigurationParameter(parameterType, parameterSize),
         m_value(reinterpret_cast<PropertyT&>(m_parameter.paramValue)) // TODO verify that this assignment of bytes indeed works for all the parameters (what if the enum is a strange number, like 5 choices or something)
     {
-        m_parameter.size = m_size;
-        m_parameter.paramType = parameterType;
-        m_parameter.paramLength = parameterSize;
         m_value = value;
     }
 
@@ -92,39 +149,8 @@ public:
      * @param parameterSize The size of the value to pack, in bytes.
      */
     explicit UwbAppConfigurationParameter(const PropertyT& value, ::uwb::protocol::fira::UwbConfiguration::ParameterTag parameterTag, std::size_t parameterSize = sizeof(PropertyT)) :
-        m_size(offsetof(UWB_APP_CONFIG_PARAM, paramValue[parameterSize])),
-        m_buffer(std::make_unique<uint8_t[]>(m_size)),
-        m_parameter(*reinterpret_cast<UWB_APP_CONFIG_PARAM*>(m_buffer.get())),
-        m_value(reinterpret_cast<PropertyT&>(m_parameter.paramValue)) // TODO verify that this assignment of bytes indeed works for all the parameters (what if the enum is a strange number, like 5 choices or something)
-    {
-        m_parameter.size = m_size;
-        m_parameter.paramType = detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
-        m_parameter.paramLength = parameterSize;
-        m_value = value;
-    }
-
-    /**
-     * @brief The total size of the UWB_APP_CONFIG_PARAM structure.
-     *
-     * @return std::size_t
-     */
-    std::size_t
-    Size() noexcept
-    {
-        return m_size;
-    }
-
-    /**
-     * @brief The buffer containing the complete UWB_APP_CONFIG_PARAM structure,
-     * along with the trailing parameter value.
-     *
-     * @return uint8_t*
-     */
-    uint8_t*
-    Buffer() noexcept
-    {
-        return m_buffer.get();
-    }
+        UwbAppConfigurationParameter(value, detail::AppConfigUwbConfigurationTagMap.at(parameterTag), parameterSize)
+    {}
 
     /**
      * @brief Return a typed reference to the flexible array member value.
@@ -137,33 +163,7 @@ public:
         return m_value;
     }
 
-    /**
-     * @brief Reference to the UwbCx DDI structure.
-     *
-     * @return UWB_APP_CONFIG_PARAM&
-     */
-    UWB_APP_CONFIG_PARAM&
-    DdiParameter() noexcept
-    {
-        return m_parameter;
-    }
-
-    /**
-     * @brief The buffer and associated size that is suitable for passing to the UwbCx DDI.
-     *
-     * @return std::tuple<uint8_t*, std::size_t>
-     */
-    std::tuple<uint8_t*, std::size_t>
-    DdiBuffer() noexcept
-    {
-        return { m_buffer, m_size };
-    }
-
 private:
-    // order of members here is important to enforce proper initialization order
-    std::size_t m_size;
-    std::unique_ptr<uint8_t[]> m_buffer;
-    UWB_APP_CONFIG_PARAM& m_parameter;
     PropertyT& m_value;
 };
 
