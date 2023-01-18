@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <cstring>
 #include <memory>
-#include <tuple>
+#include <numeric>
 
 #include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
@@ -43,20 +43,28 @@ IUwbAppConfigurationParameter::DdiBuffer() noexcept
     return m_buffer;
 }
 
-namespace
+namespace detail
 {
 std::size_t
 CalculateTotalUwbAppConfigurationBufferSize(const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>>& parameters)
 {
-    // TODO:
-    return 0;
+    return std::accumulate(parameters.cbegin(), parameters.cend(), static_cast<std::size_t>(0), [&](std::size_t totalSize, const auto& uwbAppConfigurationParameter) {
+        return totalSize + uwbAppConfigurationParameter->DdiSize();
+    });
 }
-} // namespace
+} // namespace detail
 
 UwbSetAppConfigurationParameters::UwbSetAppConfigurationParameters(const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>>& parameters) :
-    m_buffer(offsetof(UWB_APP_CONFIG_PARAMS, appConfigParamsCount) + CalculateTotalUwbAppConfigurationBufferSize(parameters)),
+    m_buffer(offsetof(UWB_APP_CONFIG_PARAMS, appConfigParamsCount) + ::detail::CalculateTotalUwbAppConfigurationBufferSize(parameters)), // TOOD: verify this is correct
     m_parameters(*reinterpret_cast<UWB_APP_CONFIG_PARAMS*>(std::data(m_buffer)))
 {
+    auto it = std::end(m_buffer);
+
+    for (const auto& parameter : parameters) {
+        const auto& parameterBuffer = parameter->DdiBuffer();
+        m_buffer.insert(it, std::cbegin(parameterBuffer), std::cend(parameterBuffer));
+        std::advance(it, std::size(parameterBuffer));
+    }
 }
 
 UWB_APP_CONFIG_PARAMS& 
