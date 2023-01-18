@@ -20,7 +20,7 @@ namespace windows::devices
 {
 namespace detail
 {
-const std::unordered_map<::uwb::protocol::fira::UwbConfiguration::ParameterTag, UWB_APP_CONFIG_PARAM_TYPE> ParameterTagAppConfigParamMap {
+const std::unordered_map<::uwb::protocol::fira::UwbConfiguration::ParameterTag, UWB_APP_CONFIG_PARAM_TYPE> AppConfigUwbConfigurationTagMap {
     { ::uwb::protocol::fira::UwbConfiguration::ParameterTag::DeviceRole, UWB_APP_CONFIG_PARAM_TYPE_DEVICE_ROLE },
     { ::uwb::protocol::fira::UwbConfiguration::ParameterTag::RangingMethod, UWB_APP_CONFIG_PARAM_TYPE_RANGING_ROUND_USAGE },
     { ::uwb::protocol::fira::UwbConfiguration::ParameterTag::StsConfig, UWB_APP_CONFIG_PARAM_TYPE_STS_CONFIG },
@@ -98,7 +98,7 @@ public:
         m_value(reinterpret_cast<PropertyT&>(m_parameter.paramValue)) // TODO verify that this assignment of bytes indeed works for all the parameters (what if the enum is a strange number, like 5 choices or something)
     {
         m_parameter.size = m_size;
-        m_parameter.paramType = detail::ParameterTagAppConfigParamMap.at(parameterTag);
+        m_parameter.paramType = detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
         m_parameter.paramLength = parameterSize;
         m_value = value;
     }
