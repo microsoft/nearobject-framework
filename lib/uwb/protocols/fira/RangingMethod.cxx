@@ -1,8 +1,8 @@
 
 #include <uwb/protocols/fira/RangingMethod.hxx>
-
+#include <stdexcept>
 uint8_t
-uwb::protocol::fira::RangingMethod::ToByte() const noexcept
+uwb::protocol::fira::RangingMethod::ToByte() const
 {
     if (Method == RangingDirection::SingleSidedTwoWay and ReportMode == MeasurementReportMode::Deferred) {
         return 1;
@@ -13,6 +13,6 @@ uwb::protocol::fira::RangingMethod::ToByte() const noexcept
     } else if (Method == RangingDirection::DoubleSidedTwoWay and ReportMode == MeasurementReportMode::NonDeferred) {
         return 4;
     } else {
-        return 0;
+        throw std::runtime_error::runtime_error("invalid ranging method");
     }
 }
