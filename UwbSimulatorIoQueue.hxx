@@ -14,8 +14,6 @@
 
 #include <wdf.h>
 
-EXTERN_C_START
-
 /**
  * @brief Per-queue context object.
  */
@@ -75,7 +73,5 @@ private:
 };
 
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(UwbSimulatorIoQueue, GetUwbSimulatorIoQueue)
-
-EXTERN_C_END
 
 #endif // UWB_SIMULATOR_IO_QUEUE_HXX
