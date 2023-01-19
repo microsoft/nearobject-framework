@@ -45,6 +45,13 @@ IUwbAppConfigurationParameter::DdiBuffer() noexcept
 
 namespace detail
 {
+/**
+ * @brief Calculate the total size in bytes of all the UWB_APP_CONFIG_PARAM DDI
+ * structures contained in the provided IUwbAppConfigurationParameter vector. 
+ * 
+ * @param parameters
+ * @return std::size_t 
+ */
 std::size_t
 CalculateTotalUwbAppConfigurationBufferSize(const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>>& parameters)
 {
@@ -60,11 +67,16 @@ UwbSetAppConfigurationParameters::UwbSetAppConfigurationParameters(const std::ve
 {
     auto it = std::next(std::begin(m_buffer), offsetof(UWB_APP_CONFIG_PARAMS, appConfigParamsCount));
 
+    // Copy each complete UWB_APP_CONFIG_PARAM structure into the byte buffer.
     for (const auto& parameter : parameters) {
         const auto& parameterBuffer = parameter->DdiBuffer();
         m_buffer.insert(it, std::cbegin(parameterBuffer), std::cend(parameterBuffer));
         std::advance(it, std::size(parameterBuffer));
     }
+
+    m_parameters.appConfigParamsCount = std::size(parameters);
+    m_parameters.size = std::size(m_buffer);
+    m_parameters.status = UWB_STATUS_OK;
 }
 
 UWB_APP_CONFIG_PARAMS&
