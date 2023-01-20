@@ -51,6 +51,21 @@
     <ClInclude Include="include\UwbSimulatorDdi.h">
       <Filter>Header Files\Public</Filter>
     </ClInclude>
+    <ClInclude Include="UwbSimulatorDdiCallbacksLrp.hxx">
+      <Filter>Header Files\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="UwbSimulatorDdiCallbacksLrpNoop.hxx">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UwbCore.hxx">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UwbVersion.hxx">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UwbCxLrpDevice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Driver.cxx">
@@ -66,6 +81,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UwbSimulatorTracelogging.cxx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UwbSimulatorDdiCallbacksLrpNoop.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

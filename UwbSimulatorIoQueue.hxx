@@ -9,10 +9,13 @@
 #define UWB_SIMULATOR_IO_QUEUE_HXX
 
 #include <cstddef>
+#include <memory>
 
 #include <windows.h>
 
 #include <wdf.h>
+
+#include "UwbSimulatorDdiCallbacksLrp.hxx"
 
 /**
  * @brief Per-queue context object.
