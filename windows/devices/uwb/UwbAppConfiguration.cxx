@@ -61,11 +61,11 @@ CalculateTotalUwbAppConfigurationBufferSize(const std::vector<std::shared_ptr<IU
 }
 } // namespace detail
 
-UwbSetAppConfigurationParameters::UwbSetAppConfigurationParameters(const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>>& parameters) :
-    m_buffer(offsetof(UWB_APP_CONFIG_PARAMS, appConfigParamsCount) + ::detail::CalculateTotalUwbAppConfigurationBufferSize(parameters)), // TOOD: verify this is correct
-    m_parameters(*reinterpret_cast<UWB_APP_CONFIG_PARAMS*>(std::data(m_buffer)))
+UwbSetAppConfigurationParameters::UwbSetAppConfigurationParameters(const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>>& parameters, uint32_t sessionId) :
+    m_buffer(offsetof(UWB_APP_CONFIG_PARAMS, appConfigParams[0]) + ::detail::CalculateTotalUwbAppConfigurationBufferSize(parameters)), // TOOD: verify this is correct
+    m_parameters(*reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS*>(std::data(m_buffer)))
 {
-    auto it = std::next(std::begin(m_buffer), offsetof(UWB_APP_CONFIG_PARAMS, appConfigParamsCount));
+    auto it = std::next(std::begin(m_buffer), offsetof(UWB_APP_CONFIG_PARAMS, appConfigParams[0]));
 
     // Copy each complete UWB_APP_CONFIG_PARAM structure into the byte buffer.
     for (const auto& parameter : parameters) {
@@ -76,10 +76,10 @@ UwbSetAppConfigurationParameters::UwbSetAppConfigurationParameters(const std::ve
 
     m_parameters.appConfigParamsCount = std::size(parameters);
     m_parameters.size = std::size(m_buffer);
-    m_parameters.status = UWB_STATUS_OK;
+    m_parameters.sessionId = sessionId;
 }
 
-UWB_APP_CONFIG_PARAMS&
+UWB_SET_APP_CONFIG_PARAMS&
 UwbSetAppConfigurationParameters::DdiParameters() noexcept
 {
     return m_parameters;

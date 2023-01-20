@@ -60,5 +60,5 @@ windows::devices::uwb::GenerateUwbSetAppConfigParameterDdi(const ::uwb::protocol
             parameterValueVariant);
     }
 
-    return UwbSetAppConfigurationParameters{ parameters };
+    return UwbSetAppConfigurationParameters{ parameters, uwbSessionData.sessionId };
 }

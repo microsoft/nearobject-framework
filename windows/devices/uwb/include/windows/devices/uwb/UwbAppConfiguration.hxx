@@ -160,9 +160,9 @@ private:
 class UwbSetAppConfigurationParameters
 {
 public:
-    explicit UwbSetAppConfigurationParameters(const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>>& parameters);
+    explicit UwbSetAppConfigurationParameters(const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>>& parameters, uint32_t sessionId);
 
-    UWB_APP_CONFIG_PARAMS&
+    UWB_SET_APP_CONFIG_PARAMS&
     DdiParameters() noexcept;
 
     std::vector<uint8_t>&
@@ -170,7 +170,7 @@ public:
 
 private:
     std::vector<uint8_t> m_buffer;
-    UWB_APP_CONFIG_PARAMS& m_parameters;
+    UWB_SET_APP_CONFIG_PARAMS& m_parameters;
 };
 } // namespace windows::devices
 
