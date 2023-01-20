@@ -1,6 +1,6 @@
 
-#include <uwb/protocols/fira/RangingMethod.hxx>
 #include <stdexcept>
+#include <uwb/protocols/fira/RangingMethod.hxx>
 uint8_t
 uwb::protocol::fira::RangingMethod::ToByte() const
 {
@@ -13,6 +13,6 @@ uwb::protocol::fira::RangingMethod::ToByte() const
     } else if (Method == RangingDirection::DoubleSidedTwoWay and ReportMode == MeasurementReportMode::NonDeferred) {
         return 4;
     } else {
-        throw std::runtime_error::runtime_error("invalid ranging method");
+        throw std::runtime_error("invalid ranging method");
     }
 }

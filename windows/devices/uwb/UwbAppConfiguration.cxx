@@ -47,10 +47,10 @@ namespace detail
 {
 /**
  * @brief Calculate the total size in bytes of all the UWB_APP_CONFIG_PARAM DDI
- * structures contained in the provided IUwbAppConfigurationParameter vector. 
- * 
+ * structures contained in the provided IUwbAppConfigurationParameter vector.
+ *
  * @param parameters
- * @return std::size_t 
+ * @return std::size_t
  */
 std::size_t
 CalculateTotalUwbAppConfigurationBufferSize(const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>>& parameters)
