@@ -160,7 +160,7 @@ private:
 class UwbSetAppConfigurationParameters
 {
 public:
-    explicit UwbSetAppConfigurationParameters(const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>>& parameters, uint32_t sessionId);
+    explicit UwbSetAppConfigurationParameters(const std::vector<std::unique_ptr<IUwbAppConfigurationParameter>>& parameters, uint32_t sessionId);
 
     UWB_SET_APP_CONFIG_PARAMS&
     DdiParameters() noexcept;

@@ -53,7 +53,7 @@ namespace detail
  * @return std::size_t
  */
 std::size_t
-CalculateTotalUwbAppConfigurationBufferSize(const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>>& parameters)
+CalculateTotalUwbAppConfigurationBufferSize(const std::vector<std::unique_ptr<IUwbAppConfigurationParameter>>& parameters)
 {
     return std::accumulate(parameters.cbegin(), parameters.cend(), static_cast<std::size_t>(0), [&](std::size_t totalSize, const auto& uwbAppConfigurationParameter) {
         return totalSize + uwbAppConfigurationParameter->DdiSize();
@@ -61,7 +61,7 @@ CalculateTotalUwbAppConfigurationBufferSize(const std::vector<std::shared_ptr<IU
 }
 } // namespace detail
 
-UwbSetAppConfigurationParameters::UwbSetAppConfigurationParameters(const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>>& parameters, uint32_t sessionId) :
+UwbSetAppConfigurationParameters::UwbSetAppConfigurationParameters(const std::vector<std::unique_ptr<IUwbAppConfigurationParameter>>& parameters, uint32_t sessionId) :
     m_buffer(offsetof(UWB_APP_CONFIG_PARAMS, appConfigParams[0]) + ::detail::CalculateTotalUwbAppConfigurationBufferSize(parameters)),
     m_parameters(*reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS*>(m_buffer.data()))
 {
