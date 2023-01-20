@@ -68,9 +68,22 @@ UwbSimulatorIoQueue::OnIoDeviceControl(WDFREQUEST request, size_t outputBufferLe
         TraceLoggingUInt64(outputBufferLength, "OutputBufferLength"),
         TraceLoggingUInt64(inputBufferLength, "InputBufferLength"));
 
-    WdfRequestComplete(request, STATUS_SUCCESS);
+    NTSTATUS status = STATUS_INVALID_DEVICE_STATE;
 
-    return;
+    switch (ioControlCode) {
+    case IOCTL_UWB_DEVICE_SIM_GET_CAPABILITIES:
+    {
+        // TODO: handle this   
+    }
+    default:
+    {
+        status = STATUS_NOT_SUPPORTED;
+    }
+    } // switch (ioControlCode)
+
+    if (status != STATUS_PENDING) {
+        WdfRequestComplete(request, status);
+    }
 }
 
 void
