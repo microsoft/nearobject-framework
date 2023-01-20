@@ -1,12 +1,11 @@
 /**
- * @file Driver.cxx
+ * @file UwbSimulatorDriver.cxx
  * @brief This file contains the driver entry points and callbacks.
  *
  * @copyright Copyright (c) 2022
  */
 
-#include "driver.hxx"
-
+#include "UwbSimulatorDriver.hxx"
 #include "UwbSimulatorDevice.hxx"
 #include "UwbSimulatorTracelogging.hxx"
 
