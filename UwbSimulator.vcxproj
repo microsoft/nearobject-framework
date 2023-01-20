@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Driver.cxx" />
+    <ClCompile Include="UwbSimulatorDriver.cxx" />
     <ClCompile Include="UwbSimulatorDdiCallbacksLrpNoop.cxx" />
     <ClCompile Include="UwbSimulatorIoQueue.cxx" />
     <ClCompile Include="UwbSimulatorDevice.cxx" />
@@ -27,7 +27,7 @@
     <ClCompile Include="UwbSimulatorTracelogging.cxx" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Driver.hxx" />
+    <ClInclude Include="UwbSimulatorDriver.hxx" />
     <ClInclude Include="include\UwbSimulatorDdi.h" />
     <ClInclude Include="UwbCore.hxx" />
     <ClInclude Include="UwbCxLrpDevice.h" />
