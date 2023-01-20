@@ -163,4 +163,37 @@ TEST_CASE("UwbSetAppConfigurationParameters performs allocation for contained va
         REQUIRE(ddiParams.size == appConfig->DdiSize() + offsetof(UWB_SET_APP_CONFIG_PARAMS, appConfigParams[0]));
         REQUIRE(std::memcmp(ddiParams.appConfigParams, appConfig->DdiBuffer().data(), appConfig->DdiSize()) == 0);
     }
+
+    SECTION("One enum parameter and one mac address parameter case")
+    {
+        using namespace windows::devices;
+        std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> parameters;
+        uint32_t expectedSessionId = 1;
+
+        // enum
+        constexpr DeviceRole roleExpected{ DeviceRole::Initiator };
+        auto appConfig1 = std::make_shared<UwbAppConfigurationParameter<DeviceRole>>(roleExpected, UWB_APP_CONFIG_PARAM_TYPE_DEVICE_ROLE);
+        parameters.push_back(appConfig1);
+
+        // mac address
+        constexpr std::array<std::array<uint8_t, 2>, 3> dstMacAddressExpected{
+            std::array<uint8_t, 2>{ 0xAAU, 0xBBU },
+            std::array<uint8_t, 2>{ 0xCCU, 0xDDU },
+            std::array<uint8_t, 2>{ 0xEEU, 0xFFU },
+        };
+        auto appConfig2 = std::make_shared<UwbAppConfigurationParameter<std::array<uwb::UwbMacAddress::ShortType, 3Ui64>>>(dstMacAddressExpected, UWB_APP_CONFIG_PARAM_TYPE_DST_MAC_ADDRESS);
+        parameters.push_back(appConfig2);
+
+        // construct the set app config params and compare
+        UwbSetAppConfigurationParameters testStruct{ parameters, expectedSessionId };
+
+        const auto& ddiParams = testStruct.DdiParameters();
+        const uint8_t *appConfigParamsBytes = reinterpret_cast<const uint8_t *>(&ddiParams.appConfigParams[0]);
+
+        REQUIRE(ddiParams.sessionId == expectedSessionId);
+        REQUIRE(ddiParams.appConfigParamsCount == std::size(parameters));
+        REQUIRE(ddiParams.size == appConfig1->DdiSize() + appConfig2->DdiSize() + offsetof(UWB_SET_APP_CONFIG_PARAMS, appConfigParams[0]));
+        REQUIRE(std::memcmp(appConfigParamsBytes, appConfig1->DdiBuffer().data(), appConfig1->DdiSize()) == 0);
+        REQUIRE(std::memcmp(&appConfigParamsBytes[appConfig1->DdiSize()], appConfig2->DdiBuffer().data(), appConfig2->DdiSize()) == 0);
+    }
 }

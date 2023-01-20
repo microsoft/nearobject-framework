@@ -63,7 +63,7 @@ CalculateTotalUwbAppConfigurationBufferSize(const std::vector<std::shared_ptr<IU
 
 UwbSetAppConfigurationParameters::UwbSetAppConfigurationParameters(const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>>& parameters, uint32_t sessionId) :
     m_size(offsetof(UWB_APP_CONFIG_PARAMS, appConfigParams[0]) + ::detail::CalculateTotalUwbAppConfigurationBufferSize(parameters)),
-    m_buffer(std::make_unique<uint8_t[]>(m_size)), // TOOD: verify this is correct
+    m_buffer(std::make_unique<uint8_t[]>(m_size)),
     m_parameters(*reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS*>(m_buffer.get()))
 {
     auto it = std::next(m_buffer.get(), offsetof(UWB_APP_CONFIG_PARAMS, appConfigParams[0]));
