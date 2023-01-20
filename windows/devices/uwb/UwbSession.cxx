@@ -37,7 +37,7 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData &uwbSessio
 
     // Populate the PUWB_SET_APP_CONFIG_PARAMS
     auto setParamsAdaptor = GenerateUwbSetAppConfigParameterDdi(uwbSessionData);
-    auto &setParamsBuffer = setParamsAdaptor.DdiBuffer();
+    auto setParamsBuffer = setParamsAdaptor.DdiBuffer();
     auto &setParams = setParamsAdaptor.DdiParameters();
 
     // Allocate memory for the PUWB_SET_APP_CONFIG_PARAMS_STATUS
@@ -47,7 +47,7 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData &uwbSessio
     statusHolder.size = statusSize;
     statusHolder.appConfigParamsCount = setParams.appConfigParamsCount;
 
-    hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_SET_APP_CONFIG_PARAMS, std::data(setParamsBuffer), std::size(setParamsBuffer), statusBuffer.get(), statusSize, nullptr, nullptr);
+    hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_SET_APP_CONFIG_PARAMS, setParamsBuffer, setParams.size, statusBuffer.get(), statusSize, nullptr, nullptr);
     if (FAILED(hr)) {
         // TODO: handle this
     }

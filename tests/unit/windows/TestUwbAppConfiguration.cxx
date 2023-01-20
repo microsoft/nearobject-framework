@@ -138,3 +138,29 @@ TEST_CASE("UwbAppConfiguration performs allocation for contained value correctly
         REQUIRE(dstMacAddressActual == dstMacAddressExpected);
     }
 }
+
+TEST_CASE("UwbSetAppConfigurationParameters performs allocation for contained values correctly", "[basic]")
+{
+    using windows::devices::UwbAppConfigurationParameter;
+    using namespace uwb::protocol::fira;
+
+    SECTION("One parameter case")
+    {
+        using namespace windows::devices;
+        std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> parameters;
+        uint32_t expectedSessionId = 1;
+
+        constexpr DeviceRole roleExpected{ DeviceRole::Initiator };
+        auto appConfig = std::make_shared<UwbAppConfigurationParameter<DeviceRole>>(roleExpected, UWB_APP_CONFIG_PARAM_TYPE_DEVICE_ROLE);
+        parameters.push_back(appConfig);
+
+        UwbSetAppConfigurationParameters testStruct{ parameters, expectedSessionId };
+
+        const auto& ddiParams = testStruct.DdiParameters();
+
+        REQUIRE(ddiParams.sessionId == expectedSessionId);
+        REQUIRE(ddiParams.appConfigParamsCount == std::size(parameters));
+        REQUIRE(ddiParams.size == appConfig->DdiSize() + offsetof(UWB_SET_APP_CONFIG_PARAMS, appConfigParams[0]));
+        REQUIRE(std::memcmp(ddiParams.appConfigParams, appConfig->DdiBuffer().data(), appConfig->DdiSize()) == 0);
+    }
+}

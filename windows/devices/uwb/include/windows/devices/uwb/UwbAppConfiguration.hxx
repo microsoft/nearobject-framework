@@ -165,11 +165,12 @@ public:
     UWB_SET_APP_CONFIG_PARAMS&
     DdiParameters() noexcept;
 
-    std::vector<uint8_t>&
+    uint8_t*
     DdiBuffer() noexcept;
 
 private:
-    std::vector<uint8_t> m_buffer;
+    std::size_t m_size;
+    std::unique_ptr<uint8_t[]> m_buffer;
     UWB_SET_APP_CONFIG_PARAMS& m_parameters;
 };
 } // namespace windows::devices
