@@ -188,12 +188,22 @@ TEST_CASE("UwbSetAppConfigurationParameters performs allocation for contained va
         UwbSetAppConfigurationParameters testStruct{ parameters, expectedSessionId };
 
         const auto& ddiParams = testStruct.DdiParameters();
-        const uint8_t *appConfigParamsBytes = reinterpret_cast<const uint8_t *>(&ddiParams.appConfigParams[0]);
+        const uint8_t* appConfigParamsBytes = reinterpret_cast<const uint8_t*>(&ddiParams.appConfigParams[0]);
 
         REQUIRE(ddiParams.sessionId == expectedSessionId);
         REQUIRE(ddiParams.appConfigParamsCount == std::size(parameters));
         REQUIRE(ddiParams.size == appConfig1->DdiSize() + appConfig2->DdiSize() + offsetof(UWB_SET_APP_CONFIG_PARAMS, appConfigParams[0]));
         REQUIRE(std::memcmp(appConfigParamsBytes, appConfig1->DdiBuffer().data(), appConfig1->DdiSize()) == 0);
         REQUIRE(std::memcmp(&appConfigParamsBytes[appConfig1->DdiSize()], appConfig2->DdiBuffer().data(), appConfig2->DdiSize()) == 0);
+    }
+}
+
+TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
+{
+    using windows::devices::UwbAppConfigurationParameter;
+    using namespace uwb::protocol::fira;
+
+    SECTION("enum works")
+    {
     }
 }
