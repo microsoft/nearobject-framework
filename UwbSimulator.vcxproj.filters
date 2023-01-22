@@ -97,8 +97,5 @@
     <None Include="vcpkg.json">
       <Filter>Packaging Files</Filter>
     </None>
-    <None Include="vcpkg-configuration.json">
-      <Filter>Packaging Files</Filter>
-    </None>
   </ItemGroup>
 </Project>
