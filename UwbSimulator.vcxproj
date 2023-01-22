@@ -161,6 +161,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="UwbSimulatorTrace.wprp" />
+    <None Include="vcpkg-configuration.json" />
+    <None Include="vcpkg.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
