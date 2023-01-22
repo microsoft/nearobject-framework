@@ -1,7 +1,6 @@
 {
   "name": "uwbsimulator",
   "version": "1.0",
-  "VcpkgEnableManifest": true,
   "vcpkg-configuration": {
     "default-registry": {
       "kind": "git",
