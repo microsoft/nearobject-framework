@@ -65,7 +65,7 @@ UwbSimulatorDdiCallbacksLrpNoop::GetApplicationConfigurationParameters(std::vect
 }
 
 UwbStatus
-GetSessionCount(uint32_t */* sessionCount */)
+UwbSimulatorDdiCallbacksLrpNoop::GetSessionCount(uint32_t * /* sessionCount */)
 {
     return UwbStatusOk;
 }
