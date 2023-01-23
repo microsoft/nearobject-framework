@@ -360,4 +360,91 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
             REQUIRE(std::memcmp(ddiParams.appConfigParams, parameters[0]->DdiBuffer().data(), parameters[0]->DdiSize()) == 0);
         }
     }
+
+    // TODO UWB_APP_CONFIG_PARAM_TYPE_RANGING_ROUND_CONTROL
+    SECTION("RangingMethod works")
+    {
+        using namespace windows::devices;
+
+        constexpr RangingMethod RangingMethodValue{ RangingDirection::SingleSidedTwoWay, MeasurementReportMode::Deferred };
+
+        UwbSessionData sessionData;
+        sessionData.sessionId = 1;
+        sessionData.uwbConfiguration = UwbConfiguration::Create().SetRangingMethod(RangingMethodValue);
+        sessionData.uwbConfigurationAvailable = true;
+
+        auto params = GenerateUwbSetAppConfigParameterDdi(sessionData);
+        const auto& ddiParams = params.DdiParameters();
+
+        REQUIRE(ddiParams.sessionId == sessionData.sessionId);
+        REQUIRE(ddiParams.appConfigParamsCount == 1);
+
+        const auto param = ddiParams.appConfigParams[0];
+        const auto sessionUwbMap = sessionData.uwbConfiguration.GetValueMap();
+
+        std::vector<std::unique_ptr<IUwbAppConfigurationParameter>> parameters;
+
+        for (const auto& [parameterTag, parameterValueVariant] : sessionUwbMap) {
+            const auto ddiType = windows::devices::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
+            REQUIRE(ddiType == param.paramType);
+
+            parameters.push_back(std::make_unique<UwbAppConfigurationParameter<uint8_t>>(RangingMethodValue.ToByte(), parameterTag));
+
+            UwbSetAppConfigurationParameters testStruct{ parameters, sessionData.sessionId };
+
+            const auto& ddiParams = testStruct.DdiParameters();
+
+            REQUIRE(ddiParams.sessionId == sessionData.sessionId);
+            REQUIRE(ddiParams.appConfigParamsCount == std::size(parameters));
+            REQUIRE(ddiParams.size == parameters[0]->DdiSize() + offsetof(UWB_SET_APP_CONFIG_PARAMS, appConfigParams[0]));
+            REQUIRE(std::memcmp(ddiParams.appConfigParams, parameters[0]->DdiBuffer().data(), parameters[0]->DdiSize()) == 0);
+        }
+    }
+
+    SECTION("ResultReportConfig works")
+    {
+        using namespace windows::devices;
+
+        constexpr ResultReportConfiguration ResultReportConfigurationValue1{ ResultReportConfiguration::AoAAzimuthReport };
+        constexpr ResultReportConfiguration ResultReportConfigurationValue2{ ResultReportConfiguration::AoAElevationReport };
+        constexpr ResultReportConfiguration ResultReportConfigurationValue3{ ResultReportConfiguration::AoAFoMReport };
+        constexpr ResultReportConfiguration ResultReportConfigurationValue4{ ResultReportConfiguration::TofReport };
+
+        UwbSessionData sessionData;
+        sessionData.sessionId = 1;
+        sessionData.uwbConfiguration = UwbConfiguration::Create().AddResultReportConfiguration(ResultReportConfigurationValue1).AddResultReportConfiguration(ResultReportConfigurationValue2).AddResultReportConfiguration(ResultReportConfigurationValue3).AddResultReportConfiguration(ResultReportConfigurationValue4);
+        sessionData.uwbConfigurationAvailable = true;
+
+        auto params = GenerateUwbSetAppConfigParameterDdi(sessionData);
+        const auto& ddiParams = params.DdiParameters();
+
+        REQUIRE(ddiParams.sessionId == sessionData.sessionId);
+        REQUIRE(ddiParams.appConfigParamsCount == 1);
+
+        const auto param = ddiParams.appConfigParams[0];
+        const auto sessionUwbMap = sessionData.uwbConfiguration.GetValueMap();
+
+        std::vector<std::unique_ptr<IUwbAppConfigurationParameter>> parameters;
+
+        for (const auto& [parameterTag, parameterValueVariant] : sessionUwbMap) {
+            const auto ddiType = windows::devices::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
+            REQUIRE(ddiType == param.paramType);
+
+            uint8_t result = 0;
+            for (const auto& config : { ResultReportConfigurationValue1, ResultReportConfigurationValue2, ResultReportConfigurationValue3, ResultReportConfigurationValue4 }) {
+                result |= notstd::to_underlying(config);
+            }
+
+            parameters.push_back(std::make_unique<UwbAppConfigurationParameter<uint8_t>>(result, parameterTag));
+
+            UwbSetAppConfigurationParameters testStruct{ parameters, sessionData.sessionId };
+
+            const auto& ddiParams = testStruct.DdiParameters();
+
+            REQUIRE(ddiParams.sessionId == sessionData.sessionId);
+            REQUIRE(ddiParams.appConfigParamsCount == std::size(parameters));
+            REQUIRE(ddiParams.size == parameters[0]->DdiSize() + offsetof(UWB_SET_APP_CONFIG_PARAMS, appConfigParams[0]));
+            REQUIRE(std::memcmp(ddiParams.appConfigParams, parameters[0]->DdiBuffer().data(), parameters[0]->DdiSize()) == 0);
+        }
+    }
 }

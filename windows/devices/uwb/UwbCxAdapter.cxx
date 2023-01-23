@@ -13,9 +13,8 @@ windows::devices::uwb::GenerateUwbSetAppConfigParameterDdi(const ::uwb::protocol
     std::vector<std::unique_ptr<IUwbAppConfigurationParameter>> parameters;
 
     // TODO NUMBER_OF_CONTROLEES
-    // TODO DEVICE_MAC_ADDRESS
-    // TODO DST_MAC_ADDRESS
     // TODO DEVICE_TYPE
+    // TODO UWB_APP_CONFIG_PARAM_TYPE_RANGING_ROUND_CONTROL
     const auto sessionUwbMap = uwbSessionData.uwbConfiguration.GetValueMap();
 
     for (const auto& [parameterTag, parameterValueVariant] : sessionUwbMap) {
