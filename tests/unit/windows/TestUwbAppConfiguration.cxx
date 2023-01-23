@@ -6,7 +6,9 @@
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
+#include <uwb/protocols/fira/UwbConfigurationBuilder.hxx>
 #include <windows/devices/uwb/UwbAppConfiguration.hxx>
+#include <windows/devices/uwb/UwbCxAdapter.hxx>
 
 TEST_CASE("UwbAppConfiguration performs allocation for contained value correctly", "[basic]")
 {
@@ -179,7 +181,7 @@ TEST_CASE("UwbSetAppConfigurationParameters performs allocation for contained va
             std::array<uint8_t, 2>{ 0xCCU, 0xDDU },
             std::array<uint8_t, 2>{ 0xEEU, 0xFFU },
         };
-        parameters.push_back(std::make_unique<UwbAppConfigurationParameter<std::array<uwb::UwbMacAddress::ShortType, 3Ui64>>>(dstMacAddressExpected, UWB_APP_CONFIG_PARAM_TYPE_DST_MAC_ADDRESS));
+        parameters.push_back(std::make_unique<UwbAppConfigurationParameter<std::array<::uwb::UwbMacAddress::ShortType, 3Ui64>>>(dstMacAddressExpected, UWB_APP_CONFIG_PARAM_TYPE_DST_MAC_ADDRESS));
 
         // construct the set app config params and compare
         UwbSetAppConfigurationParameters testStruct{ parameters, expectedSessionId };
@@ -197,10 +199,48 @@ TEST_CASE("UwbSetAppConfigurationParameters performs allocation for contained va
 
 TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
 {
-    using windows::devices::UwbAppConfigurationParameter;
-    using namespace uwb::protocol::fira;
+    using windows::devices::uwb::GenerateUwbSetAppConfigParameterDdi;
+    using namespace ::uwb::protocol::fira;
 
     SECTION("enum works")
     {
+        using namespace windows::devices;
+
+        constexpr DeviceRole roleExpected{ DeviceRole::Initiator };
+
+        UwbSessionData sessionData;
+        sessionData.sessionId = 1;
+        sessionData.uwbConfiguration = UwbConfiguration::Create().DeviceRole(roleExpected);
+        sessionData.uwbConfigurationAvailable = true;
+
+        auto params = GenerateUwbSetAppConfigParameterDdi(sessionData);
+        const auto& ddiParams = params.DdiParameters();
+
+        REQUIRE(ddiParams.sessionId == sessionData.sessionId);
+        REQUIRE(ddiParams.appConfigParamsCount == 1);
+
+        const auto param = ddiParams.appConfigParams[0];
+        const auto sessionUwbMap = sessionData.uwbConfiguration.GetValueMap();
+
+        std::vector<std::unique_ptr<IUwbAppConfigurationParameter>> parameters;
+
+        for (const auto& [parameterTag, parameterValueVariant] : sessionUwbMap) {
+            const auto ddiType = windows::devices::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
+            REQUIRE(ddiType == param.paramType);
+
+            // the following doesn't want to compile
+            // parameters.push_back(std::make_unique<UwbAppConfigurationParameter<std::underlying_type_t<ParameterValueT>>>(notstd::to_underlying(parameterValueVariant), parameterTag));
+
+            parameters.push_back(std::make_unique<UwbAppConfigurationParameter<DeviceRole>>(roleExpected, parameterTag));
+
+            UwbSetAppConfigurationParameters testStruct{ parameters, sessionData.sessionId };
+
+            const auto& ddiParams = testStruct.DdiParameters();
+
+            REQUIRE(ddiParams.sessionId == sessionData.sessionId);
+            REQUIRE(ddiParams.appConfigParamsCount == std::size(parameters));
+            REQUIRE(ddiParams.size == parameters[0]->DdiSize() + offsetof(UWB_SET_APP_CONFIG_PARAMS, appConfigParams[0]));
+            REQUIRE(std::memcmp(ddiParams.appConfigParams, parameters[0]->DdiBuffer().data(), parameters[0]->DdiSize()) == 0);
+        }
     }
 }
