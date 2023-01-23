@@ -55,7 +55,7 @@ list(APPEND UWBPROTOFIRA_PUBLIC_HEADERS
     ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionData.hxx
 )
 
-set_target_properties(uwb-proto-fira PROPERTIES FOLDER lib/uwb/protocol/fira)
+set_target_properties(uwb-proto-fira PROPERTIES FOLDER lib/uwb/protocols/fira)
 set_target_properties(uwb-proto-fira PROPERTIES PUBLIC_HEADER "${UWBPROTOFIRA_PUBLIC_HEADERS}")
 
 install(

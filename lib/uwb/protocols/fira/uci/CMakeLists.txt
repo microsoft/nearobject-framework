@@ -28,12 +28,12 @@ list(APPEND UWBPROTOFIRAUCI_PUBLIC_HEADERS
     ${UWB_PROTO_FIRA_UCI_DIR_PUBLIC_INCLUDE_PREFIX}/StatusCodes.hxx
 )
 
-set_target_properties(uwb-proto-fira-uci PROPERTIES FOLDER lib/uwb/protocol/fira)
+set_target_properties(uwb-proto-fira-uci PROPERTIES FOLDER lib/uwb/protocols/fira)
 set_target_properties(uwb-proto-fira-uci PROPERTIES PUBLIC_HEADER "${UWBPROTOFIRAUCI_PUBLIC_HEADERS}")
 
 install(
     TARGETS uwb-proto-fira-uci
     EXPORT uwb-proto-fira-uci
     ARCHIVE
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/uwb/protocol/fira
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/uwb/protocols/fira
 )
