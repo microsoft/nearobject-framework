@@ -62,7 +62,7 @@ install(
     TARGETS uwb-proto-fira
     EXPORT uwb-proto-fira
     ARCHIVE
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/uwb/protocol/fira
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/uwb/protocols/fira
 )
 
 add_subdirectory(uci)
