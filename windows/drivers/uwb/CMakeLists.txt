@@ -1,2 +1,2 @@
 add_subdirectory(cx)
-add_subdirectory(sim-old)
+add_subdirectory(simulator)
