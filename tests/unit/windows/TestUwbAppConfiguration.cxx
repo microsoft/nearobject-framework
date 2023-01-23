@@ -248,7 +248,7 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
     {
         using namespace windows::devices;
 
-        constexpr std::array<uint8_t, 2> dstMacAddressExpected { 0xAAU, 0xBBU };
+        constexpr std::array<uint8_t, 2> dstMacAddressExpected{ 0xAAU, 0xBBU };
 
         UwbSessionData sessionData;
         sessionData.sessionId = 1;
@@ -271,6 +271,45 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
             REQUIRE(ddiType == param.paramType);
 
             parameters.push_back(std::make_unique<UwbAppConfigurationParameter<::uwb::UwbMacAddress::ShortType>>(dstMacAddressExpected, parameterTag));
+
+            UwbSetAppConfigurationParameters testStruct{ parameters, sessionData.sessionId };
+
+            const auto& ddiParams = testStruct.DdiParameters();
+
+            REQUIRE(ddiParams.sessionId == sessionData.sessionId);
+            REQUIRE(ddiParams.appConfigParamsCount == std::size(parameters));
+            REQUIRE(ddiParams.size == parameters[0]->DdiSize() + offsetof(UWB_SET_APP_CONFIG_PARAMS, appConfigParams[0]));
+            REQUIRE(std::memcmp(ddiParams.appConfigParams, parameters[0]->DdiBuffer().data(), parameters[0]->DdiSize()) == 0);
+        }
+    }
+
+        SECTION("integer works")
+    {
+        using namespace windows::devices;
+
+        constexpr uint16_t slotDurationExpected = 0xFF20;
+
+        UwbSessionData sessionData;
+        sessionData.sessionId = 1;
+        sessionData.uwbConfiguration = UwbConfiguration::Create().SetSlotDuration(slotDurationExpected);
+        sessionData.uwbConfigurationAvailable = true;
+
+        auto params = GenerateUwbSetAppConfigParameterDdi(sessionData);
+        const auto& ddiParams = params.DdiParameters();
+
+        REQUIRE(ddiParams.sessionId == sessionData.sessionId);
+        REQUIRE(ddiParams.appConfigParamsCount == 1);
+
+        const auto param = ddiParams.appConfigParams[0];
+        const auto sessionUwbMap = sessionData.uwbConfiguration.GetValueMap();
+
+        std::vector<std::unique_ptr<IUwbAppConfigurationParameter>> parameters;
+
+        for (const auto& [parameterTag, parameterValueVariant] : sessionUwbMap) {
+            const auto ddiType = windows::devices::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
+            REQUIRE(ddiType == param.paramType);
+
+            parameters.push_back(std::make_unique<UwbAppConfigurationParameter<uint16_t>>(slotDurationExpected, parameterTag));
 
             UwbSetAppConfigurationParameters testStruct{ parameters, sessionData.sessionId };
 
