@@ -23,4 +23,17 @@ target_link_libraries(smartcard
         tlv
 )
 
+list(APPEND SMARTCARD_PUBLIC_HEADERS
+    ${SMARTCARD_DIR_PUBLIC_INCLUDE_PREFIX}/Apdu.hxx
+    ${SMARTCARD_DIR_PUBLIC_INCLUDE_PREFIX}/Smartcard.hxx
+)
+
 set_target_properties(smartcard PROPERTIES FOLDER lib/smartcard)
+set_target_properties(smartcard PROPERTIES PUBLIC_HEADER "${SMARTCARD_PUBLIC_HEADERS}")
+
+install(
+    TARGETS smartcard
+    EXPORT smartcard
+    ARCHIVE
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/smartcard
+)

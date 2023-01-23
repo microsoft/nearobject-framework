@@ -42,6 +42,27 @@ target_link_libraries(uwb-proto-fira
         uwb
 )
 
+list(APPEND UWBPROTOFIRA_PUBLIC_HEADERS
+    ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/ControleePreference.hxx
+    ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/FiraDevice.hxx
+    ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/RangingMethod.hxx
+    ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/SecureRangingInfo.hxx
+    ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/StaticRangingInfo.hxx
+    ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCapability.hxx
+    ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbConfiguration.hxx
+    ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbConfigurationBuilder.hxx
+    ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbRegulatoryInformation.hxx
+    ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionData.hxx
+)
+
 set_target_properties(uwb-proto-fira PROPERTIES FOLDER lib/uwb/protocol/fira)
+set_target_properties(uwb-proto-fira PROPERTIES PUBLIC_HEADER "${UWBPROTOFIRA_PUBLIC_HEADERS}")
+
+install(
+    TARGETS uwb-proto-fira
+    EXPORT uwb-proto-fira
+    ARCHIVE
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/uwb/protocol/fira
+)
 
 add_subdirectory(uci)

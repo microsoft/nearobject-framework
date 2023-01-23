@@ -23,7 +23,28 @@ target_include_directories(notstd
         ${NOTSTD_DIR_PUBLIC_INCLUDE}
 )
 
+list(APPEND NOTSTD_PUBLIC_HEADERS
+    ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/hash.hxx
+    ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/memory.hxx
+    ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/range.hxx
+    ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/tostring.hxx
+    ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/task_queue.hxx
+    ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/type_traits.hxx
+    ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/unique_ptr_out.hxx
+    ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/utility.hxx
+)
+
 target_link_libraries(notstd
     PUBLIC
         Threads::Threads
+)
+
+set_target_properties(notstd PROPERTIES FOLDER shared/notstd)
+set_target_properties(notstd PROPERTIES PUBLIC_HEADER "${NOTSTD_PUBLIC_HEADERS}")
+
+install(
+    TARGETS notstd
+    EXPORT notstd
+    ARCHIVE
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/notstd
 )

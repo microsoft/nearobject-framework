@@ -32,6 +32,22 @@ target_link_libraries(uwb
         uwb-proto-fira
 )
 
+list(APPEND UWB_PUBLIC_HEADERS
+    ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDevice.hxx
+    ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbMacAddress.hxx
+    ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbPeer.hxx
+    ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSession.hxx
+    ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionEventCallbacks.hxx
+)
+
 set_target_properties(uwb PROPERTIES FOLDER lib/uwb)
+set_target_properties(uwb PROPERTIES PUBLIC_HEADER "${UWB_PUBLIC_HEADERS}")
+
+install(
+    TARGETS uwb
+    EXPORT uwb
+    ARCHIVE
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/uwb
+)
 
 add_subdirectory(protocols)

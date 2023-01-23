@@ -12,7 +12,7 @@ target_link_libraries(nearobjectsvc
         notstd
 )
 
-set_target_properties(nearobjectsvc PROPERTIES FOLDER linux/service/nearobjectd)
+set_target_properties(nearobjectsvc PROPERTIES FOLDER windows/service)
 
 install(
     TARGETS nearobjectsvc
