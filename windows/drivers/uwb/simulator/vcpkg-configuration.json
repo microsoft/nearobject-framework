@@ -13,6 +13,6 @@
     }
   ],
   "overlay-ports": [
-    "D:\\src\\nearobject-framework\\ports"
+    "../../../../ports"
   ]
 }
