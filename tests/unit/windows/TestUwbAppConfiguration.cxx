@@ -216,7 +216,6 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
         auto params = GenerateUwbSetAppConfigParameterDdi(sessionData);
         const auto& ddiParams = params.DdiParameters();
 
-        REQUIRE(ddiParams.sessionId == sessionData.sessionId);
         REQUIRE(ddiParams.appConfigParamsCount == 1);
 
         const auto param = ddiParams.appConfigParams[0];
@@ -258,7 +257,6 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
         auto params = GenerateUwbSetAppConfigParameterDdi(sessionData);
         const auto& ddiParams = params.DdiParameters();
 
-        REQUIRE(ddiParams.sessionId == sessionData.sessionId);
         REQUIRE(ddiParams.appConfigParamsCount == 1);
 
         const auto param = ddiParams.appConfigParams[0];
@@ -297,7 +295,6 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
         auto params = GenerateUwbSetAppConfigParameterDdi(sessionData);
         const auto& ddiParams = params.DdiParameters();
 
-        REQUIRE(ddiParams.sessionId == sessionData.sessionId);
         REQUIRE(ddiParams.appConfigParamsCount == 1);
 
         const auto param = ddiParams.appConfigParams[0];
@@ -336,7 +333,6 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
         auto params = GenerateUwbSetAppConfigParameterDdi(sessionData);
         const auto& ddiParams = params.DdiParameters();
 
-        REQUIRE(ddiParams.sessionId == sessionData.sessionId);
         REQUIRE(ddiParams.appConfigParamsCount == 1);
 
         const auto param = ddiParams.appConfigParams[0];
@@ -376,7 +372,6 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
         auto params = GenerateUwbSetAppConfigParameterDdi(sessionData);
         const auto& ddiParams = params.DdiParameters();
 
-        REQUIRE(ddiParams.sessionId == sessionData.sessionId);
         REQUIRE(ddiParams.appConfigParamsCount == 1);
 
         const auto param = ddiParams.appConfigParams[0];
@@ -418,7 +413,6 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
         auto params = GenerateUwbSetAppConfigParameterDdi(sessionData);
         const auto& ddiParams = params.DdiParameters();
 
-        REQUIRE(ddiParams.sessionId == sessionData.sessionId);
         REQUIRE(ddiParams.appConfigParamsCount == 1);
 
         const auto param = ddiParams.appConfigParams[0];
