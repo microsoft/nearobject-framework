@@ -385,7 +385,7 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
         constexpr ResultReportConfiguration ResultReportConfigurationValue3{ ResultReportConfiguration::AoAFoMReport };
         constexpr ResultReportConfiguration ResultReportConfigurationValue4{ ResultReportConfiguration::TofReport };
 
-        const auto parameterTag = UwbConfiguration::ParameterTag::RangingMethod;
+        const auto parameterTag = UwbConfiguration::ParameterTag::ResultReportConfig;
         const auto ddiType = windows::devices::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
 
         // construct the sessionData and push it thru the GenerateUwbSetAppConfigParameterDdi function
