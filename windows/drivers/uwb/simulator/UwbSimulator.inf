@@ -1,0 +1,69 @@
+﻿;
+; UwbSimulator.inf
+;
+
+[Version]
+Signature="$Windows NT$"
+Class=Proximity
+ClassGuid={5630831C-06C9-4856-B327-F5D32586E060}
+Provider=%ManufacturerName%
+CatalogFile=UwbSimulator.cat
+DriverVer=12/20/2022,0.1.0.0
+PnpLockdown=1
+
+[Manufacturer]
+%ManufacturerName%=Standard,NT$ARCH$
+
+[Standard.NT$ARCH$]
+%DeviceName%=MyDevice_Install, Root\UwbSimulator
+
+[SourceDisksFiles]
+UwbSimulator.dll=1
+
+[SourceDisksNames]
+1 = %DiskName%
+
+; =================== UMDF Device ==================================
+
+[MyDevice_Install.NT]
+CopyFiles=UMDriverCopy
+
+[MyDevice_Install.NT.hw]
+
+[MyDevice_Install.NT.Services]
+AddService=WUDFRd,0x000001fa,WUDFRD_ServiceInstall
+
+[MyDevice_Install.NT.CoInstallers]
+AddReg=CoInstallers_AddReg
+
+[MyDevice_Install.NT.Wdf]
+UmdfService=UwbSimulator,UwbSimulator_Install
+UmdfServiceOrder=UwbSimulator
+
+[UwbSimulator_Install]
+UmdfLibraryVersion=$UMDFVERSION$ 
+ServiceBinary=%12%\UMDF\UwbSimulator.dll
+
+[WUDFRD_ServiceInstall]
+DisplayName = %WudfRdDisplayName%
+ServiceType = 1
+StartType = 3
+ErrorControl = 1
+ServiceBinary = %12%\WUDFRd.sys
+
+[CoInstallers_AddReg]
+HKR,,CoInstallers32,0x00010000,"WUDFCoinstaller.dll"
+
+[DestinationDirs]
+UMDriverCopy=12,UMDF ; copy to drivers\umdf
+
+[UMDriverCopy]
+UwbSimulator.dll
+
+; =================== Generic ==================================
+
+[Strings]
+ManufacturerName="Windows Near Object Team"
+DiskName = "Uwb Simulator Installation Media"
+WudfRdDisplayName="Windows Driver Foundation - User-mode Driver Framework Reflector"
+DeviceName="Uwb Simulator"

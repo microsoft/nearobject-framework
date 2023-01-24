@@ -6,7 +6,15 @@
     "nlohmann-json",
     "magic-enum",
     "cli11",
-    "wil"
+    "wil",
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    }
   ],
   "builtin-baseline": "779ce74ef67d3e12d904da1b15f9ed5626d5f677"
 }

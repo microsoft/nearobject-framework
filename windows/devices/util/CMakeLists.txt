@@ -26,4 +26,18 @@ target_link_libraries(windevutil
         WIL::WIL
 )
 
+list(APPEND WINDEVUTIL_PUBLIC_HEADERS
+    ${WINDEVUTIL_DIR_PUBLIC_INCLUDE_PREFIX}/DeviceEnumerator.hxx
+    ${WINDEVUTIL_DIR_PUBLIC_INCLUDE_PREFIX}/DevicePresenceMonitor.hxx
+    ${WINDEVUTIL_DIR_PUBLIC_INCLUDE_PREFIX}/DeviceResource.hxx
+)
+
 set_target_properties(windevutil PROPERTIES FOLDER windows/devices)
+set_target_properties(windevutil PROPERTIES PUBLIC_HEADER "${WINDEVUTIL_PUBLIC_HEADERS}")
+
+install(
+    TARGETS windevutil
+    EXPORT windevutil
+    ARCHIVE
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/windows/devices
+)

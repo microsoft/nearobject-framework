@@ -1,10 +1,11 @@
 
-vcpkg_from_git(
+vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
-    URL "https://github.com/aep-microsoft/nearobject-framework.git"
-    REF 6235d1afc5e31b0a63c5591d5548f7cc17850971
+    REPO microsoft/nearobject-framework
+    REF v0.2.2
+    SHA512 34013159a09cfd52e297529cff115b4392dec536c02b2260548b25bb1abf4702a0641e61b3c83401c4002df7bb456175b7e5277cd862d6e7972fc12312c03ae4
+    HEAD_REF develop
 )
-
 vcpkg_cmake_configure(
     SOURCE_PATH ${SOURCE_PATH}
     OPTIONS
@@ -12,9 +13,7 @@ vcpkg_cmake_configure(
         -DNOF_USE_VCPKG=TRUE
         -DNOF_OFFICIAL_BUILD=TRUE
 )
-
 vcpkg_cmake_install()
 vcpkg_copy_pdbs()
-
 file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
 file(INSTALL "${SOURCE_PATH}/LICENSE" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}" RENAME copyright)
