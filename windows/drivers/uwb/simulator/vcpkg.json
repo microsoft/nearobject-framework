@@ -3,6 +3,6 @@
   "name": "uwbsimulator",
   "version": "1.0",
   "dependencies": [
-    "nearobject-framework"
+    "nearobject-framework-umdf"
   ]
 }
