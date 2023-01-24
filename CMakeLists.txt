@@ -185,6 +185,14 @@ elseif (BUILD_FOR_WINDOWS)
       WIN32_LEAN_AND_MEAN
   )
 
+  if (NOF_BUILD_FOR_UMDF)
+    # Enable explicit selection of MSVC runtime library.
+    if (POLICY CMP0091)
+      cmake_policy(SET CMP0091 NEW)
+      set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    endif()
+  endif()
+
   add_subdirectory(windows)
 endif()
 
