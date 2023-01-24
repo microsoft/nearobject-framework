@@ -61,7 +61,7 @@ struct UwbConfiguration
         Sp0PhySetNumber = 0x8F,
         Sp1PhySetNumber = 0x90,
         Sp3PhySetNumber = 0x91,
-        PreableCodeIndex = 0x92,
+        PreableCodeIndex = 0x92, // TODO fix the typo here
         ResultReportConfig = 0x93,
         MacAddressMode = 0x94,
         ControleeShortMacAddress = 0x95,
@@ -120,7 +120,6 @@ struct UwbConfiguration
         uwb::protocol::fira::PrfMode,
         uwb::protocol::fira::RangingMethod,
         uwb::protocol::fira::RangingMode,
-        uwb::protocol::fira::ResultReportConfiguration,
         uwb::protocol::fira::SchedulingMode,
         uwb::protocol::fira::StsConfiguration,
         uwb::protocol::fira::StsPacketConfiguration,
@@ -172,10 +171,10 @@ struct UwbConfiguration
     const std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, ParameterTypesVariant>&
     GetValueMap() const noexcept;
 
-    std::optional<uint32_t>
+    std::optional<uint16_t>
     GetFiraPhyVersion() const noexcept;
 
-    std::optional<uint32_t>
+    std::optional<uint16_t>
     GetFiraMacVersion() const noexcept;
 
     std::optional<uwb::protocol::fira::DeviceRole>
@@ -247,7 +246,7 @@ struct UwbConfiguration
     std::optional<uint8_t>
     GetMaxContentionPhaseLength() const noexcept;
 
-    std::optional<uint8_t>
+    std::optional<uint16_t>
     GetSlotDuration() const noexcept;
 
     std::optional<uint16_t>

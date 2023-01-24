@@ -78,7 +78,7 @@ public:
      * been obtained as a result of out-of-band negotiation.
      */
     void
-    Configure(const uwb::protocol::fira::UwbSessionData& uwbSessionData);
+    Configure(const protocol::fira::UwbSessionData& uwbSessionData);
 
     /**
      * @brief Set the type of mac address to be used for session participants.
@@ -111,7 +111,7 @@ public:
 
 private:
     virtual void
-    ConfigureImpl(const uwb::protocol::fira::UwbSessionData& uwbSessionData) = 0;
+    ConfigureImpl(const protocol::fira::UwbSessionData& uwbSessionData) = 0;
 
     virtual void
     StartRangingImpl() = 0;
@@ -128,7 +128,7 @@ protected:
     UwbMacAddress m_uwbMacAddressSelf;
     std::atomic<bool> m_rangingActive{ false };
     std::mutex m_peerGate;
-    std::unordered_set<uwb::UwbMacAddress> m_peers{};
+    std::unordered_set<UwbMacAddress> m_peers{};
     std::weak_ptr<UwbSessionEventCallbacks> m_callbacks;
 };
 
