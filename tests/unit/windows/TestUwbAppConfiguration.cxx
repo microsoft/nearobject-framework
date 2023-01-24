@@ -322,14 +322,14 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
     {
         using namespace windows::devices;
 
-        constexpr uint32_t rangingIntervalExpected = 0xFFFF'2000;
-        const auto parameterTag = UwbConfiguration::ParameterTag::RangingInterval;
+        constexpr uint32_t uwbInitiationTimeExpected = 0x2000;
+        constexpr auto parameterTag = UwbConfiguration::ParameterTag::UwbInitiationTime;
         const auto ddiType = windows::devices::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
 
         // construct the sessionData and push it thru the GenerateUwbSetAppConfigParameterDdi function
         UwbSessionData sessionData;
         sessionData.sessionId = 1;
-        sessionData.uwbConfiguration = UwbConfiguration::Create().SetRangingInterval(rangingIntervalExpected);
+        sessionData.uwbConfiguration = UwbConfiguration::Create().SetUwbInitiationTime(uwbInitiationTimeExpected);
         sessionData.uwbConfigurationAvailable = true;
 
         auto params = GenerateUwbSetAppConfigParameterDdi(sessionData);
@@ -340,7 +340,7 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
 
         // manually construct UwbAppConfigurationParameter to see if it matches
         std::vector<std::unique_ptr<IUwbAppConfigurationParameter>> parameters;
-        parameters.push_back(std::make_unique<UwbAppConfigurationParameter<uint32_t>>(rangingIntervalExpected, parameterTag));
+        parameters.push_back(std::make_unique<UwbAppConfigurationParameter<decltype(uwbInitiationTimeExpected)>>(uwbInitiationTimeExpected, parameterTag));
 
         REQUIRE(ddiParamsGenerated.appConfigParamsCount == std::size(parameters));
         REQUIRE(ddiParamsGenerated.size == parameters[0]->DdiSize() + offsetof(UWB_SET_APP_CONFIG_PARAMS, appConfigParams[0]));

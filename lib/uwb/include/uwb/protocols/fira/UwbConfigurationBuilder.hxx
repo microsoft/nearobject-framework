@@ -25,10 +25,10 @@ public:
     operator UwbConfiguration() noexcept;
 
     UwbConfiguration::Builder&
-    SetFiraVersionPhy(uint32_t version) noexcept;
+    SetFiraVersionPhy(uint16_t version) noexcept;
 
     UwbConfiguration::Builder&
-    SetFiraVersionMac(uint32_t version) noexcept;
+    SetFiraVersionMac(uint16_t version) noexcept;
 
     UwbConfiguration::Builder&
     SetDeviceRole(uwb::protocol::fira::DeviceRole deviceRole) noexcept;
@@ -106,7 +106,7 @@ public:
     SetSlotDuration(uint16_t maxContentionPhaseLength) noexcept;
 
     UwbConfiguration::Builder&
-    SetRangingInterval(uint32_t rangingInterval) noexcept;
+    SetRangingInterval(uint16_t rangingInterval) noexcept;
 
     UwbConfiguration::Builder&
     SetKeyRotationRate(uint8_t keyRotationRate) noexcept;
@@ -131,10 +131,10 @@ public:
     FiraVersion() noexcept;
 
     UwbConfiguration::Builder&
-    Phy(uint32_t version) noexcept;
+    Phy(uint16_t version) noexcept;
 
     UwbConfiguration::Builder&
-    Mac(uint32_t version) noexcept;
+    Mac(uint16_t version) noexcept;
 
     UwbConfiguration::Builder&
     DeviceRole(uwb::protocol::fira::DeviceRole deviceRole) noexcept;
@@ -238,7 +238,7 @@ public:
     SlotDuration(uint16_t maxContentionPhaseLength) noexcept;
 
     UwbConfiguration::Builder&
-    RangingInterval(uint32_t rangingInterval) noexcept;
+    RangingInterval(uint16_t rangingInterval) noexcept;
 
     UwbConfiguration::Builder&
     KeyRotationRate(uint8_t keyRotationRate) noexcept;

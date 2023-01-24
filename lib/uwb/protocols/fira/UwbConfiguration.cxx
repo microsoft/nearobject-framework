@@ -31,16 +31,16 @@ UwbConfiguration::FromDataObject(const encoding::TlvBer& /* tlv */)
     throw std::logic_error("not implemented");
 }
 
-std::optional<uint32_t>
+std::optional<uint16_t>
 UwbConfiguration::GetFiraPhyVersion() const noexcept
 {
-    return GetValue<uint32_t>(ParameterTag::FiraPhyVersion);
+    return GetValue<uint16_t>(ParameterTag::FiraPhyVersion);
 }
 
-std::optional<uint32_t>
+std::optional<uint16_t>
 UwbConfiguration::GetFiraMacVersion() const noexcept
 {
-    return GetValue<uint32_t>(ParameterTag::FiraMacVersion);
+    return GetValue<uint16_t>(ParameterTag::FiraMacVersion);
 }
 
 std::optional<DeviceRole>
@@ -184,10 +184,10 @@ UwbConfiguration::GetMaxContentionPhaseLength() const noexcept
     return GetValue<uint8_t>(ParameterTag::MaxContentionPhaseLength);
 }
 
-std::optional<uint8_t>
+std::optional<uint16_t>
 UwbConfiguration::GetSlotDuration() const noexcept
 {
-    return GetValue<uint8_t>(ParameterTag::SlotDuration);
+    return GetValue<uint16_t>(ParameterTag::SlotDuration);
 }
 
 std::optional<uint16_t>

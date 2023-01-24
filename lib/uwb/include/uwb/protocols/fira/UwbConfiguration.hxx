@@ -171,10 +171,10 @@ struct UwbConfiguration
     const std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, ParameterTypesVariant>&
     GetValueMap() const noexcept;
 
-    std::optional<uint32_t>
+    std::optional<uint16_t>
     GetFiraPhyVersion() const noexcept;
 
-    std::optional<uint32_t>
+    std::optional<uint16_t>
     GetFiraMacVersion() const noexcept;
 
     std::optional<uwb::protocol::fira::DeviceRole>
@@ -246,7 +246,7 @@ struct UwbConfiguration
     std::optional<uint8_t>
     GetMaxContentionPhaseLength() const noexcept;
 
-    std::optional<uint8_t>
+    std::optional<uint16_t>
     GetSlotDuration() const noexcept;
 
     std::optional<uint16_t>

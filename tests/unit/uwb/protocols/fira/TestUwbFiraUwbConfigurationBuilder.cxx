@@ -11,8 +11,8 @@
 
 namespace uwb::protocol::fira::test
 {
-constexpr uint32_t FiraVersionMacValue{ 0x1234ABCD };
-constexpr uint32_t FiraVersionPhyValue{ 0xDCBA4321 };
+constexpr uint16_t FiraVersionMacValue{ 0xABCDU };
+constexpr uint16_t FiraVersionPhyValue{ 0xDCBAU };
 constexpr Channel ChannelValue{ uwb::protocol::fira::Channel::C10 };
 constexpr DeviceRole DeviceRoleValue{ DeviceRole::Initiator };
 constexpr RangingMethod RangingMethodValue{ RangingDirection::SingleSidedTwoWay, MeasurementReportMode::Deferred };

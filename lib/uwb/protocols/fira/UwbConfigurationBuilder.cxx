@@ -40,27 +40,27 @@ UwbConfiguration::Builder::FiraVersion() noexcept
 }
 
 UwbConfiguration::Builder&
-UwbConfiguration::Builder::SetFiraVersionPhy(uint32_t firaPhyVersion) noexcept
+UwbConfiguration::Builder::SetFiraVersionPhy(uint16_t firaPhyVersion) noexcept
 {
     m_values[ParameterTag::FiraPhyVersion] = firaPhyVersion;
     return *this;
 }
 
 UwbConfiguration::Builder&
-UwbConfiguration::Builder::Phy(uint32_t firaPhyVersion) noexcept
+UwbConfiguration::Builder::Phy(uint16_t firaPhyVersion) noexcept
 {
     return SetFiraVersionPhy(firaPhyVersion);
 }
 
 UwbConfiguration::Builder&
-UwbConfiguration::Builder::SetFiraVersionMac(uint32_t firaMacVersion) noexcept
+UwbConfiguration::Builder::SetFiraVersionMac(uint16_t firaMacVersion) noexcept
 {
     m_values[ParameterTag::FiraMacVersion] = firaMacVersion;
     return *this;
 }
 
 UwbConfiguration::Builder&
-UwbConfiguration::Builder::Mac(uint32_t firaMacVersion) noexcept
+UwbConfiguration::Builder::Mac(uint16_t firaMacVersion) noexcept
 {
     return SetFiraVersionMac(firaMacVersion);
 }
@@ -395,14 +395,14 @@ UwbConfiguration::Builder::SlotDuration(uint16_t slotDuration) noexcept
 }
 
 UwbConfiguration::Builder&
-UwbConfiguration::Builder::SetRangingInterval(uint32_t rangingInterval) noexcept
+UwbConfiguration::Builder::SetRangingInterval(uint16_t rangingInterval) noexcept
 {
     m_values[ParameterTag::RangingInterval] = rangingInterval;
     return *this;
 }
 
 UwbConfiguration::Builder&
-UwbConfiguration::Builder::RangingInterval(uint32_t rangingInterval) noexcept
+UwbConfiguration::Builder::RangingInterval(uint16_t rangingInterval) noexcept
 {
     return SetRangingInterval(rangingInterval);
 }
