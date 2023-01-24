@@ -4,7 +4,9 @@
 
 #include <algorithm>
 #include <memory>
+#include <numeric>
 
+#include <windows/devices/uwb/UwbCxAdapter.hxx>
 #include <windows/devices/uwb/UwbSession.hxx>
 
 using namespace windows::devices::uwb;
@@ -32,6 +34,23 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData &uwbSessio
     }
 
     m_sessionId = uwbSessionData.sessionId;
+
+    // Populate the PUWB_SET_APP_CONFIG_PARAMS
+    auto setParamsAdaptor = GenerateUwbSetAppConfigParameterDdi(uwbSessionData);
+    auto &setParamsBuffer = setParamsAdaptor.DdiBuffer();
+    auto &setParams = setParamsAdaptor.DdiParameters();
+
+    // Allocate memory for the PUWB_SET_APP_CONFIG_PARAMS_STATUS
+    auto statusSize = offsetof(UWB_SET_APP_CONFIG_PARAMS_STATUS, appConfigParamsStatus[setParams.appConfigParamsCount]);
+    auto statusBuffer = std::make_unique<uint8_t[]>(statusSize);
+    auto &statusHolder = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS_STATUS *>(statusBuffer.get());
+    statusHolder.size = statusSize;
+    statusHolder.appConfigParamsCount = setParams.appConfigParamsCount;
+
+    hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_SET_APP_CONFIG_PARAMS, std::data(setParamsBuffer), std::size(setParamsBuffer), statusBuffer.get(), statusSize, nullptr, nullptr);
+    if (FAILED(hr)) {
+        // TODO: handle this
+    }
 }
 
 void

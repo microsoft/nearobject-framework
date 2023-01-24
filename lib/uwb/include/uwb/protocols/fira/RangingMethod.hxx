@@ -28,6 +28,9 @@ struct RangingMethod
 
     auto
     operator<=>(const RangingMethod& other) const = default;
+
+    uint8_t
+    ToByte() const;
 };
 
 } // namespace uwb::protocol::fira
@@ -35,10 +38,10 @@ struct RangingMethod
 namespace std
 {
 template <>
-struct hash<uwb::protocol::fira::RangingMethod>
+struct hash<::uwb::protocol::fira::RangingMethod>
 {
     std::size_t
-    operator()(const uwb::protocol::fira::RangingMethod& rangingMethod) const noexcept
+    operator()(const ::uwb::protocol::fira::RangingMethod& rangingMethod) const noexcept
     {
         std::size_t value = 0;
         notstd::hash_combine(value, notstd::to_underlying(rangingMethod.Method), notstd::to_underlying(rangingMethod.ReportMode));

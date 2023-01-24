@@ -25,10 +25,10 @@ public:
     operator UwbConfiguration() noexcept;
 
     UwbConfiguration::Builder&
-    SetFiraVersionPhy(uint32_t version) noexcept;
+    SetFiraVersionPhy(uint16_t version) noexcept;
 
     UwbConfiguration::Builder&
-    SetFiraVersionMac(uint32_t version) noexcept;
+    SetFiraVersionMac(uint16_t version) noexcept;
 
     UwbConfiguration::Builder&
     SetDeviceRole(uwb::protocol::fira::DeviceRole deviceRole) noexcept;
@@ -103,7 +103,7 @@ public:
     SetMaxContentionPhaseLength(uint8_t maxContentionPhaseLength) noexcept;
 
     UwbConfiguration::Builder&
-    SetSlotDuration(uint8_t maxContentionPhaseLength) noexcept;
+    SetSlotDuration(uint16_t maxContentionPhaseLength) noexcept;
 
     UwbConfiguration::Builder&
     SetRangingInterval(uint16_t rangingInterval) noexcept;
@@ -131,10 +131,10 @@ public:
     FiraVersion() noexcept;
 
     UwbConfiguration::Builder&
-    Phy(uint32_t version) noexcept;
+    Phy(uint16_t version) noexcept;
 
     UwbConfiguration::Builder&
-    Mac(uint32_t version) noexcept;
+    Mac(uint16_t version) noexcept;
 
     UwbConfiguration::Builder&
     DeviceRole(uwb::protocol::fira::DeviceRole deviceRole) noexcept;
@@ -235,7 +235,7 @@ public:
     ContentionPhaseLength(uint8_t maxContentionPhaseLength) noexcept;
 
     UwbConfiguration::Builder&
-    SlotDuration(uint8_t maxContentionPhaseLength) noexcept;
+    SlotDuration(uint16_t maxContentionPhaseLength) noexcept;
 
     UwbConfiguration::Builder&
     RangingInterval(uint16_t rangingInterval) noexcept;
