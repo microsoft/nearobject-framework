@@ -77,6 +77,7 @@
     <TargetVersion>Windows10</TargetVersion>
     <UseDebugLibraries>true</UseDebugLibraries>
     <UMDF_VERSION_MAJOR>2</UMDF_VERSION_MAJOR>
+    <Driver_SpectreMitigation>Spectre</Driver_SpectreMitigation>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <TargetVersion>Windows10</TargetVersion>
@@ -115,6 +116,7 @@
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
+    <VcpkgEnabled>true</VcpkgEnabled>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -122,6 +124,8 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <ConformanceMode>false</ConformanceMode>
       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <DriverSign>
       <FileDigestAlgorithm>sha256</FileDigestAlgorithm>
