@@ -1,0 +1,27 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 16
+    },
+    "configurePresets": [
+        {
+            "name": "dev-build",
+            "displayName": "Development",
+            "description": "Enables development build for inner-loop",
+            "cacheVariables": {
+                "NOF_USE_VCPKG": false,
+                "NOF_OFFICIAL_BUILD": false
+            }
+        },
+        {
+            "name": "vcpkg-build",
+            "displayName": "Vcpkg Integration",
+            "description": "Enables development build for integration with vcpkg-based environments",
+            "cacheVariables": {
+                "NOF_USE_VCPKG": true,
+                "NOF_OFFICIAL_BUILD": true
+            }
+        }
+    ]
+}
