@@ -2,8 +2,8 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO microsoft/nearobject-framework
-    REF v0.2.0
-    SHA512 8e18b09c9f8b0594d299d70bfbbe29c44de5959dd4b10bbc07dccbcfbe6a1629d5db1d18200442735da4d4a399b4ffa4ee13e4bf96ecf5117b485a3f679f502e
+    REF v0.2.2
+    SHA512 34013159a09cfd52e297529cff115b4392dec536c02b2260548b25bb1abf4702a0641e61b3c83401c4002df7bb456175b7e5277cd862d6e7972fc12312c03ae4
     HEAD_REF develop
 )
 vcpkg_cmake_configure(
