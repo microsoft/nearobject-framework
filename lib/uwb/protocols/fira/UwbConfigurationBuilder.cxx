@@ -382,27 +382,27 @@ UwbConfiguration::Builder::ContentionPhaseLength(uint8_t maxContentionPhaseLengt
 }
 
 UwbConfiguration::Builder&
-UwbConfiguration::Builder::SetSlotDuration(uint8_t slotDuration) noexcept
+UwbConfiguration::Builder::SetSlotDuration(uint16_t slotDuration) noexcept
 {
     m_values[ParameterTag::SlotDuration] = slotDuration;
     return *this;
 }
 
 UwbConfiguration::Builder&
-UwbConfiguration::Builder::SlotDuration(uint8_t slotDuration) noexcept
+UwbConfiguration::Builder::SlotDuration(uint16_t slotDuration) noexcept
 {
     return SetSlotDuration(slotDuration);
 }
 
 UwbConfiguration::Builder&
-UwbConfiguration::Builder::SetRangingInterval(uint16_t rangingInterval) noexcept
+UwbConfiguration::Builder::SetRangingInterval(uint32_t rangingInterval) noexcept
 {
     m_values[ParameterTag::RangingInterval] = rangingInterval;
     return *this;
 }
 
 UwbConfiguration::Builder&
-UwbConfiguration::Builder::RangingInterval(uint16_t rangingInterval) noexcept
+UwbConfiguration::Builder::RangingInterval(uint32_t rangingInterval) noexcept
 {
     return SetRangingInterval(rangingInterval);
 }

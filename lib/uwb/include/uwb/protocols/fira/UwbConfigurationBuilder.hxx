@@ -103,10 +103,10 @@ public:
     SetMaxContentionPhaseLength(uint8_t maxContentionPhaseLength) noexcept;
 
     UwbConfiguration::Builder&
-    SetSlotDuration(uint8_t maxContentionPhaseLength) noexcept;
+    SetSlotDuration(uint16_t maxContentionPhaseLength) noexcept;
 
     UwbConfiguration::Builder&
-    SetRangingInterval(uint16_t rangingInterval) noexcept;
+    SetRangingInterval(uint32_t rangingInterval) noexcept;
 
     UwbConfiguration::Builder&
     SetKeyRotationRate(uint8_t keyRotationRate) noexcept;
@@ -235,10 +235,10 @@ public:
     ContentionPhaseLength(uint8_t maxContentionPhaseLength) noexcept;
 
     UwbConfiguration::Builder&
-    SlotDuration(uint8_t maxContentionPhaseLength) noexcept;
+    SlotDuration(uint16_t maxContentionPhaseLength) noexcept;
 
     UwbConfiguration::Builder&
-    RangingInterval(uint16_t rangingInterval) noexcept;
+    RangingInterval(uint32_t rangingInterval) noexcept;
 
     UwbConfiguration::Builder&
     KeyRotationRate(uint8_t keyRotationRate) noexcept;

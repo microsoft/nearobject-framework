@@ -33,8 +33,8 @@ constexpr uwb::UwbMacAddressFcsType UwbMacAddressFcsTypeValue{ uwb::UwbMacAddres
 const uwb::UwbMacAddress UwbMacAddressControleeShortValue{ uwb::UwbMacAddress{ std::array<uint8_t, 2>{ 0x00, 0x01 } } };
 const uwb::UwbMacAddress UwbMacAddressControllerValue{ uwb::UwbMacAddress{ std::array<uint8_t, 8>{ 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 } } };
 constexpr uint8_t SlotsPerRangingRoundValue{ 0 };
-constexpr uint8_t SlotDurationValue{ 255 };
-constexpr uint16_t RangingIntervalValue{ 0x1234 };
+constexpr uint16_t SlotDurationValue{ 255 };
+constexpr uint32_t RangingIntervalValue{ 0x1234 };
 constexpr uint8_t KeyRotationRateValue{ 100 };
 constexpr ResultReportConfiguration ResultReportConfigurationValue1{ ResultReportConfiguration::AoAAzimuthReport };
 constexpr ResultReportConfiguration ResultReportConfigurationValue2{ ResultReportConfiguration::AoAElevationReport };
