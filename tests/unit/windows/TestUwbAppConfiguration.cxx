@@ -264,7 +264,7 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
     {
         using namespace windows::devices;
 
-        constexpr std::array<uint8_t, 8> macAddressExpected { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77 };
+        constexpr std::array<uint8_t, 8> macAddressExpected{ 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77 };
         const auto parameterTag = UwbConfiguration::ParameterTag::ControllerMacAddress;
         const auto ddiType = windows::devices::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
 
