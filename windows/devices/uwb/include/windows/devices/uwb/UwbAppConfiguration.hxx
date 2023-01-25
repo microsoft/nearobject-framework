@@ -17,7 +17,7 @@
 
 #include <UwbCxLrpDeviceGlue.h>
 
-namespace windows::devices
+namespace windows::devices::uwb
 {
 /**
  * @brief Interface for UWB_APP_CONFIG_PARAM UwbCx DDI structure adaptor.
@@ -172,7 +172,7 @@ private:
     std::vector<uint8_t> m_buffer;
     UWB_SET_APP_CONFIG_PARAMS& m_parameters;
 };
-} // namespace windows::devices
+} // namespace windows::devices::uwb
 
 bool
 operator==(const UWB_APP_CONFIG_PARAM& lhs, const UWB_APP_CONFIG_PARAM& rhs) noexcept;

@@ -12,7 +12,7 @@
 
 TEST_CASE("UwbAppConfiguration performs allocation for contained value correctly", "[basic]")
 {
-    using windows::devices::UwbAppConfigurationParameter;
+    using windows::devices::uwb::UwbAppConfigurationParameter;
     using namespace uwb::protocol::fira;
 
     SECTION("DDI type is correctly reflected")
@@ -143,12 +143,12 @@ TEST_CASE("UwbAppConfiguration performs allocation for contained value correctly
 
 TEST_CASE("UwbSetAppConfigurationParameters performs allocation for contained values correctly", "[basic]")
 {
-    using windows::devices::UwbAppConfigurationParameter;
+    using windows::devices::uwb::UwbAppConfigurationParameter;
     using namespace uwb::protocol::fira;
 
     SECTION("One parameter case")
     {
-        using namespace windows::devices;
+        using namespace windows::devices::uwb;
         std::vector<std::unique_ptr<IUwbAppConfigurationParameter>> parameters;
         uint32_t expectedSessionId = 1;
 
@@ -167,7 +167,7 @@ TEST_CASE("UwbSetAppConfigurationParameters performs allocation for contained va
 
     SECTION("One enum parameter and one mac address parameter case")
     {
-        using namespace windows::devices;
+        using namespace windows::devices::uwb;
         std::vector<std::unique_ptr<IUwbAppConfigurationParameter>> parameters;
         uint32_t expectedSessionId = 1;
 
@@ -204,11 +204,11 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
 
     SECTION("enum works")
     {
-        using namespace windows::devices;
+        using namespace windows::devices::uwb;
 
         constexpr DeviceRole roleExpected{ DeviceRole::Initiator };
         const auto parameterTag = UwbConfiguration::ParameterTag::DeviceRole;
-        const auto ddiType = windows::devices::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
+        const auto ddiType = windows::devices::uwb::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
 
         // construct the sessionData and push it thru the GenerateUwbSetAppConfigParameterDdi function
         UwbSessionData sessionData;
@@ -233,11 +233,11 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
 
     SECTION("short mac address works")
     {
-        using namespace windows::devices;
+        using namespace windows::devices::uwb;
 
         constexpr std::array<uint8_t, 2> dstMacAddressExpected{ 0xAAU, 0xBBU };
         const auto parameterTag = UwbConfiguration::ParameterTag::ControleeShortMacAddress;
-        const auto ddiType = windows::devices::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
+        const auto ddiType = windows::devices::uwb::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
 
         // construct the sessionData and push it thru the GenerateUwbSetAppConfigParameterDdi function
         UwbSessionData sessionData;
@@ -262,11 +262,11 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
 
     SECTION("long mac address works")
     {
-        using namespace windows::devices;
+        using namespace windows::devices::uwb;
 
         constexpr std::array<uint8_t, 8> macAddressExpected{ 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77 };
         const auto parameterTag = UwbConfiguration::ParameterTag::ControllerMacAddress;
-        const auto ddiType = windows::devices::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
+        const auto ddiType = windows::devices::uwb::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
 
         // construct the sessionData and push it thru the GenerateUwbSetAppConfigParameterDdi function
         UwbSessionData sessionData;
@@ -291,11 +291,11 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
 
     SECTION("uint16_t works")
     {
-        using namespace windows::devices;
+        using namespace windows::devices::uwb;
 
         constexpr uint16_t slotDurationExpected = 0xFF20;
         const auto parameterTag = UwbConfiguration::ParameterTag::SlotDuration;
-        const auto ddiType = windows::devices::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
+        const auto ddiType = windows::devices::uwb::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
 
         // construct the sessionData and push it thru the GenerateUwbSetAppConfigParameterDdi function
         UwbSessionData sessionData;
@@ -320,11 +320,11 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
 
     SECTION("uint32_t works")
     {
-        using namespace windows::devices;
+        using namespace windows::devices::uwb;
 
         constexpr uint32_t uwbInitiationTimeExpected = 0x2000;
         constexpr auto parameterTag = UwbConfiguration::ParameterTag::UwbInitiationTime;
-        const auto ddiType = windows::devices::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
+        const auto ddiType = windows::devices::uwb::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
 
         // construct the sessionData and push it thru the GenerateUwbSetAppConfigParameterDdi function
         UwbSessionData sessionData;
@@ -349,11 +349,11 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
 
     SECTION("RangingMethod works")
     {
-        using namespace windows::devices;
+        using namespace windows::devices::uwb;
 
         constexpr RangingMethod RangingMethodValue{ RangingDirection::SingleSidedTwoWay, MeasurementReportMode::Deferred };
         const auto parameterTag = UwbConfiguration::ParameterTag::RangingMethod;
-        const auto ddiType = windows::devices::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
+        const auto ddiType = windows::devices::uwb::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
 
         // construct the sessionData and push it thru the GenerateUwbSetAppConfigParameterDdi function
         UwbSessionData sessionData;
@@ -378,7 +378,7 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
 
     SECTION("ResultReportConfig works")
     {
-        using namespace windows::devices;
+        using namespace windows::devices::uwb;
 
         constexpr ResultReportConfiguration ResultReportConfigurationValue1{ ResultReportConfiguration::AoAAzimuthReport };
         constexpr ResultReportConfiguration ResultReportConfigurationValue2{ ResultReportConfiguration::AoAElevationReport };
@@ -386,7 +386,7 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
         constexpr ResultReportConfiguration ResultReportConfigurationValue4{ ResultReportConfiguration::TofReport };
 
         const auto parameterTag = UwbConfiguration::ParameterTag::ResultReportConfig;
-        const auto ddiType = windows::devices::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
+        const auto ddiType = windows::devices::uwb::detail::AppConfigUwbConfigurationTagMap.at(parameterTag);
 
         // construct the sessionData and push it thru the GenerateUwbSetAppConfigParameterDdi function
         UwbSessionData sessionData;
