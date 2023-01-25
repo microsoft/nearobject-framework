@@ -13,7 +13,7 @@ operator==(const UWB_APP_CONFIG_PARAM& lhs, const UWB_APP_CONFIG_PARAM& rhs) noe
     return (lhs.size == rhs.size) && (std::memcmp(&lhs, &rhs, lhs.size) == 0);
 }
 
-using namespace windows::devices;
+using namespace windows::devices::uwb;
 
 IUwbAppConfigurationParameter::IUwbAppConfigurationParameter(UWB_APP_CONFIG_PARAM_TYPE parameterType, std::span<const uint8_t> parameterValue) :
     m_buffer(offsetof(UWB_APP_CONFIG_PARAM, paramValue[parameterValue.size()])),

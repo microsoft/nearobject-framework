@@ -5,7 +5,7 @@
 
 #include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
-using namespace windows::devices;
+using namespace windows::devices::uwb;
 
 UwbSetAppConfigurationParameters
 windows::devices::uwb::GenerateUwbSetAppConfigParameterDdi(const ::uwb::protocol::fira::UwbSessionData& uwbSessionData)
