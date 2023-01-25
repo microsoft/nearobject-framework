@@ -11,7 +11,7 @@
             "description": "Enables development build for inner-loop",
             "cacheVariables": {
                 "NOF_USE_VCPKG": false,
-                "NOF_OFFICIAL_BUILD": false
+                "NOF_WINDOWS_BUILD": false
             }
         },
         {
@@ -32,7 +32,7 @@
                 "vcpkg"
             ],
             "cacheVariables": {
-                "NOF_OFFICIAL_BUILD": false
+                "NOF_WINDOWS_BUILD": false
             }
         },
         {
@@ -44,7 +44,7 @@
                 "vcpkg"
             ],
             "cacheVariables": {
-                "NOF_OFFICIAL_BUILD": true
+                "NOF_WINDOWS_BUILD": true
             }
         }
     ]

@@ -10,13 +10,12 @@ vcpkg_check_features(
     OUT_FEATURE_OPTIONS FEATURE_OPTIONS
     FEATURES
         msvc-link-static-runtime NOF_USE_MSVC_STATIC_RUNTIME
+        windows-build NOF_WINDOWS_BUILD
 )
 vcpkg_cmake_configure(
     SOURCE_PATH ${SOURCE_PATH}
     OPTIONS
         -DNOF_DISABLE_TESTS=TRUE
-        -DNOF_USE_VCPKG=TRUE
-        -DNOF_OFFICIAL_BUILD=TRUE
         ${FEATURE_OPTIONS}
 )
 vcpkg_cmake_install()
