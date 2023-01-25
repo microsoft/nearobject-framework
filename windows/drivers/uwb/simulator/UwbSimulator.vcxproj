@@ -29,7 +29,6 @@
   <ItemGroup>
     <ClInclude Include="UwbSimulatorDriver.hxx" />
     <ClInclude Include="include\UwbSimulatorDdi.h" />
-    <ClInclude Include="UwbCore.hxx" />
     <ClInclude Include="UwbCxLrpDevice.h" />
     <ClInclude Include="UwbSimulatorDdiCallbacksLrp.hxx" />
     <ClInclude Include="UwbSimulatorDdiCallbacksLrpNoop.hxx" />

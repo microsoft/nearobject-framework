@@ -8,7 +8,9 @@
 #include <tuple>
 #include <vector>
 
-#include "UwbCore.hxx"
+#include <uwb/protocols/fira/FiraDevice.hxx>
+
+using namespace uwb::protocol::fira;
 
 namespace windows::devices::uwb::simulator
 {
