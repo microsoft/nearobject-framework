@@ -51,9 +51,10 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionDeninitialize(uint32_t /*sessionId*/)
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SetApplicationConfigurationParameters(const std::vector<UwbApplicationConfigurationParameter>& /* applicationConfigurationParameters */, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::optional<UwbApplicationConfigurationParameter>>>& applicationConfigurationParameterResults)
+UwbSimulatorDdiCallbacksLrpNoop::SetApplicationConfigurationParameters(const std::vector<std::unique_ptr<IUwbAppConfigurationParameter>>& /* applicationConfigurationParameters */, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::unique_ptr<IUwbAppConfigurationParameter>>>& applicationConfigurationParameterResults)
 {
-    applicationConfigurationParameterResults = {};
+    std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::unique_ptr<IUwbAppConfigurationParameter>>> results{};
+    applicationConfigurationParameterResults = std::move(results);
     return UwbStatusOk;
 }
 

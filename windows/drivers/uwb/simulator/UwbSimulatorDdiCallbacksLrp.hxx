@@ -8,6 +8,8 @@
 #include <tuple>
 #include <vector>
 
+#include <windows/devices/uwb/UwbAppConfiguration.hxx>
+
 #include <uwb/protocols/fira/FiraDevice.hxx>
 
 using namespace uwb::protocol::fira;
@@ -75,8 +77,8 @@ struct UwbSimulatorDdiCallbacksLrp
      * @return UwbStatus 
      */
     virtual UwbStatus
-    SetApplicationConfigurationParameters(const std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::optional<UwbApplicationConfigurationParameter>>> &applicationConfigurationParameterResults) = 0;
-
+    SetApplicationConfigurationParameters(const std::vector<std::unique_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::unique_ptr<IUwbAppConfigurationParameter>>> &applicationConfigurationParameterResults) = 0;
+  
     /**
      * @brief Get the Application Configuration Parameters object
      * 
