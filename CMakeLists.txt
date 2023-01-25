@@ -185,7 +185,7 @@ elseif (BUILD_FOR_WINDOWS)
       WIN32_LEAN_AND_MEAN
   )
 
-  if (NOF_BUILD_FOR_UMDF)
+  if (NOF_USE_MSVC_STATIC_RUNTIME)
     # Enable explicit selection of MSVC runtime library.
     if (POLICY CMP0091)
       cmake_policy(SET CMP0091 NEW)
@@ -195,6 +195,7 @@ elseif (BUILD_FOR_WINDOWS)
       # staticaly to the VC++ runtime and dynamically to the UCRT. See the
       # following page for aditional details: more details:
       # https://learn.microsoft.com/en-us/windows-hardware/drivers/develop/using-the-microsoft-c-runtime-with-user-mode-drivers-and-apps
+      MESSAGE(STATUS "Enabled static linking to VC++ runtime")
       set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     endif()
   endif()

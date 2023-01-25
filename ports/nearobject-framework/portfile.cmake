@@ -6,12 +6,18 @@ vcpkg_from_github(
     SHA512 34013159a09cfd52e297529cff115b4392dec536c02b2260548b25bb1abf4702a0641e61b3c83401c4002df7bb456175b7e5277cd862d6e7972fc12312c03ae4
     HEAD_REF develop
 )
+vcpkg_check_features(
+    OUT_FEATURE_OPTIONS FEATURE_OPTIONS
+    FEATURES
+        msvc-link-static-runtime NOF_USE_MSVC_STATIC_RUNTIME
+)
 vcpkg_cmake_configure(
     SOURCE_PATH ${SOURCE_PATH}
     OPTIONS
         -DNOF_DISABLE_TESTS=TRUE
         -DNOF_USE_VCPKG=TRUE
         -DNOF_OFFICIAL_BUILD=TRUE
+        ${FEATURE_OPTIONS}
 )
 vcpkg_cmake_install()
 vcpkg_copy_pdbs()

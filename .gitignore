@@ -1,4 +1,4 @@
 .vs
 build
-vcpkg*
+vcpkg*/
 .vscode/settings.json
