@@ -547,7 +547,7 @@ bool
 uwb::protocol::fira::operator==(const UwbCapability& lhs, const UwbCapability& rhs) noexcept
 {
     const auto haveSameContents = [&](const auto& v1, const auto& v2) -> bool {
-        return detail::leftUnorderedEquals(v1, v2);
+        return ::detail::leftUnorderedEquals(v1, v2);
     };
 
     const bool basicFieldsEqual = 
