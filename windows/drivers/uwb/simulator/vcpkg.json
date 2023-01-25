@@ -3,6 +3,11 @@
   "name": "uwbsimulator",
   "version": "1.0",
   "dependencies": [
-    "nearobject-framework-umdf"
+    {
+      "name": "nearobject-framework",
+      "features": [
+        "msvc-link-static-runtime"
+      ]
+    }
   ]
 }
