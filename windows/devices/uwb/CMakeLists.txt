@@ -39,7 +39,7 @@ set_target_properties(uwbcxadapter PROPERTIES PUBLIC_HEADER "${WINDEVUWB_PUBLIC_
 install(
     TARGETS uwbcxadapter 
     EXPORT uwb
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/windows/uwb
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/windows/devices/uwb
 )
 
 add_library(windev-uwb STATIC "")
