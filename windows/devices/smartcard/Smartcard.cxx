@@ -3,7 +3,7 @@
 
 #include <stdexcept>
 
-using namespace windows::devices;
+using namespace windows::devices::smartcards;
 
 void
 Smartcard::TransmitImpl(const smartcard::ApduCommand& command, smartcard::ApduResponse& response, std::chrono::milliseconds timeout)
