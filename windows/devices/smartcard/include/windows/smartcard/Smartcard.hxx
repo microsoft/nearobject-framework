@@ -10,9 +10,7 @@
 
 #include <smartcard/Smartcard.hxx>
 
-namespace windows
-{
-namespace devices
+namespace windows::devices::smartcards
 {
 /**
  * @brief Helper class to interact with Windows SmartCards using the Windows SmartCard DDI:
@@ -60,7 +58,6 @@ private:
     std::optional<std::promise<smartcard::ApduResponse>> m_pendingTxResponsePromise;
 };
 
-} // namespace devices
-} // namespace windows
+} // namespace windows::devices::smartcards
 
 #endif // WINDOWS_DEVICE_SMARTCARD_HXX
