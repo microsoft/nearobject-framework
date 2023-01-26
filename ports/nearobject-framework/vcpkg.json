@@ -1,12 +1,13 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "nearobject-framework",
-  "version-string": "0.0.1",
+  "version-string": "0.0.2",
   "dependencies": [
     "catch2",
     "nlohmann-json",
     "magic-enum",
     "cli11",
+    "plog",
     "wil",
     {
       "name": "vcpkg-cmake",
@@ -37,5 +38,5 @@
       "supports": "windows"
     }
   },
-  "builtin-baseline": "779ce74ef67d3e12d904da1b15f9ed5626d5f677"
+  "builtin-baseline": "ac12118f02e127ef1fe9806ffe1a23e7db7ef988"
 }
