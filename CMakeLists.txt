@@ -11,7 +11,22 @@ if (NOF_WINDOWS_BUILD AND NOT NOF_USE_VCPKG)
   set(NOF_USE_VCPKG CACHE BOOL ON "Enable vcpkg for Windows build")
 endif()
 
+# Select source package dependency manager based on selected option.
+# This must occur prior to the first project() statement.
 if (NOF_USE_VCPKG)
+  if (NOT NOF_WINDOWS_BUILD)
+    find_package(Git REQUIRED)
+    set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg)
+
+    # Initialize vcpkg sub-module if not already done.
+    if (NOT EXISTS ${VCPKG_SUBMODULE_ROOT}/.git)
+      execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive -- ${VCPKG_SUBMODULE_ROOT}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR} 
+        COMMAND_ERROR_IS_FATAL ANY)
+    endif()
+
+    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "vcpkg toolchain file")
+  endif()
   MESSAGE(STATUS "using vcpkg for source dependencies")
 else()
   MESSAGE(STATUS "using FetchContent for source dependencies")
@@ -57,6 +72,7 @@ set(VERSION_NLOHMANN_JSON 3.11.2)
 set(VERSION_MAGIC_ENUM 0.8.1)
 set(VERSION_CLI11 2.2.0)
 set(VERSION_CATCH2 3.1.0)
+set(VERSION PLOG 1.1.9)
 
 # Pull in external dependencies.
 if (NOF_USE_VCPKG)
@@ -64,6 +80,7 @@ if (NOF_USE_VCPKG)
   find_package(nlohmann_json CONFIG ${VERSION_NLOHMANN_JSON} REQUIRED)
   find_package(magic_enum CONFIG ${VERSION_MAGIC_ENUM} REQUIRED)
   find_package(CLI11 CONFIG ${VERSION_CLI11} REQUIRED)
+  find_package(plog CONFIG ${VERSION_PLOG} REQUIRED)
 else()
   set(JSON_ImplicitConversions OFF)
   FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v${VERSION_NLOHMANN_JSON}/json.tar.xz)
