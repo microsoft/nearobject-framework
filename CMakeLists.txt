@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.16)
 option(NOF_USE_MSVC_STATIC_RUNTIME, "Statically link against the VC++ runtime library" OFF)
 option(NOF_USE_VCPKG "Use vcpkg for obtaining source dependencies" OFF)
 option(NOF_WINDOWS_BUILD "Configure the project for an official Windows build" OFF)
+option(NOF_ENABLE_CODE_COVERAGE "Enable instrumenting the build with code coverage" OFF)
 
 # Ensure vcpkg is enabled for the Windows build.
 if (NOF_WINDOWS_BUILD AND NOT NOF_USE_VCPKG)
@@ -131,8 +132,20 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GN
       -Wl,-z,relro
       -z noexecstack
     )
+    if (NOF_ENABLE_CODE_COVERAGE)
+      add_compile_options(
+        -fprofile-arcs
+        -ftest-coverage
+      )
+    endif()
+  # clang specific options
   elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    # clang specific options, presently none
+    if (NOF_ENABLE_CODE_COVERAGE)
+      add_compile_options(
+        -fprofile-instr-generate
+        -fcoverage-mapping
+      )
+    endif()
   endif()
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
   # TODO
