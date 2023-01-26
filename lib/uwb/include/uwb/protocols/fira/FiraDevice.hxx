@@ -318,7 +318,7 @@ enum class UwbSessionReasonCode {
 };
 enum class UwbLineOfSightIndicator {
     LineOfSight,
-    NoneLineOfSight,
+    NonLineOfSight,
     Indeterminant,
 };
 enum class UwbRangingMeasurementType {
