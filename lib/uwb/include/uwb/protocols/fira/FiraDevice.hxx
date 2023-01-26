@@ -370,7 +370,7 @@ struct UwbSessionState
 
 struct UwbStatusMulticastList
 {
-    uint16_t ControleeMacAddress; // why is this uint16_t?
+    uint16_t ControleeMacAddress; // why is this uint16_t? TODO: replace with uwb::UwbMacAddress
     uint32_t SubSessionId;
     UwbStatusMulticast Status;
 };
