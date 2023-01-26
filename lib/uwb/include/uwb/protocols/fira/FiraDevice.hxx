@@ -16,8 +16,8 @@
 
 namespace uwb::protocol::fira
 {
-using ::uwb::UwbVersion;
 using ::uwb::UwbMacAddress;
+using ::uwb::UwbVersion;
 
 /**
  * @brief Converts the binary representation of the Fira PHY and Mac version to

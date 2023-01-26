@@ -10,7 +10,7 @@ UwbVersion::operator uint32_t() const noexcept
 
 /* static */
 std::optional<UwbVersion>
-UwbVersion::Parse(const std::string & /* str */) noexcept
+UwbVersion::Parse(const std::string& /* str */) noexcept
 {
     // TODO: implement me
     return std::nullopt;
