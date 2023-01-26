@@ -14,7 +14,7 @@ endif()
 # Select source package dependency manager based on selected option.
 # This must occur prior to the first project() statement.
 if (NOF_USE_VCPKG)
-  if (NOT NOF_WINDOWS_BUILD)
+  if (NOT NOF_WINDOWS_BUILD AND NOT NOF_USE_MSVC_STATIC_RUNTIME)
     find_package(Git REQUIRED)
     set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg)
 
