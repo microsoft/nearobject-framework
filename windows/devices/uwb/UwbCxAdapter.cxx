@@ -18,7 +18,7 @@ windows::devices::uwb::GenerateUwbSetAppConfigParameterDdi(const ::uwb::protocol
     const auto sessionUwbMap = uwbSessionData.uwbConfiguration.GetValueMap();
 
     for (const auto& [parameterTag, parameterValueVariant] : sessionUwbMap) {
-        std::visit([&](auto&& parameterValue) {
+        std::visit([&, parameterTag = parameterTag](auto&& parameterValue) {
             using ParameterValueT = std::decay_t<decltype(parameterValue)>;
             if constexpr (std::is_enum_v<ParameterValueT>) {
                 parameters.push_back(std::make_unique<UwbAppConfigurationParameter<std::underlying_type_t<ParameterValueT>>>(notstd::to_underlying(parameterValue), parameterTag));
