@@ -18,19 +18,19 @@ endif()
 # Select source package dependency manager based on selected option.
 # This must occur prior to the first project() statement.
 if (NOF_USE_VCPKG)
-  if (NOT NOF_WINDOWS_BUILD)
-    find_package(Git REQUIRED)
-    set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg)
+  # if (NOT NOF_WINDOWS_BUILD)
+  #   find_package(Git REQUIRED)
+  #   set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg)
 
-    # Initialize vcpkg sub-module if not already done.
-    if (NOT EXISTS ${VCPKG_SUBMODULE_ROOT}/.git)
-      execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive -- ${VCPKG_SUBMODULE_ROOT}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR} 
-        COMMAND_ERROR_IS_FATAL ANY)
-    endif()
+  #   # Initialize vcpkg sub-module if not already done.
+  #   if (NOT EXISTS ${VCPKG_SUBMODULE_ROOT}/.git)
+  #     execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive -- ${VCPKG_SUBMODULE_ROOT}
+  #       WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR} 
+  #       COMMAND_ERROR_IS_FATAL ANY)
+  #   endif()
 
-    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "vcpkg toolchain file")
-  endif()
+  #   set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "vcpkg toolchain file")
+  # endif()
   MESSAGE(STATUS "using vcpkg for source dependencies")
 else()
   MESSAGE(STATUS "using FetchContent for source dependencies")
