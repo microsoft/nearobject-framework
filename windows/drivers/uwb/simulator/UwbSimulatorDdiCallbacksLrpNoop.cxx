@@ -11,21 +11,21 @@ UwbSimulatorDdiCallbacksLrpNoop::DeviceReset()
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::DeviceGetInfo(UwbDeviceInfo& deviceInfo)
+UwbSimulatorDdiCallbacksLrpNoop::DeviceGetInfo(UwbDeviceInfo &deviceInfo)
 {
     deviceInfo = {};
     return UwbStatusOk;
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::DeviceGetCapabilities(UwbDeviceCapabilities& deviceCapabilities)
+UwbSimulatorDdiCallbacksLrpNoop::DeviceGetCapabilities(UwbDeviceCapabilities &deviceCapabilities)
 {
     deviceCapabilities = {};
     return UwbStatusOk;
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::DeviceGetConfigurationParameters(std::vector<UwbDeviceConfigurationParameterType>& /* deviceConfigurationParameterTypes */, std::vector<std::tuple<UwbDeviceConfigurationParameterType, UwbStatus, std::optional<UwbDeviceConfigurationParameter>>>& deviceConfigurationParameterResults)
+UwbSimulatorDdiCallbacksLrpNoop::DeviceGetConfigurationParameters(std::vector<UwbDeviceConfigurationParameterType> & /* deviceConfigurationParameterTypes */, std::vector<std::tuple<UwbDeviceConfigurationParameterType, UwbStatus, std::optional<UwbDeviceConfigurationParameter>>> &deviceConfigurationParameterResults)
 {
     deviceConfigurationParameterResults = {};
     return UwbStatusOk;
@@ -51,14 +51,15 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionDeninitialize(uint32_t /*sessionId*/)
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SetApplicationConfigurationParameters(const std::vector<UwbApplicationConfigurationParameter>& /* applicationConfigurationParameters */, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::optional<UwbApplicationConfigurationParameter>>>& applicationConfigurationParameterResults)
+UwbSimulatorDdiCallbacksLrpNoop::SetApplicationConfigurationParameters(const std::vector<std::unique_ptr<IUwbAppConfigurationParameter>> & /* applicationConfigurationParameters */, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::unique_ptr<IUwbAppConfigurationParameter>>> &applicationConfigurationParameterResults)
 {
-    applicationConfigurationParameterResults = {};
+    std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::unique_ptr<IUwbAppConfigurationParameter>>> results{};
+    applicationConfigurationParameterResults = std::move(results);
     return UwbStatusOk;
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::GetApplicationConfigurationParameters(std::vector<UwbApplicationConfigurationParameter>& applicationConfigurationParameters)
+UwbSimulatorDdiCallbacksLrpNoop::GetApplicationConfigurationParameters(std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters)
 {
     applicationConfigurationParameters = {};
     return UwbStatusOk;
@@ -71,13 +72,13 @@ UwbSimulatorDdiCallbacksLrpNoop::GetSessionCount(uint32_t * /* sessionCount */)
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SessionGetState(uint32_t /* sessionId */, UwbSessionState */* sessionState */)
+UwbSimulatorDdiCallbacksLrpNoop::SessionGetState(uint32_t /* sessionId */, UwbSessionState * /* sessionState */)
 {
     return UwbStatusOk;
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SessionUpdateControllerMulticastList(const std::vector<UwbMacAddress>& /* controlees */)
+UwbSimulatorDdiCallbacksLrpNoop::SessionUpdateControllerMulticastList(const std::vector<UwbMacAddress> & /* controlees */)
 {
     return UwbStatusOk;
 }
@@ -95,7 +96,7 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionStopRanging(uint32_t /* sessionId */)
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SessionGetRangingCount(uint32_t /* sessionId */, uint32_t */* rangingCount */)
+UwbSimulatorDdiCallbacksLrpNoop::SessionGetRangingCount(uint32_t /* sessionId */, uint32_t * /* rangingCount */)
 {
     return UwbStatusOk;
 }

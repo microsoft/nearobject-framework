@@ -13,8 +13,3 @@ target_link_libraries(nearobjectsvc
 )
 
 set_target_properties(nearobjectsvc PROPERTIES FOLDER windows/service)
-
-install(
-    TARGETS nearobjectsvc
-    EXPORT nearobject
-)

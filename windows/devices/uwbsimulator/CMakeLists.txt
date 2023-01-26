@@ -35,5 +35,5 @@ set_target_properties(windev-uwb-simulator PROPERTIES PUBLIC_HEADER "${WINDEVUWB
 install(
     TARGETS windev-uwb-simulator 
     EXPORT uwbsimulator
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/windows/uwb/simulator
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/windows/devices/uwb/simulator
 )

@@ -28,18 +28,18 @@ target_link_libraries(uwbcxadapter
         WIL::WIL
 )
 
-list(APPEND uwbcxadapter_PUBLIC_HEADERS
+list(APPEND UWBCXADAPTER_PUBLIC_HEADERS
     ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCxAdapter.hxx
     ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbAppConfiguration.hxx
 )
 
-set_target_properties(uwbcxadapter PROPERTIES FOLDER windows/devices)
-set_target_properties(uwbcxadapter PROPERTIES PUBLIC_HEADER "${WINDEVUWB_PUBLIC_HEADERS}")
+set_target_properties(uwbcxadapter PROPERTIES FOLDER windows/devices/uwb)
+set_target_properties(uwbcxadapter PROPERTIES PUBLIC_HEADER "${UWBCXADAPTER_PUBLIC_HEADERS}")
 
 install(
     TARGETS uwbcxadapter 
-    EXPORT uwb
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/windows/uwb
+    EXPORT uwbcxadapter
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/windows/devices/uwb
 )
 
 add_library(windev-uwb STATIC "")
@@ -85,5 +85,5 @@ set_target_properties(windev-uwb PROPERTIES PUBLIC_HEADER "${WINDEVUWB_PUBLIC_HE
 install(
     TARGETS windev-uwb 
     EXPORT uwb
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/windows/uwb
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/windows/devices/uwb
 )
