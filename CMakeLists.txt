@@ -57,6 +57,7 @@ set(VERSION_NLOHMANN_JSON 3.11.2)
 set(VERSION_MAGIC_ENUM 0.8.1)
 set(VERSION_CLI11 2.2.0)
 set(VERSION_CATCH2 3.1.0)
+set(VERSION_PLOG 1.1.9)
 
 # Pull in external dependencies.
 if (NOF_USE_VCPKG)
