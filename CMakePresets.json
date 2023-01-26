@@ -6,21 +6,45 @@
     },
     "configurePresets": [
         {
-            "name": "dev-build",
+            "name": "dev",
             "displayName": "Development",
             "description": "Enables development build for inner-loop",
             "cacheVariables": {
                 "NOF_USE_VCPKG": false,
-                "NOF_OFFICIAL_BUILD": false
+                "NOF_WINDOWS_BUILD": false
             }
         },
         {
-            "name": "vcpkg-build",
-            "displayName": "Vcpkg Integration",
-            "description": "Enables development build for integration with vcpkg-based environments",
+            "name": "vcpkg",
+            "displayName": "Vcpkg Base",
+            "description": "Defines the core settings for all vcpkg-based builds",
+            "hidden": true,
             "cacheVariables": {
                 "NOF_USE_VCPKG": true,
-                "NOF_OFFICIAL_BUILD": true
+                "VCPKG_MANIFEST_DIR": "${sourceDir}/ports/nearobject-framework"
+            }
+        },
+        {
+            "name": "vcpkg-dev",
+            "displayName": "Vcpkg Integration",
+            "description": "Enables development build for integration with vcpkg-based environments",
+            "inherits":[
+                "vcpkg"
+            ],
+            "cacheVariables": {
+                "NOF_WINDOWS_BUILD": false
+            }
+        },
+        {
+            "name": "windows-build",
+            "displayName": "Official Windows Build",
+            "description": "Enables official build for Windows",
+            "hidden": true,
+            "inherits":[
+                "vcpkg"
+            ],
+            "cacheVariables": {
+                "NOF_WINDOWS_BUILD": true
             }
         }
     ]
