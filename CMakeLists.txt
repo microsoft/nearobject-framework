@@ -11,6 +11,8 @@ if (NOF_WINDOWS_BUILD AND NOT NOF_USE_VCPKG)
   set(NOF_USE_VCPKG CACHE BOOL ON "Enable vcpkg for Windows build")
 endif()
 
+MESSAGE(STATUS "VCPKG_CHAINLOAD_TOOLCHAIN_FILE=${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}")
+
 # Select source package dependency manager based on selected option.
 # This must occur prior to the first project() statement.
 if (NOF_USE_VCPKG)
