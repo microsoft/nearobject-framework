@@ -1,13 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 
-# Option to enable statically linking against the VC++ runtime library.
+# Project configuration options.
 option(NOF_USE_MSVC_STATIC_RUNTIME, "Statically link against the VC++ runtime library" OFF)
-
-# Configuration option for using vcpkg to satisfy source package dependencies.
-# This must be set to ON for official Windows builds.
 option(NOF_USE_VCPKG "Use vcpkg for obtaining source dependencies" OFF)
-
-# Option to specify the project is being built as part of Windows.
 option(NOF_WINDOWS_BUILD "Configure the project for an official Windows build" OFF)
 
 # Ensure vcpkg is enabled for the Windows build.
@@ -15,22 +10,7 @@ if (NOF_WINDOWS_BUILD AND NOT NOF_USE_VCPKG)
   set(NOF_USE_VCPKG CACHE BOOL ON "Enable vcpkg for Windows build")
 endif()
 
-# Select source package dependency manager based on selected option.
-# This must occur prior to the first project() statement.
 if (NOF_USE_VCPKG)
-  # if (NOT NOF_WINDOWS_BUILD)
-  #   find_package(Git REQUIRED)
-  #   set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg)
-
-  #   # Initialize vcpkg sub-module if not already done.
-  #   if (NOT EXISTS ${VCPKG_SUBMODULE_ROOT}/.git)
-  #     execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive -- ${VCPKG_SUBMODULE_ROOT}
-  #       WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR} 
-  #       COMMAND_ERROR_IS_FATAL ANY)
-  #   endif()
-
-  #   set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "vcpkg toolchain file")
-  # endif()
   MESSAGE(STATUS "using vcpkg for source dependencies")
 else()
   MESSAGE(STATUS "using FetchContent for source dependencies")

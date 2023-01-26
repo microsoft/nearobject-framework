@@ -15,6 +15,8 @@ vcpkg_check_features(
 vcpkg_cmake_configure(
     SOURCE_PATH ${SOURCE_PATH}
     OPTIONS
+        -DVCPKG_MANIFEST_DIR=${SOURCE_PATH}/ports/nearobject-framework
+        -DNOF_USE_VCPKG=TRUE
         -DNOF_DISABLE_TESTS=TRUE
         ${FEATURE_OPTIONS}
 )
