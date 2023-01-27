@@ -1,16 +1,44 @@
 
+#include "UwbCxLrpDeviceGlue.h"
+
 #include "UwbSimulatorDdiHandlerLrp.hxx"
+#include "UwbSimulatorDdiCallbacksLrpNoop.hxx"
 
 using namespace windows::devices::uwb::simulator;
 
-bool
-UwbSimulatorDdiHandlerLrp::HandlesIoControlCode(ULONG /* ioControlCode */) const noexcept
+UwbSimulatorDdiHandlerLrp::UwbSimulatorDdiHandlerLrp() :
+    m_callbacks(std::make_unique<UwbSimulatorDdiCallbacksLrpNoop>())
 {
-    return false; 
+}
+
+bool
+UwbSimulatorDdiHandlerLrp::HandlesIoControlCode(ULONG ioControlCode) const noexcept
+{
+    switch (ioControlCode) {
+    case IOCTL_UWB_DEVICE_RESET:
+    case IOCTL_UWB_GET_APP_CONFIG_PARAMS:
+    case IOCTL_UWB_GET_DEVICE_CAPABILITIES:
+    case IOCTL_UWB_GET_DEVICE_CONFIG_PARAMS:
+    case IOCTL_UWB_GET_DEVICE_INFO:
+    case IOCTL_UWB_GET_RANGING_COUNT:
+    case IOCTL_UWB_GET_SESSION_COUNT:
+    case IOCTL_UWB_GET_SESSION_STATE:
+    case IOCTL_UWB_NOTIFICATION:
+    case IOCTL_UWB_SESSION_DEINIT:
+    case IOCTL_UWB_SESSION_INIT:
+    case IOCTL_UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST:
+    case IOCTL_UWB_SET_APP_CONFIG_PARAMS:
+    case IOCTL_UWB_SET_DEVICE_CONFIG_PARAMS:
+    case IOCTL_UWB_START_RANGING_SESSION:
+    case IOCTL_UWB_STOP_RANGING_SESSION:
+        return true;
+    }
+
+    return false;
 }
 
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::HandleRequest(WDFREQUEST /* request */, std::size_t /* outputBufferLength */, std::size_t /* inputBufferLength */, ULONG /* ioControlCode */)
+UwbSimulatorDdiHandlerLrp::HandleRequest(WDFREQUEST /* request */, std::span<uint8_t> /* outputBuffer */, std::span<uint8_t> /* inputBuffer */, ULONG /* ioControlCode */)
 {
-    return STATUS_NOT_IMPLEMENTED; 
+    return STATUS_NOT_IMPLEMENTED;
 }

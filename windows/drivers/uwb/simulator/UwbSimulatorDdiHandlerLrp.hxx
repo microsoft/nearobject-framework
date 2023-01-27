@@ -7,12 +7,16 @@
 #include <wdf.h>
 
 #include "UwbSimulatorDdiHandler.hxx"
+#include "UwbSimulatorDdiCallbacksLrp.hxx"
 
 namespace windows::devices::uwb::simulator
 {
 class UwbSimulatorDdiHandlerLrp :
     public UwbSimulatorDdiHandler
 {
+public:
+    UwbSimulatorDdiHandlerLrp();
+
     /**
      * @brief Indicates whether the specified i/o control code is handled by
      * this handler. 
@@ -34,7 +38,10 @@ class UwbSimulatorDdiHandlerLrp :
      * @return NTSTATUS 
      */
     NTSTATUS
-    HandleRequest(WDFREQUEST request, std::size_t outputBufferLength, std::size_t inputBufferLength, ULONG ioControlCode) override;
+    HandleRequest(WDFREQUEST request, std::span<uint8_t> outputBuffer, std::span<uint8_t> inputBuffer, ULONG ioControlCode) override;
+
+private:
+    std::unique_ptr<windows::devices::uwb::simulator::UwbSimulatorDdiCallbacksLrp> m_callbacks;
 };
 } // namespace windows::devices::uwb::simulator
 
