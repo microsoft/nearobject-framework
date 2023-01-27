@@ -165,6 +165,9 @@ UwbSimulatorDevice::OnFileCreate(WDFDEVICE device, WDFREQUEST request, WDFFILEOB
         TraceLoggingPointer(request, "Request"),
         TraceLoggingPointer(file, "File"));
 
+    auto uwbSimulatorFileBuffer = GetUwbSimulatorFile(file);
+    auto uwbSimulatorFile [[maybe_unused]] = new (uwbSimulatorFileBuffer) UwbSimulatorDeviceFile(file);
+
     WdfRequestComplete(request, STATUS_SUCCESS);
 }
 
