@@ -1,8 +1,8 @@
 
 #include "UwbCxLrpDeviceGlue.h"
 
-#include "UwbSimulatorDdiHandlerLrp.hxx"
 #include "UwbSimulatorDdiCallbacksLrpNoop.hxx"
+#include "UwbSimulatorDdiHandlerLrp.hxx"
 
 using namespace windows::devices::uwb::simulator;
 
@@ -12,7 +12,7 @@ UwbSimulatorDdiHandlerLrp::UwbSimulatorDdiHandlerLrp() :
 }
 
 bool
-UwbSimulatorDdiHandlerLrp::HandlesIoControlCode(ULONG ioControlCode) const noexcept
+UwbSimulatorDdiHandlerLrp::HandlesIoControlCode(ULONG ioControlCode)
 {
     switch (ioControlCode) {
     case IOCTL_UWB_DEVICE_RESET:
@@ -38,7 +38,13 @@ UwbSimulatorDdiHandlerLrp::HandlesIoControlCode(ULONG ioControlCode) const noexc
 }
 
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::HandleRequest(WDFREQUEST /* request */, std::span<uint8_t> /* outputBuffer */, std::span<uint8_t> /* inputBuffer */, ULONG /* ioControlCode */)
+UwbSimulatorDdiHandlerLrp::ValidateRequest(WDFREQUEST /*request*/, ULONG /*ioControlCode*/, std::size_t /*inputBufferLength*/, std::size_t /*outputBufferLength*/)
+{
+    return STATUS_NOT_SUPPORTED;
+}
+
+NTSTATUS
+UwbSimulatorDdiHandlerLrp::HandleRequest(WDFREQUEST /* request */, ULONG /* ioControlCode */, std::span<uint8_t> /* inputBuffer */, std::span<uint8_t> /* outputBuffer */)
 {
     return STATUS_NOT_IMPLEMENTED;
 }
