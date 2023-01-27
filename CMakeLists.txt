@@ -91,6 +91,9 @@ else()
 
   FetchContent_Declare(cli11 URL https://github.com/CLIUtils/CLI11/archive/refs/tags/v${VERSION_CLI11}.tar.gz)
   FetchContent_MakeAvailable(cli11)
+
+  FetchContent_Declare(plog URL https://github.com/SergiusTheBest/plog/archive/refs/tags/${VERSION_PLOG}.tar.gz)
+  FetchContent_MakeAvailable(plog)
 endif() 
 
 find_package(Threads REQUIRED)
