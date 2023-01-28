@@ -45,7 +45,7 @@ struct UwbSimulatorDdiHandler
     ValidateRequest(WDFREQUEST request, ULONG ioControlCode, std::size_t inputBufferLength, std::size_t outputBufferLength) = 0;
 
     /**
-     * @brief
+     * @brief Handles the request.
      *
      * @param request
      * @param ioControlCode
