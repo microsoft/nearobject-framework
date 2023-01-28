@@ -169,7 +169,7 @@ UwbSimulatorDevice::OnFileCreate(WDFDEVICE device, WDFREQUEST request, WDFFILEOB
     auto uwbSimulatorFile [[maybe_unused]] = new (uwbSimulatorFileBuffer) UwbSimulatorDeviceFile(file);
 
     // TODO: Here, uwbSimulatorFile should be associated with the DDI it is responsible for handling.
-    // It could make sense for it to use the pimp idiom since the storage for the class is pre-allocated
+    // It could make sense for it to use the pimpl idiom since the storage for the class is pre-allocated
     // by the driver framework, polymorphism can't be used.
 
     WdfRequestComplete(request, STATUS_SUCCESS);
