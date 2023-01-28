@@ -21,7 +21,7 @@ struct UwbSimulatorDispatchEntry
     std::size_t InputSizeMaximum{ std::numeric_limits<std::size_t>::max() };
     std::size_t OutputSizeMinimum{ 0 };
     std::size_t OutputSizeMaximum{ std::numeric_limits<std::size_t>::max() };
-    
+
     std::function<NTSTATUS(WDFREQUEST, ULONG, std::span<uint8_t>, std::span<uint8_t>)> Handler;
 
     NTSTATUS
