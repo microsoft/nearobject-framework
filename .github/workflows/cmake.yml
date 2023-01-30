@@ -2,6 +2,7 @@ name: Build [CMake]
 
 on:
   workflow_dispatch:
+  workflow_call:
     inputs:
       build-type:
         required: false
