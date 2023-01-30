@@ -6,5 +6,6 @@ on:
 
 jobs:
   coverage:
+    name: code coverage
     steps:
     - uses: codecov/codecov-action@v3.1.1
