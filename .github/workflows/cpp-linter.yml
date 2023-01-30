@@ -1,25 +1,26 @@
 name: cpp-linter
 
 on:
-  workflow_dispatch:
-  pull_request:
-    branches: [ "develop" ]
+  workflow_call:
 
 jobs:
   cpp-linter:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
-      - uses: cpp-linter/cpp-linter-action@v2.3.0
-        id: linter
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          style: file
-          lines-changed-only: true
-          ignore: '.github|lib/shared/notstd|windows/shared/notstd'
-          tidy-checks: ''
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Lint changes
+      uses: cpp-linter/cpp-linter-action@v2.3.0
+      id: linter
+      with:
+        style: file
+        lines-changed-only: true
+        ignore: '.github|lib/shared/notstd|windows/shared/notstd'
+        tidy-checks: ''
 
-      - name: Compliance check
-        if: steps.linter.outputs.checks-failed > 0
-        run: exit 1
+    - name: Compliance check
+      if: steps.linter.outputs.checks-failed > 0
+      run: |
+        echo ${{ steps.linter.outputs.checks-failed }} violations found
+        exit 1

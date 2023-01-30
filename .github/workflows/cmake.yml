@@ -10,6 +10,14 @@ on:
         default: "[ 'Debug' ]"
         type: string
         description: 'The CMake build type (CMAKE_BUILD_TYPE) to run.'
+      analyze-codeql:
+        required: false
+        default: true
+        type: boolean
+      lint:
+        required: false
+        default: true
+        type: boolean
 
 jobs:
   build:
@@ -19,17 +27,32 @@ jobs:
       matrix:
         os: [ ubuntu-22.04, windows-2022 ]
         build-type: ${{ fromJson(inputs.build-types) }}
+        language: [ 'cpp' ]
     runs-on: ${{ matrix.os }} 
     
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-    - name: Configure CMake
+    - name: Initialize CodeQL
+      if: inputs.analyze-codeql == true
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+
+    - name: CMake Configure
       run: cmake -B ${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
 
-    - name: Build
+    - name: CMake Build
       run: cmake --build ${{ github.workspace }}/build --config ${{ matrix.build-type }}
 
-    - name: Test
+    - name: Lint Changes
+      if: inputs.lint == true
+      uses: ./.github/workflows/cpp-linter.yml
+
+    - name: CMake Test (ctest)
       working-directory: ${{ github.workspace }}/build
       run: ctest -C ${{ matrix.build-types }}
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
