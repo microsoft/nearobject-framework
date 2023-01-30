@@ -3,17 +3,17 @@ name: "CodeQL"
 on:
   workflow_dispatch:
   push:
-    branches: [ "develop", main ]
+    branches: [ develop, main ]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ "develop" ]
+    branches: [ develop ]
   schedule:
     - cron: '23 15 * * 5'
 
 jobs:
   analyze:
     name: Analyze
-    runs-on: ubuntu-22.04
+    runs-on: windows-2022
     permissions:
       actions: read
       contents: read
@@ -39,4 +39,4 @@ jobs:
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
       with:
-        category: "/language:${{matrix.language}}"
+        category: "/language:${{ matrix.language }}"

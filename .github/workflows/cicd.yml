@@ -9,13 +9,13 @@ name: CI/CD
 on:
   workflow_dispatch:
   push:
-    branches: [ "develop", "main" ]
+    branches: [ develop, main ]
   pull_request:
-    branches: [ "develop", "main" ]
+    branches: [ develop, main ]
 
 jobs:
   build-validation:
     name: build validation
     uses: ./.github/workflows/cmake.yml
     with:
-      build-type: "['Debug']"
+      build-types: "[ 'Debug' ]"
