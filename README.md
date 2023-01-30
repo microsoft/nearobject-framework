@@ -1,6 +1,6 @@
 # Near Object (NO) Framework 
 
-[![Build Release [CMake]](https://github.com/microsoft/nearobject-framework/actions/workflows/cmake.yml/badge.svg)](https://github.com/microsoft/nearobject-framework/actions/workflows/cmake.yml)
+[![CI/CD](https://github.com/microsoft/nearobject-framework/actions/workflows/cicd.yml/badge.svg)](https://github.com/microsoft/nearobject-framework/actions/workflows/cicd.yml)
 [![CodeQL](https://github.com/microsoft/nearobject-framework/actions/workflows/codeql.yml/badge.svg)](https://github.com/microsoft/nearobject-framework/actions/workflows/codeql.yml)
 [![cpp-linter](https://github.com/microsoft/nearobject-framework/actions/workflows/cpp-linter.yml/badge.svg)](https://github.com/microsoft/nearobject-framework/actions/workflows/cpp-linter.yml)
 
