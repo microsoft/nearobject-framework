@@ -12,7 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UwbSimulatorDdiHandlerLrp.cxx" />
-    <ClCompile Include="UwbSimulatorDispatchEntry.cxx" />
     <ClCompile Include="UwbSimulatorDriver.cxx" />
     <ClCompile Include="UwbSimulatorDdiCallbacksLrpNoop.cxx" />
     <ClCompile Include="UwbSimulatorIoQueue.cxx" />
