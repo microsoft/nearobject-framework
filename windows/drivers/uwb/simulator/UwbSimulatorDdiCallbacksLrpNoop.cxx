@@ -11,7 +11,7 @@ UwbSimulatorDdiCallbacksLrpNoop::DeviceReset()
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::DeviceGetInfo(UwbDeviceInfo &deviceInfo)
+UwbSimulatorDdiCallbacksLrpNoop::DeviceGetInformation(UwbDeviceInfo &deviceInfo)
 {
     deviceInfo = {};
     return UwbStatusOk;
@@ -99,4 +99,10 @@ UwbStatus
 UwbSimulatorDdiCallbacksLrpNoop::SessionGetRangingCount(uint32_t /* sessionId */, uint32_t * /* rangingCount */)
 {
     return UwbStatusOk;
+}
+
+void
+UwbSimulatorDdiCallbacksLrpNoop::UwbNotification(UwbNotificationData notificationData)
+{
+
 }
