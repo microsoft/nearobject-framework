@@ -10,6 +10,7 @@
 #include <windows.h>
 
 #include "UwbSimulatorDdi.h"
+#include "UwbSimulatorDeviceFile.hxx"
 #include "UwbSimulatorIoQueue.hxx"
 #include "UwbSimulatorTracelogging.hxx"
 
@@ -70,20 +71,20 @@ UwbSimulatorIoQueue::OnIoDeviceControl(WDFREQUEST request, size_t outputBufferLe
 
     NTSTATUS status = STATUS_INVALID_DEVICE_STATE;
 
-    switch (ioControlCode) {
-    case IOCTL_UWB_DEVICE_SIM_GET_CAPABILITIES:
-    {
-        // TODO: handle this   
+    // Get the file object this request came in on, and dispatch the request to it.
+    UwbSimulatorDeviceFile *uwbSimulatorDeviceFile = GetUwbSimulatorFile(WdfRequestGetFileObject(request));
+    if (uwbSimulatorDeviceFile != nullptr) {
+        status = uwbSimulatorDeviceFile->OnRequest(request, ioControlCode, inputBufferLength, outputBufferLength);
     }
-    default:
-    {
-        status = STATUS_NOT_SUPPORTED;
-    }
-    } // switch (ioControlCode)
 
-    if (status != STATUS_PENDING) {
-        WdfRequestComplete(request, status);
-    }
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "Queue Request Complete",
+        TraceLoggingLevel(TRACE_LEVEL_VERBOSE),
+        TraceLoggingPointer(m_wdfQueue, "Queue"),
+        TraceLoggingPointer(request, "Request"),
+        TraceLoggingHexInt32(ioControlCode, "IoControlCode"),
+        TraceLoggingNTStatus(status));
 }
 
 void
