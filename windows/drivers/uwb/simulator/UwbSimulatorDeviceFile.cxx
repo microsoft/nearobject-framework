@@ -68,6 +68,7 @@ UwbSimulatorDeviceFile::OnRequest(WDFREQUEST request, ULONG ioControlCode, size_
     if (inputBufferLength != 0) {
         status = WdfRequestRetrieveInputBuffer(request, 0, &inputBufferPtr, nullptr);
         if (status != STATUS_SUCCESS) {
+            WdfRequestComplete(request, status);
             return status;
         }
     }
@@ -75,6 +76,7 @@ UwbSimulatorDeviceFile::OnRequest(WDFREQUEST request, ULONG ioControlCode, size_
     if (outputBufferLength != 0) {
         status = WdfRequestRetrieveOutputBuffer(request, 0, &outputBufferPtr, nullptr);
         if (status != STATUS_SUCCESS) {
+            WdfRequestComplete(request, status);
             return status;
         }
     }
