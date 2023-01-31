@@ -8,6 +8,7 @@ target_sources(nearobjectd
 
 target_link_libraries(nearobjectd
     PRIVATE
+        logging
         nearobject-service-linux
         plog::plog
 )

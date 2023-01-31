@@ -15,6 +15,8 @@
 #include <plog/Initializers/RollingFileInitializer.h>
 #include <plog/Log.h>
 
+#include <logging/LogUtils.hxx>
+
 /**
  * @brief Get the user's home path.
  * 
@@ -41,7 +43,7 @@ using namespace nearobject::service;
 int
 main(int argc, char *argv[])
 {
-    plog::init(plog::verbose, "nearobjectd_log.txt");
+    plog::init(plog::verbose, logging::GetLogName("nearobjectd").c_str());
 
     auto configuration = nearobject::service::NearObjectServiceConfiguration::FromCommandLineArguments(argc, argv);
 

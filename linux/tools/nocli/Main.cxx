@@ -10,10 +10,12 @@
 #include "NearObjectCliDataLinux.hxx"
 #include <nearobject/cli/NearObjectCli.hxx>
 
+#include <logging/LogUtils.hxx>
+
 int
 main(int argc, char* argv[])
 {
-    plog::init(plog::verbose, "nocli_log.txt");
+    plog::init(plog::verbose, logging::GetLogName("nocli").c_str());
 
     auto cliData = std::make_shared<nearobject::cli::NearObjectCliDataLinux>();
     auto cliHandler = std::make_shared<nearobject::cli::NearObjectCliHandler>();
