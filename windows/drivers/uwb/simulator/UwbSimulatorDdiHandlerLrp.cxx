@@ -43,6 +43,22 @@ From(const UwbStatus & /*uwbStatus*/)
     // TODO: implement this
     return UWB_STATUS_OK;
 }
+
+UWB_SESSION_STATE
+From(const UwbSessionState uwbSessionState)
+{
+    switch (uwbSessionState) {
+    case UwbSessionState::Initialized:
+        return UWB_SESSION_STATE_INIT;
+    case UwbSessionState::Deinitialized:
+        return UWB_SESSION_STATE_DEINIT;
+    case UwbSessionState::Active:
+        return UWB_SESSION_STATE_ACTIVE;
+    case UwbSessionState::Idle:
+        return UWB_SESSION_STATE_IDLE;
+    }
+}
+
 } // namespace UwbCxDdi
 
 NTSTATUS
@@ -118,8 +134,26 @@ UwbSimulatorDdiHandlerLrp::OnUwbSessionDeinitialize(WDFREQUEST /*request*/, std:
 }
 
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbGetSessionState(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandlerLrp::OnUwbGetSessionState(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer)
 {
+    NTSTATUS status = STATUS_SUCCESS;
+
+    // Convert DDI input type to neutral type.
+    auto &sessionStateIn = *reinterpret_cast<UWB_GET_SESSION_STATE *>(std::data(inputBuffer));
+    UwbSessionState sessionStateResult{};
+    auto statusUwb = m_callbacks->SessionGetState(sessionStateIn.sessionId, &sessionStateResult);
+
+    // Convert neutral types to DDI types.
+    auto &outputValue = *reinterpret_cast<UWB_SESSION_STATE_STATUS *>(std::data(outputBuffer));
+    outputValue.status = UwbCxDdi::From(statusUwb);
+
+
+    // Complete the request.
+    WdfRequestCompleteWithInformation(request, status, sizeof outputValue);
+
+    return status;
+
+
     return STATUS_NOT_IMPLEMENTED;
 }
 
