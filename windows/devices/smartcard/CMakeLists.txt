@@ -19,6 +19,7 @@ target_include_directories(windevsmartcard
 target_link_libraries(windevsmartcard
     PRIVATE
         smartcard
+        plog::plog
 )
 
 list(APPEND SMARTCARD_PUBLIC_HEADERS

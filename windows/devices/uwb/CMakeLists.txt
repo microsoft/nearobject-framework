@@ -22,6 +22,7 @@ target_link_libraries(uwbcxadapter
         windevutil
     PUBLIC
         cfgmgr32.lib
+        plog::plog
         uwb
         uwb-proto-fira
         uwbcx-driver
