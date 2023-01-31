@@ -14,12 +14,14 @@
 #include <plog/Initializers/RollingFileInitializer.h>
 #include <plog/Log.h>
 
+#include <logging/LogUtils.hxx>
+
 using namespace windows::devices;
 
 int
 main(int argc, char* argv[])
 {
-    plog::init(plog::verbose, "uwbsim_log.txt");
+    plog::init(plog::verbose, logging::GetLogName("uwbsim").c_str());
 
     CLI::App app{};
     app.name("uwbsim");
