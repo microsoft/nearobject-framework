@@ -19,7 +19,7 @@
 int
 main(int argc, char* argv[])
 {
-    plog::init(plog::verbose, logging::GetLogName("devicemon"));
+    plog::init(plog::verbose, logging::GetLogName("devicemon").c_str());
 
     CLI::App app{};
     app.name("devicemon");
