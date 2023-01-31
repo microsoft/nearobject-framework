@@ -5,6 +5,8 @@
 
 #include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
+#include <plog/Log.h>
+
 using namespace windows::devices::uwb;
 
 UwbSetAppConfigurationParameters
@@ -49,11 +51,13 @@ windows::devices::uwb::GenerateUwbSetAppConfigParameterDdi(const ::uwb::protocol
                     break;
                 }
                 default: {
+                    PLOG_DEBUG << "ignoring unknown mac address size";
                     break;
                 }
                 } // switch (value.size())
             } else {
                 // TODO: should not ever get here, log?
+                PLOG_ERROR << "encountered unknown variant type!";
             }
         },
             parameterValueVariant);

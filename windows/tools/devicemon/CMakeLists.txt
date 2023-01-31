@@ -12,6 +12,7 @@ target_link_libraries(devicemon
         magic_enum::magic_enum
         notstd-windows
         windevutil
+        plog::plog
 )
 
 set_target_properties(devicemon PROPERTIES FOLDER windows/tools)

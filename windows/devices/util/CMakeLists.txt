@@ -20,6 +20,8 @@ target_include_directories(windevutil
 )
 
 target_link_libraries(windevutil
+    PRIVATE
+        plog::plog
     PUBLIC
         cfgmgr32.lib
         notstd-windows

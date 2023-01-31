@@ -16,6 +16,7 @@ target_link_libraries(nocli-win
         magic_enum::magic_enum
         nocli-core
         notstd-windows
+        plog::plog
         windevutil
         windev-uwb
 )
