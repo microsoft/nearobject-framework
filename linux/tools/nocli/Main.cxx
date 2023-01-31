@@ -13,7 +13,7 @@
 int
 main(int argc, char* argv[])
 {
-    plog::init(plog::verbose, "noclilog.txt");
+    plog::init(plog::verbose, "nocli_log.txt");
 
     auto cliData = std::make_shared<nearobject::cli::NearObjectCliDataLinux>();
     auto cliHandler = std::make_shared<nearobject::cli::NearObjectCliHandler>();
