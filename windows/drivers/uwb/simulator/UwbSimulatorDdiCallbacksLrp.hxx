@@ -126,7 +126,7 @@ struct UwbSimulatorDdiCallbacksLrp
      * @return UwbStatus
      */
     virtual UwbStatus
-    SessionGetState(uint32_t sessionId, UwbSessionState *sessionState) = 0;
+    SessionGetState(uint32_t sessionId, UwbSessionState &sessionState) = 0;
 
     /**
      * @brief

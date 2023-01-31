@@ -72,7 +72,7 @@ UwbSimulatorDdiCallbacksLrpNoop::GetSessionCount(uint32_t * /* sessionCount */)
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SessionGetState(uint32_t /* sessionId */, UwbSessionState * /* sessionState */)
+UwbSimulatorDdiCallbacksLrpNoop::SessionGetState(uint32_t /* sessionId */, UwbSessionState & /* sessionState */)
 {
     return UwbStatusOk;
 }
