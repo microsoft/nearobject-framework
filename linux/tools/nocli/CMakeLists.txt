@@ -11,6 +11,7 @@ target_link_libraries(nocli-linux
     PRIVATE
         CLI11::CLI11
         nocli-core
+        plog::plog
 )
 
 set_target_properties(nocli-linux PROPERTIES OUTPUT_NAME nocli)

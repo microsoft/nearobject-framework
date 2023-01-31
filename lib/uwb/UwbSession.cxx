@@ -2,6 +2,8 @@
 #include <cstdint>
 #include <stdexcept>
 
+#include <plog/Log.h>
+
 #include <uwb/UwbSession.hxx>
 #include <uwb/UwbSessionEventCallbacks.hxx>
 
@@ -29,23 +31,26 @@ void
 UwbSession::AddPeer(UwbMacAddress peerMacAddress)
 {
     std::scoped_lock peersLock{ m_peerGate };
+    PLOG_VERBOSE << "adding peer with address " << peerMacAddress.ToString();
     auto [_, inserted] = m_peers.insert(peerMacAddress);
 
     if (inserted) {
         AddPeerImpl(std::move(peerMacAddress));
     }
+    PLOG_VERBOSE << "peer added";
 }
 
 void
 UwbSession::Configure(const uwb::protocol::fira::UwbSessionData& uwbSessionData)
 {
-    // TODO: log
+    PLOG_VERBOSE << "configure";
     ConfigureImpl(uwbSessionData);
 }
 
 void
 UwbSession::StartRanging()
 {
+    PLOG_VERBOSE << "start ranging";
     bool rangingActiveExpected = false;
     const bool wasRangingActive = m_rangingActive.compare_exchange_weak(rangingActiveExpected, true);
     if (wasRangingActive) {
@@ -58,6 +63,7 @@ UwbSession::StartRanging()
 void
 UwbSession::StopRanging()
 {
+    PLOG_VERBOSE << "stop ranging";
     bool rangingActiveExpected = true;
     const bool wasRangingActive = m_rangingActive.compare_exchange_weak(rangingActiveExpected, false);
     if (!wasRangingActive) {
