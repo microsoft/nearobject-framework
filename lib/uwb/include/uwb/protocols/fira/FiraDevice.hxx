@@ -345,7 +345,7 @@ struct UwbDeviceInfoVendor
     virtual ~UwbDeviceInfoVendor() = default;
 };
 
-struct UwbDeviceInfo
+struct UwbDeviceInfoInformation
 {
     UwbVersion VersionUwb;
     UwbVersion VersionUci;
