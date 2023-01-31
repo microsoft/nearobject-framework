@@ -29,6 +29,7 @@ target_link_libraries(uwb
     PRIVATE
         magic_enum::magic_enum
         tlv
+        plog::plog
     PUBLIC
         notstd
         uwb-proto-fira
