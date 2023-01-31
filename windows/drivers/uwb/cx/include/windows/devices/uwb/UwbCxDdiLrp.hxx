@@ -3,9 +3,9 @@
 #define UWBCX_DDI_LRP_HXX
 
 // NB: This must come before any other Windows include
+#include <stdint.h>
 #include <windows.h>
 #include <winioctl.h>
-#include <stdint.h>
 
 #include <windows/devices/uwb/UwbCxLrpDevice.h>
 

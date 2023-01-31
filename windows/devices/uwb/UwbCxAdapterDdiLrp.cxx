@@ -11,7 +11,7 @@
 using namespace ::uwb::protocol::fira;
 
 UWB_STATUS
-windows::devices::uwb::ddi::lrp::From(const UwbStatus &uwbStatus)
+windows::devices::uwb::ddi::lrp::From(const UwbStatus& uwbStatus)
 {
     static const std::unordered_map<UwbStatusGeneric, UWB_STATUS> StatusMapGeneric{
         { UwbStatusGeneric::Ok, UWB_STATUS_OK },
@@ -34,12 +34,12 @@ windows::devices::uwb::ddi::lrp::From(const UwbStatus &uwbStatus)
         { UwbStatusSession::NotConfigured, UWB_STATUS_ERROR_SESSION_NOT_CONFIGURED },
         { UwbStatusSession::ActiveSessionsOngoing, UWB_STATUS_ERROR_ACTIVE_SESSIONS_ONGOING },
         { UwbStatusSession::MulticastListFull, UWB_STATUS_ERROR_MULTICAST_LIST_FULL },
-        { UwbStatusSession::AddressNotFound, UWB_STATUS_ERROR_ADDRESS_NOT_FOUND },                                                                        
+        { UwbStatusSession::AddressNotFound, UWB_STATUS_ERROR_ADDRESS_NOT_FOUND },
         { UwbStatusSession::AddressAlreadyPresent, UWB_STATUS_ERROR_ADDRESS_ALREADY_PRESENT },
     };
     static const std::unordered_map<UwbStatusRanging, UWB_STATUS> StatusMapRanging{
         { UwbStatusRanging::TxFailed, UWB_STATUS_RANGING_TX_FAILED },
-        { UwbStatusRanging::RxTimeout,UWB_STATUS_RANGING_RX_TIMEOUT },
+        { UwbStatusRanging::RxTimeout, UWB_STATUS_RANGING_RX_TIMEOUT },
         { UwbStatusRanging::RxPhyDecodingFailed, UWB_STATUS_RANGING_RX_PHY_DEC_FAILED },
         { UwbStatusRanging::RxPhyToaFailed, UWB_STATUS_RANGING_RX_PHY_TOA_FAILED },
         { UwbStatusRanging::RxPhyStsFailed, UWB_STATUS_RANGING_RX_PHY_STS_FAILED },
@@ -50,9 +50,9 @@ windows::devices::uwb::ddi::lrp::From(const UwbStatus &uwbStatus)
 
     UWB_STATUS status = UWB_STATUS_FAILED;
 
-    std::visit([&status](auto &&arg) {
+    std::visit([&status](auto&& arg) {
         using T = std::decay_t<decltype(arg)>;
-        if constexpr (std::is_same_v <T, UwbStatusGeneric>) {
+        if constexpr (std::is_same_v<T, UwbStatusGeneric>) {
             status = StatusMapGeneric.at(arg);
         } else if constexpr (std::is_same_v<T, UwbStatusSession>) {
             status = StatusMapSession.at(arg);
@@ -61,7 +61,8 @@ windows::devices::uwb::ddi::lrp::From(const UwbStatus &uwbStatus)
         } else {
             throw std::runtime_error("unknown UwbStatus variant value encountered");
         }
-    }, uwbStatus);
+    },
+        uwbStatus);
 
     return status;
 }

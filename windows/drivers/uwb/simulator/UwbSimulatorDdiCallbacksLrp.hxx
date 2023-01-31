@@ -166,9 +166,9 @@ struct UwbSimulatorDdiCallbacksLrp
     SessionGetRangingCount(uint32_t sessionId, uint32_t *rangingCount) = 0;
 
     /**
-     * @brief 
-     * 
-     * @param notificationData 
+     * @brief
+     *
+     * @param notificationData
      */
     virtual void
     UwbNotification(UwbNotificationData notificationData) = 0;
