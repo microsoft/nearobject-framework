@@ -4,6 +4,7 @@
 
 #include <initializer_list>
 #include <memory>
+#include <optional>
 
 #include <windows.h>
 
@@ -105,6 +106,9 @@ private:
     NTSTATUS
     OnUwbNotification(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer);
     
+    std::optional<windows::devices::uwb::simulator::UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>>
+    TryGetDispatchEntry(ULONG ioControlCode);
+
 private:
     static const std::initializer_list<windows::devices::uwb::simulator::UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>> Dispatch;
 

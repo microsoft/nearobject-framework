@@ -8,6 +8,9 @@
 
 using namespace windows::devices::uwb::simulator;
 
+/**
+ * TODO: min+max sizes need filling in. Get these numbers from the UwbCx driver. 
+ */
 const std::initializer_list<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>> UwbSimulatorDdiHandlerLrp::Dispatch{
     UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>{ IOCTL_UWB_DEVICE_RESET, 0, 0, 0, 0, &UwbSimulatorDdiHandlerLrp::OnUwbDeviceReset },
     UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>{ IOCTL_UWB_GET_DEVICE_INFO, 0, 0, 0, 0, &UwbSimulatorDdiHandlerLrp::OnUwbGetDeviceInformation },
@@ -128,18 +131,34 @@ UwbSimulatorDdiHandlerLrp::UwbSimulatorDdiHandlerLrp() :
 {
 }
 
+std::optional<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>>
+UwbSimulatorDdiHandlerLrp::TryGetDispatchEntry(ULONG ioControlCode)
+{
+    const auto dispatchEntryIt = std::ranges::find_if(Dispatch, [&](const auto &dispatchEntry) {
+        return (dispatchEntry.IoControlCode == ioControlCode);
+    });
+
+    return (dispatchEntryIt != std::end(Dispatch))
+        ? *dispatchEntryIt
+        : std::optional<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>>(std::nullopt);
+}
+
 bool
 UwbSimulatorDdiHandlerLrp::HandlesIoControlCode(ULONG ioControlCode)
 {
-    return std::ranges::any_of(Dispatch, [&](const auto dispatchEntry) {
+    return std::ranges::any_of(Dispatch, [&](const auto& dispatchEntry) {
         return (dispatchEntry.IoControlCode == ioControlCode);
     });
 }
 
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::ValidateRequest(WDFREQUEST /*request*/, ULONG /*ioControlCode*/, std::size_t /*inputBufferLength*/, std::size_t /*outputBufferLength*/)
+UwbSimulatorDdiHandlerLrp::ValidateRequest(WDFREQUEST /* request */, ULONG ioControlCode, std::size_t inputBufferLength, std::size_t outputBufferLength)
 {
-    return STATUS_NOT_SUPPORTED;
+    const auto dispatchEntry = TryGetDispatchEntry(ioControlCode);
+    NTSTATUS status = dispatchEntry.has_value()
+        ? dispatchEntry->GetRequestValidityStatus(inputBufferLength, outputBufferLength)
+        : STATUS_NOT_SUPPORTED;
+    return status;
 }
 
 NTSTATUS
