@@ -1,13 +1,16 @@
 
 #include <algorithm>
 #include <functional>
+#include <stdexcept>
 
 #include "UwbCxLrpDeviceGlue.h"
-
 #include "UwbSimulatorDdiCallbacksLrpNoop.hxx"
 #include "UwbSimulatorDdiHandlerLrp.hxx"
 
+#include <uwb/protocols/fira/FiraDevice.hxx>
+
 using namespace windows::devices::uwb::simulator;
+using namespace uwb::protocol::fira;
 
 /**
  * TODO: min+max sizes need filling in. Get these numbers from the UwbCx driver.
@@ -57,6 +60,8 @@ From(const UwbSessionState uwbSessionState)
     case UwbSessionState::Idle:
         return UWB_SESSION_STATE_IDLE;
     }
+
+    throw std::runtime_error("unknown enumeration value");
 }
 
 } // namespace UwbCxDdi
@@ -145,16 +150,14 @@ UwbSimulatorDdiHandlerLrp::OnUwbGetSessionState(WDFREQUEST request, std::span<ui
 
     // Convert neutral types to DDI types.
     auto &outputValue = *reinterpret_cast<UWB_SESSION_STATE_STATUS *>(std::data(outputBuffer));
+    outputValue.size = sizeof outputValue;
     outputValue.status = UwbCxDdi::From(statusUwb);
-
+    outputValue.sessionState = UwbCxDdi::From(sessionStateResult);
 
     // Complete the request.
-    WdfRequestCompleteWithInformation(request, status, sizeof outputValue);
+    WdfRequestCompleteWithInformation(request, status, outputValue.size);
 
     return status;
-
-
-    return STATUS_NOT_IMPLEMENTED;
 }
 
 NTSTATUS
