@@ -21,6 +21,8 @@ namespace windows::devices::uwb::simulator
  */
 struct UwbSimulatorDdiCallbacksLrp
 {
+    virtual ~UwbSimulatorDdiCallbacksLrp() = default;
+
     /**
      * @brief
      *
@@ -36,7 +38,7 @@ struct UwbSimulatorDdiCallbacksLrp
      * @return UwbStatus
      */
     virtual UwbStatus
-    DeviceGetInfo(UwbDeviceInfo &deviceInfo) = 0;
+    DeviceGetInformation(UwbDeviceInfo &deviceInfo) = 0;
 
     /**
      * @brief
@@ -70,6 +72,15 @@ struct UwbSimulatorDdiCallbacksLrp
     DeviceSetConfigurationParameters(const std::vector<UwbDeviceConfigurationParameter> &deviceConfigurationParameters, std::vector<std::tuple<UwbDeviceConfigurationParameterType, UwbStatus>> &deviceConfigurationParameterResults) = 0;
 
     /**
+     * @brief Get the Application Configuration Parameters object
+     *
+     * @param applicationConfigurationParameters
+     * @return UwbStatus
+     */
+    virtual UwbStatus
+    GetApplicationConfigurationParameters(std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters) = 0;
+
+    /**
      * @brief Set the Application Configuration Parameters object
      *
      * @param applicationConfigurationParameters
@@ -78,15 +89,6 @@ struct UwbSimulatorDdiCallbacksLrp
      */
     virtual UwbStatus
     SetApplicationConfigurationParameters(const std::vector<std::unique_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::unique_ptr<IUwbAppConfigurationParameter>>> &applicationConfigurationParameterResults) = 0;
-
-    /**
-     * @brief Get the Application Configuration Parameters object
-     *
-     * @param applicationConfigurationParameters
-     * @return UwbStatus
-     */
-    virtual UwbStatus
-    GetApplicationConfigurationParameters(std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters) = 0;
 
     /**
      * @brief Get the Session Count object
@@ -162,6 +164,14 @@ struct UwbSimulatorDdiCallbacksLrp
      */
     virtual UwbStatus
     SessionGetRangingCount(uint32_t sessionId, uint32_t *rangingCount) = 0;
+
+    /**
+     * @brief 
+     * 
+     * @param notificationData 
+     */
+    virtual void
+    UwbNotification(UwbNotificationData notificationData) = 0;
 };
 } // namespace windows::devices::uwb::simulator
 

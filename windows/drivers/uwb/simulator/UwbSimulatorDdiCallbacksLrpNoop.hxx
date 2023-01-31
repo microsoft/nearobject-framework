@@ -16,7 +16,7 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     DeviceReset() override;
 
     virtual UwbStatus
-    DeviceGetInfo(UwbDeviceInfo &deviceInfo) override;
+    DeviceGetInformation(UwbDeviceInfo &deviceInfo) override;
 
     virtual UwbStatus
     DeviceGetCapabilities(UwbDeviceCapabilities &deviceCapabilities) override;
@@ -56,6 +56,9 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
 
     virtual UwbStatus
     SessionGetRangingCount(uint32_t sessionId, uint32_t *rangingCount) override;
+
+    virtual void
+    UwbNotification(UwbNotificationData notificationData) override;
 };
 } // namespace windows::devices::uwb::simulator
 

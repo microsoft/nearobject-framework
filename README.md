@@ -1,7 +1,6 @@
 # Near Object (NO) Framework 
 
-[![Build Release [CMake]](https://github.com/microsoft/nearobject-framework/actions/workflows/cmake.yml/badge.svg)](https://github.com/microsoft/nearobject-framework/actions/workflows/cmake.yml)
-[![CodeQL](https://github.com/microsoft/nearobject-framework/actions/workflows/codeql.yml/badge.svg)](https://github.com/microsoft/nearobject-framework/actions/workflows/codeql.yml)
+[![CI/CD](https://github.com/microsoft/nearobject-framework/actions/workflows/cicd.yml/badge.svg)](https://github.com/microsoft/nearobject-framework/actions/workflows/cicd.yml)
 [![cpp-linter](https://github.com/microsoft/nearobject-framework/actions/workflows/cpp-linter.yml/badge.svg)](https://github.com/microsoft/nearobject-framework/actions/workflows/cpp-linter.yml)
 
 This project is a framework for interacting with short-range devices, providing secure location, ranging, radar, or proximity services. There is a particular focus on [IEEE 802.15.4z-2020](https://standards.ieee.org/ieee/802.15.4z/10230/) Ultra-Wideband (UWB) devices using the [Fine Ranging Consortium (FiRa)](https://www.firaconsortium.org/), however, the framework is not limited to this.

@@ -1,32 +1,49 @@
-name: Build Release [CMake]
+name: Build [CMake]
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ "develop", "main" ]
-  pull_request:
-    branches: [ "develop", "main" ]
-
-env:
-  BUILD_TYPE: Release
+  workflow_call:
+    inputs:
+      build-types:
+        required: false
+        # Note the string here contains a JSON array. This is later converted to an array using fromJson.
+        default: "[ 'Debug' ]"
+        type: string
+        description: 'The CMake build type (CMAKE_BUILD_TYPE) to run.'
+      analyze-codeql:
+        required: false
+        default: true
+        type: boolean
 
 jobs:
   build:
+    name: cmake build
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-22.04, windows-latest ]
+        os: [ ubuntu-22.04, windows-2022 ]
+        build-type: ${{ fromJson(inputs.build-types) }}
     runs-on: ${{ matrix.os }} 
     
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-    - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+    - name: Initialize CodeQL
+      if: inputs.analyze-codeql == true
+      uses: github/codeql-action/init@v2
+      with:
+        languages: 'cpp'
 
-    - name: Build
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+    - name: CMake Configure
+      run: cmake -B ${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      run: ctest -C ${{env.BUILD_TYPE}}
+    - name: CMake Build
+      run: cmake --build ${{ github.workspace }}/build --config ${{ matrix.build-type }}
+
+    - name: CMake Test (ctest)
+      working-directory: ${{ github.workspace }}/build
+      run: ctest -C ${{ matrix.build-types }}
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
