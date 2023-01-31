@@ -64,8 +64,30 @@ From(const UwbSessionState uwbSessionState)
     throw std::runtime_error("unknown enumeration value");
 }
 
+UWB_DEVICE_INFO
+From(const UwbDeviceInfo& uwbDeviceInfo)
+{
+    UWB_DEVICE_INFO deviceInfo{};
+    deviceInfo.size = sizeof deviceInfo;
+    deviceInfo.status = From(uwbDeviceInfo.Status);
+    deviceInfo.vendorSpecificInfoLength = 0;
+    // TODO: fill in remaining fields
+    return deviceInfo;
+}
+
+UWB_DEVICE_CAPABILITIES
+From(const UwbDeviceCapabilities& /*uwbDeviceCapabilities*/)
+{
+    UWB_DEVICE_CAPABILITIES deviceCapabilities{};
+    deviceCapabilities.size = sizeof deviceCapabilities;
+    deviceCapabilities.capabilityParamsCount = 0;
+    // TODO: implement this properly
+    return deviceCapabilities;
+}
+
 } // namespace UwbCxDdi
 
+// IOCTL_UWB_DEVICE_RESET
 NTSTATUS
 UwbSimulatorDdiHandlerLrp::OnUwbDeviceReset(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
 {
@@ -84,16 +106,44 @@ UwbSimulatorDdiHandlerLrp::OnUwbDeviceReset(WDFREQUEST request, std::span<uint8_
     return status;
 }
 
+// IOCTL_UWB_GET_DEVICE_INFO
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbGetDeviceInformation(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandlerLrp::OnUwbGetDeviceInformation(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
 {
-    return STATUS_NOT_IMPLEMENTED;
+    NTSTATUS status = STATUS_SUCCESS;
+
+    // Execute callback.
+    UwbDeviceInfo deviceInformation{};
+    auto statusUwb = m_callbacks->DeviceGetInformation(deviceInformation);
+
+    // Convert neutral types to DDI types.
+    auto &outputValue = *reinterpret_cast<UWB_DEVICE_INFO *>(std::data(outputBuffer));
+    outputValue = UwbCxDdi::From(deviceInformation);
+
+    // Complete the request.
+    WdfRequestCompleteWithInformation(request, status, outputValue.size);
+
+    return status;
 }
 
+// IOCTL_UWB_GET_DEVICE_CAPABILITIES
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbGetDeviceCapabilities(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandlerLrp::OnUwbGetDeviceCapabilities(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
 {
-    return STATUS_NOT_IMPLEMENTED;
+    NTSTATUS status = STATUS_SUCCESS;
+
+    // Execute callback.
+    UwbDeviceCapabilities deviceCapabilities{};
+    auto statusUwb = m_callbacks->DeviceGetCapabilities(deviceCapabilities);
+
+    // Convert neutral types to DDI types.
+    auto &outputValue = *reinterpret_cast<UWB_DEVICE_CAPABILITIES *>(std::data(outputBuffer));
+    outputValue = UwbCxDdi::From(deviceCapabilities);
+
+    // Complete the request.
+    WdfRequestCompleteWithInformation(request, status, outputValue.size);
+
+    return status;
 }
 
 NTSTATUS
@@ -146,7 +196,7 @@ UwbSimulatorDdiHandlerLrp::OnUwbGetSessionState(WDFREQUEST request, std::span<ui
     // Convert DDI input type to neutral type.
     auto &sessionStateIn = *reinterpret_cast<UWB_GET_SESSION_STATE *>(std::data(inputBuffer));
     UwbSessionState sessionStateResult{};
-    auto statusUwb = m_callbacks->SessionGetState(sessionStateIn.sessionId, &sessionStateResult);
+    auto statusUwb = m_callbacks->SessionGetState(sessionStateIn.sessionId, sessionStateResult);
 
     // Convert neutral types to DDI types.
     auto &outputValue = *reinterpret_cast<UWB_SESSION_STATE_STATUS *>(std::data(outputBuffer));
