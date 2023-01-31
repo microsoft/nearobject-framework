@@ -80,8 +80,8 @@ private:
     OnUwbSetApplicationConfigurationParameters(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer);
 
     NTSTATUS
-    OnUwbGetSessionCount(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer); 
-    
+    OnUwbGetSessionCount(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer);
+
     NTSTATUS
     OnUwbSessionInitialize(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer);
 
@@ -93,7 +93,7 @@ private:
 
     NTSTATUS
     OnUwbSessionUpdateControllerMulticastList(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer);
-    
+
     NTSTATUS
     OnUwbSessionStartRanging(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer);
 
@@ -105,7 +105,7 @@ private:
 
     NTSTATUS
     OnUwbNotification(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer);
-    
+
     std::optional<windows::devices::uwb::simulator::UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>>
     TryGetDispatchEntry(ULONG ioControlCode);
 

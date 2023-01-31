@@ -10,7 +10,7 @@
 using namespace windows::devices::uwb::simulator;
 
 /**
- * TODO: min+max sizes need filling in. Get these numbers from the UwbCx driver. 
+ * TODO: min+max sizes need filling in. Get these numbers from the UwbCx driver.
  */
 const std::initializer_list<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>> UwbSimulatorDdiHandlerLrp::Dispatch{
     UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>{ IOCTL_UWB_DEVICE_RESET, 0, 0, 0, 0, &UwbSimulatorDdiHandlerLrp::OnUwbDeviceReset },
@@ -34,16 +34,16 @@ const std::initializer_list<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>
 namespace UwbCxDdi
 {
 /**
- * @brief 
+ * @brief
  * TODO: move this to its own file
  */
 UWB_STATUS
-From(const UwbStatus& /*uwbStatus*/)
+From(const UwbStatus & /*uwbStatus*/)
 {
     // TODO: implement this
     return UWB_STATUS_OK;
 }
-} // namespace detail
+} // namespace UwbCxDdi
 
 NTSTATUS
 UwbSimulatorDdiHandlerLrp::OnUwbDeviceReset(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
@@ -52,13 +52,13 @@ UwbSimulatorDdiHandlerLrp::OnUwbDeviceReset(WDFREQUEST request, std::span<uint8_
 
     // Execute callback.
     auto statusUwb = m_callbacks->DeviceReset();
-    
+
     // Convert neutral types to DDI types.
     auto &outputValue = *reinterpret_cast<UWB_STATUS *>(std::data(outputBuffer));
     outputValue = UwbCxDdi::From(statusUwb);
 
     // Complete the request.
-    WdfRequestCompleteWithInformation(request, status, sizeof outputValue);  
+    WdfRequestCompleteWithInformation(request, status, sizeof outputValue);
 
     return status;
 }
@@ -173,7 +173,7 @@ UwbSimulatorDdiHandlerLrp::TryGetDispatchEntry(ULONG ioControlCode)
 bool
 UwbSimulatorDdiHandlerLrp::HandlesIoControlCode(ULONG ioControlCode)
 {
-    return std::ranges::any_of(Dispatch, [&](const auto& dispatchEntry) {
+    return std::ranges::any_of(Dispatch, [&](const auto &dispatchEntry) {
         return (dispatchEntry.IoControlCode == ioControlCode);
     });
 }
@@ -189,7 +189,7 @@ UwbSimulatorDdiHandlerLrp::ValidateRequest(WDFREQUEST /* request */, ULONG ioCon
 }
 
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::HandleRequest(WDFREQUEST request, ULONG ioControlCode , std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer)
+UwbSimulatorDdiHandlerLrp::HandleRequest(WDFREQUEST request, ULONG ioControlCode, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer)
 {
     auto dispatchEntry = TryGetDispatchEntry(ioControlCode);
     if (!dispatchEntry.has_value()) {

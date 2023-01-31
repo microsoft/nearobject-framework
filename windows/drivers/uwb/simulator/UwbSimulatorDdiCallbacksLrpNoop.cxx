@@ -104,5 +104,4 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionGetRangingCount(uint32_t /* sessionId */
 void
 UwbSimulatorDdiCallbacksLrpNoop::UwbNotification(UwbNotificationData notificationData)
 {
-
 }
