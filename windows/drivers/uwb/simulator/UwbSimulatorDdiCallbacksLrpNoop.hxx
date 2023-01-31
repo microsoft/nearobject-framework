@@ -16,7 +16,7 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     DeviceReset() override;
 
     virtual UwbStatus
-    DeviceGetInformation(UwbDeviceInfo &deviceInfo) override;
+    DeviceGetInformation(UwbDeviceInfoInformation &deviceInfo) override;
 
     virtual UwbStatus
     DeviceGetCapabilities(UwbDeviceCapabilities &deviceCapabilities) override;

@@ -11,7 +11,7 @@ UwbSimulatorDdiCallbacksLrpNoop::DeviceReset()
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::DeviceGetInformation(UwbDeviceInfo &deviceInfo)
+UwbSimulatorDdiCallbacksLrpNoop::DeviceGetInformation(UwbDeviceInfoInformation &deviceInfo)
 {
     deviceInfo = {};
     return UwbStatusOk;

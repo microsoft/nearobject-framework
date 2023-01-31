@@ -38,7 +38,7 @@ struct UwbSimulatorDdiCallbacksLrp
      * @return UwbStatus
      */
     virtual UwbStatus
-    DeviceGetInformation(UwbDeviceInfo &deviceInfo) = 0;
+    DeviceGetInformation(UwbDeviceInfoInformation &deviceInfo) = 0;
 
     /**
      * @brief
