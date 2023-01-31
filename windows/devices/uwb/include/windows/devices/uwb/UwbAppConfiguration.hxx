@@ -15,7 +15,7 @@
 
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
 
-#include <UwbCxLrpDeviceGlue.h>
+#include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 
 namespace windows::devices::uwb
 {

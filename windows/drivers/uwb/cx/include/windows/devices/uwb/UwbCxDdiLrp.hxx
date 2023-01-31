@@ -1,6 +1,6 @@
 
-#ifndef UWBCX_LRP_DEVICE_GLUE_H
-#define UWBCX_LRP_DEVICE_GLUE_H
+#ifndef UWBCX_DDI_LRP_HXX
+#define UWBCX_DDI_LRP_HXX
 
 // NB: This must come before any other Windows include
 #include <windows.h>
@@ -9,4 +9,4 @@
 
 #include <UwbCxLrpDevice.h>
 
-#endif // UWBCX_LRP_DEVICE_GLUE_H
+#endif // UWBCX_DDI_LRP_HXX

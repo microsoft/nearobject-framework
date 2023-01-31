@@ -4,7 +4,7 @@
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
 
-#include <UwbCxLrpDeviceGlue.h>
+#include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 
 /**
  * @brief Define LRP DDI conversion functionality as free functions in a

@@ -7,7 +7,7 @@ set(UWBCXDRIVER_DIR_PUBLIC_INCLUDE_PREFIX ${UWBCXDRIVER_DIR_PUBLIC_INCLUDE})
 target_sources(uwbcx-driver
     INTERFACE
         ${UWBCXDRIVER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCxLrpDevice.h
-        ${UWBCXDRIVER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCxLrpDeviceGlue.h
+        ${UWBCXDRIVER_DIR_PUBLIC_INCLUDE_PREFIX}/windows/devices/uwb/UwbCxDdiLrp.hxx
 )
 
 target_include_directories(uwbcx-driver
@@ -17,7 +17,7 @@ target_include_directories(uwbcx-driver
 
 list(APPEND UWBCXDRIVER_PUBLIC_HEADERS
     ${UWBCXDRIVER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCxLrpDevice.h
-    ${UWBCXDRIVER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCxLrpDeviceGlue.h
+    ${UWBCXDRIVER_DIR_PUBLIC_INCLUDE_PREFIX}/windows/devices/uwb/UwbCxDdiLrp.hxx
 )
 
 set_target_properties(uwbcx-driver PROPERTIES FOLDER windows/devices/uwb)
