@@ -23,7 +23,6 @@ jobs:
       matrix:
         os: [ ubuntu-22.04, windows-2022 ]
         build-type: ${{ fromJson(inputs.build-types) }}
-        language: [ 'cpp' ]
     runs-on: ${{ matrix.os }} 
     
     steps:
@@ -34,7 +33,7 @@ jobs:
       if: inputs.analyze-codeql == true
       uses: github/codeql-action/init@v2
       with:
-        languages: ${{ matrix.language }}
+        languages: 'cpp'
 
     - name: CMake Configure
       run: cmake -B ${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}

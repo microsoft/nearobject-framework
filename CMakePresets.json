@@ -28,7 +28,7 @@
             "name": "vcpkg-dev",
             "displayName": "Vcpkg Integration",
             "description": "Enables development build for integration with vcpkg-based environments",
-            "inherits":[
+            "inherits": [
                 "vcpkg"
             ],
             "cacheVariables": {
@@ -40,12 +40,35 @@
             "displayName": "Official Windows Build",
             "description": "Enables official build for Windows",
             "hidden": true,
-            "inherits":[
+            "inherits": [
                 "vcpkg"
             ],
             "cacheVariables": {
                 "NOF_WINDOWS_BUILD": true
             }
+        },
+    ],
+    "buildPresets": [
+        {
+            "name": "dev",
+            "configurePreset": "dev"
+        },
+        {
+            "name": "vcpkg",
+            "configurePreset": "vcpkg-dev"
+        },
+        {
+            "name": "release",
+            "configuration": "Release",
+            "inherits": [
+                "dev"
+            ]
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "dev",
+            "configurePreset": "dev"
         }
     ]
 }
