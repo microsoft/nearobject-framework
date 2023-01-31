@@ -3,7 +3,6 @@
 #define UWB_CX_ADAPTER_DDI_LRP_HXX
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
-
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 
 /**

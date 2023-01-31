@@ -14,7 +14,6 @@
 #include <vector>
 
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
-
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 
 namespace windows::devices::uwb

@@ -7,6 +7,6 @@
 #include <winioctl.h>
 #include <stdint.h>
 
-#include <UwbCxLrpDevice.h>
+#include <windows/devices/uwb/UwbCxLrpDevice.h>
 
 #endif // UWBCX_DDI_LRP_HXX
