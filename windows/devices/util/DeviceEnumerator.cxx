@@ -27,7 +27,7 @@ DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(const GUID& deviceInterfa
         CM_GET_DEVICE_INTERFACE_LIST_PRESENT);
     if (configRet != CR_SUCCESS) {
         // TODO: ???
-        PLOG_ERROR << "CM_Get_Device_Interface_List_Size failed";
+        PLOG_ERROR << "CM_Get_Device_Interface_List_Size failed with configRet=0x" << std::hex << configRet;
         return {};
     } else if (deviceInterfaceNamesBufferSize == 0) {
         return {};
@@ -44,10 +44,9 @@ DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(const GUID& deviceInterfa
         CM_GET_DEVICE_INTERFACE_LIST_PRESENT);
     if (configRet != CR_SUCCESS) {
         // TODO: ???
-        PLOG_ERROR << "CM_Get_Device_Interface_List failed";
+        PLOG_ERROR << "CM_Get_Device_Interface_List failed with configRet=0x" << std::hex << configRet;
         return {};
     }
-
 
     // Pull out individual strings from the double-null terminated list returned above.
     std::vector<std::string> deviceInterfaceNames{};

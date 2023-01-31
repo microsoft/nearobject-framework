@@ -32,7 +32,7 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData &uwbSessio
     HRESULT hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_SESSION_INIT, &sessionInit, sizeof sessionInit, nullptr, 0, nullptr, nullptr);
     if (FAILED(hr)) {
         // TODO: handle this
-        PLOG_ERROR << "could not request a new session from the driver";
+        PLOG_ERROR << "could not request a new session from the driver, hr=" << std::hex << hr;
     }
 
     m_sessionId = uwbSessionData.sessionId;
