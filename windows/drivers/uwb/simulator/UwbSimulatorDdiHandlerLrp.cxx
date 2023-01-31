@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <functional>
 
 #include "UwbCxLrpDeviceGlue.h"
 
@@ -30,10 +31,36 @@ const std::initializer_list<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>
     UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>{ IOCTL_UWB_NOTIFICATION, 0, 0, 0, 0, &UwbSimulatorDdiHandlerLrp::OnUwbNotification },
 };
 
-NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbDeviceReset(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+namespace UwbCxDdi
 {
-    return STATUS_NOT_IMPLEMENTED;
+/**
+ * @brief 
+ * TODO: move this to its own file
+ */
+UWB_STATUS
+From(const UwbStatus& /*uwbStatus*/)
+{
+    // TODO: implement this
+    return UWB_STATUS_OK;
+}
+} // namespace detail
+
+NTSTATUS
+UwbSimulatorDdiHandlerLrp::OnUwbDeviceReset(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
+{
+    NTSTATUS status = STATUS_SUCCESS;
+
+    // Execute callback.
+    auto statusUwb = m_callbacks->DeviceReset();
+    
+    // Convert neutral types to DDI types.
+    auto &outputValue = *reinterpret_cast<UWB_STATUS *>(std::data(outputBuffer));
+    outputValue = UwbCxDdi::From(statusUwb);
+
+    // Complete the request.
+    WdfRequestCompleteWithInformation(request, status, sizeof outputValue);  
+
+    return status;
 }
 
 NTSTATUS
@@ -162,7 +189,17 @@ UwbSimulatorDdiHandlerLrp::ValidateRequest(WDFREQUEST /* request */, ULONG ioCon
 }
 
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::HandleRequest(WDFREQUEST /* request */, ULONG /* ioControlCode */, std::span<uint8_t> /* inputBuffer */, std::span<uint8_t> /* outputBuffer */)
+UwbSimulatorDdiHandlerLrp::HandleRequest(WDFREQUEST request, ULONG ioControlCode , std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer)
 {
-    return STATUS_NOT_IMPLEMENTED;
+    auto dispatchEntry = TryGetDispatchEntry(ioControlCode);
+    if (!dispatchEntry.has_value()) {
+        return STATUS_NOT_SUPPORTED;
+    } else if (dispatchEntry->Handler == nullptr) {
+        return STATUS_NOT_IMPLEMENTED;
+    }
+
+    // The handler function is an unbound member function so use std::invoke to
+    // bind it to this object instance, forwarding the request arguments.
+    NTSTATUS status = std::invoke(dispatchEntry->Handler, this, request, inputBuffer, outputBuffer);
+    return status;
 }
