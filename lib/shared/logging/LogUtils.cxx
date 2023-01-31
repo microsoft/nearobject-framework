@@ -2,7 +2,8 @@
 #include <ctime>
 #include <iomanip>
 #include <sstream>
-#include <LogUtils.hxx>
+
+#include <logging/LogUtils.hxx>
 
 std::string
 logging::GetLogName(const std::string& executableName)

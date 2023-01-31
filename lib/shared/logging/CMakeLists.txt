@@ -2,12 +2,13 @@
 add_library(logging STATIC "")
 
 set(LOGGING_DIR_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
+set(LOGGING_DIR_PUBLIC_INCLUDE_PREFIX ${LOGGING_DIR_PUBLIC_INCLUDE}/logging)
 
 target_sources(logging
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/LogUtils.cxx
     PUBLIC
-        ${LOGGING_DIR_PUBLIC_INCLUDE}/LogUtils.hxx
+        ${LOGGING_DIR_PUBLIC_INCLUDE_PREFIX}/LogUtils.hxx
 )
 
 target_include_directories(logging
@@ -16,7 +17,7 @@ target_include_directories(logging
 )
 
 list(APPEND LOGGING_PUBLIC_HEADERS
-    ${LOGGING_DIR_PUBLIC_INCLUDE}/LogUtils.hxx
+    ${LOGGING_DIR_PUBLIC_INCLUDE_PREFIX}/LogUtils.hxx
 )
 
 set_target_properties(logging PROPERTIES FOLDER shared/logging)
