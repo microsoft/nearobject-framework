@@ -14,10 +14,12 @@
 #include <plog/Initializers/RollingFileInitializer.h>
 #include <plog/Log.h>
 
+#include <logging/LogUtils.hxx>
+
 int
 main(int argc, char* argv[])
 {
-    plog::init(plog::verbose, "devicemon_log.txt");
+    plog::init(plog::verbose, logging::GetLogName("devicemon"));
 
     CLI::App app{};
     app.name("devicemon");
