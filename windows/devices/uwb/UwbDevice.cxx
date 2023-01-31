@@ -161,7 +161,7 @@ FromUwbCx(const UWB_DEVICE_CAPABILITIES& uwbDeviceCapabilities)
         }
         default:
             // ignore unknown parameter tags
-            PLOG_DEBUG << "ignoring unknown parameter tag " << notstd::to_underlying(capability.paramType);
+            PLOG_DEBUG << "ignoring unknown UwbCapability parameter tag " << notstd::to_underlying(capability.paramType);
             break;
         }
     }
@@ -220,7 +220,7 @@ UwbDevice::GetCapabilities() const
     HRESULT hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_GET_DEVICE_CAPABILITIES, nullptr, 0, nullptr, 0, &bytesRequired, nullptr);
     if (FAILED(hr)) {
         // TODO: need to do something different here
-        PLOG_ERROR << "error when sending IOCTL_UWB_GET_DEVICE_CAPABILITIES";
+        PLOG_ERROR << "error when sending IOCTL_UWB_GET_DEVICE_CAPABILITIES, hr=0x" << std::hex << hr;
         return {};
     }
 
@@ -230,7 +230,7 @@ UwbDevice::GetCapabilities() const
     hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_GET_DEVICE_CAPABILITIES, nullptr, 0, uwbDeviceCapabilitiesBuffer.get(), uwbCapabilitiesSize, &bytesRequired, nullptr);
     if (FAILED(hr)) {
         // TODO: need to do something different here
-        PLOG_ERROR << "error when sending IOCTL_UWB_GET_DEVICE_CAPABILITIES";
+        PLOG_ERROR << "error when sending IOCTL_UWB_GET_DEVICE_CAPABILITIES, hr=0x" << std::hex << hr;
         return {};
     }
 
