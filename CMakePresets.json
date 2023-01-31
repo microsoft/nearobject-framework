@@ -51,11 +51,13 @@
     "buildPresets": [
         {
             "name": "dev",
-            "configurePreset": "dev"
+            "configurePreset": "dev",
+            "configuration": "Debug"
         },
         {
             "name": "vcpkg",
-            "configurePreset": "vcpkg-dev"
+            "configurePreset": "vcpkg-dev",
+            "configuration": "Debug"
         },
         {
             "name": "release",
