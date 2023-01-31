@@ -46,7 +46,7 @@
             "cacheVariables": {
                 "NOF_WINDOWS_BUILD": true
             }
-        },
+        }
     ],
     "buildPresets": [
         {
