@@ -1,5 +1,4 @@
 
-#include <UwbCxLrpDeviceGlue.h>
 #include <wil/result.h>
 
 #include <algorithm>
@@ -7,6 +6,7 @@
 #include <numeric>
 
 #include <windows/devices/uwb/UwbCxAdapter.hxx>
+#include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 #include <windows/devices/uwb/UwbSession.hxx>
 
 #include <plog/Log.h>

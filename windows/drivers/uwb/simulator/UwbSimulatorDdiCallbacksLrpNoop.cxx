@@ -11,7 +11,7 @@ UwbSimulatorDdiCallbacksLrpNoop::DeviceReset()
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::DeviceGetInformation(UwbDeviceInfo &deviceInfo)
+UwbSimulatorDdiCallbacksLrpNoop::DeviceGetInformation(UwbDeviceInfoInformation &deviceInfo)
 {
     deviceInfo = {};
     return UwbStatusOk;
@@ -72,7 +72,7 @@ UwbSimulatorDdiCallbacksLrpNoop::GetSessionCount(uint32_t * /* sessionCount */)
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SessionGetState(uint32_t /* sessionId */, UwbSessionState * /* sessionState */)
+UwbSimulatorDdiCallbacksLrpNoop::SessionGetState(uint32_t /* sessionId */, UwbSessionState & /* sessionState */)
 {
     return UwbStatusOk;
 }
@@ -104,5 +104,4 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionGetRangingCount(uint32_t /* sessionId */
 void
 UwbSimulatorDdiCallbacksLrpNoop::UwbNotification(UwbNotificationData notificationData)
 {
-
 }

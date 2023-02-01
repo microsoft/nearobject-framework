@@ -1,15 +1,22 @@
 
 #include <algorithm>
-
-#include "UwbCxLrpDeviceGlue.h"
+#include <functional>
+#include <stdexcept>
+#include <type_traits>
+#include <unordered_map>
 
 #include "UwbSimulatorDdiCallbacksLrpNoop.hxx"
 #include "UwbSimulatorDdiHandlerLrp.hxx"
 
+#include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
+#include <windows/devices/uwb/UwbCxDdiLrp.hxx>
+
 using namespace windows::devices::uwb::simulator;
 
+namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
+
 /**
- * TODO: min+max sizes need filling in. Get these numbers from the UwbCx driver. 
+ * TODO: min+max sizes need filling in. Get these numbers from the UwbCx driver.
  */
 const std::initializer_list<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>> UwbSimulatorDdiHandlerLrp::Dispatch{
     UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>{ IOCTL_UWB_DEVICE_RESET, 0, 0, 0, 0, &UwbSimulatorDdiHandlerLrp::OnUwbDeviceReset },
@@ -30,22 +37,63 @@ const std::initializer_list<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>
     UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>{ IOCTL_UWB_NOTIFICATION, 0, 0, 0, 0, &UwbSimulatorDdiHandlerLrp::OnUwbNotification },
 };
 
+// IOCTL_UWB_DEVICE_RESET
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbDeviceReset(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandlerLrp::OnUwbDeviceReset(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
 {
-    return STATUS_NOT_IMPLEMENTED;
+    NTSTATUS status = STATUS_SUCCESS;
+
+    // Execute callback.
+    auto statusUwb = m_callbacks->DeviceReset();
+
+    // Convert neutral types to DDI types.
+    auto &outputValue = *reinterpret_cast<UWB_STATUS *>(std::data(outputBuffer));
+    outputValue = UwbCxDdi::From(statusUwb);
+
+    // Complete the request.
+    WdfRequestCompleteWithInformation(request, status, sizeof outputValue);
+
+    return status;
 }
 
+// IOCTL_UWB_GET_DEVICE_INFO
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbGetDeviceInformation(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandlerLrp::OnUwbGetDeviceInformation(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
 {
-    return STATUS_NOT_IMPLEMENTED;
+    NTSTATUS status = STATUS_SUCCESS;
+
+    // Execute callback.
+    UwbDeviceInfoInformation deviceInformation{};
+    auto statusUwb = m_callbacks->DeviceGetInformation(deviceInformation);
+
+    // Convert neutral types to DDI types.
+    auto &outputValue = *reinterpret_cast<UWB_DEVICE_INFO *>(std::data(outputBuffer));
+    outputValue = UwbCxDdi::From(deviceInformation);
+
+    // Complete the request.
+    WdfRequestCompleteWithInformation(request, status, outputValue.size);
+
+    return status;
 }
 
+// IOCTL_UWB_GET_DEVICE_CAPABILITIES
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbGetDeviceCapabilities(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandlerLrp::OnUwbGetDeviceCapabilities(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
 {
-    return STATUS_NOT_IMPLEMENTED;
+    NTSTATUS status = STATUS_SUCCESS;
+
+    // Execute callback.
+    UwbDeviceCapabilities deviceCapabilities{};
+    auto statusUwb = m_callbacks->DeviceGetCapabilities(deviceCapabilities);
+
+    // Convert neutral types to DDI types.
+    auto &outputValue = *reinterpret_cast<UWB_DEVICE_CAPABILITIES *>(std::data(outputBuffer));
+    outputValue = UwbCxDdi::From(deviceCapabilities);
+
+    // Complete the request.
+    WdfRequestCompleteWithInformation(request, status, outputValue.size);
+
+    return status;
 }
 
 NTSTATUS
@@ -91,9 +139,25 @@ UwbSimulatorDdiHandlerLrp::OnUwbSessionDeinitialize(WDFREQUEST /*request*/, std:
 }
 
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbGetSessionState(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandlerLrp::OnUwbGetSessionState(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer)
 {
-    return STATUS_NOT_IMPLEMENTED;
+    NTSTATUS status = STATUS_SUCCESS;
+
+    // Convert DDI input type to neutral type.
+    auto &sessionStateIn = *reinterpret_cast<UWB_GET_SESSION_STATE *>(std::data(inputBuffer));
+    UwbSessionState sessionStateResult{};
+    auto statusUwb = m_callbacks->SessionGetState(sessionStateIn.sessionId, sessionStateResult);
+
+    // Convert neutral types to DDI types.
+    auto &outputValue = *reinterpret_cast<UWB_SESSION_STATE_STATUS *>(std::data(outputBuffer));
+    outputValue.size = sizeof outputValue;
+    outputValue.status = UwbCxDdi::From(statusUwb);
+    outputValue.sessionState = UwbCxDdi::From(sessionStateResult);
+
+    // Complete the request.
+    WdfRequestCompleteWithInformation(request, status, outputValue.size);
+
+    return status;
 }
 
 NTSTATUS
@@ -146,7 +210,7 @@ UwbSimulatorDdiHandlerLrp::TryGetDispatchEntry(ULONG ioControlCode)
 bool
 UwbSimulatorDdiHandlerLrp::HandlesIoControlCode(ULONG ioControlCode)
 {
-    return std::ranges::any_of(Dispatch, [&](const auto& dispatchEntry) {
+    return std::ranges::any_of(Dispatch, [&](const auto &dispatchEntry) {
         return (dispatchEntry.IoControlCode == ioControlCode);
     });
 }
@@ -162,7 +226,17 @@ UwbSimulatorDdiHandlerLrp::ValidateRequest(WDFREQUEST /* request */, ULONG ioCon
 }
 
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::HandleRequest(WDFREQUEST /* request */, ULONG /* ioControlCode */, std::span<uint8_t> /* inputBuffer */, std::span<uint8_t> /* outputBuffer */)
+UwbSimulatorDdiHandlerLrp::HandleRequest(WDFREQUEST request, ULONG ioControlCode, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer)
 {
-    return STATUS_NOT_IMPLEMENTED;
+    auto dispatchEntry = TryGetDispatchEntry(ioControlCode);
+    if (!dispatchEntry.has_value()) {
+        return STATUS_NOT_SUPPORTED;
+    } else if (dispatchEntry->Handler == nullptr) {
+        return STATUS_NOT_IMPLEMENTED;
+    }
+
+    // The handler function is an unbound member function so use std::invoke to
+    // bind it to this object instance, forwarding the request arguments.
+    NTSTATUS status = std::invoke(dispatchEntry->Handler, this, request, inputBuffer, outputBuffer);
+    return status;
 }

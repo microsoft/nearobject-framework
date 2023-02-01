@@ -3,8 +3,7 @@
 #include <stdexcept>
 #include <unordered_map>
 
-#include <UwbCxLrpDeviceGlue.h>
-
+#include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
 #include <windows/devices/uwb/UwbSession.hxx>
 

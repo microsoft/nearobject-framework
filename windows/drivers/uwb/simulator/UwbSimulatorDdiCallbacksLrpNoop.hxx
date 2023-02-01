@@ -16,7 +16,7 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     DeviceReset() override;
 
     virtual UwbStatus
-    DeviceGetInformation(UwbDeviceInfo &deviceInfo) override;
+    DeviceGetInformation(UwbDeviceInfoInformation &deviceInfo) override;
 
     virtual UwbStatus
     DeviceGetCapabilities(UwbDeviceCapabilities &deviceCapabilities) override;
@@ -43,7 +43,7 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     GetSessionCount(uint32_t *sessionCount) override;
 
     virtual UwbStatus
-    SessionGetState(uint32_t sessionId, UwbSessionState *sessionState) override;
+    SessionGetState(uint32_t sessionId, UwbSessionState &sessionState) override;
 
     virtual UwbStatus
     SessionUpdateControllerMulticastList(const std::vector<UwbMacAddress> &controlees) override;
