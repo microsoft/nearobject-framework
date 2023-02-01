@@ -1,25 +1,15 @@
 
-#include <ctime>
+#include <chrono>
+#include <format>
 #include <iomanip>
-#include <sstream>
 
 #include <logging/LogUtils.hxx>
 
 std::string
 logging::GetLogName(const std::string& executableName)
 {
-    auto now = time(0);
-    tm* ltm = localtime(&now);
+    auto now = std::chrono::system_clock::now();
+    auto dateString = std::vformat("{0:%Y%M%d}", std::make_format_args(now));
 
-    std::stringstream ss;
-
-    ss << 1900 + ltm->tm_year
-       << std::setw(2) << std::setfill('0')
-       << ltm->tm_mon
-       << ltm->tm_mday
-       << "-LogNearObject-"
-       << executableName
-       << ".txt";
-
-    return ss.str();
+    return dateString + "-LogNearObject-" + executableName + ".txt";
 }
