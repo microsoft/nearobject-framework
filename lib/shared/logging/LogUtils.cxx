@@ -1,7 +1,7 @@
 
 #include <chrono>
-#include <format>
 #include <iomanip>
+#include <sstream>
 
 #include <logging/LogUtils.hxx>
 
@@ -9,7 +9,15 @@ std::string
 logging::GetLogName(const std::string& executableName)
 {
     auto now = std::chrono::system_clock::now();
-    auto dateString = std::vformat("{0:%Y%M%d}", std::make_format_args(now));
 
-    return dateString + "-LogNearObject-" + executableName + ".txt";
+    const std::time_t t_c = std::chrono::system_clock::to_time_t(now);
+
+    std::stringstream ss;
+
+    ss << std::put_time(std::localtime(&t_c), "%Y%m%d")
+       << "-LogNearObject-"
+       << executableName
+       << ".txt";
+
+    return ss.str();
 }
