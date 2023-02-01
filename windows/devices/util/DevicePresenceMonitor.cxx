@@ -3,6 +3,8 @@
 
 #include <windows/devices/DevicePresenceMonitor.hxx>
 
+#include <plog/Log.h>
+
 using namespace windows::devices;
 
 DevicePresenceMonitor::DevicePresenceMonitor(const GUID &deviceGuid, std::function<void(DevicePresenceEvent presenceEvent, std::string deviceName)> callback) noexcept :
@@ -21,6 +23,7 @@ DevicePresenceMonitor::RegisterForDeviceClassNotifications()
 
     auto notifyRegistrationResult = CM_Register_Notification(&interfaceFilter, this, OnDeviceInterfaceNotificationCallback, &m_hcmNotificationHandle);
     if (notifyRegistrationResult != CR_SUCCESS) {
+        PLOG_ERROR << "failed to register notification callback";
         throw DevicePresenceMonitor::StartException{ notifyRegistrationResult };
     }
 }

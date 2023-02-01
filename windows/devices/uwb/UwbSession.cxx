@@ -9,6 +9,8 @@
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 #include <windows/devices/uwb/UwbSession.hxx>
 
+#include <plog/Log.h>
+
 using namespace windows::devices::uwb;
 
 UwbSession::UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, wil::unique_hfile handleDriver) :
@@ -19,8 +21,7 @@ UwbSession::UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks,
 void
 UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData &uwbSessionData)
 {
-    // TODO: collect options set from uwbConfiguration, translate them to
-    // UWB_APP_CONFIG_PARAM, and send them to the driver.
+    PLOG_VERBOSE << "ConfigureImpl";
 
     // Populate the session initialization command argument.
     UWB_SESSION_INIT sessionInit;
@@ -31,6 +32,7 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData &uwbSessio
     HRESULT hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_SESSION_INIT, &sessionInit, sizeof sessionInit, nullptr, 0, nullptr, nullptr);
     if (FAILED(hr)) {
         // TODO: handle this
+        PLOG_ERROR << "could not request a new session from the driver, hr=" << std::hex << hr;
     }
 
     m_sessionId = uwbSessionData.sessionId;
@@ -50,6 +52,7 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData &uwbSessio
     hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_SET_APP_CONFIG_PARAMS, std::data(setParamsBuffer), std::size(setParamsBuffer), statusBuffer.get(), statusSize, nullptr, nullptr);
     if (FAILED(hr)) {
         // TODO: handle this
+        PLOG_ERROR << "could not send params to driver";
     }
 }
 
@@ -58,9 +61,10 @@ UwbSession::StartRangingImpl()
 {
     UWB_START_RANGING_SESSION startRangingSession;
     startRangingSession.sessionId = GetId();
-    HRESULT hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_STOP_RANGING_SESSION, &startRangingSession, sizeof startRangingSession, nullptr, 0, nullptr, nullptr);
+    HRESULT hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_START_RANGING_SESSION, &startRangingSession, sizeof startRangingSession, nullptr, 0, nullptr, nullptr);
     if (FAILED(hr)) {
         // TODO
+        PLOG_ERROR << "could not send start ranging command to driver";
     }
 }
 
@@ -72,12 +76,14 @@ UwbSession::StopRangingImpl()
     HRESULT hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_STOP_RANGING_SESSION, &stopRangingSession, sizeof stopRangingSession, nullptr, 0, nullptr, nullptr);
     if (FAILED(hr)) {
         // TODO
+        PLOG_ERROR << "could not send stop ranging command to driver";
     }
 }
 
 void
     UwbSession::AddPeerImpl(::uwb::UwbMacAddress /* peerMacAddress */)
 {
+    PLOG_VERBOSE << "AddPeerImpl";
     // TODO: two main options for updating the UWB-CLX peer list:
     //  1) Every time a peer is added (on-demand)
     //  2) Only when StartRanging() is called.
@@ -124,5 +130,6 @@ void
     HRESULT hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_SET_APP_CONFIG_PARAMS, &appConfigParams, static_cast<DWORD>(appConfigParamsSize), &appConfigParamsStatus, sizeof appConfigParamsStatus, &bytesReturned, nullptr);
     if (FAILED(hr)) {
         // TODO
+        PLOG_ERROR << "could not send params to driver";
     }
 }

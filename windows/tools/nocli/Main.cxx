@@ -15,9 +15,16 @@
 #include <windows/devices/DevicePresenceMonitor.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
 
+#include <plog/Initializers/RollingFileInitializer.h>
+#include <plog/Log.h>
+
+#include <logging/LogUtils.hxx>
+
 int
 main(int argc, char* argv[])
 try {
+    plog::init(plog::verbose, logging::GetLogName("nocli").c_str());
+
     auto cliData = std::make_shared<nearobject::cli::NearObjectCliDataWindows>();
     auto cliHandler = std::make_shared<nearobject::cli::NearObjectCliHandlerWindows>();
 

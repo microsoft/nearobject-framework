@@ -3,6 +3,8 @@
 
 #include <stdexcept>
 
+#include <plog/Log.h>
+
 using namespace windows::devices::smartcards;
 
 void
@@ -21,6 +23,7 @@ Smartcard::TransmitAsyncImpl(const smartcard::ApduCommand& command, std::chrono:
     const auto pendingTransmitLock = std::scoped_lock(m_pendingTxGate);
     if (m_pendingTxResponsePromise.has_value()) {
         // only a single asynchronous transmission is currently allowed, bail out
+        PLOG_INFO << "only a single asynchronous transmission is currently allowed, bail out";
         return { SubmissionFailed, {} };
     }
 

@@ -12,6 +12,11 @@
 #include <nearobject/service/NearObjectServiceInjector.hxx>
 #include <nearobject/service/ServiceRuntime.hxx>
 
+#include <plog/Initializers/RollingFileInitializer.h>
+#include <plog/Log.h>
+
+#include <logging/LogUtils.hxx>
+
 /**
  * @brief Get the user's home path.
  * 
@@ -38,11 +43,14 @@ using namespace nearobject::service;
 int
 main(int argc, char *argv[])
 {
+    plog::init(plog::verbose, logging::GetLogName("nearobjectd").c_str());
+
     auto configuration = nearobject::service::NearObjectServiceConfiguration::FromCommandLineArguments(argc, argv);
 
     // Resolve user home directory.
     const std::filesystem::path homePath{ GetUserHomePath() };
     if (homePath.empty()) {
+        PLOG_FATAL << "unable to determine user home path";
         throw std::runtime_error("unable to determine user home path");
     }
 
@@ -71,6 +79,7 @@ main(int argc, char *argv[])
         if (daemon(nochdir, noclose) != 0) {
             int error = errno;
             const std::string what = "failed to daemonize (error=" + std::to_string(error) + ")";
+            PLOG_FATAL << what;
             throw std::runtime_error(what);
         }
     }

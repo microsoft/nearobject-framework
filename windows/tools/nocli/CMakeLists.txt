@@ -13,9 +13,11 @@ target_sources(nocli-win
 target_link_libraries(nocli-win
     PRIVATE
         CLI11::CLI11
+        logging
         magic_enum::magic_enum
         nocli-core
         notstd-windows
+        plog::plog
         windevutil
         windev-uwb
 )

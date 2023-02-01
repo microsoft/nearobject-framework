@@ -11,9 +11,16 @@
 #include <windows/devices/DeviceEnumerator.hxx>
 #include <windows/devices/DevicePresenceMonitor.hxx>
 
+#include <plog/Initializers/RollingFileInitializer.h>
+#include <plog/Log.h>
+
+#include <logging/LogUtils.hxx>
+
 int
 main(int argc, char* argv[])
 {
+    plog::init(plog::verbose, logging::GetLogName("devicemon").c_str());
+
     CLI::App app{};
     app.name("devicemon");
     app.description("monitor device class instances for presence changes");

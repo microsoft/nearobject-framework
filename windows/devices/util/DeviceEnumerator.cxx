@@ -6,6 +6,8 @@
 
 #include <cfgmgr32.h>
 
+#include <plog/Log.h>
+
 using namespace windows::devices;
 
 /* static */
@@ -25,6 +27,7 @@ DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(const GUID& deviceInterfa
         CM_GET_DEVICE_INTERFACE_LIST_PRESENT);
     if (configRet != CR_SUCCESS) {
         // TODO: ???
+        PLOG_ERROR << "CM_Get_Device_Interface_List_Size failed with configRet=0x" << std::hex << configRet;
         return {};
     } else if (deviceInterfaceNamesBufferSize == 0) {
         return {};
@@ -41,9 +44,9 @@ DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(const GUID& deviceInterfa
         CM_GET_DEVICE_INTERFACE_LIST_PRESENT);
     if (configRet != CR_SUCCESS) {
         // TODO: ???
+        PLOG_ERROR << "CM_Get_Device_Interface_List failed with configRet=0x" << std::hex << configRet;
         return {};
     }
-
 
     // Pull out individual strings from the double-null terminated list returned above.
     std::vector<std::string> deviceInterfaceNames{};
@@ -62,6 +65,7 @@ DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(std::string_view deviceIn
 {
     auto deviceClassInterfaceGuid = notstd::GuidFromStringView(deviceInterfaceClassString);
     if (!deviceClassInterfaceGuid.has_value()) {
+        PLOG_DEBUG << "empty guid";
         return {};
     }
 

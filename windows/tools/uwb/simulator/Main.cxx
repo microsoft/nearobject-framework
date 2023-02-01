@@ -11,11 +11,18 @@
 #include <windows/devices/DeviceEnumerator.hxx>
 #include <windows/devices/uwb/simulator/UwbDeviceSimulator.hxx>
 
+#include <plog/Initializers/RollingFileInitializer.h>
+#include <plog/Log.h>
+
+#include <logging/LogUtils.hxx>
+
 using namespace windows::devices;
 
 int
 main(int argc, char* argv[])
 {
+    plog::init(plog::verbose, logging::GetLogName("uwbsim").c_str());
+
     CLI::App app{};
     app.name("uwbsim");
     app.description("control and interact uwb simulator devices");
