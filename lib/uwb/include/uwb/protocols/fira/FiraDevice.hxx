@@ -305,6 +305,12 @@ enum class UwbSessionType {
     RangingSession,
     TestMode,
 };
+enum class UwbSessionState {
+    Initialized,
+    Deinitialized,
+    Active,
+    Idle,
+};
 enum class UwbSessionReasonCode {
     StateChangeWithSessionManagementCommands,
     MaxRangignRoundRetryCountReached,
@@ -339,7 +345,7 @@ struct UwbDeviceInfoVendor
     virtual ~UwbDeviceInfoVendor() = default;
 };
 
-struct UwbDeviceInfo
+struct UwbDeviceInfoInformation
 {
     UwbVersion VersionUwb;
     UwbVersion VersionUci;
@@ -362,11 +368,6 @@ enum class UwbApplicationConfigurationParameterType {
 
 struct UwbApplicationConfigurationParameter
 {};
-
-struct UwbSessionState
-{
-    uint32_t Id;
-};
 
 struct UwbStatusMulticastList
 {

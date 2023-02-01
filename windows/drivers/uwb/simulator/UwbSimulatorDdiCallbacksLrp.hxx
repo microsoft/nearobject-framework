@@ -38,7 +38,7 @@ struct UwbSimulatorDdiCallbacksLrp
      * @return UwbStatus
      */
     virtual UwbStatus
-    DeviceGetInformation(UwbDeviceInfo &deviceInfo) = 0;
+    DeviceGetInformation(UwbDeviceInfoInformation &deviceInfo) = 0;
 
     /**
      * @brief
@@ -126,7 +126,7 @@ struct UwbSimulatorDdiCallbacksLrp
      * @return UwbStatus
      */
     virtual UwbStatus
-    SessionGetState(uint32_t sessionId, UwbSessionState *sessionState) = 0;
+    SessionGetState(uint32_t sessionId, UwbSessionState &sessionState) = 0;
 
     /**
      * @brief
@@ -166,9 +166,9 @@ struct UwbSimulatorDdiCallbacksLrp
     SessionGetRangingCount(uint32_t sessionId, uint32_t *rangingCount) = 0;
 
     /**
-     * @brief 
-     * 
-     * @param notificationData 
+     * @brief
+     *
+     * @param notificationData
      */
     virtual void
     UwbNotification(UwbNotificationData notificationData) = 0;

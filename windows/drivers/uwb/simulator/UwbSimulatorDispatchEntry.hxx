@@ -16,7 +16,7 @@ namespace windows::devices::uwb::simulator
 /**
  * @brief Represents an entry used to dispatch WDF requests to a handler
  * implementation.
- * 
+ *
  * @tparam ClassT The type of the containing class which defines the
  * implementation handler functions. This limits the member functions which can
  * be used to dispatch execution.
@@ -36,7 +36,7 @@ struct UwbSimulatorDispatchEntry
     /**
      * @brief Determines whether the specified request parameters are valid for
      * this dispatch entry.
-     * 
+     *
      * @param inputBufferSize The size of the request input buffer, in bytes.
      * @param outputBufferSize The size of the request output buffer, in bytes.
      * @return NTSTATUS
