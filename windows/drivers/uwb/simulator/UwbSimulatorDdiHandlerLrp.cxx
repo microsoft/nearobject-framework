@@ -33,8 +33,8 @@ namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
  * @tparam The type of the IOCTL ouput that's accepted.
  */
 template <
-    typename InputT = void *,
-    typename OutputT = void *>
+    typename InputT = Unrestricted,
+    typename OutputT = Unrestricted>
 UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp> (*MakeLrpDispatchEntry)(ULONG, typename UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>::HandlerFuncT) = &MakeDispatchEntry<UwbSimulatorDdiHandlerLrp, InputT, OutputT>;
 
 /**
