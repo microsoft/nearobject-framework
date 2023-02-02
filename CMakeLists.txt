@@ -16,7 +16,7 @@ endif()
 if (NOF_USE_VCPKG)
   if ("${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}" STREQUAL "")
     find_package(Git REQUIRED)
-    set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg)
+    set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg/vcpkg)
 
     # Initialize vcpkg sub-module if not already done.
     if (NOT EXISTS ${VCPKG_SUBMODULE_ROOT}/.git)
@@ -25,7 +25,7 @@ if (NOF_USE_VCPKG)
         COMMAND_ERROR_IS_FATAL ANY)
     endif()
 
-    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "vcpkg toolchain file")
+    set(CMAKE_TOOLCHAIN_FILE "${VCPKG_SUBMODULE_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "vcpkg toolchain file")
   endif()
   MESSAGE(STATUS "using vcpkg for source dependencies")
 else()

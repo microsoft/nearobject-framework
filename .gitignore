@@ -2,3 +2,4 @@
 build
 vcpkg_installed*/
 .vscode/settings.json
+/vcpkg/vcpkg/
