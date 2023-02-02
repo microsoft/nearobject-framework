@@ -1,4 +1,11 @@
 
+vcpkg_from_git(
+    OUT_SOURCE_PATH SOURCE_PATH
+    URL @NOF_VCPKG_DRIVER_URL@
+    REF @NOF_VCPKG_DRIVER_GIT_REF@
+    FETCH_REF @NOF_VCPKG_DRIVER_GIT_REF_FETCH@
+)
+
 vcpkg_check_features(
     OUT_FEATURE_OPTIONS FEATURE_OPTIONS
     FEATURES
@@ -6,22 +13,6 @@ vcpkg_check_features(
         windows-build NOF_WINDOWS_BUILD
         windows-build-driver NOF_WINDOWS_BUILD_DRIVER
 )
-
-if (NOF_WINDOWS_BUILD_DRIVER)
-    vcpkg_from_git(
-        OUT_SOURCE_PATH SOURCE_PATH
-        URL https://github.com/microsoft/nearobject-framework.git
-        REF @NOF_VCPKG_PORT_GIT_REF@
-    )
-else()
-    vcpkg_from_github(
-        OUT_SOURCE_PATH SOURCE_PATH
-        REPO microsoft/nearobject-framework
-        REF @NOF_VCPKG_PORT_RELEASE_REF@
-        SHA512 @NOF_VCPKG_PORT_RELEASE_SHA512@
-        HEAD_REF develop
-    )
-endif()
 
 vcpkg_cmake_configure(
     SOURCE_PATH ${SOURCE_PATH}
