@@ -18,7 +18,7 @@ vcpkg_cmake_configure(
         -DVCPKG_MANIFEST_DIR=/ports/nearobject-framework
         -DNOF_USE_VCPKG=TRUE
         -DNOF_DISABLE_TESTS=TRUE
-        
+        ${FEATURE_OPTIONS}
 )
 
 vcpkg_cmake_install()
