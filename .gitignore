@@ -1,6 +1,12 @@
+# VS and VSCode
 .vs
-build
-vcpkg_installed*/
 .vscode/settings.json
-/vcpkg/vcpkg/
+
+# CMake
+build/
+out/
+
+# vcpkg
+vcpkg_installed*/
+/packaging/vcpkg/vcpkg/
 /packaging/vcpkg/ports/nearobject-framework/portfile.cmake
