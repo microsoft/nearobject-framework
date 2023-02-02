@@ -207,18 +207,20 @@ elseif (BUILD_FOR_WINDOWS)
       WIN32_LEAN_AND_MEAN
   )
 
-  if (NOF_USE_MSVC_STATIC_RUNTIME)
-    # Enable explicit selection of MSVC runtime library.
-    if (POLICY CMP0091)
-      cmake_policy(SET CMP0091 NEW)
-      # Statically link to the VC++ runtime library. This is required because
-      # when an MSBuild project targets the 'WindowsUserModeDriver10.0' toolset,
-      # the runtime library settings are completely ignored and instead links
-      # staticaly to the VC++ runtime and dynamically to the UCRT. See the
-      # following page for aditional details: more details:
-      # https://learn.microsoft.com/en-us/windows-hardware/drivers/develop/using-the-microsoft-c-runtime-with-user-mode-drivers-and-apps
-      MESSAGE(STATUS "Enabled static linking to VC++ runtime")
-      set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+  if (NOF_WINDOWS_BUILD_DRIVER)
+    if (NOF_USE_MSVC_STATIC_RUNTIME)
+      # Enable explicit selection of MSVC runtime library.
+      if (POLICY CMP0091)
+        cmake_policy(SET CMP0091 NEW)
+        # Statically link to the VC++ runtime library. This is required because
+        # when an MSBuild project targets the 'WindowsUserModeDriver10.0' toolset,
+        # the runtime library settings are completely ignored and instead links
+        # staticaly to the VC++ runtime and dynamically to the UCRT. See the
+        # following page for aditional details: more details:
+        # https://learn.microsoft.com/en-us/windows-hardware/drivers/develop/using-the-microsoft-c-runtime-with-user-mode-drivers-and-apps
+        MESSAGE(STATUS "Enabled static linking to VC++ runtime")
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+      endif()
     endif()
   endif()
 

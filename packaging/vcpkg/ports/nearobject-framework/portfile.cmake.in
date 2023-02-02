@@ -11,7 +11,7 @@ if (NOF_WINDOWS_BUILD_DRIVER)
     vcpkg_from_git(
         OUT_SOURCE_PATH SOURCE_PATH
         URL https://github.com/microsoft/nearobject-framework.git
-        REF 3a7d98db8b352e9b1bc737aadaf8891bab7ed9bf
+        REF @NOF_VCPKG_PORT_GIT_REF@
     )
 else()
     vcpkg_from_github(
