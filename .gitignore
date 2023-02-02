@@ -3,3 +3,4 @@ build
 vcpkg_installed*/
 .vscode/settings.json
 /vcpkg/vcpkg/
+/packaging/vcpkg/ports/nearobject-framework/profile.cmake
