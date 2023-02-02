@@ -11,5 +11,3 @@ execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
 MESSAGE(STATUS "vcpkg development port using commit ${NOF_VCPKG_PORT_GIT_REF}")
 
 configure_file(${PORT_FILE_IN} ${PORT_FILE_OUT} @ONLY)
-
-add_subdirectory(registry)
