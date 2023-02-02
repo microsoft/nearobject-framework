@@ -10,9 +10,13 @@
       "kind": "artifact",
       "location": "https://aka.ms/vcpkg-ce-default",
       "name": "microsoft"
+    },
+    {
+      "kind": "filesystem",
+      "path": "../../../../packaging/vcpkg/registry",
+      "packages": [
+        "nearobject-framework"
+      ]
     }
-  ],
-  "overlay-ports": [
-    "../../../../packaging/vcpkg/ports"
   ]
 }
