@@ -227,6 +227,7 @@ endif()
 
 add_subdirectory(lib)
 add_subdirectory(tools)
+add_subdirectory(vcpkg)
 
 if (NOT NOF_DISABLE_TESTS)
   add_subdirectory(tests)

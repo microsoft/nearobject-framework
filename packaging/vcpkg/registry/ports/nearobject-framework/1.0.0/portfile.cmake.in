@@ -1,10 +1,8 @@
 
-vcpkg_from_github(
+vcpkg_from_git(
     OUT_SOURCE_PATH SOURCE_PATH
-    REPO microsoft/nearobject-framework
-    REF v0.2.4
-    SHA512 f1e262c329ada13fe289ae35e4061a9730c98aeff8b10ca07962c7879ac3048a8d2c0a5901e2f1c477838d8eb27d5d2bccf82cc68851f39765d33249d60677cd
-    HEAD_REF develop
+    URL https://github.com/microsoft/nearobject-framework.git
+    REF ${NOF_VCPKG_PORT_GIT_REF}
 )
 
 vcpkg_check_features(
