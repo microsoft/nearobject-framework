@@ -6,7 +6,7 @@
     {
       "name": "nearobject-framework",
       "features": [
-        "msvc-link-static-runtime"
+        "windows-build-driver"
       ]
     }
   ]
