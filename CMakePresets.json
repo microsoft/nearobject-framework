@@ -21,7 +21,7 @@
             "hidden": true,
             "cacheVariables": {
                 "NOF_USE_VCPKG": true,
-                "VCPKG_MANIFEST_DIR": "${sourceDir}/ports/nearobject-framework"
+                "VCPKG_MANIFEST_DIR": "${sourceDir}/packaging/vcpkg/ports/nearobject-framework"
             }
         },
         {

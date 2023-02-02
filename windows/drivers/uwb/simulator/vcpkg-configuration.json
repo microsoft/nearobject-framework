@@ -13,6 +13,6 @@
     }
   ],
   "overlay-ports": [
-    "../../../../vcpkg/ports"
+    "../../../../packaging/vcpkg/ports"
   ]
 }
