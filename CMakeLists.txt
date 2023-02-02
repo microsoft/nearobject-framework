@@ -4,10 +4,11 @@ cmake_minimum_required(VERSION 3.16)
 option(NOF_USE_MSVC_STATIC_RUNTIME, "Statically link against the VC++ runtime library" OFF)
 option(NOF_USE_VCPKG "Use vcpkg for obtaining source dependencies" OFF)
 option(NOF_WINDOWS_BUILD "Configure the project for an official Windows build" OFF)
+option(NOF_WINDOWS_BUILD_DRIVER "Configure the project for building for a Windows driver" OFF)
 option(NOF_ENABLE_CODE_COVERAGE "Enable instrumenting the build with code coverage" OFF)
 
-# Ensure vcpkg is enabled for the Windows build.
-if (NOF_WINDOWS_BUILD AND NOT NOF_USE_VCPKG)
+# Ensure vcpkg is enabled for the Windows builds.
+if ((NOF_WINDOWS_BUILD OR NOF_WINDOWS_BUILD_DRIVER) AND NOT NOF_USE_VCPKG)
   set(NOF_USE_VCPKG CACHE BOOL ON "Enable vcpkg for Windows build")
 endif()
 
