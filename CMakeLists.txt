@@ -16,7 +16,7 @@ endif()
 if (NOF_USE_VCPKG)
   if ("${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}" STREQUAL "")
     find_package(Git REQUIRED)
-    set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg/vcpkg)
+    set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/packaging/vcpkg/vcpkg)
 
     # Initialize vcpkg sub-module if not already done.
     if (NOT EXISTS ${VCPKG_SUBMODULE_ROOT}/.git)
@@ -227,7 +227,7 @@ endif()
 
 add_subdirectory(lib)
 add_subdirectory(tools)
-add_subdirectory(vcpkg)
+add_subdirectory(packaging)
 
 if (NOT NOF_DISABLE_TESTS)
   add_subdirectory(tests)
