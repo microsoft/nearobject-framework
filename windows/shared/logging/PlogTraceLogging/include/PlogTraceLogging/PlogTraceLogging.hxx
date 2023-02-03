@@ -1,6 +1,6 @@
 
-#ifndef PLOG_TRACE_UTILS_HXX
-#define PLOG_TRACE_UTILS_HXX
+#ifndef PLOG_TRACE_LOGGING_HXX
+#define PLOG_TRACE_LOGGING_HXX
 
 #include <string>
 
@@ -21,4 +21,4 @@ GetLogName2(const std::string& executableName);
 
 } // namespace logging
 
-#endif // PLOG_TRACE_UTILS_HXX
+#endif // PLOG_TRACE_LOGGING_HXX
