@@ -6,32 +6,83 @@
     },
     "configurePresets": [
         {
-            "name": "dev",
-            "displayName": "Development",
-            "description": "Enables development build for inner-loop",
+            "name": "resolve-deps-fetchcontent",
+            "hidden": true,
+            "displayName": "Resolve dependencies with FetchContent",
+            "description": "configures project to resolve dependencies with FetchContent",
             "cacheVariables": {
-                "NOF_BUILD_ENVIRONMENT_DEVELOPMENT": "development",
                 "NOF_DEPENDENCY_RESOLUTION_METHOD": "FetchContent"
             }
         },
         {
-            "name": "vcpkg",
-            "displayName": "Vcpkg Base",
-            "description": "Defines the core settings for all vcpkg-based builds",
+            "name": "resolve-deps-vcpkg",
             "hidden": true,
+            "displayName": "Resolve dependencies with vcpkg",
+            "description": "configures project to resolve dependencies with vcpkg",
             "cacheVariables": {
                 "NOF_DEPENDENCY_RESOLUTION_METHOD": "vcpkg"
             }
         },
         {
+            "name": "dev-base",
+            "hidden": true,
+            "displayName": "Development (base)",
+            "description": "Base options for all development presets",
+            "cacheVariables": {
+                "NOF_BUILD_ENVIRONMENT": "development",
+                "NOF_VCPKG_TARGET": "development"
+            }
+        },
+        {
+            "name": "vcpkg-base",
+            "hidden": true,
+            "displayName": "vcpkg (base)",
+            "description": "Base options for all vcpkg presets",
+            "inherits":[
+                "resolve-deps-vcpkg"
+            ],
+            "cacheVariables": {
+                "NOF_BUILD_ENVIRONMENT": "vcpkg"
+            }
+        },
+        {
+            "name": "dev",
+            "displayName": "Development (with FetchContent)",
+            "description": "Development build for inner-loop with FetchContent",
+            "inherits": [
+                "dev-base",
+                "resolve-deps-fetchcontent"
+            ]
+        },
+        {
+            "name": "dev-vcpkg",
+            "displayName": "Development (with vcpkg)",
+            "description": "Development build for inner-loop with vcpkg",
+            "inherits": [
+                "dev-base",
+                "resolve-deps-vcpkg"
+            ]
+        },
+        {
             "name": "vcpkg-dev",
-            "displayName": "Vcpkg Integration",
-            "description": "Enables development build for integration with vcpkg-based environments",
+            "displayName": "vcpkg (development)",
+            "description": "vcpkg-based build with development (latest) sources",
+            "inherits": [
+                "vcpkg-base"
+            ],
+            "cacheVariables": {
+                "NOF_VCPKG_TARGET": "development"
+            }
+        },
+        {
+            "name": "vcpkg-release",
+            "displayName": "vcpkg (release)",
+            "description": "vcpkg-based build with release (stable) sources",
             "inherits": [
                 "vcpkg"
             ],
             "cacheVariables": {
-                "NOF_BUILD_ENVIRONMENT_DEVELOPMENT": "development"
+                "NOF_VCPKG_TARGET": "release"
             }
         }
     ],
@@ -48,10 +99,8 @@
         },
         {
             "name": "release",
-            "configuration": "Release",
-            "inherits": [
-                "dev"
-            ]
+            "configurePreset": "vcpkg-release",
+            "configuration": "Release"
         }
     ],
     "testPresets": [
