@@ -1,3 +1,11 @@
+
+# Configures vcpkg for use locally.
+# 
+# This will determine if vcpkg is available. If not, it will clone the vcpkg
+# Github repository as a submodule into the directory specified by
+# SUBMODULE_ROOT, and instruct cmake to use its toolchain file to help satisfy
+# dependencies. It also adds a local git configuration rule to ignore all
+# changes in the submodule.
 function(vcpkg_configure)
   cmake_parse_arguments(
     VCPKG 
