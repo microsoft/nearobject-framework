@@ -79,7 +79,7 @@
             "displayName": "vcpkg (release)",
             "description": "vcpkg-based build with release (stable) sources",
             "inherits": [
-                "vcpkg"
+                "vcpkg-base"
             ],
             "cacheVariables": {
                 "NOF_VCPKG_TARGET": "release"
