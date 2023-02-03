@@ -7,27 +7,21 @@ option(NOF_WINDOWS_BUILD "Configure the project for an official Windows build" O
 option(NOF_WINDOWS_BUILD_DRIVER "Configure the project for building for a Windows driver" OFF)
 option(NOF_ENABLE_CODE_COVERAGE "Enable instrumenting the build with code coverage" OFF)
 
+# Other fixed project variables.
+set(NOF_VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/packaging/vcpkg/vcpkg)
+
 # Ensure vcpkg is enabled for the Windows builds.
 if ((NOF_WINDOWS_BUILD OR NOF_WINDOWS_BUILD_DRIVER) AND NOT NOF_USE_VCPKG)
   set(NOF_USE_VCPKG CACHE BOOL ON "Enable vcpkg for Windows build")
 endif()
 
+include(CMakeParseArguments)
+
 # Select source package dependency manager based on selected option.
 # This must occur prior to the first project() statement.
 if (NOF_USE_VCPKG)
-  if ("${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}" STREQUAL "")
-    find_package(Git REQUIRED)
-    set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/packaging/vcpkg/vcpkg)
-
-    # Initialize vcpkg sub-module if not already done.
-    if (NOT EXISTS ${VCPKG_SUBMODULE_ROOT}/.git)
-      execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive -- ${VCPKG_SUBMODULE_ROOT}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR} 
-        COMMAND_ERROR_IS_FATAL ANY)
-    endif()
-
-    set(CMAKE_TOOLCHAIN_FILE "${VCPKG_SUBMODULE_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "vcpkg toolchain file")
-  endif()
+  include(cmake/vcpkg.cmake)
+  vcpkg_configure(SUBMODULE_ROOT ${NOF_VCPKG_SUBMODULE_ROOT}) 
   MESSAGE(STATUS "using vcpkg for source dependencies")
 else()
   MESSAGE(STATUS "using FetchContent for source dependencies")
@@ -185,46 +179,6 @@ set(NOF_DIR_WINDOWS ${CMAKE_CURRENT_LIST_DIR}/windows)
 if (BUILD_FOR_LINUX)
   add_subdirectory(linux)
 elseif (BUILD_FOR_WINDOWS)
-  # Make public version of wil available.
-  set(WIL_BUILD_TESTS OFF CACHE INTERNAL "Turn off wil tests")
-  set(WIL_BUILD_PACKAGING OFF CACHE INTERNAL "Turn off wil packaging")
-
-  if (NOF_USE_VCPKG)
-    find_package(wil CONFIG REQUIRED)
-  else()
-    FetchContent_Declare(WIL
-        GIT_REPOSITORY "https://github.com/microsoft/wil"
-        GIT_TAG "5eb59d60e167482639cc47ffb40442158da7fd04"
-        GIT_SHALLOW OFF
-    )
-    FetchContent_MakeAvailable(WIL)
-  endif()
-
-  # Add Windows-specific global compile definitions.
-  add_compile_definitions(
-      _UNICODE
-      UNICODE
-      NOMINMAX
-      WIN32_LEAN_AND_MEAN
-  )
-
-  if (NOF_WINDOWS_BUILD_DRIVER)
-    if (NOF_USE_MSVC_STATIC_RUNTIME)
-      # Enable explicit selection of MSVC runtime library.
-      if (POLICY CMP0091)
-        cmake_policy(SET CMP0091 NEW)
-        # Statically link to the VC++ runtime library. This is required because
-        # when an MSBuild project targets the 'WindowsUserModeDriver10.0' toolset,
-        # the runtime library settings are completely ignored and instead links
-        # staticaly to the VC++ runtime and dynamically to the UCRT. See the
-        # following page for aditional details: more details:
-        # https://learn.microsoft.com/en-us/windows-hardware/drivers/develop/using-the-microsoft-c-runtime-with-user-mode-drivers-and-apps
-        MESSAGE(STATUS "Enabled static linking to VC++ runtime")
-        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-      endif()
-    endif()
-  endif()
-
   add_subdirectory(windows)
 endif()
 

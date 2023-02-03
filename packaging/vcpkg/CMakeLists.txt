@@ -32,10 +32,10 @@ set(NOF_VCPKG_RELEASE_GIT_REF ${NOF_VCPKG_RELEASE_TAG})
 set(NOF_VCPKG_RELEASE_GIT_REF_FETCH ${NOF_GIT_BRANCH_CURRENT})
 
 # Determine the vcpkg target the codebase is being built for.
-if (NOF_WINDOWS_BUILD_DRIVER)
-    set(NOF_VCPKG_TARGET DRIVER)
+if (NOF_WINDOWS_BUILD)
+  set(NOF_VCPKG_TARGET RELEASE)
 else()
-    set(NOF_VCPKG_TARGET RELEASE)
+  set(NOF_VCPKG_TARGET DRIVER)
 endif()
 
 # Select configuration based on build target.
