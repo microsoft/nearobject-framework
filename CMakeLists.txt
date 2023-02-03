@@ -4,24 +4,51 @@ cmake_minimum_required(VERSION 3.16)
 option(NOF_USE_MSVC_STATIC_RUNTIME, "Statically link against the VC++ runtime library" OFF)
 option(NOF_CODE_COVERAGE "Enable instrumenting the build with code coverage" OFF)
 
+# Build environment definitions.
+# 
+# When "development" is selected, the project is configured to build for active development purposes.
+# When "vcpkg" is selected, the project is configured to build on behalf of a vcpkg port.
+#
+set(NOF_BUILD_ENVIRONMENT_DEVELOPMENT "development")
+set(NOF_BUILD_ENVIRONMENT_VCPKG "vcpkg")
+set(NOF_BUILD_ENVIRONMENT ${NOF_BUILD_ENVIRONMENT_DEVELOPMENT} CACHE STRING "Build profile: either local 'development' or 'vcpkg'")
+
 # Dependency resolution configuration.
 set(NOF_DEPENDENCY_RESOLUTION_METHOD_FETCHCONTENT "FetchContent")
 set(NOF_DEPENDENCY_RESOLUTION_METHOD_VCPKG "vcpkg")
 set(NOF_DEPENDENCY_RESOLUTION_METHOD ${NOF_DEPENDENCY_RESOLUTION_METHOD_FETCHCONTENT} CACHE STRING "Method used to resolve dependencies: either 'FetchContent' or 'vcpkg'")
 
-# vcpkg related cache options.
+include(cmake/vcpkg.cmake)
+
+# vcpkg feature related variables and options.
+#
+# These exist solely for being set through the vcpkg port file and each has a
+# 1:1 mapping to all official vcpkg features for our package. The following
+# table describes the mapping between feature name and CMake variable:
+#
+# vcpkg feature name       |    CMake variable name                  
+# -------------------------|-----------------------------------------
+# <top-level feature>      | NOF_VCPKG_ENABLE
+# msvc-link-static-runtime | NOF_VCPKG_FEATURE_USE_MSVC_STATIC_RUNTIME
+# enable-development       | NOF_VCPKG_FEATURE_ENABLE_DEVELOPMENT
+#
 option(NOF_VCPKG_ENABLE "Enable building the project via a vcpkg port" OFF)
 option(NOF_VCPKG_FEATURE_USE_MSVC_STATIC_RUNTIME "vcpkg feature: Statically link against the VC++ runtime library" OFF)
 option(NOF_VCPKG_FEATURE_ENABLE_DEVELOPMENT "vcpkg feature: Enable development mode, using the latest sources" OFF)
 
-# vcpkg variables.
+# vcpkg build target.
+# 
+# This controls the versioning information used when the vcpkg is built. 
+# When "development" is selected, the HEAD revision of the current branch will be used.  
+# When "release" is selected, the latest hard-coded version in packaging/vcpkg/CMakeLists.txt.
+#
+set(NOF_VCPKG_TARGET_DEVELOPMENT "development")
+set(NOF_VCPKG_TARGET_RELEASE "release")
+set(NOF_VCPKG_TARGET ${NOF_VCPKG_TARGET_DEVELOPMENT} CACHE STRING "vcpkg target: either 'development' or 'release'") 
+
+# vcpkg const variables.
 set(VCPKG_MANIFEST_DIR ${CMAKE_CURRENT_LIST_DIR}/packaging/vcpkg/ports/nearobject-framework)
 set(NOF_VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/packaging/vcpkg/vcpkg)
-
-# Build environment definitions.
-set(NOF_BUILD_ENVIRONMENT_DEVELOPMENT "development")
-set(NOF_BUILD_ENVIRONMENT_VCPKG "vcpkg")
-set(NOF_BUILD_ENVIRONMENT ${NOF_BUILD_ENVIRONMENT_DEVELOPMENT} CACHE STRING "Build profile: either local 'development' or 'vcpkg'")
 
 # Enable vcpkg build environment if building on behalf of vcpkg.
 if (NOF_VCPKG_ENABLE)
@@ -32,31 +59,26 @@ endif()
 if (NOF_BUILD_ENVIRONMENT STREQUAL NOF_BUILD_ENVIRONMENT_VCPKG)
   # vcpkg build environment must use vcpkg for dependency resolution, so override the cache value.
   set(NOF_DEPENDENCY_RESOLUTION_METHOD ${NOF_DEPENDENCY_RESOLUTION_METHOD_VCPKG} CACHE STRING "override" FORCE)
-  # Enable static runtime linking if requiested via vcpkg feature.
+  # Enable static runtime linking if requested via vcpkg feature.
   if (NOF_VCPKG_FEATURE_USE_MSVC_STATIC_RUNTIME)
     set(NOF_USE_MSVC_STATIC_RUNTIME TRUE CACHE BOOL "override" FORCE)
   endif()
-  set(NOF_VCPKG_TARGET RELEASE)
+  # Enable development target if requested.
+  if (NOF_VCPKG_FEATURE_ENABLE_DEVELOPMENT)
+    set(NOF_VCPKG_TARGET ${NOF_VCPKG_TARGET_DEVELOPMENT} CACHE STRING "override") 
+  endif()
 elseif (NOF_BUILD_ENVIRONMENT STREQUAL NOF_BUILD_ENVIRONMENT_DEVELOPMENT)
-  # Nothing specified needed for the deveopment environment as yet.
-  set(NOF_VCPKG_TARGET DEVELOPMENT)
+  # If using vcpkg to resolve dependencies, clone the vcpkg github repository so
+  # that it's usable directly in the project without having to install it
+  # manually. This must occur prior to the first project statement.
+  if (NOF_DEPENDENCY_RESOLUTION_METHOD STREQUAL NOF_DEPENDENCY_RESOLUTION_METHOD_VCPKG)
+    vcpkg_configure(SUBMODULE_ROOT ${NOF_VCPKG_SUBMODULE_ROOT})
+  endif()
 else()
   MESSAGE(FATAL_ERROR "Unknown build environment '${NOF_BUILD_ENVIRONMENT}' specified")
 endif()
 
 MESSAGE(STATUS "using build environment '${NOF_BUILD_ENVIRONMENT}' with dependency resolution method '${NOF_DEPENDENCY_RESOLUTION_METHOD}'")
-
-# Inlcude helper scripts for vcpkg related logic.
-include(CMakeParseArguments)
-include(cmake/vcpkg.cmake)
-
-# Check if using vcpkg to resolve dependencies in development environment. In
-# this case, we clone the vcpkg Github repository as a sub-module so that it's
-# usable directly in the repository without having to install it manually.
-# This must occur prior to the first project() statement.
-if (NOF_DEPENDENCY_RESOLUTION_METHOD STREQUAL NOF_DEPENDENCY_RESOLUTION_METHOD_VCPKG AND NOT NOF_BUILD_ENVIRONMENT STREQUAL NOF_BUILD_ENVIRONMENT_VCPKG)
-  vcpkg_configure(SUBMODULE_ROOT ${NOF_VCPKG_SUBMODULE_ROOT})
-endif()
 
 project(nearobject-framework LANGUAGES CXX)
 
