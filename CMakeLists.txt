@@ -2,10 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 # Project configuration options.
 option(NOF_USE_MSVC_STATIC_RUNTIME, "Statically link against the VC++ runtime library" OFF)
-option(NOF_USE_VCPKG "Use vcpkg for obtaining source dependencies" OFF)
-option(NOF_WINDOWS_BUILD "Configure the project for an official Windows build" OFF)
-option(NOF_WINDOWS_BUILD_DRIVER "Configure the project for building for a Windows driver" OFF)
-option(NOF_ENABLE_CODE_COVERAGE "Enable instrumenting the build with code coverage" OFF)
+option(NOF_CODE_COVERAGE "Enable instrumenting the build with code coverage" OFF)
 
 # Dependency resolution configuration.
 set(NOF_DEPENDENCY_RESOLUTION_METHOD_FETCHCONTENT "FetchContent")
@@ -15,14 +12,21 @@ set(NOF_DEPENDENCY_RESOLUTION_METHOD ${NOF_DEPENDENCY_RESOLUTION_METHOD_FETCHCON
 # vcpkg related cache options.
 option(NOF_VCPKG_ENABLE "Enable building the project via a vcpkg port" OFF)
 option(NOF_VCPKG_FEATURE_USE_MSVC_STATIC_RUNTIME "vcpkg feature: Statically link against the VC++ runtime library" OFF)
+option(NOF_VCPKG_FEATURE_ENABLE_DEVELOPMENT "vcpkg feature: Enable development mode, using the latest sources" OFF)
 
 # vcpkg variables.
+set(VCPKG_MANIFEST_DIR ${CMAKE_CURRENT_LIST_DIR}/packaging/vcpkg/ports/nearobject-framework)
 set(NOF_VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/packaging/vcpkg/vcpkg)
 
 # Build environment definitions.
 set(NOF_BUILD_ENVIRONMENT_DEVELOPMENT "development")
 set(NOF_BUILD_ENVIRONMENT_VCPKG "vcpkg")
 set(NOF_BUILD_ENVIRONMENT ${NOF_BUILD_ENVIRONMENT_DEVELOPMENT} CACHE STRING "Build profile: either local 'development' or 'vcpkg'")
+
+# Enable vcpkg build environment if building on behalf of vcpkg.
+if (NOF_VCPKG_ENABLE)
+  set(NOF_BUILD_ENVIRONMENT ${NOF_BUILD_ENVIRONMENT_VCPKG} CACHE STRING "override" FORCE)
+endif()
 
 # Apply build-environment specific settings and configuration.
 if (NOF_BUILD_ENVIRONMENT STREQUAL NOF_BUILD_ENVIRONMENT_VCPKG)
@@ -32,23 +36,19 @@ if (NOF_BUILD_ENVIRONMENT STREQUAL NOF_BUILD_ENVIRONMENT_VCPKG)
   if (NOF_VCPKG_FEATURE_USE_MSVC_STATIC_RUNTIME)
     set(NOF_USE_MSVC_STATIC_RUNTIME TRUE CACHE BOOL "override" FORCE)
   endif()
+  set(NOF_VCPKG_TARGET RELEASE)
 elseif (NOF_BUILD_ENVIRONMENT STREQUAL NOF_BUILD_ENVIRONMENT_DEVELOPMENT)
   # Nothing specified needed for the deveopment environment as yet.
+  set(NOF_VCPKG_TARGET DRIVER)
 else()
   MESSAGE(FATAL_ERROR "Unknown build environment '${NOF_BUILD_ENVIRONMENT}' specified")
 endif()
 
-MESSAGE(STATUS "using dependency resolution method '${NOF_DEPENDENCY_RESOLUTION_METHOD}'") 
-MESSAGE(STATUS "using build environment '${NOF_BUILD_ENVIRONMENT}'")
+MESSAGE(STATUS "using build environment '${NOF_BUILD_ENVIRONMENT}' with dependency resolution method '${NOF_DEPENDENCY_RESOLUTION_METHOD}'")
 
 # Inlcude helper scripts for vcpkg related logic.
 include(CMakeParseArguments)
 include(cmake/vcpkg.cmake)
-
-# Ensure vcpkg is enabled for the Windows builds.
-if ((NOF_WINDOWS_BUILD OR NOF_WINDOWS_BUILD_DRIVER) AND NOT NOF_USE_VCPKG)
-  set(NOF_USE_VCPKG CACHE BOOL ON "Enable vcpkg for Windows build")
-endif()
 
 # Check if using vcpkg to resolve dependencies in development environment. In
 # this case, we clone the vcpkg Github repository as a sub-module so that it's
@@ -180,7 +180,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GN
       -Wl,-z,relro
       -z noexecstack
     )
-    if (NOF_ENABLE_CODE_COVERAGE)
+    if (NOF_CODE_COVERAGE)
       add_compile_options(
         -fprofile-arcs
         -ftest-coverage
@@ -188,7 +188,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GN
     endif()
   # clang specific options
   elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    if (NOF_ENABLE_CODE_COVERAGE)
+    if (NOF_CODE_COVERAGE)
       add_compile_options(
         -fprofile-instr-generate
         -fcoverage-mapping

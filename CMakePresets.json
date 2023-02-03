@@ -10,8 +10,8 @@
             "displayName": "Development",
             "description": "Enables development build for inner-loop",
             "cacheVariables": {
-                "NOF_USE_VCPKG": false,
-                "NOF_WINDOWS_BUILD": false
+                "NOF_BUILD_ENVIRONMENT_DEVELOPMENT": "development",
+                "NOF_DEPENDENCY_RESOLUTION_METHOD": "FetchContent"
             }
         },
         {
@@ -20,8 +20,7 @@
             "description": "Defines the core settings for all vcpkg-based builds",
             "hidden": true,
             "cacheVariables": {
-                "NOF_USE_VCPKG": true,
-                "VCPKG_MANIFEST_DIR": "${sourceDir}/packaging/vcpkg/ports/nearobject-framework"
+                "NOF_DEPENDENCY_RESOLUTION_METHOD": "vcpkg"
             }
         },
         {
@@ -32,19 +31,7 @@
                 "vcpkg"
             ],
             "cacheVariables": {
-                "NOF_WINDOWS_BUILD": false
-            }
-        },
-        {
-            "name": "windows-build",
-            "displayName": "Official Windows Build",
-            "description": "Enables official build for Windows",
-            "hidden": true,
-            "inherits": [
-                "vcpkg"
-            ],
-            "cacheVariables": {
-                "NOF_WINDOWS_BUILD": true
+                "NOF_BUILD_ENVIRONMENT_DEVELOPMENT": "development"
             }
         }
     ],

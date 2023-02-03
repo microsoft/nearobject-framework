@@ -11,15 +11,14 @@ vcpkg_check_features(
     # TODO: try to get 'PREFIX NOF_VCPKG' working 
     FEATURES
         msvc-link-static-runtime NOF_VCPKG_FEATURE_USE_MSVC_STATIC_RUNTIME
-        windows-build NOF_WINDOWS_BUILD
-        windows-build-driver NOF_WINDOWS_BUILD_DRIVER
+        enable-development NOF_VCPKG_FEATURE_ENABLE_DEVELOPMENT
 )
 
 vcpkg_cmake_configure(
     SOURCE_PATH ${SOURCE_PATH}
     OPTIONS
-        -DVCPKG_MANIFEST_DIR=${SOURCE_PATH}/ports/nearobject-framework
-        -DNOF_USE_VCPKG=TRUE
+        # -DVCPKG_MANIFEST_DIR=${SOURCE_PATH}/ports/nearobject-framework
+        -DNOF_VCPKG_ENABLE=TRUE
         -DNOF_DISABLE_TESTS=TRUE
         ${FEATURE_OPTIONS}
 )
