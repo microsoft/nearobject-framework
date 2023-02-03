@@ -23,7 +23,7 @@ function(vcpkg_configure)
     # Initialize vcpkg sub-module if not already done.
     if (NOT EXISTS ${VCPKG_SUBMODULE_ROOT}/.git)
       execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive -- ${VCPKG_SUBMODULE_ROOT}
-        WORKING_DIRECTORY ${VCPKG_SUBMODULE_ROOT}../
+        WORKING_DIRECTORY ${VCPKG_SUBMODULE_ROOT}/../
         COMMAND_ERROR_IS_FATAL ANY)
     endif()
     set(CMAKE_TOOLCHAIN_FILE "${VCPKG_SUBMODULE_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "vcpkg toolchain file")
