@@ -19,23 +19,10 @@
     }
   ],
   "features": {
-    "msvc-link-static-runtime": {
-      "description": "Enables statically linking against the VC++ runtime, required for UMDF drivers",
-      "dependencies": [
-        "nearobject-framework"
-      ],
-      "supports": "windows"
-    },
     "windows-build-driver": {
       "description": "Enables specific functionality for Windows driver development",
-      "dependencies": [
-        {
-          "name": "nearobject-framework",
-          "default-features": false,
-          "features": [
-            "msvc-link-static-runtime"
-          ]
-        }
+      "dependencies": [ 
+        "nearobject-framework" 
       ],
       "supports": "windows"
     },

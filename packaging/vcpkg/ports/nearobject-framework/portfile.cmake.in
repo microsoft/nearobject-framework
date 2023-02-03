@@ -9,7 +9,6 @@ vcpkg_from_git(
 vcpkg_check_features(
     OUT_FEATURE_OPTIONS FEATURE_OPTIONS
     FEATURES
-        msvc-link-static-runtime NOF_USE_MSVC_STATIC_RUNTIME
         windows-build NOF_WINDOWS_BUILD
         windows-build-driver NOF_WINDOWS_BUILD_DRIVER
 )
