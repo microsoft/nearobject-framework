@@ -31,7 +31,7 @@ endif()
 # Apply build-environment specific settings and configuration.
 if (NOF_BUILD_ENVIRONMENT STREQUAL NOF_BUILD_ENVIRONMENT_VCPKG)
   # vcpkg build environment must use vcpkg for dependency resolution, so override the cache value.
-  set(NOF_DEPENDENCY_RESOLUTION_METHOD NOF_DEPENDENCY_RESOLUTION_METHOD_VCPKG CACHE STRING "override" FORCE)
+  set(NOF_DEPENDENCY_RESOLUTION_METHOD ${NOF_DEPENDENCY_RESOLUTION_METHOD_VCPKG} CACHE STRING "override" FORCE)
   # Enable static runtime linking if requiested via vcpkg feature.
   if (NOF_VCPKG_FEATURE_USE_MSVC_STATIC_RUNTIME)
     set(NOF_USE_MSVC_STATIC_RUNTIME TRUE CACHE BOOL "override" FORCE)
