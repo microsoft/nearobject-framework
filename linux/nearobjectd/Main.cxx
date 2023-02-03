@@ -15,7 +15,7 @@
 #include <plog/Initializers/RollingFileInitializer.h>
 #include <plog/Log.h>
 
-#include <logging/LogUtils.hxx>
+#include <LogUtils/LogUtils.hxx>
 
 /**
  * @brief Get the user's home path.

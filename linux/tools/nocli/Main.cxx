@@ -10,7 +10,7 @@
 #include "NearObjectCliDataLinux.hxx"
 #include <nearobject/cli/NearObjectCli.hxx>
 
-#include <logging/LogUtils.hxx>
+#include <LogUtils/LogUtils.hxx>
 
 int
 main(int argc, char* argv[])

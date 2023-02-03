@@ -13,7 +13,7 @@ target_link_libraries(devicemon
         notstd-windows
         windevutil
         plog::plog
-        logging
+        LogUtils
 )
 
 set_target_properties(devicemon PROPERTIES FOLDER windows/tools)

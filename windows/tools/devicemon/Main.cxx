@@ -14,7 +14,7 @@
 #include <plog/Initializers/RollingFileInitializer.h>
 #include <plog/Log.h>
 
-#include <logging/LogUtils.hxx>
+#include <LogUtils/LogUtils.hxx>
 
 int
 main(int argc, char* argv[])
