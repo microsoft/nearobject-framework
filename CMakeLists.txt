@@ -7,6 +7,12 @@ option(NOF_WINDOWS_BUILD "Configure the project for an official Windows build" O
 option(NOF_WINDOWS_BUILD_DRIVER "Configure the project for building for a Windows driver" OFF)
 option(NOF_ENABLE_CODE_COVERAGE "Enable instrumenting the build with code coverage" OFF)
 
+# Other fixed project variables.
+set(NOF_VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/packaging/vcpkg/vcpkg)
+
+include(CMakeParseArguments)
+include(cmake/vcpkg.cmake)
+
 # Ensure vcpkg is enabled for the Windows builds.
 if ((NOF_WINDOWS_BUILD OR NOF_WINDOWS_BUILD_DRIVER) AND NOT NOF_USE_VCPKG)
   set(NOF_USE_VCPKG CACHE BOOL ON "Enable vcpkg for Windows build")
@@ -15,19 +21,7 @@ endif()
 # Select source package dependency manager based on selected option.
 # This must occur prior to the first project() statement.
 if (NOF_USE_VCPKG)
-  if ("${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}" STREQUAL "")
-    find_package(Git REQUIRED)
-    set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/packaging/vcpkg/vcpkg)
-
-    # Initialize vcpkg sub-module if not already done.
-    if (NOT EXISTS ${VCPKG_SUBMODULE_ROOT}/.git)
-      execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive -- ${VCPKG_SUBMODULE_ROOT}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR} 
-        COMMAND_ERROR_IS_FATAL ANY)
-    endif()
-
-    set(CMAKE_TOOLCHAIN_FILE "${VCPKG_SUBMODULE_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "vcpkg toolchain file")
-  endif()
+  vcpkg_configure(SUBMODULE_ROOT ${NOF_VCPKG_SUBMODULE_ROOT})
   MESSAGE(STATUS "using vcpkg for source dependencies")
 else()
   MESSAGE(STATUS "using FetchContent for source dependencies")
