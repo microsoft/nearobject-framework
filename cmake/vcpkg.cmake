@@ -1,4 +1,6 @@
 
+include(CMakeParseArguments)
+
 # Configures vcpkg for use locally.
 # 
 # This will determine if vcpkg is available. If not, it will clone the vcpkg
