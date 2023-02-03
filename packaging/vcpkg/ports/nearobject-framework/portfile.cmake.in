@@ -8,7 +8,6 @@ vcpkg_from_git(
 
 vcpkg_check_features(
     OUT_FEATURE_OPTIONS FEATURE_OPTIONS
-    # TODO: try to get 'PREFIX NOF_VCPKG' working 
     FEATURES
         msvc-link-static-runtime NOF_VCPKG_FEATURE_USE_MSVC_STATIC_RUNTIME
         enable-development NOF_VCPKG_FEATURE_ENABLE_DEVELOPMENT
