@@ -144,9 +144,27 @@ UwbSimulatorDdiHandlerLrp::OnUwbGetApplicationConfigurationParameters(WDFREQUEST
 
 // IOCTL_UWB_SET_APP_CONFIG_PARAMS
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbSetApplicationConfigurationParameters(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandlerLrp::OnUwbSetApplicationConfigurationParameters(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer)
 {
-    return STATUS_NOT_IMPLEMENTED;
+    NTSTATUS status = STATUS_SUCCESS;
+
+    // Convert DDI input type to neutral type.
+    auto &applicationConfigurationParametersIn [[maybe_unused]] = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS *>(std::data(inputBuffer));
+    std::vector<std::unique_ptr<IUwbAppConfigurationParameter>> applicationConfigurationParameters{};
+    std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::unique_ptr<IUwbAppConfigurationParameter>>> applicationConfigurationParameterResults;
+
+    // Invoke callback.
+    auto statusUwb = m_callbacks->SetApplicationConfigurationParameters(applicationConfigurationParameters, applicationConfigurationParameterResults);
+
+    // Convert neutral types to DDI types.
+    auto &outputValue = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS_STATUS *>(std::data(outputBuffer));
+    outputValue.size = sizeof outputValue;
+    outputValue.status = UwbCxDdi::From(statusUwb);
+
+    // Complete the request.
+    WdfRequestCompleteWithInformation(request, status, outputValue.size);
+
+    return status;
 }
 
 // IOCTL_UWB_GET_SESSION_COUNT
