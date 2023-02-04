@@ -5,12 +5,14 @@
 #include <memory>
 #include <vector>
 
+#include <uwb/protocols/fira/FiraDevice.hxx>
 #include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
 namespace windows::devices::uwb::simulator
 {
 struct UwbSimulatorSession
 {
+    UwbSessionState State{ UwbSessionState::Deinitialized };
     std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> AapplicationConfigurationParameters;
 };
 } // namespace windows::devices::uwb::simulator

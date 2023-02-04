@@ -82,8 +82,16 @@ UwbSimulatorDdiCallbacksLrpNoop::GetSessionCount(uint32_t &sessionCount)
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SessionGetState(uint32_t /* sessionId */, UwbSessionState & /* sessionState */)
+UwbSimulatorDdiCallbacksLrpNoop::SessionGetState(uint32_t  sessionId , UwbSessionState &sessionState)
 {
+    std::shared_lock sessionsReadLock{ m_sessionsGate };
+    auto sessionIt = m_sessions.find(sessionId);
+    if (sessionIt == std::cend(m_sessions)) {
+        return UwbStatusGeneric::InvalidParameter; // TODO: is this the expected return when session id is invalid?
+    }
+
+    const auto &[_, session] = *sessionIt;
+    sessionState = session.State;
     return UwbStatusOk;
 }
 
