@@ -79,7 +79,7 @@ struct UwbSimulatorDdiCallbacksLrp
      * @return UwbStatus
      */
     virtual UwbStatus
-    GetApplicationConfigurationParameters(std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters) = 0;
+    GetApplicationConfigurationParameters(std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters) = 0;
 
     /**
      * @brief Set the Application Configuration Parameters object

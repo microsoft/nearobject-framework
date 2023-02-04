@@ -3,9 +3,12 @@
 #define UWB_SIMULATOR_DDI_CALLBACKS_LRP_NOOP
 
 #include <cstdint>
+#include <memory>
 #include <vector>
 
 #include "UwbSimulatorDdiCallbacksLrp.hxx"
+
+#include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
 namespace windows::devices::uwb::simulator
 {
@@ -37,7 +40,7 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     SetApplicationConfigurationParameters(const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::shared_ptr<IUwbAppConfigurationParameter>>> &applicationConfigurationParameterResults) override;
 
     virtual UwbStatus
-    GetApplicationConfigurationParameters(std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters) override;
+    GetApplicationConfigurationParameters(std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters) override;
 
     virtual UwbStatus
     GetSessionCount(uint32_t *sessionCount) override;
@@ -59,6 +62,9 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
 
     virtual void
     UwbNotification(UwbNotificationData notificationData) override;
+
+private:
+    std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> m_applicationConfigurationParameters;
 };
 } // namespace windows::devices::uwb::simulator
 

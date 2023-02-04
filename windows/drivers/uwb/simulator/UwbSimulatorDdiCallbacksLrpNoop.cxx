@@ -59,7 +59,7 @@ UwbSimulatorDdiCallbacksLrpNoop::SetApplicationConfigurationParameters(const std
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::GetApplicationConfigurationParameters(std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters)
+UwbSimulatorDdiCallbacksLrpNoop::GetApplicationConfigurationParameters(std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters)
 {
     applicationConfigurationParameters = {};
     return UwbStatusOk;
