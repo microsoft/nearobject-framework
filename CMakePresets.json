@@ -6,6 +6,24 @@
     },
     "configurePresets": [
         {
+            "name": "os-windows",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "os-linux",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+        {
             "name": "resolve-deps-fetchcontent",
             "hidden": true,
             "displayName": "Resolve dependencies with FetchContent",
@@ -64,6 +82,27 @@
             ]
         },
         {
+            "name": "dev-driver",
+            "displayName": "Development (driver)",
+            "description": "Development for the simulator driver",
+            "inherits": [
+                "os-windows",
+                "dev"
+            ],
+            "generator": "Visual Studio 17 2022",
+            "architecture":{
+                "strategy": "set",
+                "value": "x64"
+            },
+            "toolset":{
+                "strategy": "set",
+                "value": "host=x64"
+            },
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.34.31933/bin/Hostx64/x64/cl.exe"
+            }
+        },
+        {
             "name": "vcpkg-dev",
             "displayName": "vcpkg (development)",
             "description": "vcpkg-based build with development (latest) sources",
@@ -101,6 +140,10 @@
             "name": "release",
             "configurePreset": "vcpkg-release",
             "configuration": "Release"
+        },
+        {
+            "name": "driver",
+            "configurePreset": "dev-driver"
         }
     ],
     "testPresets": [
