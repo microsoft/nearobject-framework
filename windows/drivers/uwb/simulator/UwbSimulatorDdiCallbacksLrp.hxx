@@ -3,6 +3,7 @@
 #define UWB_SIMULATOR_DDI_CALLBACKS_LRP
 
 #include <cstdint>
+#include <memory>
 #include <optional>
 #include <string>
 #include <tuple>
@@ -88,7 +89,7 @@ struct UwbSimulatorDdiCallbacksLrp
      * @return UwbStatus
      */
     virtual UwbStatus
-    SetApplicationConfigurationParameters(const std::vector<std::unique_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::unique_ptr<IUwbAppConfigurationParameter>>> &applicationConfigurationParameterResults) = 0;
+    SetApplicationConfigurationParameters(const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::shared_ptr<IUwbAppConfigurationParameter>>> &applicationConfigurationParameterResults) = 0;
 
     /**
      * @brief Get the Session Count object
