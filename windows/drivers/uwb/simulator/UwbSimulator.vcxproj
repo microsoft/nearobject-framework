@@ -29,7 +29,6 @@
     <ClInclude Include="UwbSimulatorDdiCallbacksLrp.hxx" />
     <ClInclude Include="UwbSimulatorDdiCallbacksLrpNoop.hxx" />
     <ClInclude Include="UwbSimulatorIoQueue.hxx" />
-    <ClInclude Include="UwbCxDependencies.hxx" />
     <ClInclude Include="UwbSimulatorDevice.hxx" />
     <ClInclude Include="UwbSimulatorDeviceFile.hxx" />
     <ClInclude Include="UwbSimulatorTracelogging.hxx" />
