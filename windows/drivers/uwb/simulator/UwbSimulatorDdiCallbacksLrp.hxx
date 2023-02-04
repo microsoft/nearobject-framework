@@ -98,7 +98,7 @@ struct UwbSimulatorDdiCallbacksLrp
      * @return UwbStatus
      */
     virtual UwbStatus
-    GetSessionCount(uint32_t *sessionCount) = 0;
+    GetSessionCount(uint32_t &sessionCount) = 0;
 
     /**
      * @brief

@@ -46,7 +46,7 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters) override;
 
     virtual UwbStatus
-    GetSessionCount(uint32_t *sessionCount) override;
+    GetSessionCount(uint32_t &sessionCount) override;
 
     virtual UwbStatus
     SessionGetState(uint32_t sessionId, UwbSessionState &sessionState) override;

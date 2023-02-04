@@ -74,8 +74,10 @@ UwbSimulatorDdiCallbacksLrpNoop::GetApplicationConfigurationParameters(uint32_t 
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::GetSessionCount(uint32_t * /* sessionCount */)
+UwbSimulatorDdiCallbacksLrpNoop::GetSessionCount(uint32_t &sessionCount)
 {
+    std::shared_lock sessionsReadLock{ m_sessionsGate };
+    sessionCount = static_cast<uint32_t>(std::size(m_sessions));
     return UwbStatusOk;
 }
 
