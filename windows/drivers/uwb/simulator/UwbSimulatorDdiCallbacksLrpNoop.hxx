@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <shared_mutex>
 #include <vector>
 
 #include "UwbSimulatorDdiCallbacksLrp.hxx"
@@ -64,6 +65,7 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     UwbNotification(UwbNotificationData notificationData) override;
 
 private:
+    std::shared_mutex m_applicationConfigurationParametersGate;
     std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> m_applicationConfigurationParameters;
 };
 } // namespace windows::devices::uwb::simulator
