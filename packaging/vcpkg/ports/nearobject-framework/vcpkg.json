@@ -26,27 +26,11 @@
       ],
       "supports": "windows"
     },
-    "windows-build-driver": {
-      "description": "Enables specific functionality for Windows driver development",
+    "enable-development": {
+      "description": "Enables development using the latest sources instead of the last published release",
       "dependencies": [
-        {
-          "name": "nearobject-framework",
-          "default-features": false,
-          "features": [
-            "msvc-link-static-runtime"
-          ]
-        }
-      ],
-      "supports": "windows"
-    },
-    "windows-build": {
-      "description": "Configures the project for an official Windows build",
-      "dependencies": [
-        {
-          "name": "nearobject-framework"
-        }
-      ],
-      "supports": "windows"
+        "nearobject-framework"
+      ]
     }
   },
   "builtin-baseline": "ac12118f02e127ef1fe9806ffe1a23e7db7ef988"
