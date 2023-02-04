@@ -51,7 +51,7 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionDeninitialize(uint32_t /*sessionId*/)
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SetApplicationConfigurationParameters(const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> & /* applicationConfigurationParameters */, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::shared_ptr<IUwbAppConfigurationParameter>>> &applicationConfigurationParameterResults)
+UwbSimulatorDdiCallbacksLrpNoop::SetApplicationConfigurationParameters(uint32_t /*sessionId*/, const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> & /* applicationConfigurationParameters */, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::shared_ptr<IUwbAppConfigurationParameter>>> &applicationConfigurationParameterResults)
 {
     std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::shared_ptr<IUwbAppConfigurationParameter>>> results{};
     applicationConfigurationParameterResults = std::move(results);
@@ -59,10 +59,17 @@ UwbSimulatorDdiCallbacksLrpNoop::SetApplicationConfigurationParameters(const std
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::GetApplicationConfigurationParameters(std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters)
+UwbSimulatorDdiCallbacksLrpNoop::GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters)
 {
-    std::shared_lock applicationConfigurationParametersReadLock{ m_applicationConfigurationParametersGate };
-    applicationConfigurationParameters = m_applicationConfigurationParameters;
+    std::shared_lock sessionsReadLock{ m_sessionsGate };
+    auto sessionIt = m_sessions.find(sessionId);
+    if (sessionIt == std::cend(m_sessions)) {
+        applicationConfigurationParameters = {};
+        return UwbStatusGeneric::InvalidParameter; // TODO: is this the expected return when session id is invalid?
+    }
+
+    const auto &[_, session] = *sessionIt;
+    applicationConfigurationParameters = session.AapplicationConfigurationParameters;
     return UwbStatusOk;
 }
 

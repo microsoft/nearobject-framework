@@ -31,6 +31,7 @@
     <ClInclude Include="UwbSimulatorIoQueue.hxx" />
     <ClInclude Include="UwbSimulatorDevice.hxx" />
     <ClInclude Include="UwbSimulatorDeviceFile.hxx" />
+    <ClInclude Include="UwbSimulatorSession.hxx" />
     <ClInclude Include="UwbSimulatorTracelogging.hxx" />
   </ItemGroup>
   <ItemGroup>
