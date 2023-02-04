@@ -86,7 +86,8 @@
             "displayName": "Development (driver)",
             "description": "Development for the simulator driver",
             "inherits": [
-                "os-windows"
+                "os-windows",
+                "dev"
             ],
             "generator": "Visual Studio 17 2022",
             "architecture":{
