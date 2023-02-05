@@ -21,8 +21,8 @@ IUwbAppConfigurationParameter::IUwbAppConfigurationParameter(UWB_APP_CONFIG_PARA
 {
     m_parameter.size = std::size(m_buffer);
     m_parameter.paramType = parameterType;
-    m_parameter.paramLength = parameterValue.size();
-    std::memcpy(&m_parameter.paramValue, parameterValue.data(), parameterValue.size());
+    m_parameter.paramLength = std::size(parameterValue);
+    std::memcpy(&m_parameter.paramValue, std::data(parameterValue), std::size(parameterValue));
 }
 
 std::size_t
@@ -55,7 +55,7 @@ namespace detail
 std::size_t
 CalculateTotalUwbAppConfigurationBufferSize(const std::vector<std::unique_ptr<IUwbAppConfigurationParameter>>& parameters)
 {
-    return std::accumulate(parameters.cbegin(), parameters.cend(), static_cast<std::size_t>(0), [&](std::size_t totalSize, const auto& uwbAppConfigurationParameter) {
+    return std::accumulate(std::cbegin(parameters), std::end(parameters), static_cast<std::size_t>(0), [&](std::size_t totalSize, const auto& uwbAppConfigurationParameter) {
         return totalSize + uwbAppConfigurationParameter->DdiSize();
     });
 }
