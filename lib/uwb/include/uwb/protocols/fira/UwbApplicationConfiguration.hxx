@@ -76,7 +76,6 @@ struct UwbApplicationConfiguration
     MultiNodeMode RangingModeMultiNode{ MultiNodeMode::Unicast };
     Channel ChannelNumber{ Channel::C9 };
     ::uwb::UwbMacAddress DeviceMacAddress{};
-    // TODO: attempt to combine these next 2
     uint8_t NumberOfControlees{ 0 };
     std::vector<::uwb::UwbMacAddress> Controlees{};
     uint16_t SlotDuration{ 2400U };
