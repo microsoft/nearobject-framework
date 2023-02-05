@@ -68,6 +68,7 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
 
 private:
     std::shared_mutex m_sessionsGate;
+    UwbDeviceInfoInformation m_deviceInformation{};
     std::unordered_map<uint32_t, UwbSimulatorSession> m_sessions{};
 };
 } // namespace windows::devices::uwb::simulator

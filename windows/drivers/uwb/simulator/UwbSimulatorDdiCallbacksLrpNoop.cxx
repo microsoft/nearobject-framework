@@ -15,9 +15,9 @@ UwbSimulatorDdiCallbacksLrpNoop::DeviceReset()
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::DeviceGetInformation(UwbDeviceInfoInformation &deviceInfo)
+UwbSimulatorDdiCallbacksLrpNoop::DeviceGetInformation(UwbDeviceInfoInformation &deviceInformation)
 {
-    deviceInfo = {};
+    deviceInformation = m_deviceInformation;
     return UwbStatusOk;
 }
 
@@ -69,7 +69,7 @@ UwbSimulatorDdiCallbacksLrpNoop::GetApplicationConfigurationParameters(uint32_t 
     auto sessionIt = m_sessions.find(sessionId);
     if (sessionIt == std::cend(m_sessions)) {
         applicationConfigurationParameters = {};
-        return UwbStatusGeneric::InvalidParameter; // TODO: is this the expected return when session id is invalid?
+        return UwbStatusSession::NotExist;
     }
 
     const auto &[_, session] = *sessionIt;
@@ -91,7 +91,7 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionGetState(uint32_t  sessionId , UwbSessio
     std::shared_lock sessionsReadLock{ m_sessionsGate };
     auto sessionIt = m_sessions.find(sessionId);
     if (sessionIt == std::cend(m_sessions)) {
-        return UwbStatusGeneric::InvalidParameter; // TODO: is this the expected return when session id is invalid?
+        return UwbStatusSession::NotExist;
     }
 
     const auto &[_, session] = *sessionIt;
@@ -105,7 +105,7 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionUpdateControllerMulticastList(uint32_t s
     std::unique_lock sessionsWriteLock{ m_sessionsGate };
     auto sessionIt = m_sessions.find(sessionId);
     if (sessionIt == std::cend(m_sessions)) {
-        return UwbStatusGeneric::InvalidParameter; // TODO: is this the expected return when session id is invalid?
+        return UwbStatusSession::NotExist;
     }
 
     auto &[_, session] = *sessionIt;
