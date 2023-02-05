@@ -21,7 +21,51 @@ namespace uwb::protocol::fira
 {
 enum class UwbApplicationConfigurationParameterType {
     DeviceType,
-    // TODO: replace with NOF definitions when moved to repo
+    RangingRoundUsage,
+    StsConfiguration,
+    MultiNodeMode,
+    ChannelNumber,
+    NumberOfControlees,
+    DeviceMacAddress,
+    DST_MAC_ADDRESS,
+    SlotDuration,
+    RangingInterval,
+    StsIndex,
+    MacFcsType,
+    RangingRoundControl,
+    AoAResultRequest,
+    RangeDataNotificationConfig,
+    RangeDataNotificationProximityNear,
+    RangeDataNotificationProximityFar,
+    DeviceRole,
+    RFrameConfiguration,
+    PreambleCodeIndex = 0x14,
+    SfdId,
+    PsduDataRate,
+    PreambleDuration,
+    RangingTimeStruct = 0x1A,
+    SlotsPerRangingRound,
+    TxAdaptivePayloadPower,
+    ResponderSlotIndex = 0x1E,
+    PrfMode,
+    ScheduledMode = 0x22,
+    KeyRotation,
+    KeyRotationRate,
+    SessionPriority,
+    MacAddressMode,
+    VendorId,
+    StaticStsIv,
+    NumberOfStsSegments,
+    MaxRangingRoundRetry,
+    UwbInitiationTime,
+    HoppingMode,
+    BlockStrideLength,
+    ResultReportConfig,
+    InBandTerminationAttemptCount,
+    SubSessionId,
+    BprfPhrDataRate,
+    MaxNumberOfMeasurements,
+    StsLength = 0x35
 };
 
 struct UwbApplicationConfiguration
@@ -71,7 +115,6 @@ struct UwbApplicationConfiguration
     uint16_t MaxNumberOfMeasurements{ 0x0000U };
     StsLength StsSegmentLength{ StsLength::Symbols64 };
 };
-
 } // namespace uwb::protocol::fira
 
 #endif // UWB_APPLICATION_CONFIGURATION_HXX
