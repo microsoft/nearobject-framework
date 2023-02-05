@@ -64,7 +64,7 @@ protected:
     std::vector<uint8_t> m_buffer;
     UWB_APP_CONFIG_PARAM& m_parameter;
 
-    // TODO: this assert fails; fix it with alignas()
+    // TODO: this assert fails. Fix it with alignas(); tracked by github issue #67.
     // Ensure the alignment of the vector data buffer can be safely used for UWB_APP_CONFIG_PARAM.
     // static_assert(alignof(uint8_t) == alignof(UWB_APP_CONFIG_PARAM), "UWB_APP_CONFIG_PARAM alignment not satisfied");
 };

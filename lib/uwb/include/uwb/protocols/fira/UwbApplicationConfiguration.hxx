@@ -19,6 +19,10 @@
 
 namespace uwb::protocol::fira
 {
+/**
+ * @brief See FiRa Consortium - UCI Generic Specification v1.1.0, Section 8.3,
+ * Table 29, 'APP Configuration Parameter IDs'.
+ */
 enum class UwbApplicationConfigurationParameterType : uint8_t {
     DeviceType = 0x00U,
     RangingRoundUsage = 0x01U,
@@ -68,6 +72,13 @@ enum class UwbApplicationConfigurationParameterType : uint8_t {
     StsLength = 0x35U,
 };
 
+/**
+ * @brief Session configuration controlled by the application.
+ * 
+ * TODO: consider converting enumerations whose values are exclusively binary
+ * (Disable, Enable) to booleans instead since the conversion can be done
+ * directly with uary operators in both directions.
+ */
 struct UwbApplicationConfiguration
 {
     DeviceType DevType{ DeviceType::Controller };
