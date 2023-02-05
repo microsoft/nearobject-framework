@@ -66,6 +66,10 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     virtual void
     UwbNotification(UwbNotificationData notificationData) override;
 
+protected:
+    void 
+    SessionUpdateState(UwbSimulatorSession &session, UwbSessionState sessionState);
+
 private:
     std::shared_mutex m_sessionsGate;
     UwbDeviceInfoInformation m_deviceInformation{};

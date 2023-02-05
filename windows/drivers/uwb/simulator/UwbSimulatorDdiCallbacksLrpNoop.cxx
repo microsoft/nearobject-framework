@@ -3,10 +3,33 @@
 #include <iterator>
 #include <mutex>
 
+#include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
+
 #include "UwbSimulatorDdiCallbacksLrpNoop.hxx"
 
 using namespace windows::devices::uwb;
 using namespace windows::devices::uwb::simulator;
+
+/**
+ * @brief Namespace alias to reduce typing but preserve clarity regarding DDI
+ * conversion.
+ */
+namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
+
+void
+UwbSimulatorDdiCallbacksLrpNoop::SessionUpdateState(UwbSimulatorSession& session, UwbSessionState sessionState)
+{
+    session.State = sessionState;
+    
+    UWB_NOTIFICATION_DATA notificationData{};
+    notificationData.notificationType = UWB_NOTIFICATION_TYPE_SESSION_STATUS;
+    auto &sessionStatus = notificationData.sessionStatus;
+    sessionStatus.size = sizeof sessionStatus;
+    sessionStatus.sessionId = session.Id;
+    sessionStatus.state = UwbCxDdi::From(sessionState);
+    sessionStatus.reasonCode = UWB_SESSION_REASON_CODE_STATE_CHANGE_WITH_SESSION_MANAGEMENT_COMMANDS;
+    // TODO: raise this notification
+}
 
 UwbStatus
 UwbSimulatorDdiCallbacksLrpNoop::DeviceReset()
@@ -46,10 +69,13 @@ UwbStatus
 UwbSimulatorDdiCallbacksLrpNoop::SessionInitialize(uint32_t sessionId, UwbSessionType sessionType)
 {
     std::unique_lock sessionsWriteLock{ m_sessionsGate };
-    auto [_, inserted] = m_sessions.try_emplace(sessionId, sessionType);
+    auto [sessionIt, inserted] = m_sessions.try_emplace(sessionId, sessionId, sessionType);
     if (!inserted) {
         return UwbStatusSession::Duplicate;
     }
+
+    auto &[_, session] = *sessionIt;
+    SessionUpdateState(session, UwbSessionState::Initialized);
 
     return UwbStatusOk;
 }
@@ -66,8 +92,11 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionDeninitialize(uint32_t sessionId)
         return UwbStatusSession::NotExist;
     }
     
-    UwbSimulatorSession &session [[maybe_unused]] = nodeHandle.mapped();
-    // TODO: do whatever is necessarey for deinitialization
+    auto &session = nodeHandle.mapped();
+    SessionUpdateState(session, UwbSessionState::Deinitialized);
+
+    // TODO: do whatever else is needed for deinitialization
+
     return UwbStatusOk;
 }
 
@@ -131,14 +160,30 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionUpdateControllerMulticastList(uint32_t s
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SessionStartRanging(uint32_t /* sessionId */)
+UwbSimulatorDdiCallbacksLrpNoop::SessionStartRanging(uint32_t sessionId)
 {
+    std::unique_lock sessionsWriteLock{ m_sessionsGate };
+    auto sessionIt = m_sessions.find(sessionId);
+    if (sessionIt == std::cend(m_sessions)) {
+        return UwbStatusSession::NotExist;
+    }
+
+    auto &[_, session] = *sessionIt;
+    session.Sequence++;
     return UwbStatusOk;
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SessionStopRanging(uint32_t /* sessionId */)
+UwbSimulatorDdiCallbacksLrpNoop::SessionStopRanging(uint32_t sessionId)
 {
+    std::unique_lock sessionsWriteLock{ m_sessionsGate };
+    auto sessionIt = m_sessions.find(sessionId);
+    if (sessionIt == std::cend(m_sessions)) {
+        return UwbStatusSession::NotExist;
+    }
+
+    auto &[_, session] = *sessionIt;
+
     return UwbStatusOk;
 }
 
