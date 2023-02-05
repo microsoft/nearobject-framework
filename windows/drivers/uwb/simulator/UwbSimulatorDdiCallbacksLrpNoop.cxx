@@ -1,4 +1,8 @@
 
+#include <algorithm>
+#include <iterator>
+#include <mutex>
+
 #include "UwbSimulatorDdiCallbacksLrpNoop.hxx"
 
 using namespace windows::devices::uwb;
@@ -96,8 +100,16 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionGetState(uint32_t  sessionId , UwbSessio
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SessionUpdateControllerMulticastList(const std::vector<UwbMacAddress> & /* controlees */)
+UwbSimulatorDdiCallbacksLrpNoop::SessionUpdateControllerMulticastList(uint32_t sessionId, std::vector<UwbMacAddress> controlees)
 {
+    std::unique_lock sessionsWriteLock{ m_sessionsGate };
+    auto sessionIt = m_sessions.find(sessionId);
+    if (sessionIt == std::cend(m_sessions)) {
+        return UwbStatusGeneric::InvalidParameter; // TODO: is this the expected return when session id is invalid?
+    }
+
+    auto &[_, session] = *sessionIt;
+    std::move(std::begin(controlees), std::end(controlees), std::inserter(session.Controlees, std::end(session.Controlees)));
     return UwbStatusOk;
 }
 

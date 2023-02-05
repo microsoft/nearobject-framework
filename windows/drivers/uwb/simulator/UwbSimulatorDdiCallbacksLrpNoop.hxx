@@ -52,7 +52,7 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     SessionGetState(uint32_t sessionId, UwbSessionState &sessionState) override;
 
     virtual UwbStatus
-    SessionUpdateControllerMulticastList(const std::vector<UwbMacAddress> &controlees) override;
+    SessionUpdateControllerMulticastList(uint32_t sessionId, std::vector<UwbMacAddress> controlees) override;
 
     virtual UwbStatus
     SessionStartRanging(uint32_t sessionId) override;
