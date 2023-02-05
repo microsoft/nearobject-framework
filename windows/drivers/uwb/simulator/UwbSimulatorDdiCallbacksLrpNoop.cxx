@@ -43,8 +43,14 @@ UwbSimulatorDdiCallbacksLrpNoop::DeviceSetConfigurationParameters(const std::vec
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SessionInitialize(uint32_t /*sessionId*/, UwbSessionType /*sessionType*/)
+UwbSimulatorDdiCallbacksLrpNoop::SessionInitialize(uint32_t sessionId, UwbSessionType sessionType)
 {
+    std::unique_lock sessionsWriteLock{ m_sessionsGate };
+    auto [_, inserted] = m_sessions.try_emplace(sessionId, sessionType);
+    if (!inserted) {
+        return UwbStatusSession::Duplicate;
+    }
+
     return UwbStatusOk;
 }
 

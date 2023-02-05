@@ -14,6 +14,7 @@ namespace windows::devices::uwb::simulator
 {
 struct UwbSimulatorSession
 {
+    UwbSessionType Type{ UwbSessionType::RangingSession };
     UwbSessionState State{ UwbSessionState::Deinitialized };
     std::unordered_set<UwbMacAddress> Controlees;
     std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> ApplicationConfigurationParameters;
