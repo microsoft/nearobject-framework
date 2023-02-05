@@ -55,8 +55,19 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionInitialize(uint32_t sessionId, UwbSessio
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SessionDeninitialize(uint32_t /*sessionId*/)
+UwbSimulatorDdiCallbacksLrpNoop::SessionDeninitialize(uint32_t sessionId)
 {
+    decltype(m_sessions)::node_type nodeHandle;
+    {
+        std::unique_lock sessionsWriteLock{ m_sessionsGate };
+        nodeHandle = m_sessions.extract(sessionId);
+    }
+    if (nodeHandle.empty()) {
+        return UwbStatusSession::NotExist;
+    }
+    
+    UwbSimulatorSession &session [[maybe_unused]] = nodeHandle.mapped();
+    // TODO: do whatever is necessarey for deinitialization
     return UwbStatusOk;
 }
 
