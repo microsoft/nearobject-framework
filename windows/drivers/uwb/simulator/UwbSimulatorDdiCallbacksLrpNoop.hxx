@@ -61,7 +61,7 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     SessionStopRanging(uint32_t sessionId) override;
 
     virtual UwbStatus
-    SessionGetRangingCount(uint32_t sessionId, uint32_t *rangingCount) override;
+    SessionGetRangingCount(uint32_t sessionId, uint32_t &rangingCount) override;
 
     virtual void
     UwbNotification(UwbNotificationData notificationData) override;

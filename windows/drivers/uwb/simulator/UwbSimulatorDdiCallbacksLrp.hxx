@@ -164,7 +164,7 @@ struct UwbSimulatorDdiCallbacksLrp
      * @return UwbStatus
      */
     virtual UwbStatus
-    SessionGetRangingCount(uint32_t sessionId, uint32_t *rangingCount) = 0;
+    SessionGetRangingCount(uint32_t sessionId, uint32_t &rangingCount) = 0;
 
     /**
      * @brief

@@ -69,7 +69,7 @@ UwbSimulatorDdiCallbacksLrpNoop::GetApplicationConfigurationParameters(uint32_t 
     }
 
     const auto &[_, session] = *sessionIt;
-    applicationConfigurationParameters = session.AapplicationConfigurationParameters;
+    applicationConfigurationParameters = session.ApplicationConfigurationParameters;
     return UwbStatusOk;
 }
 
@@ -114,7 +114,7 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionStopRanging(uint32_t /* sessionId */)
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SessionGetRangingCount(uint32_t /* sessionId */, uint32_t * /* rangingCount */)
+UwbSimulatorDdiCallbacksLrpNoop::SessionGetRangingCount(uint32_t /* sessionId */, uint32_t & /* rangingCount */)
 {
     return UwbStatusOk;
 }
