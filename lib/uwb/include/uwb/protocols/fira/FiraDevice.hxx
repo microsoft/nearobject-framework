@@ -352,7 +352,7 @@ struct UwbDeviceInfoInformation
     UwbVersion VersionMac;
     UwbVersion VersionPhy;
     UwbStatus Status;
-    std::unique_ptr<UwbDeviceInfoVendor> VendorSpecificInfo;
+    std::shared_ptr<UwbDeviceInfoVendor> VendorSpecificInfo;
 };
 
 struct UwbDeviceCapabilities
