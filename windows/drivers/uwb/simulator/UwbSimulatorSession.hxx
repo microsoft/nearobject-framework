@@ -13,7 +13,7 @@ namespace windows::devices::uwb::simulator
 struct UwbSimulatorSession
 {
     UwbSessionState State{ UwbSessionState::Deinitialized };
-    std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> AapplicationConfigurationParameters;
+    std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> ApplicationConfigurationParameters;
 };
 } // namespace windows::devices::uwb::simulator
 
