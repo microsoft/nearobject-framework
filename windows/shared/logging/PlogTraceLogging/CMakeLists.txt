@@ -16,6 +16,11 @@ target_include_directories(PlogTraceLogging
         ${PLOGTRACELOGGING_DIR_PUBLIC_INCLUDE}
 )
 
+target_link_libraries(PlogTraceLogging
+PUBLIC
+    plog::plog
+)
+
 list(APPEND PLOGTRACELOGGING_PUBLIC_HEADERS
     ${PLOGTRACELOGGING_DIR_PUBLIC_INCLUDE_PREFIX}/PlogTraceLogging.hxx
 )

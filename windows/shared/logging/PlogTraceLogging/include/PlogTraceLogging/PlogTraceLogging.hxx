@@ -4,6 +4,8 @@
 
 #include <string>
 
+#include <plog/Log.h>
+
 namespace logging
 {
 
