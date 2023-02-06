@@ -32,6 +32,7 @@ The main project defines a vcpkg called [`nearobject-framework`](../../../../pac
 
 ### Quickstart: How to Build the Driver
 
+0. Ensure all pre-requisites have been installed.
 1. Check out the main project if not already done.
 2. Configure the project with CMake (see [here](../../../../README.md#cmake)).
 3. Open the simulator driver solution file [UwbSimulator.sln](UwbSimulator.sln) in Visual Studio 2022.
