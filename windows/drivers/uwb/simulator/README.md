@@ -17,6 +17,8 @@ Pre-requisites:
 
 Follow the instructions on the [Windows WDK download page](https://learn.microsoft.com/en-us/windows-hardware/drivers/download-the-wdk) to install the above pre-requisites. In Step 1 when installing Visual Studio and selecting workloads, in addition to the `Desktop development with C++` workload, you must also install the `Linux and embedded development with C++` workload to obtain built-in support for vcpkg. The vcpkg support applies to Windows as well, but the feature started out on Linux and hasn't yet been moved to an appropriate VS installer feature set option.
 
+Last, install vcpkg system-wide using the instructions [here](https://devblogs.microsoft.com/cppblog/vcpkg-environment-activation-in-visual-studio/). Once installed, execute the following command: [`vcpkg integrate install`](https://vcpkg.io/en/docs/commands/integrate.html#vcpkg-integrate-install) which integrates vcpkg with Visual Studio.
+
 The project also contains a build task for Visual Studio Code. However, it is simple and only meant for convenience. Most build tasks and deployment scenarios will be much easier to accomplish from Visual Studio.
 
 ## Build Architecture
