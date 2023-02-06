@@ -67,10 +67,21 @@ windows::devices::uwb::ddi::lrp::From(const UwbStatus& uwbStatus)
     return status;
 }
 
+UWB_DEVICE_CONFIG_PARAM_TYPE
+windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbDeviceConfigurationParameterType &uwbDeviceConfigurationParameterType)
+{
+    static const std::unordered_map<UwbDeviceConfigurationParameterType, UWB_DEVICE_CONFIG_PARAM_TYPE> ConfigParamMap{
+        { UwbDeviceConfigurationParameterType::DeviceState, UWB_DEVICE_CONFIG_PARAM_TYPE_DEVICE_STATE },
+        { UwbDeviceConfigurationParameterType::LowPowerMode, UWB_DEVICE_CONFIG_PARAM_TYPE_LOW_POWER_MODE },
+    };
+
+    return ConfigParamMap.at(uwbDeviceConfigurationParameterType);
+}
+
 UWB_APP_CONFIG_PARAM_TYPE
 windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbApplicationConfigurationParameterType &uwbApplicationConfigurationParameterType)
 {
-    static const std::unordered_map<UwbApplicationConfigurationParameterType, UWB_APP_CONFIG_PARAM_TYPE> MapType{
+    static const std::unordered_map<UwbApplicationConfigurationParameterType, UWB_APP_CONFIG_PARAM_TYPE> AppConfigParamMap{
         { UwbApplicationConfigurationParameterType::DeviceType, UWB_APP_CONFIG_PARAM_TYPE_DEVICE_TYPE },
         { UwbApplicationConfigurationParameterType::RangingRoundUsage, UWB_APP_CONFIG_PARAM_TYPE_RANGING_ROUND_USAGE },
         { UwbApplicationConfigurationParameterType::StsConfiguration, UWB_APP_CONFIG_PARAM_TYPE_STS_CONFIG },
@@ -118,23 +129,21 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbApplicatio
         { UwbApplicationConfigurationParameterType::MaxNumberOfMeasurements, UWB_APP_CONFIG_PARAM_TYPE_MAX_NUMBER_OF_MEASUREMENTS },
         { UwbApplicationConfigurationParameterType::StsLength, UWB_APP_CONFIG_PARAM_TYPE_STS_LENGTH },
     };
+
+    return AppConfigParamMap.at(uwbApplicationConfigurationParameterType);
 }
 
 UWB_SESSION_STATE
 windows::devices::uwb::ddi::lrp::From(const UwbSessionState uwbSessionState)
 {
-    switch (uwbSessionState) {
-    case UwbSessionState::Initialized:
-        return UWB_SESSION_STATE_INIT;
-    case UwbSessionState::Deinitialized:
-        return UWB_SESSION_STATE_DEINIT;
-    case UwbSessionState::Active:
-        return UWB_SESSION_STATE_ACTIVE;
-    case UwbSessionState::Idle:
-        return UWB_SESSION_STATE_IDLE;
-    }
+    static const std::unordered_map<UwbSessionState, UWB_SESSION_STATE> SessionStateMap{
+        { UwbSessionState::Initialized, UWB_SESSION_STATE_INIT },
+        { UwbSessionState::Deinitialized, UWB_SESSION_STATE_DEINIT },
+        { UwbSessionState::Active, UWB_SESSION_STATE_ACTIVE },
+        { UwbSessionState::Idle, UWB_SESSION_STATE_IDLE },
+    };
 
-    throw std::runtime_error("unknown enumeration value");
+    return SessionStateMap.at(uwbSessionState);
 }
 
 UWB_DEVICE_INFO

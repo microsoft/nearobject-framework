@@ -64,6 +64,15 @@ From(const ::uwb::protocol::fira::UwbDeviceInfoInformation &uwbDeviceInfo);
 UWB_DEVICE_CAPABILITIES
 From(const ::uwb::protocol::fira::UwbDeviceCapabilities &uwbDeviceCapabilities);
 
+/**
+ * @brief Converts UwbDeviceConfigurationParameterType to UWB_DEVICE_CONFIG_PARAM_TYPE.
+ * 
+ * @param uwbDeviceConfigurationParameterType 
+ * @return UWB_DEVICE_CONFIG_PARAM_TYPE 
+ */
+UWB_DEVICE_CONFIG_PARAM_TYPE
+From(const ::uwb::protocol::fira::UwbDeviceConfigurationParameterType &uwbDeviceConfigurationParameterType);
+
 } // namespace windows::devices::uwb::ddi::lrp
 
 #endif // UWB_CX_ADAPTER_DDI_LRP_HXX
