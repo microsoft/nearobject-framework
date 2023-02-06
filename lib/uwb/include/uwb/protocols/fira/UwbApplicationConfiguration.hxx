@@ -12,10 +12,10 @@
 #include <unordered_set>
 #include <variant>
 
+#include <uwb/UwbMacAddress.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/RangingMethod.hxx>
 #include <uwb/protocols/fira/StaticRangingInfo.hxx>
-#include <uwb/UwbMacAddress.hxx>
 
 namespace uwb::protocol::fira
 {
@@ -74,7 +74,7 @@ enum class UwbApplicationConfigurationParameterType : uint8_t {
 
 /**
  * @brief Session configuration controlled by the application.
- * 
+ *
  * TODO: consider converting enumerations whose values are exclusively binary
  * (Disable, Enable) to booleans instead since the conversion can be done
  * directly with uary operators in both directions.
@@ -94,7 +94,7 @@ struct UwbApplicationConfiguration
     uint32_t StsIndex{ 0x00000000U };
     ::uwb::UwbMacAddressFcsType MacAddressFcsType{ ::uwb::UwbMacAddressFcsType::Crc16 };
     std::bitset<8> RangingRoundControl{ 0x03 };
-    AoAResult AoAResultRequest{ AoAResult::Enable }; 
+    AoAResult AoAResultRequest{ AoAResult::Enable };
     RangeDataNotificationConfiguration RangeDataNotificationConfig{ RangeDataNotificationConfiguration::Enable };
     uint16_t RangeDataNotificationProximityNear{ 0U };
     uint16_t RangeDataNotificationProximityFar{ 2000U };

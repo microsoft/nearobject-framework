@@ -6,8 +6,8 @@
 #include <unordered_set>
 #include <vector>
 
-#include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/UwbMacAddress.hxx>
+#include <uwb/protocols/fira/FiraDevice.hxx>
 #include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
 namespace windows::devices::uwb::simulator

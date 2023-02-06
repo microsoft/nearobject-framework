@@ -17,7 +17,7 @@ TEST_CASE("uwb application configuration objects can be created", "[basic]")
     SECTION("destruction doesn't cause a crash")
     {
         auto uwbApplicationConfiguration = std::make_unique<UwbApplicationConfiguration>();
-        REQUIRE_NOTHROW([&]{ 
+        REQUIRE_NOTHROW([&] {
             uwbApplicationConfiguration.reset();
         });
     }
