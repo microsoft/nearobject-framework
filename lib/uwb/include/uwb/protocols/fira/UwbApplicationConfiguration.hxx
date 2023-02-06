@@ -6,12 +6,6 @@
 #include <cstdint>
 #include <vector>
 
-#include <array>
-#include <memory>
-#include <unordered_map>
-#include <unordered_set>
-#include <variant>
-
 #include <uwb/UwbMacAddress.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/RangingMethod.hxx>
