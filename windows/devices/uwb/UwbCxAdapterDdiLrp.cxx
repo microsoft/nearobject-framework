@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <variant>
 
+#include <uwb/protocols/fira/UwbCapability.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 
 using namespace ::uwb::protocol::fira;
@@ -158,7 +159,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbDeviceInfoInformation& uwbDeviceI
 }
 
 UWB_DEVICE_CAPABILITIES
-windows::devices::uwb::ddi::lrp::From(const UwbDeviceCapabilities& /*uwbDeviceCapabilities*/)
+windows::devices::uwb::ddi::lrp::From(const UwbCapability& uwbDeviceCapabilities)
 {
     UWB_DEVICE_CAPABILITIES deviceCapabilities{};
     deviceCapabilities.size = sizeof deviceCapabilities;

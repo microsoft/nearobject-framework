@@ -12,6 +12,7 @@
 #include "UwbSimulatorSession.hxx"
 
 #include <uwb/protocols/fira/UwbApplicationConfiguration.hxx>
+#include <uwb/protocols/fira/UwbCapability.hxx>
 #include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
 namespace windows::devices::uwb::simulator
@@ -26,7 +27,7 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     DeviceGetInformation(UwbDeviceInfoInformation &deviceInfo) override;
 
     virtual UwbStatus
-    DeviceGetCapabilities(UwbDeviceCapabilities &deviceCapabilities) override;
+    DeviceGetCapabilities(UwbCapability &deviceCapabilities) override;
 
     virtual UwbStatus
     DeviceGetConfigurationParameters(std::vector<UwbDeviceConfigurationParameterType> &deviceConfigurationParameterTypes, std::vector<std::tuple<UwbDeviceConfigurationParameterType, UwbStatus, std::optional<UwbDeviceConfigurationParameter>>> &deviceConfigurationParameterResults) override;
@@ -68,12 +69,13 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     UwbNotification(UwbNotificationData notificationData) override;
 
 protected:
-    void 
+    void
     SessionUpdateState(UwbSimulatorSession &session, UwbSessionState sessionState);
 
 private:
     std::shared_mutex m_sessionsGate;
     UwbDeviceInfoInformation m_deviceInformation{};
+    UwbCapability m_deviceCapabilities{};
     std::unordered_map<uint32_t, UwbSimulatorSession> m_sessions{};
 };
 } // namespace windows::devices::uwb::simulator

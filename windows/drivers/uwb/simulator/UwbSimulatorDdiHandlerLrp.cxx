@@ -108,7 +108,7 @@ UwbSimulatorDdiHandlerLrp::OnUwbGetDeviceCapabilities(WDFREQUEST request, std::s
     NTSTATUS status = STATUS_SUCCESS;
 
     // Execute callback.
-    UwbDeviceCapabilities deviceCapabilities{};
+    UwbCapability deviceCapabilities{};
     auto statusUwb = m_callbacks->DeviceGetCapabilities(deviceCapabilities);
 
     // Convert neutral types to DDI types.

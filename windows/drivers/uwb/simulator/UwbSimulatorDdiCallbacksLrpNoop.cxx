@@ -17,10 +17,10 @@ using namespace windows::devices::uwb::simulator;
 namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
 
 void
-UwbSimulatorDdiCallbacksLrpNoop::SessionUpdateState(UwbSimulatorSession& session, UwbSessionState sessionState)
+UwbSimulatorDdiCallbacksLrpNoop::SessionUpdateState(UwbSimulatorSession &session, UwbSessionState sessionState)
 {
     session.State = sessionState;
-    
+
     UWB_NOTIFICATION_DATA notificationData{};
     notificationData.notificationType = UWB_NOTIFICATION_TYPE_SESSION_STATUS;
     auto &sessionStatus = notificationData.sessionStatus;
@@ -45,9 +45,9 @@ UwbSimulatorDdiCallbacksLrpNoop::DeviceGetInformation(UwbDeviceInfoInformation &
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::DeviceGetCapabilities(UwbDeviceCapabilities &deviceCapabilities)
+UwbSimulatorDdiCallbacksLrpNoop::DeviceGetCapabilities(UwbCapability &deviceCapabilities)
 {
-    deviceCapabilities = {};
+    deviceCapabilities = m_deviceCapabilities;
     return UwbStatusOk;
 }
 
@@ -91,7 +91,7 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionDeninitialize(uint32_t sessionId)
     if (nodeHandle.empty()) {
         return UwbStatusSession::NotExist;
     }
-    
+
     auto &session = nodeHandle.mapped();
     SessionUpdateState(session, UwbSessionState::Deinitialized);
 
@@ -132,7 +132,7 @@ UwbSimulatorDdiCallbacksLrpNoop::GetSessionCount(uint32_t &sessionCount)
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SessionGetState(uint32_t  sessionId , UwbSessionState &sessionState)
+UwbSimulatorDdiCallbacksLrpNoop::SessionGetState(uint32_t sessionId, UwbSessionState &sessionState)
 {
     std::shared_lock sessionsReadLock{ m_sessionsGate };
     auto sessionIt = m_sessions.find(sessionId);

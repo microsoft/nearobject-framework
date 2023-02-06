@@ -13,6 +13,7 @@
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/UwbApplicationConfiguration.hxx>
+#include <uwb/protocols/fira/UwbCapability.hxx>
 
 using namespace uwb::protocol::fira;
 
@@ -49,7 +50,7 @@ struct UwbSimulatorDdiCallbacksLrp
      * @return UwbStatus
      */
     virtual UwbStatus
-    DeviceGetCapabilities(UwbDeviceCapabilities &deviceCapabilities) = 0;
+    DeviceGetCapabilities(UwbCapability &deviceCapabilities) = 0;
 
     /**
      * @brief

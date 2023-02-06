@@ -355,9 +355,6 @@ struct UwbDeviceInfoInformation
     std::shared_ptr<UwbDeviceInfoVendor> VendorSpecificInfo;
 };
 
-struct UwbDeviceCapabilities
-{};
-
 struct UwbDeviceConfigurationParameter
 {};
 
