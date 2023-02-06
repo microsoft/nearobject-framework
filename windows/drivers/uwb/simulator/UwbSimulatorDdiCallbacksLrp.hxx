@@ -3,6 +3,7 @@
 #define UWB_SIMULATOR_DDI_CALLBACKS_LRP
 
 #include <cstdint>
+#include <memory>
 #include <optional>
 #include <string>
 #include <tuple>
@@ -11,6 +12,8 @@
 #include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
+#include <uwb/protocols/fira/UwbApplicationConfiguration.hxx>
+#include <uwb/protocols/fira/UwbCapability.hxx>
 
 using namespace uwb::protocol::fira;
 
@@ -47,7 +50,7 @@ struct UwbSimulatorDdiCallbacksLrp
      * @return UwbStatus
      */
     virtual UwbStatus
-    DeviceGetCapabilities(UwbDeviceCapabilities &deviceCapabilities) = 0;
+    DeviceGetCapabilities(UwbCapability &deviceCapabilities) = 0;
 
     /**
      * @brief
@@ -78,7 +81,7 @@ struct UwbSimulatorDdiCallbacksLrp
      * @return UwbStatus
      */
     virtual UwbStatus
-    GetApplicationConfigurationParameters(std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters) = 0;
+    GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters) = 0;
 
     /**
      * @brief Set the Application Configuration Parameters object
@@ -88,7 +91,7 @@ struct UwbSimulatorDdiCallbacksLrp
      * @return UwbStatus
      */
     virtual UwbStatus
-    SetApplicationConfigurationParameters(const std::vector<std::unique_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::unique_ptr<IUwbAppConfigurationParameter>>> &applicationConfigurationParameterResults) = 0;
+    SetApplicationConfigurationParameters(uint32_t sessionId, const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::shared_ptr<IUwbAppConfigurationParameter>>> &applicationConfigurationParameterResults) = 0;
 
     /**
      * @brief Get the Session Count object
@@ -97,7 +100,7 @@ struct UwbSimulatorDdiCallbacksLrp
      * @return UwbStatus
      */
     virtual UwbStatus
-    GetSessionCount(uint32_t *sessionCount) = 0;
+    GetSessionCount(uint32_t &sessionCount) = 0;
 
     /**
      * @brief
@@ -135,7 +138,7 @@ struct UwbSimulatorDdiCallbacksLrp
      * @return UwbStatus
      */
     virtual UwbStatus
-    SessionUpdateControllerMulticastList(const std::vector<UwbMacAddress> &controlees) = 0;
+    SessionUpdateControllerMulticastList(uint32_t sessionId, std::vector<UwbMacAddress> controlees) = 0;
 
     /**
      * @brief
@@ -163,7 +166,7 @@ struct UwbSimulatorDdiCallbacksLrp
      * @return UwbStatus
      */
     virtual UwbStatus
-    SessionGetRangingCount(uint32_t sessionId, uint32_t *rangingCount) = 0;
+    SessionGetRangingCount(uint32_t sessionId, uint32_t &rangingCount) = 0;
 
     /**
      * @brief

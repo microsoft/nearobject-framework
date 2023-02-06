@@ -3,6 +3,7 @@
 #define UWB_CX_ADAPTER_DDI_LRP_HXX
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
+#include <uwb/protocols/fira/UwbApplicationConfiguration.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 
 /**
@@ -28,6 +29,15 @@ UWB_STATUS
 From(const ::uwb::protocol::fira::UwbStatus &uwbStatus);
 
 /**
+ * @brief Converts UwbApplicationConfigurationParameterType to UWB_APP_CONFIG_PARAM_TYPE.
+ *
+ * @param uwbApplicationConfigurationParameterType
+ * @return UWB_APP_CONFIG_PARAM_TYPE
+ */
+UWB_APP_CONFIG_PARAM_TYPE
+From(const ::uwb::protocol::fira::UwbApplicationConfigurationParameterType &uwbApplicationConfigurationParameterType);
+
+/**
  * @brief Converts UwbSessionState to UWB_SESSION_STATE.
  *
  * @param uwbSessionState
@@ -46,13 +56,22 @@ UWB_DEVICE_INFO
 From(const ::uwb::protocol::fira::UwbDeviceInfoInformation &uwbDeviceInfo);
 
 /**
- * @brief Converts UwbDeviceCapabilities to UWB_DEVICE_CAPABILITIES.
+ * @brief Converts UwbCapability to UWB_DEVICE_CAPABILITIES.
  *
  * @param uwbDeviceCapabilities
  * @return UWB_DEVICE_CAPABILITIES
  */
 UWB_DEVICE_CAPABILITIES
-From(const ::uwb::protocol::fira::UwbDeviceCapabilities &uwbDeviceCapabilities);
+From(const ::uwb::protocol::fira::UwbCapability &uwbDeviceCapabilities);
+
+/**
+ * @brief Converts UwbDeviceConfigurationParameterType to UWB_DEVICE_CONFIG_PARAM_TYPE.
+ *
+ * @param uwbDeviceConfigurationParameterType
+ * @return UWB_DEVICE_CONFIG_PARAM_TYPE
+ */
+UWB_DEVICE_CONFIG_PARAM_TYPE
+From(const ::uwb::protocol::fira::UwbDeviceConfigurationParameterType &uwbDeviceConfigurationParameterType);
 
 } // namespace windows::devices::uwb::ddi::lrp
 

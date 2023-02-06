@@ -9,6 +9,7 @@ target_sources(uwb-test
         ${CMAKE_CURRENT_LIST_DIR}/protocols/fira/TestUwbFiraRegulatoryInformation.cxx
         ${CMAKE_CURRENT_LIST_DIR}/protocols/fira/TestUwbFiraSecureRangingInfo.cxx
         ${CMAKE_CURRENT_LIST_DIR}/protocols/fira/TestUwbFiraStaticRangingInfo.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/protocols/fira/TestUwbFiraUwbApplicationConfiguration.cxx
         ${CMAKE_CURRENT_LIST_DIR}/protocols/fira/TestUwbFiraUwbCapability.cxx
         ${CMAKE_CURRENT_LIST_DIR}/protocols/fira/TestUwbFiraUwbConfiguration.cxx
         ${CMAKE_CURRENT_LIST_DIR}/protocols/fira/TestUwbFiraUwbConfigurationBuilder.cxx
