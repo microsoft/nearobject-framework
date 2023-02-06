@@ -21,7 +21,7 @@ The project also contains a build task for Visual Studio Code. However, it is si
 
 ## Build Architecture
 
-The simulator driver depends on a few libraries from the main nearobject-framework [project](../../../../README.md). These dependencies are resolved using the newly added [vcpkg support in Visual Studio](https://devblogs.microsoft.com/cppblog/vcpkg-environment-activation-in-visual-studio/)(Visual Studio 2022 17.4+). This is controlled by two files in the driver project:
+The simulator driver depends on a few libraries from the main nearobject-framework [project](../../../../README.md). These dependencies are resolved using the newly added [vcpkg support in Visual Studio](https://devblogs.microsoft.com/cppblog/vcpkg-environment-activation-in-visual-studio/) (Visual Studio 2022 17.4+). This is controlled by two files in the driver project:
 
 1. [vcpkg.json](./vcpkg.json): The vcpkg "manifest" which defines the dependencies this project depends on.
 2. [vcpkg-configuration.json](./vcpkg-configuration.json): The vcpkg configuration which defines where to resolve the dependencies defined in the vcpkg.json manifest.
