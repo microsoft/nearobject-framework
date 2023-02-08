@@ -35,10 +35,9 @@ public:
     {
         std::wstring str = Formatter::format(record);
 
-        // Log an event
-        TraceLoggingWrite(g_hplogTraceLoggingProvider,      // handle to my provider
-            "PlogTraceLoggingWrapper",                          // Event Name that should uniquely identify your event.
-            TraceLoggingValue(str.c_str(), "Message")); // Field for your event in the form of (value, field name).
+        TraceLoggingWrite(g_hplogTraceLoggingProvider,
+            "PlogTraceLoggingWrapper",
+            TraceLoggingValue(str.c_str(), "Message"));
     }
 };
 
