@@ -6,54 +6,42 @@
 
 #include <TraceLoggingProvider.h>
 
-#include <string>
-
+#include <plog/Appenders/IAppender.h>
 #include <plog/Log.h>
+
+#include <string>
 
 TRACELOGGING_DECLARE_PROVIDER(g_hplogTraceLoggingProvider);
 
-namespace logging
+namespace plog
 {
 
-/**
- * @brief Returns the name of the log file to be used
- * Format is <date>-LogNearObject-<executableName>.txt
- * For example, if the date was Jan 2, 2001 and the executableName was nocli, then the name would be
- * 20010102-LogNearObject-nocli.txt
- *
- * @param executableName
- * @return std::string
- */
-std::string
-GetLogName2(const std::string& executableName);
+template <class Formatter>
+class TraceLoggingAppender : public IAppender
+{
+public:
+    TraceLoggingAppender()
+    {
+        TraceLoggingRegister(g_hplogTraceLoggingProvider);
+    }
 
-// template <class Formatter>
-// class PLOG_LINKAGE_HIDDEN TraceLoggingAppender : public IAppender
-// {
-// public:
-//     TraceLoggingAppender()
-//     {
-//     }
+    ~TraceLoggingAppender()
+    {
+        TraceLoggingUnregister(g_hplogTraceLoggingProvider);
+    }
 
-//     ~TraceLoggingAppender()
-//     {
-//         DeregisterEventSource(m_eventSource);
-//     }
+    virtual void
+    write(const Record& record) PLOG_OVERRIDE
+    {
+        std::string str = Formatter::format(record);
 
-//     virtual void write(const Record& record) PLOG_OVERRIDE
-//     {
-//         std::wstring str = Formatter::format(record);
-//         const wchar_t* logMessagePtr[] = { str.c_str() };
+        // Log an event
+        TraceLoggingWrite(g_hplogTraceLoggingProvider,      // handle to my provider
+            "HelloWorldTestEvent",                          // Event Name that should uniquely identify your event.
+            TraceLoggingValue(str.c_str(), "TestMessage")); // Field for your event in the form of (value, field name).
+    }
+};
 
-        
-//     }
-
-// private:
-
-// private:
-
-// };
-
-} // namespace logging
+} // namespace plog
 
 #endif // PLOG_TRACE_LOGGING_HXX
