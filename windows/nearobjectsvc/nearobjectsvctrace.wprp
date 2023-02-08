@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WindowsPerformanceRecorder 
+    Version="1.0" 
+    Author="Windows Near Object Team" 
+    Copyright="Microsoft Corporation" 
+    Company="Microsoft Corporation">
+
+  <Profiles>
+    <EventCollector Id="Collector" Name="PlogTraceLoggingProvider">
+      <BufferSize Value="64" />
+      <Buffers Value="4" />
+    </EventCollector>
+
+    <EventProvider Id="NearObjectSvc" Name="EB735AF1-3A63-4650-B4B0-47A4CEE75468" />
+
+    <Profile 
+        Id="PlogTraceLoggingProvider.Verbose.File" 
+        Name="PlogTraceLoggingProvider" 
+        Description="PlogTraceLoggingProvider" 
+        LoggingMode="File" 
+        DetailLevel="Verbose">
+      <Collectors>
+        <EventCollectorId Value="Collector">
+          <EventProviders>
+            <EventProviderId Value="NearObjectSvc" />
+          </EventProviders>
+        </EventCollectorId>
+      </Collectors>
+    </Profile>
+
+    <Profile 
+        Id="PlogTraceLoggingProvider.Light.File" 
+        Name="PlogTraceLoggingProvider" 
+        Description="PlogTraceLoggingProvider" 
+        Base="PlogTraceLoggingProvider.Verbose.File" 
+        LoggingMode="File" 
+        DetailLevel="Light" 
+    />
+    <Profile 
+        Id="PlogTraceLoggingProvider.Verbose.Memory" 
+        Name="PlogTraceLoggingProvider" 
+        Description="PlogTraceLoggingProvider" 
+        Base="PlogTraceLoggingProvider.Verbose.File" 
+        LoggingMode="Memory" 
+        DetailLevel="Verbose" 
+    />
+    <Profile 
+        Id="PlogTraceLoggingProvider.Light.Memory" 
+        Name="PlogTraceLoggingProvider" 
+        Description="PlogTraceLoggingProvider" 
+        Base="PlogTraceLoggingProvider.Verbose.File" 
+        LoggingMode="Memory" 
+        DetailLevel="Light"
+    />
+    
+  </Profiles>
+</WindowsPerformanceRecorder>
