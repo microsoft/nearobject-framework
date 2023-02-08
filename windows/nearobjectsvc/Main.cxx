@@ -10,6 +10,12 @@
 #include <nearobject/service/ServiceRuntime.hxx>
 #include <windows/nearobject/service/NearObjectDeviceDiscoveryAgentUwb.hxx>
 
+#include <plog/Log.h>
+#include <plog/Init.h>
+#include <plog/Formatters/TxtFormatter.h>
+
+#include <PlogTraceLogging/PlogTraceLogging.hxx>
+
 /**
  * @brief Get the user's home path.
  * 
@@ -40,6 +46,9 @@ using windows::nearobject::service::NearObjectDeviceDiscoveryAgentUwb;
 int
 main(int argc, char *argv[])
 {
+    static plog::TraceLoggingAppender<plog::TxtFormatter> traceLoggingAppender;
+    plog::init(plog::debug, &traceLoggingAppender);
+
     // Resolve user home directory.
     const std::filesystem::path homePath{ GetUserHomePath() };
     if (homePath.empty()) {

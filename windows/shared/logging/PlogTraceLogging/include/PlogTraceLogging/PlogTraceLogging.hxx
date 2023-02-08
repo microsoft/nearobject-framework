@@ -33,12 +33,12 @@ public:
     virtual void
     write(const Record& record) PLOG_OVERRIDE
     {
-        std::string str = Formatter::format(record);
+        std::wstring str = Formatter::format(record);
 
         // Log an event
         TraceLoggingWrite(g_hplogTraceLoggingProvider,      // handle to my provider
-            "HelloWorldTestEvent",                          // Event Name that should uniquely identify your event.
-            TraceLoggingValue(str.c_str(), "TestMessage")); // Field for your event in the form of (value, field name).
+            "PlogTraceLoggingWrapper",                          // Event Name that should uniquely identify your event.
+            TraceLoggingValue(str.c_str(), "Message")); // Field for your event in the form of (value, field name).
     }
 };
 
