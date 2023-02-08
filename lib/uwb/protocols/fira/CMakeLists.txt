@@ -19,6 +19,7 @@ target_sources(uwb-proto-fira
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/RangingMethod.hxx
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/SecureRangingInfo.hxx
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/StaticRangingInfo.hxx
+        ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbApplicationConfiguration.hxx
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCapability.hxx
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbConfiguration.hxx
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbConfigurationBuilder.hxx
@@ -48,6 +49,7 @@ list(APPEND UWBPROTOFIRA_PUBLIC_HEADERS
     ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/RangingMethod.hxx
     ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/SecureRangingInfo.hxx
     ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/StaticRangingInfo.hxx
+    ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbApplicationConfiguration.hxx
     ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCapability.hxx
     ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbConfiguration.hxx
     ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbConfigurationBuilder.hxx

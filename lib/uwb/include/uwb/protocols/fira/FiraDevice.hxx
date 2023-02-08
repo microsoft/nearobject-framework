@@ -52,9 +52,9 @@ enum class DeviceRole : uint8_t {
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
  * 5.1.
  */
-enum class DeviceType {
-    Controller,
-    Controlee,
+enum class DeviceType : uint8_t {
+    Controlee = 0,
+    Controller = 1,
 };
 
 /**
@@ -352,22 +352,59 @@ struct UwbDeviceInfoInformation
     UwbVersion VersionMac;
     UwbVersion VersionPhy;
     UwbStatus Status;
-    std::unique_ptr<UwbDeviceInfoVendor> VendorSpecificInfo;
+    std::shared_ptr<UwbDeviceInfoVendor> VendorSpecificInfo;
 };
-
-struct UwbDeviceCapabilities
-{};
 
 struct UwbDeviceConfigurationParameter
 {};
 
-enum class UwbApplicationConfigurationParameterType {
-    DeviceType,
-    // TODO: replace with NOF definitions when moved to repo
+enum class RangingRoundControl : uint8_t {
+    RangingResultReportMessage = 0b00000001U,
+    ControlMessage = 0b00000010U,
+    MeasurementReportMessage = 0b10000000U,
 };
 
-struct UwbApplicationConfigurationParameter
-{};
+enum class AoAResult : uint8_t {
+    Disable = 0U,
+    Enable = 1U,
+};
+
+enum class RangeDataNotificationConfiguration : uint8_t {
+    Disable = 0U,
+    Enable = 1U,
+};
+
+enum class PreambleDuration : uint8_t {
+    Symbols32 = 0x00U,
+    Symbols64 = 0x01U,
+};
+
+enum class TxAdaptivePayloadPower : uint8_t {
+    Disable = 0U,
+    Enable = 1U,
+};
+
+enum class PrfModeDetailed : uint8_t {
+    Bprf62MHz = 0x00U,
+    Hprf124MHz = 0x01U,
+    Hprf249MHz = 0x02U,
+};
+
+enum class KeyRotation : uint8_t {
+    Disable = 0U,
+    Enable = 1U,
+};
+
+enum class BprfPhrDataRate : uint8_t {
+    Rate850kbps = 0x00U,
+    Rate6Mbps = 0x01U,
+};
+
+enum class StsLength : uint8_t {
+    Symbols32 = 0x00U,
+    Symbols64 = 0x01U,
+    Symbols128 = 0x02U,
+};
 
 struct UwbStatusMulticastList
 {
@@ -388,6 +425,7 @@ struct UwbSessionUpdateControllerMulticastListEvent
     uint32_t NumberOfControlees;
     std::vector<UwbStatusMulticastList> Status;
 };
+
 struct UwbRangingMeasurementData
 {
     uint16_t Result;
@@ -407,6 +445,7 @@ struct UwbRangingMeasurement
     UwbRangingMeasurementData AoaDestinationAzimuth;
     UwbRangingMeasurementData AoaDestinationElevation;
 };
+
 struct UwbRangingData
 {
     uint32_t SequenceNumber;

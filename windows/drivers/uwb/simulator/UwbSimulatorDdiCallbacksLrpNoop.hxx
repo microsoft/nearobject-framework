@@ -3,9 +3,17 @@
 #define UWB_SIMULATOR_DDI_CALLBACKS_LRP_NOOP
 
 #include <cstdint>
+#include <memory>
+#include <shared_mutex>
+#include <unordered_map>
 #include <vector>
 
 #include "UwbSimulatorDdiCallbacksLrp.hxx"
+#include "UwbSimulatorSession.hxx"
+
+#include <uwb/protocols/fira/UwbApplicationConfiguration.hxx>
+#include <uwb/protocols/fira/UwbCapability.hxx>
+#include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
 namespace windows::devices::uwb::simulator
 {
@@ -19,7 +27,7 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     DeviceGetInformation(UwbDeviceInfoInformation &deviceInfo) override;
 
     virtual UwbStatus
-    DeviceGetCapabilities(UwbDeviceCapabilities &deviceCapabilities) override;
+    DeviceGetCapabilities(UwbCapability &deviceCapabilities) override;
 
     virtual UwbStatus
     DeviceGetConfigurationParameters(std::vector<UwbDeviceConfigurationParameterType> &deviceConfigurationParameterTypes, std::vector<std::tuple<UwbDeviceConfigurationParameterType, UwbStatus, std::optional<UwbDeviceConfigurationParameter>>> &deviceConfigurationParameterResults) override;
@@ -34,19 +42,19 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     SessionDeninitialize(uint32_t sessionId) override;
 
     virtual UwbStatus
-    SetApplicationConfigurationParameters(const std::vector<std::unique_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::unique_ptr<IUwbAppConfigurationParameter>>> &applicationConfigurationParameterResults) override;
+    SetApplicationConfigurationParameters(uint32_t sessionId, const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::shared_ptr<IUwbAppConfigurationParameter>>> &applicationConfigurationParameterResults) override;
 
     virtual UwbStatus
-    GetApplicationConfigurationParameters(std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters) override;
+    GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters) override;
 
     virtual UwbStatus
-    GetSessionCount(uint32_t *sessionCount) override;
+    GetSessionCount(uint32_t &sessionCount) override;
 
     virtual UwbStatus
     SessionGetState(uint32_t sessionId, UwbSessionState &sessionState) override;
 
     virtual UwbStatus
-    SessionUpdateControllerMulticastList(const std::vector<UwbMacAddress> &controlees) override;
+    SessionUpdateControllerMulticastList(uint32_t sessionId, std::vector<UwbMacAddress> controlees) override;
 
     virtual UwbStatus
     SessionStartRanging(uint32_t sessionId) override;
@@ -55,10 +63,20 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     SessionStopRanging(uint32_t sessionId) override;
 
     virtual UwbStatus
-    SessionGetRangingCount(uint32_t sessionId, uint32_t *rangingCount) override;
+    SessionGetRangingCount(uint32_t sessionId, uint32_t &rangingCount) override;
 
     virtual void
     UwbNotification(UwbNotificationData notificationData) override;
+
+protected:
+    void
+    SessionUpdateState(UwbSimulatorSession &session, UwbSessionState sessionState);
+
+private:
+    std::shared_mutex m_sessionsGate;
+    UwbDeviceInfoInformation m_deviceInformation{};
+    UwbCapability m_deviceCapabilities{};
+    std::unordered_map<uint32_t, UwbSimulatorSession> m_sessions{};
 };
 } // namespace windows::devices::uwb::simulator
 

@@ -36,9 +36,6 @@
     <ClInclude Include="UwbSimulatorIoQueue.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UwbCxDependencies.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UwbSimulatorDevice.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -57,16 +54,22 @@
     <ClInclude Include="UwbSimulatorDdiCallbacksLrpNoop.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UwbCore.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UwbVersion.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UwbCxLrpDevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UwbSimulatorDriver.hxx">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UwbSimulatorDdiHandler.hxx">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UwbSimulatorDdiHandlerLrp.hxx">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UwbSimulatorDispatchEntry.hxx">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UwbSimulatorSession.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -87,6 +90,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UwbSimulatorDriver.cxx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UwbSimulatorDdiHandlerLrp.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
