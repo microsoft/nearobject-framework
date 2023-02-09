@@ -1,17 +1,17 @@
 
-add_library(LogUtils STATIC "")
+add_library(logutils STATIC "")
 
 set(LOGUTILS_DIR_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
-set(LOGUTILS_DIR_PUBLIC_INCLUDE_PREFIX ${LOGUTILS_DIR_PUBLIC_INCLUDE}/LogUtils)
+set(LOGUTILS_DIR_PUBLIC_INCLUDE_PREFIX ${LOGUTILS_DIR_PUBLIC_INCLUDE}/logging)
 
-target_sources(LogUtils
+target_sources(logutils
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/LogUtils.cxx
     PUBLIC
         ${LOGUTILS_DIR_PUBLIC_INCLUDE_PREFIX}/LogUtils.hxx
 )
 
-target_include_directories(LogUtils
+target_include_directories(logutils
     PUBLIC
         ${LOGUTILS_DIR_PUBLIC_INCLUDE}
 )
@@ -20,12 +20,12 @@ list(APPEND LOGUTILS_PUBLIC_HEADERS
     ${LOGUTILS_DIR_PUBLIC_INCLUDE_PREFIX}/LogUtils.hxx
 )
 
-set_target_properties(LogUtils PROPERTIES FOLDER shared/LogUtils)
-set_target_properties(LogUtils PROPERTIES PUBLIC_HEADER "${LOGUTILS_PUBLIC_HEADERS}")
+set_target_properties(logutils PROPERTIES FOLDER shared/logging)
+set_target_properties(logutils PROPERTIES PUBLIC_HEADER "${LOGUTILS_PUBLIC_HEADERS}")
 
 install(
-    TARGETS LogUtils
-    EXPORT LogUtils
+    TARGETS logutils
+    EXPORT logutils
     ARCHIVE
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/LogUtils
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/logging
 )

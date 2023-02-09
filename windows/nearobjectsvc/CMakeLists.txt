@@ -10,7 +10,7 @@ target_link_libraries(nearobjectsvc
     PRIVATE
         nearobject-service-windows
         notstd
-        plog-trace-logging
+        logging-plog-windows
 )
 
 set_target_properties(nearobjectsvc PROPERTIES FOLDER windows/service)

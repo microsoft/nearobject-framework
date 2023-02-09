@@ -10,7 +10,7 @@ target_sources(nocli-linux
 target_link_libraries(nocli-linux
     PRIVATE
         CLI11::CLI11
-        LogUtils
+        logutils
         nocli-core
         plog::plog
 )

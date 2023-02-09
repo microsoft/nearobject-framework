@@ -14,7 +14,7 @@
 #include <plog/Init.h>
 #include <plog/Log.h>
 
-#include <PlogTraceLogging/PlogTraceLogging.hxx>
+#include <logging/windows/PlogTraceLogging.hxx>
 
 TRACELOGGING_DEFINE_PROVIDER(
     NearObjectSvcTraceLoggingProvider,
