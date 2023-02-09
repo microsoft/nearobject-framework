@@ -46,7 +46,7 @@ public:
 
         TraceLoggingWrite(m_providerHandle,
             "PlogTraceLoggingWrapper",
-            TraceLoggingValue(str.c_str(), "Message"));
+            TraceLoggingWideString(str.c_str(), "Message"));
     }
 
 private:
