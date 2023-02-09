@@ -1,1 +1,1 @@
-add_subdirectory(LogUtils)
+add_subdirectory(logutils)

@@ -1,1 +1,1 @@
-add_subdirectory(PlogTraceLogging)
+add_subdirectory(logging-plog-windows)
