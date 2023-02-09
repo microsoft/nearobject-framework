@@ -11,15 +11,20 @@
 #include <windows/devices/DeviceEnumerator.hxx>
 #include <windows/devices/DevicePresenceMonitor.hxx>
 
-#include <plog/Initializers/RollingFileInitializer.h>
+#include <plog/Appenders/RollingFileAppender.h>
+#include <plog/Formatters/TxtFormatter.h>
+#include <plog/Init.h>
 #include <plog/Log.h>
 
 #include <logging/LogUtils.hxx>
+#include <logging/windows/PlogDebugWrapper.hxx>
 
 int
 main(int argc, char* argv[])
 {
-    plog::init(plog::verbose, logging::GetLogName("devicemon").c_str());
+    plog::RollingFileAppender<plog::TxtFormatter> rollingFile(logging::GetLogName("devicemon").c_str());
+    logging::plog::DebugWrapperAppender<plog::TxtFormatter> finalAppender(&rollingFile);
+    plog::init(plog::verbose, &finalAppender);
 
     CLI::App app{};
     app.name("devicemon");
@@ -63,10 +68,10 @@ main(int argc, char* argv[])
         }
     }
 
-    windows::devices::DevicePresenceMonitor monitor{deviceGuid.value(), [](auto&& presenceEvent, auto&& deviceName) {
-        const auto presenceEventName = magic_enum::enum_name(presenceEvent);
-        std::cout << deviceName << " " << presenceEventName << std::endl;
-    }};
+    windows::devices::DevicePresenceMonitor monitor{ deviceGuid.value(), [](auto&& presenceEvent, auto&& deviceName) {
+                                                        const auto presenceEventName = magic_enum::enum_name(presenceEvent);
+                                                        std::cout << deviceName << " " << presenceEventName << std::endl;
+                                                    } };
 
     monitor.Start();
 
