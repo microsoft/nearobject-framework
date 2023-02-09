@@ -16,6 +16,12 @@
 
 #include <PlogTraceLogging/PlogTraceLogging.hxx>
 
+TRACELOGGING_DEFINE_PROVIDER(
+    NearObjectSvcTraceLoggingProvider,
+    "NearObjectSvcTraceLoggingProvider",
+    // {EB735AF1-3A63-4650-B4B0-47A4CEE75468}
+    (0xeb735af1, 0x3a63, 0x4650, 0xb4, 0xb0, 0x47, 0xa4, 0xce, 0xe7, 0x54, 0x68));
+
 /**
  * @brief Get the user's home path.
  * 
@@ -46,7 +52,7 @@ using windows::nearobject::service::NearObjectDeviceDiscoveryAgentUwb;
 int
 main(int argc, char *argv[])
 {
-    static plog::TraceLoggingAppender<plog::TxtFormatter> traceLoggingAppender;
+    plog::TraceLoggingAppender<plog::TxtFormatter> traceLoggingAppender(NearObjectSvcTraceLoggingProvider);
     plog::init(plog::debug, &traceLoggingAppender);
 
     // Resolve user home directory.

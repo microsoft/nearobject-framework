@@ -6,7 +6,7 @@
     Company="Microsoft Corporation">
 
   <Profiles>
-    <EventCollector Id="Collector" Name="PlogTraceLoggingProvider">
+    <EventCollector Id="Collector" Name="NearObjectSvcTraceLoggingProvider">
       <BufferSize Value="64" />
       <Buffers Value="4" />
     </EventCollector>
@@ -14,9 +14,9 @@
     <EventProvider Id="NearObjectSvc" Name="EB735AF1-3A63-4650-B4B0-47A4CEE75468" />
 
     <Profile 
-        Id="PlogTraceLoggingProvider.Verbose.File" 
-        Name="PlogTraceLoggingProvider" 
-        Description="PlogTraceLoggingProvider" 
+        Id="NearObjectSvcTraceLoggingProvider.Verbose.File" 
+        Name="NearObjectSvcTraceLoggingProvider" 
+        Description="NearObjectSvcTraceLoggingProvider" 
         LoggingMode="File" 
         DetailLevel="Verbose">
       <Collectors>
@@ -29,26 +29,26 @@
     </Profile>
 
     <Profile 
-        Id="PlogTraceLoggingProvider.Light.File" 
-        Name="PlogTraceLoggingProvider" 
-        Description="PlogTraceLoggingProvider" 
-        Base="PlogTraceLoggingProvider.Verbose.File" 
+        Id="NearObjectSvcTraceLoggingProvider.Light.File" 
+        Name="NearObjectSvcTraceLoggingProvider" 
+        Description="NearObjectSvcTraceLoggingProvider" 
+        Base="NearObjectSvcTraceLoggingProvider.Verbose.File" 
         LoggingMode="File" 
         DetailLevel="Light" 
     />
     <Profile 
-        Id="PlogTraceLoggingProvider.Verbose.Memory" 
-        Name="PlogTraceLoggingProvider" 
-        Description="PlogTraceLoggingProvider" 
-        Base="PlogTraceLoggingProvider.Verbose.File" 
+        Id="NearObjectSvcTraceLoggingProvider.Verbose.Memory" 
+        Name="NearObjectSvcTraceLoggingProvider" 
+        Description="NearObjectSvcTraceLoggingProvider" 
+        Base="NearObjectSvcTraceLoggingProvider.Verbose.File" 
         LoggingMode="Memory" 
         DetailLevel="Verbose" 
     />
     <Profile 
-        Id="PlogTraceLoggingProvider.Light.Memory" 
-        Name="PlogTraceLoggingProvider" 
-        Description="PlogTraceLoggingProvider" 
-        Base="PlogTraceLoggingProvider.Verbose.File" 
+        Id="NearObjectSvcTraceLoggingProvider.Light.Memory" 
+        Name="NearObjectSvcTraceLoggingProvider" 
+        Description="NearObjectSvcTraceLoggingProvider" 
+        Base="NearObjectSvcTraceLoggingProvider.Verbose.File" 
         LoggingMode="Memory" 
         DetailLevel="Light"
     />

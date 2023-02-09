@@ -11,8 +11,6 @@
 
 #include <string>
 
-TRACELOGGING_DECLARE_PROVIDER(g_hplogTraceLoggingProvider);
-
 namespace plog
 {
 
@@ -20,14 +18,14 @@ template <class Formatter>
 class TraceLoggingAppender : public IAppender
 {
 public:
-    TraceLoggingAppender()
+    TraceLoggingAppender(TraceLoggingHProvider providerHandle) : m_providerHandle(providerHandle)
     {
-        TraceLoggingRegister(g_hplogTraceLoggingProvider);
+        TraceLoggingRegister(m_providerHandle);
     }
 
     ~TraceLoggingAppender()
     {
-        TraceLoggingUnregister(g_hplogTraceLoggingProvider);
+        TraceLoggingUnregister(m_providerHandle);
     }
 
     virtual void
@@ -35,10 +33,13 @@ public:
     {
         std::wstring str = Formatter::format(record);
 
-        TraceLoggingWrite(g_hplogTraceLoggingProvider,
+        TraceLoggingWrite(m_providerHandle,
             "PlogTraceLoggingWrapper",
             TraceLoggingValue(str.c_str(), "Message"));
     }
+
+private:
+    TraceLoggingHProvider m_providerHandle;
 };
 
 } // namespace plog
