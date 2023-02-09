@@ -11,11 +11,12 @@
 
 #include <string>
 
-namespace plog
+namespace logging
 {
+namespace plog{
 
 template <typename Formatter>
-class TraceLoggingAppender : public IAppender
+class TraceLoggingAppender : public ::plog::IAppender
 {
 public:
     /**
@@ -40,7 +41,7 @@ public:
     }
 
     virtual void
-    write(const Record& record) PLOG_OVERRIDE
+    write(const ::plog::Record& record) PLOG_OVERRIDE
     {
         std::wstring str = Formatter::format(record);
 
@@ -54,5 +55,6 @@ private:
 };
 
 } // namespace plog
+} // namespace logging
 
 #endif // PLOG_TRACE_LOGGING_HXX

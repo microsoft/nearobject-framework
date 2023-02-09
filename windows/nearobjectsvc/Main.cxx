@@ -52,7 +52,7 @@ using windows::nearobject::service::NearObjectDeviceDiscoveryAgentUwb;
 int
 main(int argc, char *argv[])
 {
-    plog::TraceLoggingAppender<plog::TxtFormatter> traceLoggingAppender(NearObjectSvcTraceLoggingProvider);
+    logging::plog::TraceLoggingAppender<plog::TxtFormatter> traceLoggingAppender(NearObjectSvcTraceLoggingProvider);
     plog::init(plog::debug, &traceLoggingAppender);
 
     // Resolve user home directory.
