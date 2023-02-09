@@ -10,9 +10,9 @@
 #include <nearobject/service/ServiceRuntime.hxx>
 #include <windows/nearobject/service/NearObjectDeviceDiscoveryAgentUwb.hxx>
 
-#include <plog/Log.h>
-#include <plog/Init.h>
 #include <plog/Formatters/TxtFormatter.h>
+#include <plog/Init.h>
+#include <plog/Log.h>
 
 #include <PlogTraceLogging/PlogTraceLogging.hxx>
 
@@ -24,7 +24,7 @@ TRACELOGGING_DEFINE_PROVIDER(
 
 /**
  * @brief Get the user's home path.
- * 
+ *
  * @return std::filesystem::path Returns a valid path if it could be resolved,
  * otherwise an empty path is returned indicating it could not be resolved.
  */
@@ -73,10 +73,8 @@ main(int argc, char *argv[])
     deviceManager->AddDiscoveryAgent(std::move(uwbDeviceAgent));
 
     // Create service.
-    auto service = NearObjectService::Create({
-        std::move(profileManager),
-        std::move(deviceManager)
-    });
+    auto service = NearObjectService::Create({ std::move(profileManager),
+        std::move(deviceManager) });
 
     // Start service runtime.
     ServiceRuntime nearObjectServiceRuntime{};
