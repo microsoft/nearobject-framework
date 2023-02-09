@@ -20,7 +20,11 @@ class TraceLoggingAppender : public IAppender
 public:
     TraceLoggingAppender(TraceLoggingHProvider providerHandle) : m_providerHandle(providerHandle)
     {
-        TraceLoggingRegister(m_providerHandle);
+        HRESULT hr = TraceLoggingRegister(m_providerHandle);
+        if(!SUCCEEDED(hr)){
+            // todo figure out what to do
+            throw std::runtime_error("could not register TraceLoggingProvider!");
+        }
     }
 
     ~TraceLoggingAppender()
