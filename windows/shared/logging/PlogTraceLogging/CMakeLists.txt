@@ -17,8 +17,8 @@ target_include_directories(plog-trace-logging
 )
 
 target_link_libraries(plog-trace-logging
-PUBLIC
-    plog::plog
+    PUBLIC
+        plog::plog
 )
 
 list(APPEND PLOGTRACELOGGING_PUBLIC_HEADERS

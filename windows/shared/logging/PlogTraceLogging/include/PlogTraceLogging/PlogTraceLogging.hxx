@@ -14,10 +14,17 @@
 namespace plog
 {
 
-template <class Formatter>
+template <typename Formatter>
 class TraceLoggingAppender : public IAppender
 {
 public:
+    /**
+     * @brief Construct a new TraceLoggingAppender object
+     * This class is a wrapper around the trace logging calls, exposing them through the plog interface.
+     * You must provide your own providerHandle, which needs to be defined elsewhere via the TRACELOGGING_DEFINE_PROVIDER macro
+     * 
+     * @param providerHandle 
+     */
     TraceLoggingAppender(TraceLoggingHProvider providerHandle) : m_providerHandle(providerHandle)
     {
         HRESULT hr = TraceLoggingRegister(m_providerHandle);
