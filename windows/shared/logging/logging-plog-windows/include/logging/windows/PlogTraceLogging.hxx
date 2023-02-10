@@ -9,6 +9,7 @@
 #include <plog/Appenders/IAppender.h>
 #include <plog/Log.h>
 
+#include <iostream>
 #include <string>
 
 namespace logging
@@ -32,8 +33,7 @@ public:
     {
         HRESULT hr = TraceLoggingRegister(m_providerHandle);
         if (!SUCCEEDED(hr)) {
-            // todo figure out what to do
-            throw std::runtime_error("could not register TraceLoggingProvider!");
+            std::cerr << "could not register TraceLoggingProvider!";
         }
     }
 
