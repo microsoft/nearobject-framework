@@ -12,9 +12,7 @@
 #include <iostream>
 #include <string>
 
-namespace logging
-{
-namespace plog
+namespace logging::plog
 {
 
 template <typename Formatter>
@@ -56,7 +54,6 @@ private:
     TraceLoggingHProvider m_providerHandle;
 };
 
-} // namespace plog
-} // namespace logging
+} // namespace logging::plog
 
 #endif // PLOG_TRACE_LOGGING_HXX
