@@ -43,7 +43,7 @@ public:
     }
 
     virtual void
-    write(const ::plog::Record& record) PLOG_OVERRIDE
+    write(const ::plog::Record& record) override
     {
         std::wstring str = Formatter::format(record);
 
