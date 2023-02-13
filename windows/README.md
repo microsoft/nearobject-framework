@@ -11,7 +11,7 @@ Download the latest version of [Visual Studio 2022 Build Tools](https://visualst
 
 * C++ CMake tools for Windows
 * MSVC v143 - VS 2022 C++ x64/x86 build tools (Latest)
-* MSVC v143 - VS 2022 C++ x74/x86 Spectre-mitigated libs (Latest)
+* MSVC v143 - VS 2022 C++ x64/x86 Spectre-mitigated libs (Latest)
 * Windows 11 SDK (10.0.22621.0)
 
 Additionally if you are using the Visual Studio 2022 Build Tools install the followng under 'Individual Components'
