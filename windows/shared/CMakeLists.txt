@@ -1,3 +1,4 @@
+add_subdirectory(logging)
 
 add_library(notstd-windows INTERFACE)
 
