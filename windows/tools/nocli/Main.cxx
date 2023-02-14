@@ -15,20 +15,20 @@
 #include <windows/devices/DevicePresenceMonitor.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
 
+#include <plog/Appenders/DebugOutputAppender.h>
 #include <plog/Appenders/RollingFileAppender.h>
 #include <plog/Formatters/TxtFormatter.h>
 #include <plog/Init.h>
 #include <plog/Log.h>
 
 #include <logging/LogUtils.hxx>
-#include <logging/windows/PlogDebugWrapper.hxx>
 
 int
 main(int argc, char* argv[])
 try {
-    plog::RollingFileAppender<plog::TxtFormatter> rollingFile(logging::GetLogName("nocli").c_str());
-    logging::plog::DebugWrapperAppender<plog::TxtFormatter> finalAppender(&rollingFile);
-    plog::init(plog::verbose, &finalAppender);
+    plog::RollingFileAppender<plog::TxtFormatter> rollingFileAppender(logging::GetLogName("nocli").c_str());
+    plog::DebugOutputAppender<plog::TxtFormatter> debugAppender;
+    plog::init(plog::verbose, &rollingFileAppender).addAppender(&debugAppender);
 
     auto cliData = std::make_shared<nearobject::cli::NearObjectCliDataWindows>();
     auto cliHandler = std::make_shared<nearobject::cli::NearObjectCliHandlerWindows>();

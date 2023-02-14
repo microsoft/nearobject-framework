@@ -11,22 +11,22 @@
 #include <windows/devices/DeviceEnumerator.hxx>
 #include <windows/devices/uwb/simulator/UwbDeviceSimulator.hxx>
 
+#include <plog/Appenders/DebugOutputAppender.h>
 #include <plog/Appenders/RollingFileAppender.h>
 #include <plog/Formatters/TxtFormatter.h>
 #include <plog/Init.h>
 #include <plog/Log.h>
 
 #include <logging/LogUtils.hxx>
-#include <logging/windows/PlogDebugWrapper.hxx>
 
 using namespace windows::devices;
 
 int
 main(int argc, char* argv[])
 {
-    plog::RollingFileAppender<plog::TxtFormatter> rollingFile(logging::GetLogName("uwbsim").c_str());
-    logging::plog::DebugWrapperAppender<plog::TxtFormatter> finalAppender(&rollingFile);
-    plog::init(plog::verbose, &finalAppender);
+    plog::RollingFileAppender<plog::TxtFormatter> rollingFileAppender(logging::GetLogName("uwbsim").c_str());
+    plog::DebugOutputAppender<plog::TxtFormatter> debugAppender;
+    plog::init(plog::verbose, &rollingFileAppender).addAppender(&debugAppender);
 
     CLI::App app{};
     app.name("uwbsim");
