@@ -1,2 +1,2 @@
-#include <logging/windows/PlogTraceLogging.hxx>
 
+#include <logging/windows/PlogTraceLogging.hxx>

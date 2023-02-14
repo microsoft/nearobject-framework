@@ -9,11 +9,10 @@
 #include <plog/Appenders/IAppender.h>
 #include <plog/Log.h>
 
+#include <iostream>
 #include <string>
 
-namespace logging
-{
-namespace plog
+namespace logging::plog
 {
 
 template <typename Formatter>
@@ -32,8 +31,7 @@ public:
     {
         HRESULT hr = TraceLoggingRegister(m_providerHandle);
         if (!SUCCEEDED(hr)) {
-            // todo figure out what to do
-            throw std::runtime_error("could not register TraceLoggingProvider!");
+            std::cerr << "could not register TraceLoggingProvider!";
         }
     }
 
@@ -43,7 +41,7 @@ public:
     }
 
     virtual void
-    write(const ::plog::Record& record) PLOG_OVERRIDE
+    write(const ::plog::Record& record) override
     {
         std::wstring str = Formatter::format(record);
 
@@ -56,7 +54,6 @@ private:
     TraceLoggingHProvider m_providerHandle;
 };
 
-} // namespace plog
-} // namespace logging
+} // namespace logging::plog
 
 #endif // PLOG_TRACE_LOGGING_HXX
