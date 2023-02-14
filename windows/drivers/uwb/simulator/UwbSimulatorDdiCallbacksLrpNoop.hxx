@@ -84,7 +84,6 @@ private:
     std::shared_mutex m_sessionsGate;
     std::unordered_map<uint32_t, UwbSimulatorSession> m_sessions{};
 
-    
     // Notification promise and associated lock that protects it.
     std::mutex m_notificationGate;
     std::optional<std::promise<UwbNotificationData>> m_notificationPromise;
