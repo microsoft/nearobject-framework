@@ -94,3 +94,43 @@ uwb::protocol::fira::StringToResultReportConfiguration(const std::string& input)
 
     return output;
 }
+
+std::string
+UwbStatusDevice::ToString() const
+{
+    std::ostringstream ss;
+    ss << "State: " << magic_enum::enum_name(State);
+    return ss.str();
+}
+
+std::string
+UwbStatusMulticastList::ToString() const
+{
+    std::ostringstream ss{};
+    // TODO: implement this
+    return ss.str();
+}
+
+std::string
+UwbSessionStatus::ToString() const
+{
+    std::ostringstream ss{};
+    // TODO: implement this
+    return ss.str();
+}
+
+std::string
+UwbRangingData::ToString() const
+{
+    std::ostringstream ss{};
+    // TODO: implement this
+    return ss.str();
+}
+
+std::string
+ToString(const UwbNotificationData& uwbNotificationData)
+{
+    std::ostringstream ss{};
+    // TODO: implement this
+    return ss.str();
+}

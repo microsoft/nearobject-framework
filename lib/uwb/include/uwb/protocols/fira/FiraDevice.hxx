@@ -6,6 +6,7 @@
 #include <iostream>
 #include <memory>
 #include <optional>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <variant>
@@ -338,6 +339,14 @@ enum class UwbDeviceConfigurationParameterType {
 struct UwbStatusDevice
 {
     UwbDeviceState State;
+
+    /**
+     * @brief 
+     * 
+     * @return std::string 
+     */
+    std::string
+    ToString() const;
 };
 
 struct UwbDeviceInfoVendor
@@ -411,6 +420,14 @@ struct UwbStatusMulticastList
     uint16_t ControleeMacAddress; // why is this uint16_t? TODO: replace with uwb::UwbMacAddress
     uint32_t SubSessionId;
     UwbStatusMulticast Status;
+
+    /**
+     * @brief 
+     * 
+     * @return std::string 
+     */
+    std::string
+    ToString() const;
 };
 
 enum class UwbMulticastAction {
@@ -431,6 +448,14 @@ struct UwbSessionStatus
     uint32_t SessionId;
     UwbSessionState State;
     std::optional<UwbSessionReasonCode> ReasonCode;
+
+    /**
+     * @brief 
+     * 
+     * @return std::string 
+     */
+    std::string
+    ToString() const;
 };
 
 struct UwbRangingMeasurementData
@@ -460,9 +485,20 @@ struct UwbRangingData
     uint32_t CurrentRangingInterval;
     UwbRangingMeasurementType RangingMeasurementType;
     std::vector<UwbRangingMeasurement> RangingMeasurements;
+
+    /**
+     * @brief 
+     * 
+     * @return std::string 
+     */
+    std::string
+    ToString() const;
 };
 
 using UwbNotificationData = std::variant<UwbStatus, UwbStatusDevice, UwbSessionStatus, UwbStatusMulticast, UwbRangingData>;
+
+std::string
+ToString(const UwbNotificationData& uwbNotificationData);
 
 } // namespace uwb::protocol::fira
 
