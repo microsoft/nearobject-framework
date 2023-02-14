@@ -128,9 +128,22 @@ UwbRangingData::ToString() const
 }
 
 std::string
-ToString(const UwbNotificationData& uwbNotificationData)
+uwb::protocol::fira::ToString(const UwbNotificationData& uwbNotificationData)
 {
     std::ostringstream ss{};
+    ss << "Type: ";
+
+    std::visit([&ss](auto&& arg) {
+        using ValueType = std::decay_t<decltype(arg)>;
+        if constexpr (std::is_enum_v<ValueType>) {
+            ss << magic_enum::enum_type_name<ValueType>();
+            // ss << magic_enum::enum_value(arg);
+        // , 
+        } else if constexpr (std::is_same_v<ValueType, UwbStatusDevice> || std::is_same_v<ValueType, UwbStatusMulticast> || std::is_same_v<ValueType, UwbRangingData>) {
+            ss << arg.ToString();
+        }
+    }, uwbNotificationData);
+
     // TODO: implement this
     return ss.str();
 }
