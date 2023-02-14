@@ -3,7 +3,10 @@
 #define UWB_SIMULATOR_DDI_CALLBACKS_LRP_NOOP
 
 #include <cstdint>
+#include <future>
 #include <memory>
+#include <mutex>
+#include <optional>
 #include <shared_mutex>
 #include <unordered_map>
 #include <vector>
@@ -24,7 +27,7 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     DeviceReset() override;
 
     virtual UwbStatus
-    DeviceGetInformation(UwbDeviceInfoInformation &deviceInfo) override;
+    DeviceGetInformation(UwbDeviceInformation &deviceInfo) override;
 
     virtual UwbStatus
     DeviceGetCapabilities(UwbCapability &deviceCapabilities) override;
@@ -66,17 +69,24 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     SessionGetRangingCount(uint32_t sessionId, uint32_t &rangingCount) override;
 
     virtual void
-    UwbNotification(UwbNotificationData notificationData) override;
+    UwbNotification(UwbNotificationData &notificationData) override;
 
 protected:
     void
     SessionUpdateState(UwbSimulatorSession &session, UwbSessionState sessionState);
 
 private:
-    std::shared_mutex m_sessionsGate;
-    UwbDeviceInfoInformation m_deviceInformation{};
+    // Static device information.
+    UwbDeviceInformation m_deviceInformation{};
     UwbCapability m_deviceCapabilities{};
+
+    // Session state and associated lock that protects it.
+    std::shared_mutex m_sessionsGate;
     std::unordered_map<uint32_t, UwbSimulatorSession> m_sessions{};
+
+    // Notification promise and associated lock that protects it.
+    std::mutex m_notificationGate;
+    std::optional<std::promise<UwbNotificationData>> m_notificationPromise;
 };
 } // namespace windows::devices::uwb::simulator
 

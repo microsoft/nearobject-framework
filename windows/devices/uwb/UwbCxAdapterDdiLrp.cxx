@@ -148,7 +148,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbSessionState uwbSessionState)
 }
 
 UWB_DEVICE_INFO
-windows::devices::uwb::ddi::lrp::From(const UwbDeviceInfoInformation& uwbDeviceInfo)
+windows::devices::uwb::ddi::lrp::From(const UwbDeviceInformation& uwbDeviceInfo)
 {
     UWB_DEVICE_INFO deviceInfo{};
     deviceInfo.size = sizeof deviceInfo;

@@ -1,7 +1,6 @@
 
 #include <algorithm>
 #include <iterator>
-#include <mutex>
 
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 
@@ -38,7 +37,7 @@ UwbSimulatorDdiCallbacksLrpNoop::DeviceReset()
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::DeviceGetInformation(UwbDeviceInfoInformation &deviceInformation)
+UwbSimulatorDdiCallbacksLrpNoop::DeviceGetInformation(UwbDeviceInformation &deviceInformation)
 {
     deviceInformation = m_deviceInformation;
     return UwbStatusOk;
@@ -194,6 +193,22 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionGetRangingCount(uint32_t /* sessionId */
 }
 
 void
-UwbSimulatorDdiCallbacksLrpNoop::UwbNotification(UwbNotificationData notificationData)
+UwbSimulatorDdiCallbacksLrpNoop::UwbNotification(UwbNotificationData &notificationData)
 {
+    // Acquire the notification lock to ensure the notification proimise can be safely inspected and updated.
+    std::unique_lock notificationLock{ m_notificationGate };
+    if (m_notificationPromise.has_value()) {
+        // pre-existing promise, this should not happen. TODO: log it.
+        return;
+    }
+
+    // Create a new promise whose shared state will be updated when a notification is raised.
+    auto notificationFuture = m_notificationPromise.emplace().get_future();
+
+    // Release the lock since the shared data (promise) has been created and future obtained.
+    notificationLock.unlock();
+
+    // Lock is now released; synchronously wait indefinitely for the shared state to be updated.
+    notificationFuture.wait();
+    notificationData = notificationFuture.get();
 }
