@@ -72,8 +72,25 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     UwbNotification(UwbNotificationData &notificationData) override;
 
 protected:
+    /**
+     * @brief Update the state of the specified session.
+     * 
+     * This function will also generate a UWB notification associated with the change. 
+     * 
+     * @param session The session to update.
+     * @param sessionState The new session state.
+     * @param reasonCode The reason code for the update, if sessionState == UwbSessionState::Idle.
+     */
     void
-    SessionUpdateState(UwbSimulatorSession &session, UwbSessionState sessionState);
+    SessionUpdateState(UwbSimulatorSession &session, UwbSessionState sessionState, std::optional<UwbSessionReasonCode> reasonCode);
+
+    /**
+     * @brief Raise a UWB notification. 
+     * 
+     * @param uwbNotificationData The notification data to provide with the event.
+     */
+    void
+    RaiseUwbNotification(UwbNotificationData uwbNotificationData);
 
 private:
     // Static device information.
