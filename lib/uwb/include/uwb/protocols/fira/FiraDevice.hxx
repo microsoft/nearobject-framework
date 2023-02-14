@@ -426,6 +426,13 @@ struct UwbSessionUpdateControllerMulticastListEvent
     std::vector<UwbStatusMulticastList> Status;
 };
 
+struct UwbSessionStatus
+{
+    uint32_t SessionId;
+    UwbSessionState State;
+    UwbSessionReasonCode ReasonCode;
+};
+
 struct UwbRangingMeasurementData
 {
     uint16_t Result;
@@ -455,7 +462,7 @@ struct UwbRangingData
     std::vector<UwbRangingMeasurement> RangingMeasurements;
 };
 
-using UwbNotificationData = std::variant<UwbStatus, UwbStatusDevice, UwbStatusSession, UwbStatusMulticast, UwbRangingData>;
+using UwbNotificationData = std::variant<UwbStatus, UwbStatusDevice, UwbSessionStatus, UwbStatusMulticast, UwbRangingData>;
 
 } // namespace uwb::protocol::fira
 
