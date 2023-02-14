@@ -10,8 +10,8 @@
 #include <nearobject/service/ServiceRuntime.hxx>
 #include <windows/nearobject/service/NearObjectDeviceDiscoveryAgentUwb.hxx>
 
-#include <plog/Formatters/TxtFormatter.h>
 #include <plog/Appenders/DebugOutputAppender.h>
+#include <plog/Formatters/TxtFormatter.h>
 #include <plog/Init.h>
 #include <plog/Log.h>
 
