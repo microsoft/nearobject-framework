@@ -430,7 +430,7 @@ struct UwbSessionStatus
 {
     uint32_t SessionId;
     UwbSessionState State;
-    UwbSessionReasonCode ReasonCode;
+    std::optional<UwbSessionReasonCode> ReasonCode;
 };
 
 struct UwbRangingMeasurementData
