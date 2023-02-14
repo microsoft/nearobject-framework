@@ -174,7 +174,7 @@ struct UwbSimulatorDdiCallbacksLrp
      * @param notificationData
      */
     virtual void
-    UwbNotification(UwbNotificationData& notificationData) = 0;
+    UwbNotification(UwbNotificationData &notificationData) = 0;
 };
 } // namespace windows::devices::uwb::simulator
 

@@ -193,7 +193,7 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionGetRangingCount(uint32_t /* sessionId */
 }
 
 void
-UwbSimulatorDdiCallbacksLrpNoop::UwbNotification(UwbNotificationData& notificationData)
+UwbSimulatorDdiCallbacksLrpNoop::UwbNotification(UwbNotificationData &notificationData)
 {
     // Acquire the notification lock to ensure the notification proimise can be safely inspected and updated.
     std::unique_lock notificationLock{ m_notificationGate };

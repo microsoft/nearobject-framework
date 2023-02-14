@@ -69,7 +69,7 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     SessionGetRangingCount(uint32_t sessionId, uint32_t &rangingCount) override;
 
     virtual void
-    UwbNotification(UwbNotificationData& notificationData) override;
+    UwbNotification(UwbNotificationData &notificationData) override;
 
 protected:
     void
@@ -79,7 +79,7 @@ private:
     // Static device information.
     UwbDeviceInformation m_deviceInformation{};
     UwbCapability m_deviceCapabilities{};
-    
+
     // Session state and associated lock that protects it.
     std::shared_mutex m_sessionsGate;
     std::unordered_map<uint32_t, UwbSimulatorSession> m_sessions{};
