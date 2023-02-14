@@ -28,11 +28,7 @@ public:
     DebugWrapperAppender(::plog::IAppender *appender)
     {
         ::plog::DynamicAppender::addAppender(appender);
-#ifdef DEBUG
-        if (IsDebuggerPresent()) {
-            ::plog::DynamicAppender::addAppender(&m_debugAppender);
-        }
-#endif
+        ::plog::DynamicAppender::addAppender(&m_debugAppender);
     }
 
 private:
