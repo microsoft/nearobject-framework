@@ -14,6 +14,7 @@
 #include <plog/Init.h>
 #include <plog/Log.h>
 
+#include <logging/windows/PlogDebugWrapper.hxx>
 #include <logging/windows/PlogTraceLogging.hxx>
 
 TRACELOGGING_DEFINE_PROVIDER(
@@ -53,7 +54,8 @@ int
 main(int argc, char *argv[])
 {
     logging::plog::TraceLoggingAppender<plog::TxtFormatter> traceLoggingAppender(NearObjectSvcTraceLoggingProvider);
-    plog::init(plog::debug, &traceLoggingAppender);
+    logging::plog::DebugWrapperAppender<plog::TxtFormatter> finalAppender(&traceLoggingAppender);
+    plog::init(plog::debug, &finalAppender);
 
     // Resolve user home directory.
     const std::filesystem::path homePath{ GetUserHomePath() };

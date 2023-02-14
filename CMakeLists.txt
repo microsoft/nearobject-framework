@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 # Project configuration options.
 option(NOF_USE_MSVC_STATIC_RUNTIME, "Statically link against the VC++ runtime library" OFF)
 option(NOF_CODE_COVERAGE "Enable instrumenting the build with code coverage" OFF)
+option(NOF_BUILD_WINDOWS_UWB_SIMULATOR_DRIVER "Enable building the Windows UWB Simulator driver" OFF)
 
 # Build environment definitions.
 # 

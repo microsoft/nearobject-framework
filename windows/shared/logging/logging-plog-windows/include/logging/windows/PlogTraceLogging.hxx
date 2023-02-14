@@ -12,9 +12,7 @@
 #include <iostream>
 #include <string>
 
-namespace logging
-{
-namespace plog
+namespace logging::plog
 {
 
 template <typename Formatter>
@@ -43,7 +41,7 @@ public:
     }
 
     virtual void
-    write(const ::plog::Record& record) PLOG_OVERRIDE
+    write(const ::plog::Record& record) override
     {
         std::wstring str = Formatter::format(record);
 
@@ -56,7 +54,6 @@ private:
     TraceLoggingHProvider m_providerHandle;
 };
 
-} // namespace plog
-} // namespace logging
+} // namespace logging::plog
 
 #endif // PLOG_TRACE_LOGGING_HXX
