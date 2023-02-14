@@ -41,7 +41,7 @@ struct UwbSimulatorDdiCallbacksLrp
      * @return UwbStatus
      */
     virtual UwbStatus
-    DeviceGetInformation(UwbDeviceInfoInformation &deviceInfo) = 0;
+    DeviceGetInformation(UwbDeviceInformation &deviceInfo) = 0;
 
     /**
      * @brief
@@ -174,7 +174,7 @@ struct UwbSimulatorDdiCallbacksLrp
      * @param notificationData
      */
     virtual void
-    UwbNotification(UwbNotificationData notificationData) = 0;
+    UwbNotification(UwbNotificationData &notificationData) = 0;
 };
 } // namespace windows::devices::uwb::simulator
 

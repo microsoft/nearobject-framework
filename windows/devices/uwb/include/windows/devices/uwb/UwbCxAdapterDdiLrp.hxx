@@ -48,13 +48,13 @@ UWB_SESSION_STATE
 From(const ::uwb::protocol::fira::UwbSessionState uwbSessionState);
 
 /**
- * @brief Converts UwbDeviceInfoInformation to UWB_DEVICE_INFO.
+ * @brief Converts UwbDeviceInformation to UWB_DEVICE_INFO.
  *
  * @param uwbDeviceInfo
  * @return UWB_DEVICE_INFO
  */
 UWB_DEVICE_INFO
-From(const ::uwb::protocol::fira::UwbDeviceInfoInformation &uwbDeviceInfo);
+From(const ::uwb::protocol::fira::UwbDeviceInformation &uwbDeviceInfo);
 
 /**
  * @brief Converts UwbCapability to UWB_DEVICE_CAPABILITIES.
