@@ -167,3 +167,11 @@ windows::devices::uwb::ddi::lrp::From(const UwbCapability& uwbDeviceCapabilities
     // TODO: implement this properly
     return deviceCapabilities;
 }
+
+UWB_NOTIFICATION_DATA
+windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbNotificationData &uwbNotificationData)
+{
+    UWB_NOTIFICATION_DATA notificationData{};
+    // TODO: implement this properly
+    return notificationData;
+}

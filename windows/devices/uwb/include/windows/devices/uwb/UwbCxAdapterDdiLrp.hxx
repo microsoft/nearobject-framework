@@ -74,6 +74,15 @@ From(const ::uwb::protocol::fira::UwbCapability &uwbDeviceCapabilities);
 UWB_DEVICE_CONFIG_PARAM_TYPE
 From(const ::uwb::protocol::fira::UwbDeviceConfigurationParameterType &uwbDeviceConfigurationParameterType);
 
+/**
+ * @brief Converts UwbNotificationData to UWB_NOTIFICATION_DATA.
+ * 
+ * @param uwbNotificationData 
+ * @return UWB_NOTIFICATION_DATA 
+ */
+UWB_NOTIFICATION_DATA
+From(const ::uwb::protocol::fira::UwbNotificationData &uwbNotificationData);
+
 } // namespace windows::devices::uwb::ddi::lrp
 
 #endif // UWB_CX_ADAPTER_DDI_LRP_HXX
