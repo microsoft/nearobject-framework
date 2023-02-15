@@ -1,9 +1,14 @@
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
 
-#include <magic_enum.hpp>
 #include <numeric>
 #include <sstream>
+#include <string_view>
+#include <typeindex>
+#include <typeinfo>
+
+#include <magic_enum.hpp>
+#include <notstd/tostring.hxx>
 
 using namespace uwb::protocol::fira;
 
@@ -120,6 +125,14 @@ UwbSessionStatus::ToString() const
 }
 
 std::string
+UwbSessionUpdateMulicastListStatus::ToString() const
+{
+    std::ostringstream ss{};
+    // TODO: implement this
+    return ss.str();
+}
+
+std::string
 UwbRangingData::ToString() const
 {
     std::ostringstream ss{};
@@ -130,20 +143,29 @@ UwbRangingData::ToString() const
 std::string
 uwb::protocol::fira::ToString(const UwbNotificationData& uwbNotificationData)
 {
+    const std::unordered_map<std::type_index, std::string_view> TypeNameMap{
+        { std::type_index(typeid(UwbStatus)), "Status" },
+        { std::type_index(typeid(UwbStatusDevice)), "Device Status" },
+        { std::type_index(typeid(UwbSessionStatus)), "Session Status" },
+        { std::type_index(typeid(UwbSessionUpdateMulicastListStatus)), "Session Multicast List Status" },
+        { std::type_index(typeid(UwbRangingData)), "Ranging Data" },
+    };
+
+    using namespace strings::ostream_operators;
+
     std::ostringstream ss{};
-    ss << "Type: ";
 
-    std::visit([&ss](auto&& arg) {
+    std::visit([&](auto&& arg) {
         using ValueType = std::decay_t<decltype(arg)>;
-        if constexpr (std::is_enum_v<ValueType>) {
-            ss << magic_enum::enum_type_name<ValueType>();
-            // ss << magic_enum::enum_value(arg);
-        // , 
-        } else if constexpr (std::is_same_v<ValueType, UwbStatusDevice> || std::is_same_v<ValueType, UwbStatusMulticast> || std::is_same_v<ValueType, UwbRangingData>) {
-            ss << arg.ToString();
+        ss << TypeNameMap.at(typeid(ValueType)) << " {";
+        if constexpr (std::is_same_v<ValueType, UwbStatusDevice> || std::is_same_v<ValueType, UwbSessionStatus> || std::is_same_v<ValueType, UwbSessionUpdateMulicastListStatus> || std::is_same_v<ValueType, UwbRangingData>) {
+            ss << arg;
+        } else if constexpr (std::is_enum_v<ValueType>) {
+            ss << magic_enum::enum_value(arg);
         }
-    }, uwbNotificationData);
+        ss << " }";
+    },
+        uwbNotificationData);
 
-    // TODO: implement this
     return ss.str();
 }

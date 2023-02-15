@@ -461,6 +461,14 @@ struct UwbSessionUpdateMulicastListStatus
 {
     uint32_t SessionId;
     std::vector<UwbMulticastListStatus> Status;
+
+    /**
+     * @brief Returns a string representation of the object.
+     * 
+     * @return std::string 
+     */
+    std::string
+    ToString() const;
 };
 
 struct UwbSessionStatus
