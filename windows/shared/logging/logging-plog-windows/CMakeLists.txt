@@ -19,7 +19,6 @@ target_include_directories(logging-plog-windows
 target_link_libraries(logging-plog-windows
     PUBLIC
         plog::plog
-        logutils
 )
 
 list(APPEND PLOGTRACELOGGING_PUBLIC_HEADERS
