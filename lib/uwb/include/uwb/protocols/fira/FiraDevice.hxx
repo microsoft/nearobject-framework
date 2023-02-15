@@ -341,7 +341,7 @@ struct UwbStatusDevice
     UwbDeviceState State;
 
     /**
-     * @brief 
+     * @brief Returns a string representation of the object.
      * 
      * @return std::string 
      */
@@ -422,7 +422,7 @@ struct UwbMulticastListStatus
     UwbStatusMulticast Status;
 
     /**
-     * @brief 
+     * @brief Returns a string representation of the object.
      * 
      * @return std::string 
      */
@@ -461,7 +461,7 @@ struct UwbSessionStatus
     std::optional<UwbSessionReasonCode> ReasonCode;
 
     /**
-     * @brief 
+     * @brief Returns a string representation of the object.
      * 
      * @return std::string 
      */
@@ -498,7 +498,7 @@ struct UwbRangingData
     std::vector<UwbRangingMeasurement> RangingMeasurements;
 
     /**
-     * @brief 
+     * @brief Returns a string representation of the object.
      * 
      * @return std::string 
      */
@@ -508,6 +508,12 @@ struct UwbRangingData
 
 using UwbNotificationData = std::variant<UwbStatus, UwbStatusDevice, UwbSessionStatus, UwbSessionUpdateMulicastListStatus, UwbRangingData>;
 
+/**
+ * @brief Returns a string representation of the object.
+ * 
+ * @param uwbNotificationData 
+ * @return std::string 
+ */
 std::string
 ToString(const UwbNotificationData& uwbNotificationData);
 
