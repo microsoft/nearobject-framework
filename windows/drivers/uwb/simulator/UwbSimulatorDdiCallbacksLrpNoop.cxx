@@ -19,7 +19,7 @@ using namespace windows::devices::uwb::simulator;
  */
 namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
 
-void
+NTSTATUS
 UwbSimulatorDdiCallbacksLrpNoop::RaiseUwbNotification(UwbNotificationData uwbNotificationData)
 {
     // Acquire the notification lock to ensure the notification proimise can be safely inspected and updated.
@@ -35,11 +35,13 @@ UwbSimulatorDdiCallbacksLrpNoop::RaiseUwbNotification(UwbNotificationData uwbNot
 
     if (!m_notificationPromise.has_value()) {
         // No outstanding client waiting for a result, so nothing to do.
-        return;
+        return STATUS_INVALID_DEVICE_REQUEST;
     }
 
     m_notificationPromise->set_value(std::move(uwbNotificationData));
     m_notificationPromise.reset();
+
+    return STATUS_SUCCESS;
 }
 
 void
@@ -228,7 +230,7 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionGetRangingCount(uint32_t /* sessionId */
     return UwbStatusOk;
 }
 
-void
+NTSTATUS
 UwbSimulatorDdiCallbacksLrpNoop::UwbNotification(UwbNotificationData &notificationData)
 {
     // Acquire the notification lock to ensure the notification proimise can be safely inspected and updated.
@@ -240,7 +242,7 @@ UwbSimulatorDdiCallbacksLrpNoop::UwbNotification(UwbNotificationData &notificati
             "UwbNotification",
             TraceLoggingLevel(TRACE_LEVEL_WARNING),
             TraceLoggingString("Ignore", "Action"));
-        return;
+        return STATUS_ALREADY_REGISTERED;
     }
 
     // Create a new promise whose shared state will be updated when a notification is raised.
@@ -264,4 +266,6 @@ UwbSimulatorDdiCallbacksLrpNoop::UwbNotification(UwbNotificationData &notificati
         "UwbNotification",
         TraceLoggingLevel(TRACE_LEVEL_VERBOSE),
         TraceLoggingString("WaitComplete", "Action"));
+
+    return STATUS_SUCCESS;
 }

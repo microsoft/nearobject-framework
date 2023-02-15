@@ -11,6 +11,10 @@
 #include <unordered_map>
 #include <vector>
 
+#include <windows.h>
+
+#include <wdf.h>
+
 #include "UwbSimulatorDdiCallbacksLrp.hxx"
 #include "UwbSimulatorSession.hxx"
 
@@ -68,7 +72,7 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     virtual UwbStatus
     SessionGetRangingCount(uint32_t sessionId, uint32_t &rangingCount) override;
 
-    virtual void
+    virtual NTSTATUS
     UwbNotification(UwbNotificationData &notificationData) override;
 
 protected:
@@ -89,7 +93,7 @@ protected:
      * 
      * @param uwbNotificationData The notification data to provide with the event.
      */
-    void
+    NTSTATUS
     RaiseUwbNotification(UwbNotificationData uwbNotificationData);
 
 private:
