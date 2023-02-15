@@ -11,6 +11,7 @@
 #include <notstd/tostring.hxx>
 
 using namespace uwb::protocol::fira;
+using namespace strings::ostream_operators;
 
 std::string
 uwb::protocol::fira::VersionToString(uint32_t input) noexcept
@@ -112,7 +113,9 @@ std::string
 UwbMulticastListStatus::ToString() const
 {
     std::ostringstream ss{};
-    // TODO: implement this
+    ss << "SubSessionId: " << SubSessionId << ", "
+       << "ControleeMacAddress: " << ControleeMacAddress << ", "
+       << "Status: " << magic_enum::enum_name(Status);
     return ss.str();
 }
 
@@ -120,7 +123,22 @@ std::string
 UwbSessionStatus::ToString() const
 {
     std::ostringstream ss{};
-    // TODO: implement this
+    ss << "SessionId: " << SessionId << ", "
+       << "State: " << magic_enum::enum_name(State) << ", "
+       << "ReasonCode: ";
+    if (ReasonCode.has_value()) {
+        ss << magic_enum::enum_name(ReasonCode.value());
+    } else {
+        ss << "None";
+    }
+    return ss.str();
+}
+
+std::string
+UwbRangingMeasurementData::ToString() const
+{
+    std::ostringstream ss{};
+    ss << Result << " (FoM=" << FigureOfMerit.value_or(0) << ")";
     return ss.str();
 }
 
@@ -128,7 +146,27 @@ std::string
 UwbSessionUpdateMulicastListStatus::ToString() const
 {
     std::ostringstream ss{};
-    // TODO: implement this
+    ss << "SessionId: " << SessionId << '\n'
+       << "Statuses:\n";
+    for (auto statusIndex = 0; statusIndex < std::size(Status); statusIndex++) {
+        ss << " [" << statusIndex << "] " << Status[statusIndex] << '\n';
+    }
+    return ss.str();
+}
+
+std::string
+UwbRangingMeasurement::ToString() const
+{
+    std::ostringstream ss{};
+    ss << "SlotIndex: " << SlotIndex << ", "
+       << "Distance: " << Distance << ", "
+       << "Status: " << ::ToString(Status) << ", "
+       << "Peer Mac Address: " << PeerMacAddress << ", "
+       << "Line Of Sight Indicator: " << magic_enum::enum_name(LineOfSignIndicator) << ", "
+       << "Angle of Arrival Azimuth: " << AoAAzimuth << ", "
+       << "Angle of Arrival Elevation: " << AoAElevation << ", "
+       << "Angle of Arrival Destination Azimuth: " << AoaDestinationAzimuth << ", "
+       << "Angle of Arrival Destination Elevation: " << AoaDestinationElevation;
     return ss.str();
 }
 
@@ -136,7 +174,30 @@ std::string
 UwbRangingData::ToString() const
 {
     std::ostringstream ss{};
-    // TODO: implement this
+    ss << "Session Id: " << SessionId << ", "
+       << "Sequence Number: " << SequenceNumber << ", "
+       << "Ranging Interval: " << CurrentRangingInterval << " "
+       << "Measurement Type: " << magic_enum::enum_name(RangingMeasurementType) << '\n'
+       << "Measurements:\n";
+    for (auto rangingMeasurementIndex = 0; rangingMeasurementIndex < std::size(RangingMeasurements); rangingMeasurementIndex++) {
+        ss << "  [" << rangingMeasurementIndex << "] " << RangingMeasurements[rangingMeasurementIndex] << '\n';
+    }
+    return ss.str();
+}
+
+std::string
+uwb::protocol::fira::ToString(const UwbStatus& uwbStatus)
+{
+    std::ostringstream ss{};
+
+    std::visit([&ss](auto&& arg) {
+        using ValueType = std::decay_t<decltype(arg)>;
+        if constexpr (std::is_enum_v<ValueType>) {
+            ss << magic_enum::enum_name(arg);
+        }
+    },
+        uwbStatus);
+
     return ss.str();
 }
 
@@ -151,8 +212,6 @@ uwb::protocol::fira::ToString(const UwbNotificationData& uwbNotificationData)
         { std::type_index(typeid(UwbRangingData)), "Ranging Data" },
     };
 
-    using namespace strings::ostream_operators;
-
     std::ostringstream ss{};
 
     std::visit([&](auto&& arg) {
@@ -161,7 +220,7 @@ uwb::protocol::fira::ToString(const UwbNotificationData& uwbNotificationData)
         if constexpr (std::is_same_v<ValueType, UwbStatusDevice> || std::is_same_v<ValueType, UwbSessionStatus> || std::is_same_v<ValueType, UwbSessionUpdateMulicastListStatus> || std::is_same_v<ValueType, UwbRangingData>) {
             ss << arg;
         } else if constexpr (std::is_enum_v<ValueType>) {
-            ss << magic_enum::enum_value(arg);
+            ss << magic_enum::enum_name(arg);
         }
         ss << " }";
     },
