@@ -61,8 +61,7 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionUpdateState(UwbSimulatorSession &session
         UwbSessionStatus{
             .SessionId = session.Id,
             .State = sessionState,
-            .ReasonCode = reasonCode
-        }
+            .ReasonCode = reasonCode }
     };
 
     RaiseUwbNotification(std::move(notificationData));

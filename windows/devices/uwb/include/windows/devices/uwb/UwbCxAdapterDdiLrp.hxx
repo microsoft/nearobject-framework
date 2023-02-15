@@ -40,72 +40,72 @@ From(const ::uwb::protocol::fira::UwbDeviceState &uwbDeviceState);
 
 /**
  * @brief Converts UwbMulticastAction to UWB_MULTICAST_ACTION.
- * 
- * @param uwbMulticastAction 
- * @return UWB_MULTICAST_ACTION 
+ *
+ * @param uwbMulticastAction
+ * @return UWB_MULTICAST_ACTION
  */
 UWB_MULTICAST_ACTION
 From(const ::uwb::protocol::fira::UwbMulticastAction &uwbMulticastAction);
 
 /**
  * @brief Converts UwbStatusMulticast to UWB_MULTICAST_STATUS.
- * 
+ *
  * @param uwbStatusMulticast
- * @return UWB_MULTICAST_STATUS 
+ * @return UWB_MULTICAST_STATUS
  */
 UWB_MULTICAST_STATUS
 From(const ::uwb::protocol::fira::UwbStatusMulticast &uwbStatusMulticast);
 
 /**
  * @brief Converts UwbStatusMulticast to UWB_MULTICAST_LIST_STATUS.
- * 
- * @param uwbStatusMulticast 
- * @return UWB_MULTICAST_LIST_STATUS 
+ *
+ * @param uwbStatusMulticast
+ * @return UWB_MULTICAST_LIST_STATUS
  */
 UWB_MULTICAST_LIST_STATUS
 From(const ::uwb::protocol::fira::UwbMulticastListStatus &uwbStatusMulticastList);
 
 /**
  * @brief Converts UwbSessionUpdateMulticastListEntry to UWB_MULTICAST_CONTROLEE_LIST_ENTRY.
- * 
- * @param uwbSessionUpdateMulticastListEntry 
- * @return UWB_MULTICAST_CONTROLEE_LIST_ENTRY 
+ *
+ * @param uwbSessionUpdateMulticastListEntry
+ * @return UWB_MULTICAST_CONTROLEE_LIST_ENTRY
  */
 UWB_MULTICAST_CONTROLEE_LIST_ENTRY
 From(const ::uwb::protocol::fira::UwbSessionUpdateMulticastListEntry &uwbSessionUpdateMulticastListEntry);
 
 /**
  * @brief Converts UwbSessionUpdateMulicastList to UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST.
- * 
- * @param uwbSessionUpdateMulicastList 
- * @return UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST 
+ *
+ * @param uwbSessionUpdateMulicastList
+ * @return UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST
  */
 UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST
 From(const ::uwb::protocol::fira::UwbSessionUpdateMulicastList &uwbSessionUpdateMulicastList);
 
 /**
  * @brief Converts UwbSessionUpdateMulicastListStatus to UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF.
- * 
- * @param uwbSessionUpdateMulicastListStatus 
- * @return UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF 
+ *
+ * @param uwbSessionUpdateMulicastListStatus
+ * @return UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF
  */
 UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF
 From(const ::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus &uwbSessionUpdateMulicastListStatus);
 
 /**
- * @brief Converts UwbRangingMeasurementType to UWB_RANGING_MEASUREMENT_TYPE. 
- * 
- * @param uwbRangingType 
- * @return UWB_RANGING_MEASUREMENT_TYPE 
+ * @brief Converts UwbRangingMeasurementType to UWB_RANGING_MEASUREMENT_TYPE.
+ *
+ * @param uwbRangingType
+ * @return UWB_RANGING_MEASUREMENT_TYPE
  */
 UWB_RANGING_MEASUREMENT_TYPE
 From(const ::uwb::protocol::fira::UwbRangingMeasurementType &uwbRangingType);
 
 /**
- * @brief Converts UwbSessionReasonCode to UWB_SESSION_REASON_CODE. 
- * 
- * @param uwbSessionReasonCode 
- * @return UWB_SESSION_REASON_CODE 
+ * @brief Converts UwbSessionReasonCode to UWB_SESSION_REASON_CODE.
+ *
+ * @param uwbSessionReasonCode
+ * @return UWB_SESSION_REASON_CODE
  */
 UWB_SESSION_REASON_CODE
 From(const ::uwb::protocol::fira::UwbSessionReasonCode &uwbSessionReasonCode);
@@ -130,9 +130,9 @@ From(const ::uwb::protocol::fira::UwbSessionState uwbSessionState);
 
 /**
  * @brief Converts UwbSessionStatus to UWB_SESSION_STATUS.
- * 
- * @param uwbSessionStatus 
- * @return UWB_SESSION_STATUS 
+ *
+ * @param uwbSessionStatus
+ * @return UWB_SESSION_STATUS
  */
 UWB_SESSION_STATUS
 From(const ::uwb::protocol::fira::UwbSessionStatus &uwbSessionStatus);
@@ -175,9 +175,9 @@ From(const ::uwb::protocol::fira::UwbDeviceConfigurationParameterType &uwbDevice
 
 /**
  * @brief Converts UwbRangingData to UWB_RANGING_DATA.
- * 
- * @param uwbRangingData 
- * @return UWB_RANGING_DATA 
+ *
+ * @param uwbRangingData
+ * @return UWB_RANGING_DATA
  */
 UWB_RANGING_DATA
 From(const ::uwb::protocol::fira::UwbRangingData &uwbRangingData);

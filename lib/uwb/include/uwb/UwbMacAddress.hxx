@@ -231,8 +231,8 @@ public:
 
     /**
      * @brief Get the short address as a value (POD type).
-     * 
-     * @return std::optional<uint16_t> 
+     *
+     * @return std::optional<uint16_t>
      */
     std::optional<uint16_t>
     GetValueShort() const;

@@ -2,8 +2,8 @@
 #include <algorithm>
 #include <functional>
 #include <stdexcept>
-#include <typeindex>
 #include <type_traits>
+#include <typeindex>
 #include <unordered_map>
 #include <variant>
 
@@ -13,7 +13,7 @@
 using namespace ::uwb::protocol::fira;
 
 UWB_STATUS
-windows::devices::uwb::ddi::lrp::From(const UwbStatus& uwbStatus)
+windows::devices::uwb::ddi::lrp::From(const UwbStatus &uwbStatus)
 {
     static const std::unordered_map<UwbStatusGeneric, UWB_STATUS> StatusMapGeneric{
         { UwbStatusGeneric::Ok, UWB_STATUS_OK },
@@ -52,7 +52,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbStatus& uwbStatus)
 
     UWB_STATUS status = UWB_STATUS_FAILED;
 
-    std::visit([&status](auto&& arg) {
+    std::visit([&status](auto &&arg) {
         using T = std::decay_t<decltype(arg)>;
         if constexpr (std::is_same_v<T, UwbStatusGeneric>) {
             status = StatusMapGeneric.at(arg);
@@ -132,7 +132,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbSessionUpd
     multicastListEntry.size = sizeof multicastListEntry;
     multicastListEntry.subSessionId = uwbSessionUpdateMulticastListEntry.SubSessionId;
     multicastListEntry.shortAddress = uwbSessionUpdateMulticastListEntry.ControleeMacAddress.GetValueShort().value();
-    
+
     return multicastListEntry;
 }
 
@@ -157,7 +157,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbSessionUpd
     multicastListStatus.sessionId = uwbSessionUpdateMulicastListStatus.SessionId;
     multicastListStatus.numberOfControlees = std::size(uwbSessionUpdateMulicastListStatus.Status);
     multicastListStatus.remainingMulticastListSize = 0;
-    // TODO: append status information 
+    // TODO: append status information
 
     return multicastListStatus;
 }
@@ -191,7 +191,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbSessionRea
 }
 
 UWB_DEVICE_CONFIG_PARAM_TYPE
-windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbDeviceConfigurationParameterType& uwbDeviceConfigurationParameterType)
+windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbDeviceConfigurationParameterType &uwbDeviceConfigurationParameterType)
 {
     static const std::unordered_map<UwbDeviceConfigurationParameterType, UWB_DEVICE_CONFIG_PARAM_TYPE> ConfigParamMap{
         { UwbDeviceConfigurationParameterType::DeviceState, UWB_DEVICE_CONFIG_PARAM_TYPE_DEVICE_STATE },
@@ -202,7 +202,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbDeviceConf
 }
 
 UWB_APP_CONFIG_PARAM_TYPE
-windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbApplicationConfigurationParameterType& uwbApplicationConfigurationParameterType)
+windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbApplicationConfigurationParameterType &uwbApplicationConfigurationParameterType)
 {
     static const std::unordered_map<UwbApplicationConfigurationParameterType, UWB_APP_CONFIG_PARAM_TYPE> AppConfigParamMap{
         { UwbApplicationConfigurationParameterType::DeviceType, UWB_APP_CONFIG_PARAM_TYPE_DEVICE_TYPE },
@@ -284,18 +284,33 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbSessionSta
 }
 
 UWB_DEVICE_INFO
-windows::devices::uwb::ddi::lrp::From(const UwbDeviceInformation& uwbDeviceInfo)
+windows::devices::uwb::ddi::lrp::From(const UwbDeviceInformation &uwbDeviceInfo)
 {
     UWB_DEVICE_INFO deviceInfo{};
     deviceInfo.size = sizeof deviceInfo;
     deviceInfo.status = From(uwbDeviceInfo.Status);
-    deviceInfo.vendorSpecificInfoLength = 0;
-    // TODO: fill in remaining fields
+    deviceInfo.uciGenericVersionMajor = uwbDeviceInfo.VersionUci.Major;
+    deviceInfo.uciGenericVersionMinorAndMaintenance = uwbDeviceInfo.VersionUci.Minor | uwbDeviceInfo.VersionUci.Maintenance; // TODO: FIXME
+    deviceInfo.uciTestVersionMajor = uwbDeviceInfo.VersionUciTest.Major;
+    deviceInfo.uciTestVersionMinorAndMaintenance = uwbDeviceInfo.VersionUciTest.Minor | uwbDeviceInfo.VersionUciTest.Maintenance;
+    deviceInfo.macVersionMajor = uwbDeviceInfo.VersionMac.Major;
+    deviceInfo.macVersionMinorAndMaintenance = uwbDeviceInfo.VersionMac.Minor | uwbDeviceInfo.VersionMac.Maintenance;
+    deviceInfo.phyVersionMajor = uwbDeviceInfo.VersionPhy.Major;
+    deviceInfo.phyVersionMinorAndMaintenance = uwbDeviceInfo.VersionPhy.Minor | uwbDeviceInfo.VersionPhy.Maintenance;
+
+    if (uwbDeviceInfo.VendorSpecificInfo != nullptr) {
+        auto vendorSpecificInfo = uwbDeviceInfo.VendorSpecificInfo->GetData();
+        deviceInfo.vendorSpecificInfoLength = std::size(vendorSpecificInfo);
+        // TODO: append std::data(vendorSpecificInfo) to end of structure.
+    } else {
+        deviceInfo.vendorSpecificInfoLength = 0;
+    }
+
     return deviceInfo;
 }
 
 UWB_DEVICE_CAPABILITIES
-windows::devices::uwb::ddi::lrp::From(const UwbCapability& uwbDeviceCapabilities)
+windows::devices::uwb::ddi::lrp::From(const UwbCapability &uwbDeviceCapabilities)
 {
     UWB_DEVICE_CAPABILITIES deviceCapabilities{};
     deviceCapabilities.size = sizeof deviceCapabilities;
@@ -317,7 +332,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbStatusDevi
 UWB_RANGING_DATA
 windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingData &uwbRangingData)
 {
-    UWB_RANGING_DATA rangingData{}; // TODO: this must be allocated to account for 'RangingMeasurements' in uwbRangingData.
+    UWB_RANGING_DATA rangingData{};            // TODO: this must be allocated to account for 'RangingMeasurements' in uwbRangingData.
     rangingData.size = sizeof rangingData + 0; // TODO: fix this to account for variable length
     rangingData.sequenceNumber = uwbRangingData.SequenceNumber;
     rangingData.sessionId = uwbRangingData.SessionId;
@@ -341,7 +356,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbNotificati
 
     UWB_NOTIFICATION_DATA notificationData{};
 
-    std::visit([&notificationData](auto&& arg) {
+    std::visit([&notificationData](auto &&arg) {
         using ValueType = std::decay_t<decltype(arg)>;
 
         notificationData.notificationType = NotificationTypeMap.at(typeid(arg));
@@ -360,7 +375,8 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbNotificati
         // Note: no else clause is needed here since if the type is not
         // supported, at at() call above will throw std::out_of_range, ensuring
         // this code will never be reached.
-        }, uwbNotificationData);
+    },
+        uwbNotificationData);
 
     return notificationData;
 }

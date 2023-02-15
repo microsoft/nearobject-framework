@@ -1,6 +1,6 @@
 
-#include <ios>
 #include <iomanip>
+#include <ios>
 #include <sstream>
 #include <stdexcept>
 
@@ -106,7 +106,7 @@ uwb::operator==(const UwbMacAddress& lhs, const UwbMacAddress& rhs) noexcept
     return (lhs.m_value == rhs.m_value);
 }
 
-auto 
+auto
 uwb::UwbMacAddress::operator<=>(const UwbMacAddress& other) const noexcept
 {
     return this->m_value <=> other.m_value;
@@ -133,19 +133,19 @@ uwb::operator>>(std::istream& stream, UwbMacAddress& uwbMacAddress) noexcept
     }
 
     if (numOctets == data.size()) {
-        uwbMacAddress = UwbMacAddress{ std::array<uint8_t, 8>{ 
-            static_cast<uint8_t>(data[0] & 0x000000FFu), 
-            static_cast<uint8_t>(data[1] & 0x000000FFu), 
-            static_cast<uint8_t>(data[2] & 0x000000FFu), 
-            static_cast<uint8_t>(data[3] & 0x000000FFu), 
-            static_cast<uint8_t>(data[4] & 0x000000FFu), 
-            static_cast<uint8_t>(data[5] & 0x000000FFu), 
-            static_cast<uint8_t>(data[6] & 0x000000FFu), 
+        uwbMacAddress = UwbMacAddress{ std::array<uint8_t, 8>{
+            static_cast<uint8_t>(data[0] & 0x000000FFu),
+            static_cast<uint8_t>(data[1] & 0x000000FFu),
+            static_cast<uint8_t>(data[2] & 0x000000FFu),
+            static_cast<uint8_t>(data[3] & 0x000000FFu),
+            static_cast<uint8_t>(data[4] & 0x000000FFu),
+            static_cast<uint8_t>(data[5] & 0x000000FFu),
+            static_cast<uint8_t>(data[6] & 0x000000FFu),
             static_cast<uint8_t>(data[7] & 0x000000FFu) } };
     } else if (numOctets > 0) {
         stream.clear();
-        uwbMacAddress = UwbMacAddress{ std::array<uint8_t, 2>{ 
-            static_cast<uint8_t>(data[0] & 0x000000FFu), 
+        uwbMacAddress = UwbMacAddress{ std::array<uint8_t, 2>{
+            static_cast<uint8_t>(data[0] & 0x000000FFu),
             static_cast<uint8_t>(data[1] & 0x000000FFu) } };
     }
 

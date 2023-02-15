@@ -6,6 +6,7 @@
 #include <iostream>
 #include <memory>
 #include <optional>
+#include <span>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -342,8 +343,8 @@ struct UwbStatusDevice
 
     /**
      * @brief Returns a string representation of the object.
-     * 
-     * @return std::string 
+     *
+     * @return std::string
      */
     std::string
     ToString() const;
@@ -352,12 +353,20 @@ struct UwbStatusDevice
 struct UwbDeviceInfoVendor
 {
     virtual ~UwbDeviceInfoVendor() = default;
+
+    /**
+     * @brief Provides a view of the vendor-specific data.
+     *
+     * @return std::span<uint8_t>
+     */
+    virtual std::span<uint8_t>
+    GetData() const noexcept = 0;
 };
 
 struct UwbDeviceInformation
 {
-    UwbVersion VersionUwb;
     UwbVersion VersionUci;
+    UwbVersion VersionUciTest;
     UwbVersion VersionMac;
     UwbVersion VersionPhy;
     UwbStatus Status;
@@ -423,8 +432,8 @@ struct UwbMulticastListStatus
 
     /**
      * @brief Returns a string representation of the object.
-     * 
-     * @return std::string 
+     *
+     * @return std::string
      */
     std::string
     ToString() const;
@@ -435,7 +444,7 @@ enum class UwbMulticastAction {
     DeleteShortAddress,
 };
 
-struct UwbSessionUpdateMulticastListEntry 
+struct UwbSessionUpdateMulticastListEntry
 {
     UwbMacAddress ControleeMacAddress;
     uint32_t SubSessionId;
@@ -462,8 +471,8 @@ struct UwbSessionStatus
 
     /**
      * @brief Returns a string representation of the object.
-     * 
-     * @return std::string 
+     *
+     * @return std::string
      */
     std::string
     ToString() const;
@@ -499,8 +508,8 @@ struct UwbRangingData
 
     /**
      * @brief Returns a string representation of the object.
-     * 
-     * @return std::string 
+     *
+     * @return std::string
      */
     std::string
     ToString() const;
@@ -510,9 +519,9 @@ using UwbNotificationData = std::variant<UwbStatus, UwbStatusDevice, UwbSessionS
 
 /**
  * @brief Returns a string representation of the object.
- * 
- * @param uwbNotificationData 
- * @return std::string 
+ *
+ * @param uwbNotificationData
+ * @return std::string
  */
 std::string
 ToString(const UwbNotificationData& uwbNotificationData);

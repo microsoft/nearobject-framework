@@ -78,9 +78,9 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
 protected:
     /**
      * @brief Update the state of the specified session.
-     * 
-     * This function will also generate a UWB notification associated with the change. 
-     * 
+     *
+     * This function will also generate a UWB notification associated with the change.
+     *
      * @param session The session to update.
      * @param sessionState The new session state.
      * @param reasonCode The reason code for the update, if sessionState == UwbSessionState::Idle.
@@ -89,8 +89,8 @@ protected:
     SessionUpdateState(UwbSimulatorSession &session, UwbSessionState sessionState, std::optional<UwbSessionReasonCode> reasonCode);
 
     /**
-     * @brief Raise a UWB notification. 
-     * 
+     * @brief Raise a UWB notification.
+     *
      * @param uwbNotificationData The notification data to provide with the event.
      */
     NTSTATUS
