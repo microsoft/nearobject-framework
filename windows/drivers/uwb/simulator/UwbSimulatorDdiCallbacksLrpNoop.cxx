@@ -2,9 +2,13 @@
 #include <algorithm>
 #include <iterator>
 
+#include <magic_enum.hpp>
+
+#include <uwb/protocols/fira/FiraDevice.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 
 #include "UwbSimulatorDdiCallbacksLrpNoop.hxx"
+#include "UwbSimulatorTracelogging.hxx"
 
 using namespace windows::devices::uwb;
 using namespace windows::devices::uwb::simulator;
@@ -15,19 +19,52 @@ using namespace windows::devices::uwb::simulator;
  */
 namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
 
-void
-UwbSimulatorDdiCallbacksLrpNoop::SessionUpdateState(UwbSimulatorSession &session, UwbSessionState sessionState)
+NTSTATUS
+UwbSimulatorDdiCallbacksLrpNoop::RaiseUwbNotification(UwbNotificationData uwbNotificationData)
 {
+    // Acquire the notification lock to ensure the notification proimise can be safely inspected and updated.
+    std::unique_lock notificationLock{ m_notificationGate };
+
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "UwbNotification",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingString("EventRaised", "Action"),
+        TraceLoggingBool(m_notificationPromise.has_value(), "WaitPending"),
+        TraceLoggingString(std::data(ToString(uwbNotificationData)), "Data"));
+
+    if (!m_notificationPromise.has_value()) {
+        // No outstanding client waiting for a result, so nothing to do.
+        return STATUS_INVALID_DEVICE_REQUEST;
+    }
+
+    m_notificationPromise->set_value(std::move(uwbNotificationData));
+    m_notificationPromise.reset();
+
+    return STATUS_SUCCESS;
+}
+
+void
+UwbSimulatorDdiCallbacksLrpNoop::SessionUpdateState(UwbSimulatorSession &session, UwbSessionState sessionState, std::optional<UwbSessionReasonCode> reasonCode = std::nullopt)
+{
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "SessionStateUpdate",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingString(std::data(magic_enum::enum_name(session.State)), "StatePrevious"),
+        TraceLoggingString(std::data(magic_enum::enum_name(sessionState)), "StateNew"));
+
     session.State = sessionState;
 
-    UWB_NOTIFICATION_DATA notificationData{};
-    notificationData.notificationType = UWB_NOTIFICATION_TYPE_SESSION_STATUS;
-    auto &sessionStatus = notificationData.sessionStatus;
-    sessionStatus.size = sizeof sessionStatus;
-    sessionStatus.sessionId = session.Id;
-    sessionStatus.state = UwbCxDdi::From(sessionState);
-    sessionStatus.reasonCode = UWB_SESSION_REASON_CODE_STATE_CHANGE_WITH_SESSION_MANAGEMENT_COMMANDS;
-    // TODO: raise this notification
+    // Create and raise a notification with the state change.
+    UwbNotificationData notificationData{
+        UwbSessionStatus{
+            .SessionId = session.Id,
+            .State = sessionState,
+            .ReasonCode = reasonCode }
+    };
+
+    RaiseUwbNotification(std::move(notificationData));
 }
 
 UwbStatus
@@ -192,14 +229,19 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionGetRangingCount(uint32_t /* sessionId */
     return UwbStatusOk;
 }
 
-void
+NTSTATUS
 UwbSimulatorDdiCallbacksLrpNoop::UwbNotification(UwbNotificationData &notificationData)
 {
     // Acquire the notification lock to ensure the notification proimise can be safely inspected and updated.
     std::unique_lock notificationLock{ m_notificationGate };
     if (m_notificationPromise.has_value()) {
-        // pre-existing promise, this should not happen. TODO: log it.
-        return;
+        // pre-existing promise, this should not happen.
+        TraceLoggingWrite(
+            UwbSimulatorTraceloggingProvider,
+            "UwbNotification",
+            TraceLoggingLevel(TRACE_LEVEL_WARNING),
+            TraceLoggingString("Ignore", "Action"));
+        return STATUS_ALREADY_REGISTERED;
     }
 
     // Create a new promise whose shared state will be updated when a notification is raised.
@@ -208,7 +250,21 @@ UwbSimulatorDdiCallbacksLrpNoop::UwbNotification(UwbNotificationData &notificati
     // Release the lock since the shared data (promise) has been created and future obtained.
     notificationLock.unlock();
 
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "UwbNotification",
+        TraceLoggingLevel(TRACE_LEVEL_VERBOSE),
+        TraceLoggingString("Wait", "Action"));
+
     // Lock is now released; synchronously wait indefinitely for the shared state to be updated.
     notificationFuture.wait();
     notificationData = notificationFuture.get();
+
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "UwbNotification",
+        TraceLoggingLevel(TRACE_LEVEL_VERBOSE),
+        TraceLoggingString("WaitComplete", "Action"));
+
+    return STATUS_SUCCESS;
 }

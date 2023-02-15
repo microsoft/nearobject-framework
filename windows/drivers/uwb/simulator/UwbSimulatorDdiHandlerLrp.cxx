@@ -259,9 +259,23 @@ UwbSimulatorDdiHandlerLrp::OnUwbSessionGetRangingCount(WDFREQUEST /*request*/, s
 
 // IOCTL_UWB_NOTIFICATION
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbNotification(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandlerLrp::OnUwbNotification(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
 {
-    return STATUS_NOT_IMPLEMENTED;
+    UwbNotificationData uwbNotificationData{};
+    NTSTATUS status = m_callbacks->UwbNotification(uwbNotificationData);
+
+    if (status == STATUS_SUCCESS) {
+        // Convert neutral types to DDI types.
+        auto &outputValue = *reinterpret_cast<UWB_NOTIFICATION_DATA *>(std::data(outputBuffer));
+        outputValue = UwbCxDdi::From(uwbNotificationData);
+
+        // Complete the request.
+        WdfRequestCompleteWithInformation(request, status, outputValue.size);
+    } else {
+        WdfRequestComplete(request, status);
+    }
+
+    return status;
 }
 
 UwbSimulatorDdiHandlerLrp::UwbSimulatorDdiHandlerLrp() :

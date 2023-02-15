@@ -6,6 +6,8 @@
 #include <iostream>
 #include <memory>
 #include <optional>
+#include <span>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <variant>
@@ -338,17 +340,33 @@ enum class UwbDeviceConfigurationParameterType {
 struct UwbStatusDevice
 {
     UwbDeviceState State;
+
+    /**
+     * @brief Returns a string representation of the object.
+     *
+     * @return std::string
+     */
+    std::string
+    ToString() const;
 };
 
 struct UwbDeviceInfoVendor
 {
     virtual ~UwbDeviceInfoVendor() = default;
+
+    /**
+     * @brief Provides a view of the vendor-specific data.
+     *
+     * @return std::span<uint8_t>
+     */
+    virtual std::span<uint8_t>
+    GetData() const noexcept = 0;
 };
 
 struct UwbDeviceInformation
 {
-    UwbVersion VersionUwb;
     UwbVersion VersionUci;
+    UwbVersion VersionUciTest;
     UwbVersion VersionMac;
     UwbVersion VersionPhy;
     UwbStatus Status;
@@ -406,11 +424,19 @@ enum class StsLength : uint8_t {
     Symbols128 = 0x02U,
 };
 
-struct UwbStatusMulticastList
+struct UwbMulticastListStatus
 {
-    uint16_t ControleeMacAddress; // why is this uint16_t? TODO: replace with uwb::UwbMacAddress
+    uwb::UwbMacAddress ControleeMacAddress;
     uint32_t SubSessionId;
     UwbStatusMulticast Status;
+
+    /**
+     * @brief Returns a string representation of the object.
+     *
+     * @return std::string
+     */
+    std::string
+    ToString() const;
 };
 
 enum class UwbMulticastAction {
@@ -418,12 +444,46 @@ enum class UwbMulticastAction {
     DeleteShortAddress,
 };
 
-struct UwbSessionUpdateControllerMulticastListEvent
+struct UwbSessionUpdateMulticastListEntry
+{
+    UwbMacAddress ControleeMacAddress;
+    uint32_t SubSessionId;
+};
+
+struct UwbSessionUpdateMulicastList
 {
     uint32_t SessionId;
-    uint32_t RemainingMulticastListSize;
-    uint32_t NumberOfControlees;
-    std::vector<UwbStatusMulticastList> Status;
+    UwbMulticastAction Action;
+    std::vector<UwbSessionUpdateMulticastListEntry> Controlees;
+};
+
+struct UwbSessionUpdateMulicastListStatus
+{
+    uint32_t SessionId;
+    std::vector<UwbMulticastListStatus> Status;
+
+    /**
+     * @brief Returns a string representation of the object.
+     * 
+     * @return std::string 
+     */
+    std::string
+    ToString() const;
+};
+
+struct UwbSessionStatus
+{
+    uint32_t SessionId;
+    UwbSessionState State;
+    std::optional<UwbSessionReasonCode> ReasonCode;
+
+    /**
+     * @brief Returns a string representation of the object.
+     *
+     * @return std::string
+     */
+    std::string
+    ToString() const;
 };
 
 struct UwbRangingMeasurementData
@@ -453,9 +513,26 @@ struct UwbRangingData
     uint32_t CurrentRangingInterval;
     UwbRangingMeasurementType RangingMeasurementType;
     std::vector<UwbRangingMeasurement> RangingMeasurements;
+
+    /**
+     * @brief Returns a string representation of the object.
+     *
+     * @return std::string
+     */
+    std::string
+    ToString() const;
 };
 
-using UwbNotificationData = std::variant<UwbStatus, UwbStatusDevice, UwbStatusSession, UwbStatusMulticast, UwbRangingData>;
+using UwbNotificationData = std::variant<UwbStatus, UwbStatusDevice, UwbSessionStatus, UwbSessionUpdateMulicastListStatus, UwbRangingData>;
+
+/**
+ * @brief Returns a string representation of the object.
+ *
+ * @param uwbNotificationData
+ * @return std::string
+ */
+std::string
+ToString(const UwbNotificationData& uwbNotificationData);
 
 } // namespace uwb::protocol::fira
 

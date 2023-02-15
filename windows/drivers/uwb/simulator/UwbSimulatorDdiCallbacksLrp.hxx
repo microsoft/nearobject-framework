@@ -9,6 +9,9 @@
 #include <tuple>
 #include <vector>
 
+#include <windows.h>
+
+#include <wdf.h>
 #include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
@@ -173,7 +176,7 @@ struct UwbSimulatorDdiCallbacksLrp
      *
      * @param notificationData
      */
-    virtual void
+    virtual NTSTATUS
     UwbNotification(UwbNotificationData &notificationData) = 0;
 };
 } // namespace windows::devices::uwb::simulator

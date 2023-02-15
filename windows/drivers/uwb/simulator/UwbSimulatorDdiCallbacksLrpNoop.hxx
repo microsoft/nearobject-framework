@@ -11,6 +11,10 @@
 #include <unordered_map>
 #include <vector>
 
+#include <windows.h>
+
+#include <wdf.h>
+
 #include "UwbSimulatorDdiCallbacksLrp.hxx"
 #include "UwbSimulatorSession.hxx"
 
@@ -68,12 +72,29 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     virtual UwbStatus
     SessionGetRangingCount(uint32_t sessionId, uint32_t &rangingCount) override;
 
-    virtual void
+    virtual NTSTATUS
     UwbNotification(UwbNotificationData &notificationData) override;
 
 protected:
+    /**
+     * @brief Update the state of the specified session.
+     *
+     * This function will also generate a UWB notification associated with the change.
+     *
+     * @param session The session to update.
+     * @param sessionState The new session state.
+     * @param reasonCode The reason code for the update, if sessionState == UwbSessionState::Idle.
+     */
     void
-    SessionUpdateState(UwbSimulatorSession &session, UwbSessionState sessionState);
+    SessionUpdateState(UwbSimulatorSession &session, UwbSessionState sessionState, std::optional<UwbSessionReasonCode> reasonCode);
+
+    /**
+     * @brief Raise a UWB notification.
+     *
+     * @param uwbNotificationData The notification data to provide with the event.
+     */
+    NTSTATUS
+    RaiseUwbNotification(UwbNotificationData uwbNotificationData);
 
 private:
     // Static device information.
