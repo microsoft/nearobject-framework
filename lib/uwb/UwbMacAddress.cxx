@@ -75,6 +75,17 @@ UwbMacAddress::GetValue() const noexcept
     return m_view;
 }
 
+std::optional<uint16_t>
+UwbMacAddress::GetValueShort() const
+{
+    if (m_type != UwbMacAddressType::Short) {
+        return std::nullopt;
+    }
+
+    // TODO: do we need to account for endianness? revisit
+    return (static_cast<uint16_t>(m_view[1]) << 8U) | m_view[0];
+}
+
 std::string
 UwbMacAddress::ToString() const
 {

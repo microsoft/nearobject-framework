@@ -8,6 +8,7 @@
 #include <climits>
 #include <cstdint>
 #include <istream>
+#include <optional>
 #include <random>
 #include <span>
 #include <string>
@@ -227,6 +228,14 @@ public:
      */
     std::span<const uint8_t>
     GetValue() const noexcept;
+
+    /**
+     * @brief Get the short address as a value (POD type).
+     * 
+     * @return std::optional<uint16_t> 
+     */
+    std::optional<uint16_t>
+    GetValueShort() const;
 
     /**
      * @brief Return a string representation of the address.
