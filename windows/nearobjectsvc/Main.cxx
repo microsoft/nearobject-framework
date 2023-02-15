@@ -10,6 +10,7 @@
 #include <nearobject/service/ServiceRuntime.hxx>
 #include <windows/nearobject/service/NearObjectDeviceDiscoveryAgentUwb.hxx>
 
+#include <plog/Appenders/DebugOutputAppender.h>
 #include <plog/Formatters/TxtFormatter.h>
 #include <plog/Init.h>
 #include <plog/Log.h>
@@ -53,7 +54,8 @@ int
 main(int argc, char *argv[])
 {
     logging::plog::TraceLoggingAppender<plog::TxtFormatter> traceLoggingAppender(NearObjectSvcTraceLoggingProvider);
-    plog::init(plog::debug, &traceLoggingAppender);
+    plog::DebugOutputAppender<plog::TxtFormatter> debugAppender;
+    plog::init(plog::debug, &traceLoggingAppender).addAppender(&debugAppender);
 
     // Resolve user home directory.
     const std::filesystem::path homePath{ GetUserHomePath() };
