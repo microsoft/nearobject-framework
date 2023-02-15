@@ -417,7 +417,7 @@ enum class StsLength : uint8_t {
 
 struct UwbMulticastListStatus
 {
-    uint16_t ControleeMacAddress; // why is this uint16_t? TODO: replace with uwb::UwbMacAddress
+    uwb::UwbMacAddress ControleeMacAddress;
     uint32_t SubSessionId;
     UwbStatusMulticast Status;
 
@@ -437,7 +437,7 @@ enum class UwbMulticastAction {
 
 struct UwbSessionUpdateMulticastListEntry 
 {
-    UwbMacAddress ShortAddress;
+    UwbMacAddress ControleeMacAddress;
     uint32_t SubSessionId;
 };
 

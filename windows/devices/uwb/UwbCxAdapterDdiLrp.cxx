@@ -108,9 +108,13 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbStatusMult
 UWB_MULTICAST_LIST_STATUS
 windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbMulticastListStatus &uwbStatusMulticastList)
 {
+    if (uwbStatusMulticastList.ControleeMacAddress.GetType() != ::uwb::UwbMacAddressType::Short) {
+        throw std::runtime_error("UWB_MULTICAST_LIST_STATUS requires a short mac address");
+    }
+
     UWB_MULTICAST_LIST_STATUS statusMulticastList{};
     statusMulticastList.size = sizeof statusMulticastList;
-    statusMulticastList.controleeMacAddress = uwbStatusMulticastList.ControleeMacAddress;
+    statusMulticastList.controleeMacAddress = uwbStatusMulticastList.ControleeMacAddress.GetValueShort().value();
     statusMulticastList.subSessionId = uwbStatusMulticastList.SubSessionId;
     statusMulticastList.status = From(uwbStatusMulticastList.Status);
 
@@ -120,19 +124,14 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbMulticastL
 UWB_MULTICAST_CONTROLEE_LIST_ENTRY
 windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbSessionUpdateMulticastListEntry &uwbSessionUpdateMulticastListEntry)
 {
-    const auto macAddress = uwbSessionUpdateMulticastListEntry.ShortAddress.GetValue();
-    if (std::size(macAddress) != ::uwb::UwbMacAddress::ShortLength) {
+    if (uwbSessionUpdateMulticastListEntry.ControleeMacAddress.GetType() != ::uwb::UwbMacAddressType::Short) {
         throw std::runtime_error("UWB_MULTICAST_CONTROLEE_LIST_ENTRY requires a short mac address");
-        // TODO: this should probably not throw; revisit.
     }
 
     UWB_MULTICAST_CONTROLEE_LIST_ENTRY multicastListEntry{};
     multicastListEntry.size = sizeof multicastListEntry;
     multicastListEntry.subSessionId = uwbSessionUpdateMulticastListEntry.SubSessionId;
-    multicastListEntry.shortAddress = (static_cast<uint16_t>(macAddress[0]) << 8U) | macAddress[1];
-    // TODO: uwb::UwbMacAddress might be extended to provide the uint16_t short
-    // value directly since endianness needs to be accounted for and this should
-    // be done in one place.
+    multicastListEntry.shortAddress = uwbSessionUpdateMulticastListEntry.ControleeMacAddress.GetValueShort().value();
     
     return multicastListEntry;
 }
