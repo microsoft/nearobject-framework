@@ -104,7 +104,7 @@ UwbStatusDevice::ToString() const
 }
 
 std::string
-UwbStatusMulticastList::ToString() const
+UwbMulticastListStatus::ToString() const
 {
     std::ostringstream ss{};
     // TODO: implement this

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <functional>
 #include <stdexcept>
+#include <typeindex>
 #include <type_traits>
 #include <unordered_map>
 #include <variant>
@@ -66,6 +67,128 @@ windows::devices::uwb::ddi::lrp::From(const UwbStatus& uwbStatus)
         uwbStatus);
 
     return status;
+}
+
+UWB_DEVICE_STATE
+windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbDeviceState &uwbDeviceState)
+{
+    static const std::unordered_map<UwbDeviceState, UWB_DEVICE_STATE> DeviceStateMap{
+        { UwbDeviceState::Ready, UWB_DEVICE_STATE_READY },
+        { UwbDeviceState::Active, UWB_DEVICE_STATE_ACTIVE },
+        { UwbDeviceState::Error, UWB_DEVICE_STATE_ERROR },
+    };
+
+    return DeviceStateMap.at(uwbDeviceState);
+}
+
+UWB_MULTICAST_ACTION
+windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbMulticastAction &uwbMulticastAction)
+{
+    static const std::unordered_map<UwbMulticastAction, UWB_MULTICAST_ACTION> ActionMap{
+        { UwbMulticastAction::AddShortAddress, UWB_MULTICAST_ACTION_ADD_SHORT_ADDRESS },
+        { UwbMulticastAction::DeleteShortAddress, UWB_MULTICAST_ACTION_DELETE_SHORT_ADDRESS },
+    };
+
+    return ActionMap.at(uwbMulticastAction);
+}
+
+UWB_MULTICAST_STATUS
+windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbStatusMulticast &uwbStatusMulticast)
+{
+    static const std::unordered_map<UwbStatusMulticast, UWB_MULTICAST_STATUS> StatusMap{
+        { UwbStatusMulticast::OkUpdate, UWB_MULTICAST_STATUS_OK_MULTICAST_LIST_UPDATE },
+        { UwbStatusMulticast::ErrorListFull, UWB_MULTICAST_STATUS_ERROR_MULTICAST_LIST_FULL },
+        { UwbStatusMulticast::ErrorKeyFetchFail, UWB_MULTICAST_STATUS_ERROR_KEY_FETCH_FAIL },
+        { UwbStatusMulticast::ErrorSubSessionIdNotFound, UWB_MULTICAST_STATUS_ERROR_SUB_SESSION_ID_NOT_FOUND },
+    };
+
+    return StatusMap.at(uwbStatusMulticast);
+}
+
+UWB_MULTICAST_LIST_STATUS
+windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbMulticastListStatus &uwbStatusMulticastList)
+{
+    UWB_MULTICAST_LIST_STATUS statusMulticastList{};
+    statusMulticastList.size = sizeof statusMulticastList;
+    statusMulticastList.controleeMacAddress = uwbStatusMulticastList.ControleeMacAddress;
+    statusMulticastList.subSessionId = uwbStatusMulticastList.SubSessionId;
+    statusMulticastList.status = From(uwbStatusMulticastList.Status);
+
+    return statusMulticastList;
+}
+
+UWB_MULTICAST_CONTROLEE_LIST_ENTRY
+windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbSessionUpdateMulticastListEntry &uwbSessionUpdateMulticastListEntry)
+{
+    const auto macAddress = uwbSessionUpdateMulticastListEntry.ShortAddress.GetValue();
+    if (std::size(macAddress) != ::uwb::UwbMacAddress::ShortLength) {
+        throw std::runtime_error("UWB_MULTICAST_CONTROLEE_LIST_ENTRY requires a short mac address");
+        // TODO: this should probably not throw; revisit.
+    }
+
+    UWB_MULTICAST_CONTROLEE_LIST_ENTRY multicastListEntry{};
+    multicastListEntry.size = sizeof multicastListEntry;
+    multicastListEntry.subSessionId = uwbSessionUpdateMulticastListEntry.SubSessionId;
+    multicastListEntry.shortAddress = (static_cast<uint16_t>(macAddress[0]) << 8U) | macAddress[1];
+    // TODO: uwb::UwbMacAddress might be extended to provide the uint16_t short
+    // value directly since endianness needs to be accounted for and this should
+    // be done in one place.
+    
+    return multicastListEntry;
+}
+
+UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST
+windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbSessionUpdateMulicastList &uwbSessionUpdateMulicastList)
+{
+    UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST sessionUpdateControllerMulticastList{};
+    sessionUpdateControllerMulticastList.size = sizeof sessionUpdateControllerMulticastList; // TODO: update for variable length
+    sessionUpdateControllerMulticastList.sessionId = uwbSessionUpdateMulicastList.SessionId;
+    sessionUpdateControllerMulticastList.action = From(uwbSessionUpdateMulicastList.Action);
+    sessionUpdateControllerMulticastList.numberOfControlees = std::size(uwbSessionUpdateMulicastList.Controlees);
+    // TODO: append controlee information
+
+    return sessionUpdateControllerMulticastList;
+}
+
+UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF
+windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus &uwbSessionUpdateMulicastListStatus)
+{
+    UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF multicastListStatus{};
+    multicastListStatus.size = sizeof multicastListStatus; // TODO: update for variable length
+    multicastListStatus.sessionId = uwbSessionUpdateMulicastListStatus.SessionId;
+    multicastListStatus.numberOfControlees = std::size(uwbSessionUpdateMulicastListStatus.Status);
+    multicastListStatus.remainingMulticastListSize = 0;
+    // TODO: append status information 
+
+    return multicastListStatus;
+}
+
+UWB_RANGING_MEASUREMENT_TYPE
+windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingMeasurementType &uwbRangingType)
+{
+    static const std::unordered_map<UwbRangingMeasurementType, UWB_RANGING_MEASUREMENT_TYPE> RangingTypeMap{
+        { UwbRangingMeasurementType::TwoWay, UWB_RANGING_MEASUREMENT_TYPE_TWO_WAY },
+    };
+
+    return RangingTypeMap.at(uwbRangingType);
+}
+
+UWB_SESSION_REASON_CODE
+windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbSessionReasonCode &uwbSessionReasonCode)
+{
+    static const std::unordered_map<UwbSessionReasonCode, UWB_SESSION_REASON_CODE> SessionReasonCodeMap{
+        { UwbSessionReasonCode::StateChangeWithSessionManagementCommands, UWB_SESSION_REASON_CODE_STATE_CHANGE_WITH_SESSION_MANAGEMENT_COMMANDS },
+        { UwbSessionReasonCode::MaxRangignRoundRetryCountReached, UWB_SESSION_REASON_CODE_MAX_RANGING_ROUND_RETRY_COUNT_REACHED },
+        { UwbSessionReasonCode::MaxNumberOfMeasurementsReached, UWB_SESSION_REASON_CODE_MAX_NUMBER_OF_MEASUREMENTS_REACHED },
+        { UwbSessionReasonCode::ErrorSlotLengthNotSupported, UWB_SESSION_REASON_CODE_ERROR_SLOT_LENGTH_NOT_SUPPORTED },
+        { UwbSessionReasonCode::ErrorInsufficientSlotsPerRangingRound, UWB_SESSION_REASON_CODE_ERROR_INSUFFICIENT_SLOTS_PER_RR },
+        { UwbSessionReasonCode::ErrorMacAddressModeNotSupported, UWB_SESSION_REASON_CODE_ERROR_MAC_ADDRESS_MODE_NOT_SUPPORTED },
+        { UwbSessionReasonCode::ErrorInvalidRangingInterval, UWB_SESSION_REASON_CODE_ERROR_INVALID_RANGING_INTERVAL },
+        { UwbSessionReasonCode::ErrorInvalidStsConfiguration, UWB_SESSION_REASON_CODE_ERROR_INVALID_STS_CONFIG },
+        { UwbSessionReasonCode::ErrorInvalidRFrameConfiguration, UWB_SESSION_REASON_CODE_ERROR_INVALID_RFRAME_CONFIG },
+    };
+
+    return SessionReasonCodeMap.at(uwbSessionReasonCode);
 }
 
 UWB_DEVICE_CONFIG_PARAM_TYPE
@@ -147,6 +270,20 @@ windows::devices::uwb::ddi::lrp::From(const UwbSessionState uwbSessionState)
     return SessionStateMap.at(uwbSessionState);
 }
 
+UWB_SESSION_STATUS
+windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbSessionStatus &uwbSessionStatus)
+{
+    UWB_SESSION_STATUS sessionStatus{};
+    sessionStatus.size = sizeof sessionStatus;
+    sessionStatus.sessionId = uwbSessionStatus.SessionId;
+    sessionStatus.state = From(uwbSessionStatus.State);
+    if (uwbSessionStatus.ReasonCode.has_value()) {
+        sessionStatus.reasonCode = From(uwbSessionStatus.ReasonCode.value());
+    }
+
+    return sessionStatus;
+}
+
 UWB_DEVICE_INFO
 windows::devices::uwb::ddi::lrp::From(const UwbDeviceInformation& uwbDeviceInfo)
 {
@@ -168,10 +305,63 @@ windows::devices::uwb::ddi::lrp::From(const UwbCapability& uwbDeviceCapabilities
     return deviceCapabilities;
 }
 
+UWB_DEVICE_STATUS
+windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbStatusDevice &uwbStatusDevice)
+{
+    UWB_DEVICE_STATUS statusDevice{};
+    statusDevice.size = sizeof statusDevice;
+    statusDevice.deviceState = From(uwbStatusDevice.State);
+
+    return statusDevice;
+}
+
+UWB_RANGING_DATA
+windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingData &uwbRangingData)
+{
+    UWB_RANGING_DATA rangingData{}; // TODO: this must be allocated to account for 'RangingMeasurements' in uwbRangingData.
+    rangingData.size = sizeof rangingData + 0; // TODO: fix this to account for variable length
+    rangingData.sequenceNumber = uwbRangingData.SequenceNumber;
+    rangingData.sessionId = uwbRangingData.SessionId;
+    rangingData.currentRangingInterval = uwbRangingData.CurrentRangingInterval;
+    rangingData.rangingMeasurementType = From(uwbRangingData.RangingMeasurementType);
+    rangingData.numberOfRangingMeasurements = std::size(uwbRangingData.RangingMeasurements);
+
+    return rangingData;
+}
+
 UWB_NOTIFICATION_DATA
 windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbNotificationData &uwbNotificationData)
 {
+    static const std::unordered_map<std::type_index, UWB_NOTIFICATION_TYPE> NotificationTypeMap{
+        { std::type_index(typeid(UwbStatus)), UWB_NOTIFICATION_TYPE_GENERIC_ERROR },
+        { std::type_index(typeid(UwbStatusDevice)), UWB_NOTIFICATION_TYPE_DEVICE_STATUS },
+        { std::type_index(typeid(UwbSessionStatus)), UWB_NOTIFICATION_TYPE_SESSION_STATUS },
+        { std::type_index(typeid(UwbSessionUpdateMulicastListStatus)), UWB_NOTIFICATION_TYPE_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST },
+        { std::type_index(typeid(UwbRangingData)), UWB_NOTIFICATION_TYPE_RANGING_DATA },
+    };
+
     UWB_NOTIFICATION_DATA notificationData{};
-    // TODO: implement this properly
+
+    std::visit([&notificationData](auto&& arg) {
+        using ValueType = std::decay_t<decltype(arg)>;
+
+        notificationData.notificationType = NotificationTypeMap.at(typeid(arg));
+
+        if constexpr (std::is_same_v<ValueType, UwbStatus>) {
+            notificationData.genericError = From(arg);
+        } else if constexpr (std::is_same_v<ValueType, UwbStatusDevice>) {
+            notificationData.deviceStatus = From(arg);
+        } else if constexpr (std::is_same_v<ValueType, UwbSessionStatus>) {
+            notificationData.sessionStatus = From(arg);
+        } else if constexpr (std::is_same_v<ValueType, UwbSessionUpdateMulicastListStatus>) {
+            notificationData.sessionUpdateControllerMulticastList = From(arg);
+        } else if constexpr (std::is_same_v<ValueType, UwbRangingData>) {
+            notificationData.rangingData = From(arg);
+        }
+        // Note: no else clause is needed here since if the type is not
+        // supported, at at() call above will throw std::out_of_range, ensuring
+        // this code will never be reached.
+        }, uwbNotificationData);
+
     return notificationData;
 }

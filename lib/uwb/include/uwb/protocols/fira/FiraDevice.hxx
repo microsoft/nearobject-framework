@@ -415,7 +415,7 @@ enum class StsLength : uint8_t {
     Symbols128 = 0x02U,
 };
 
-struct UwbStatusMulticastList
+struct UwbMulticastListStatus
 {
     uint16_t ControleeMacAddress; // why is this uint16_t? TODO: replace with uwb::UwbMacAddress
     uint32_t SubSessionId;
@@ -435,12 +435,23 @@ enum class UwbMulticastAction {
     DeleteShortAddress,
 };
 
-struct UwbSessionUpdateControllerMulticastListEvent
+struct UwbSessionUpdateMulticastListEntry 
+{
+    UwbMacAddress ShortAddress;
+    uint32_t SubSessionId;
+};
+
+struct UwbSessionUpdateMulicastList
 {
     uint32_t SessionId;
-    uint32_t RemainingMulticastListSize;
-    uint32_t NumberOfControlees;
-    std::vector<UwbStatusMulticastList> Status;
+    UwbMulticastAction Action;
+    std::vector<UwbSessionUpdateMulticastListEntry> Controlees;
+};
+
+struct UwbSessionUpdateMulicastListStatus
+{
+    uint32_t SessionId;
+    std::vector<UwbMulticastListStatus> Status;
 };
 
 struct UwbSessionStatus
@@ -495,7 +506,7 @@ struct UwbRangingData
     ToString() const;
 };
 
-using UwbNotificationData = std::variant<UwbStatus, UwbStatusDevice, UwbSessionStatus, UwbStatusMulticast, UwbRangingData>;
+using UwbNotificationData = std::variant<UwbStatus, UwbStatusDevice, UwbSessionStatus, UwbSessionUpdateMulicastListStatus, UwbRangingData>;
 
 std::string
 ToString(const UwbNotificationData& uwbNotificationData);
