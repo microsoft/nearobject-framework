@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <string>
+#include <thread>
 
 // NB: This must come before any other Windows include
 #include <windows.h>
@@ -11,6 +12,7 @@
 #include <cfgmgr32.h>
 #include <wil/resource.h>
 
+#include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/UwbDevice.hxx>
 #include <uwb/UwbSessionEventCallbacks.hxx>
 #include <windows/devices/DeviceResource.hxx>
@@ -80,10 +82,27 @@ public:
     IsEqual(const ::uwb::UwbDevice& other) const noexcept override;
 
 private:
+    /**
+     * @brief Handles a single UWB notification.
+     * 
+     * @param uwbNotificationData 
+     */
+    void
+    HandleNotification(::uwb::protocol::fira::UwbNotificationData uwbNotificationData);
+
+    /**
+     * @brief Thread function for handling UWB notifications from the driver. 
+     */
+    void
+    HandleNotifications();
+
+private:
     const std::string m_deviceName;
 
     unique_hcmnotification m_hcmNotificationHandle;
     wil::unique_hfile m_handleDriver;
+    wil::unique_hfile m_handleDriverNotifications;
+    std::jthread m_notificationThread;
 };
 } // namespace windows::devices::uwb
 

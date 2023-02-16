@@ -1,8 +1,10 @@
 
 #include <bitset>
+#include <future>
 #include <stdexcept>
 #include <unordered_map>
 
+#include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
 #include <windows/devices/uwb/UwbSession.hxx>
@@ -191,12 +193,82 @@ UwbDevice::Initialize()
         FILE_FLAG_OVERLAPPED,
         nullptr));
 
-    // TODO: wil::unique_hfile handleDriver(CreateFile(m_deviceName))
+    wil::unique_hfile handleDriverNotifications(CreateFileA(
+        m_deviceName.c_str(),
+        GENERIC_READ | GENERIC_WRITE,
+        FILE_SHARE_READ | FILE_SHARE_WRITE,
+        nullptr,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        nullptr));
+
     // TODO: call CM_Register_Notification(handleDriver, filterType=CM_NOTIFY_FILTER_TYPE_DEVICEHANDLE)
     //   - handle CM_NOTIFY_ACTION_DEVICEQUERYREMOVE -> close handleDriver since device removal is requested
     //   - handle CM_NOTIFY_ACTION_DEVICEQUERYREMOVEFAILED -> query removal failed
 
     m_handleDriver = std::move(handleDriver);
+    m_handleDriverNotifications = std::move(handleDriverNotifications);
+    m_notificationThread = std::jthread([this]{
+        HandleNotifications();
+    });
+}
+
+/**
+ * @brief Namespace alias to reduce typing but preserve clarity regarding DDI
+ * conversion.
+ */
+namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
+
+void
+UwbDevice::HandleNotification(::uwb::protocol::fira::UwbNotificationData /* uwbNotificationData */)
+{
+    // TODO: implement this
+}
+
+void
+UwbDevice::HandleNotifications()
+{
+    for (;;) {
+        // TODO: check exit condition
+
+        // Determine the amount of memory required for the UWB_NOTIFICATION_DATA from the driver.
+        DWORD bytesRequired = 0;
+        HRESULT hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, nullptr, 0, &bytesRequired, nullptr);
+        if (FAILED(hr)) {
+            PLOG_ERROR << "error determining output buffer size for UWB notification, hr=0x" << std::hex << hr << std::endl;
+            continue;
+        }
+
+        // Allocate memory for the UWB_NOTIFICATION_DATA structure, and pass this to the driver request.
+        DWORD uwbNotificationDataSize = bytesRequired;
+        std::vector<uint8_t> uwbNotificationDataBuffer(uwbNotificationDataSize);
+        hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, std::data(uwbNotificationDataBuffer), uwbNotificationDataSize, &bytesRequired, nullptr);
+        if (FAILED(hr)) {
+            PLOG_ERROR << "error obtaining UWB notification buffer, hr=0x" << std::hex << hr << std::endl;
+            continue;
+        }
+
+        // Log a message if the output buffer is not aligned to UWB_NOTIFICATION_DATA. Ignore it for now as this should not occur often.
+        if (reinterpret_cast<uintptr_t>(std::data(uwbNotificationDataBuffer)) % alignof(UWB_NOTIFICATION_DATA) != 0) {
+            PLOG_ERROR << "driver output buffer is unaligned! undefined behavior may result" << std::endl;
+        }
+
+        // Convert to neutral type and process the notification.
+        UWB_NOTIFICATION_DATA& notificationData = *reinterpret_cast<UWB_NOTIFICATION_DATA *>(std::data(uwbNotificationDataBuffer));
+        auto uwbNotificationData = UwbCxDdi::To(notificationData);
+        
+        // Handle the notification in a fire-and-forget fashion. This may change
+        // later. Since std::async returns a future, and the future's
+        // destructor waits for it to complete, we cannot just ignore the
+        // returned future. To work around this, we move the returned future
+        // into a shared_ptr, then pass this by value to the std::async's
+        // lambda, increasing its reference count. This will ensure the future
+        // is automatically destructed once the async lambda has completed.
+        auto notificationHandlerFuture = std::make_shared<std::future<void>>();
+        *notificationHandlerFuture = std::async(std::launch::async, [this, notificationHandlerFuture, uwbNotificationData = std::move(uwbNotificationData)]() {
+            HandleNotification(std::move(uwbNotificationData));
+        });
+    }
 }
 
 std::unique_ptr<uwb::UwbSession>
