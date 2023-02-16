@@ -51,7 +51,7 @@ struct UwbDeviceEventCallbacks
     OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList) = 0;
 
     /**
-     * @brief Invoke when a session has a ranging data update. 
+     * @brief Invoked when a session has a ranging data update. 
      * 
      * @param rangingData The new ranging data.
      */
