@@ -22,22 +22,6 @@ public:
     UwbDevice() = default;
 
     /**
-     * @brief Create a new UWB session.
-     * 
-     * @return std::shared_ptr<uwb::UwbSession> 
-     */
-    std::shared_ptr<uwb::UwbSession>
-    CreateSession(std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks);
-
-    /**
-     * @brief Get the capabilities of the device.
-     * 
-     * @return uwb::protocol::fira::UwbCapability 
-     */
-    uwb::protocol::fira::UwbCapability
-    GetCapabilities();
-
-    /**
      * @brief Determine if this device is the same as another.
      * 
      * @param other 
