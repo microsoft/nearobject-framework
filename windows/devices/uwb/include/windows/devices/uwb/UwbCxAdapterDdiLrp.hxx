@@ -192,6 +192,15 @@ UWB_NOTIFICATION_DATA
 From(const ::uwb::protocol::fira::UwbNotificationData &uwbNotificationData);
 
 /**
+ * @brief Converts UWB_DEVICE_CAPABILITIES to UwbCapability.
+ * 
+ * @param deviceCapabilities 
+ * @return ::uwb::protocol::fira::UwbCapability 
+ */
+::uwb::protocol::fira::UwbCapability
+To(const UWB_DEVICE_CAPABILITIES& deviceCapabilities);
+
+/**
  * @brief Converts UWB_NOTIFICATION_DATA to UwbNotificationData.
  * 
  * @param notificationData 

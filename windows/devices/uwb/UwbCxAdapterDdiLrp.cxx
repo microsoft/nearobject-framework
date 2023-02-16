@@ -1,11 +1,17 @@
 
 #include <algorithm>
+#include <bitset>
 #include <functional>
 #include <stdexcept>
 #include <type_traits>
 #include <typeindex>
 #include <unordered_map>
 #include <variant>
+#include <vector>
+
+#include <plog/Log.h>
+#include <notstd/utility.hxx>
+#include <wil/common.h>
 
 #include <uwb/protocols/fira/UwbCapability.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
@@ -70,7 +76,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbStatus &uwbStatus)
 }
 
 UWB_DEVICE_STATE
-windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbDeviceState &uwbDeviceState)
+windows::devices::uwb::ddi::lrp::From(const UwbDeviceState &uwbDeviceState)
 {
     static const std::unordered_map<UwbDeviceState, UWB_DEVICE_STATE> DeviceStateMap{
         { UwbDeviceState::Ready, UWB_DEVICE_STATE_READY },
@@ -82,7 +88,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbDeviceStat
 }
 
 UWB_MULTICAST_ACTION
-windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbMulticastAction &uwbMulticastAction)
+windows::devices::uwb::ddi::lrp::From(const UwbMulticastAction &uwbMulticastAction)
 {
     static const std::unordered_map<UwbMulticastAction, UWB_MULTICAST_ACTION> ActionMap{
         { UwbMulticastAction::AddShortAddress, UWB_MULTICAST_ACTION_ADD_SHORT_ADDRESS },
@@ -93,7 +99,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbMulticastA
 }
 
 UWB_MULTICAST_STATUS
-windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbStatusMulticast &uwbStatusMulticast)
+windows::devices::uwb::ddi::lrp::From(const UwbStatusMulticast &uwbStatusMulticast)
 {
     static const std::unordered_map<UwbStatusMulticast, UWB_MULTICAST_STATUS> StatusMap{
         { UwbStatusMulticast::OkUpdate, UWB_MULTICAST_STATUS_OK_MULTICAST_LIST_UPDATE },
@@ -106,7 +112,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbStatusMult
 }
 
 UWB_MULTICAST_LIST_STATUS
-windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbMulticastListStatus &uwbStatusMulticastList)
+windows::devices::uwb::ddi::lrp::From(const UwbMulticastListStatus &uwbStatusMulticastList)
 {
     if (uwbStatusMulticastList.ControleeMacAddress.GetType() != ::uwb::UwbMacAddressType::Short) {
         throw std::runtime_error("UWB_MULTICAST_LIST_STATUS requires a short mac address");
@@ -122,7 +128,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbMulticastL
 }
 
 UWB_MULTICAST_CONTROLEE_LIST_ENTRY
-windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbSessionUpdateMulticastListEntry &uwbSessionUpdateMulticastListEntry)
+windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulticastListEntry &uwbSessionUpdateMulticastListEntry)
 {
     if (uwbSessionUpdateMulticastListEntry.ControleeMacAddress.GetType() != ::uwb::UwbMacAddressType::Short) {
         throw std::runtime_error("UWB_MULTICAST_CONTROLEE_LIST_ENTRY requires a short mac address");
@@ -137,7 +143,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbSessionUpd
 }
 
 UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST
-windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbSessionUpdateMulicastList &uwbSessionUpdateMulicastList)
+windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulicastList &uwbSessionUpdateMulicastList)
 {
     UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST sessionUpdateControllerMulticastList{};
     sessionUpdateControllerMulticastList.size = sizeof sessionUpdateControllerMulticastList; // TODO: update for variable length
@@ -150,7 +156,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbSessionUpd
 }
 
 UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF
-windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus &uwbSessionUpdateMulicastListStatus)
+windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulicastListStatus &uwbSessionUpdateMulicastListStatus)
 {
     UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF multicastListStatus{};
     multicastListStatus.size = sizeof multicastListStatus; // TODO: update for variable length
@@ -163,7 +169,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbSessionUpd
 }
 
 UWB_RANGING_MEASUREMENT_TYPE
-windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingMeasurementType &uwbRangingType)
+windows::devices::uwb::ddi::lrp::From(const UwbRangingMeasurementType &uwbRangingType)
 {
     static const std::unordered_map<UwbRangingMeasurementType, UWB_RANGING_MEASUREMENT_TYPE> RangingTypeMap{
         { UwbRangingMeasurementType::TwoWay, UWB_RANGING_MEASUREMENT_TYPE_TWO_WAY },
@@ -173,7 +179,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingMea
 }
 
 UWB_SESSION_REASON_CODE
-windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbSessionReasonCode &uwbSessionReasonCode)
+windows::devices::uwb::ddi::lrp::From(const UwbSessionReasonCode &uwbSessionReasonCode)
 {
     static const std::unordered_map<UwbSessionReasonCode, UWB_SESSION_REASON_CODE> SessionReasonCodeMap{
         { UwbSessionReasonCode::StateChangeWithSessionManagementCommands, UWB_SESSION_REASON_CODE_STATE_CHANGE_WITH_SESSION_MANAGEMENT_COMMANDS },
@@ -191,7 +197,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbSessionRea
 }
 
 UWB_DEVICE_CONFIG_PARAM_TYPE
-windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbDeviceConfigurationParameterType &uwbDeviceConfigurationParameterType)
+windows::devices::uwb::ddi::lrp::From(const UwbDeviceConfigurationParameterType &uwbDeviceConfigurationParameterType)
 {
     static const std::unordered_map<UwbDeviceConfigurationParameterType, UWB_DEVICE_CONFIG_PARAM_TYPE> ConfigParamMap{
         { UwbDeviceConfigurationParameterType::DeviceState, UWB_DEVICE_CONFIG_PARAM_TYPE_DEVICE_STATE },
@@ -202,7 +208,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbDeviceConf
 }
 
 UWB_APP_CONFIG_PARAM_TYPE
-windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbApplicationConfigurationParameterType &uwbApplicationConfigurationParameterType)
+windows::devices::uwb::ddi::lrp::From(const UwbApplicationConfigurationParameterType &uwbApplicationConfigurationParameterType)
 {
     static const std::unordered_map<UwbApplicationConfigurationParameterType, UWB_APP_CONFIG_PARAM_TYPE> AppConfigParamMap{
         { UwbApplicationConfigurationParameterType::DeviceType, UWB_APP_CONFIG_PARAM_TYPE_DEVICE_TYPE },
@@ -270,7 +276,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbSessionState uwbSessionState)
 }
 
 UWB_SESSION_STATUS
-windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbSessionStatus &uwbSessionStatus)
+windows::devices::uwb::ddi::lrp::From(const UwbSessionStatus &uwbSessionStatus)
 {
     UWB_SESSION_STATUS sessionStatus{};
     sessionStatus.size = sizeof sessionStatus;
@@ -320,7 +326,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbCapability &uwbDeviceCapabilities
 }
 
 UWB_DEVICE_STATUS
-windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbStatusDevice &uwbStatusDevice)
+windows::devices::uwb::ddi::lrp::From(const UwbStatusDevice &uwbStatusDevice)
 {
     UWB_DEVICE_STATUS statusDevice{};
     statusDevice.size = sizeof statusDevice;
@@ -330,7 +336,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbStatusDevi
 }
 
 UWB_RANGING_DATA
-windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingData &uwbRangingData)
+windows::devices::uwb::ddi::lrp::From(const UwbRangingData &uwbRangingData)
 {
     UWB_RANGING_DATA rangingData{};            // TODO: this must be allocated to account for 'RangingMeasurements' in uwbRangingData.
     rangingData.size = sizeof rangingData + 0; // TODO: fix this to account for variable length
@@ -344,7 +350,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingDat
 }
 
 UWB_NOTIFICATION_DATA
-windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbNotificationData &uwbNotificationData)
+windows::devices::uwb::ddi::lrp::From(const UwbNotificationData &uwbNotificationData)
 {
     static const std::unordered_map<std::type_index, UWB_NOTIFICATION_TYPE> NotificationTypeMap{
         { std::type_index(typeid(UwbStatus)), UWB_NOTIFICATION_TYPE_GENERIC_ERROR },
@@ -381,7 +387,154 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbNotificati
     return notificationData;
 }
 
-::uwb::protocol::fira::UwbNotificationData
+namespace detail
+{
+/**
+ * @brief Helper to process supported parameters from a given map which
+ * associates a value with a bit position. If the specified bitmap contains
+ * support for the value, the value is added to the result container.
+ *
+ * @tparam N The size of the bitset.
+ * @tparam T The type of the value.
+ * @param map The map associating values with bit positions in the bitset.
+ * @param support The bitset defining parameter support.
+ * @param result The vector to hold supported values that are present in the bitset.
+ */
+template <std::size_t N, typename T>
+void
+ProcessSupportFromBitset(std::unordered_map<T, std::size_t> map, const std::bitset<N>& support, std::vector<T>& result)
+{
+    for (const auto& [value, bit] : map) {
+        if (support.test(bit)) {
+            result.push_back(value);
+        }
+    }
+}
+} // namespace detail
+
+UwbCapability
+windows::devices::uwb::ddi::lrp::To(const UWB_DEVICE_CAPABILITIES& deviceCapabilities)
+{
+    UwbCapability uwbCapability;
+
+    for (const auto capability : wil::make_range(&deviceCapabilities.capabilityParams[0], deviceCapabilities.capabilityParamsCount)) {
+        switch (capability.paramType) {
+        case UWB_CAPABILITY_PARAM_TYPE_RANGING_METHOD: {
+            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            std::bitset<4> rangingMethods{ value };
+            detail::ProcessSupportFromBitset(UwbCapability::RangingMethodBit, rangingMethods, uwbCapability.RangingMethods);
+            break;
+        }
+        case UWB_CAPABILITY_PARAM_TYPE_DEVICE_ROLES: {
+            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            std::bitset<2> deviceRoles{ value };
+            detail::ProcessSupportFromBitset(UwbCapability::DeviceRoleBit, deviceRoles, uwbCapability.DeviceRoles);
+            break;
+        }
+        case UWB_CAPABILITY_PARAM_TYPE_PHY_VERSION_RANGE: {
+            const auto value = *reinterpret_cast<const uint32_t*>(&capability.paramValue);
+            uwbCapability.FiraPhyVersionRange = value;
+            break;
+        }
+        case UWB_CAPABILITY_PARAM_TYPE_MAC_VERSION_RANGE: {
+            const auto value = *reinterpret_cast<const uint32_t*>(&capability.paramValue);
+            uwbCapability.FiraMacVersionRange = value;
+            break;
+        }
+        case UWB_CAPABILITY_PARAM_TYPE_BLOCK_STRIDING: {
+            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            std::bitset<1> blockStriding{ value };
+            uwbCapability.BlockStriding = blockStriding.test(UwbCapability::BlockStridingBit);
+            break;
+        }
+        case UWB_CAPABILITY_PARAM_TYPE_HOPPING_MODE: {
+            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            std::bitset<1> hoppingMode{ value };
+            uwbCapability.HoppingMode = hoppingMode.test(UwbCapability::HoppingModeBit);
+            break;
+        }
+        case UWB_CAPABILITY_PARAM_TYPE_SCHEDULED_MODE: {
+            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            std::bitset<2> schedulingModes{ value };
+            detail::ProcessSupportFromBitset(UwbCapability::SchedulingModeBit, schedulingModes, uwbCapability.SchedulingModes);
+            break;
+        }
+        case UWB_CAPABILITY_PARAM_TYPE_RANGING_TIME_STRUCT: {
+            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            std::bitset<2> rangingTimeStructs{ value };
+            detail::ProcessSupportFromBitset(UwbCapability::RangingModeBit, rangingTimeStructs, uwbCapability.RangingTimeStructs);
+            break;
+        }
+        case UWB_CAPABILITY_PARAM_TYPE_MULTI_NODE_MODE: {
+            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            std::bitset<3> modes{ value };
+            detail::ProcessSupportFromBitset(UwbCapability::MultiNodeModeBit, modes, uwbCapability.MultiNodeModes);
+            break;
+        }
+        case UWB_CAPABILITY_PARAM_TYPE_UWB_INITIATION_TIME: {
+            const uint8_t value = capability.paramValue[0];
+            uwbCapability.UwbInitiationTime = !!value;
+            break;
+        }
+        case UWB_CAPABILITY_PARAM_TYPE_STS_CONFIG: {
+            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            std::bitset<3> stsConfigurations{ value };
+            detail::ProcessSupportFromBitset(UwbCapability::StsConfigurationBit, stsConfigurations, uwbCapability.StsConfigurations);
+            break;
+        }
+        case UWB_CAPABILITY_PARAM_TYPE_RFRAME_CONFIG: {
+            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            std::bitset<4> rframeConfigurations{ value };
+            detail::ProcessSupportFromBitset(UwbCapability::RFrameConfigurationBit, rframeConfigurations, uwbCapability.RFrameConfigurations);
+            break;
+        }
+        case UWB_CAPABILITY_PARAM_TYPE_AOA_SUPPORT: {
+            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            std::bitset<4> aoaTypes{ value };
+            detail::ProcessSupportFromBitset(UwbCapability::AngleOfArrivalBit, aoaTypes, uwbCapability.AngleOfArrivalTypes);
+            uwbCapability.AngleOfArrivalFom = aoaTypes.test(UwbCapability::AngleOfArrivalFomBit);
+            break;
+        }
+        case UWB_CAPABILITY_PARAM_TYPE_EXTENDED_MAC_ADDRESS: {
+            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            uwbCapability.ExtendedMacAddress = !!value;
+            break;
+        }
+        case UWB_CAPABILITY_PARAM_TYPE_CC_CONSTRAINT_LENGTH: {
+            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            std::bitset<2> convolutionalCodeConstraintLengths{ value };
+            detail::ProcessSupportFromBitset(UwbCapability::ConvolutionalCodeConstraintLengthsBit, convolutionalCodeConstraintLengths, uwbCapability.ConvolutionalCodeConstraintLengths);
+            break;
+        }
+        case UWB_CAPABILITY_PARAM_TYPE_CHANNELS: {
+            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            std::bitset<8> channels{ value };
+            detail::ProcessSupportFromBitset(UwbCapability::ChannelsBit, channels, uwbCapability.Channels);
+            break;
+        }
+        case UWB_CAPABILITY_PARAM_TYPE_BPRF_PARAMETER_SETS: {
+            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            std::bitset<6> bprfParameterSets{ value };
+            detail::ProcessSupportFromBitset(UwbCapability::BprfParameterSetsBit, bprfParameterSets, uwbCapability.BprfParameterSets);
+            break;
+        }
+        case UWB_CAPABILITY_PARAM_TYPE_HPRF_PARAMETER_SETS: {
+            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            std::bitset<35> hprfParameterSets{ value };
+            detail::ProcessSupportFromBitset(UwbCapability::HprfParameterSetsBit, hprfParameterSets, uwbCapability.HprfParameterSets);
+            break;
+        }
+        default:
+            // ignore unknown parameter tags
+            PLOG_DEBUG << "ignoring unknown UwbCapability parameter tag " << notstd::to_underlying(capability.paramType);
+            break;
+        }
+    }
+
+    return uwbCapability;
+}
+
+UwbNotificationData
 windows::devices::uwb::ddi::lrp::To(const UWB_NOTIFICATION_DATA& /* notificationData */)
 {
     UwbNotificationData uwbNotificationData{};
