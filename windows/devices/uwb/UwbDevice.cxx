@@ -110,8 +110,8 @@ UwbDevice::HandleNotifications()
     }
 }
 
-std::unique_ptr<uwb::UwbSession>
-UwbDevice::CreateSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
+std::shared_ptr<uwb::UwbSession>
+UwbDevice::CreateSessionImpl(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
 {
     // Create a duplicate handle to the driver for use by the session.
     wil::unique_hfile handleDriverForSession;
@@ -119,11 +119,11 @@ UwbDevice::CreateSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callback
         return nullptr;
     }
 
-    return std::make_unique<UwbSession>(std::move(callbacks), std::move(handleDriverForSession));
+    return std::make_shared<UwbSession>(std::move(callbacks), std::move(handleDriverForSession));
 }
 
 UwbCapability
-UwbDevice::GetCapabilities() const
+UwbDevice::GetCapabilitiesImpl()
 {
     // Determine the amount of memory required for the UWB_DEVICE_CAPABILITIES from the driver.
     DWORD bytesRequired = 0;

@@ -3,6 +3,8 @@
 #define UWB_DEVICE_HXX
 
 #include <memory>
+#include <shared_mutex>
+#include <unordered_map>
 
 #include <uwb/UwbSessionEventCallbacks.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
@@ -20,19 +22,20 @@ class UwbDevice
 public:
     /**
      * @brief Creates a new UWB session with no configuration nor peers.
-     *
-     * @return std::unique_ptr<uwb::UwbSession>
+     * 
+     * @param callbacks 
+     * @return std::shared_ptr<UwbSession> 
      */
-    virtual std::unique_ptr<UwbSession>
-    CreateSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks) = 0;
+    std::shared_ptr<UwbSession>
+    CreateSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks);
 
     /**
      * @brief Get the FiRa capabilities of the device.
      *
      * @return uwb::protocol::fira::UwbCapability
      */
-    virtual uwb::protocol::fira::UwbCapability
-    GetCapabilities() const = 0;
+    uwb::protocol::fira::UwbCapability
+    GetCapabilities();
 
     /**
      * @brief Determine if this device is the same as another.
@@ -49,6 +52,24 @@ public:
      */
     virtual ~UwbDevice() = default;
 
+private:
+    /**
+     * @brief Creates a new UWB session with no configuration nor peers.
+     * 
+     * @param callbacks 
+     * @return std::shared_ptr<UwbSession> 
+     */
+    virtual std::shared_ptr<UwbSession>
+    CreateSessionImpl(std::weak_ptr<UwbSessionEventCallbacks> callbacks) = 0;
+
+    /**
+     * @brief Get the FiRa capabilities of the device.
+     *
+     * @return uwb::protocol::fira::UwbCapability
+     */
+    virtual uwb::protocol::fira::UwbCapability
+    GetCapabilitiesImpl() = 0;
+
 protected:
     /**
      * @brief Invoked when a UWB notification has been received.
@@ -59,6 +80,15 @@ protected:
     OnUwbNotification(::uwb::protocol::fira::UwbNotificationData uwbNotificationData);
 
 private:
+    /**
+     * @brief Get a reference to the specified session.
+     * 
+     * @param sessionId 
+     * @return std::shared_ptr<UwbSession> 
+     */
+    std::shared_ptr<UwbSession>
+    GetSession(uint32_t sessionId);
+
     /**
      * @brief Invoked when a generic error occurs.
      *
@@ -98,6 +128,10 @@ private:
      */
     void
     OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData);
+
+private:
+    std::shared_mutex m_sessionsGate;
+    std::unordered_map<uint32_t, std::weak_ptr<uwb::UwbSession>> m_sessions{};
 };
 
 bool
