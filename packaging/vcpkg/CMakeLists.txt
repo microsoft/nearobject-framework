@@ -53,9 +53,9 @@ set(NOF_VCPKG_PORT_FILE_IN ${NOF_VCPKG_PORT_FILE_OUT}.in)
 # VS uses the MSBuild platform value ($(Platform)) to name the vcpkg timestamp file. This is not easy to obtain from CMake, so it is hardcoded for now, meaning this will only work on amd64/x64 architectures.
 set(NOF_WINDOWS_PLATFORM "x64")
 set(WINDOWS_UWB_SIMULATOR_DRIVER_VCPKG_TIMESTAMP_FILE ${CMAKE_SOURCE_DIR}/windows/drivers/uwb/simulator/vcpkg_installed/${NOF_WINDOWS_PLATFORM}-windows/.msbuildstamp-${NOF_WINDOWS_PLATFORM}-windows.stamp)
-message(STATUS "removing Windows simulator driver vcpkg timestamp file: ${WINDOWS_UWB_SIMULATOR_DRIVER_VCPKG_TIMESTAMP_FILE }")
+message(STATUS "removing Windows simulator driver vcpkg timestamp file: ${WINDOWS_UWB_SIMULATOR_DRIVER_VCPKG_TIMESTAMP_FILE}")
 
-file(REMOVE ${WINDOWS_UWB_SIMULATOR_DRIVER_VCPKG_TIMESTAMP_FILE })
+file(REMOVE ${WINDOWS_UWB_SIMULATOR_DRIVER_VCPKG_TIMESTAMP_FILE})
 
 
 # Generate portfile.cmake with selected versioning and configuration information.
