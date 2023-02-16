@@ -53,7 +53,7 @@ UwbDevice::OnSessionStatusChanged([[maybe_unused]] UwbSessionStatus statusSessio
         return;
     }
 
-    // TODO: implement the rest of this
+    // TODO: implement this
 }
 
 void
@@ -65,7 +65,7 @@ UwbDevice::OnSessionMulticastListStatus([[maybe_unused]] UwbSessionUpdateMulicas
         return;
     }
 
-    // TODO: implement the rest of this
+    // TODO: implement this
 }
 
 void
@@ -77,7 +77,7 @@ UwbDevice::OnSessionRangingData([[maybe_unused]] UwbRangingData rangingData)
         return;
     }
 
-    // TODO: implement the rest of this
+    // TODO: implement this
 }
 
 void
