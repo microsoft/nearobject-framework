@@ -380,3 +380,11 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbNotificati
 
     return notificationData;
 }
+
+::uwb::protocol::fira::UwbNotificationData
+windows::devices::uwb::ddi::lrp::To(const UWB_NOTIFICATION_DATA& /* notificationData */)
+{
+    UwbNotificationData uwbNotificationData{};
+    // TODO: implement this
+    return uwbNotificationData;
+}
