@@ -64,10 +64,10 @@ UwbDevice::CreateSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks)
     auto session = CreateSessionImpl(callbacks);
     {
         std::unique_lock sessionExclusiveLock{ m_sessionsGate };
-        m_sessions[session->GetId()] = std::move(session);
+        m_sessions[session->GetId()] = std::weak_ptr<UwbSession>(session);
     }
 
-    return nullptr; // FIXME: needs to be shared_ptr
+    return session;
 }
 
 bool

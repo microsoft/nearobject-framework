@@ -122,7 +122,7 @@ private:
 
 private:
     std::shared_mutex m_sessionsGate;
-    std::unordered_map<uint32_t, std::shared_ptr<uwb::UwbSession>> m_sessions{};
+    std::unordered_map<uint32_t, std::weak_ptr<uwb::UwbSession>> m_sessions{};
 };
 
 bool
