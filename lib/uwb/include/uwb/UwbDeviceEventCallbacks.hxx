@@ -8,7 +8,7 @@ namespace uwb
 {
 /**
  * @brief Interface for receiving events from a UwbDevice. This is the primary
- * method to receive information from the device driver.
+ * method to receive event information from the device driver.
  */
 struct UwbDeviceEventCallbacks
 {
