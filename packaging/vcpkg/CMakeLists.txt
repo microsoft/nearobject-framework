@@ -48,5 +48,10 @@ MESSAGE(STATUS "using vcpkg target ${NOF_VCPKG_TARGET} with ${NOF_VCPKG_GIT_URL}
 set(NOF_VCPKG_PORT_FILE_OUT ${CMAKE_CURRENT_LIST_DIR}/ports/nearobject-framework/portfile.cmake)
 set(NOF_VCPKG_PORT_FILE_IN ${NOF_VCPKG_PORT_FILE_OUT}.in)
 
+# Delete the timestamp file
+set(SIMULATOR_DRIVER_VCPKG_TIMESTAMP_FILE ${CMAKE_SOURCE_DIR}/windows/drivers/uwb/simulator/vcpkg_installed/x64-windows/.msbuildstamp-x64-windows.stamp)
+message(STATUS "removing simulator driver timestamp file: ${SIMULATOR_DRIVER_VCPKG_TIMESTAMP_FILE}")
+file(REMOVE ${SIMULATOR_DRIVER_VCPKG_TIMESTAMP_FILE})
+
 # Generate portfile.cmake with selected versioning and configuration information.
 configure_file(${NOF_VCPKG_PORT_FILE_IN} ${NOF_VCPKG_PORT_FILE_OUT} @ONLY)
