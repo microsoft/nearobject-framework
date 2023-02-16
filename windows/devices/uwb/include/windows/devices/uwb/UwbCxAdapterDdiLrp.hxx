@@ -191,6 +191,24 @@ From(const ::uwb::protocol::fira::UwbRangingData &uwbRangingData);
 UWB_NOTIFICATION_DATA
 From(const ::uwb::protocol::fira::UwbNotificationData &uwbNotificationData);
 
+/**
+ * @brief Converts UWB_DEVICE_CAPABILITIES to UwbCapability.
+ *
+ * @param deviceCapabilities
+ * @return ::uwb::protocol::fira::UwbCapability
+ */
+::uwb::protocol::fira::UwbCapability
+To(const UWB_DEVICE_CAPABILITIES &deviceCapabilities);
+
+/**
+ * @brief Converts UWB_NOTIFICATION_DATA to UwbNotificationData.
+ *
+ * @param notificationData
+ * @return ::uwb::protocol::fira::UwbNotificationData
+ */
+::uwb::protocol::fira::UwbNotificationData
+To(const UWB_NOTIFICATION_DATA &notificationData);
+
 } // namespace windows::devices::uwb::ddi::lrp
 
 #endif // UWB_CX_ADAPTER_DDI_LRP_HXX

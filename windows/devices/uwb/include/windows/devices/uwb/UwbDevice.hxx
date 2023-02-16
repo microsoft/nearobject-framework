@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <string>
+#include <thread>
 
 // NB: This must come before any other Windows include
 #include <windows.h>
@@ -13,6 +14,7 @@
 
 #include <uwb/UwbDevice.hxx>
 #include <uwb/UwbSessionEventCallbacks.hxx>
+#include <uwb/protocols/fira/FiraDevice.hxx>
 #include <windows/devices/DeviceResource.hxx>
 
 namespace uwb
@@ -80,10 +82,19 @@ public:
     IsEqual(const ::uwb::UwbDevice& other) const noexcept override;
 
 private:
+    /**
+     * @brief Thread function for handling UWB notifications from the driver.
+     */
+    void
+    HandleNotifications();
+
+private:
     const std::string m_deviceName;
 
     unique_hcmnotification m_hcmNotificationHandle;
     wil::unique_hfile m_handleDriver;
+    wil::unique_hfile m_handleDriverNotifications;
+    std::jthread m_notificationThread;
 };
 } // namespace windows::devices::uwb
 
