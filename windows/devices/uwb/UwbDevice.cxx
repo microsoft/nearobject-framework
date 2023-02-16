@@ -83,13 +83,13 @@ UwbDevice::HandleNotifications()
         ioResult = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, std::data(uwbNotificationDataBuffer), uwbNotificationDataSize, &bytesRequired, nullptr);
         if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
             HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-            PLOG_ERROR << "error obtaining UWB notification buffer, hr=" << std::showbase << std::hex << hr << std::endl;
+            PLOG_ERROR << "error obtaining UWB notification buffer, hr=" << std::showbase << std::hex << hr;
             continue;
         }
 
         // Log a message if the output buffer is not aligned to UWB_NOTIFICATION_DATA. Ignore it for now as this should not occur often.
         if (reinterpret_cast<uintptr_t>(std::data(uwbNotificationDataBuffer)) % alignof(UWB_NOTIFICATION_DATA) != 0) {
-            PLOG_ERROR << "driver output buffer is unaligned! undefined behavior may result" << std::endl;
+            PLOG_ERROR << "driver output buffer is unaligned! undefined behavior may result";
         }
 
         // Convert to neutral type and process the notification.
