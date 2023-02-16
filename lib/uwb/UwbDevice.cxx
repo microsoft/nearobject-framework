@@ -58,6 +58,14 @@ UwbDevice::OnUwbNotification(UwbNotificationData uwbNotificationData)
         uwbNotificationData);
 }
 
+std::unique_ptr<UwbSession>
+UwbDevice::CreateSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks)
+{
+    auto session = CreateSessionImpl(callbacks);
+    // TODO: put session in map
+    return session;
+}
+
 bool
 uwb::operator==(const UwbDevice& lhs, const UwbDevice& rhs) noexcept
 {

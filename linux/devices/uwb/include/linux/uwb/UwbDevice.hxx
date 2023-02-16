@@ -27,7 +27,7 @@ public:
      * @return std::unique_ptr<uwb::UwbSession> 
      */
     std::unique_ptr<uwb::UwbSession>
-    CreateSession(std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks) override;
+    CreateSession(std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks);
 
     /**
      * @brief Get the capabilities of the device.
@@ -35,7 +35,7 @@ public:
      * @return uwb::protocol::fira::UwbCapability 
      */
     uwb::protocol::fira::UwbCapability
-    GetCapabilities() const override;
+    GetCapabilities();
 
     /**
      * @brief Determine if this device is the same as another.
@@ -46,6 +46,24 @@ public:
      */
     bool
     IsEqual(const uwb::UwbDevice& other) const noexcept override;
+
+private:
+    /**
+     * @brief Create a Session object
+     * 
+     * @param callbacks 
+     * @return std::unique_ptr<uwb::UwbSession> 
+     */
+    std::unique_ptr<uwb::UwbSession>
+    CreateSessionImpl(std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks) override;
+
+    /**
+     * @brief Get the capabilities of the device.
+     * 
+     * @return uwb::protocol::fira::UwbCapability 
+     */
+    uwb::protocol::fira::UwbCapability
+    GetCapabilitiesImpl() override;
 };
 
 } // namespace devices

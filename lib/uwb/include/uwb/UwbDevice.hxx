@@ -20,19 +20,20 @@ class UwbDevice
 public:
     /**
      * @brief Creates a new UWB session with no configuration nor peers.
-     *
-     * @return std::unique_ptr<uwb::UwbSession>
+     * 
+     * @param callbacks 
+     * @return std::unique_ptr<UwbSession> 
      */
-    virtual std::unique_ptr<UwbSession>
-    CreateSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks) = 0;
+    std::unique_ptr<UwbSession>
+    CreateSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks);
 
     /**
      * @brief Get the FiRa capabilities of the device.
      *
      * @return uwb::protocol::fira::UwbCapability
      */
-    virtual uwb::protocol::fira::UwbCapability
-    GetCapabilities() const = 0;
+    uwb::protocol::fira::UwbCapability
+    GetCapabilities();
 
     /**
      * @brief Determine if this device is the same as another.
@@ -48,6 +49,24 @@ public:
      * @brief Destroy the UwbDevice object.
      */
     virtual ~UwbDevice() = default;
+
+private:
+    /**
+     * @brief Creates a new UWB session with no configuration nor peers.
+     * 
+     * @param callbacks 
+     * @return std::unique_ptr<UwbSession> 
+     */
+    virtual std::unique_ptr<UwbSession>
+    CreateSessionImpl(std::weak_ptr<UwbSessionEventCallbacks> callbacks) = 0;
+
+    /**
+     * @brief Get the FiRa capabilities of the device.
+     *
+     * @return uwb::protocol::fira::UwbCapability
+     */
+    virtual uwb::protocol::fira::UwbCapability
+    GetCapabilitiesImpl() = 0;
 
 protected:
     /**
