@@ -464,8 +464,8 @@ struct UwbSessionUpdateMulicastListStatus
 
     /**
      * @brief Returns a string representation of the object.
-     * 
-     * @return std::string 
+     *
+     * @return std::string
      */
     std::string
     ToString() const;
@@ -491,6 +491,14 @@ struct UwbRangingMeasurementData
     uint16_t Result;
     std::optional<uint8_t> FigureOfMerit;
     decltype(FigureOfMerit)& FoM = FigureOfMerit;
+
+    /**
+     * @brief Returns a string representation of the object.
+     *
+     * @return std::string
+     */
+    std::string
+    ToString() const;
 };
 
 struct UwbRangingMeasurement
@@ -504,6 +512,14 @@ struct UwbRangingMeasurement
     UwbRangingMeasurementData AoAElevation;
     UwbRangingMeasurementData AoaDestinationAzimuth;
     UwbRangingMeasurementData AoaDestinationElevation;
+
+    /**
+     * @brief Returns a string representation of the object.
+     *
+     * @return std::string
+     */
+    std::string
+    ToString() const;
 };
 
 struct UwbRangingData
@@ -524,6 +540,15 @@ struct UwbRangingData
 };
 
 using UwbNotificationData = std::variant<UwbStatus, UwbStatusDevice, UwbSessionStatus, UwbSessionUpdateMulicastListStatus, UwbRangingData>;
+
+/**
+ * @brief Returns a string representation of the object.
+ *
+ * @param uwbStatus
+ * @return std::string
+ */
+std::string
+ToString(const UwbStatus& uwbStatus);
 
 /**
  * @brief Returns a string representation of the object.
