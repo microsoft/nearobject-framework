@@ -19,7 +19,7 @@ UwbDevice::GetSession(uint32_t sessionId)
             PLOG_VERBOSE << "Session with id=" << sessionId << " not found";
             return nullptr;
         }
-    
+
         sessionWeak = sessionIt->second;
     }
 
