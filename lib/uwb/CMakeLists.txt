@@ -13,6 +13,7 @@ target_sources(uwb
         ${CMAKE_CURRENT_LIST_DIR}/UwbVersion.cxx
     PUBLIC
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDevice.hxx
+        ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceEventCallbacks.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbMacAddress.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbPeer.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSession.hxx
@@ -37,6 +38,7 @@ target_link_libraries(uwb
 
 list(APPEND UWB_PUBLIC_HEADERS
     ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDevice.hxx
+    ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceEventCallbacks.hxx
     ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbMacAddress.hxx
     ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbPeer.hxx
     ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSession.hxx

@@ -1,15 +1,15 @@
 
-#include <wil/result.h>
-
 #include <algorithm>
+#include <ios>
 #include <memory>
 #include <numeric>
+
+#include <plog/Log.h>
+#include <wil/result.h>
 
 #include <windows/devices/uwb/UwbCxAdapter.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 #include <windows/devices/uwb/UwbSession.hxx>
-
-#include <plog/Log.h>
 
 using namespace windows::devices::uwb;
 
@@ -29,10 +29,11 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData &uwbSessio
     sessionInit.sessionType = UWB_SESSION_TYPE_RANGING_SESSION;
 
     // Request a new session from the driver.
-    HRESULT hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_SESSION_INIT, &sessionInit, sizeof sessionInit, nullptr, 0, nullptr, nullptr);
-    if (FAILED(hr)) {
+    BOOL ioResult = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_SESSION_INIT, &sessionInit, sizeof sessionInit, nullptr, 0, nullptr, nullptr);
+    if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         // TODO: handle this
-        PLOG_ERROR << "could not request a new session from the driver, hr=" << std::hex << hr;
+        HRESULT hr = GetLastError();
+        PLOG_ERROR << "could not request a new session from the driver, hr=" << std::showbase << std::hex << hr;
     }
 
     m_sessionId = uwbSessionData.sessionId;
@@ -49,10 +50,11 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData &uwbSessio
     statusHolder.size = statusSize;
     statusHolder.appConfigParamsCount = setParams.appConfigParamsCount;
 
-    hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_SET_APP_CONFIG_PARAMS, std::data(setParamsBuffer), std::size(setParamsBuffer), statusBuffer.get(), statusSize, nullptr, nullptr);
-    if (FAILED(hr)) {
+    ioResult = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_SET_APP_CONFIG_PARAMS, std::data(setParamsBuffer), std::size(setParamsBuffer), statusBuffer.get(), statusSize, nullptr, nullptr);
+    if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         // TODO: handle this
-        PLOG_ERROR << "could not send params to driver";
+        HRESULT hr = GetLastError();
+        PLOG_ERROR << "could not send params to driver, hr=" << std::showbase << std::hex << hr;
     }
 }
 
@@ -61,10 +63,11 @@ UwbSession::StartRangingImpl()
 {
     UWB_START_RANGING_SESSION startRangingSession;
     startRangingSession.sessionId = GetId();
-    HRESULT hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_START_RANGING_SESSION, &startRangingSession, sizeof startRangingSession, nullptr, 0, nullptr, nullptr);
-    if (FAILED(hr)) {
-        // TODO
-        PLOG_ERROR << "could not send start ranging command to driver";
+    BOOL ioResult = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_START_RANGING_SESSION, &startRangingSession, sizeof startRangingSession, nullptr, 0, nullptr, nullptr);
+    if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
+        // TODO: determine error signaling strategy, and signal error
+        HRESULT hr = GetLastError();
+        PLOG_ERROR << "could not send start ranging command to driver, hr=" << std::showbase << std::hex << hr;
     }
 }
 
@@ -73,10 +76,11 @@ UwbSession::StopRangingImpl()
 {
     UWB_STOP_RANGING_SESSION stopRangingSession;
     stopRangingSession.sessionId = GetId();
-    HRESULT hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_STOP_RANGING_SESSION, &stopRangingSession, sizeof stopRangingSession, nullptr, 0, nullptr, nullptr);
-    if (FAILED(hr)) {
+    BOOL ioResult = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_STOP_RANGING_SESSION, &stopRangingSession, sizeof stopRangingSession, nullptr, 0, nullptr, nullptr);
+    if (LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         // TODO
-        PLOG_ERROR << "could not send stop ranging command to driver";
+        HRESULT hr = GetLastError();
+        PLOG_ERROR << "could not send stop ranging command to driver, hr=" << std::showbase << std::hex << hr;
     }
 }
 
@@ -127,9 +131,10 @@ void
     // Attempt to set all new parameters.
     DWORD bytesReturned = 0;
     UWB_SET_APP_CONFIG_PARAMS_STATUS appConfigParamsStatus; // TODO: this needs to be dynamically allocated to fit returned content
-    HRESULT hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_SET_APP_CONFIG_PARAMS, &appConfigParams, static_cast<DWORD>(appConfigParamsSize), &appConfigParamsStatus, sizeof appConfigParamsStatus, &bytesReturned, nullptr);
-    if (FAILED(hr)) {
+    BOOL ioResult = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_SET_APP_CONFIG_PARAMS, &appConfigParams, static_cast<DWORD>(appConfigParamsSize), &appConfigParamsStatus, sizeof appConfigParamsStatus, &bytesReturned, nullptr);
+    if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         // TODO
-        PLOG_ERROR << "could not send params to driver";
+        HRESULT hr = GetLastError();
+        PLOG_ERROR << "could not send params to driver, hr=" << std::showbase << std::hex << hr;
     }
 }

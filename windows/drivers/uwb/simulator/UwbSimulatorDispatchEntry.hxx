@@ -50,7 +50,7 @@ struct UwbSimulatorDispatchEntry
      * std::size_t paramLengthTotal = sizeof (UWB_CAPABILITY_PARAM) + paramLength - 1;
      * auto paramsBuffer = std::make_unique<uint8_t[]>(paramLenghtTotal);
      * UWB_CAPABILITY_PARAM *params = reinterpret_cast<UWB_CAPABILITY_PARAM *>(paramsBuffer.get());
-     * auto hr = DeviceIoControl(handle, ..., paramsBuffer, paramLengthTotal, ...);
+     * BOOL ioResult = DeviceIoControl(handle, ..., paramsBuffer, paramLengthTotal, ...);
      *
      * <in driver>
      * std::size_t paramLengthExpected = 10;
