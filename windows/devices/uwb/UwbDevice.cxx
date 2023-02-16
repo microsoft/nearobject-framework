@@ -17,7 +17,7 @@ using namespace ::uwb::protocol::fira;
  * conversion.
  */
 namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
-      
+
 UwbDevice::UwbDevice(std::string deviceName) :
     m_deviceName(std::move(deviceName))
 {}
@@ -59,7 +59,6 @@ UwbDevice::Initialize()
         HandleNotifications();
     });
 }
-
 
 void
 UwbDevice::HandleNotifications()
@@ -119,7 +118,7 @@ UwbDevice::CreateSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callback
     return std::make_unique<UwbSession>(std::move(callbacks), std::move(handleDriverForSession));
 }
 
-uwb::protocol::fira::UwbCapability
+UwbCapability
 UwbDevice::GetCapabilities() const
 {
     // Determine the amount of memory required for the UWB_DEVICE_CAPABILITIES from the driver.

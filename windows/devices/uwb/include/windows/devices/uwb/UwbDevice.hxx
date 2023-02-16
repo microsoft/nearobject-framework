@@ -12,9 +12,9 @@
 #include <cfgmgr32.h>
 #include <wil/resource.h>
 
-#include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/UwbDevice.hxx>
 #include <uwb/UwbSessionEventCallbacks.hxx>
+#include <uwb/protocols/fira/FiraDevice.hxx>
 #include <windows/devices/DeviceResource.hxx>
 
 namespace uwb
@@ -83,7 +83,7 @@ public:
 
 private:
     /**
-     * @brief Thread function for handling UWB notifications from the driver. 
+     * @brief Thread function for handling UWB notifications from the driver.
      */
     void
     HandleNotifications();

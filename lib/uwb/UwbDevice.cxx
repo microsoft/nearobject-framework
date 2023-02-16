@@ -8,7 +8,7 @@ using namespace uwb;
 using namespace uwb::protocol::fira;
 
 void
-UwbDevice::OnStatusChanged([[maybe_unused]] UwbStatus /* status */)
+UwbDevice::OnStatusChanged([[maybe_unused]] UwbStatus status)
 {
     // TODO: implement this
 }
@@ -26,7 +26,7 @@ UwbDevice::OnSessionStatusChanged([[maybe_unused]] UwbSessionStatus statusSessio
 }
 
 void
-UwbDevice::OnSessionMulticastListStatus([[maybe_unused]] UwbSessionUpdateMulicastListStatus /* statusMulticastList */)
+UwbDevice::OnSessionMulticastListStatus([[maybe_unused]] UwbSessionUpdateMulicastListStatus statusMulticastList)
 {
     // TODO: implement this
 }

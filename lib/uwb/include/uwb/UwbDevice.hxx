@@ -59,9 +59,9 @@ protected:
     OnUwbNotification(::uwb::protocol::fira::UwbNotificationData uwbNotificationData);
 
 private:
-     /**
-     * @brief Invoked when a generic error occurs. 
-     * 
+    /**
+     * @brief Invoked when a generic error occurs.
+     *
      * @param status The generic error that occurred.
      */
     void
@@ -69,15 +69,15 @@ private:
 
     /**
      * @brief Invoked when the device status changes.
-     * 
-     * @param statusDevice 
+     *
+     * @param statusDevice
      */
-    void 
+    void
     OnDeviceStatusChanged(::uwb::protocol::fira::UwbStatusDevice statusDevice);
 
     /**
      * @brief Invoked when the status of a session changes.
-     * 
+     *
      * @param statusSession The new status of the session.
      */
     void
@@ -85,15 +85,15 @@ private:
 
     /**
      * @brief Invoked when the multicast list for a session has a status update.
-     * 
+     *
      * @param statusMulticastList The status of the session's multicast list.
      */
     void
     OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList);
 
     /**
-     * @brief Invoked when a session has a ranging data update. 
-     * 
+     * @brief Invoked when a session has a ranging data update.
+     *
      * @param rangingData The new ranging data.
      */
     void

@@ -9,8 +9,8 @@
 #include <variant>
 #include <vector>
 
-#include <plog/Log.h>
 #include <notstd/utility.hxx>
+#include <plog/Log.h>
 #include <wil/common.h>
 
 #include <uwb/protocols/fira/UwbCapability.hxx>
@@ -402,9 +402,9 @@ namespace detail
  */
 template <std::size_t N, typename T>
 void
-ProcessSupportFromBitset(std::unordered_map<T, std::size_t> map, const std::bitset<N>& support, std::vector<T>& result)
+ProcessSupportFromBitset(std::unordered_map<T, std::size_t> map, const std::bitset<N> &support, std::vector<T> &result)
 {
-    for (const auto& [value, bit] : map) {
+    for (const auto &[value, bit] : map) {
         if (support.test(bit)) {
             result.push_back(value);
         }
@@ -413,60 +413,60 @@ ProcessSupportFromBitset(std::unordered_map<T, std::size_t> map, const std::bits
 } // namespace detail
 
 UwbCapability
-windows::devices::uwb::ddi::lrp::To(const UWB_DEVICE_CAPABILITIES& deviceCapabilities)
+windows::devices::uwb::ddi::lrp::To(const UWB_DEVICE_CAPABILITIES &deviceCapabilities)
 {
     UwbCapability uwbCapability;
 
     for (const auto capability : wil::make_range(&deviceCapabilities.capabilityParams[0], deviceCapabilities.capabilityParamsCount)) {
         switch (capability.paramType) {
         case UWB_CAPABILITY_PARAM_TYPE_RANGING_METHOD: {
-            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            const auto value = *reinterpret_cast<const uint8_t *>(&capability.paramValue);
             std::bitset<4> rangingMethods{ value };
             detail::ProcessSupportFromBitset(UwbCapability::RangingMethodBit, rangingMethods, uwbCapability.RangingMethods);
             break;
         }
         case UWB_CAPABILITY_PARAM_TYPE_DEVICE_ROLES: {
-            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            const auto value = *reinterpret_cast<const uint8_t *>(&capability.paramValue);
             std::bitset<2> deviceRoles{ value };
             detail::ProcessSupportFromBitset(UwbCapability::DeviceRoleBit, deviceRoles, uwbCapability.DeviceRoles);
             break;
         }
         case UWB_CAPABILITY_PARAM_TYPE_PHY_VERSION_RANGE: {
-            const auto value = *reinterpret_cast<const uint32_t*>(&capability.paramValue);
+            const auto value = *reinterpret_cast<const uint32_t *>(&capability.paramValue);
             uwbCapability.FiraPhyVersionRange = value;
             break;
         }
         case UWB_CAPABILITY_PARAM_TYPE_MAC_VERSION_RANGE: {
-            const auto value = *reinterpret_cast<const uint32_t*>(&capability.paramValue);
+            const auto value = *reinterpret_cast<const uint32_t *>(&capability.paramValue);
             uwbCapability.FiraMacVersionRange = value;
             break;
         }
         case UWB_CAPABILITY_PARAM_TYPE_BLOCK_STRIDING: {
-            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            const auto value = *reinterpret_cast<const uint8_t *>(&capability.paramValue);
             std::bitset<1> blockStriding{ value };
             uwbCapability.BlockStriding = blockStriding.test(UwbCapability::BlockStridingBit);
             break;
         }
         case UWB_CAPABILITY_PARAM_TYPE_HOPPING_MODE: {
-            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            const auto value = *reinterpret_cast<const uint8_t *>(&capability.paramValue);
             std::bitset<1> hoppingMode{ value };
             uwbCapability.HoppingMode = hoppingMode.test(UwbCapability::HoppingModeBit);
             break;
         }
         case UWB_CAPABILITY_PARAM_TYPE_SCHEDULED_MODE: {
-            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            const auto value = *reinterpret_cast<const uint8_t *>(&capability.paramValue);
             std::bitset<2> schedulingModes{ value };
             detail::ProcessSupportFromBitset(UwbCapability::SchedulingModeBit, schedulingModes, uwbCapability.SchedulingModes);
             break;
         }
         case UWB_CAPABILITY_PARAM_TYPE_RANGING_TIME_STRUCT: {
-            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            const auto value = *reinterpret_cast<const uint8_t *>(&capability.paramValue);
             std::bitset<2> rangingTimeStructs{ value };
             detail::ProcessSupportFromBitset(UwbCapability::RangingModeBit, rangingTimeStructs, uwbCapability.RangingTimeStructs);
             break;
         }
         case UWB_CAPABILITY_PARAM_TYPE_MULTI_NODE_MODE: {
-            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            const auto value = *reinterpret_cast<const uint8_t *>(&capability.paramValue);
             std::bitset<3> modes{ value };
             detail::ProcessSupportFromBitset(UwbCapability::MultiNodeModeBit, modes, uwbCapability.MultiNodeModes);
             break;
@@ -477,49 +477,49 @@ windows::devices::uwb::ddi::lrp::To(const UWB_DEVICE_CAPABILITIES& deviceCapabil
             break;
         }
         case UWB_CAPABILITY_PARAM_TYPE_STS_CONFIG: {
-            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            const auto value = *reinterpret_cast<const uint8_t *>(&capability.paramValue);
             std::bitset<3> stsConfigurations{ value };
             detail::ProcessSupportFromBitset(UwbCapability::StsConfigurationBit, stsConfigurations, uwbCapability.StsConfigurations);
             break;
         }
         case UWB_CAPABILITY_PARAM_TYPE_RFRAME_CONFIG: {
-            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            const auto value = *reinterpret_cast<const uint8_t *>(&capability.paramValue);
             std::bitset<4> rframeConfigurations{ value };
             detail::ProcessSupportFromBitset(UwbCapability::RFrameConfigurationBit, rframeConfigurations, uwbCapability.RFrameConfigurations);
             break;
         }
         case UWB_CAPABILITY_PARAM_TYPE_AOA_SUPPORT: {
-            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            const auto value = *reinterpret_cast<const uint8_t *>(&capability.paramValue);
             std::bitset<4> aoaTypes{ value };
             detail::ProcessSupportFromBitset(UwbCapability::AngleOfArrivalBit, aoaTypes, uwbCapability.AngleOfArrivalTypes);
             uwbCapability.AngleOfArrivalFom = aoaTypes.test(UwbCapability::AngleOfArrivalFomBit);
             break;
         }
         case UWB_CAPABILITY_PARAM_TYPE_EXTENDED_MAC_ADDRESS: {
-            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            const auto value = *reinterpret_cast<const uint8_t *>(&capability.paramValue);
             uwbCapability.ExtendedMacAddress = !!value;
             break;
         }
         case UWB_CAPABILITY_PARAM_TYPE_CC_CONSTRAINT_LENGTH: {
-            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            const auto value = *reinterpret_cast<const uint8_t *>(&capability.paramValue);
             std::bitset<2> convolutionalCodeConstraintLengths{ value };
             detail::ProcessSupportFromBitset(UwbCapability::ConvolutionalCodeConstraintLengthsBit, convolutionalCodeConstraintLengths, uwbCapability.ConvolutionalCodeConstraintLengths);
             break;
         }
         case UWB_CAPABILITY_PARAM_TYPE_CHANNELS: {
-            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            const auto value = *reinterpret_cast<const uint8_t *>(&capability.paramValue);
             std::bitset<8> channels{ value };
             detail::ProcessSupportFromBitset(UwbCapability::ChannelsBit, channels, uwbCapability.Channels);
             break;
         }
         case UWB_CAPABILITY_PARAM_TYPE_BPRF_PARAMETER_SETS: {
-            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            const auto value = *reinterpret_cast<const uint8_t *>(&capability.paramValue);
             std::bitset<6> bprfParameterSets{ value };
             detail::ProcessSupportFromBitset(UwbCapability::BprfParameterSetsBit, bprfParameterSets, uwbCapability.BprfParameterSets);
             break;
         }
         case UWB_CAPABILITY_PARAM_TYPE_HPRF_PARAMETER_SETS: {
-            const auto value = *reinterpret_cast<const uint8_t*>(&capability.paramValue);
+            const auto value = *reinterpret_cast<const uint8_t *>(&capability.paramValue);
             std::bitset<35> hprfParameterSets{ value };
             detail::ProcessSupportFromBitset(UwbCapability::HprfParameterSetsBit, hprfParameterSets, uwbCapability.HprfParameterSets);
             break;
@@ -535,7 +535,7 @@ windows::devices::uwb::ddi::lrp::To(const UWB_DEVICE_CAPABILITIES& deviceCapabil
 }
 
 UwbNotificationData
-windows::devices::uwb::ddi::lrp::To(const UWB_NOTIFICATION_DATA& /* notificationData */)
+windows::devices::uwb::ddi::lrp::To(const UWB_NOTIFICATION_DATA & /* notificationData */)
 {
     UwbNotificationData uwbNotificationData{};
     // TODO: implement this

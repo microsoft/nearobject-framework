@@ -13,27 +13,27 @@ struct UwbDeviceCallbacksTest : public UwbDeviceEventCallbacks
     ~UwbDeviceCallbacksTest() = default;
 
     void
-    OnStatusChanged(::uwb::protocol::fira::UwbStatus /* status */) override
-    {
-    }
-
-    void 
-    OnDeviceStatusChanged(::uwb::protocol::fira::UwbStatusDevice /* statusDevice */) override
+    OnStatusChanged([[maybe_unused]] ::uwb::protocol::fira::UwbStatus status) override
     {
     }
 
     void
-    OnSessionStatusChanged(::uwb::protocol::fira::UwbSessionStatus /* statusSession */) override
+    OnDeviceStatusChanged([[maybe_unused]] ::uwb::protocol::fira::UwbStatusDevice statusDevice) override
     {
     }
 
     void
-    OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus /* statusMulticastList */) override
+    OnSessionStatusChanged([[maybe_unused]] ::uwb::protocol::fira::UwbSessionStatus statusSession) override
     {
     }
 
     void
-    OnSessionRangingData(::uwb::protocol::fira::UwbRangingData /* rangingData */) override
+    OnSessionMulticastListStatus([[maybe_unused]] ::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList) override
+    {
+    }
+
+    void
+    OnSessionRangingData([[maybe_unused]] ::uwb::protocol::fira::UwbRangingData rangingData) override
     {
     }
 };
