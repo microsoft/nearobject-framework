@@ -81,6 +81,15 @@ protected:
 
 private:
     /**
+     * @brief Get a reference to the specified session.
+     * 
+     * @param sessionId 
+     * @return std::shared_ptr<UwbSession> 
+     */
+    std::shared_ptr<UwbSession>
+    GetSession(uint32_t sessionId);
+
+    /**
      * @brief Invoked when a generic error occurs.
      *
      * @param status The generic error that occurred.
