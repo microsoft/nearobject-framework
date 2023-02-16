@@ -2,7 +2,9 @@
 #include <bitset>
 #include <future>
 #include <stdexcept>
+#include <type_traits>
 #include <unordered_map>
+#include <variant>
 
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
@@ -12,6 +14,7 @@
 #include <plog/Log.h>
 
 using namespace windows::devices::uwb;
+using namespace ::uwb::protocol::fira;
 
 namespace detail
 {
@@ -208,7 +211,7 @@ UwbDevice::Initialize()
 
     m_handleDriver = std::move(handleDriver);
     m_handleDriverNotifications = std::move(handleDriverNotifications);
-    m_notificationThread = std::jthread([this]{
+    m_notificationThread = std::jthread([this] {
         HandleNotifications();
     });
 }
@@ -220,9 +223,52 @@ UwbDevice::Initialize()
 namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
 
 void
-UwbDevice::HandleNotification(::uwb::protocol::fira::UwbNotificationData /* uwbNotificationData */)
+UwbDevice::OnStatusChanged([[maybe_unused]] ::uwb::protocol::fira::UwbStatus /* status */)
 {
     // TODO: implement this
+}
+
+void
+UwbDevice::OnDeviceStatusChanged([[maybe_unused]] ::uwb::protocol::fira::UwbStatusDevice /* statusDevice */)
+{
+    // TODO: implement this
+}
+void
+UwbDevice::OnSessionStatusChanged([[maybe_unused]] ::uwb::protocol::fira::UwbSessionStatus /* statusSession */)
+{
+    // TODO: implement this
+}
+void
+UwbDevice::OnSessionMulticastListStatus([[maybe_unused]] ::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus /* statusMulticastList */)
+{
+    // TODO: implement this
+}
+
+void
+UwbDevice::OnSessionRangingData([[maybe_unused]] ::uwb::protocol::fira::UwbRangingData rangingData)
+{
+    // TODO: implement this
+}
+
+void
+UwbDevice::HandleNotification(::uwb::protocol::fira::UwbNotificationData uwbNotificationData)
+{
+    std::visit([this](auto&& arg) {
+        using ValueType = std::decay_t<decltype(arg)>;
+
+        if constexpr (std::is_same_v<ValueType, UwbStatus>) {
+            OnStatusChanged(arg);
+        } else if constexpr (std::is_same_v<ValueType, UwbStatusDevice>) {
+            OnDeviceStatusChanged(arg);
+        } else if constexpr (std::is_same_v<ValueType, UwbSessionStatus>) {
+            OnSessionStatusChanged(arg);
+        } else if constexpr (std::is_same_v<ValueType, UwbSessionUpdateMulicastListStatus>) {
+            OnSessionMulticastListStatus(arg);
+        } else if constexpr (std::is_same_v<ValueType, UwbRangingData>) {
+            OnSessionRangingData(arg);
+        }
+    },
+        uwbNotificationData);
 }
 
 void
@@ -254,9 +300,9 @@ UwbDevice::HandleNotifications()
         }
 
         // Convert to neutral type and process the notification.
-        UWB_NOTIFICATION_DATA& notificationData = *reinterpret_cast<UWB_NOTIFICATION_DATA *>(std::data(uwbNotificationDataBuffer));
+        UWB_NOTIFICATION_DATA& notificationData = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
         auto uwbNotificationData = UwbCxDdi::To(notificationData);
-        
+
         // Handle the notification in a fire-and-forget fashion. This may change
         // later. Since std::async returns a future, and the future's
         // destructor waits for it to complete, we cannot just ignore the
