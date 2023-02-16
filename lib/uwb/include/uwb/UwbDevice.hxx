@@ -3,6 +3,8 @@
 #define UWB_DEVICE_HXX
 
 #include <memory>
+#include <shared_mutex>
+#include <unordered_map>
 
 #include <uwb/UwbSessionEventCallbacks.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
@@ -117,6 +119,10 @@ private:
      */
     void
     OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData);
+
+private:
+    std::shared_mutex m_sessionsGate;
+    std::unordered_map<uint32_t, std::unique_ptr<uwb::UwbSession>> m_sessions{};
 };
 
 bool

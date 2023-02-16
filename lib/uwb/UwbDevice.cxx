@@ -62,8 +62,12 @@ std::unique_ptr<UwbSession>
 UwbDevice::CreateSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks)
 {
     auto session = CreateSessionImpl(callbacks);
-    // TODO: put session in map
-    return session;
+    {
+        std::unique_lock sessionExclusiveLock{ m_sessionsGate };
+        m_sessions[session->GetId()] = std::move(session);
+    }
+
+    return nullptr; // FIXME: needs to be shared_ptr
 }
 
 bool
