@@ -44,7 +44,7 @@ Any time new changes are made to dependent libraries in the main project (eg. `u
 
 1. Make the changes to the main project library or libraries and ensure the `install` (or `ALL_BUILD`) target builds successfully.
 2. Commit the changes. The changes __do not__ have to be pushed to a remote; committing to the local repository is fine.
-3. Manually delete the UwbSimulator driver vcpkg timestamp file (`${MSBuildProjectDirectory}/vcpkg_installed/x64-windows/.msbuildstamp-x64-windows.stamp`).
+3. Reconfigure the project using cmake. This will also automatically delete the timestamp file.
 4. Rebuild the UwbSimulator driver project in Visual Studio.
 
 The project output window should display a line indicating the the `nerarobject-framework` vcpkg needs to be rebuilt, similar to below:
