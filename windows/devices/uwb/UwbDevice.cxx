@@ -1,5 +1,6 @@
 
 #include <future>
+#include <ios>
 #include <stdexcept>
 
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
@@ -8,6 +9,7 @@
 #include <windows/devices/uwb/UwbSession.hxx>
 
 #include <plog/Log.h>
+#include <wil/result.h>
 
 using namespace windows::devices::uwb;
 using namespace ::uwb::protocol::fira;
@@ -68,18 +70,20 @@ UwbDevice::HandleNotifications()
 
         // Determine the amount of memory required for the UWB_NOTIFICATION_DATA from the driver.
         DWORD bytesRequired = 0;
-        HRESULT hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, nullptr, 0, &bytesRequired, nullptr);
-        if (FAILED(hr)) {
-            PLOG_ERROR << "error determining output buffer size for UWB notification, hr=0x" << std::hex << hr << std::endl;
+        BOOL ioResult = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, nullptr, 0, &bytesRequired, nullptr);
+        if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
+            HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
+            PLOG_ERROR << "error determining output buffer size for UWB notification, hr=" << std::showbase << std::hex << hr;
             continue;
         }
 
         // Allocate memory for the UWB_NOTIFICATION_DATA structure, and pass this to the driver request.
         DWORD uwbNotificationDataSize = bytesRequired;
         std::vector<uint8_t> uwbNotificationDataBuffer(uwbNotificationDataSize);
-        hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, std::data(uwbNotificationDataBuffer), uwbNotificationDataSize, &bytesRequired, nullptr);
-        if (FAILED(hr)) {
-            PLOG_ERROR << "error obtaining UWB notification buffer, hr=0x" << std::hex << hr << std::endl;
+        ioResult = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, std::data(uwbNotificationDataBuffer), uwbNotificationDataSize, &bytesRequired, nullptr);
+        if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
+            HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
+            PLOG_ERROR << "error obtaining UWB notification buffer, hr=" << std::showbase << std::hex << hr << std::endl;
             continue;
         }
 
@@ -123,20 +127,22 @@ UwbDevice::GetCapabilities() const
 {
     // Determine the amount of memory required for the UWB_DEVICE_CAPABILITIES from the driver.
     DWORD bytesRequired = 0;
-    HRESULT hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_GET_DEVICE_CAPABILITIES, nullptr, 0, nullptr, 0, &bytesRequired, nullptr);
-    if (FAILED(hr)) {
+    BOOL ioResult = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_GET_DEVICE_CAPABILITIES, nullptr, 0, nullptr, 0, &bytesRequired, nullptr);
+    if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         // TODO: need to do something different here
-        PLOG_ERROR << "error when sending IOCTL_UWB_GET_DEVICE_CAPABILITIES, hr=0x" << std::hex << hr;
+        HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
+        PLOG_ERROR << "error when sending IOCTL_UWB_GET_DEVICE_CAPABILITIES, hr=" << std::showbase << std::hex << hr;
         return {};
     }
 
     // Allocate memory for the UWB_DEVICE_CAPABILITIES structure, and pass this to the driver request.
     DWORD uwbCapabilitiesSize = bytesRequired;
     auto uwbDeviceCapabilitiesBuffer = std::make_unique<uint8_t[]>(uwbCapabilitiesSize);
-    hr = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_GET_DEVICE_CAPABILITIES, nullptr, 0, uwbDeviceCapabilitiesBuffer.get(), uwbCapabilitiesSize, &bytesRequired, nullptr);
-    if (FAILED(hr)) {
+    ioResult = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_GET_DEVICE_CAPABILITIES, nullptr, 0, uwbDeviceCapabilitiesBuffer.get(), uwbCapabilitiesSize, &bytesRequired, nullptr);
+    if (!ioResult) {
         // TODO: need to do something different here
-        PLOG_ERROR << "error when sending IOCTL_UWB_GET_DEVICE_CAPABILITIES, hr=0x" << std::hex << hr;
+        HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
+        PLOG_ERROR << "error when sending IOCTL_UWB_GET_DEVICE_CAPABILITIES, hr=" << std::showbase << std::hex << hr;
         return {};
     }
 
