@@ -45,7 +45,7 @@ UwbDevice::OnDeviceStatusChanged([[maybe_unused]] UwbStatusDevice statusDevice)
 }
 
 void
-UwbDevice::OnSessionStatusChanged([[maybe_unused]] UwbSessionStatus statusSession)
+UwbDevice::OnSessionStatusChanged(UwbSessionStatus statusSession)
 {
     auto session = GetSession(statusSession.SessionId);
     if (!session) {
@@ -57,7 +57,7 @@ UwbDevice::OnSessionStatusChanged([[maybe_unused]] UwbSessionStatus statusSessio
 }
 
 void
-UwbDevice::OnSessionMulticastListStatus([[maybe_unused]] UwbSessionUpdateMulicastListStatus statusMulticastList)
+UwbDevice::OnSessionMulticastListStatus(UwbSessionUpdateMulicastListStatus statusMulticastList)
 {
     auto session = GetSession(statusMulticastList.SessionId);
     if (!session) {
@@ -69,7 +69,7 @@ UwbDevice::OnSessionMulticastListStatus([[maybe_unused]] UwbSessionUpdateMulicas
 }
 
 void
-UwbDevice::OnSessionRangingData([[maybe_unused]] UwbRangingData rangingData)
+UwbDevice::OnSessionRangingData(UwbRangingData rangingData)
 {
     auto session = GetSession(rangingData.SessionId);
     if (!session) {
