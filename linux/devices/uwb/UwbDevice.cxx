@@ -3,7 +3,7 @@
 
 using namespace linux::devices;
 
-std::unique_ptr<uwb::UwbSession>
+std::shared_ptr<uwb::UwbSession>
 UwbDevice::CreateSession(std::weak_ptr<uwb::UwbSessionEventCallbacks> /* callbacks */)
 {
     // TODO

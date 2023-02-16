@@ -69,9 +69,9 @@ private:
      * @brief Create a new UWB session.
      *
      * @param callbacks The event callback instance.
-     * @return std::unique_ptr<uwb::UwbSession>
+     * @return std::shared_ptr<uwb::UwbSession>
      */
-    std::unique_ptr<::uwb::UwbSession>
+    std::shared_ptr<::uwb::UwbSession>
     CreateSessionImpl(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks) override;
 
     /**

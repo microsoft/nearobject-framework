@@ -58,7 +58,7 @@ UwbDevice::OnUwbNotification(UwbNotificationData uwbNotificationData)
         uwbNotificationData);
 }
 
-std::unique_ptr<UwbSession>
+std::shared_ptr<UwbSession>
 UwbDevice::CreateSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks)
 {
     auto session = CreateSessionImpl(callbacks);

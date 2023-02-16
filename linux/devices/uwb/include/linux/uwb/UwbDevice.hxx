@@ -24,9 +24,9 @@ public:
     /**
      * @brief Create a new UWB session.
      * 
-     * @return std::unique_ptr<uwb::UwbSession> 
+     * @return std::shared_ptr<uwb::UwbSession> 
      */
-    std::unique_ptr<uwb::UwbSession>
+    std::shared_ptr<uwb::UwbSession>
     CreateSession(std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks);
 
     /**
@@ -52,9 +52,9 @@ private:
      * @brief Create a Session object
      * 
      * @param callbacks 
-     * @return std::unique_ptr<uwb::UwbSession> 
+     * @return std::shared_ptr<uwb::UwbSession> 
      */
-    std::unique_ptr<uwb::UwbSession>
+    std::shared_ptr<uwb::UwbSession>
     CreateSessionImpl(std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks) override;
 
     /**

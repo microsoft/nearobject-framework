@@ -24,9 +24,9 @@ public:
      * @brief Creates a new UWB session with no configuration nor peers.
      * 
      * @param callbacks 
-     * @return std::unique_ptr<UwbSession> 
+     * @return std::shared_ptr<UwbSession> 
      */
-    std::unique_ptr<UwbSession>
+    std::shared_ptr<UwbSession>
     CreateSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks);
 
     /**
@@ -57,9 +57,9 @@ private:
      * @brief Creates a new UWB session with no configuration nor peers.
      * 
      * @param callbacks 
-     * @return std::unique_ptr<UwbSession> 
+     * @return std::shared_ptr<UwbSession> 
      */
-    virtual std::unique_ptr<UwbSession>
+    virtual std::shared_ptr<UwbSession>
     CreateSessionImpl(std::weak_ptr<UwbSessionEventCallbacks> callbacks) = 0;
 
     /**
@@ -122,7 +122,7 @@ private:
 
 private:
     std::shared_mutex m_sessionsGate;
-    std::unordered_map<uint32_t, std::unique_ptr<uwb::UwbSession>> m_sessions{};
+    std::unordered_map<uint32_t, std::shared_ptr<uwb::UwbSession>> m_sessions{};
 };
 
 bool
