@@ -2,9 +2,7 @@
 #include <bitset>
 #include <future>
 #include <stdexcept>
-#include <type_traits>
 #include <unordered_map>
-#include <variant>
 
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
