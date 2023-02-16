@@ -223,55 +223,6 @@ UwbDevice::Initialize()
 namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
 
 void
-UwbDevice::OnStatusChanged([[maybe_unused]] ::uwb::protocol::fira::UwbStatus /* status */)
-{
-    // TODO: implement this
-}
-
-void
-UwbDevice::OnDeviceStatusChanged([[maybe_unused]] ::uwb::protocol::fira::UwbStatusDevice /* statusDevice */)
-{
-    // TODO: implement this
-}
-void
-UwbDevice::OnSessionStatusChanged([[maybe_unused]] ::uwb::protocol::fira::UwbSessionStatus /* statusSession */)
-{
-    // TODO: implement this
-}
-void
-UwbDevice::OnSessionMulticastListStatus([[maybe_unused]] ::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus /* statusMulticastList */)
-{
-    // TODO: implement this
-}
-
-void
-UwbDevice::OnSessionRangingData([[maybe_unused]] ::uwb::protocol::fira::UwbRangingData rangingData)
-{
-    // TODO: implement this
-}
-
-void
-UwbDevice::HandleNotification(::uwb::protocol::fira::UwbNotificationData uwbNotificationData)
-{
-    std::visit([this](auto&& arg) {
-        using ValueType = std::decay_t<decltype(arg)>;
-
-        if constexpr (std::is_same_v<ValueType, UwbStatus>) {
-            OnStatusChanged(arg);
-        } else if constexpr (std::is_same_v<ValueType, UwbStatusDevice>) {
-            OnDeviceStatusChanged(arg);
-        } else if constexpr (std::is_same_v<ValueType, UwbSessionStatus>) {
-            OnSessionStatusChanged(arg);
-        } else if constexpr (std::is_same_v<ValueType, UwbSessionUpdateMulicastListStatus>) {
-            OnSessionMulticastListStatus(arg);
-        } else if constexpr (std::is_same_v<ValueType, UwbRangingData>) {
-            OnSessionRangingData(arg);
-        }
-    },
-        uwbNotificationData);
-}
-
-void
 UwbDevice::HandleNotifications()
 {
     for (;;) {
@@ -312,7 +263,7 @@ UwbDevice::HandleNotifications()
         // is automatically destructed once the async lambda has completed.
         auto notificationHandlerFuture = std::make_shared<std::future<void>>();
         *notificationHandlerFuture = std::async(std::launch::async, [this, notificationHandlerFuture, uwbNotificationData = std::move(uwbNotificationData)]() {
-            HandleNotification(std::move(uwbNotificationData));
+            ::UwbDevice::OnUwbNotification(std::move(uwbNotificationData));
         });
     }
 }
