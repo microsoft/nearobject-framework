@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <limits>
 #include <string>
 #include <string_view>
 
@@ -106,12 +107,27 @@ void
 NearObjectCliHandlerWindows::HandleMonitorMode() noexcept
 try {
     // TODO: this should probably be moved into its own function
-    GUID guidToMonitor{};
-    DevicePresenceMonitor presenceMonitor{ windows::devices::uwb::InterfaceClassUwb, [](auto&& presenceEvent, auto&& deviceName) {
+    std::vector<std::unique_ptr<windows::devices::uwb::UwbDevice>> uwbDevices{};
+
+    DevicePresenceMonitor presenceMonitor{ windows::devices::uwb::InterfaceClassUwb, [&](auto&& presenceEvent, auto&& deviceName) {
         const auto presenceEventName = magic_enum::enum_name(presenceEvent);
         PLOG_INFO << deviceName << " " << presenceEventName << std::endl;
+
+        auto uwbDevice = std::make_unique<windows::devices::uwb::UwbDevice>(deviceName);
+        if (!uwbDevice) {
+            PLOG_ERROR << "Failed to instantiate UWB device with name " << deviceName;
+            return;
+        }
+        uwbDevices.push_back(std::move(uwbDevice));
     }};
 
+    presenceMonitor.Start();
+
+    // Wait for input before stopping.
+    PLOG_INFO << "UWB monitor mode started. Press any key to stop monitoring.";
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    presenceMonitor.Stop();
 } catch (...) {
     // TODO: handle this properly
 }
