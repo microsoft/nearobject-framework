@@ -11,7 +11,7 @@ target_link_libraries(uwbsim-win
         CLI11::CLI11
         logutils
         plog::plog
-        windevutil
+        windev-util
         windev-uwb-simulator
 )
 

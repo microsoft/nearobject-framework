@@ -11,7 +11,7 @@ target_link_libraries(devicemon
         CLI11::CLI11
         magic_enum::magic_enum
         notstd-windows
-        windevutil
+        windev-util
         plog::plog
         logutils
 )

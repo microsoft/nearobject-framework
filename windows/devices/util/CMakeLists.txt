@@ -1,10 +1,10 @@
 
-add_library(windevutil STATIC "")
+add_library(windev-util STATIC "")
 
 set(WINDEVUTIL_DIR_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
 set(WINDEVUTIL_DIR_PUBLIC_INCLUDE_PREFIX ${WINDEVUTIL_DIR_PUBLIC_INCLUDE}/windows/devices)
 
-target_sources(windevutil
+target_sources(windev-util
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/DeviceEnumerator.cxx
         ${CMAKE_CURRENT_LIST_DIR}/DevicePresenceMonitor.cxx
@@ -14,12 +14,12 @@ target_sources(windevutil
         ${WINDEVUTIL_DIR_PUBLIC_INCLUDE_PREFIX}/DeviceResource.hxx
 )
 
-target_include_directories(windevutil
+target_include_directories(windev-util
     PUBLIC
         ${WINDEVUTIL_DIR_PUBLIC_INCLUDE}
 )
 
-target_link_libraries(windevutil
+target_link_libraries(windev-util
     PRIVATE
         plog::plog
     PUBLIC
@@ -34,12 +34,12 @@ list(APPEND WINDEVUTIL_PUBLIC_HEADERS
     ${WINDEVUTIL_DIR_PUBLIC_INCLUDE_PREFIX}/DeviceResource.hxx
 )
 
-set_target_properties(windevutil PROPERTIES FOLDER windows/devices)
-set_target_properties(windevutil PROPERTIES PUBLIC_HEADER "${WINDEVUTIL_PUBLIC_HEADERS}")
+set_target_properties(windev-util PROPERTIES FOLDER windows/devices)
+set_target_properties(windev-util PROPERTIES PUBLIC_HEADER "${WINDEVUTIL_PUBLIC_HEADERS}")
 
 install(
-    TARGETS windevutil
-    EXPORT windevutil
+    TARGETS windev-util
+    EXPORT windev-util
     ARCHIVE
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/windows/devices
 )
