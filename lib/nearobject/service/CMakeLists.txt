@@ -50,3 +50,9 @@ target_link_libraries(nearobject-service
 )
 
 set_target_properties(nearobject-service PROPERTIES FOLDER lib/nearobject/service)
+
+install(
+    TARGETS nearobject-service
+    EXPORT nearobject-service
+    ARCHIVE
+)
