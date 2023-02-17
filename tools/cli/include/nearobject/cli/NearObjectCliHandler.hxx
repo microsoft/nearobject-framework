@@ -50,6 +50,12 @@ struct NearObjectCliHandler
      */
     virtual void
     HandleStopRanging() noexcept;
+
+    /**
+     * @brief Invoked by the command-line driver when monitor mode is requested to be enabled.
+     */
+    virtual void
+    HandleMonitorMode() noexcept;
 };
 
 } // namespace nearobject::cli

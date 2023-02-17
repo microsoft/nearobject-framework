@@ -28,3 +28,9 @@ NearObjectCliHandler::HandleStopRanging() noexcept
 {
     // TODO
 }
+
+void
+NearObjectCliHandler::HandleMonitorMode() noexcept
+{
+    // TODO
+}

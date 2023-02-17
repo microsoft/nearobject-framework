@@ -1,23 +1,26 @@
 
 #include <iostream>
+#include <limits>
 #include <string>
 #include <string_view>
 
+#include <magic_enum.hpp>
 #include <notstd/guid.hxx>
+#include <plog/Log.h>
 
 #include <windows/devices/DeviceEnumerator.hxx>
 #include <windows/devices/DevicePresenceMonitor.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
+#include <windows/devices/uwb/UwbDeviceDriver.hxx>
 
 #include "NearObjectCliDataWindows.hxx"
 #include "NearObjectCliHandlerWindows.hxx"
 
 using namespace nearobject::cli;
+using namespace windows::devices;
 
 namespace detail
 {
-using namespace windows::devices;
-
 /**
  * @brief Get the default UWB device on the system.
  *
@@ -98,4 +101,57 @@ NearObjectCliHandlerWindows::ResolveUwbDevice(const nearobject::cli::NearObjectC
     }
 
     return detail::ResolveUwbDevice(*cliDataWindows);
+}
+
+void
+NearObjectCliHandlerWindows::HandleMonitorMode() noexcept
+try {
+    // TODO: this should probably be moved into its own function
+
+    // Keep a container of known devices. Once initialized,
+    std::vector<std::unique_ptr<windows::devices::uwb::UwbDevice>> uwbDevices{};
+
+    DevicePresenceMonitor presenceMonitor(windows::devices::uwb::InterfaceClassUwb, [&](auto&& presenceEvent, auto&& deviceName) {
+        const auto presenceEventName = magic_enum::enum_name(presenceEvent);
+        PLOG_INFO << deviceName << " " << presenceEventName << std::endl;
+
+        switch (presenceEvent) {
+        case DevicePresenceEvent::Arrived: {
+            auto uwbDevice = std::make_unique<windows::devices::uwb::UwbDevice>(deviceName);
+            if (!uwbDevice) {
+                PLOG_ERROR << "Failed to instantiate UWB device with name " << deviceName;
+                return;
+            }
+
+            uwbDevice->Initialize();
+            uwbDevices.push_back(std::move(uwbDevice));
+            break;
+        }
+        case DevicePresenceEvent::Departed: {
+            auto numErased = std::erase_if(uwbDevices, [&](const auto& uwbDevice) {
+                return uwbDevice->DeviceName() == deviceName;
+            });
+            if (numErased == 0) {
+                PLOG_WARNING << "UWB device with name " << deviceName << " not found; ignoring removal event";
+            }
+            break;
+        }
+        default: {
+            PLOG_ERROR << "Ignoring unknown presence event";
+            break;
+        }
+        }
+    });
+
+    presenceMonitor.Start();
+
+    // Wait for input before stopping.
+    PLOG_INFO << "UWB monitor mode started. Press <enter> to stop monitoring.";
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    presenceMonitor.Stop();
+    PLOG_INFO << "UWB monitor mode stopped";
+
+} catch (...) {
+    // TODO: handle this properly
 }

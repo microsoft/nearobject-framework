@@ -21,7 +21,7 @@ target_include_directories(uwbcxadapter
 
 target_link_libraries(uwbcxadapter
     PRIVATE
-        windevutil
+        windev-util
     PUBLIC
         cfgmgr32.lib
         plog::plog
@@ -69,7 +69,7 @@ target_include_directories(windev-uwb
 target_link_libraries(windev-uwb
     PRIVATE
         uwbcxadapter
-        windevutil
+        windev-util
     PUBLIC
         uwb
         uwb-proto-fira

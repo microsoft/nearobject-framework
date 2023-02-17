@@ -15,6 +15,9 @@ struct NearObjectCliHandlerWindows :
 {
     std::shared_ptr<::uwb::UwbDevice>
     ResolveUwbDevice(const nearobject::cli::NearObjectCliData& cliData) noexcept override;
+
+    void
+    HandleMonitorMode() noexcept override;
 };
 } // namespace nearobject::cli
 

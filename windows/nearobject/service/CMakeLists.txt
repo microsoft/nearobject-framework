@@ -22,7 +22,7 @@ target_link_libraries(nearobject-service-windows
     PUBLIC
         nearobject-service
         WIL::WIL
-        windevutil
+        windev-util
 )
 
 list(APPEND NO_SERVICE_WINDOWS_PUBLIC_HEADERS

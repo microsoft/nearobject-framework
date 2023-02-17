@@ -18,7 +18,7 @@ target_link_libraries(nocli-win
         nocli-core
         notstd-windows
         plog::plog
-        windevutil
+        windev-util
         windev-uwb
 )
 

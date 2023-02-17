@@ -15,8 +15,10 @@
 #include <windows/devices/DevicePresenceMonitor.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
 
+#include <plog/Appenders/ColorConsoleAppender.h>
 #include <plog/Appenders/DebugOutputAppender.h>
 #include <plog/Appenders/RollingFileAppender.h>
+#include <plog/Formatters/MessageOnlyFormatter.h>
 #include <plog/Formatters/TxtFormatter.h>
 #include <plog/Init.h>
 #include <plog/Log.h>
@@ -28,7 +30,10 @@ main(int argc, char* argv[])
 try {
     plog::RollingFileAppender<plog::TxtFormatter> rollingFileAppender(logging::GetLogName("nocli").c_str());
     plog::DebugOutputAppender<plog::TxtFormatter> debugAppender;
-    plog::init(plog::verbose, &rollingFileAppender).addAppender(&debugAppender);
+    plog::ColorConsoleAppender<plog::MessageOnlyFormatter> colorConsoleAppender{};
+    plog::init(plog::verbose, &rollingFileAppender)
+        .addAppender(&debugAppender)
+        .addAppender(&colorConsoleAppender);
 
     auto cliData = std::make_shared<nearobject::cli::NearObjectCliDataWindows>();
     auto cliHandler = std::make_shared<nearobject::cli::NearObjectCliHandlerWindows>();

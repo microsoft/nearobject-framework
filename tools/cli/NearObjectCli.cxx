@@ -160,9 +160,22 @@ NearObjectCli::AddSubcommandUwb(CLI::App* parent)
     auto uwbApp = parent->add_subcommand("uwb", "commands related to uwb")->require_subcommand()->fallthrough();
 
     // sub-commands
+    m_monitorApp = AddSubcommandUwbMonitor(uwbApp);
     m_rangeApp = AddSubcommandUwbRange(uwbApp);
 
     return uwbApp;
+}
+
+CLI::App*
+NearObjectCli::AddSubcommandUwbMonitor(CLI::App* parent)
+{
+    auto monitorApp = parent->add_subcommand("monitor", "commands relating to monitor mode")->fallthrough();
+
+    monitorApp->final_callback([this] {
+        m_cliHandler->HandleMonitorMode();
+    });
+
+    return monitorApp;
 }
 
 CLI::App*

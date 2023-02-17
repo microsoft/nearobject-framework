@@ -124,6 +124,15 @@ private:
     AddSubcommandUwb(CLI::App* parent);
 
     /**
+     * @brief Add the 'uwb monitor' sub-command. 
+     * 
+     * @param parent The parent app to add the command to.
+     * @return CLI::App* 
+     */
+    CLI::App*
+    AddSubcommandUwbMonitor(CLI::App* parent);
+
+    /**
      * @brief Add the 'uwb range' sub-command.
      *
      * @param parent The parent app to add the command to.
@@ -160,6 +169,7 @@ private:
     std::unique_ptr<CLI::App> m_cliApp;
     // The following are helper references to the subcommands of m_cliApp, the memory is managed by CLI11.
     CLI::App* m_uwbApp;
+    CLI::App* m_monitorApp;
     CLI::App* m_rangeApp;
     CLI::App* m_rangeStartApp;
     CLI::App* m_rangeStopApp;

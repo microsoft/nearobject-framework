@@ -18,7 +18,7 @@ target_include_directories(windev-uwb-simulator
 
 target_link_libraries(windev-uwb-simulator
     PRIVATE
-        windevutil
+        windev-util
     PUBLIC
         uwb-proto-fira
         uwbsim-driver
