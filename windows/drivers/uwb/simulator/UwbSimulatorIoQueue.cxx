@@ -8,6 +8,7 @@
 #include <memory>
 
 #include <windows.h>
+#include <windows/devices/uwb/UwbCxLrpDevice.h>
 
 #include "UwbSimulatorDdi.h"
 #include "UwbSimulatorDeviceFile.hxx"
@@ -46,6 +47,16 @@ UwbSimulatorIoQueue::Initialize()
             TraceLoggingNTStatus(status, "Status"));
         return status;
     }
+
+     status = WdfDeviceCreateDeviceInterface(wdfDevice, &GUID_UWB_DEVICE_INTERFACE, nullptr);
+     if (!NT_SUCCESS(status)) {
+         TraceLoggingWrite(
+             UwbSimulatorTraceloggingProvider,
+             "Queue WdfDeviceCreateDeviceInterface failed",
+             TraceLoggingLevel(TRACE_LEVEL_ERROR),
+             TraceLoggingNTStatus(status, "Status"));
+         return status;
+     }
 
     return STATUS_SUCCESS;
 }
