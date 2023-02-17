@@ -32,5 +32,5 @@ NearObjectCliHandler::HandleStopRanging() noexcept
 void
 NearObjectCliHandler::HandleMonitorMode() noexcept
 {
-
+    // TODO
 }

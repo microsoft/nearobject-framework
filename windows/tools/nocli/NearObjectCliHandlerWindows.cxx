@@ -3,21 +3,23 @@
 #include <string>
 #include <string_view>
 
+#include <magic_enum.hpp>
 #include <notstd/guid.hxx>
+#include <plog/Log.h>
 
 #include <windows/devices/DeviceEnumerator.hxx>
 #include <windows/devices/DevicePresenceMonitor.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
+#include <windows/devices/uwb/UwbDeviceDriver.hxx>
 
 #include "NearObjectCliDataWindows.hxx"
 #include "NearObjectCliHandlerWindows.hxx"
 
 using namespace nearobject::cli;
+using namespace windows::devices;
 
 namespace detail
 {
-using namespace windows::devices;
-
 /**
  * @brief Get the default UWB device on the system.
  *
@@ -98,4 +100,18 @@ NearObjectCliHandlerWindows::ResolveUwbDevice(const nearobject::cli::NearObjectC
     }
 
     return detail::ResolveUwbDevice(*cliDataWindows);
+}
+
+void
+NearObjectCliHandlerWindows::HandleMonitorMode() noexcept
+try {
+    // TODO: this should probably be moved into its own function
+    GUID guidToMonitor{};
+    DevicePresenceMonitor presenceMonitor{ windows::devices::uwb::InterfaceClassUwb, [](auto&& presenceEvent, auto&& deviceName) {
+        const auto presenceEventName = magic_enum::enum_name(presenceEvent);
+        PLOG_INFO << deviceName << " " << presenceEventName << std::endl;
+    }};
+
+} catch (...) {
+    // TODO: handle this properly
 }
