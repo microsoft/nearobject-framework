@@ -25,9 +25,9 @@ struct test_flex_type
     std::size_t num_elements;
     flex_element_t elements[notstd::to_underlying(flex_element_type_array_index)];
 
-    template <std::size_t NumElements>
+    template <std::size_t num_elements>
     struct total_size :
-        public std::integral_constant<std::size_t, offsetof(test_flex_type, elements[NumElements])>
+        public std::integral_constant<std::size_t, offsetof(test_flex_type, elements[num_elements])>
     {};
 };
 
