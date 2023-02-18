@@ -15,7 +15,7 @@ namespace notstd::test
 {
 template <
     typename ElementT,
-    flex_array_type ElementTArrayIndex = flex_array_type::Anysize
+    flex_array_type ElementTArrayIndex = flex_array_type::anysize
 >
 struct test_flex_type
 {
@@ -34,7 +34,7 @@ struct test_flex_type
 
 template <
     typename ElementT,
-    flex_array_type FlexElementAdjuster = flex_array_type::Anysize
+    flex_array_type FlexElementAdjuster = flex_array_type::anysize
 >
 struct test_flex_wrapper : 
     public notstd::flextype_wrapper<test_flex_type<ElementT, FlexElementAdjuster>, ElementT, FlexElementAdjuster>
@@ -47,12 +47,15 @@ struct test_flex_wrapper :
     {}
 };
 
-using test_flex_type_element_byte = uint8_t;
+struct test_flex_type_element_byte
+{
+    uint8_t Data{ 0xFFU };
+};
 
 struct test_flex_type_element_compound
 {
-    uint32_t Data1;
-    uint8_t Data2;
+    uint32_t Data1{ 0xDEADBEEFU };
+    uint8_t Data2 { 0xADU };
 };
 } // namespace notstd::test
 
@@ -77,7 +80,7 @@ TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
         flex_wrapper_type wrapper{NumElements};
 
         // Ensure the total size matches.
-        REQUIRE(wrapper.Size() == SizeTotal);
+        REQUIRE(wrapper.size() == SizeTotal);
 
         // Populate the value.
         flex_wrapper_type::value_type& value = wrapper;
@@ -87,7 +90,7 @@ TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
         }
 
         // Verify the value in the buffer reflects the populated value.
-        auto& buffer = wrapper.Buffer();
+        auto& buffer = wrapper.buffer();
         flex_wrapper_type::value_type& valueFromBuffer = *reinterpret_cast<flex_wrapper_type::value_type*>(std::data(buffer));
         REQUIRE(std::memcmp(&valueFromBuffer, &value, SizeTotal) == 0);
     }

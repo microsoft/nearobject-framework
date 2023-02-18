@@ -15,14 +15,14 @@ namespace notstd
 {
 
 enum class flex_array_type : std::size_t {
-    ZeroLength = 0,
-    Anysize = 1,
+    zero_length = 0,
+    anysize = 1,
 };
 
 template <
     typename ValueT,
     typename FlexElementT,
-    flex_array_type FlexElementAdjuster = flex_array_type::Anysize
+    flex_array_type FlexElementAdjuster = flex_array_type::anysize
 >
 requires std::is_standard_layout_v<ValueT> && std::is_standard_layout_v<FlexElementT>
 struct flextype_wrapper
@@ -41,7 +41,7 @@ struct flextype_wrapper
     flextype_wrapper(std::size_t numFlexElements, const ValueT& value) :
         flextype_wrapper(numFlexElements)
     {
-        std::memcpy(&m_value, &value, Size());
+        std::memcpy(&m_value, &value, size());
     }
 
     operator ValueT&() noexcept
@@ -50,13 +50,13 @@ struct flextype_wrapper
     }
 
     std::size_t
-    Size() const noexcept
+    size() const noexcept
     {
         return std::size(m_buffer);
     }
 
     std::vector<uint8_t>&
-    Buffer() noexcept
+    buffer() noexcept
     {
         return m_buffer;
     }
