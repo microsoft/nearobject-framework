@@ -6,6 +6,7 @@ set(NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX ${NOTSTD_DIR_PUBLIC_INCLUDE}/notstd)
 
 target_sources(notstd
     PUBLIC
+        ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/flextype_wrapper.hxx
         ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/hash.hxx
         ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/memory.hxx
         ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/range.hxx
@@ -24,6 +25,7 @@ target_include_directories(notstd
 )
 
 list(APPEND NOTSTD_PUBLIC_HEADERS
+    ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/flextype_wrapper.hxx
     ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/hash.hxx
     ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/memory.hxx
     ${NOTSTD_DIR_PUBLIC_INCLUDE_PREFIX}/range.hxx
