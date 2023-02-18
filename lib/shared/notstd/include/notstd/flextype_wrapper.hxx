@@ -15,7 +15,7 @@ namespace notstd
 {
 /**
  * @brief Type of flex-array.
- * 
+ *
  * zero_length: This is the official C99 form: 'int flexArray[]'
  * anysize: This is the pre-C99 form: 'int flexArray[1]'
  */
@@ -27,20 +27,20 @@ enum class flex_array_type : std::size_t {
 /**
  * @brief Wrapper for "flexible array" types. That is, those that have a
  * flexible array as their last member. Eg.
- * 
+ *
  * struct Element {};
  * struct ElementContainer {
  *     int index;
  *     std::size_t numElements;
  *     Element elements[];
  * };
- * 
+ *
  * This type allocates a buffer to contain the wrapped type plus the specified
  * number of elements in its trailing flexible array member. The buffer size
  * calculation avoids the use of macros (eg. offsetof) for a cleaner
  * implementation at the cost of small over-allocation in cases where
  * padding is inserted into the containing structure.
- * 
+ *
  * @tparam ValueT The type being wrapped.
  * @tparam FlexElementT The array type.
  * @tparam FlexElementAdjuster The adjustment factor based on the flex array type.
@@ -61,7 +61,7 @@ struct flextype_wrapper
     /**
      * @brief Construct a new flextype wrapper object with enough room for the
      * specified number of flex-array elements.
-     * 
+     *
      * @param numFlexElements The number of flex-array elements to acommoodate.
      */
     flextype_wrapper(std::size_t numFlexElements) :
@@ -71,10 +71,10 @@ struct flextype_wrapper
 
     /**
      * @brief Construct a new flextype wrapper object from a pre-existing value.
-     * 
-     * @param numFlexElements The number of flexible array elements in the value. 
+     *
+     * @param numFlexElements The number of flexible array elements in the value.
      * @param value The pre-existing value to copy.
-     * 
+     *
      * TODO: the caller knows the exact size of the structure, so we should
      * instead just take in that value instead, avoiding any possible
      * overallocation due to padding. It probably makes sense to convert this to
@@ -89,8 +89,8 @@ struct flextype_wrapper
     /**
      * @brief User-defined operator allowing the wrapper to be implicitly
      * converted to the wrapped type.
-     * 
-     * @return value_type& 
+     *
+     * @return value_type&
      */
     operator value_type&() noexcept
     {
@@ -102,8 +102,8 @@ struct flextype_wrapper
      * the size required to contain all of the flex-array elements since the
      * size calculation does not calculate the length accurately to avoid
      * requiring the field name and use of a macro.
-     * 
-     * @return std::size_t 
+     *
+     * @return std::size_t
      */
     std::size_t
     size() const noexcept
@@ -113,8 +113,8 @@ struct flextype_wrapper
 
     /**
      * @brief The buffer containing the wrapped type.
-     * 
-     * @return std::vector<uint8_t>& 
+     *
+     * @return std::vector<uint8_t>&
      */
     std::vector<uint8_t>&
     data() noexcept
