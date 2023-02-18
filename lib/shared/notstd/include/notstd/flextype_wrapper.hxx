@@ -55,7 +55,7 @@ struct flextype_wrapper
     }
 
     std::vector<uint8_t>&
-    buffer() noexcept
+    data() noexcept
     {
         return m_buffer;
     }
