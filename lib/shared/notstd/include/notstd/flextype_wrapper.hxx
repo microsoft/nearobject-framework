@@ -22,9 +22,8 @@ enum class flex_array_type : std::size_t {
 template <
     typename ValueT,
     typename FlexElementT,
-    flex_array_type FlexElementAdjuster = flex_array_type::anysize
->
-requires std::is_standard_layout_v<ValueT> && std::is_standard_layout_v<FlexElementT>
+    flex_array_type FlexElementAdjuster = flex_array_type::anysize>
+    requires std::is_standard_layout_v<ValueT> && std::is_standard_layout_v<FlexElementT>
 struct flextype_wrapper
 {
     using value_type = ValueT;

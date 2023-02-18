@@ -15,8 +15,7 @@ namespace notstd::test
 {
 template <
     typename ElementT,
-    flex_array_type ElementTArrayIndex = flex_array_type::anysize
->
+    flex_array_type ElementTArrayIndex = flex_array_type::anysize>
 struct test_flex_type
 {
     using flex_element_t = ElementT;
@@ -27,16 +26,15 @@ struct test_flex_type
     flex_element_t elements[notstd::to_underlying(flex_element_type_array_index)];
 
     template <std::size_t NumElements>
-    struct total_size : 
+    struct total_size :
         public std::integral_constant<std::size_t, offsetof(test_flex_type, elements[NumElements])>
     {};
 };
 
 template <
     typename ElementT,
-    flex_array_type FlexElementAdjuster = flex_array_type::anysize
->
-struct test_flex_wrapper : 
+    flex_array_type FlexElementAdjuster = flex_array_type::anysize>
+struct test_flex_wrapper :
     public notstd::flextype_wrapper<test_flex_type<ElementT, FlexElementAdjuster>, ElementT, FlexElementAdjuster>
 {
     using value_type = test_flex_type<ElementT, FlexElementAdjuster>;
@@ -55,7 +53,7 @@ struct test_flex_type_element_byte
 struct test_flex_type_element_compound
 {
     uint32_t Data1{ 0xDEADBEEFU };
-    uint8_t Data2 { 0xADU };
+    uint8_t Data2{ 0xADU };
 };
 } // namespace notstd::test
 
@@ -77,7 +75,7 @@ TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
 
         constexpr static auto SizeTotal = flex_wrapper_type::value_type::total_size<NumElements>();
 
-        flex_wrapper_type wrapper{NumElements};
+        flex_wrapper_type wrapper{ NumElements };
 
         // Ensure the total size matches.
         REQUIRE(wrapper.size() == SizeTotal);
