@@ -39,9 +39,12 @@ template <
 struct test_flex_wrapper : 
     public notstd::flextype_wrapper<test_flex_type<ElementT, FlexElementAdjuster>, ElementT, FlexElementAdjuster>
 {
+    using value_type = test_flex_type<ElementT, FlexElementAdjuster>;
+    using flex_wrapper_type = flextype_wrapper<value_type, ElementT, FlexElementAdjuster>;
+
     test_flex_wrapper(std::size_t numElements) :
-        flextype_wrapper<test_flex_type<ElementT, FlexElementAdjuster>, ElementT, FlexElementAdjuster>(numElements)
-    {}   
+        flex_wrapper_type(numElements)
+    {}
 };
 
 using test_flex_type_element_byte = uint8_t;
