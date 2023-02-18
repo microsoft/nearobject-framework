@@ -33,17 +33,17 @@ struct flextype_wrapper
     virtual ~flextype_wrapper() = default;
 
     flextype_wrapper(std::size_t numFlexElements) :
-        m_buffer(sizeof(ValueT) + (sizeof(FlexElementT) * (numFlexElements - notstd::to_underlying(FlexElementAdjuster)))),
+        m_buffer(sizeof(value_type) + (sizeof(element_type) * (numFlexElements - notstd::to_underlying(array_adjuster)))),
         m_value(*reinterpret_cast<ValueT*>(std::data(m_buffer)))
     {}
 
-    flextype_wrapper(std::size_t numFlexElements, const ValueT& value) :
+    flextype_wrapper(std::size_t numFlexElements, const value_type& value) :
         flextype_wrapper(numFlexElements)
     {
         std::memcpy(&m_value, &value, size());
     }
 
-    operator ValueT&() noexcept
+    operator value_type&() noexcept
     {
         return m_value;
     }
@@ -62,7 +62,7 @@ struct flextype_wrapper
 
 private:
     std::vector<uint8_t> m_buffer;
-    ValueT& m_value;
+    value_type& m_value;
 };
 } // namespace notstd
 
