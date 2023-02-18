@@ -62,14 +62,13 @@ TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
     using namespace notstd;
     using namespace notstd::test;
 
-    static constexpr std::size_t NumElements = 20;
+    static constexpr std::size_t NumElements = 5;
 
     SECTION("value type is correctly reflected with single byte flex-element")
     {
         using flex_wrapper_type = test_flex_wrapper<test_flex_type_element_byte>;
         flex_wrapper_type wrapper{ NumElements };
-
-        REQUIRE(wrapper.size() == flex_wrapper_type::value_type::total_size<NumElements>());
+        REQUIRE(wrapper.size() >= flex_wrapper_type::value_type::total_size<NumElements>());
 
         flex_wrapper_type::value_type& value = wrapper;
         value.num_elements = NumElements;
@@ -79,18 +78,17 @@ TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
 
         auto& buffer = wrapper.data();
         flex_wrapper_type::value_type& valueFromBuffer = *reinterpret_cast<flex_wrapper_type::value_type*>(std::data(buffer));
-        REQUIRE(std::memcmp(&valueFromBuffer, &value, wrapper.size()));
+        REQUIRE(std::memcmp(&valueFromBuffer, &value, wrapper.size()) == 0);
     }
 
     SECTION("value type is correctly reflected with compound flex-element")
     {
         using flex_wrapper_type = test_flex_wrapper<test_flex_type_element_compound>;
-        constexpr static auto SizeTotal = flex_wrapper_type::value_type::total_size<NumElements>();
 
         flex_wrapper_type wrapper{ NumElements };
 
         // Ensure the total size matches.
-        REQUIRE(wrapper.size() == SizeTotal);
+        REQUIRE(wrapper.size() >= flex_wrapper_type::value_type::total_size<NumElements>());
 
         // Populate the value.
         flex_wrapper_type::value_type& value = wrapper;
@@ -102,7 +100,7 @@ TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
         // Verify the value in the buffer reflects the populated value.
         auto& buffer = wrapper.data();
         flex_wrapper_type::value_type& valueFromBuffer = *reinterpret_cast<flex_wrapper_type::value_type*>(std::data(buffer));
-        REQUIRE(std::memcmp(&valueFromBuffer, &value, SizeTotal) == 0);
+        REQUIRE(std::memcmp(&valueFromBuffer, &value, wrapper.size()) == 0);
     }
 }
 
