@@ -1,10 +1,7 @@
 
-#include <concepts>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
-#include <type_traits>
-#include <utility>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -13,6 +10,14 @@
 
 namespace notstd::test
 {
+/**
+ * @brief Helper type which defines a type to be used with the flextype_wrapper.
+ * The number of flex-array elements must be known at compile time, which is
+ * fine for testing purpose.
+ *
+ * @tparam ElementT The flex-array element type.
+ * @tparam ElementTArrayIndex The type of flex-array (index) to use.
+ */
 template <
     typename ElementT,
     flex_array_type ElementTArrayIndex = flex_array_type::anysize>
@@ -21,16 +26,35 @@ struct test_flex_type
     using flex_element_t = ElementT;
     static constexpr flex_array_type flex_element_type_array_index = ElementTArrayIndex;
 
+    // Note: the types and widths here are intentional to ensure that padding is
+    // added between the 'value' member (32-bit alignment) and the
+    // 'num_elements' member (64-bit alignment). This ensures the structure's
+    // size will always be greater than the sum of the size of its members.
     uint32_t value;
     std::size_t num_elements;
     flex_element_t elements[notstd::to_underlying(flex_element_type_array_index)];
 
+    /**
+     * @brief Helper template function to calculate the total size of the
+     * wrapped structure including a specified number of flex-array elements.
+     *
+     * This returns the exact size required since it uses the offsetof macro,
+     * which uses compile-time reflection.
+     *
+     * @tparam num_elements The desired number of elements in the flex-array.
+     */
     template <std::size_t num_elements>
     struct total_size :
         public std::integral_constant<std::size_t, offsetof(test_flex_type, elements[num_elements])>
     {};
 };
 
+/**
+ * @brief Helper type which composes a flextype_wrapper using the test_flex_type helper.
+ *
+ * @tparam ElementT The flex-array element type.
+ * @tparam ElementTArrayIndex The type of flex-array (index) to use.
+ */
 template <
     typename ElementT,
     flex_array_type FlexElementAdjuster = flex_array_type::anysize>
@@ -45,15 +69,21 @@ struct test_flex_wrapper :
     {}
 };
 
+/**
+ * @brief Simple single-byte type for use in a flex-array.
+ */
 struct test_flex_type_element_byte
 {
-    uint8_t Data{ 0xFFU };
+    uint8_t data{ 0xFFU };
 };
 
+/**
+ * @brief Complex multi-byte type for use in a flex-array.
+ */
 struct test_flex_type_element_compound
 {
-    uint32_t Data1{ 0xDEADBEEFU };
-    uint8_t Data2{ 0xADU };
+    uint32_t data1{ 0xDEADBEEFU };
+    uint8_t data2{ 0xADU };
 };
 } // namespace notstd::test
 
@@ -62,17 +92,25 @@ TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
     using namespace notstd;
     using namespace notstd::test;
 
-    static constexpr std::size_t NumElements = 5;
+    static constexpr std::size_t num_elements = 5;
+
+    // TODO: the test code for the below 2 sections is nearly identical except
+    // for the population bits, so can likely be consolidated into a template
+    // test validation function.
 
     SECTION("value type is correctly reflected with single byte flex-element")
     {
         using flex_wrapper_type = test_flex_wrapper<test_flex_type_element_byte>;
-        flex_wrapper_type wrapper{ NumElements };
-        REQUIRE(wrapper.size() >= flex_wrapper_type::value_type::total_size<NumElements>());
+
+        flex_wrapper_type wrapper{ num_elements };
+
+        // Ensure there's enough room to store the complete type including flex array elements.
+        REQUIRE(wrapper.size() >= flex_wrapper_type::value_type::total_size<num_elements>());
 
         flex_wrapper_type::value_type& value = wrapper;
-        value.num_elements = NumElements;
-        for (uint8_t i = 0U; i < NumElements; i++) {
+        value.value = 0xAA55AA55U;
+        value.num_elements = num_elements;
+        for (uint8_t i = 0U; i < num_elements; i++) {
             value.elements[i] = { i };
         }
 
@@ -85,15 +123,16 @@ TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
     {
         using flex_wrapper_type = test_flex_wrapper<test_flex_type_element_compound>;
 
-        flex_wrapper_type wrapper{ NumElements };
+        flex_wrapper_type wrapper{ num_elements };
 
-        // Ensure the total size matches.
-        REQUIRE(wrapper.size() >= flex_wrapper_type::value_type::total_size<NumElements>());
+        // Ensure there's enough room to store the complete type including flex array elements.
+        REQUIRE(wrapper.size() >= flex_wrapper_type::value_type::total_size<num_elements>());
 
         // Populate the value.
         flex_wrapper_type::value_type& value = wrapper;
-        value.num_elements = NumElements;
-        for (uint8_t i = 0U; i < NumElements; i++) {
+        value.value = 0xFEEDF00DU;
+        value.num_elements = num_elements;
+        for (uint8_t i = 0U; i < num_elements; i++) {
             value.elements[i] = { i, i };
         }
 
@@ -110,5 +149,6 @@ TEST_CASE("flextype_wrapper can be used with an existing value", "[basic]")
 
     SECTION("wrapped value matches original value")
     {
+        // TODO
     }
 }
