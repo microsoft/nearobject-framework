@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <type_traits>
 #include <utility>
 
 #include <catch2/catch_test_macros.hpp>
@@ -25,11 +26,15 @@ struct test_flex_type
     std::size_t num_elements;
     flex_element_t elements[notstd::to_underlying(flex_element_type_array_index)];
 
+    // template <std::size_t NumElements>
+    // static inline constexpr std::size_t total_size()
+    // {
+    //     return offsetof(test_flex_type, elements[NumElements]);
+    // }
+
     template <std::size_t NumElements>
-    static inline constexpr std::size_t total_size()
-    {
-        return offsetof(test_flex_type, elements[NumElements]);
-    }
+    struct total_size : public std::integral_constant<std::size_t, NumElements>
+    {};
 };
 
 template <
@@ -65,16 +70,14 @@ TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
 
     SECTION("value type is correctly reflected with single byte flex-element")
     {
-        // TODO
-        test_flex_wrapper<test_flex_type_element_compound> wrapper{ NumElements };
+        test_flex_wrapper<test_flex_type_element_byte> wrapper{ NumElements };
     }
 
     SECTION("value type is correctly reflected with compound flex-element")
     {
-        using flex_type = test_flex_type<test_flex_type_element_compound>;
-        using flex_wrapper_type = flextype_wrapper<flex_type, flex_type::flex_element_t>;
+        using flex_wrapper_type = test_flex_wrapper<test_flex_type_element_compound>;
 
-        constexpr static auto SizeTotal = flex_type::total_size<NumElements>();
+        constexpr static auto SizeTotal = flex_wrapper_type::value_type::total_size<NumElements>();
 
         flex_wrapper_type wrapper{NumElements};
 
@@ -82,7 +85,7 @@ TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
         REQUIRE(wrapper.Size() == SizeTotal);
 
         // Populate the value.
-        flex_type& value = wrapper;
+        flex_wrapper_type::value_type& value = wrapper;
         value.num_elements = NumElements;
         for (uint8_t i = 0U; i < NumElements; i++) {
             value.elements[i] = { i, i };
@@ -90,7 +93,7 @@ TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
 
         // Verify the value in the buffer reflects the populated value.
         auto& buffer = wrapper.Buffer();
-        flex_type& valueFromBuffer = *reinterpret_cast<flex_type*>(std::data(buffer));
+        flex_wrapper_type::value_type& valueFromBuffer = *reinterpret_cast<flex_wrapper_type::value_type*>(std::data(buffer));
         REQUIRE(std::memcmp(&valueFromBuffer, &value, SizeTotal) == 0);
     }
 }
