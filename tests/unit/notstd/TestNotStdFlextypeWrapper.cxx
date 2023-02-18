@@ -13,7 +13,7 @@ namespace notstd::test
 /**
  * @brief Helper type which defines a type to be used with the flextype_wrapper.
  * The number of flex-array elements must be known at compile time, which is
- * fine for testing purpose.
+ * fine for testing purposes.
  *
  * @tparam ElementT The flex-array element type.
  * @tparam ElementTArrayIndex The type of flex-array (index) to use.
