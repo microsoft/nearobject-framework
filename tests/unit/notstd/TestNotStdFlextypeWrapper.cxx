@@ -18,7 +18,7 @@ template <
 >
 struct test_flex_type
 {
-    using flex_element_t = typename ElementT;
+    using flex_element_t = ElementT;
     static constexpr flex_array_type flex_element_type_array_index = ElementTArrayIndex;
 
     uint32_t value;

@@ -27,9 +27,9 @@ template <
 requires std::is_standard_layout_v<ValueT> && std::is_standard_layout_v<FlexElementT>
 struct flextype_wrapper
 {
-    using value_type = typename ValueT;
-    using element_type = typename FlexElementT;
-    static constexpr flex_array_type array_adjusted = FlexElementAdjuster;
+    using value_type = ValueT;
+    using element_type = FlexElementT;
+    static constexpr flex_array_type array_adjuster = FlexElementAdjuster;
 
     virtual ~flextype_wrapper() = default;
 
