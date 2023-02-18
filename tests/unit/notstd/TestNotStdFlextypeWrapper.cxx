@@ -32,6 +32,18 @@ struct test_flex_type
     }
 };
 
+template <
+    typename ElementT,
+    flex_array_type FlexElementAdjuster = flex_array_type::Anysize
+>
+struct test_flex_wrapper : 
+    public notstd::flextype_wrapper<test_flex_type<ElementT, FlexElementAdjuster>, ElementT, FlexElementAdjuster>
+{
+    test_flex_wrapper(std::size_t numElements) :
+        flextype_wrapper<test_flex_type<ElementT, FlexElementAdjuster>, ElementT, FlexElementAdjuster>(numElements)
+    {}   
+};
+
 using test_flex_type_element_byte = uint8_t;
 
 struct test_flex_type_element_compound
@@ -39,27 +51,6 @@ struct test_flex_type_element_compound
     uint32_t Data1;
     uint8_t Data2;
 };
-
-/**
- * @brief The MSVC compiler gets really confused when using this, as it attempts
- * to deduce a template argument (and fails) even though the argument was
- * explicitly specified. So, it's commented out for now.
- * 
- * @tparam value_t 
- */
-// template <
-//     template <
-//         typename, flex_array_type
-//     > typename value_t
-// >
-// requires std::is_base_of_v<value_t, test_flex_type>
-// struct test_flex_wrapper : 
-//     public notstd::flextype_wrapper<value_t, typename value_t::flex_element_t, value_t::flex_array_type>
-// {
-//     test_flex_wrapper(std::size_t numElements) :
-//         flextype_wrapper(numElements)
-//     {}   
-// };
 } // namespace notstd::test
 
 TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
@@ -72,6 +63,7 @@ TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
     SECTION("value type is correctly reflected with single byte flex-element")
     {
         // TODO
+        test_flex_wrapper<test_flex_type_element_compound> wrapper{ NumElements };
     }
 
     SECTION("value type is correctly reflected with compound flex-element")
