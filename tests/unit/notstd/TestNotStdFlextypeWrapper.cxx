@@ -66,13 +66,25 @@ TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
 
     SECTION("value type is correctly reflected with single byte flex-element")
     {
-        test_flex_wrapper<test_flex_type_element_byte> wrapper{ NumElements };
+        using flex_wrapper_type = test_flex_wrapper<test_flex_type_element_byte>;
+        flex_wrapper_type wrapper{ NumElements };
+
+        REQUIRE(wrapper.size() == flex_wrapper_type::value_type::total_size<NumElements>());
+
+        flex_wrapper_type::value_type& value = wrapper;
+        value.num_elements = NumElements;
+        for (uint8_t i = 0U; i < NumElements; i++) {
+            value.elements[i] = { i };
+        }
+
+        auto& buffer = wrapper.data();
+        flex_wrapper_type::value_type& valueFromBuffer = *reinterpret_cast<flex_wrapper_type::value_type*>(std::data(buffer));
+        REQUIRE(std::memcmp(&valueFromBuffer, &value, wrapper.size()));
     }
 
     SECTION("value type is correctly reflected with compound flex-element")
     {
         using flex_wrapper_type = test_flex_wrapper<test_flex_type_element_compound>;
-
         constexpr static auto SizeTotal = flex_wrapper_type::value_type::total_size<NumElements>();
 
         flex_wrapper_type wrapper{ NumElements };
@@ -88,7 +100,7 @@ TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
         }
 
         // Verify the value in the buffer reflects the populated value.
-        auto& buffer = wrapper.buffer();
+        auto& buffer = wrapper.data();
         flex_wrapper_type::value_type& valueFromBuffer = *reinterpret_cast<flex_wrapper_type::value_type*>(std::data(buffer));
         REQUIRE(std::memcmp(&valueFromBuffer, &value, SizeTotal) == 0);
     }
