@@ -2,10 +2,12 @@
 #ifndef FLEXTYPE_WRAPPER_HXX
 #define FLEXTYPE_WRAPPER_HXX
 
+#include <cassert>
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+#include <memory>
 #include <type_traits>
 #include <vector>
 
@@ -102,9 +104,11 @@ struct flextype_wrapper
      * @param num_flex_elements The number of flex-array elements to acommoodate.
      */
     flextype_wrapper(std::size_t num_flex_elements) :
-        m_buffer(required_buffer_size(num_flex_elements)),
-        m_value(*reinterpret_cast<ValueT*>(std::data(m_buffer)))
-    {}
+        m_buffer(alignof(value_type) + required_buffer_size(num_flex_elements)),
+        m_value(*aligned_buffer(m_buffer, required_buffer_size(num_flex_elements)))
+    {
+        assert(reinterpret_cast<uintptr_t>(&m_value) % alignof(decltype(m_value)) == 0);
+    }
 
     /**
      * @brief Construct a new flextype wrapper object from a pre-existing value.
