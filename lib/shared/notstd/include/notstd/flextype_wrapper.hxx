@@ -42,7 +42,7 @@ enum class flex_array_type : std::size_t {
  * calculation avoids the use of macros (eg. offsetof) for a cleaner
  * implementation at the cost of small over-allocation in cases where
  * padding is inserted into the containing structure.
- * 
+ *
  * Important: This type *must not* be used with types that have nested flex-array
  * members since it uses 'sizeof(FlexElementT)' to determine the total required
  * size. This limitation will be removed once this class is updated to be created
@@ -72,7 +72,7 @@ struct flextype_wrapper
      * (value_type) plus a specified number of flex-array elements
      * (element_type). The calculation does not account for padding in the
      * wrapped type and so will provide an over-estimate in these scenarios.
-     * 
+     *
      * The sum consists of:
      *  1. The complete size of the wrapped type on its own.
      *  2. The number of flex-array elements that will follow it.
@@ -104,16 +104,16 @@ struct flextype_wrapper
 
     /**
      * @brief Given an input vector, return a pointer aligned to value_type.
-     * 
+     *
      * @param buffer The vector containing the buffer to align.
      * @param num_bytes_to_align The number of bytes in the buffer to align.
-     * @return value_type* 
+     * @return value_type*
      */
     static inline value_type*
     aligned_buffer(std::vector<uint8_t>& buffer, std::size_t num_bytes_to_align)
     {
         std::size_t space = std::size(buffer);
-        void *aligned_pointer = std::data(buffer);
+        void* aligned_pointer = std::data(buffer);
         return reinterpret_cast<value_type*>(std::align(alignof(value_type), num_bytes_to_align, aligned_pointer, space));
     }
 
