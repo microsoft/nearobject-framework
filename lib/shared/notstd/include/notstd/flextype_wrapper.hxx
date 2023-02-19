@@ -30,11 +30,11 @@ enum class flex_array_type : std::size_t {
  * @brief Wrapper for "flexible array" types. That is, those that have a
  * flexible array as their last member. Eg.
  *
- * struct Element {};
- * struct ElementContainer {
+ * struct element {};
+ * struct element_container {
  *     int index;
- *     std::size_t numElements;
- *     Element elements[];
+ *     std::size_t num_elements;
+ *     element elements[];
  * };
  *
  * This type allocates a buffer to contain the wrapped type plus the specified
@@ -42,6 +42,11 @@ enum class flex_array_type : std::size_t {
  * calculation avoids the use of macros (eg. offsetof) for a cleaner
  * implementation at the cost of small over-allocation in cases where
  * padding is inserted into the containing structure.
+ * 
+ * Important: This type *must not* be used with types that have nested flex-array
+ * members since it uses 'sizeof(FlexElementT)' to determine the total required
+ * size. This limitation will be removed once this class is updated to be created
+ * with a total size instead of just the number of wrapped elements.
  *
  * @tparam ValueT The type being wrapped.
  * @tparam FlexElementT The array type.
