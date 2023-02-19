@@ -103,6 +103,21 @@ struct flextype_wrapper
     }
 
     /**
+     * @brief Given an input vector, return a pointer aligned to value_type.
+     * 
+     * @param buffer The vector containing the buffer to align.
+     * @param num_bytes_to_align The number of bytes in the buffer to align.
+     * @return value_type* 
+     */
+    static inline value_type*
+    aligned_buffer(std::vector<uint8_t>& buffer, std::size_t num_bytes_to_align)
+    {
+        std::size_t space = std::size(buffer);
+        void *aligned_pointer = std::data(buffer);
+        return reinterpret_cast<value_type*>(std::align(alignof(value_type), num_bytes_to_align, aligned_pointer, space));
+    }
+
+    /**
      * @brief Construct a new flextype wrapper object with enough room for the
      * specified number of flex-array elements.
      *
