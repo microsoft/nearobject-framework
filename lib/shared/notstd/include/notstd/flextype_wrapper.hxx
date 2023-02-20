@@ -44,11 +44,6 @@ enum class flex_array_type : std::size_t {
  * implementation at the cost of small over-allocation in cases where
  * padding is inserted into the containing structure.
  *
- * Important: This type *must not* be used with types that have nested flex-array
- * members since it uses 'sizeof(FlexElementT)' to determine the total required
- * size. This limitation will be removed once this class is updated to be created
- * with a total size instead of just the number of wrapped elements.
- *
  * @tparam ValueT The type being wrapped.
  * @tparam FlexElementT The array type.
  * @tparam FlexElementAdjuster The adjustment factor based on the flex array type.
