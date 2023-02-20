@@ -102,7 +102,7 @@ TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
     {
         using flex_wrapper_type = test_flex_wrapper<test_flex_type_element_byte>;
 
-        flex_wrapper_type wrapper{ num_elements };
+        auto wrapper = flex_wrapper_type::from_num_elements(num_elements);
 
         // Ensure there's enough room to store the complete type including flex array elements.
         REQUIRE(wrapper.size() >= flex_wrapper_type::value_type::total_size<num_elements>());
@@ -114,7 +114,7 @@ TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
             value.elements[i] = { i };
         }
 
-        auto& buffer = wrapper.data();
+        auto buffer = wrapper.data();
         flex_wrapper_type::value_type& valueFromBuffer = *reinterpret_cast<flex_wrapper_type::value_type*>(std::data(buffer));
         REQUIRE(std::memcmp(&valueFromBuffer, &value, wrapper.size()) == 0);
     }
@@ -123,7 +123,7 @@ TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
     {
         using flex_wrapper_type = test_flex_wrapper<test_flex_type_element_compound>;
 
-        flex_wrapper_type wrapper{ num_elements };
+        auto wrapper = flex_wrapper_type::from_num_elements(num_elements);
 
         // Ensure there's enough room to store the complete type including flex array elements.
         REQUIRE(wrapper.size() >= flex_wrapper_type::value_type::total_size<num_elements>());
@@ -137,7 +137,7 @@ TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
         }
 
         // Verify the value in the buffer reflects the populated value.
-        auto& buffer = wrapper.data();
+        auto buffer = wrapper.data();
         flex_wrapper_type::value_type& valueFromBuffer = *reinterpret_cast<flex_wrapper_type::value_type*>(std::data(buffer));
         REQUIRE(std::memcmp(&valueFromBuffer, &value, wrapper.size()) == 0);
     }

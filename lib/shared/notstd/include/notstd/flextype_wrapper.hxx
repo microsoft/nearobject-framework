@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <iterator>
 #include <memory>
+#include <span>
 #include <type_traits>
 #include <vector>
 
@@ -74,13 +75,15 @@ struct flextype_wrapper
      * wrapped type and so will provide an over-estimate in these scenarios.
      *
      * The sum consists of:
-     *  1. The complete size of the wrapped type on its own.
-     *  2. The number of flex-array elements that will follow it.
-     *  3. The adjusted byte count for the flex-array declaration.
+     *  1. The size of the wrapped type on its own.
+     *  2. The size of the specified number of flex-array elements that follow it.
+     *  3. The adjusted byte count for the flex-array declaration type.
      *
-     * In case the flex-array is a pre-C99 'anysize' type, the wrapped structure
-     * will include storage for a single flex-array element. In this case, that
-     * storage space is subtracted from the total required.
+     * In case the flex-array uses a pre-C99 'anysize' declaration, the wrapped
+     * type will include storage for a single flex-array element. In this case,
+     * that storage space is subtracted from the total required. Otherwise, the
+     * C99 conforming flex-array declaration does not require adjustment and no
+     * storage is subtracted.
      *
      * The preferred approach to calculate the size is to use compile-time
      * reflection referencing the structure field offset of the flex-array type
@@ -100,6 +103,29 @@ struct flextype_wrapper
     required_buffer_size(std::size_t num_elements)
     {
         return sizeof(value_type) + (sizeof(element_type) * (num_elements - notstd::to_underlying(array_adjuster)));
+    }
+
+    /**
+     * @brief Create a flextype_wrapper instance with enough room to store a
+     * specified number of flex-array elements (element_type). This is purely a
+     * conveneience factory function and must only be used for wrapped types
+     * whose element_type itself does not contain a flex-array member (ie. no
+     * nested flex-array types). This is because this function uses
+     * 'sizeof(element_type)' in the total size calculation, and the sizeof
+     * expression for types containing a flex-array member are incorrect by
+     * definition.
+     *
+     * For nested flex-array types, the caller must recursively compute the
+     * size of the wrapped type pass this to the constructor accepting the total
+     * size instead.
+     *
+     * @param num_flex_elements Desired number of flex-array elements to store.
+     * @return flextype_wrapper
+     */
+    static flextype_wrapper
+    from_num_elements(std::size_t num_flex_elements)
+    {
+        return flextype_wrapper{ required_buffer_size(num_flex_elements) };
     }
 
     /**
@@ -123,9 +149,10 @@ struct flextype_wrapper
      *
      * @param num_flex_elements The number of flex-array elements to acommoodate.
      */
-    flextype_wrapper(std::size_t num_flex_elements) :
-        m_buffer(alignof(value_type) + required_buffer_size(num_flex_elements)),
-        m_value(*aligned_buffer(m_buffer, required_buffer_size(num_flex_elements)))
+    explicit flextype_wrapper(std::size_t total_size) :
+        m_buffer(alignof(value_type) + total_size),
+        m_value(*aligned_buffer(m_buffer, total_size)),
+        m_data(reinterpret_cast<uint8_t*>(&m_value), total_size)
     {
         assert(reinterpret_cast<uintptr_t>(&m_value) % alignof(decltype(m_value)) == 0);
     }
@@ -133,16 +160,11 @@ struct flextype_wrapper
     /**
      * @brief Construct a new flextype wrapper object from a pre-existing value.
      *
-     * @param num_flex_elements The number of flexible array elements in the value.
+     * @param total_size The total size of the pre-existing value.
      * @param value The pre-existing value to copy.
-     *
-     * TODO: the caller knows the exact size of the structure, so we should
-     * instead just take in that value instead, avoiding any possible
-     * overallocation due to padding. It probably makes sense to convert this to
-     * a static function instead.
      */
-    flextype_wrapper(std::size_t num_flex_elements, const value_type& value) :
-        flextype_wrapper(num_flex_elements)
+    flextype_wrapper(std::size_t total_size, const value_type& value) :
+        flextype_wrapper(total_size)
     {
         std::memcpy(&m_value, &value, size());
     }
@@ -159,33 +181,32 @@ struct flextype_wrapper
     }
 
     /**
-     * @brief The total size of the buffer. Note that this may be larger than
-     * the size required to contain all of the flex-array elements since the
-     * size calculation does not calculate the length accurately to avoid
-     * requiring the field name and use of a macro.
+     * @brief The total size of the value. Note, the buffer may be larger than
+     * this value since it has enough space to guarantee correct alignment.
      *
      * @return std::size_t
      */
     std::size_t
     size() const noexcept
     {
-        return std::size(m_buffer);
+        return std::size(m_data);
     }
 
     /**
      * @brief The buffer containing the wrapped type.
      *
-     * @return std::vector<uint8_t>&
+     * @return std::span<uint8_t>
      */
-    std::vector<uint8_t>&
+    std::span<uint8_t>
     data() noexcept
     {
-        return m_buffer;
+        return m_data;
     }
 
 private:
     std::vector<uint8_t> m_buffer;
     value_type& m_value;
+    std::span<uint8_t> m_data;
 };
 } // namespace notstd
 
