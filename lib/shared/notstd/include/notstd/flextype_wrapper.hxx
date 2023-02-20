@@ -38,11 +38,11 @@ enum class flex_array_type : std::size_t {
  *     element elements[];
  * };
  *
- * This type allocates a buffer to contain the wrapped type plus the specified
- * number of elements in its trailing flexible array member. The buffer size
- * calculation avoids the use of macros (eg. offsetof) for a cleaner
- * implementation at the cost of small over-allocation in cases where
- * padding is inserted into the containing structure.
+ * This class allocates a properly sized and aligned buffer to contain the
+ * wrapped type plus the specified number of elements in its trailing flexible
+ * array member. The buffer size calculation avoids the use of macros (eg.
+ * offsetof) for a cleaner implementation at the cost of small over-allocation
+ * in cases where padding is inserted into the containing structure.
  *
  * @tparam ValueT The type being wrapped.
  * @tparam FlexElementT The array type.
@@ -56,16 +56,18 @@ template <
 struct flextype_wrapper
 {
     using value_type = ValueT;
+    using wrapped_type = ValueT;
     using element_type = FlexElementT;
     static constexpr flex_array_type array_adjuster = FlexElementAdjuster;
 
     virtual ~flextype_wrapper() = default;
 
     /**
-     * @brief The required buffer size.
-     *
+     * @brief The required buffer size for the specified number of flex-array
+     * elements.
+     * 
      * This calculates the size of the buffer required to store the wrapped type
-     * (value_type) plus a specified number of flex-array elements
+     * (value_type) plus the specified number of flex-array elements
      * (element_type). The calculation does not account for padding in the
      * wrapped type and so will provide an over-estimate in these scenarios.
      *
@@ -87,17 +89,16 @@ struct flextype_wrapper
      *  size = offsetof(value_type, flex_array_field_name[num_elements])
      *
      * However, specifying 'flex_array_field_name' cannot (AFAIK) be supplied as
-     * a template argument. Thus, the calculation method decribed above is used
+     * a template argument. Thus, the calculation method described above is used
      * instead as a compromise.
      *
-     * @param num_elements The desired number of elements to store following the
-     * wrapped type.
+     * @param num_flex_elements Desired number of flex-array elements to store.
      * @return constexpr auto
      */
     static inline constexpr auto
-    required_buffer_size(std::size_t num_elements)
+    required_buffer_size(std::size_t num_flex_elements)
     {
-        return sizeof(value_type) + (sizeof(element_type) * (num_elements - notstd::to_underlying(array_adjuster)));
+        return sizeof(value_type) + (sizeof(element_type) * (num_flex_elements - notstd::to_underlying(array_adjuster)));
     }
 
     /**
@@ -111,8 +112,8 @@ struct flextype_wrapper
      * definition.
      *
      * For nested flex-array types, the caller must recursively compute the
-     * size of the wrapped type pass this to the constructor accepting the total
-     * size instead.
+     * size of the wrapped type and pass this to the constructor accepting the
+     * total size instead.
      *
      * @param num_flex_elements Desired number of flex-array elements to store.
      * @return flextype_wrapper
@@ -139,10 +140,18 @@ struct flextype_wrapper
     }
 
     /**
-     * @brief Construct a new flextype wrapper object with enough room for the
-     * specified number of flex-array elements.
-     *
-     * @param num_flex_elements The number of flex-array elements to acommoodate.
+     * @brief Construct a new flextype_wrapper with storage to fit 'total_size'
+     * bytes. The total size must include space for the wrapped type plus space
+     * for all trailing flex-array elements. For types which do not contain
+     * nested flex-array elements, the following expression may be used to
+     * calculate the correct size:
+     * 
+     *  std::size_t size = offsetof(value_type, flex_array_field_name[num_elements])
+     * 
+     * For wrapped types which contain nested flex-array members, the total size
+     * must be calculated recursively.
+     * 
+     * @param total_size The total size required for the wrapped type.
      */
     explicit flextype_wrapper(std::size_t total_size) :
         m_buffer(alignof(value_type) + total_size),
