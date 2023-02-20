@@ -87,7 +87,7 @@ struct test_flex_type_element_compound
 };
 } // namespace notstd::test
 
-TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
+TEST_CASE("flextype_wrapper can be used as a value container with element-based creational pattern", "[basic]")
 {
     using namespace notstd;
     using namespace notstd::test;
@@ -141,6 +141,13 @@ TEST_CASE("flextype_wrapper can be used as value container", "[basic]")
         flex_wrapper_type::value_type& valueFromBuffer = *reinterpret_cast<flex_wrapper_type::value_type*>(std::data(buffer));
         REQUIRE(std::memcmp(&valueFromBuffer, &value, wrapper.size()) == 0);
     }
+}
+
+TEST_CASE("flextype_wrapper can be used as value container with size-based creational pattern", "[basic]")
+{
+    using namespace notstd::test;
+
+    // TODO
 }
 
 TEST_CASE("flextype_wrapper can be used with an existing value", "[basic]")
