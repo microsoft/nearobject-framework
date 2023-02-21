@@ -575,6 +575,25 @@ static const std::unordered_map<UWB_STATUS, UwbStatusRanging> StatusToMapRanging
     { UWB_STATUS_RANGING_RX_MAC_IE_MISSING, UwbStatusRanging::RxMacIeMissing },
 };
 
+static const std::unordered_map<UWB_SESSION_STATE, UwbSessionState> SessionStateToMap{
+    { UWB_SESSION_STATE_INIT, UwbSessionState::Initialized },
+    { UWB_SESSION_STATE_DEINIT, UwbSessionState::Deinitialized },
+    { UWB_SESSION_STATE_ACTIVE, UwbSessionState::Active },
+    { UWB_SESSION_STATE_IDLE, UwbSessionState::Idle },
+};
+
+static const std::unordered_map<UWB_SESSION_REASON_CODE, UwbSessionReasonCode> SessionReasonCodeToMap{
+    { UWB_SESSION_REASON_CODE_STATE_CHANGE_WITH_SESSION_MANAGEMENT_COMMANDS, UwbSessionReasonCode::StateChangeWithSessionManagementCommands },
+    { UWB_SESSION_REASON_CODE_MAX_RANGING_ROUND_RETRY_COUNT_REACHED, UwbSessionReasonCode::MaxRangignRoundRetryCountReached },
+    { UWB_SESSION_REASON_CODE_MAX_NUMBER_OF_MEASUREMENTS_REACHED, UwbSessionReasonCode::MaxNumberOfMeasurementsReached },
+    { UWB_SESSION_REASON_CODE_ERROR_SLOT_LENGTH_NOT_SUPPORTED, UwbSessionReasonCode::ErrorSlotLengthNotSupported },
+    { UWB_SESSION_REASON_CODE_ERROR_INSUFFICIENT_SLOTS_PER_RR, UwbSessionReasonCode::ErrorInsufficientSlotsPerRangingRound },
+    { UWB_SESSION_REASON_CODE_ERROR_MAC_ADDRESS_MODE_NOT_SUPPORTED, UwbSessionReasonCode::ErrorMacAddressModeNotSupported },
+    { UWB_SESSION_REASON_CODE_ERROR_INVALID_RANGING_INTERVAL, UwbSessionReasonCode::ErrorInvalidRangingInterval },
+    { UWB_SESSION_REASON_CODE_ERROR_INVALID_STS_CONFIG, UwbSessionReasonCode::ErrorInvalidStsConfiguration },
+    { UWB_SESSION_REASON_CODE_ERROR_INVALID_RFRAME_CONFIG, UwbSessionReasonCode::ErrorInvalidRFrameConfiguration },
+};
+
 UwbNotificationData
 windows::devices::uwb::ddi::lrp::To(const UWB_NOTIFICATION_DATA &notificationData)
 {
@@ -593,8 +612,15 @@ windows::devices::uwb::ddi::lrp::To(const UWB_NOTIFICATION_DATA &notificationDat
         }
         return StatusToMapRanging.at(notificationData.genericError);
     }
-    case UWB_NOTIFICATION_TYPE_SESSION_STATUS:
-    case UWB_NOTIFICATION_TYPE_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST:
+    case UWB_NOTIFICATION_TYPE_SESSION_STATUS: {
+        auto sessionStatus = notificationData.sessionStatus;
+        return UwbSessionStatus{ .SessionId = sessionStatus.sessionId,
+            .State = SessionStateToMap.at(sessionStatus.state),
+            .ReasonCode = SessionReasonCodeToMap.at(sessionStatus.reasonCode) };
+    }
+    case UWB_NOTIFICATION_TYPE_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST: {
+        break;
+    }
     case UWB_NOTIFICATION_TYPE_RANGING_DATA:
         break;
     }
