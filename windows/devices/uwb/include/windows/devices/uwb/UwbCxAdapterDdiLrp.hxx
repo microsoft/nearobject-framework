@@ -154,13 +154,15 @@ using UwbDeviceInformationWrapper = notstd::flextype_wrapper<UWB_DEVICE_INFO, st
 UwbDeviceInformationWrapper
 From(const ::uwb::protocol::fira::UwbDeviceInformation &uwbDeviceInfo);
 
+using UwbDeviceCapabilitiesWrapper = notstd::flextype_wrapper<UWB_DEVICE_CAPABILITIES, std::remove_extent<decltype(UWB_DEVICE_CAPABILITIES::capabilityParams)>>;
+
 /**
  * @brief Converts UwbCapability to UWB_DEVICE_CAPABILITIES.
  *
  * @param uwbDeviceCapabilities
- * @return UWB_DEVICE_CAPABILITIES
+ * @return UwbDeviceCapabilitiesWrapper
  */
-UWB_DEVICE_CAPABILITIES
+UwbDeviceCapabilitiesWrapper
 From(const ::uwb::protocol::fira::UwbCapability &uwbDeviceCapabilities);
 
 /**
