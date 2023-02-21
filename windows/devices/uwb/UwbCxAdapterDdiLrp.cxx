@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <bitset>
 #include <functional>
+#include <ranges>
 #include <stdexcept>
 #include <type_traits>
 #include <typeindex>
