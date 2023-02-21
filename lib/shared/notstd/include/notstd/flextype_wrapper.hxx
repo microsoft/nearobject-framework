@@ -2,6 +2,7 @@
 #ifndef FLEXTYPE_WRAPPER_HXX
 #define FLEXTYPE_WRAPPER_HXX
 
+#include <algorithm>
 #include <cassert>
 #include <concepts>
 #include <cstddef>
@@ -65,7 +66,7 @@ struct flextype_wrapper
     /**
      * @brief The required buffer size for the specified number of flex-array
      * elements.
-     * 
+     *
      * This calculates the size of the buffer required to store the wrapped type
      * (value_type) plus the specified number of flex-array elements
      * (element_type). The calculation does not account for padding in the
@@ -145,12 +146,12 @@ struct flextype_wrapper
      * for all trailing flex-array elements. For types which do not contain
      * nested flex-array elements, the following expression may be used to
      * calculate the correct size:
-     * 
+     *
      *  std::size_t size = offsetof(value_type, flex_array_field_name[num_elements])
-     * 
+     *
      * For wrapped types which contain nested flex-array members, the total size
      * must be calculated recursively.
-     * 
+     *
      * @param total_size The total size required for the wrapped type.
      */
     explicit flextype_wrapper(std::size_t total_size) :
@@ -158,13 +159,36 @@ struct flextype_wrapper
     {}
 
     /**
-     * @brief Construct a new flextype wrapper object copy.
-     * 
+     * @brief Construct a new flextype_wrapper object copy.
+     *
      * @param other The other wrapper instance to copy.
      */
     flextype_wrapper(const flextype_wrapper& other) :
         flextype_wrapper(other.m_buffer, std::size(other.m_data))
     {}
+
+    /**
+     * @brief Construct a new flextype_wrapper object copy with assignment.
+     *
+     * @param other The other wrapper instance to copy.
+     * @return flextype_wrapper&
+     */
+    flextype_wrapper&
+    operator=(const flextype_wrapper other)
+    {
+        std::swap(m_buffer, other.buffer);
+        std::swap(m_value, other.m_value);
+        std::swap(m_data, other.data);
+    }
+
+    /**
+     * Declare move constructor and assignment operators as default as the move
+     * operation is safe for all members in the class.
+     */
+    flextype_wrapper(flextype_wrapper&&) = default;
+
+    flextype_wrapper&
+    operator=(flextype_wrapper&&) = default;
 
     /**
      * @brief Construct a new flextype wrapper object from a pre-existing value.
@@ -213,6 +237,16 @@ struct flextype_wrapper
     }
 
 private:
+    /**
+     * @brief Construct a new flextype wrapper object from a pre-allocated
+     * vector. This constructor assumes that the passed in buffer is has
+     * capacity >= total_size bytes. Since it is meant only to be called by
+     * other code in this class, this restriction is neither checked nor
+     * enforced.
+     *
+     * @param buffer The pre-existing buffer with size >= total_size.
+     * @param total_size The total size of the wrapped object.
+     */
     flextype_wrapper(std::vector<uint8_t> buffer, std::size_t total_size) :
         m_buffer(std::move(buffer)),
         m_value(*aligned_buffer(m_buffer, total_size)),

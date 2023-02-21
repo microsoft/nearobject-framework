@@ -36,16 +36,16 @@ struct test_flex_type
     flex_element_t elements[notstd::to_underlying(flex_element_type_array_index)];
 
     /**
-     * @brief 
-     * 
-     * @param other 
-     * @return true 
-     * @return false 
+     * @brief
+     *
+     * @param other
+     * @return true
+     * @return false
      */
     bool
     operator==(const test_flex_type& other) const noexcept
     {
-        return std::tie(this->value, this->num_elements) == std::tie(other.value, other.num_elements) && 
+        return std::tie(this->value, this->num_elements) == std::tie(other.value, other.num_elements) &&
             std::memcmp(&this->elements[0], &other.elements[0], other.num_elements * sizeof elements[0]) == 0;
     }
 
@@ -169,9 +169,15 @@ TEST_CASE("flextype_wrapper can be used as a value container with element-based 
             value.elements[i] = { i, i };
         }
 
+        // Test copy-constructor.
         auto wrapper_copy{ wrapper };
         flex_wrapper_type::value_type& value_copy = wrapper_copy;
-        REQUIRE(value == value_copy); 
+        REQUIRE(value == value_copy);
+
+        // Test copy-assignment operator.
+        auto wrapper_copy_assigned = wrapper_copy;
+        value_copy = wrapper_copy_assigned;
+        REQUIRE(value == value_copy);
     }
 
     SECTION("vlaue type is correctly reflected in moved instance")
@@ -186,9 +192,15 @@ TEST_CASE("flextype_wrapper can be used as a value container with element-based 
             value.elements[i] = { i, i };
         }
 
-        auto wrapper_copy{ std::move(wrapper) };
-        flex_wrapper_type::value_type& value_copy = wrapper_copy;
-        REQUIRE(value == value_copy); 
+        // Test move-constructor.
+        auto wrapper_moved{ std::move(wrapper) };
+        flex_wrapper_type::value_type& value_moved = wrapper_moved;
+        REQUIRE(value == value_moved);
+
+        // Test move-assignment operator.
+        auto wrapper_move_assigned = std::move(wrapper_moved);
+        value_moved = wrapper_move_assigned;
+        REQUIRE(value == value_moved);
     }
 }
 
