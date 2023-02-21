@@ -143,13 +143,15 @@ From(const ::uwb::protocol::fira::UwbSessionState uwbSessionState);
 UWB_SESSION_STATUS
 From(const ::uwb::protocol::fira::UwbSessionStatus &uwbSessionStatus);
 
+using UwbDeviceInformationWrapper = notstd::flextype_wrapper<UWB_DEVICE_INFO, std::remove_extent<decltype(UWB_DEVICE_INFO::vendorSpecificInfo)>>;
+
 /**
  * @brief Converts UwbDeviceInformation to UWB_DEVICE_INFO.
  *
  * @param uwbDeviceInfo
- * @return UWB_DEVICE_INFO
+ * @return UwbDeviceInformationWrapper
  */
-UWB_DEVICE_INFO
+UwbDeviceInformationWrapper
 From(const ::uwb::protocol::fira::UwbDeviceInformation &uwbDeviceInfo);
 
 /**
