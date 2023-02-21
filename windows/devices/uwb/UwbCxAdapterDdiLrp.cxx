@@ -148,14 +148,14 @@ UwbSessionUpdateMulicastListWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulicastList &uwbSessionUpdateMulicastList)
 {
     auto sessionUpdateControllerMulticastListWrapper = UwbSessionUpdateMulicastListWrapper::from_num_elements(std::size(uwbSessionUpdateMulicastList.Controlees));
-    UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST& sessionUpdateControllerMulticastList = sessionUpdateControllerMulticastListWrapper;
+    UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST &sessionUpdateControllerMulticastList = sessionUpdateControllerMulticastListWrapper;
     sessionUpdateControllerMulticastList.size = sessionUpdateControllerMulticastListWrapper.size();
     sessionUpdateControllerMulticastList.sessionId = uwbSessionUpdateMulicastList.SessionId;
     sessionUpdateControllerMulticastList.action = From(uwbSessionUpdateMulicastList.Action);
     sessionUpdateControllerMulticastList.numberOfControlees = std::size(uwbSessionUpdateMulicastList.Controlees);
 
     for (auto i = 0; i < std::size(uwbSessionUpdateMulicastList.Controlees); i++) {
-        auto& controlee = sessionUpdateControllerMulticastList.controleeList[i];
+        auto &controlee = sessionUpdateControllerMulticastList.controleeList[i];
         controlee = From(uwbSessionUpdateMulicastList.Controlees[i]);
     }
 
@@ -166,14 +166,14 @@ UwbSessionUpdateMulicastListStatusWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulicastListStatus &uwbSessionUpdateMulicastListStatus)
 {
     auto multicastListStatusWrapper = UwbSessionUpdateMulicastListStatusWrapper::from_num_elements(std::size(uwbSessionUpdateMulicastListStatus.Status));
-    UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF& multicastListStatus = multicastListStatusWrapper;
+    UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF &multicastListStatus = multicastListStatusWrapper;
     multicastListStatus.size = multicastListStatusWrapper.size();
     multicastListStatus.sessionId = uwbSessionUpdateMulicastListStatus.SessionId;
     multicastListStatus.numberOfControlees = std::size(uwbSessionUpdateMulicastListStatus.Status);
     multicastListStatus.remainingMulticastListSize = 0;
 
     for (auto i = 0; i < std::size(uwbSessionUpdateMulicastListStatus.Status); i++) {
-        auto& status = multicastListStatus.statusList[i];
+        auto &status = multicastListStatus.statusList[i];
         status = From(uwbSessionUpdateMulicastListStatus.Status[i]);
     }
 
@@ -315,7 +315,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbDeviceInformation &uwbDeviceInfo)
     }
 
     auto deviceInfoWrapper = UwbDeviceInformationWrapper::from_num_elements(numElements);
-    UWB_DEVICE_INFO& deviceInfo = deviceInfoWrapper;
+    UWB_DEVICE_INFO &deviceInfo = deviceInfoWrapper;
     deviceInfo.size = deviceInfoWrapper.size();
     deviceInfo.status = From(uwbDeviceInfo.Status);
     deviceInfo.uciGenericVersionMajor = uwbDeviceInfo.VersionUci.Major;
@@ -334,14 +334,21 @@ windows::devices::uwb::ddi::lrp::From(const UwbDeviceInformation &uwbDeviceInfo)
     return deviceInfoWrapper;
 }
 
-UWB_DEVICE_CAPABILITIES
+UwbDeviceCapabilitiesWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbCapability &uwbDeviceCapabilities)
 {
-    UWB_DEVICE_CAPABILITIES deviceCapabilities{};
-    deviceCapabilities.size = sizeof deviceCapabilities;
-    deviceCapabilities.capabilityParamsCount = 0;
-    // TODO: implement this properly
-    return deviceCapabilities;
+    std::size_t numElements = 2; // TODO: calculate this from uwbDeviceCapabilities
+    auto deviceCapabilitiesWrapper = UwbDeviceCapabilitiesWrapper::from_num_elements(numElements);
+
+    UWB_DEVICE_CAPABILITIES& deviceCapabilities = deviceCapabilitiesWrapper;
+    deviceCapabilities.size = deviceCapabilitiesWrapper.size();
+    deviceCapabilities.capabilityParamsCount = numElements;
+
+    // TODO: fill in deviceCapabilities.capabilityParams. There is currently no
+    // generic list of capabilities, so, we may have to convert each capability
+    // one-by-one.
+    
+    return deviceCapabilitiesWrapper;
 }
 
 UWB_DEVICE_STATUS
@@ -358,7 +365,7 @@ UwbRangingDataWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbRangingData &uwbRangingData)
 {
     auto rangingDataWrapper = UwbRangingDataWrapper::from_num_elements(std::size(uwbRangingData.RangingMeasurements));
-    UWB_RANGING_DATA& rangingData = rangingDataWrapper;
+    UWB_RANGING_DATA &rangingData = rangingDataWrapper;
     rangingData.size = rangingDataWrapper.size();
     rangingData.sequenceNumber = uwbRangingData.SequenceNumber;
     rangingData.sessionId = uwbRangingData.SessionId;
