@@ -594,29 +594,45 @@ static const std::unordered_map<UWB_SESSION_REASON_CODE, UwbSessionReasonCode> S
     { UWB_SESSION_REASON_CODE_ERROR_INVALID_RFRAME_CONFIG, UwbSessionReasonCode::ErrorInvalidRFrameConfiguration },
 };
 
+UwbStatusDevice
+windows::devices::uwb::ddi::lrp::To(const UWB_DEVICE_STATUS &deviceStatus)
+{
+    return UwbStatusDevice{ .State = DeviceStateToMap.at(deviceStatus.deviceState) };
+}
+
+UwbStatus
+windows::devices::uwb::ddi::lrp::To(const UWB_STATUS &genericError)
+{
+    auto enumId = notstd::to_underlying(genericError);
+    if (enumId < notstd::to_underlying(UWB_STATUS_ERROR_SESSION_NOT_EXIST)) {
+        return StatusToMapGeneric.at(genericError);
+    }
+    if (enumId < notstd::to_underlying(UWB_STATUS_RANGING_TX_FAILED)) {
+        return StatusToMapSession.at(genericError);
+    }
+    return StatusToMapRanging.at(genericError);
+}
+
+UwbSessionStatus
+windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_STATUS &sessionStatus)
+{
+    return UwbSessionStatus{ .SessionId = sessionStatus.sessionId,
+        .State = SessionStateToMap.at(sessionStatus.state),
+        .ReasonCode = SessionReasonCodeToMap.at(sessionStatus.reasonCode) };
+}
+
 UwbNotificationData
 windows::devices::uwb::ddi::lrp::To(const UWB_NOTIFICATION_DATA &notificationData)
 {
-    // TODO: finish implementing this
     switch (notificationData.notificationType) {
     case UWB_NOTIFICATION_TYPE_DEVICE_STATUS: {
-        return UwbStatusDevice{ .State = DeviceStateToMap.at(notificationData.deviceStatus.deviceState) };
+        return To(notificationData.deviceStatus);
     }
     case UWB_NOTIFICATION_TYPE_GENERIC_ERROR: {
-        auto enumId = notstd::to_underlying(notificationData.genericError);
-        if (enumId < notstd::to_underlying(UWB_STATUS_ERROR_SESSION_NOT_EXIST)) {
-            return StatusToMapGeneric.at(notificationData.genericError);
-        }
-        if (enumId < notstd::to_underlying(UWB_STATUS_RANGING_TX_FAILED)) {
-            return StatusToMapSession.at(notificationData.genericError);
-        }
-        return StatusToMapRanging.at(notificationData.genericError);
+        return To(notificationData.genericError);
     }
     case UWB_NOTIFICATION_TYPE_SESSION_STATUS: {
-        auto sessionStatus = notificationData.sessionStatus;
-        return UwbSessionStatus{ .SessionId = sessionStatus.sessionId,
-            .State = SessionStateToMap.at(sessionStatus.state),
-            .ReasonCode = SessionReasonCodeToMap.at(sessionStatus.reasonCode) };
+        return To(notificationData.sessionStatus);
     }
     case UWB_NOTIFICATION_TYPE_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST: {
         break;
