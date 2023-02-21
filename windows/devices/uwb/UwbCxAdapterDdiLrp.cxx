@@ -17,6 +17,7 @@
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 
 using namespace ::uwb::protocol::fira;
+using namespace windows::devices::uwb::ddi::lrp;
 
 UWB_STATUS
 windows::devices::uwb::ddi::lrp::From(const UwbStatus &uwbStatus)
@@ -142,30 +143,32 @@ windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulticastListEntry &
     return multicastListEntry;
 }
 
-UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST
+UwbSessionUpdateMulicastListWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulicastList &uwbSessionUpdateMulicastList)
 {
-    UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST sessionUpdateControllerMulticastList{};
-    sessionUpdateControllerMulticastList.size = sizeof sessionUpdateControllerMulticastList; // TODO: update for variable length
+    auto sessionUpdateControllerMulticastListWrapper = UwbSessionUpdateMulicastListWrapper::from_num_elements(std::size(uwbSessionUpdateMulicastList.Controlees));
+    UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST& sessionUpdateControllerMulticastList = sessionUpdateControllerMulticastListWrapper;
+    sessionUpdateControllerMulticastList.size = sessionUpdateControllerMulticastListWrapper.size();
     sessionUpdateControllerMulticastList.sessionId = uwbSessionUpdateMulicastList.SessionId;
     sessionUpdateControllerMulticastList.action = From(uwbSessionUpdateMulicastList.Action);
     sessionUpdateControllerMulticastList.numberOfControlees = std::size(uwbSessionUpdateMulicastList.Controlees);
     // TODO: append controlee information
 
-    return sessionUpdateControllerMulticastList;
+    return sessionUpdateControllerMulticastListWrapper;
 }
 
-UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF
+UwbSessionUpdateMulicastListStatusWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulicastListStatus &uwbSessionUpdateMulicastListStatus)
 {
-    UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF multicastListStatus{};
-    multicastListStatus.size = sizeof multicastListStatus; // TODO: update for variable length
+    auto multicastListStatusWrapper = UwbSessionUpdateMulicastListStatusWrapper::from_num_elements(std::size(uwbSessionUpdateMulicastListStatus.Status));
+    UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF& multicastListStatus = multicastListStatusWrapper;
+    multicastListStatus.size = multicastListStatusWrapper.size();
     multicastListStatus.sessionId = uwbSessionUpdateMulicastListStatus.SessionId;
     multicastListStatus.numberOfControlees = std::size(uwbSessionUpdateMulicastListStatus.Status);
     multicastListStatus.remainingMulticastListSize = 0;
     // TODO: append status information
 
-    return multicastListStatus;
+    return multicastListStatusWrapper;
 }
 
 UWB_RANGING_MEASUREMENT_TYPE
@@ -335,18 +338,19 @@ windows::devices::uwb::ddi::lrp::From(const UwbStatusDevice &uwbStatusDevice)
     return statusDevice;
 }
 
-UWB_RANGING_DATA
+UwbRangingDataWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbRangingData &uwbRangingData)
 {
-    UWB_RANGING_DATA rangingData{};            // TODO: this must be allocated to account for 'RangingMeasurements' in uwbRangingData.
-    rangingData.size = sizeof rangingData + 0; // TODO: fix this to account for variable length
+    auto rangingDataWrapper = UwbRangingDataWrapper::from_num_elements(std::size(uwbRangingData.RangingMeasurements));
+    UWB_RANGING_DATA& rangingData = rangingDataWrapper;
+    rangingData.size = rangingDataWrapper.size();
     rangingData.sequenceNumber = uwbRangingData.SequenceNumber;
     rangingData.sessionId = uwbRangingData.SessionId;
     rangingData.currentRangingInterval = uwbRangingData.CurrentRangingInterval;
     rangingData.rangingMeasurementType = From(uwbRangingData.RangingMeasurementType);
     rangingData.numberOfRangingMeasurements = std::size(uwbRangingData.RangingMeasurements);
 
-    return rangingData;
+    return rangingDataWrapper;
 }
 
 UWB_NOTIFICATION_DATA
@@ -379,7 +383,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbNotificationData &uwbNotification
             notificationData.rangingData = From(arg);
         }
         // Note: no else clause is needed here since if the type is not
-        // supported, at at() call above will throw std::out_of_range, ensuring
+        // supported, the at() call above will throw std::out_of_range, ensuring
         // this code will never be reached.
     },
         uwbNotificationData);
