@@ -154,12 +154,17 @@ struct flextype_wrapper
      * @param total_size The total size required for the wrapped type.
      */
     explicit flextype_wrapper(std::size_t total_size) :
-        m_buffer(alignof(value_type) + total_size),
-        m_value(*aligned_buffer(m_buffer, total_size)),
-        m_data(reinterpret_cast<uint8_t*>(&m_value), total_size)
-    {
-        assert(reinterpret_cast<uintptr_t>(&m_value) % alignof(decltype(m_value)) == 0);
-    }
+        flextype_wrapper(std::vector<std::uint8_t>(alignof(value_type) + total_size), total_size)
+    {}
+
+    /**
+     * @brief Construct a new flextype wrapper object copy.
+     * 
+     * @param other The other wrapper instance to copy.
+     */
+    flextype_wrapper(const flextype_wrapper& other) :
+        flextype_wrapper(other.m_buffer, std::size(other.m_data))
+    {}
 
     /**
      * @brief Construct a new flextype wrapper object from a pre-existing value.
@@ -205,6 +210,15 @@ struct flextype_wrapper
     data() noexcept
     {
         return m_data;
+    }
+
+private:
+    flextype_wrapper(std::vector<uint8_t> buffer, std::size_t total_size) :
+        m_buffer(std::move(buffer)),
+        m_value(*aligned_buffer(m_buffer, total_size)),
+        m_data(reinterpret_cast<uint8_t*>(&m_value), total_size)
+    {
+        assert(reinterpret_cast<uintptr_t>(&m_value) % alignof(decltype(m_value)) == 0);
     }
 
 private:

@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <tuple>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -33,6 +34,20 @@ struct test_flex_type
     uint32_t value;
     std::size_t num_elements;
     flex_element_t elements[notstd::to_underlying(flex_element_type_array_index)];
+
+    /**
+     * @brief 
+     * 
+     * @param other 
+     * @return true 
+     * @return false 
+     */
+    bool
+    operator==(const test_flex_type& other) const noexcept
+    {
+        return std::tie(this->value, this->num_elements) == std::tie(other.value, other.num_elements) && 
+            std::memcmp(&this->elements[0], &other.elements[0], other.num_elements * sizeof elements[0]) == 0;
+    }
 
     /**
      * @brief Helper template function to calculate the total size of the
@@ -140,6 +155,40 @@ TEST_CASE("flextype_wrapper can be used as a value container with element-based 
         auto buffer = wrapper.data();
         flex_wrapper_type::value_type& valueFromBuffer = *reinterpret_cast<flex_wrapper_type::value_type*>(std::data(buffer));
         REQUIRE(std::memcmp(&valueFromBuffer, &value, wrapper.size()) == 0);
+    }
+
+    SECTION("value type is correctly reflected in copied instance")
+    {
+        using flex_wrapper_type = test_flex_wrapper<test_flex_type_element_compound>;
+
+        auto wrapper = flex_wrapper_type::from_num_elements(num_elements);
+        flex_wrapper_type::value_type& value = wrapper;
+        value.value = 0xFEEDF00DU;
+        value.num_elements = num_elements;
+        for (uint8_t i = 0U; i < num_elements; i++) {
+            value.elements[i] = { i, i };
+        }
+
+        auto wrapper_copy{ wrapper };
+        flex_wrapper_type::value_type& value_copy = wrapper_copy;
+        REQUIRE(value == value_copy); 
+    }
+
+    SECTION("vlaue type is correctly reflected in moved instance")
+    {
+        using flex_wrapper_type = test_flex_wrapper<test_flex_type_element_compound>;
+
+        auto wrapper = flex_wrapper_type::from_num_elements(num_elements);
+        flex_wrapper_type::value_type& value = wrapper;
+        value.value = 0xFEEDF00DU;
+        value.num_elements = num_elements;
+        for (uint8_t i = 0U; i < num_elements; i++) {
+            value.elements[i] = { i, i };
+        }
+
+        auto wrapper_copy{ std::move(wrapper) };
+        flex_wrapper_type::value_type& value_copy = wrapper_copy;
+        REQUIRE(value == value_copy); 
     }
 }
 
