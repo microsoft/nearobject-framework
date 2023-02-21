@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <bitset>
 #include <functional>
+#include <ranges>
 #include <stdexcept>
 #include <type_traits>
 #include <typeindex>
@@ -152,7 +153,11 @@ windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulicastList &uwbSes
     sessionUpdateControllerMulticastList.sessionId = uwbSessionUpdateMulicastList.SessionId;
     sessionUpdateControllerMulticastList.action = From(uwbSessionUpdateMulicastList.Action);
     sessionUpdateControllerMulticastList.numberOfControlees = std::size(uwbSessionUpdateMulicastList.Controlees);
-    // TODO: append controlee information
+
+    for (auto i = 0; i < std::size(uwbSessionUpdateMulicastList.Controlees); i++) {
+        auto& controlee = sessionUpdateControllerMulticastList.controleeList[i];
+        controlee = From(uwbSessionUpdateMulicastList.Controlees[i]);
+    }
 
     return sessionUpdateControllerMulticastListWrapper;
 }
@@ -166,7 +171,11 @@ windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulicastListStatus &
     multicastListStatus.sessionId = uwbSessionUpdateMulicastListStatus.SessionId;
     multicastListStatus.numberOfControlees = std::size(uwbSessionUpdateMulicastListStatus.Status);
     multicastListStatus.remainingMulticastListSize = 0;
-    // TODO: append status information
+
+    for (auto i = 0; i < std::size(uwbSessionUpdateMulicastListStatus.Status); i++) {
+        auto& status = multicastListStatus.statusList[i];
+        status = From(uwbSessionUpdateMulicastListStatus.Status[i]);
+    }
 
     return multicastListStatusWrapper;
 }
@@ -292,30 +301,37 @@ windows::devices::uwb::ddi::lrp::From(const UwbSessionStatus &uwbSessionStatus)
     return sessionStatus;
 }
 
-UWB_DEVICE_INFO
+UwbDeviceInformationWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbDeviceInformation &uwbDeviceInfo)
 {
-    UWB_DEVICE_INFO deviceInfo{};
-    deviceInfo.size = sizeof deviceInfo;
+    std::size_t numElements = 0;
+    std::span<uint8_t> vendorSpecificInfo;
+
+    if (uwbDeviceInfo.VendorSpecificInfo != nullptr) {
+        vendorSpecificInfo = uwbDeviceInfo.VendorSpecificInfo->GetData();
+        numElements = std::size(vendorSpecificInfo);
+    } else {
+        numElements = 1;
+    }
+
+    auto deviceInfoWrapper = UwbDeviceInformationWrapper::from_num_elements(numElements);
+    UWB_DEVICE_INFO& deviceInfo = deviceInfoWrapper;
+    deviceInfo.size = deviceInfoWrapper.size();
     deviceInfo.status = From(uwbDeviceInfo.Status);
     deviceInfo.uciGenericVersionMajor = uwbDeviceInfo.VersionUci.Major;
-    deviceInfo.uciGenericVersionMinorAndMaintenance = uwbDeviceInfo.VersionUci.Minor | uwbDeviceInfo.VersionUci.Maintenance; // TODO: FIXME
+    deviceInfo.uciGenericVersionMinorAndMaintenance = uwbDeviceInfo.VersionUci.Minor | uwbDeviceInfo.VersionUci.Maintenance;
     deviceInfo.uciTestVersionMajor = uwbDeviceInfo.VersionUciTest.Major;
     deviceInfo.uciTestVersionMinorAndMaintenance = uwbDeviceInfo.VersionUciTest.Minor | uwbDeviceInfo.VersionUciTest.Maintenance;
     deviceInfo.macVersionMajor = uwbDeviceInfo.VersionMac.Major;
     deviceInfo.macVersionMinorAndMaintenance = uwbDeviceInfo.VersionMac.Minor | uwbDeviceInfo.VersionMac.Maintenance;
     deviceInfo.phyVersionMajor = uwbDeviceInfo.VersionPhy.Major;
     deviceInfo.phyVersionMinorAndMaintenance = uwbDeviceInfo.VersionPhy.Minor | uwbDeviceInfo.VersionPhy.Maintenance;
-
-    if (uwbDeviceInfo.VendorSpecificInfo != nullptr) {
-        auto vendorSpecificInfo = uwbDeviceInfo.VendorSpecificInfo->GetData();
-        deviceInfo.vendorSpecificInfoLength = std::size(vendorSpecificInfo);
-        // TODO: append std::data(vendorSpecificInfo) to end of structure.
-    } else {
-        deviceInfo.vendorSpecificInfoLength = 0;
+    deviceInfo.vendorSpecificInfoLength = std::size(vendorSpecificInfo);
+    if (deviceInfo.vendorSpecificInfoLength > 0) {
+        std::memcpy(&deviceInfo.vendorSpecificInfo[0], std::data(vendorSpecificInfo), std::size(vendorSpecificInfo));
     }
 
-    return deviceInfo;
+    return deviceInfoWrapper;
 }
 
 UWB_DEVICE_CAPABILITIES
