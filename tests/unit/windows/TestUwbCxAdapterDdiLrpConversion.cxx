@@ -85,39 +85,11 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         }
     }
 
-    SECTION("UwbSessionState is stable")
-    {
-        for (const auto& uwbSessionState : magic_enum::enum_values<UwbSessionState>()) {
-            test::ValidateRoundtrip(uwbSessionState);
-        }
-    }
-
-    SECTION("UwbSessionReasonCode is stable")
-    {
-        for (const auto& uwbReasonCode : magic_enum::enum_values<UwbSessionReasonCode>()) {
-            test::ValidateRoundtrip(uwbReasonCode);
-        }
-    }
-
-    SECTION("UwbRangingMeasurementType is stable")
-    {
-        for (const auto& uwbMeasurementType : magic_enum::enum_values<UwbRangingMeasurementType>()) {
-            test::ValidateRoundtrip(uwbMeasurementType);
-        }
-    }
-
-    SECTION("UwbApplicationConfigurationParameterType is stable")
-    {
-        for (const auto& uwbApplicationConfigurationParameterType : magic_enum::enum_values<UwbApplicationConfigurationParameterType>()) {
-            test::ValidateRoundtrip(uwbApplicationConfigurationParameterType);
-        }
-    }
-
     SECTION("UwbMulticastListStatus is stable")
     {
 
     }
-    
+
     SECTION("UwbSessionUpdateMulticastListEntry is stable")
     {
 
@@ -131,6 +103,34 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
     SECTION("UwbSessionUpdateMulicastListStatus is stable")
     {
 
+    }
+
+    SECTION("UwbRangingMeasurementType is stable")
+    {
+        for (const auto& uwbMeasurementType : magic_enum::enum_values<UwbRangingMeasurementType>()) {
+            test::ValidateRoundtrip(uwbMeasurementType);
+        }
+    }
+
+    SECTION("UwbSessionReasonCode is stable")
+    {
+        for (const auto& uwbReasonCode : magic_enum::enum_values<UwbSessionReasonCode>()) {
+            test::ValidateRoundtrip(uwbReasonCode);
+        }
+    }
+
+    SECTION("UwbApplicationConfigurationParameterType is stable")
+    {
+        for (const auto& uwbApplicationConfigurationParameterType : magic_enum::enum_values<UwbApplicationConfigurationParameterType>()) {
+            test::ValidateRoundtrip(uwbApplicationConfigurationParameterType);
+        }
+    }
+
+    SECTION("UwbSessionState is stable")
+    {
+        for (const auto& uwbSessionState : magic_enum::enum_values<UwbSessionState>()) {
+            test::ValidateRoundtrip(uwbSessionState);
+        }
     }
 
     SECTION("UwbSessionStatus is stable")
@@ -147,5 +147,35 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
                 test::ValidateRoundtrip(uwbSessionStatus);
             }
         }
+    }
+
+    SECTION("UwbDeviceInformation is stable")
+    {
+
+    }
+
+    SECTION("UwbCapability is stable")
+    {
+
+    }
+
+    SECTION("UwbStatusDevice is stable")
+    {
+
+    }
+
+    SECTION("UwbDeviceConfigurationParameterType is stable")
+    {
+
+    }
+
+    SECTION("UwbRangingData is stable")
+    {
+
+    }
+
+    SECTION("UwbNotificationData is stable")
+    {
+
     }
 }
