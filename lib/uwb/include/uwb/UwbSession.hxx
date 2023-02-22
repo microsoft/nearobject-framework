@@ -110,7 +110,7 @@ public:
     StopRanging();
 
     /**
-     * @brief Set the Session Status object. NOTE, this function is NOT asynch safe
+     * @brief Set the Session Status object. NOTE, this function is NOT thread safe
      *
      * @param status the new status
      */
