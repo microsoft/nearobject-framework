@@ -4,6 +4,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <magic_enum.hpp>
 
+#include <uwb/UwbMacAddress.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 
@@ -13,15 +14,15 @@ namespace windows::devices::uwb::ddi::lrp::test
 {
 /**
  * @brief Helper to perform a round-trip conversion of a neutral type.
- * 
+ *
  * This takes a neutral type, converts it to the DDI type, then converts the DDI
  * type back to the neutral type. If the resulting neutral type matches the
  * original neutral type instance, this proves that no information is lost in
  * the conversion, or is "stable".
- * 
+ *
  * @tparam NeutralT The neutral type.
  * @param instance An instance of the neutral type.
- * @return NeutralT 
+ * @return NeutralT
  */
 template <typename NeutralT>
 NeutralT
@@ -32,8 +33,8 @@ ConvertRoundtrip(const NeutralT& instance)
 
 /**
  * @brief Validate a neutral type round-trip conversion works.
- * 
- * @tparam NeutralT 
+ *
+ * @tparam NeutralT
  * @param instance An instance of the neutral type to validate.
  */
 template <typename NeutralT>
@@ -87,22 +88,26 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
 
     SECTION("UwbMulticastListStatus is stable")
     {
-
     }
 
     SECTION("UwbSessionUpdateMulticastListEntry is stable")
     {
-
     }
 
     SECTION("UwbSessionUpdateMulicastList is stable")
     {
-
     }
 
     SECTION("UwbSessionUpdateMulicastListStatus is stable")
     {
-
+        for (const auto& uwbStatusMulticast : magic_enum::enum_values<UwbStatusMulticast>()) {
+            UwbMulticastListStatus uwbMulticastListStatus{
+                .ControleeMacAddress = ::uwb::UwbMacAddress::Random<::uwb::UwbMacAddressType::Short>(),
+                .SubSessionId = RandomDistribution(RandomEngine),
+                .Status = uwbStatusMulticast
+            };
+            test::ValidateRoundtrip(uwbMulticastListStatus);
+        }
     }
 
     SECTION("UwbRangingMeasurementType is stable")
@@ -151,12 +156,10 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
 
     SECTION("UwbDeviceInformation is stable")
     {
-
     }
 
     SECTION("UwbCapability is stable")
     {
-
     }
 
     SECTION("UwbStatusDevice is stable")
@@ -181,11 +184,9 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
 
     SECTION("UwbRangingData is stable")
     {
-
     }
 
     SECTION("UwbNotificationData is stable")
     {
-
     }
 }
