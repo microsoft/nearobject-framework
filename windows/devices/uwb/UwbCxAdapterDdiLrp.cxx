@@ -339,14 +339,14 @@ windows::devices::uwb::ddi::lrp::From(const UwbCapability &uwbDeviceCapabilities
     std::size_t numElements = 2; // TODO: calculate this from uwbDeviceCapabilities
     auto deviceCapabilitiesWrapper = UwbDeviceCapabilitiesWrapper::from_num_elements(numElements);
 
-    UWB_DEVICE_CAPABILITIES& deviceCapabilities = deviceCapabilitiesWrapper;
+    UWB_DEVICE_CAPABILITIES &deviceCapabilities = deviceCapabilitiesWrapper;
     deviceCapabilities.size = deviceCapabilitiesWrapper.size();
     deviceCapabilities.capabilityParamsCount = numElements;
 
     // TODO: fill in deviceCapabilities.capabilityParams. There is currently no
     // generic list of capabilities, so, we may have to convert each capability
     // one-by-one.
-    
+
     return deviceCapabilitiesWrapper;
 }
 
@@ -560,12 +560,6 @@ windows::devices::uwb::ddi::lrp::To(const UWB_DEVICE_CAPABILITIES &deviceCapabil
     return uwbCapability;
 }
 
-static const std::unordered_map<UWB_DEVICE_STATE, UwbDeviceState> DeviceStateToMap{
-    { UWB_DEVICE_STATE_READY, UwbDeviceState::Ready },
-    { UWB_DEVICE_STATE_ACTIVE, UwbDeviceState::Active },
-    { UWB_DEVICE_STATE_ERROR, UwbDeviceState::Error }
-};
-
 static const std::unordered_map<UWB_STATUS, UwbStatusGeneric> StatusToMapGeneric{
     { UWB_STATUS_OK, UwbStatusGeneric::Ok },
     { UWB_STATUS_REJECTED, UwbStatusGeneric::Rejected },
@@ -590,45 +584,21 @@ static const std::unordered_map<UWB_STATUS, UwbStatusSession> StatusToMapSession
     { UWB_STATUS_ERROR_ADDRESS_NOT_FOUND, UwbStatusSession::AddressNotFound },
     { UWB_STATUS_ERROR_ADDRESS_ALREADY_PRESENT, UwbStatusSession::AddressAlreadyPresent },
 };
-static const std::unordered_map<UWB_STATUS, UwbStatusRanging> StatusToMapRanging{
-    { UWB_STATUS_RANGING_TX_FAILED, UwbStatusRanging::TxFailed },
-    { UWB_STATUS_RANGING_RX_TIMEOUT, UwbStatusRanging::RxTimeout },
-    { UWB_STATUS_RANGING_RX_PHY_DEC_FAILED, UwbStatusRanging::RxPhyDecodingFailed },
-    { UWB_STATUS_RANGING_RX_PHY_TOA_FAILED, UwbStatusRanging::RxPhyToaFailed },
-    { UWB_STATUS_RANGING_RX_PHY_STS_FAILED, UwbStatusRanging::RxPhyStsFailed },
-    { UWB_STATUS_RANGING_RX_MAC_DEC_FAILED, UwbStatusRanging::MacDecodingFailed },
-    { UWB_STATUS_RANGING_RX_MAC_IE_DEC_FAILED, UwbStatusRanging::RxMacIeDecodingFailed },
-    { UWB_STATUS_RANGING_RX_MAC_IE_MISSING, UwbStatusRanging::RxMacIeMissing },
-};
-
-static const std::unordered_map<UWB_SESSION_STATE, UwbSessionState> SessionStateToMap{
-    { UWB_SESSION_STATE_INIT, UwbSessionState::Initialized },
-    { UWB_SESSION_STATE_DEINIT, UwbSessionState::Deinitialized },
-    { UWB_SESSION_STATE_ACTIVE, UwbSessionState::Active },
-    { UWB_SESSION_STATE_IDLE, UwbSessionState::Idle },
-};
-
-static const std::unordered_map<UWB_SESSION_REASON_CODE, UwbSessionReasonCode> SessionReasonCodeToMap{
-    { UWB_SESSION_REASON_CODE_STATE_CHANGE_WITH_SESSION_MANAGEMENT_COMMANDS, UwbSessionReasonCode::StateChangeWithSessionManagementCommands },
-    { UWB_SESSION_REASON_CODE_MAX_RANGING_ROUND_RETRY_COUNT_REACHED, UwbSessionReasonCode::MaxRangignRoundRetryCountReached },
-    { UWB_SESSION_REASON_CODE_MAX_NUMBER_OF_MEASUREMENTS_REACHED, UwbSessionReasonCode::MaxNumberOfMeasurementsReached },
-    { UWB_SESSION_REASON_CODE_ERROR_SLOT_LENGTH_NOT_SUPPORTED, UwbSessionReasonCode::ErrorSlotLengthNotSupported },
-    { UWB_SESSION_REASON_CODE_ERROR_INSUFFICIENT_SLOTS_PER_RR, UwbSessionReasonCode::ErrorInsufficientSlotsPerRangingRound },
-    { UWB_SESSION_REASON_CODE_ERROR_MAC_ADDRESS_MODE_NOT_SUPPORTED, UwbSessionReasonCode::ErrorMacAddressModeNotSupported },
-    { UWB_SESSION_REASON_CODE_ERROR_INVALID_RANGING_INTERVAL, UwbSessionReasonCode::ErrorInvalidRangingInterval },
-    { UWB_SESSION_REASON_CODE_ERROR_INVALID_STS_CONFIG, UwbSessionReasonCode::ErrorInvalidStsConfiguration },
-    { UWB_SESSION_REASON_CODE_ERROR_INVALID_RFRAME_CONFIG, UwbSessionReasonCode::ErrorInvalidRFrameConfiguration },
-};
-
-UwbStatusDevice
-windows::devices::uwb::ddi::lrp::To(const UWB_DEVICE_STATUS &deviceStatus)
-{
-    return UwbStatusDevice{ .State = DeviceStateToMap.at(deviceStatus.deviceState) };
-}
 
 UwbStatus
 windows::devices::uwb::ddi::lrp::To(const UWB_STATUS &status)
 {
+    static const std::unordered_map<UWB_STATUS, UwbStatusRanging> StatusToMapRanging{
+        { UWB_STATUS_RANGING_TX_FAILED, UwbStatusRanging::TxFailed },
+        { UWB_STATUS_RANGING_RX_TIMEOUT, UwbStatusRanging::RxTimeout },
+        { UWB_STATUS_RANGING_RX_PHY_DEC_FAILED, UwbStatusRanging::RxPhyDecodingFailed },
+        { UWB_STATUS_RANGING_RX_PHY_TOA_FAILED, UwbStatusRanging::RxPhyToaFailed },
+        { UWB_STATUS_RANGING_RX_PHY_STS_FAILED, UwbStatusRanging::RxPhyStsFailed },
+        { UWB_STATUS_RANGING_RX_MAC_DEC_FAILED, UwbStatusRanging::MacDecodingFailed },
+        { UWB_STATUS_RANGING_RX_MAC_IE_DEC_FAILED, UwbStatusRanging::RxMacIeDecodingFailed },
+        { UWB_STATUS_RANGING_RX_MAC_IE_MISSING, UwbStatusRanging::RxMacIeMissing },
+    };
+
     auto enumId = notstd::to_underlying(status);
     if (enumId < notstd::to_underlying(UWB_STATUS_ERROR_SESSION_NOT_EXIST)) {
         return StatusToMapGeneric.at(status);
@@ -639,12 +609,82 @@ windows::devices::uwb::ddi::lrp::To(const UWB_STATUS &status)
     return StatusToMapRanging.at(status);
 }
 
+UwbStatusDevice
+windows::devices::uwb::ddi::lrp::To(const UWB_DEVICE_STATUS &deviceStatus)
+{
+    static const std::unordered_map<UWB_DEVICE_STATE, UwbDeviceState> DeviceStateToMap{
+        { UWB_DEVICE_STATE_READY, UwbDeviceState::Ready },
+        { UWB_DEVICE_STATE_ACTIVE, UwbDeviceState::Active },
+        { UWB_DEVICE_STATE_ERROR, UwbDeviceState::Error }
+    };
+
+    return UwbStatusDevice{
+        .State = DeviceStateToMap.at(deviceStatus.deviceState)
+    };
+}
+
+UwbDeviceState
+windows::devices::uwb::ddi::lrp::To(const UWB_DEVICE_STATE &deviceState)
+{
+    static const std::unordered_map<UWB_DEVICE_STATE, UwbDeviceState> DeviceStateMap{
+        { UWB_DEVICE_STATE_READY, UwbDeviceState::Ready },
+        { UWB_DEVICE_STATE_ACTIVE, UwbDeviceState::Active },
+        { UWB_DEVICE_STATE_ERROR, UwbDeviceState::Error },
+    };
+
+    return DeviceStateMap.at(deviceState);
+}
+
+UwbMulticastAction
+windows::devices::uwb::ddi::lrp::To(const UWB_MULTICAST_ACTION &multicastAction)
+{
+    static const std::unordered_map<UWB_MULTICAST_ACTION, UwbMulticastAction> ActionMap{
+        { UWB_MULTICAST_ACTION_ADD_SHORT_ADDRESS, UwbMulticastAction::AddShortAddress },
+        { UWB_MULTICAST_ACTION_DELETE_SHORT_ADDRESS, UwbMulticastAction::DeleteShortAddress },
+    };
+
+    return ActionMap.at(multicastAction);
+}
+
+UwbSessionState
+windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_STATE &sessionState)
+{
+    static const std::unordered_map<UWB_SESSION_STATE, UwbSessionState> SessionStateToMap{
+        { UWB_SESSION_STATE_INIT, UwbSessionState::Initialized },
+        { UWB_SESSION_STATE_DEINIT, UwbSessionState::Deinitialized },
+        { UWB_SESSION_STATE_ACTIVE, UwbSessionState::Active },
+        { UWB_SESSION_STATE_IDLE, UwbSessionState::Idle },
+    };
+
+    return SessionStateToMap.at(sessionState);
+}
+
+UwbSessionReasonCode
+windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_REASON_CODE &sessionReasonCode)
+{
+    static const std::unordered_map<UWB_SESSION_REASON_CODE, UwbSessionReasonCode> SessionReasonCodeToMap{
+        { UWB_SESSION_REASON_CODE_STATE_CHANGE_WITH_SESSION_MANAGEMENT_COMMANDS, UwbSessionReasonCode::StateChangeWithSessionManagementCommands },
+        { UWB_SESSION_REASON_CODE_MAX_RANGING_ROUND_RETRY_COUNT_REACHED, UwbSessionReasonCode::MaxRangignRoundRetryCountReached },
+        { UWB_SESSION_REASON_CODE_MAX_NUMBER_OF_MEASUREMENTS_REACHED, UwbSessionReasonCode::MaxNumberOfMeasurementsReached },
+        { UWB_SESSION_REASON_CODE_ERROR_SLOT_LENGTH_NOT_SUPPORTED, UwbSessionReasonCode::ErrorSlotLengthNotSupported },
+        { UWB_SESSION_REASON_CODE_ERROR_INSUFFICIENT_SLOTS_PER_RR, UwbSessionReasonCode::ErrorInsufficientSlotsPerRangingRound },
+        { UWB_SESSION_REASON_CODE_ERROR_MAC_ADDRESS_MODE_NOT_SUPPORTED, UwbSessionReasonCode::ErrorMacAddressModeNotSupported },
+        { UWB_SESSION_REASON_CODE_ERROR_INVALID_RANGING_INTERVAL, UwbSessionReasonCode::ErrorInvalidRangingInterval },
+        { UWB_SESSION_REASON_CODE_ERROR_INVALID_STS_CONFIG, UwbSessionReasonCode::ErrorInvalidStsConfiguration },
+        { UWB_SESSION_REASON_CODE_ERROR_INVALID_RFRAME_CONFIG, UwbSessionReasonCode::ErrorInvalidRFrameConfiguration },
+    };
+
+    return SessionReasonCodeToMap.at(sessionReasonCode);
+}
+
 UwbSessionStatus
 windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_STATUS &sessionStatus)
 {
-    return UwbSessionStatus{ .SessionId = sessionStatus.sessionId,
-        .State = SessionStateToMap.at(sessionStatus.state),
-        .ReasonCode = SessionReasonCodeToMap.at(sessionStatus.reasonCode) };
+    return UwbSessionStatus{
+        .SessionId = sessionStatus.sessionId,
+        .State = To(sessionStatus.state),
+        .ReasonCode = To(sessionStatus.reasonCode)
+    };
 }
 
 UwbNotificationData
