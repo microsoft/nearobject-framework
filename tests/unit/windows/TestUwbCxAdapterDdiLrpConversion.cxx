@@ -11,6 +11,18 @@ namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
 
 namespace windows::devices::uwb::ddi::lrp::test
 {
+/**
+ * @brief Helper to perform a round-trip conversion of a neutral type.
+ * 
+ * This takes a neutral type, converts it to the DDI type, then converts the DDI
+ * type back to the neutral type. If the resulting neutral type matches the
+ * original neutral type instance, this proves that no information is lost in
+ * the conversion, or is "stable".
+ * 
+ * @tparam NeutralT The neutral type.
+ * @param instance An instance of the neutral type.
+ * @return NeutralT 
+ */
 template <typename NeutralT>
 NeutralT
 ConvertRoundtrip(const NeutralT& instance)
@@ -18,6 +30,12 @@ ConvertRoundtrip(const NeutralT& instance)
     return UwbCxDdi::To(UwbCxDdi::From(instance));
 }
 
+/**
+ * @brief Validate a neutral type round-trip conversion works.
+ * 
+ * @tparam NeutralT 
+ * @param instance An instance of the neutral type to validate.
+ */
 template <typename NeutralT>
 void
 ValidateRoundtrip(const NeutralT& instance)
