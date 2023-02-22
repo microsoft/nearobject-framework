@@ -74,11 +74,6 @@ UwbSession::StopRanging()
 void
 UwbSession::SetSessionStatus(const uwb::protocol::fira::UwbSessionStatus& status)
 {
+    PLOG_VERBOSE << "session changed state:" << m_sessionStatus.ToString() << " --> " << status.ToString();
     m_sessionStatus = status;
-}
-
-const uwb::protocol::fira::UwbSessionStatus&
-UwbSession::GetSessionStatus()
-{
-    return m_sessionStatus;
 }

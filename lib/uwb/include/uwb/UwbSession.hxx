@@ -110,19 +110,12 @@ public:
     StopRanging();
 
     /**
-     * @brief Set the Session Status object
+     * @brief Set the Session Status object. NOTE, this function is NOT asynch safe
      *
+     * @param status the new status
      */
     void
-    SetSessionStatus(const uwb::protocol::fira::UwbSessionStatus&);
-
-    /**
-     * @brief Get the Session Status object
-     *
-     * @return const UwbSessionStatus&
-     */
-    const uwb::protocol::fira::UwbSessionStatus&
-    GetSessionStatus();
+    SetSessionStatus(const uwb::protocol::fira::UwbSessionStatus& status);
 
 private:
     virtual void

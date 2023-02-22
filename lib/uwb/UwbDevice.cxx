@@ -72,7 +72,6 @@ UwbDevice::OnSessionStatusChanged(UwbSessionStatus statusSession)
         return;
     }
 
-    PLOG_VERBOSE << "session changed state:" << session->GetSessionStatus().ToString() << " --> " << statusSession.ToString();
     session->SetSessionStatus(statusSession);
 }
 
