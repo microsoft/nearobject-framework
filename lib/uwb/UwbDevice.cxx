@@ -41,7 +41,15 @@ UwbDevice::OnStatusChanged([[maybe_unused]] UwbStatus status)
 void
 UwbDevice::OnDeviceStatusChanged([[maybe_unused]] UwbStatusDevice statusDevice)
 {
-    // TODO: implement this
+    if (m_status.State == UwbDeviceState::Uninitialized) {
+        m_status = statusDevice;
+        PLOG_VERBOSE << "initialized device status as " << m_status.ToString();
+        return;
+    }
+    if (m_status.State != statusDevice.State) {
+        PLOG_VERBOSE << "changed state: " << m_status.ToString() << " --> " << statusDevice.ToString();
+        m_status = statusDevice;
+    }
 }
 
 void

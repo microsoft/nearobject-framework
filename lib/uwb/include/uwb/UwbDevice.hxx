@@ -22,9 +22,9 @@ class UwbDevice
 public:
     /**
      * @brief Creates a new UWB session with no configuration nor peers.
-     * 
-     * @param callbacks 
-     * @return std::shared_ptr<UwbSession> 
+     *
+     * @param callbacks
+     * @return std::shared_ptr<UwbSession>
      */
     std::shared_ptr<UwbSession>
     CreateSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks);
@@ -55,9 +55,9 @@ public:
 private:
     /**
      * @brief Creates a new UWB session with no configuration nor peers.
-     * 
-     * @param callbacks 
-     * @return std::shared_ptr<UwbSession> 
+     *
+     * @param callbacks
+     * @return std::shared_ptr<UwbSession>
      */
     virtual std::shared_ptr<UwbSession>
     CreateSessionImpl(std::weak_ptr<UwbSessionEventCallbacks> callbacks) = 0;
@@ -82,9 +82,9 @@ protected:
 private:
     /**
      * @brief Get a reference to the specified session.
-     * 
-     * @param sessionId 
-     * @return std::shared_ptr<UwbSession> 
+     *
+     * @param sessionId
+     * @return std::shared_ptr<UwbSession>
      */
     std::shared_ptr<UwbSession>
     GetSession(uint32_t sessionId);
@@ -130,6 +130,7 @@ private:
     OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData);
 
 private:
+    ::uwb::protocol::fira::UwbStatusDevice m_status{ .State = ::uwb::protocol::fira::UwbDeviceState::Uninitialized };
     std::shared_mutex m_sessionsGate;
     std::unordered_map<uint32_t, std::weak_ptr<uwb::UwbSession>> m_sessions{};
 };

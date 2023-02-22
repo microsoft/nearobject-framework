@@ -201,6 +201,32 @@ From(const ::uwb::protocol::fira::UwbNotificationData &uwbNotificationData);
 To(const UWB_DEVICE_CAPABILITIES &deviceCapabilities);
 
 /**
+ * @brief Converts UWB_DEVICE_STATUS to UwbStatusDevice.
+ *
+ * @param device_status
+ * @return ::uwb::protocol::fira::UwbStatusDevice
+ */
+::uwb::protocol::fira::UwbStatusDevice
+To(const UWB_DEVICE_STATUS &deviceStatus);
+
+/**
+ * @brief Converts UWB_STATUS to UwbStatus
+ *
+ * @param status
+ * @return ::uwb::protocol::fira::UwbStatus
+ */
+::uwb::protocol::fira::UwbStatus
+To(const UWB_STATUS &status);
+
+/**
+ * @brief Converts UWB_SESSION_STATUS to UwbSessionStatus
+ *
+ * @return ::uwb::protocol::fira::UwbSessionStatus
+ */
+::uwb::protocol::fira::UwbSessionStatus
+To(const UWB_SESSION_STATUS &sessionStatus);
+
+/**
  * @brief Converts UWB_NOTIFICATION_DATA to UwbNotificationData.
  *
  * @param notificationData

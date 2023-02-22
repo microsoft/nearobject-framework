@@ -534,10 +534,111 @@ windows::devices::uwb::ddi::lrp::To(const UWB_DEVICE_CAPABILITIES &deviceCapabil
     return uwbCapability;
 }
 
-UwbNotificationData
-windows::devices::uwb::ddi::lrp::To(const UWB_NOTIFICATION_DATA & /* notificationData */)
+static const std::unordered_map<UWB_DEVICE_STATE, UwbDeviceState> DeviceStateToMap{
+    { UWB_DEVICE_STATE_READY, UwbDeviceState::Ready },
+    { UWB_DEVICE_STATE_ACTIVE, UwbDeviceState::Active },
+    { UWB_DEVICE_STATE_ERROR, UwbDeviceState::Error }
+};
+
+static const std::unordered_map<UWB_STATUS, UwbStatusGeneric> StatusToMapGeneric{
+    { UWB_STATUS_OK, UwbStatusGeneric::Ok },
+    { UWB_STATUS_REJECTED, UwbStatusGeneric::Rejected },
+    { UWB_STATUS_FAILED, UwbStatusGeneric::Failed },
+    { UWB_STATUS_SYNTAX_ERROR, UwbStatusGeneric::SyntaxError },
+    { UWB_STATUS_INVALID_PARAM, UwbStatusGeneric::InvalidParameter },
+    { UWB_STATUS_INVALID_RANGE, UwbStatusGeneric::InvalidRange },
+    { UWB_STATUS_INVALID_MESSAGE_SIZE, UwbStatusGeneric::InvalidMessageSize },
+    { UWB_STATUS_UNKNOWN_GID, UwbStatusGeneric::UnknownGid },
+    { UWB_STATUS_UNKNOWN_OID, UwbStatusGeneric::UnknownOid },
+    { UWB_STATUS_READ_ONLY, UwbStatusGeneric::ReadOnly },
+    { UWB_STATUS_COMMAND_RETRY, UwbStatusGeneric::CommandRetry },
+};
+static const std::unordered_map<UWB_STATUS, UwbStatusSession> StatusToMapSession{
+    { UWB_STATUS_ERROR_SESSION_NOT_EXIST, UwbStatusSession::NotExist },
+    { UWB_STATUS_ERROR_SESSION_DUPLICATE, UwbStatusSession::Duplicate },
+    { UWB_STATUS_ERROR_SESSION_ACTIVE, UwbStatusSession::Active },
+    { UWB_STATUS_ERROR_MAX_SESSIONS_EXCEEDED, UwbStatusSession::MaxSessionsExceeded },
+    { UWB_STATUS_ERROR_SESSION_NOT_CONFIGURED, UwbStatusSession::NotConfigured },
+    { UWB_STATUS_ERROR_ACTIVE_SESSIONS_ONGOING, UwbStatusSession::ActiveSessionsOngoing },
+    { UWB_STATUS_ERROR_MULTICAST_LIST_FULL, UwbStatusSession::MulticastListFull },
+    { UWB_STATUS_ERROR_ADDRESS_NOT_FOUND, UwbStatusSession::AddressNotFound },
+    { UWB_STATUS_ERROR_ADDRESS_ALREADY_PRESENT, UwbStatusSession::AddressAlreadyPresent },
+};
+static const std::unordered_map<UWB_STATUS, UwbStatusRanging> StatusToMapRanging{
+    { UWB_STATUS_RANGING_TX_FAILED, UwbStatusRanging::TxFailed },
+    { UWB_STATUS_RANGING_RX_TIMEOUT, UwbStatusRanging::RxTimeout },
+    { UWB_STATUS_RANGING_RX_PHY_DEC_FAILED, UwbStatusRanging::RxPhyDecodingFailed },
+    { UWB_STATUS_RANGING_RX_PHY_TOA_FAILED, UwbStatusRanging::RxPhyToaFailed },
+    { UWB_STATUS_RANGING_RX_PHY_STS_FAILED, UwbStatusRanging::RxPhyStsFailed },
+    { UWB_STATUS_RANGING_RX_MAC_DEC_FAILED, UwbStatusRanging::MacDecodingFailed },
+    { UWB_STATUS_RANGING_RX_MAC_IE_DEC_FAILED, UwbStatusRanging::RxMacIeDecodingFailed },
+    { UWB_STATUS_RANGING_RX_MAC_IE_MISSING, UwbStatusRanging::RxMacIeMissing },
+};
+
+static const std::unordered_map<UWB_SESSION_STATE, UwbSessionState> SessionStateToMap{
+    { UWB_SESSION_STATE_INIT, UwbSessionState::Initialized },
+    { UWB_SESSION_STATE_DEINIT, UwbSessionState::Deinitialized },
+    { UWB_SESSION_STATE_ACTIVE, UwbSessionState::Active },
+    { UWB_SESSION_STATE_IDLE, UwbSessionState::Idle },
+};
+
+static const std::unordered_map<UWB_SESSION_REASON_CODE, UwbSessionReasonCode> SessionReasonCodeToMap{
+    { UWB_SESSION_REASON_CODE_STATE_CHANGE_WITH_SESSION_MANAGEMENT_COMMANDS, UwbSessionReasonCode::StateChangeWithSessionManagementCommands },
+    { UWB_SESSION_REASON_CODE_MAX_RANGING_ROUND_RETRY_COUNT_REACHED, UwbSessionReasonCode::MaxRangignRoundRetryCountReached },
+    { UWB_SESSION_REASON_CODE_MAX_NUMBER_OF_MEASUREMENTS_REACHED, UwbSessionReasonCode::MaxNumberOfMeasurementsReached },
+    { UWB_SESSION_REASON_CODE_ERROR_SLOT_LENGTH_NOT_SUPPORTED, UwbSessionReasonCode::ErrorSlotLengthNotSupported },
+    { UWB_SESSION_REASON_CODE_ERROR_INSUFFICIENT_SLOTS_PER_RR, UwbSessionReasonCode::ErrorInsufficientSlotsPerRangingRound },
+    { UWB_SESSION_REASON_CODE_ERROR_MAC_ADDRESS_MODE_NOT_SUPPORTED, UwbSessionReasonCode::ErrorMacAddressModeNotSupported },
+    { UWB_SESSION_REASON_CODE_ERROR_INVALID_RANGING_INTERVAL, UwbSessionReasonCode::ErrorInvalidRangingInterval },
+    { UWB_SESSION_REASON_CODE_ERROR_INVALID_STS_CONFIG, UwbSessionReasonCode::ErrorInvalidStsConfiguration },
+    { UWB_SESSION_REASON_CODE_ERROR_INVALID_RFRAME_CONFIG, UwbSessionReasonCode::ErrorInvalidRFrameConfiguration },
+};
+
+UwbStatusDevice
+windows::devices::uwb::ddi::lrp::To(const UWB_DEVICE_STATUS &deviceStatus)
 {
-    UwbNotificationData uwbNotificationData{};
-    // TODO: implement this
-    return uwbNotificationData;
+    return UwbStatusDevice{ .State = DeviceStateToMap.at(deviceStatus.deviceState) };
+}
+
+UwbStatus
+windows::devices::uwb::ddi::lrp::To(const UWB_STATUS &genericError)
+{
+    auto enumId = notstd::to_underlying(genericError);
+    if (enumId < notstd::to_underlying(UWB_STATUS_ERROR_SESSION_NOT_EXIST)) {
+        return StatusToMapGeneric.at(genericError);
+    }
+    if (enumId < notstd::to_underlying(UWB_STATUS_RANGING_TX_FAILED)) {
+        return StatusToMapSession.at(genericError);
+    }
+    return StatusToMapRanging.at(genericError);
+}
+
+UwbSessionStatus
+windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_STATUS &sessionStatus)
+{
+    return UwbSessionStatus{ .SessionId = sessionStatus.sessionId,
+        .State = SessionStateToMap.at(sessionStatus.state),
+        .ReasonCode = SessionReasonCodeToMap.at(sessionStatus.reasonCode) };
+}
+
+UwbNotificationData
+windows::devices::uwb::ddi::lrp::To(const UWB_NOTIFICATION_DATA &notificationData)
+{
+    switch (notificationData.notificationType) {
+    case UWB_NOTIFICATION_TYPE_DEVICE_STATUS: {
+        return To(notificationData.deviceStatus);
+    }
+    case UWB_NOTIFICATION_TYPE_GENERIC_ERROR: {
+        return To(notificationData.genericError);
+    }
+    case UWB_NOTIFICATION_TYPE_SESSION_STATUS: {
+        return To(notificationData.sessionStatus);
+    }
+    case UWB_NOTIFICATION_TYPE_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST: {
+        break;
+    }
+    case UWB_NOTIFICATION_TYPE_RANGING_DATA:
+        break;
+    }
+    return UwbNotificationData{};
 }
