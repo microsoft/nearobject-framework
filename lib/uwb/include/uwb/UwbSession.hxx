@@ -20,8 +20,8 @@ struct UwbSessionEventCallbacks;
  */
 enum class UwbSessionEndReason {
     /**
-     * @brief The session owner stopped the session. 
-     * 
+     * @brief The session owner stopped the session.
+     *
      * This is the reason used when the session ends naturally.
      */
     Stopped,
@@ -50,7 +50,7 @@ class UwbSession
 public:
     /**
      * @brief Construct a new UwbSession object.
-     * 
+     *
      * @param callbacks The callbacks to invoke for session events.
      */
     UwbSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks);
@@ -62,18 +62,18 @@ public:
 
     /**
      * @brief Get the unique session id.
-     * 
-     * @return uint32_t 
+     *
+     * @return uint32_t
      */
     uint32_t
     GetId() const noexcept;
 
     /**
      * @brief Configure the session for use.
-     * 
+     *
      * TODO: This probably needs to return something to indicate whether it was
      * successful or not.
-     * 
+     *
      * @param uwbSessionData The session configuration to use. This should have
      * been obtained as a result of out-of-band negotiation.
      */
@@ -82,7 +82,7 @@ public:
 
     /**
      * @brief Set the type of mac address to be used for session participants.
-     * 
+     *
      * @param uwbMacAddressType The type of mac address to use.
      */
     void
@@ -90,7 +90,7 @@ public:
 
     /**
      * @brief Add a peer to this session.
-     * 
+     *
      * @param peerMacAddress The mac address of the peer. This is expected to be
      * in the mac address format configured for the session.
      */
@@ -98,16 +98,31 @@ public:
     AddPeer(UwbMacAddress peerMacAddress);
 
     /**
-     * @brief 
+     * @brief
      */
     void
     StartRanging();
 
     /**
-     * @brief 
+     * @brief
      */
     void
     StopRanging();
+
+    /**
+     * @brief Set the Session Status object
+     *
+     */
+    void
+    SetSessionStatus(const uwb::protocol::fira::UwbSessionStatus&);
+
+    /**
+     * @brief Get the Session Status object
+     *
+     * @return const UwbSessionStatus&
+     */
+    const uwb::protocol::fira::UwbSessionStatus&
+    GetSessionStatus();
 
 private:
     virtual void
@@ -124,6 +139,7 @@ private:
 
 protected:
     uint32_t m_sessionId{ 0 };
+    uwb::protocol::fira::UwbSessionStatus m_sessionStatus;
     UwbMacAddressType m_uwbMacAddressType{ UwbMacAddressType::Extended };
     UwbMacAddress m_uwbMacAddressSelf;
     std::atomic<bool> m_rangingActive{ false };

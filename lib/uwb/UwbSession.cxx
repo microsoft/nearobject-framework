@@ -70,3 +70,15 @@ UwbSession::StopRanging()
         return;
     }
 }
+
+void
+UwbSession::SetSessionStatus(const uwb::protocol::fira::UwbSessionStatus& status)
+{
+    m_sessionStatus = status;
+}
+
+const uwb::protocol::fira::UwbSessionStatus&
+UwbSession::GetSessionStatus()
+{
+    return m_sessionStatus;
+}

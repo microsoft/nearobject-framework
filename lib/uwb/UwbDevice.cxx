@@ -61,7 +61,7 @@ UwbDevice::OnSessionStatusChanged(UwbSessionStatus statusSession)
         return;
     }
 
-    // TODO: implement this
+    session->SetSessionStatus(statusSession);
 }
 
 void
