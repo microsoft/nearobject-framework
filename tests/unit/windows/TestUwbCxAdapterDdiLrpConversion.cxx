@@ -88,18 +88,6 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
 
     SECTION("UwbMulticastListStatus is stable")
     {
-    }
-
-    SECTION("UwbSessionUpdateMulticastListEntry is stable")
-    {
-    }
-
-    SECTION("UwbSessionUpdateMulicastList is stable")
-    {
-    }
-
-    SECTION("UwbSessionUpdateMulicastListStatus is stable")
-    {
         for (const auto& uwbStatusMulticast : magic_enum::enum_values<UwbStatusMulticast>()) {
             UwbMulticastListStatus uwbMulticastListStatus{
                 .ControleeMacAddress = ::uwb::UwbMacAddress::Random<::uwb::UwbMacAddressType::Short>(),
@@ -108,6 +96,22 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
             };
             test::ValidateRoundtrip(uwbMulticastListStatus);
         }
+    }
+
+    SECTION("UwbSessionUpdateMulticastListEntry is stable")
+    {
+        UwbSessionUpdateMulticastListEntry uwbSessionUpdateMulticastListEntry{
+            .ControleeMacAddress = ::uwb::UwbMacAddress::Random<::uwb::UwbMacAddressType::Short>(),
+            .SubSessionId = RandomDistribution(RandomEngine)
+        };
+    }
+
+    SECTION("UwbSessionUpdateMulicastList is stable")
+    {
+    }
+
+    SECTION("UwbSessionUpdateMulicastListStatus is stable")
+    {
     }
 
     SECTION("UwbRangingMeasurementType is stable")
