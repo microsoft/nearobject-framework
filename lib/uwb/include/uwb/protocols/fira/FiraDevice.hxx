@@ -475,8 +475,11 @@ struct UwbSessionUpdateMulicastListStatus
 struct UwbSessionStatus
 {
     uint32_t SessionId;
-    UwbSessionState State;
+    UwbSessionState State{ UwbSessionState::Deinitialized };
     std::optional<UwbSessionReasonCode> ReasonCode;
+
+    auto
+    operator<=>(const UwbSessionStatus&) const noexcept = default;
 
     /**
      * @brief Returns a string representation of the object.

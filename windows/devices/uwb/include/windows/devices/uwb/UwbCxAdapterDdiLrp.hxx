@@ -2,6 +2,8 @@
 #ifndef UWB_CX_ADAPTER_DDI_LRP_HXX
 #define UWB_CX_ADAPTER_DDI_LRP_HXX
 
+#include <notstd/flextype_wrapper.hxx>
+
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/UwbApplicationConfiguration.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
@@ -74,22 +76,26 @@ From(const ::uwb::protocol::fira::UwbMulticastListStatus &uwbStatusMulticastList
 UWB_MULTICAST_CONTROLEE_LIST_ENTRY
 From(const ::uwb::protocol::fira::UwbSessionUpdateMulticastListEntry &uwbSessionUpdateMulticastListEntry);
 
+using UwbSessionUpdateMulicastListWrapper = notstd::flextype_wrapper<UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST, std::remove_extent<decltype(UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST::controleeList)>>;
+
 /**
  * @brief Converts UwbSessionUpdateMulicastList to UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST.
  *
  * @param uwbSessionUpdateMulicastList
- * @return UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST
+ * @return UwbSessionUpdateMulicastListWrapper 
  */
-UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST
+UwbSessionUpdateMulicastListWrapper
 From(const ::uwb::protocol::fira::UwbSessionUpdateMulicastList &uwbSessionUpdateMulicastList);
+
+using UwbSessionUpdateMulicastListStatusWrapper = notstd::flextype_wrapper<UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF, std::remove_extent<decltype(UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF::statusList)>>;
 
 /**
  * @brief Converts UwbSessionUpdateMulicastListStatus to UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF.
  *
  * @param uwbSessionUpdateMulicastListStatus
- * @return UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF
+ * @return UwbSessionUpdateMulicastListStatusWrapper 
  */
-UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF
+UwbSessionUpdateMulicastListStatusWrapper
 From(const ::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus &uwbSessionUpdateMulicastListStatus);
 
 /**
@@ -137,22 +143,26 @@ From(const ::uwb::protocol::fira::UwbSessionState uwbSessionState);
 UWB_SESSION_STATUS
 From(const ::uwb::protocol::fira::UwbSessionStatus &uwbSessionStatus);
 
+using UwbDeviceInformationWrapper = notstd::flextype_wrapper<UWB_DEVICE_INFO, std::remove_extent<decltype(UWB_DEVICE_INFO::vendorSpecificInfo)>>;
+
 /**
  * @brief Converts UwbDeviceInformation to UWB_DEVICE_INFO.
  *
  * @param uwbDeviceInfo
- * @return UWB_DEVICE_INFO
+ * @return UwbDeviceInformationWrapper
  */
-UWB_DEVICE_INFO
+UwbDeviceInformationWrapper
 From(const ::uwb::protocol::fira::UwbDeviceInformation &uwbDeviceInfo);
+
+using UwbDeviceCapabilitiesWrapper = notstd::flextype_wrapper<UWB_DEVICE_CAPABILITIES, std::remove_extent<decltype(UWB_DEVICE_CAPABILITIES::capabilityParams)>>;
 
 /**
  * @brief Converts UwbCapability to UWB_DEVICE_CAPABILITIES.
  *
  * @param uwbDeviceCapabilities
- * @return UWB_DEVICE_CAPABILITIES
+ * @return UwbDeviceCapabilitiesWrapper
  */
-UWB_DEVICE_CAPABILITIES
+UwbDeviceCapabilitiesWrapper
 From(const ::uwb::protocol::fira::UwbCapability &uwbDeviceCapabilities);
 
 /**
@@ -173,13 +183,15 @@ From(const ::uwb::protocol::fira::UwbStatusDevice &uwbStatusDevice);
 UWB_DEVICE_CONFIG_PARAM_TYPE
 From(const ::uwb::protocol::fira::UwbDeviceConfigurationParameterType &uwbDeviceConfigurationParameterType);
 
+using UwbRangingDataWrapper = notstd::flextype_wrapper<UWB_RANGING_DATA, std::remove_extent<decltype(UWB_RANGING_DATA::rangingMeasurements)>>;
+
 /**
  * @brief Converts UwbRangingData to UWB_RANGING_DATA.
  *
  * @param uwbRangingData
- * @return UWB_RANGING_DATA
+ * @return UwbRangingDataWrapper
  */
-UWB_RANGING_DATA
+UwbRangingDataWrapper
 From(const ::uwb::protocol::fira::UwbRangingData &uwbRangingData);
 
 /**
