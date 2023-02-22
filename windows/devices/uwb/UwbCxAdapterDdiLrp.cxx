@@ -13,6 +13,7 @@
 #include <plog/Log.h>
 #include <wil/common.h>
 
+#include <uwb/UwbMacAddress.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 
@@ -627,7 +628,7 @@ windows::devices::uwb::ddi::lrp::To(const UWB_DEVICE_CONFIG_PARAM_TYPE &deviceCo
 {
     static const std::unordered_map<UWB_DEVICE_CONFIG_PARAM_TYPE, UwbDeviceConfigurationParameterType> ConfigParamMap{
         { UWB_DEVICE_CONFIG_PARAM_TYPE_DEVICE_STATE, UwbDeviceConfigurationParameterType::DeviceState },
-        { UWB_DEVICE_CONFIG_PARAM_TYPE_LOW_POWER_MODE, UwbDeviceConfigurationParameterType::LowPowerMode  },
+        { UWB_DEVICE_CONFIG_PARAM_TYPE_LOW_POWER_MODE, UwbDeviceConfigurationParameterType::LowPowerMode },
     };
 
     return ConfigParamMap.at(deviceConfigurationParameterType);
@@ -667,6 +668,22 @@ windows::devices::uwb::ddi::lrp::To(const UWB_MULTICAST_STATUS &statusMulticast)
     };
 
     return StatusMap.at(statusMulticast);
+}
+
+UwbMulticastListStatus
+windows::devices::uwb::ddi::lrp::To(const UWB_MULTICAST_LIST_STATUS &multicastListStatus)
+{
+    ::uwb::UwbMacAddress controleeMacAddress{ std::array<uint8_t, ::uwb::UwbMacAddressLength::Short>{ 
+        (multicastListStatus.controleeMacAddress & 0x00FFU) >> 0U,
+        (multicastListStatus.controleeMacAddress & 0xFF00U) >> 8U,
+    }};
+
+    UwbMulticastListStatus uwbMulticastListStatus{};
+    uwbMulticastListStatus.ControleeMacAddress = std::move(controleeMacAddress);
+    uwbMulticastListStatus.SubSessionId = multicastListStatus.subSessionId;
+    uwbMulticastListStatus.Status = To(multicastListStatus.status);
+
+    return uwbMulticastListStatus;
 }
 
 UwbSessionState
@@ -725,7 +742,7 @@ windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM_TYPE &appConfigPa
         { UWB_APP_CONFIG_PARAM_TYPE_SLOT_DURATION, UwbApplicationConfigurationParameterType::SlotDuration },
         { UWB_APP_CONFIG_PARAM_TYPE_RANGING_INTERVAL, UwbApplicationConfigurationParameterType::RangingInterval },
         { UWB_APP_CONFIG_PARAM_TYPE_STS_INDEX, UwbApplicationConfigurationParameterType::StsIndex },
-        { UWB_APP_CONFIG_PARAM_TYPE_MAC_FCS_TYPE, UwbApplicationConfigurationParameterType::MacFcsType,  },
+        { UWB_APP_CONFIG_PARAM_TYPE_MAC_FCS_TYPE, UwbApplicationConfigurationParameterType::MacFcsType },
         { UWB_APP_CONFIG_PARAM_TYPE_RANGING_ROUND_CONTROL, UwbApplicationConfigurationParameterType::RangingRoundControl },
         { UWB_APP_CONFIG_PARAM_TYPE_AOA_RESULT_REQ, UwbApplicationConfigurationParameterType::AoAResultRequest },
         { UWB_APP_CONFIG_PARAM_TYPE_RANGE_DATA_NTF_CONFIG, UwbApplicationConfigurationParameterType::RangeDataNotificationConfig },
