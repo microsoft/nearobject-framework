@@ -671,6 +671,16 @@ windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_STATE &sessionState)
     return SessionStateToMap.at(sessionState);
 }
 
+UwbRangingMeasurementType
+windows::devices::uwb::ddi::lrp::To(const UWB_RANGING_MEASUREMENT_TYPE &rangingMeasurementType)
+{
+    static const std::unordered_map<UWB_RANGING_MEASUREMENT_TYPE, UwbRangingMeasurementType> RangingTypeMap{
+        { UWB_RANGING_MEASUREMENT_TYPE_TWO_WAY, UwbRangingMeasurementType::TwoWay },
+    };
+
+    return RangingTypeMap.at(rangingMeasurementType);
+}
+
 UwbSessionReasonCode
 windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_REASON_CODE &sessionReasonCode)
 {
@@ -687,6 +697,61 @@ windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_REASON_CODE &sessionReason
     };
 
     return SessionReasonCodeToMap.at(sessionReasonCode);
+}
+
+UwbApplicationConfigurationParameterType
+windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM_TYPE &appConfigParameterType)
+{
+    static const std::unordered_map<UWB_APP_CONFIG_PARAM_TYPE, UwbApplicationConfigurationParameterType> AppConfigParamMap{
+        { UWB_APP_CONFIG_PARAM_TYPE_DEVICE_TYPE, UwbApplicationConfigurationParameterType::DeviceType },
+        { UWB_APP_CONFIG_PARAM_TYPE_RANGING_ROUND_USAGE, UwbApplicationConfigurationParameterType::RangingRoundUsage },
+        { UWB_APP_CONFIG_PARAM_TYPE_STS_CONFIG, UwbApplicationConfigurationParameterType::StsConfiguration },
+        { UWB_APP_CONFIG_PARAM_TYPE_MULTI_NODE_MODE, UwbApplicationConfigurationParameterType::MultiNodeMode },
+        { UWB_APP_CONFIG_PARAM_TYPE_CHANNEL_NUMBER, UwbApplicationConfigurationParameterType::ChannelNumber },
+        { UWB_APP_CONFIG_PARAM_TYPE_NUMBER_OF_CONTROLEES, UwbApplicationConfigurationParameterType::NumberOfControlees },
+        { UWB_APP_CONFIG_PARAM_TYPE_DEVICE_MAC_ADDRESS, UwbApplicationConfigurationParameterType::DeviceMacAddress },
+        { UWB_APP_CONFIG_PARAM_TYPE_DST_MAC_ADDRESS, UwbApplicationConfigurationParameterType::ControleeMacAddress },
+        { UWB_APP_CONFIG_PARAM_TYPE_SLOT_DURATION, UwbApplicationConfigurationParameterType::SlotDuration },
+        { UWB_APP_CONFIG_PARAM_TYPE_RANGING_INTERVAL, UwbApplicationConfigurationParameterType::RangingInterval },
+        { UWB_APP_CONFIG_PARAM_TYPE_STS_INDEX, UwbApplicationConfigurationParameterType::StsIndex },
+        { UWB_APP_CONFIG_PARAM_TYPE_MAC_FCS_TYPE, UwbApplicationConfigurationParameterType::MacFcsType,  },
+        { UWB_APP_CONFIG_PARAM_TYPE_RANGING_ROUND_CONTROL, UwbApplicationConfigurationParameterType::RangingRoundControl },
+        { UWB_APP_CONFIG_PARAM_TYPE_AOA_RESULT_REQ, UwbApplicationConfigurationParameterType::AoAResultRequest },
+        { UWB_APP_CONFIG_PARAM_TYPE_RANGE_DATA_NTF_CONFIG, UwbApplicationConfigurationParameterType::RangeDataNotificationConfig },
+        { UWB_APP_CONFIG_PARAM_TYPE_RANGE_DATA_NTF_PROXIMITY_NEAR, UwbApplicationConfigurationParameterType::RangeDataNotificationProximityNear },
+        { UWB_APP_CONFIG_PARAM_TYPE_RANGE_DATA_NTF_PROXIMITY_FAR, UwbApplicationConfigurationParameterType::RangeDataNotificationProximityFar },
+        { UWB_APP_CONFIG_PARAM_TYPE_DEVICE_ROLE, UwbApplicationConfigurationParameterType::DeviceRole },
+        { UWB_APP_CONFIG_PARAM_TYPE_RFRAME_CONFIG, UwbApplicationConfigurationParameterType::RFrameConfiguration },
+        { UWB_APP_CONFIG_PARAM_TYPE_PREAMBLE_CODE_INDEX, UwbApplicationConfigurationParameterType::PreambleCodeIndex },
+        { UWB_APP_CONFIG_PARAM_TYPE_SFD_ID, UwbApplicationConfigurationParameterType::SfdId },
+        { UWB_APP_CONFIG_PARAM_TYPE_PSDU_DATA_RATE, UwbApplicationConfigurationParameterType::PsduDataRate },
+        { UWB_APP_CONFIG_PARAM_TYPE_PREAMBLE_DURATION, UwbApplicationConfigurationParameterType::PreambleDuration },
+        { UWB_APP_CONFIG_PARAM_TYPE_RANGING_TIME_STRUCT, UwbApplicationConfigurationParameterType::RangingTimeStruct },
+        { UWB_APP_CONFIG_PARAM_TYPE_SLOTS_PER_RR, UwbApplicationConfigurationParameterType::SlotsPerRangingRound },
+        { UWB_APP_CONFIG_PARAM_TYPE_TX_ADAPTIVE_PAYLOAD_POWER, UwbApplicationConfigurationParameterType::TxAdaptivePayloadPower },
+        { UWB_APP_CONFIG_PARAM_TYPE_RESPONDER_SLOT_INDEX, UwbApplicationConfigurationParameterType::ResponderSlotIndex },
+        { UWB_APP_CONFIG_PARAM_TYPE_PRF_MODE, UwbApplicationConfigurationParameterType::PrfMode },
+        { UWB_APP_CONFIG_PARAM_TYPE_SCHEDULED_MODE, UwbApplicationConfigurationParameterType::ScheduledMode },
+        { UWB_APP_CONFIG_PARAM_TYPE_KEY_ROTATION, UwbApplicationConfigurationParameterType::KeyRotation },
+        { UWB_APP_CONFIG_PARAM_TYPE_KEY_ROTATION_RATE, UwbApplicationConfigurationParameterType::KeyRotationRate },
+        { UWB_APP_CONFIG_PARAM_TYPE_SESSION_PRIORITY, UwbApplicationConfigurationParameterType::SessionPriority },
+        { UWB_APP_CONFIG_PARAM_TYPE_MAC_ADDRESS_MODE, UwbApplicationConfigurationParameterType::MacAddressMode },
+        { UWB_APP_CONFIG_PARAM_TYPE_VENDOR_ID, UwbApplicationConfigurationParameterType::VendorId },
+        { UWB_APP_CONFIG_PARAM_TYPE_STATIC_STS_IV, UwbApplicationConfigurationParameterType::StaticStsIv },
+        { UWB_APP_CONFIG_PARAM_TYPE_NUMBER_OF_STS_SEGMENTS, UwbApplicationConfigurationParameterType::NumberOfStsSegments },
+        { UWB_APP_CONFIG_PARAM_TYPE_MAX_RR_RETRY, UwbApplicationConfigurationParameterType::MaxRangingRoundRetry },
+        { UWB_APP_CONFIG_PARAM_TYPE_UWB_INITIATION_TIME, UwbApplicationConfigurationParameterType::UwbInitiationTime },
+        { UWB_APP_CONFIG_PARAM_TYPE_HOPPING_MODE, UwbApplicationConfigurationParameterType::HoppingMode },
+        { UWB_APP_CONFIG_PARAM_TYPE_BLOCK_STRIDE_LENGTH, UwbApplicationConfigurationParameterType::BlockStrideLength },
+        { UWB_APP_CONFIG_PARAM_TYPE_RESULT_REPORT_CONFIG, UwbApplicationConfigurationParameterType::ResultReportConfig },
+        { UWB_APP_CONFIG_PARAM_TYPE_IN_BAND_TERMINATION_ATTEMPT_COUNT, UwbApplicationConfigurationParameterType::InBandTerminationAttemptCount },
+        { UWB_APP_CONFIG_PARAM_TYPE_SUB_SESSION_ID, UwbApplicationConfigurationParameterType::SubSessionId },
+        { UWB_APP_CONFIG_PARAM_TYPE_BPRF_PHR_DATA_RATE, UwbApplicationConfigurationParameterType::BprfPhrDataRate },
+        { UWB_APP_CONFIG_PARAM_TYPE_MAX_NUMBER_OF_MEASUREMENTS, UwbApplicationConfigurationParameterType::MaxNumberOfMeasurements },
+        { UWB_APP_CONFIG_PARAM_TYPE_STS_LENGTH, UwbApplicationConfigurationParameterType::StsLength },
+    };
+
+    return AppConfigParamMap.at(appConfigParameterType);
 }
 
 UwbSessionStatus

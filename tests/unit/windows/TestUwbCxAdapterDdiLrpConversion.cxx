@@ -99,6 +99,40 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         }
     }
 
+    SECTION("UwbRangingMeasurementType is stable")
+    {
+        for (const auto& uwbMeasurementType : magic_enum::enum_values<UwbRangingMeasurementType>()) {
+            test::ValidateRoundtrip(uwbMeasurementType);
+        }
+    }
+
+    SECTION("UwbApplicationConfigurationParameterType is stable")
+    {
+        for (const auto& uwbApplicationConfigurationParameterType : magic_enum::enum_values<UwbApplicationConfigurationParameterType>()) {
+            test::ValidateRoundtrip(uwbApplicationConfigurationParameterType);
+        }
+    }
+
+    SECTION("UwbMulticastListStatus is stable")
+    {
+
+    }
+    
+    SECTION("UwbSessionUpdateMulticastListEntry is stable")
+    {
+
+    }
+
+    SECTION("UwbSessionUpdateMulicastList is stable")
+    {
+
+    }
+
+    SECTION("UwbSessionUpdateMulicastListStatus is stable")
+    {
+
+    }
+
     SECTION("UwbSessionStatus is stable")
     {
         // Generate all possible session states.

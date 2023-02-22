@@ -250,9 +250,9 @@ To(const UWB_MULTICAST_ACTION &multicastAction);
 
 /**
  * @brief Converts UWB_MULTICAST_STATUS to UwbStatusMulticast.
- * 
- * @param statusMulticast 
- * @return ::uwb::protocol::fira::UwbStatusMulticast 
+ *
+ * @param statusMulticast
+ * @return ::uwb::protocol::fira::UwbStatusMulticast
  */
 ::uwb::protocol::fira::UwbStatusMulticast
 To(const UWB_MULTICAST_STATUS &statusMulticast);
@@ -275,6 +275,15 @@ To(const UWB_SESSION_STATE &sessionState);
 To(const UWB_SESSION_STATUS &sessionStatus);
 
 /**
+ * @brief Converts UWB_RANGING_MEASUREMENT_TYPE to UwbRangingMeasurementType.
+ *
+ * @param rangingMeasurementType
+ * @return ::uwb::protocol::fira::UwbRangingMeasurementType
+ */
+::uwb::protocol::fira::UwbRangingMeasurementType
+To(const UWB_RANGING_MEASUREMENT_TYPE &rangingMeasurementType);
+
+/**
  * @brief Converts UWB_SESSION_REASON_CODE to UwbSessionReasonCode.
  *
  * @param sessionReasonCode
@@ -282,6 +291,15 @@ To(const UWB_SESSION_STATUS &sessionStatus);
  */
 ::uwb::protocol::fira::UwbSessionReasonCode
 To(const UWB_SESSION_REASON_CODE &sessionReasonCode);
+
+/**
+ * @brief Converts UWB_APP_CONFIG_PARAM_TYPE to UwbApplicationConfigurationParameterType.
+ *
+ * @param appConfigParameterType
+ * @return ::uwb::protocol::fira::UwbApplicationConfigurationParameterType
+ */
+::uwb::protocol::fira::UwbApplicationConfigurationParameterType
+To(const UWB_APP_CONFIG_PARAM_TYPE &appConfigParameterType);
 
 /**
  * @brief Converts UWB_NOTIFICATION_DATA to UwbNotificationData.
