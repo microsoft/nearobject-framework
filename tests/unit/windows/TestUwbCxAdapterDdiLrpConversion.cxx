@@ -78,6 +78,13 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         }
     }
 
+    SECTION("UwbStatusMulticast is stable")
+    {
+        for (const auto& uwbStatusMulticast : magic_enum::enum_values<UwbStatusMulticast>()) {
+            test::ValidateRoundtrip(uwbStatusMulticast);
+        }
+    }
+
     SECTION("UwbSessionState is stable")
     {
         for (const auto& uwbSessionState : magic_enum::enum_values<UwbSessionState>()) {

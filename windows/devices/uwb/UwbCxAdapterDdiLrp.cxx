@@ -646,6 +646,19 @@ windows::devices::uwb::ddi::lrp::To(const UWB_MULTICAST_ACTION &multicastAction)
     return ActionMap.at(multicastAction);
 }
 
+UwbStatusMulticast
+windows::devices::uwb::ddi::lrp::To(const UWB_MULTICAST_STATUS &statusMulticast)
+{
+    static const std::unordered_map<UWB_MULTICAST_STATUS, UwbStatusMulticast> StatusMap{
+        { UWB_MULTICAST_STATUS_OK_MULTICAST_LIST_UPDATE, UwbStatusMulticast::OkUpdate },
+        { UWB_MULTICAST_STATUS_ERROR_MULTICAST_LIST_FULL, UwbStatusMulticast::ErrorListFull },
+        { UWB_MULTICAST_STATUS_ERROR_KEY_FETCH_FAIL, UwbStatusMulticast::ErrorKeyFetchFail },
+        { UWB_MULTICAST_STATUS_ERROR_SUB_SESSION_ID_NOT_FOUND, UwbStatusMulticast::ErrorSubSessionIdNotFound },
+    };
+
+    return StatusMap.at(statusMulticast);
+}
+
 UwbSessionState
 windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_STATE &sessionState)
 {
