@@ -622,6 +622,17 @@ windows::devices::uwb::ddi::lrp::To(const UWB_DEVICE_STATUS &deviceStatus)
     };
 }
 
+UwbDeviceConfigurationParameterType
+windows::devices::uwb::ddi::lrp::To(const UWB_DEVICE_CONFIG_PARAM_TYPE &deviceConfigurationParameterType)
+{
+    static const std::unordered_map<UWB_DEVICE_CONFIG_PARAM_TYPE, UwbDeviceConfigurationParameterType> ConfigParamMap{
+        { UWB_DEVICE_CONFIG_PARAM_TYPE_DEVICE_STATE, UwbDeviceConfigurationParameterType::DeviceState },
+        { UWB_DEVICE_CONFIG_PARAM_TYPE_LOW_POWER_MODE, UwbDeviceConfigurationParameterType::LowPowerMode  },
+    };
+
+    return ConfigParamMap.at(deviceConfigurationParameterType);
+}
+
 UwbDeviceState
 windows::devices::uwb::ddi::lrp::To(const UWB_DEVICE_STATE &deviceState)
 {

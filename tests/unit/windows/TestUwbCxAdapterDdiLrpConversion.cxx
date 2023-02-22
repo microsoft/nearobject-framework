@@ -139,7 +139,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         for (const auto& uwbSessionState : magic_enum::enum_values<UwbSessionState>()) {
             // Generate all possible session reason codes.
             for (const auto& uwbSessionReasonCode : magic_enum::enum_values<UwbSessionReasonCode>()) {
-                UwbSessionStatus uwbSessionStatus{
+                const UwbSessionStatus uwbSessionStatus{
                     .SessionId = RandomDistribution(RandomEngine),
                     .State = uwbSessionState,
                     .ReasonCode = uwbSessionReasonCode
@@ -161,12 +161,22 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
 
     SECTION("UwbStatusDevice is stable")
     {
-
+        for (const auto& uwbDeviceState : magic_enum::enum_values<UwbDeviceState>()) {
+            // Avoid roundtrip test for neutral enum value which has no corresponding DDI value.
+            if (uwbDeviceState != UwbDeviceState::Uninitialized) {
+                const UwbStatusDevice uwbStatusDevice{
+                    .State = uwbDeviceState
+                };
+                test::ValidateRoundtrip(uwbStatusDevice);
+            }
+        }
     }
 
     SECTION("UwbDeviceConfigurationParameterType is stable")
     {
-
+        for (const auto& uwbDeviceConfigurationParameterType : magic_enum::enum_values<UwbDeviceConfigurationParameterType>()) {
+            test::ValidateRoundtrip(uwbDeviceConfigurationParameterType);
+        }
     }
 
     SECTION("UwbRangingData is stable")

@@ -222,6 +222,15 @@ To(const UWB_DEVICE_CAPABILITIES &deviceCapabilities);
 To(const UWB_DEVICE_STATUS &deviceStatus);
 
 /**
+ * @brief Converts UWB_DEVICE_CONFIG_PARAM_TYPE to UwbDeviceConfigurationParameterType.
+ * 
+ * @param deviceConfigurationParameterType 
+ * @return ::uwb::protocol::fira::UwbDeviceConfigurationParameterType 
+ */
+::uwb::protocol::fira::UwbDeviceConfigurationParameterType
+To(const UWB_DEVICE_CONFIG_PARAM_TYPE &deviceConfigurationParameterType);
+
+/**
  * @brief Converts UWB_STATUS to UwbStatus.
  *
  * @param status
