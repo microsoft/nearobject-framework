@@ -5,6 +5,8 @@
 #include <plog/Log.h>
 #include <uwb/UwbDevice.hxx>
 
+#include <magic_enum.hpp>
+
 using namespace uwb;
 using namespace uwb::protocol::fira;
 
@@ -33,13 +35,22 @@ UwbDevice::GetSession(uint32_t sessionId)
 }
 
 void
-UwbDevice::OnStatusChanged([[maybe_unused]] UwbStatus status)
+UwbDevice::OnStatusChanged(UwbStatus status)
 {
-    // TODO: implement this
+    m_lastError = status;
+    std::visit([&status](auto&& arg) {
+        using T = std::decay_t<decltype(arg)>;
+        if constexpr (std::is_enum_v<T>) {
+            PLOG_VERBOSE << magic_enum::enum_name(arg);
+        } else {
+            PLOG_WARNING << "unknown UwbStatus variant value encountered";
+        }
+    },
+        status);
 }
 
 void
-UwbDevice::OnDeviceStatusChanged([[maybe_unused]] UwbStatusDevice statusDevice)
+UwbDevice::OnDeviceStatusChanged(UwbStatusDevice statusDevice)
 {
     if (m_status.State == UwbDeviceState::Uninitialized) {
         m_status = statusDevice;
