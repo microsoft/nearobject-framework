@@ -627,16 +627,16 @@ windows::devices::uwb::ddi::lrp::To(const UWB_DEVICE_STATUS &deviceStatus)
 }
 
 UwbStatus
-windows::devices::uwb::ddi::lrp::To(const UWB_STATUS &genericError)
+windows::devices::uwb::ddi::lrp::To(const UWB_STATUS &status)
 {
-    auto enumId = notstd::to_underlying(genericError);
+    auto enumId = notstd::to_underlying(status);
     if (enumId < notstd::to_underlying(UWB_STATUS_ERROR_SESSION_NOT_EXIST)) {
-        return StatusToMapGeneric.at(genericError);
+        return StatusToMapGeneric.at(status);
     }
     if (enumId < notstd::to_underlying(UWB_STATUS_RANGING_TX_FAILED)) {
-        return StatusToMapSession.at(genericError);
+        return StatusToMapSession.at(status);
     }
-    return StatusToMapRanging.at(genericError);
+    return StatusToMapRanging.at(status);
 }
 
 UwbSessionStatus
