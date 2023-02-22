@@ -139,7 +139,7 @@ private:
 
 protected:
     uint32_t m_sessionId{ 0 };
-    uwb::protocol::fira::UwbSessionStatus m_sessionStatus;
+    uwb::protocol::fira::UwbSessionStatus m_sessionStatus{};
     UwbMacAddressType m_uwbMacAddressType{ UwbMacAddressType::Extended };
     UwbMacAddress m_uwbMacAddressSelf;
     std::atomic<bool> m_rangingActive{ false };
