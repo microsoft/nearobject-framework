@@ -342,6 +342,9 @@ struct UwbStatusDevice
 {
     UwbDeviceState State;
 
+    auto
+    operator<=>(const UwbStatusDevice&) const noexcept = default;
+
     /**
      * @brief Returns a string representation of the object.
      *
@@ -372,6 +375,9 @@ struct UwbDeviceInformation
     UwbVersion VersionPhy;
     UwbStatus Status;
     std::shared_ptr<UwbDeviceInfoVendor> VendorSpecificInfo;
+
+    auto
+    operator<=>(const UwbDeviceInformation&) const noexcept = default;
 };
 
 struct UwbDeviceConfigurationParameter
@@ -431,6 +437,9 @@ struct UwbMulticastListStatus
     uint32_t SubSessionId;
     UwbStatusMulticast Status;
 
+    auto
+    operator<=>(const UwbMulticastListStatus&) const noexcept = default;
+
     /**
      * @brief Returns a string representation of the object.
      *
@@ -449,6 +458,9 @@ struct UwbSessionUpdateMulticastListEntry
 {
     UwbMacAddress ControleeMacAddress;
     uint32_t SubSessionId;
+
+    auto
+    operator<=>(const UwbSessionUpdateMulticastListEntry&) const noexcept = default;
 };
 
 struct UwbSessionUpdateMulicastList
@@ -456,12 +468,18 @@ struct UwbSessionUpdateMulicastList
     uint32_t SessionId;
     UwbMulticastAction Action;
     std::vector<UwbSessionUpdateMulticastListEntry> Controlees;
+
+    auto
+    operator<=>(const UwbSessionUpdateMulicastList&) const noexcept = default;
 };
 
 struct UwbSessionUpdateMulicastListStatus
 {
     uint32_t SessionId;
     std::vector<UwbMulticastListStatus> Status;
+
+    auto
+    operator<=>(const UwbSessionUpdateMulicastListStatus&) const noexcept = default;
 
     /**
      * @brief Returns a string representation of the object.
@@ -496,6 +514,9 @@ struct UwbRangingMeasurementData
     std::optional<uint8_t> FigureOfMerit;
     decltype(FigureOfMerit)& FoM = FigureOfMerit;
 
+    auto
+    operator<=>(const UwbRangingMeasurementData&) const noexcept = default;
+
     /**
      * @brief Returns a string representation of the object.
      *
@@ -517,6 +538,9 @@ struct UwbRangingMeasurement
     UwbRangingMeasurementData AoaDestinationAzimuth;
     UwbRangingMeasurementData AoaDestinationElevation;
 
+    auto
+    operator<=>(const UwbRangingMeasurement&) const noexcept = default;
+
     /**
      * @brief Returns a string representation of the object.
      *
@@ -533,6 +557,9 @@ struct UwbRangingData
     uint32_t CurrentRangingInterval;
     UwbRangingMeasurementType RangingMeasurementType;
     std::vector<UwbRangingMeasurement> RangingMeasurements;
+
+    auto
+    operator<=>(const UwbRangingData&) const noexcept = default;
 
     /**
      * @brief Returns a string representation of the object.
