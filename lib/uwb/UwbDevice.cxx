@@ -35,26 +35,22 @@ UwbDevice::GetSession(uint32_t sessionId)
 }
 
 void
-UwbDevice::OnStatusChanged([[maybe_unused]] UwbStatus status)
+UwbDevice::OnStatusChanged(UwbStatus status)
 {
     m_lastError = status;
     std::visit([&status](auto&& arg) {
         using T = std::decay_t<decltype(arg)>;
-        if constexpr (std::is_same_v<T, UwbStatusGeneric>) {
-            PLOG_VERBOSE << magic_enum::enum_name(arg);
-        } else if constexpr (std::is_same_v<T, UwbStatusSession>) {
-            PLOG_VERBOSE << magic_enum::enum_name(arg);
-        } else if constexpr (std::is_same_v<T, UwbStatusRanging>) {
+        if constexpr (std::is_enum_v<T>) {
             PLOG_VERBOSE << magic_enum::enum_name(arg);
         } else {
-            throw std::runtime_error("unknown UwbStatus variant value encountered");
+            PLOG_WARNING << "unknown UwbStatus variant value encountered";
         }
     },
         status);
 }
 
 void
-UwbDevice::OnDeviceStatusChanged([[maybe_unused]] UwbStatusDevice statusDevice)
+UwbDevice::OnDeviceStatusChanged(UwbStatusDevice statusDevice)
 {
     if (m_status.State == UwbDeviceState::Uninitialized) {
         m_status = statusDevice;
