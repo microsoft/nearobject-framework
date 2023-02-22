@@ -223,9 +223,9 @@ To(const UWB_DEVICE_STATUS &deviceStatus);
 
 /**
  * @brief Converts UWB_DEVICE_CONFIG_PARAM_TYPE to UwbDeviceConfigurationParameterType.
- * 
- * @param deviceConfigurationParameterType 
- * @return ::uwb::protocol::fira::UwbDeviceConfigurationParameterType 
+ *
+ * @param deviceConfigurationParameterType
+ * @return ::uwb::protocol::fira::UwbDeviceConfigurationParameterType
  */
 ::uwb::protocol::fira::UwbDeviceConfigurationParameterType
 To(const UWB_DEVICE_CONFIG_PARAM_TYPE &deviceConfigurationParameterType);
@@ -268,18 +268,18 @@ To(const UWB_MULTICAST_STATUS &statusMulticast);
 
 /**
  * @brief Converts UWB_MULTICAST_LIST_STATUS to UwbMulticastListStatus.
- * 
- * @param multicastListStatus 
- * @return ::uwb::protocol::fira::UwbMulticastListStatus 
+ *
+ * @param multicastListStatus
+ * @return ::uwb::protocol::fira::UwbMulticastListStatus
  */
 ::uwb::protocol::fira::UwbMulticastListStatus
 To(const UWB_MULTICAST_LIST_STATUS &multicastListStatus);
 
 /**
  * @brief Converts UWB_MULTICAST_CONTROLEE_LIST_ENTRY to UwbSessionUpdateMulticastListEntry.
- * 
- * @param sessionUpdateMulticastListEntry 
- * @return ::uwb::protocol::fira::UwbSessionUpdateMulticastListEntry 
+ *
+ * @param sessionUpdateMulticastListEntry
+ * @return ::uwb::protocol::fira::UwbSessionUpdateMulticastListEntry
  */
 ::uwb::protocol::fira::UwbSessionUpdateMulticastListEntry
 To(const UWB_MULTICAST_CONTROLEE_LIST_ENTRY &sessionUpdateMulticastListEntry);
