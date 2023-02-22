@@ -276,6 +276,15 @@ To(const UWB_MULTICAST_STATUS &statusMulticast);
 To(const UWB_MULTICAST_LIST_STATUS &multicastListStatus);
 
 /**
+ * @brief Converts UWB_MULTICAST_CONTROLEE_LIST_ENTRY to UwbSessionUpdateMulticastListEntry.
+ * 
+ * @param sessionUpdateMulticastListEntry 
+ * @return ::uwb::protocol::fira::UwbSessionUpdateMulticastListEntry 
+ */
+::uwb::protocol::fira::UwbSessionUpdateMulticastListEntry
+To(const UWB_MULTICAST_CONTROLEE_LIST_ENTRY &sessionUpdateMulticastListEntry);
+
+/**
  * @brief Converts UWB_SESSION_STATE to UwbSessionState.
  *
  * @param sessionState

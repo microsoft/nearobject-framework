@@ -678,12 +678,29 @@ windows::devices::uwb::ddi::lrp::To(const UWB_MULTICAST_LIST_STATUS &multicastLi
         (multicastListStatus.controleeMacAddress & 0xFF00U) >> 8U,
     }};
 
-    UwbMulticastListStatus uwbMulticastListStatus{};
-    uwbMulticastListStatus.ControleeMacAddress = std::move(controleeMacAddress);
-    uwbMulticastListStatus.SubSessionId = multicastListStatus.subSessionId;
-    uwbMulticastListStatus.Status = To(multicastListStatus.status);
+    UwbMulticastListStatus uwbMulticastListStatus{
+        .ControleeMacAddress = std::move(controleeMacAddress),
+        .SubSessionId = multicastListStatus.subSessionId,
+        .Status = To(multicastListStatus.status)
+    };
 
     return uwbMulticastListStatus;
+}
+
+UwbSessionUpdateMulticastListEntry
+windows::devices::uwb::ddi::lrp::To(const UWB_MULTICAST_CONTROLEE_LIST_ENTRY &sessionUpdateMulticastListEntry)
+{
+    ::uwb::UwbMacAddress controleeMacAddress{ std::array<uint8_t, ::uwb::UwbMacAddressLength::Short>{ 
+        (sessionUpdateMulticastListEntry.shortAddress & 0x00FFU) >> 0U,
+        (sessionUpdateMulticastListEntry.shortAddress & 0xFF00U) >> 8U,
+    }};
+
+    UwbSessionUpdateMulticastListEntry uwbSessionUpdateMulticastListEntry{
+        .ControleeMacAddress = std::move(controleeMacAddress),
+        .SubSessionId = sessionUpdateMulticastListEntry.subSessionId
+    };
+
+    return uwbSessionUpdateMulticastListEntry;
 }
 
 UwbSessionState
