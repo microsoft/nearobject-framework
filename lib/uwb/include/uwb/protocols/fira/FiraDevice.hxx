@@ -302,7 +302,7 @@ enum class UwbDeviceState {
     Ready,
     Active,
     Error,
-    Uninitialized
+    Uninitialized,
 };
 enum class UwbSessionType {
     RangingSession,
