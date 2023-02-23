@@ -183,6 +183,15 @@ From(const ::uwb::protocol::fira::UwbStatusDevice &uwbStatusDevice);
 UWB_DEVICE_CONFIG_PARAM_TYPE
 From(const ::uwb::protocol::fira::UwbDeviceConfigurationParameterType &uwbDeviceConfigurationParameterType);
 
+/**
+ * @brief Converts UwbRangingMeasurement to UWB_RANGING_MEASUREMENT.
+ *
+ * @param uwbRangingMeasurement 
+ * @return UWB_RANGING_MEASUREMENT 
+ */
+UWB_RANGING_MEASUREMENT
+From(const ::uwb::protocol::fira::UwbRangingMeasurement &uwbRangingMeasurement);
+
 using UwbRangingDataWrapper = notstd::flextype_wrapper<UWB_RANGING_DATA, std::remove_extent<decltype(UWB_RANGING_DATA::rangingMeasurements)>>;
 
 /**
@@ -345,6 +354,24 @@ To(const UWB_SESSION_REASON_CODE &sessionReasonCode);
  */
 ::uwb::protocol::fira::UwbApplicationConfigurationParameterType
 To(const UWB_APP_CONFIG_PARAM_TYPE &appConfigParameterType);
+
+/**
+ * @brief Converts UWB_RANGING_MEASUREMENT to UwbRangingMeasurement.
+ * 
+ * @param rangingMeasurement 
+ * @return ::uwb::protocol::fira::UwbRangingMeasurement 
+ */
+::uwb::protocol::fira::UwbRangingMeasurement
+To(const UWB_RANGING_MEASUREMENT &rangingMeasurement);
+
+/**
+ * @brief Converts UWB_RANGING_DATA to UwbRangingData.
+ * 
+ * @param rangingData 
+ * @return ::uwb::protocol::fira::UwbRangingData 
+ */
+::uwb::protocol::fira::UwbRangingData
+To(const UWB_RANGING_DATA &rangingData);
 
 /**
  * @brief Converts UWB_NOTIFICATION_DATA to UwbNotificationData.
