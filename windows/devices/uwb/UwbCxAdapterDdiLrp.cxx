@@ -703,6 +703,23 @@ windows::devices::uwb::ddi::lrp::To(const UWB_MULTICAST_CONTROLEE_LIST_ENTRY &se
     return uwbSessionUpdateMulticastListEntry;
 }
 
+UwbSessionUpdateMulicastList
+windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST &sessionUpdateMulicastList)
+{
+    std::vector<UwbSessionUpdateMulticastListEntry> controlees{};
+    for (std::size_t i = 0; i < sessionUpdateMulicastList.numberOfControlees; i++) {
+        const auto& multicastControleeListEntry = sessionUpdateMulicastList.controleeList[i];
+        controlees.push_back(To(multicastControleeListEntry));
+    }
+
+    UwbSessionUpdateMulicastList uwbSessionUpdateMulicastList{
+        .SessionId = sessionUpdateMulicastList.sessionId,
+        .Action = To(sessionUpdateMulicastList.action),
+        .Controlees = std::move(controlees)
+    };
+    return uwbSessionUpdateMulicastList;
+}
+
 UwbSessionState
 windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_STATE &sessionState)
 {
@@ -714,6 +731,23 @@ windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_STATE &sessionState)
     };
 
     return SessionStateToMap.at(sessionState);
+}
+
+UwbSessionUpdateMulicastListStatus
+windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF &sessionUpdateControllerMulticastListNtf)
+{
+    std::vector<UwbMulticastListStatus> status{}; 
+    for (std::size_t i = 0; i < sessionUpdateControllerMulticastListNtf.numberOfControlees; i++) {
+        const auto& multicastListStatus = sessionUpdateControllerMulticastListNtf.statusList[i];
+        status.push_back(To(multicastListStatus));
+    }
+
+    UwbSessionUpdateMulicastListStatus uwbSessionUpdateMulicastListStatus{
+        .SessionId = sessionUpdateControllerMulticastListNtf.sessionId,
+        .Status = std::move(status)
+    };
+
+    return uwbSessionUpdateMulicastListStatus;
 }
 
 UwbRangingMeasurementType

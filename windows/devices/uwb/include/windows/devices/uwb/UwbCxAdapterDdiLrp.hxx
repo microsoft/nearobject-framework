@@ -285,6 +285,15 @@ To(const UWB_MULTICAST_LIST_STATUS &multicastListStatus);
 To(const UWB_MULTICAST_CONTROLEE_LIST_ENTRY &sessionUpdateMulticastListEntry);
 
 /**
+ * @brief Converts UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST to UwbSessionUpdateMulicastList.
+ * 
+ * @param sessionUpdateMulicastList 
+ * @return ::uwb::protocol::fira::UwbSessionUpdateMulicastList 
+ */
+::uwb::protocol::fira::UwbSessionUpdateMulicastList
+To(const UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST &sessionUpdateMulicastList);
+
+/**
  * @brief Converts UWB_SESSION_STATE to UwbSessionState.
  *
  * @param sessionState
@@ -300,6 +309,15 @@ To(const UWB_SESSION_STATE &sessionState);
  */
 ::uwb::protocol::fira::UwbSessionStatus
 To(const UWB_SESSION_STATUS &sessionStatus);
+
+/**
+ * @brief Converts UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF to UwbSessionUpdateMulicastListStatus.
+ * 
+ * @param sessionUpdateControllerMulticastListNtf 
+ * @return ::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus 
+ */
+::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus
+To(const UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF &sessionUpdateControllerMulticastListNtf);
 
 /**
  * @brief Converts UWB_RANGING_MEASUREMENT_TYPE to UwbRangingMeasurementType.

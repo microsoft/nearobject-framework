@@ -108,10 +108,14 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
 
     SECTION("UwbSessionUpdateMulicastList is stable")
     {
+        UwbSessionUpdateMulicastListStatus uwbSessionUpdateMulicastListStatus{};
+        // TODO
     }
 
     SECTION("UwbSessionUpdateMulicastListStatus is stable")
     {
+        UwbSessionUpdateMulicastListStatus uwbSessionUpdateMulicastListStatus{};
+        // TODO
     }
 
     SECTION("UwbRangingMeasurementType is stable")
