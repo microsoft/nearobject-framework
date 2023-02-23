@@ -129,7 +129,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
                 .Controlees = controlees
             };
 
-            // test::ValidateRoundtrip(uwbSessionUpdateMulicastList);
+            test::ValidateRoundtrip(uwbSessionUpdateMulicastList);
         }
     }
 
@@ -148,7 +148,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
             .Status = std::move(uwbMulticastListStatus)
         };
 
-        // test::ValidateRoundtrip(uwbSessionUpdateMulicastListStatus);
+        test::ValidateRoundtrip(uwbSessionUpdateMulicastListStatus);
     }
 
     SECTION("UwbRangingMeasurementType is stable")
