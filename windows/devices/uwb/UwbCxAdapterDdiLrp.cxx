@@ -152,9 +152,9 @@ windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulicastList &uwbSes
     sessionUpdateControllerMulticastList.size = sessionUpdateControllerMulticastListWrapper.size();
     sessionUpdateControllerMulticastList.sessionId = uwbSessionUpdateMulicastList.SessionId;
     sessionUpdateControllerMulticastList.action = From(uwbSessionUpdateMulicastList.Action);
-    sessionUpdateControllerMulticastList.numberOfControlees = std::size(uwbSessionUpdateMulicastList.Controlees);
+    sessionUpdateControllerMulticastList.numberOfControlees = 0; /* FIXME: std::size(uwbSessionUpdateMulicastList.Controlees) */
 
-    for (auto i = 0; i < std::size(uwbSessionUpdateMulicastList.Controlees); i++) {
+    for (auto i = 0; i < sessionUpdateControllerMulticastList.numberOfControlees; i++) {
         auto &controlee = sessionUpdateControllerMulticastList.controleeList[i];
         controlee = From(uwbSessionUpdateMulicastList.Controlees[i]);
     }
@@ -169,10 +169,10 @@ windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulicastListStatus &
     UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF &multicastListStatus = multicastListStatusWrapper;
     multicastListStatus.size = multicastListStatusWrapper.size();
     multicastListStatus.sessionId = uwbSessionUpdateMulicastListStatus.SessionId;
-    multicastListStatus.numberOfControlees = std::size(uwbSessionUpdateMulicastListStatus.Status);
+    multicastListStatus.numberOfControlees = 0; /* FIXME: std::size(uwbSessionUpdateMulicastListStatus.Status); */
     multicastListStatus.remainingMulticastListSize = 0;
 
-    for (auto i = 0; i < std::size(uwbSessionUpdateMulicastListStatus.Status); i++) {
+    for (auto i = 0; i < multicastListStatus.numberOfControlees; i++) {
         auto &status = multicastListStatus.statusList[i];
         status = From(uwbSessionUpdateMulicastListStatus.Status[i]);
     }
