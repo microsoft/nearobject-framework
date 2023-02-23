@@ -253,6 +253,7 @@ private:
         m_data(reinterpret_cast<uint8_t*>(&m_value), total_size)
     {
         assert(reinterpret_cast<uintptr_t>(&m_value) % alignof(decltype(m_value)) == 0);
+        m_value = value_type{};
     }
 
 private:
