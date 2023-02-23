@@ -82,7 +82,7 @@ using UwbSessionUpdateMulicastListWrapper = notstd::flextype_wrapper<UWB_SESSION
  * @brief Converts UwbSessionUpdateMulicastList to UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST.
  *
  * @param uwbSessionUpdateMulicastList
- * @return UwbSessionUpdateMulicastListWrapper 
+ * @return UwbSessionUpdateMulicastListWrapper
  */
 UwbSessionUpdateMulicastListWrapper
 From(const ::uwb::protocol::fira::UwbSessionUpdateMulicastList &uwbSessionUpdateMulicastList);
@@ -93,7 +93,7 @@ using UwbSessionUpdateMulicastListStatusWrapper = notstd::flextype_wrapper<UWB_S
  * @brief Converts UwbSessionUpdateMulicastListStatus to UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF.
  *
  * @param uwbSessionUpdateMulicastListStatus
- * @return UwbSessionUpdateMulicastListStatusWrapper 
+ * @return UwbSessionUpdateMulicastListStatusWrapper
  */
 UwbSessionUpdateMulicastListStatusWrapper
 From(const ::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus &uwbSessionUpdateMulicastListStatus);
@@ -222,7 +222,16 @@ To(const UWB_DEVICE_CAPABILITIES &deviceCapabilities);
 To(const UWB_DEVICE_STATUS &deviceStatus);
 
 /**
- * @brief Converts UWB_STATUS to UwbStatus
+ * @brief Converts UWB_DEVICE_CONFIG_PARAM_TYPE to UwbDeviceConfigurationParameterType.
+ *
+ * @param deviceConfigurationParameterType
+ * @return ::uwb::protocol::fira::UwbDeviceConfigurationParameterType
+ */
+::uwb::protocol::fira::UwbDeviceConfigurationParameterType
+To(const UWB_DEVICE_CONFIG_PARAM_TYPE &deviceConfigurationParameterType);
+
+/**
+ * @brief Converts UWB_STATUS to UwbStatus.
  *
  * @param status
  * @return ::uwb::protocol::fira::UwbStatus
@@ -231,12 +240,111 @@ To(const UWB_DEVICE_STATUS &deviceStatus);
 To(const UWB_STATUS &status);
 
 /**
- * @brief Converts UWB_SESSION_STATUS to UwbSessionStatus
+ * @brief Converts UWB_DEVICE_STATE to UwbDeviceState.
+ *
+ * @param deviceState
+ * @return ::uwb::protocol::fira::UwbDeviceState
+ */
+::uwb::protocol::fira::UwbDeviceState
+To(const UWB_DEVICE_STATE &deviceState);
+
+/**
+ * @brief Converts UWB_MULTICAST_ACTION to UwbMulticastAction.
+ *
+ * @param multicastAction
+ * @return ::uwb::protocol::fira::UwbMulticastAction
+ */
+::uwb::protocol::fira::UwbMulticastAction
+To(const UWB_MULTICAST_ACTION &multicastAction);
+
+/**
+ * @brief Converts UWB_MULTICAST_STATUS to UwbStatusMulticast.
+ *
+ * @param statusMulticast
+ * @return ::uwb::protocol::fira::UwbStatusMulticast
+ */
+::uwb::protocol::fira::UwbStatusMulticast
+To(const UWB_MULTICAST_STATUS &statusMulticast);
+
+/**
+ * @brief Converts UWB_MULTICAST_LIST_STATUS to UwbMulticastListStatus.
+ *
+ * @param multicastListStatus
+ * @return ::uwb::protocol::fira::UwbMulticastListStatus
+ */
+::uwb::protocol::fira::UwbMulticastListStatus
+To(const UWB_MULTICAST_LIST_STATUS &multicastListStatus);
+
+/**
+ * @brief Converts UWB_MULTICAST_CONTROLEE_LIST_ENTRY to UwbSessionUpdateMulticastListEntry.
+ *
+ * @param sessionUpdateMulticastListEntry
+ * @return ::uwb::protocol::fira::UwbSessionUpdateMulticastListEntry
+ */
+::uwb::protocol::fira::UwbSessionUpdateMulticastListEntry
+To(const UWB_MULTICAST_CONTROLEE_LIST_ENTRY &sessionUpdateMulticastListEntry);
+
+/**
+ * @brief Converts UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST to UwbSessionUpdateMulicastList.
+ *
+ * @param sessionUpdateMulicastList
+ * @return ::uwb::protocol::fira::UwbSessionUpdateMulicastList
+ */
+::uwb::protocol::fira::UwbSessionUpdateMulicastList
+To(const UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST &sessionUpdateMulicastList);
+
+/**
+ * @brief Converts UWB_SESSION_STATE to UwbSessionState.
+ *
+ * @param sessionState
+ * @return ::uwb::protocol::fira::UwbSessionState
+ */
+::uwb::protocol::fira::UwbSessionState
+To(const UWB_SESSION_STATE &sessionState);
+
+/**
+ * @brief Converts UWB_SESSION_STATUS to UwbSessionStatus.
  *
  * @return ::uwb::protocol::fira::UwbSessionStatus
  */
 ::uwb::protocol::fira::UwbSessionStatus
 To(const UWB_SESSION_STATUS &sessionStatus);
+
+/**
+ * @brief Converts UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF to UwbSessionUpdateMulicastListStatus.
+ *
+ * @param sessionUpdateControllerMulticastListNtf
+ * @return ::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus
+ */
+::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus
+To(const UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF &sessionUpdateControllerMulticastListNtf);
+
+/**
+ * @brief Converts UWB_RANGING_MEASUREMENT_TYPE to UwbRangingMeasurementType.
+ *
+ * @param rangingMeasurementType
+ * @return ::uwb::protocol::fira::UwbRangingMeasurementType
+ */
+::uwb::protocol::fira::UwbRangingMeasurementType
+To(const UWB_RANGING_MEASUREMENT_TYPE &rangingMeasurementType);
+
+/**
+ * @brief Converts UWB_SESSION_REASON_CODE to UwbSessionReasonCode.
+ *
+ * @param sessionReasonCode
+ * @return ::uwb::protocol::fira::UwbSessionReasonCode
+ */
+::uwb::protocol::fira::UwbSessionReasonCode
+To(const UWB_SESSION_REASON_CODE &sessionReasonCode);
+
+/**
+ * @brief Converts UWB_APP_CONFIG_PARAM_TYPE to UwbApplicationConfigurationParameterType.
+ *
+ * @param appConfigParameterType
+ * @return ::uwb::protocol::fira::UwbApplicationConfigurationParameterType
+ */
+::uwb::protocol::fira::UwbApplicationConfigurationParameterType
+To(const UWB_APP_CONFIG_PARAM_TYPE &appConfigParameterType);
 
 /**
  * @brief Converts UWB_NOTIFICATION_DATA to UwbNotificationData.
