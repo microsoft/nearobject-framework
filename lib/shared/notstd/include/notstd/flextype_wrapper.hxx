@@ -156,7 +156,9 @@ struct flextype_wrapper
      */
     explicit flextype_wrapper(std::size_t total_size) :
         flextype_wrapper(std::vector<std::uint8_t>(alignof(value_type) + total_size), total_size)
-    {}
+    {
+        m_value = {};
+    }
 
     /**
      * @brief Construct a new flextype_wrapper object copy.
@@ -253,7 +255,6 @@ private:
         m_data(reinterpret_cast<uint8_t*>(&m_value), total_size)
     {
         assert(reinterpret_cast<uintptr_t>(&m_value) % alignof(decltype(m_value)) == 0);
-        m_value = value_type{};
     }
 
 private:
