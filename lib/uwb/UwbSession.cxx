@@ -70,3 +70,10 @@ UwbSession::StopRanging()
         return;
     }
 }
+
+void
+UwbSession::SetSessionStatus(const uwb::protocol::fira::UwbSessionStatus& status)
+{
+    PLOG_VERBOSE << "session changed state: " << m_sessionStatus.ToString() << " --> " << status.ToString();
+    m_sessionStatus = status;
+}
