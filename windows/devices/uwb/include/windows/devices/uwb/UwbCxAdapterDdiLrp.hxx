@@ -286,9 +286,9 @@ To(const UWB_MULTICAST_CONTROLEE_LIST_ENTRY &sessionUpdateMulticastListEntry);
 
 /**
  * @brief Converts UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST to UwbSessionUpdateMulicastList.
- * 
- * @param sessionUpdateMulicastList 
- * @return ::uwb::protocol::fira::UwbSessionUpdateMulicastList 
+ *
+ * @param sessionUpdateMulicastList
+ * @return ::uwb::protocol::fira::UwbSessionUpdateMulicastList
  */
 ::uwb::protocol::fira::UwbSessionUpdateMulicastList
 To(const UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST &sessionUpdateMulicastList);
@@ -312,9 +312,9 @@ To(const UWB_SESSION_STATUS &sessionStatus);
 
 /**
  * @brief Converts UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF to UwbSessionUpdateMulicastListStatus.
- * 
- * @param sessionUpdateControllerMulticastListNtf 
- * @return ::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus 
+ *
+ * @param sessionUpdateControllerMulticastListNtf
+ * @return ::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus
  */
 ::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus
 To(const UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF &sessionUpdateControllerMulticastListNtf);

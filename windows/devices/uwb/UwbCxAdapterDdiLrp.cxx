@@ -708,7 +708,7 @@ windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_UPDATE_CONTROLLER_MULTICAS
 {
     std::vector<UwbSessionUpdateMulticastListEntry> controlees{};
     for (std::size_t i = 0; i < sessionUpdateMulicastList.numberOfControlees; i++) {
-        const auto& multicastControleeListEntry = sessionUpdateMulicastList.controleeList[i];
+        const auto &multicastControleeListEntry = sessionUpdateMulicastList.controleeList[i];
         controlees.push_back(To(multicastControleeListEntry));
     }
 
@@ -717,6 +717,7 @@ windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_UPDATE_CONTROLLER_MULTICAS
         .Action = To(sessionUpdateMulicastList.action),
         .Controlees = std::move(controlees)
     };
+
     return uwbSessionUpdateMulicastList;
 }
 
@@ -736,9 +737,9 @@ windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_STATE &sessionState)
 UwbSessionUpdateMulicastListStatus
 windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF &sessionUpdateControllerMulticastListNtf)
 {
-    std::vector<UwbMulticastListStatus> status{}; 
+    std::vector<UwbMulticastListStatus> status{};
     for (std::size_t i = 0; i < sessionUpdateControllerMulticastListNtf.numberOfControlees; i++) {
-        const auto& multicastListStatus = sessionUpdateControllerMulticastListNtf.statusList[i];
+        const auto &multicastListStatus = sessionUpdateControllerMulticastListNtf.statusList[i];
         status.push_back(To(multicastListStatus));
     }
 
