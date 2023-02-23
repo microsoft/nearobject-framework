@@ -154,7 +154,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulicastList &uwbSes
     sessionUpdateControllerMulticastList.action = From(uwbSessionUpdateMulicastList.Action);
     sessionUpdateControllerMulticastList.numberOfControlees = std::size(uwbSessionUpdateMulicastList.Controlees);
 
-    for (auto i = 0; i < std::size(uwbSessionUpdateMulicastList.Controlees); i++) {
+    for (auto i = 0; i < sessionUpdateControllerMulticastList.numberOfControlees; i++) {
         auto &controlee = sessionUpdateControllerMulticastList.controleeList[i];
         controlee = From(uwbSessionUpdateMulicastList.Controlees[i]);
     }
@@ -172,7 +172,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulicastListStatus &
     multicastListStatus.numberOfControlees = std::size(uwbSessionUpdateMulicastListStatus.Status);
     multicastListStatus.remainingMulticastListSize = 0;
 
-    for (auto i = 0; i < std::size(uwbSessionUpdateMulicastListStatus.Status); i++) {
+    for (auto i = 0; i < multicastListStatus.numberOfControlees; i++) {
         auto &status = multicastListStatus.statusList[i];
         status = From(uwbSessionUpdateMulicastListStatus.Status[i]);
     }
