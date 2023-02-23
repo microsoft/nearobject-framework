@@ -131,6 +131,7 @@ private:
 
 private:
     ::uwb::protocol::fira::UwbStatusDevice m_status{ .State = ::uwb::protocol::fira::UwbDeviceState::Uninitialized };
+    ::uwb::protocol::fira::UwbStatus m_lastError{ ::uwb::protocol::fira::UwbStatusGeneric::Ok };
     std::shared_mutex m_sessionsGate;
     std::unordered_map<uint32_t, std::weak_ptr<uwb::UwbSession>> m_sessions{};
 };
