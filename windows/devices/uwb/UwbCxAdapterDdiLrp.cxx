@@ -420,7 +420,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingMea
     rangingMeasurement.lineOfSightIndicator = From(uwbRangingMeasurement.LineOfSignIndicator);
     rangingMeasurement.distance = uwbRangingMeasurement.Distance;
     rangingMeasurement.aoaAzimuth[0] = (uwbRangingMeasurement.AoAAzimuth.Result & 0x00FFU);
-    rangingMeasurement.aoaAzimuth[1] = (uwbRangingMeasurement.AoAAzimuth.Result & 0xFF00U) >> 8U; // TODO: verify masking
+    rangingMeasurement.aoaAzimuth[1] = (uwbRangingMeasurement.AoAAzimuth.Result & 0xFF00U) >> 8U;
     rangingMeasurement.aoaAzimuthFigureOfMerit = uwbRangingMeasurement.AoAAzimuth.FigureOfMerit.value_or(0);
     rangingMeasurement.aoaElevation[0] = (uwbRangingMeasurement.AoAElevation.Result & 0x00FFU);
     rangingMeasurement.aoaElevation[1] = (uwbRangingMeasurement.AoAElevation.Result & 0xFF00U) >> 8U;
