@@ -138,7 +138,7 @@ std::string
 UwbRangingMeasurementData::ToString() const
 {
     std::ostringstream ss{};
-    ss << Result << " (FoM=" << FigureOfMerit.value_or(0) << ")";
+    ss << Result << " (FoM=" << +FigureOfMerit.value_or(0) << ")";
     return ss.str();
 }
 
@@ -158,7 +158,7 @@ std::string
 UwbRangingMeasurement::ToString() const
 {
     std::ostringstream ss{};
-    ss << "SlotIndex: " << SlotIndex << ", "
+    ss << "SlotIndex: " << +SlotIndex << ", "
        << "Distance: " << Distance << ", "
        << "Status: " << ::ToString(Status) << ", "
        << "Peer Mac Address: " << PeerMacAddress << ", "
