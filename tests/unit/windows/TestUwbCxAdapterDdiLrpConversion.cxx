@@ -323,6 +323,52 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
 
     SECTION("UwbRangingData is stable")
     {
+        for (const auto& uwbRangingMeasurementType : magic_enum::enum_values<UwbRangingMeasurementType>()) {
+            const UwbRangingData uwbRangingData{
+                .SequenceNumber = test::GetRandom<uint32_t>(),
+                .SessionId = test::GetRandom<uint32_t>(),
+                .CurrentRangingInterval = test::GetRandom<uint32_t>(),
+                .RangingMeasurementType = uwbRangingMeasurementType,
+                .RangingMeasurements = {
+                    UwbRangingMeasurement {
+                        .SlotIndex = test::GetRandom<uint8_t>(),
+                        .Distance = test::GetRandom<uint16_t>(),
+                        .Status = UwbStatusGeneric::Rejected,
+                        .PeerMacAddress = ::uwb::UwbMacAddress::Random<::uwb::UwbMacAddressType::Extended>(),
+                        .LineOfSightIndicator = UwbLineOfSightIndicator::LineOfSight,
+                        .AoAAzimuth = test::GetRandomUwbMeasurementData(),
+                        .AoAElevation = test::GetRandomUwbMeasurementData(),
+                        .AoaDestinationAzimuth = test::GetRandomUwbMeasurementData(),
+                        .AoaDestinationElevation = test::GetRandomUwbMeasurementData(),
+                    },
+                    UwbRangingMeasurement {
+                        .SlotIndex = test::GetRandom<uint8_t>(),
+                        .Distance = test::GetRandom<uint16_t>(),
+                        .Status = UwbStatusGeneric::Rejected,
+                        .PeerMacAddress = ::uwb::UwbMacAddress::Random<::uwb::UwbMacAddressType::Short>(),
+                        .LineOfSightIndicator = UwbLineOfSightIndicator::NonLineOfSight,
+                        .AoAAzimuth = test::GetRandomUwbMeasurementData(),
+                        .AoAElevation = test::GetRandomUwbMeasurementData(),
+                        .AoaDestinationAzimuth = test::GetRandomUwbMeasurementData(),
+                        .AoaDestinationElevation = test::GetRandomUwbMeasurementData(),
+                    },
+                    UwbRangingMeasurement {
+                        .SlotIndex = test::GetRandom<uint8_t>(),
+                        .Distance = test::GetRandom<uint16_t>(),
+                        .Status = UwbStatusGeneric::Rejected,
+                        .PeerMacAddress = ::uwb::UwbMacAddress::Random<::uwb::UwbMacAddressType::Short>(),
+                        .LineOfSightIndicator = UwbLineOfSightIndicator::Indeterminant,
+                        .AoAAzimuth = test::GetRandomUwbMeasurementData(),
+                        .AoAElevation = test::GetRandomUwbMeasurementData(),
+                        .AoaDestinationAzimuth = test::GetRandomUwbMeasurementData(),
+                        .AoaDestinationElevation = test::GetRandomUwbMeasurementData(),
+                    },
+                },
+            };
+
+            test::ValidateRoundtrip(uwbRangingData);
+        }
+
     }
 
     SECTION("UwbNotificationData is stable")
