@@ -84,6 +84,7 @@ UwbDevice::OnSessionMulticastListStatus(UwbSessionUpdateMulicastListStatus statu
         return;
     }
 
+    PLOG_VERBOSE << "Adding peer to session " << statusMulticastList.SessionId;
     for (const auto& peerAddStatus : statusMulticastList.Status) {
         if (peerAddStatus.Status == UwbStatusMulticast::OkUpdate) {
             session->InsertPeer(peerAddStatus.ControleeMacAddress);
@@ -100,7 +101,8 @@ UwbDevice::OnSessionRangingData(UwbRangingData rangingData)
         return;
     }
 
-    // TODO: implement this
+    PLOG_VERBOSE << "Adding ranging data to session " << rangingData.SessionId;
+    session->AddRangingData(rangingData);
 }
 
 void

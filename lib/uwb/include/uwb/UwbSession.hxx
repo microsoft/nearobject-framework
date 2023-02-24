@@ -125,6 +125,14 @@ public:
     void
     InsertPeer(const uwb::UwbMacAddress& peerAddress);
 
+    /**
+     * @brief Add some ranging data to this session
+     * 
+     * @param data 
+     */
+    void
+    AddRangingData(const uwb::protocol::fira::UwbRangingData& data);
+
 private:
     virtual void
     ConfigureImpl(const protocol::fira::UwbSessionData& uwbSessionData) = 0;
@@ -141,6 +149,7 @@ private:
 protected:
     uint32_t m_sessionId{ 0 };
     uwb::protocol::fira::UwbSessionStatus m_sessionStatus{};
+    std::vector<uwb::protocol::fira::UwbRangingData> m_rangingData{};
     UwbMacAddressType m_uwbMacAddressType{ UwbMacAddressType::Extended };
     UwbMacAddress m_uwbMacAddressSelf;
     std::atomic<bool> m_rangingActive{ false };
