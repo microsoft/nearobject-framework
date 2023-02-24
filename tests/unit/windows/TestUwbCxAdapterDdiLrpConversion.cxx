@@ -1,5 +1,8 @@
 
+#include <concepts>
+#include <iterator>
 #include <random>
+#include <type_traits>
 
 #include <catch2/catch_test_macros.hpp>
 #include <magic_enum.hpp>
@@ -43,6 +46,36 @@ ValidateRoundtrip(const NeutralT& instance)
 {
     auto instanceCopy = ConvertRoundtrip(instance);
     REQUIRE(instanceCopy == instance);
+}
+
+/**
+ * @brief Generate a random integral value.
+ * 
+ * @tparam ReturnT 
+ */
+template <typename ReturnT = uint32_t>
+requires (std::is_same_v<ReturnT, uint8_t> || std::is_same_v<ReturnT, uint16_t> || std::is_same_v<ReturnT, uint32_t>)
+ReturnT
+GetRandom()
+{
+    static std::mt19937 engine{ std::random_device{}() };
+    static std::uniform_int_distribution<uint32_t> distribution{};
+
+    return static_cast<ReturnT>(distribution(engine));
+}
+
+/**
+ * @brief Generate a random uwb ranging measurement.
+ * 
+ * @return ::uwb::protocol::fira::UwbRangingMeasurementData 
+ */
+::uwb::protocol::fira::UwbRangingMeasurementData
+GetRandomUwbMeasurementData()
+{
+    return ::uwb::protocol::fira::UwbRangingMeasurementData {
+        .Result = GetRandom<uint16_t>(),
+        .FigureOfMerit = GetRandom<uint8_t>()
+    };
 }
 } // namespace windows::devices::uwb::ddi::lrp::test
 
@@ -251,6 +284,53 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
 
     SECTION("UwbRangingMeasurement is stable")
     {
+        // Build a vector of all possible UwbStatus values.
+        std::vector<UwbStatus> uwbStatus{};
+        auto uwbStatusGeneric = magic_enum::enum_values<UwbStatusGeneric>();
+        auto uwbStatusSession = magic_enum::enum_values<UwbStatusSession>();
+        auto uwbStatusRanging = magic_enum::enum_values<UwbStatusRanging>();
+        uwbStatus.insert(std::end(uwbStatus), std::make_move_iterator(std::begin(uwbStatusGeneric)), std::make_move_iterator(std::end(uwbStatusGeneric)));
+        uwbStatus.insert(std::end(uwbStatus), std::make_move_iterator(std::begin(uwbStatusSession)), std::make_move_iterator(std::end(uwbStatusSession)));
+        uwbStatus.insert(std::end(uwbStatus), std::make_move_iterator(std::begin(uwbStatusRanging)), std::make_move_iterator(std::end(uwbStatusRanging)));
+
+        for (const auto& status : uwbStatus) {
+            for (const auto& uwbLineOfSightIndicator : magic_enum::enum_values<UwbLineOfSightIndicator>()) {
+                for (const auto& uwbMacAddressType : magic_enum::enum_values<::uwb::UwbMacAddressType>()) {
+                    const UwbRangingMeasurement uwbRangingMeasurement{
+                        .SlotIndex = test::GetRandom<uint8_t>(),
+                        .Distance = test::GetRandom<uint16_t>(),
+                        .Status = status,
+                        .PeerMacAddress = ::uwb::UwbMacAddress::Random(uwbMacAddressType),
+                        .LineOfSignIndicator = uwbLineOfSightIndicator,
+                        .AoAAzimuth = test::GetRandomUwbMeasurementData(),
+                        .AoAElevation = test::GetRandomUwbMeasurementData(),
+                        .AoaDestinationAzimuth = test::GetRandomUwbMeasurementData(),
+                        .AoaDestinationElevation = test::GetRandomUwbMeasurementData()
+                    };
+                }
+            }
+        }
+    }
+
+    SECTION("UwbRangingMeasurement is stable")
+    {
+        for (const auto& uwbMacAddressType : magic_enum::enum_values<::uwb::UwbMacAddressType>()) {
+            for (const auto& uwbLineOfSightIndicator : magic_enum::enum_values<UwbLineOfSightIndicator>()) {
+                const UwbRangingMeasurement uwbRangingMeasurement{
+                    .SlotIndex = test::GetRandom<uint8_t>(),
+                    .Distance = test::GetRandom<uint16_t>(),
+                    .Status = UwbStatusGeneric::CommandRetry,
+                    .PeerMacAddress = ::uwb::UwbMacAddress::Random(uwbMacAddressType),
+                    .LineOfSignIndicator = uwbLineOfSightIndicator,
+                    .AoAAzimuth = test::GetRandomUwbMeasurementData(),
+                    .AoAElevation = test::GetRandomUwbMeasurementData(),
+                    .AoaDestinationAzimuth = test::GetRandomUwbMeasurementData(),
+                    .AoaDestinationElevation = test::GetRandomUwbMeasurementData()
+                };
+
+                test::ValidateRoundtrip(uwbRangingMeasurement);
+            }
+        }
     }
 
     SECTION("UwbRangingData is stable")
