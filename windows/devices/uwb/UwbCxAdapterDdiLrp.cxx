@@ -418,17 +418,17 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingMea
     rangingMeasurement.macAddrPeer = From(uwbRangingMeasurement.PeerMacAddress);
     rangingMeasurement.lineOfSightIndicator = From(uwbRangingMeasurement.LineOfSignIndicator);
     rangingMeasurement.distance = uwbRangingMeasurement.Distance;
-    rangingMeasurement.aoaAzimuth[0] = (uwbRangingMeasurement.AoAAzimuth.Result & 0x00FFU) << 0U;
-    rangingMeasurement.aoaAzimuth[1] = (uwbRangingMeasurement.AoAAzimuth.Result & 0xFF00U) << 8U; // TODO: verify masking
+    rangingMeasurement.aoaAzimuth[0] = (uwbRangingMeasurement.AoAAzimuth.Result & 0x00FFU)
+    rangingMeasurement.aoaAzimuth[1] = (uwbRangingMeasurement.AoAAzimuth.Result & 0xFF00U) >> 8U; // TODO: verify masking
     rangingMeasurement.aoaAzimuthFigureOfMerit = uwbRangingMeasurement.AoAAzimuth.FigureOfMerit.value_or(0);
-    rangingMeasurement.aoaElevation[0] = (uwbRangingMeasurement.AoAElevation.Result & 0x00FFU) << 0U;
-    rangingMeasurement.aoaElevation[1] = (uwbRangingMeasurement.AoAElevation.Result & 0xFF00U) << 8U;
+    rangingMeasurement.aoaElevation[0] = (uwbRangingMeasurement.AoAElevation.Result & 0x00FFU);
+    rangingMeasurement.aoaElevation[1] = (uwbRangingMeasurement.AoAElevation.Result & 0xFF00U) >> 8U;
     rangingMeasurement.aoaElevationFigureOfMerit = uwbRangingMeasurement.AoAElevation.FigureOfMerit.value_or(0);
-    rangingMeasurement.aoaDestinationAzimuth[0] = (uwbRangingMeasurement.AoaDestinationAzimuth.Result & 0x00FFU) << 0U;
-    rangingMeasurement.aoaDestinationAzimuth[1] = (uwbRangingMeasurement.AoaDestinationAzimuth.Result & 0xFF00U) << 8U;
+    rangingMeasurement.aoaDestinationAzimuth[0] = (uwbRangingMeasurement.AoaDestinationAzimuth.Result & 0x00FFU);
+    rangingMeasurement.aoaDestinationAzimuth[1] = (uwbRangingMeasurement.AoaDestinationAzimuth.Result & 0xFF00U) >> 8U;
     rangingMeasurement.aoaElevationFigureOfMerit = uwbRangingMeasurement.AoaDestinationAzimuth.FigureOfMerit.value_or(0);
-    rangingMeasurement.aoaDestinationElevation[0] = (uwbRangingMeasurement.AoaDestinationElevation.Result & 0x00FFU) << 0U;
-    rangingMeasurement.aoaDestinationElevation[1] = (uwbRangingMeasurement.AoaDestinationElevation.Result & 0xFF00U) << 8U;
+    rangingMeasurement.aoaDestinationElevation[0] = (uwbRangingMeasurement.AoaDestinationElevation.Result & 0x00FFU)
+    rangingMeasurement.aoaDestinationElevation[1] = (uwbRangingMeasurement.AoaDestinationElevation.Result & 0xFF00U) >> 8U;
     rangingMeasurement.aoaDestinationElevationFigureOfMerit = uwbRangingMeasurement.AoaDestinationElevation.FigureOfMerit.value_or(0);
     rangingMeasurement.slotIndex = uwbRangingMeasurement.SlotIndex;
 
