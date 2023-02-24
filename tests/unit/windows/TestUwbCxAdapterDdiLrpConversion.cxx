@@ -72,10 +72,17 @@ GetRandom()
 ::uwb::protocol::fira::UwbRangingMeasurementData
 GetRandomUwbMeasurementData()
 {
-    return ::uwb::protocol::fira::UwbRangingMeasurementData {
+    ::uwb::protocol::fira::UwbRangingMeasurementData uwbRangingMeasurementData {
         .Result = GetRandom<uint16_t>(),
-        .FigureOfMerit = GetRandom<uint8_t>()
+        .FigureOfMerit = GetRandom<uint8_t>(),
     };
+
+    // FoM value of 0 means it is not present, so reset the optional state to match.
+    if (uwbRangingMeasurementData.FigureOfMerit == 0) {
+        uwbRangingMeasurementData.FigureOfMerit.reset();
+    }
+
+    return uwbRangingMeasurementData;
 }
 } // namespace windows::devices::uwb::ddi::lrp::test
 
@@ -307,28 +314,19 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
                         .AoaDestinationAzimuth = test::GetRandomUwbMeasurementData(),
                         .AoaDestinationElevation = test::GetRandomUwbMeasurementData()
                     };
+
+                    // return UwbCxDdi::To(UwbCxDdi::From(instance));
+                    auto from = UwbCxDdi::From(uwbRangingMeasurement);
+                    auto   to = UwbCxDdi::To(from);
+                    INFO("from: " << uwbRangingMeasurement.ToString());
+                    INFO("  to: " << to.ToString()); 
+                    bool equal = uwbRangingMeasurement == to;
+                    CHECK(equal);
+                    if (!equal) {
+                        INFO("darn");
+                    }
+                    // test::ValidateRoundtrip(uwbRangingMeasurement);
                 }
-            }
-        }
-    }
-
-    SECTION("UwbRangingMeasurement is stable")
-    {
-        for (const auto& uwbMacAddressType : magic_enum::enum_values<::uwb::UwbMacAddressType>()) {
-            for (const auto& uwbLineOfSightIndicator : magic_enum::enum_values<UwbLineOfSightIndicator>()) {
-                const UwbRangingMeasurement uwbRangingMeasurement{
-                    .SlotIndex = test::GetRandom<uint8_t>(),
-                    .Distance = test::GetRandom<uint16_t>(),
-                    .Status = UwbStatusGeneric::CommandRetry,
-                    .PeerMacAddress = ::uwb::UwbMacAddress::Random(uwbMacAddressType),
-                    .LineOfSignIndicator = uwbLineOfSightIndicator,
-                    .AoAAzimuth = test::GetRandomUwbMeasurementData(),
-                    .AoAElevation = test::GetRandomUwbMeasurementData(),
-                    .AoaDestinationAzimuth = test::GetRandomUwbMeasurementData(),
-                    .AoaDestinationElevation = test::GetRandomUwbMeasurementData()
-                };
-
-                test::ValidateRoundtrip(uwbRangingMeasurement);
             }
         }
     }
