@@ -41,6 +41,15 @@ UWB_DEVICE_STATE
 From(const ::uwb::protocol::fira::UwbDeviceState &uwbDeviceState);
 
 /**
+ * @brief Converts UwbLineOfSightIndicator to UWB_LINE_OF_SIGHT_INDICATOR.
+ * 
+ * @param uwbLineOfSightIndicator 
+ * @return UWB_LINE_OF_SIGHT_INDICATOR 
+ */
+UWB_LINE_OF_SIGHT_INDICATOR
+From(const ::uwb::protocol::fira::UwbLineOfSightIndicator &uwbLineOfSightIndicator);
+
+/**
  * @brief Converts UwbMulticastAction to UWB_MULTICAST_ACTION.
  *
  * @param uwbMulticastAction
@@ -175,6 +184,33 @@ UWB_DEVICE_STATUS
 From(const ::uwb::protocol::fira::UwbStatusDevice &uwbStatusDevice);
 
 /**
+ * @brief Converts UwbMacAddressType to UWB_MAC_ADDRESS_MODE_INDICATOR.
+ * 
+ * @param uwbMacAddressModeIndicator 
+ * @return UWB_MAC_ADDRESS_MODE_INDICATOR 
+ */
+UWB_MAC_ADDRESS_MODE_INDICATOR
+From(const ::uwb::UwbMacAddressType &uwbMacAddressModeIndicator);
+
+/**
+ * @brief Converts UwbMacAddress to UWB_MAC_ADDRESS.
+ * 
+ * @param uwbMacAddress 
+ * @return UWB_MAC_ADDRESS 
+ */
+UWB_MAC_ADDRESS
+From(const ::uwb::UwbMacAddress &uwbMacAddress);
+
+/**
+ * @brief Converts UwbRangingMeasurement to UWB_RANGING_MEASUREMENT.
+ * 
+ * @param uwbRangingMeasurement 
+ * @return UWB_RANGING_MEASUREMENT 
+ */
+UWB_RANGING_MEASUREMENT
+From(const ::uwb::protocol::fira::UwbRangingMeasurement& uwbRangingMeasurement);
+
+/**
  * @brief Converts UwbDeviceConfigurationParameterType to UWB_DEVICE_CONFIG_PARAM_TYPE.
  *
  * @param uwbDeviceConfigurationParameterType
@@ -247,6 +283,15 @@ To(const UWB_STATUS &status);
  */
 ::uwb::protocol::fira::UwbDeviceState
 To(const UWB_DEVICE_STATE &deviceState);
+
+/**
+ * @brief Converts UWB_LINE_OF_SIGHT_INDICATOR to UwbLineOfSightIndicator.
+ * 
+ * @param lineOfSightIndicator 
+ * @return ::uwb::protocol::fira::UwbLineOfSightIndicator 
+ */
+::uwb::protocol::fira::UwbLineOfSightIndicator
+To(const UWB_LINE_OF_SIGHT_INDICATOR &lineOfSightIndicator);
 
 /**
  * @brief Converts UWB_MULTICAST_ACTION to UwbMulticastAction.
@@ -345,6 +390,24 @@ To(const UWB_SESSION_REASON_CODE &sessionReasonCode);
  */
 ::uwb::protocol::fira::UwbApplicationConfigurationParameterType
 To(const UWB_APP_CONFIG_PARAM_TYPE &appConfigParameterType);
+
+/**
+ * @brief Converts a UWB_MAC_ADDRESS_MODE_INDICATOR to UwbMacAddressType.
+ * 
+ * @param macAddressModeIndicator 
+ * @return ::uwb::UwbMacAddressType 
+ */
+::uwb::UwbMacAddressType
+To(const UWB_MAC_ADDRESS_MODE_INDICATOR &macAddressModeIndicator);
+
+/**
+ * @brief Converts UWB_MAC_ADDRESS to UwbMacAddress.
+ * 
+ * @param macAddress 
+ * @return ::uwb::UwbMacAddress 
+ */
+::uwb::UwbMacAddress
+To(const UWB_MAC_ADDRESS &macAddress);
 
 /**
  * @brief Converts UWB_RANGING_MEASUREMENT to UwbRangingMeasurement.

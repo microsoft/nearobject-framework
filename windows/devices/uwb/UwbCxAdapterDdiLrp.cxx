@@ -89,6 +89,18 @@ windows::devices::uwb::ddi::lrp::From(const UwbDeviceState &uwbDeviceState)
     return DeviceStateMap.at(uwbDeviceState);
 }
 
+UWB_LINE_OF_SIGHT_INDICATOR
+windows::devices::uwb::ddi::lrp::From(const UwbLineOfSightIndicator &uwbLineOfSightIndicator)
+{
+    static const std::unordered_map<UwbLineOfSightIndicator, UWB_LINE_OF_SIGHT_INDICATOR> LineOfSightIndicatorMap{
+        { UwbLineOfSightIndicator::LineOfSight, UWB_LINE_OF_SIGHT_INDICATOR_LINE_OF_SIGHT },
+        { UwbLineOfSightIndicator::NonLineOfSight, UWB_LINE_OF_SIGHT_INDICATOR_NON_LINE_OF_SIGHT },
+        { UwbLineOfSightIndicator::Indeterminant, UWB_LINE_OF_SIGHT_INDICATOR_UNABLE_TO_DETERMINE },
+    };
+
+    return LineOfSightIndicatorMap.at(uwbLineOfSightIndicator);
+}
+
 UWB_MULTICAST_ACTION
 windows::devices::uwb::ddi::lrp::From(const UwbMulticastAction &uwbMulticastAction)
 {
@@ -359,6 +371,68 @@ windows::devices::uwb::ddi::lrp::From(const UwbStatusDevice &uwbStatusDevice)
     statusDevice.deviceState = From(uwbStatusDevice.State);
 
     return statusDevice;
+}
+
+UWB_MAC_ADDRESS_MODE_INDICATOR
+windows::devices::uwb::ddi::lrp::From(const ::uwb::UwbMacAddressType &uwbMacAddressModeIndicator)
+{
+    static const std::unordered_map<::uwb::UwbMacAddressType, UWB_MAC_ADDRESS_MODE_INDICATOR> MacAddressModeIndicatorMap{
+        { ::uwb::UwbMacAddressType::Short, UWB_MAC_ADDRESS_MODE_INDICATOR_SHORT },
+        { ::uwb::UwbMacAddressType::Extended, UWB_MAC_ADDRESS_MODE_INDICATOR_EXTENDED },
+    };
+
+    return MacAddressModeIndicatorMap.at(uwbMacAddressModeIndicator);
+}
+
+UWB_MAC_ADDRESS
+windows::devices::uwb::ddi::lrp::From(const ::uwb::UwbMacAddress &uwbMacAddress)
+{
+    UWB_MAC_ADDRESS macAddress{
+        .addressType = From(uwbMacAddress.GetType())
+    };
+
+    uint8_t *value = nullptr;
+
+    switch (macAddress.addressType) {
+    case UWB_MAC_ADDRESS_MODE_INDICATOR_SHORT:
+        value = &macAddress.addressShort[0];
+        break;
+    case UWB_MAC_ADDRESS_MODE_INDICATOR_EXTENDED:
+        value = &macAddress.addressExtended[0];
+        break;
+    default:
+        throw std::runtime_error("unknown mac address type");
+    }
+
+    auto valueUwb = uwbMacAddress.GetValue();
+    std::memcpy(value, std::data(valueUwb), std::size(valueUwb));
+
+    return macAddress;
+}
+
+UWB_RANGING_MEASUREMENT
+windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingMeasurement &uwbRangingMeasurement)
+{
+    UWB_RANGING_MEASUREMENT rangingMeasurement{};
+    rangingMeasurement.size = sizeof rangingMeasurement;
+    rangingMeasurement.macAddrPeer = From(uwbRangingMeasurement.PeerMacAddress);
+    rangingMeasurement.lineOfSightIndicator = From(uwbRangingMeasurement.LineOfSignIndicator);
+    rangingMeasurement.distance = uwbRangingMeasurement.Distance;
+    rangingMeasurement.aoaAzimuth[0] = (uwbRangingMeasurement.AoAAzimuth.Result & 0x00FFU) << 0U;
+    rangingMeasurement.aoaAzimuth[1] = (uwbRangingMeasurement.AoAAzimuth.Result & 0xFF00U) << 8U; // TODO: verify masking
+    rangingMeasurement.aoaAzimuthFigureOfMerit = uwbRangingMeasurement.AoAAzimuth.FigureOfMerit.value_or(0);
+    rangingMeasurement.aoaElevation[0] = (uwbRangingMeasurement.AoAElevation.Result & 0x00FFU) << 0U;
+    rangingMeasurement.aoaElevation[1] = (uwbRangingMeasurement.AoAElevation.Result & 0xFF00U) << 8U;
+    rangingMeasurement.aoaElevationFigureOfMerit = uwbRangingMeasurement.AoAElevation.FigureOfMerit.value_or(0);
+    rangingMeasurement.aoaDestinationAzimuth[0] = (uwbRangingMeasurement.AoaDestinationAzimuth.Result & 0x00FFU) << 0U;
+    rangingMeasurement.aoaDestinationAzimuth[1] = (uwbRangingMeasurement.AoaDestinationAzimuth.Result & 0xFF00U) << 8U;
+    rangingMeasurement.aoaElevationFigureOfMerit = uwbRangingMeasurement.AoaDestinationAzimuth.FigureOfMerit.value_or(0);
+    rangingMeasurement.aoaDestinationElevation[0] = (uwbRangingMeasurement.AoaDestinationElevation.Result & 0x00FFU) << 0U;
+    rangingMeasurement.aoaDestinationElevation[1] = (uwbRangingMeasurement.AoaDestinationElevation.Result & 0xFF00U) << 8U;
+    rangingMeasurement.aoaDestinationElevationFigureOfMerit = uwbRangingMeasurement.AoaDestinationElevation.FigureOfMerit.value_or(0);
+    rangingMeasurement.slotIndex = uwbRangingMeasurement.SlotIndex;
+
+    return rangingMeasurement;
 }
 
 UwbRangingDataWrapper
@@ -646,6 +720,18 @@ windows::devices::uwb::ddi::lrp::To(const UWB_DEVICE_STATE &deviceState)
     return DeviceStateMap.at(deviceState);
 }
 
+UwbLineOfSightIndicator
+windows::devices::uwb::ddi::lrp::To(const UWB_LINE_OF_SIGHT_INDICATOR &lineOfSightIndicator)
+{
+    static const std::unordered_map<UWB_LINE_OF_SIGHT_INDICATOR, UwbLineOfSightIndicator> LineOfSightIndicatorMap{
+        { UWB_LINE_OF_SIGHT_INDICATOR_LINE_OF_SIGHT, UwbLineOfSightIndicator::LineOfSight },
+        { UWB_LINE_OF_SIGHT_INDICATOR_NON_LINE_OF_SIGHT, UwbLineOfSightIndicator::NonLineOfSight },
+        { UWB_LINE_OF_SIGHT_INDICATOR_UNABLE_TO_DETERMINE, UwbLineOfSightIndicator::Indeterminant },
+    };
+
+    return LineOfSightIndicatorMap.at(lineOfSightIndicator);
+}
+
 UwbMulticastAction
 windows::devices::uwb::ddi::lrp::To(const UWB_MULTICAST_ACTION &multicastAction)
 {
@@ -834,6 +920,84 @@ windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM_TYPE &appConfigPa
     return AppConfigParamMap.at(appConfigParameterType);
 }
 
+::uwb::UwbMacAddressType
+windows::devices::uwb::ddi::lrp::To(const UWB_MAC_ADDRESS_MODE_INDICATOR &macAddressModeIndicator)
+{
+    static const std::unordered_map<UWB_MAC_ADDRESS_MODE_INDICATOR, ::uwb::UwbMacAddressType> MacAddressModeIndicatorMap{
+        { UWB_MAC_ADDRESS_MODE_INDICATOR_SHORT, ::uwb::UwbMacAddressType::Short },
+        { UWB_MAC_ADDRESS_MODE_INDICATOR_EXTENDED, ::uwb::UwbMacAddressType::Extended },
+    };
+
+    return MacAddressModeIndicatorMap.at(macAddressModeIndicator);
+}
+
+::uwb::UwbMacAddress
+windows::devices::uwb::ddi::lrp::To(const UWB_MAC_ADDRESS &macAddress)
+{
+    ::uwb::UwbMacAddress uwbMacAddress{};
+
+    switch (macAddress.addressType) {
+    case UWB_MAC_ADDRESS_MODE_INDICATOR_SHORT: {
+        const auto data = std::to_array<const uint8_t, ::uwb::UwbMacAddressLength::Short>(macAddress.addressShort);
+        uwbMacAddress = ::uwb::UwbMacAddress(data);
+        break;
+    }
+    case UWB_MAC_ADDRESS_MODE_INDICATOR_EXTENDED: {
+        const auto data = std::to_array<const uint8_t, ::uwb::UwbMacAddressLength::Extended>(macAddress.addressExtended);
+        uwbMacAddress = ::uwb::UwbMacAddress(data);
+        break;
+    }
+    default: {
+        throw std::runtime_error("unknown mac address type");
+    }
+    }
+
+    return uwbMacAddress;
+}
+
+UwbRangingMeasurement
+windows::devices::uwb::ddi::lrp::To(const UWB_RANGING_MEASUREMENT &rangingMeasurement)
+{
+    UwbRangingMeasurement uwbRangingMeasurement{
+        .SlotIndex = rangingMeasurement.slotIndex,
+        .Distance = rangingMeasurement.distance,
+        .Status = To(rangingMeasurement.status),
+        .PeerMacAddress = To(rangingMeasurement.macAddrPeer),
+        .LineOfSignIndicator = To(rangingMeasurement.lineOfSightIndicator),
+        .AoAAzimuth = {
+            .Result = *reinterpret_cast<const uint16_t*>(&rangingMeasurement.aoaAzimuth[0])
+        },
+        .AoAElevation = {
+            .Result = *reinterpret_cast<const uint16_t*>(&rangingMeasurement.aoaElevation[0])
+        },
+        .AoaDestinationAzimuth = {
+            .Result = *reinterpret_cast<const uint16_t*>(&rangingMeasurement.aoaDestinationAzimuth[0])
+        },
+        .AoaDestinationElevation = {
+            .Result = *reinterpret_cast<const uint16_t*>(&rangingMeasurement.aoaDestinationElevation[0])
+        }
+    };
+    return uwbRangingMeasurement;
+}
+
+UwbRangingData
+windows::devices::uwb::ddi::lrp::To(const UWB_RANGING_DATA &rangingData)
+{
+    UwbRangingData uwbRangingData{
+        .SequenceNumber = rangingData.sequenceNumber,
+        .SessionId = rangingData.sessionId,
+        .CurrentRangingInterval = rangingData.currentRangingInterval,
+        .RangingMeasurementType = To(rangingData.rangingMeasurementType)
+    };
+
+    for (std::size_t i = 0; i < rangingData.numberOfRangingMeasurements; i++) {
+        const auto& rangingMeasurement = rangingData.rangingMeasurements[i];
+        uwbRangingData.RangingMeasurements.push_back(To(rangingMeasurement));
+    }
+
+    return uwbRangingData;
+}
+
 UwbSessionStatus
 windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_STATUS &sessionStatus)
 {
@@ -861,7 +1025,9 @@ windows::devices::uwb::ddi::lrp::To(const UWB_NOTIFICATION_DATA &notificationDat
         return To(notificationData.sessionUpdateControllerMulticastList);
     }
     case UWB_NOTIFICATION_TYPE_RANGING_DATA:
-        break;
+        return To(notificationData.rangingData);
     }
+
+    PLOG_WARNING << "unknown UwbNotificationData type encountered; returning default constructed instance";
     return UwbNotificationData{};
 }
