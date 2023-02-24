@@ -315,17 +315,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
                         .AoaDestinationElevation = test::GetRandomUwbMeasurementData()
                     };
 
-                    // return UwbCxDdi::To(UwbCxDdi::From(instance));
-                    auto from = UwbCxDdi::From(uwbRangingMeasurement);
-                    auto   to = UwbCxDdi::To(from);
-                    INFO("from: " << uwbRangingMeasurement.ToString());
-                    INFO("  to: " << to.ToString()); 
-                    bool equal = uwbRangingMeasurement == to;
-                    CHECK(equal);
-                    if (!equal) {
-                        INFO("darn");
-                    }
-                    // test::ValidateRoundtrip(uwbRangingMeasurement);
+                    test::ValidateRoundtrip(uwbRangingMeasurement);
                 }
             }
         }

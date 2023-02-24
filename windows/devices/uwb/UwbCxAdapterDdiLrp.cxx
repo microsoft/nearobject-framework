@@ -421,7 +421,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingMea
         .status = From(uwbRangingMeasurement.Status),
         .lineOfSightIndicator = From(uwbRangingMeasurement.LineOfSightIndicator),
         .distance = uwbRangingMeasurement.Distance,
-        .aoaAzimuth = { 
+        .aoaAzimuth = {
             (uwbRangingMeasurement.AoAAzimuth.Result & 0x00FFU),
             (uwbRangingMeasurement.AoAAzimuth.Result & 0xFF00U) >> 8U },
         .aoaAzimuthFigureOfMerit = uwbRangingMeasurement.AoAAzimuth.FigureOfMerit.value_or(0),
@@ -429,7 +429,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingMea
             (uwbRangingMeasurement.AoAElevation.Result & 0x00FFU),
             (uwbRangingMeasurement.AoAElevation.Result & 0xFF00U) >> 8U },
         .aoaElevationFigureOfMerit = uwbRangingMeasurement.AoAElevation.FigureOfMerit.value_or(0),
-        .aoaDestinationAzimuth = { 
+        .aoaDestinationAzimuth = {
             (uwbRangingMeasurement.AoaDestinationAzimuth.Result & 0x00FFU),
             (uwbRangingMeasurement.AoaDestinationAzimuth.Result & 0xFF00U) >> 8U },
         .aoaDestinationAzimuthFigureOfMerit = uwbRangingMeasurement.AoaDestinationAzimuth.FigureOfMerit.value_or(0),
