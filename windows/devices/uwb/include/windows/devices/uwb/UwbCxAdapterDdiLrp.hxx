@@ -42,9 +42,9 @@ From(const ::uwb::protocol::fira::UwbDeviceState &uwbDeviceState);
 
 /**
  * @brief Converts UwbLineOfSightIndicator to UWB_LINE_OF_SIGHT_INDICATOR.
- * 
- * @param uwbLineOfSightIndicator 
- * @return UWB_LINE_OF_SIGHT_INDICATOR 
+ *
+ * @param uwbLineOfSightIndicator
+ * @return UWB_LINE_OF_SIGHT_INDICATOR
  */
 UWB_LINE_OF_SIGHT_INDICATOR
 From(const ::uwb::protocol::fira::UwbLineOfSightIndicator &uwbLineOfSightIndicator);
@@ -185,30 +185,30 @@ From(const ::uwb::protocol::fira::UwbStatusDevice &uwbStatusDevice);
 
 /**
  * @brief Converts UwbMacAddressType to UWB_MAC_ADDRESS_MODE_INDICATOR.
- * 
- * @param uwbMacAddressModeIndicator 
- * @return UWB_MAC_ADDRESS_MODE_INDICATOR 
+ *
+ * @param uwbMacAddressModeIndicator
+ * @return UWB_MAC_ADDRESS_MODE_INDICATOR
  */
 UWB_MAC_ADDRESS_MODE_INDICATOR
 From(const ::uwb::UwbMacAddressType &uwbMacAddressModeIndicator);
 
 /**
  * @brief Converts UwbMacAddress to UWB_MAC_ADDRESS.
- * 
- * @param uwbMacAddress 
- * @return UWB_MAC_ADDRESS 
+ *
+ * @param uwbMacAddress
+ * @return UWB_MAC_ADDRESS
  */
 UWB_MAC_ADDRESS
 From(const ::uwb::UwbMacAddress &uwbMacAddress);
 
 /**
  * @brief Converts UwbRangingMeasurement to UWB_RANGING_MEASUREMENT.
- * 
- * @param uwbRangingMeasurement 
- * @return UWB_RANGING_MEASUREMENT 
+ *
+ * @param uwbRangingMeasurement
+ * @return UWB_RANGING_MEASUREMENT
  */
 UWB_RANGING_MEASUREMENT
-From(const ::uwb::protocol::fira::UwbRangingMeasurement& uwbRangingMeasurement);
+From(const ::uwb::protocol::fira::UwbRangingMeasurement &uwbRangingMeasurement);
 
 /**
  * @brief Converts UwbDeviceConfigurationParameterType to UWB_DEVICE_CONFIG_PARAM_TYPE.
@@ -286,9 +286,9 @@ To(const UWB_DEVICE_STATE &deviceState);
 
 /**
  * @brief Converts UWB_LINE_OF_SIGHT_INDICATOR to UwbLineOfSightIndicator.
- * 
- * @param lineOfSightIndicator 
- * @return ::uwb::protocol::fira::UwbLineOfSightIndicator 
+ *
+ * @param lineOfSightIndicator
+ * @return ::uwb::protocol::fira::UwbLineOfSightIndicator
  */
 ::uwb::protocol::fira::UwbLineOfSightIndicator
 To(const UWB_LINE_OF_SIGHT_INDICATOR &lineOfSightIndicator);
@@ -393,36 +393,36 @@ To(const UWB_APP_CONFIG_PARAM_TYPE &appConfigParameterType);
 
 /**
  * @brief Converts a UWB_MAC_ADDRESS_MODE_INDICATOR to UwbMacAddressType.
- * 
- * @param macAddressModeIndicator 
- * @return ::uwb::UwbMacAddressType 
+ *
+ * @param macAddressModeIndicator
+ * @return ::uwb::UwbMacAddressType
  */
 ::uwb::UwbMacAddressType
 To(const UWB_MAC_ADDRESS_MODE_INDICATOR &macAddressModeIndicator);
 
 /**
  * @brief Converts UWB_MAC_ADDRESS to UwbMacAddress.
- * 
- * @param macAddress 
- * @return ::uwb::UwbMacAddress 
+ *
+ * @param macAddress
+ * @return ::uwb::UwbMacAddress
  */
 ::uwb::UwbMacAddress
 To(const UWB_MAC_ADDRESS &macAddress);
 
 /**
  * @brief Converts UWB_RANGING_MEASUREMENT to UwbRangingMeasurement.
- * 
- * @param rangingMeasurement 
- * @return ::uwb::protocol::fira::UwbRangingMeasurement 
+ *
+ * @param rangingMeasurement
+ * @return ::uwb::protocol::fira::UwbRangingMeasurement
  */
 ::uwb::protocol::fira::UwbRangingMeasurement
 To(const UWB_RANGING_MEASUREMENT &rangingMeasurement);
 
 /**
  * @brief Converts UWB_RANGING_DATA to UwbRangingData.
- * 
- * @param rangingData 
- * @return ::uwb::protocol::fira::UwbRangingData 
+ *
+ * @param rangingData
+ * @return ::uwb::protocol::fira::UwbRangingData
  */
 ::uwb::protocol::fira::UwbRangingData
 To(const UWB_RANGING_DATA &rangingData);
