@@ -977,6 +977,20 @@ windows::devices::uwb::ddi::lrp::To(const UWB_RANGING_MEASUREMENT &rangingMeasur
         .AoaDestinationAzimuth = { .Result = std::bit_cast<uint16_t>(rangingMeasurement.aoaDestinationAzimuth) },
         .AoaDestinationElevation = { .Result = std::bit_cast<uint16_t>(rangingMeasurement.aoaDestinationElevation) },
     };
+
+    if (rangingMeasurement.aoaAzimuthFigureOfMerit != 0) {
+        uwbRangingMeasurement.AoAAzimuth.FigureOfMerit = rangingMeasurement.aoaAzimuthFigureOfMerit;
+    }
+    if (rangingMeasurement.aoaElevationFigureOfMerit != 0) {
+        uwbRangingMeasurement.AoAElevation.FigureOfMerit = rangingMeasurement.aoaElevationFigureOfMerit;
+    }
+    if (rangingMeasurement.aoaDestinationAzimuthFigureOfMerit != 0) {
+        uwbRangingMeasurement.AoaDestinationAzimuth.FigureOfMerit = rangingMeasurement.aoaDestinationAzimuthFigureOfMerit;
+    }
+    if (rangingMeasurement.aoaDestinationElevationFigureOfMerit != 0) {
+        uwbRangingMeasurement.AoaDestinationElevation.FigureOfMerit = rangingMeasurement.aoaDestinationElevationFigureOfMerit;
+    }
+
     return uwbRangingMeasurement;
 }
 
