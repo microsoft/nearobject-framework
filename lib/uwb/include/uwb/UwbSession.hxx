@@ -127,8 +127,8 @@ public:
 
     /**
      * @brief Add some ranging data to this session
-     * 
-     * @param data 
+     *
+     * @param data
      */
     void
     AddRangingData(const uwb::protocol::fira::UwbRangingData& data);

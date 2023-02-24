@@ -87,7 +87,8 @@ UwbSession::InsertPeer(const uwb::UwbMacAddress& peerAddress)
 }
 
 void
-UwbSession::AddRangingData(const uwb::protocol::fira::UwbRangingData& data){
+UwbSession::AddRangingData(const uwb::protocol::fira::UwbRangingData& data)
+{
     m_rangingData.emplace_back(data);
     PLOG_VERBOSE << "Added ranging data " << data.ToString();
 }
