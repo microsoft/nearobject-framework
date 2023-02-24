@@ -117,6 +117,14 @@ public:
     void
     SetSessionStatus(const uwb::protocol::fira::UwbSessionStatus& status);
 
+    /**
+     * @brief Temporarily public function to directly add a peer to m_peers
+     *
+     * @param peerAddress
+     */
+    void
+    InsertPeer(const uwb::UwbMacAddress& peerAddress);
+
 private:
     virtual void
     ConfigureImpl(const protocol::fira::UwbSessionData& uwbSessionData) = 0;

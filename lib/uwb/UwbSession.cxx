@@ -77,3 +77,9 @@ UwbSession::SetSessionStatus(const uwb::protocol::fira::UwbSessionStatus& status
     PLOG_VERBOSE << "session changed state: " << m_sessionStatus.ToString() << " --> " << status.ToString();
     m_sessionStatus = status;
 }
+
+void
+UwbSession::InsertPeer(const uwb::UwbMacAddress& peerAddress)
+{
+    m_peers.insert(peerAddress);
+}
