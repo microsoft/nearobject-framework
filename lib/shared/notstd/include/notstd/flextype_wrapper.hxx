@@ -53,7 +53,7 @@ template <
     typename ValueT,
     typename FlexElementT,
     flex_array_type FlexElementAdjuster = flex_array_type::anysize>
-    requires (std::is_standard_layout_v<ValueT> && !std::is_array_v<FlexElementT>)
+    requires std::is_standard_layout_v<ValueT>
 struct flextype_wrapper
 {
     using value_type = ValueT;
@@ -156,7 +156,9 @@ struct flextype_wrapper
      */
     explicit flextype_wrapper(std::size_t total_size) :
         flextype_wrapper(std::vector<std::uint8_t>(alignof(value_type) + total_size), total_size)
-    {}
+    {
+        m_value = {};
+    }
 
     /**
      * @brief Construct a new flextype_wrapper object copy.

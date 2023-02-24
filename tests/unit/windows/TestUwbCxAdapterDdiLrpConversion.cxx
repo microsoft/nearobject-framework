@@ -89,7 +89,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
     SECTION("UwbMulticastListStatus is stable")
     {
         for (const auto& uwbStatusMulticast : magic_enum::enum_values<UwbStatusMulticast>()) {
-            UwbMulticastListStatus uwbMulticastListStatus{
+            const UwbMulticastListStatus uwbMulticastListStatus{
                 .ControleeMacAddress = ::uwb::UwbMacAddress::Random<::uwb::UwbMacAddressType::Short>(),
                 .SubSessionId = RandomDistribution(RandomEngine),
                 .Status = uwbStatusMulticast
@@ -113,16 +113,13 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         const std::vector<UwbSessionUpdateMulticastListEntry> controlees{
             UwbSessionUpdateMulticastListEntry{
                 .ControleeMacAddress = ::uwb::UwbMacAddress::Random<::uwb::UwbMacAddressType::Short>(),
-                .SubSessionId = RandomDistribution(RandomEngine)
-            },
+                .SubSessionId = RandomDistribution(RandomEngine) },
             UwbSessionUpdateMulticastListEntry{
                 .ControleeMacAddress = ::uwb::UwbMacAddress::Random<::uwb::UwbMacAddressType::Short>(),
-                .SubSessionId = RandomDistribution(RandomEngine)
-            },
+                .SubSessionId = RandomDistribution(RandomEngine) },
             UwbSessionUpdateMulticastListEntry{
                 .ControleeMacAddress = ::uwb::UwbMacAddress::Random<::uwb::UwbMacAddressType::Short>(),
-                .SubSessionId = RandomDistribution(RandomEngine)
-            }
+                .SubSessionId = RandomDistribution(RandomEngine) }
         };
 
         for (const auto& uwbMulticastAction : magic_enum::enum_values<UwbMulticastAction>()) {
@@ -132,7 +129,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
                 .Controlees = controlees
             };
 
-            // test::ValidateRoundtrip(uwbSessionUpdateMulicastList);
+            test::ValidateRoundtrip(uwbSessionUpdateMulicastList);
         }
     }
 
@@ -143,8 +140,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
             uwbMulticastListStatus.push_back(UwbMulticastListStatus{
                 .ControleeMacAddress = uwb::UwbMacAddress::Random<uwb::UwbMacAddressType::Short>(),
                 .SubSessionId = RandomDistribution(RandomEngine),
-                .Status = uwbStatusMulticast
-            });
+                .Status = uwbStatusMulticast });
         }
 
         const UwbSessionUpdateMulicastListStatus uwbSessionUpdateMulicastListStatus{
@@ -152,7 +148,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
             .Status = std::move(uwbMulticastListStatus)
         };
 
-        // test::ValidateRoundtrip(uwbSessionUpdateMulicastListStatus);
+        test::ValidateRoundtrip(uwbSessionUpdateMulicastListStatus);
     }
 
     SECTION("UwbRangingMeasurementType is stable")
