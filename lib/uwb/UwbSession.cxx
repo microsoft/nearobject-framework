@@ -83,4 +83,5 @@ UwbSession::InsertPeer(const uwb::UwbMacAddress& peerAddress)
 {
     std::scoped_lock peersLock{ m_peerGate };
     m_peers.insert(peerAddress);
+    PLOG_VERBOSE << "Added peer " << peerAddress.ToString();
 }
