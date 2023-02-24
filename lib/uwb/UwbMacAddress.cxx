@@ -105,7 +105,6 @@ UwbMacAddress::ToString() const
 {
     std::ostringstream macString{};
 
-    macString << magic_enum::enum_name(m_type) << ' ' << std::hex;
     for (const auto& b : m_view.first(m_view.size() - 1)) {
         macString << +b << ':';
     }
