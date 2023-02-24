@@ -419,7 +419,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingMea
         .size = sizeof rangingMeasurement,
         .macAddrPeer = From(uwbRangingMeasurement.PeerMacAddress),
         .status = From(uwbRangingMeasurement.Status),
-        .lineOfSightIndicator = From(uwbRangingMeasurement.LineOfSignIndicator),
+        .lineOfSightIndicator = From(uwbRangingMeasurement.LineOfSightIndicator),
         .distance = uwbRangingMeasurement.Distance,
         .aoaAzimuth = { 
             (uwbRangingMeasurement.AoAAzimuth.Result & 0x00FFU),
@@ -971,7 +971,7 @@ windows::devices::uwb::ddi::lrp::To(const UWB_RANGING_MEASUREMENT &rangingMeasur
         .Distance = rangingMeasurement.distance,
         .Status = To(rangingMeasurement.status),
         .PeerMacAddress = To(rangingMeasurement.macAddrPeer),
-        .LineOfSignIndicator = To(rangingMeasurement.lineOfSightIndicator),
+        .LineOfSightIndicator = To(rangingMeasurement.lineOfSightIndicator),
         .AoAAzimuth = { .Result = std::bit_cast<uint16_t>(rangingMeasurement.aoaAzimuth) },
         .AoAElevation = { .Result = std::bit_cast<uint16_t>(rangingMeasurement.aoaElevation) },
         .AoaDestinationAzimuth = { .Result = std::bit_cast<uint16_t>(rangingMeasurement.aoaDestinationAzimuth) },

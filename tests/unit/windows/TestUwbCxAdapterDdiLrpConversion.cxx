@@ -301,7 +301,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
                         .Distance = test::GetRandom<uint16_t>(),
                         .Status = status,
                         .PeerMacAddress = ::uwb::UwbMacAddress::Random(uwbMacAddressType),
-                        .LineOfSignIndicator = uwbLineOfSightIndicator,
+                        .LineOfSightIndicator = uwbLineOfSightIndicator,
                         .AoAAzimuth = test::GetRandomUwbMeasurementData(),
                         .AoAElevation = test::GetRandomUwbMeasurementData(),
                         .AoaDestinationAzimuth = test::GetRandomUwbMeasurementData(),

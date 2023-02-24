@@ -162,7 +162,7 @@ UwbRangingMeasurement::ToString() const
        << "Distance: " << Distance << ", "
        << "Status: " << ::ToString(Status) << ", "
        << "Peer Mac Address: " << PeerMacAddress << ", "
-       << "Line Of Sight Indicator: " << magic_enum::enum_name(LineOfSignIndicator) << ", "
+       << "Line Of Sight Indicator: " << magic_enum::enum_name(LineOfSightIndicator) << ", "
        << "Angle of Arrival Azimuth: " << AoAAzimuth << ", "
        << "Angle of Arrival Elevation: " << AoAElevation << ", "
        << "Angle of Arrival Destination Azimuth: " << AoaDestinationAzimuth << ", "

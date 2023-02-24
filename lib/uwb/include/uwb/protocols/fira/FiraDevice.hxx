@@ -531,7 +531,7 @@ struct UwbRangingMeasurement
     uint16_t Distance;
     UwbStatus Status;
     UwbMacAddress PeerMacAddress;
-    UwbLineOfSightIndicator LineOfSignIndicator;
+    UwbLineOfSightIndicator LineOfSightIndicator;
     UwbRangingMeasurementData AoAAzimuth;
     UwbRangingMeasurementData AoAElevation;
     UwbRangingMeasurementData AoaDestinationAzimuth;
