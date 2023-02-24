@@ -455,6 +455,11 @@ windows::devices::uwb::ddi::lrp::From(const UwbRangingData &uwbRangingData)
     rangingData.rangingMeasurementType = From(uwbRangingData.RangingMeasurementType);
     rangingData.numberOfRangingMeasurements = std::size(uwbRangingData.RangingMeasurements);
 
+    for (std::size_t i = 0; i < rangingData.numberOfRangingMeasurements; i++) {
+        auto &rangingMeasurement = rangingData.rangingMeasurements[i];
+        rangingMeasurement = From(uwbRangingData.RangingMeasurements[i]);
+    }
+
     return rangingDataWrapper;
 }
 
