@@ -388,6 +388,7 @@ UWB_MAC_ADDRESS
 windows::devices::uwb::ddi::lrp::From(const ::uwb::UwbMacAddress &uwbMacAddress)
 {
     UWB_MAC_ADDRESS macAddress{
+        .size = sizeof(macAddress),
         .addressType = From(uwbMacAddress.GetType())
     };
 
