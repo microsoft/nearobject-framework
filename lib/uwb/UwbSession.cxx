@@ -77,3 +77,11 @@ UwbSession::SetSessionStatus(const uwb::protocol::fira::UwbSessionStatus& status
     PLOG_VERBOSE << "session changed state: " << m_sessionStatus.ToString() << " --> " << status.ToString();
     m_sessionStatus = status;
 }
+
+void
+UwbSession::InsertPeer(const uwb::UwbMacAddress& peerAddress)
+{
+    std::scoped_lock peersLock{ m_peerGate };
+    m_peers.insert(peerAddress);
+    PLOG_VERBOSE << "Added peer " << peerAddress.ToString();
+}
