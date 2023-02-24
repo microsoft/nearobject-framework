@@ -251,7 +251,6 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
 
     SECTION("UwbRangingMeasurement is stable")
     {
-
     }
 
     SECTION("UwbRangingData is stable")
