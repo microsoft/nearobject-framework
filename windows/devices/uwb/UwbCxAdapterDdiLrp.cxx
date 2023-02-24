@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <bit>
 #include <bitset>
 #include <functional>
 #include <stdexcept>
@@ -965,11 +966,10 @@ windows::devices::uwb::ddi::lrp::To(const UWB_RANGING_MEASUREMENT &rangingMeasur
         .Status = To(rangingMeasurement.status),
         .PeerMacAddress = To(rangingMeasurement.macAddrPeer),
         .LineOfSignIndicator = To(rangingMeasurement.lineOfSightIndicator),
-        .AoAAzimuth = {
-            .Result = *reinterpret_cast<const uint16_t *>(&rangingMeasurement.aoaAzimuth[0]) },
-        .AoAElevation = { .Result = *reinterpret_cast<const uint16_t *>(&rangingMeasurement.aoaElevation[0]) },
-        .AoaDestinationAzimuth = { .Result = *reinterpret_cast<const uint16_t *>(&rangingMeasurement.aoaDestinationAzimuth[0]) },
-        .AoaDestinationElevation = { .Result = *reinterpret_cast<const uint16_t *>(&rangingMeasurement.aoaDestinationElevation[0]) }
+        .AoAAzimuth = { .Result = std::bit_cast<uint16_t>(rangingMeasurement.aoaAzimuth) },
+        .AoAElevation = { .Result = std::bit_cast<uint16_t>(rangingMeasurement.aoaElevation) },
+        .AoaDestinationAzimuth = { .Result = std::bit_cast<uint16_t>(rangingMeasurement.aoaDestinationAzimuth) },
+        .AoaDestinationElevation = { .Result = std::bit_cast<uint16_t>(rangingMeasurement.aoaDestinationElevation) },
     };
     return uwbRangingMeasurement;
 }
