@@ -512,7 +512,6 @@ struct UwbRangingMeasurementData
 {
     uint16_t Result;
     std::optional<uint8_t> FigureOfMerit;
-    decltype(FigureOfMerit)& FoM = FigureOfMerit;
 
     auto
     operator<=>(const UwbRangingMeasurementData&) const noexcept = default;
