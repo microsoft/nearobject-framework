@@ -858,7 +858,7 @@ windows::devices::uwb::ddi::lrp::To(const UWB_NOTIFICATION_DATA &notificationDat
         return To(notificationData.sessionStatus);
     }
     case UWB_NOTIFICATION_TYPE_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST: {
-        break;
+        return To(notificationData.sessionUpdateControllerMulticastList);
     }
     case UWB_NOTIFICATION_TYPE_RANGING_DATA:
         break;
