@@ -86,6 +86,20 @@ UwbMacAddress::GetValueShort() const
     return (static_cast<uint16_t>(m_view[1]) << 8U) | m_view[0];
 }
 
+/* static */
+UwbMacAddress
+UwbMacAddress::Random(UwbMacAddressType type)
+{
+    switch (type) {
+    case UwbMacAddressType::Short:
+        return Random<UwbMacAddressType::Short>();
+    case UwbMacAddressType::Extended:
+        return Random<UwbMacAddressType::Extended>();
+    default:
+        throw std::runtime_error("unknown mac address type");
+    }
+}
+
 std::string
 UwbMacAddress::ToString() const
 {
