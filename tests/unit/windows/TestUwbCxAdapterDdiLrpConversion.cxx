@@ -69,7 +69,7 @@ GetRandom()
  * 
  * @return ::uwb::protocol::fira::UwbRangingMeasurementData 
  */
-::uwb::protocol::fira::UwbRangingMeasurementData
+::uwb::protocol::fira::UwbRangingMeasurementData 
 GetRandomUwbMeasurementData()
 {
     ::uwb::protocol::fira::UwbRangingMeasurementData uwbRangingMeasurementData {
@@ -84,6 +84,32 @@ GetRandomUwbMeasurementData()
 
     return uwbRangingMeasurementData;
 }
+
+/**
+ * @brief Returns a vector of all possible UwbStatus values. 
+ * 
+ * @return const std::vector<::uwb::protocol::fira::UwbStatus>& 
+ */
+const std::vector<::uwb::protocol::fira::UwbStatus>&
+AllUwbStatusValues()
+{
+    static std::optional<std::vector<::uwb::protocol::fira::UwbStatus>> uwbStatusOpt{};
+
+    // Note: this is not thread-safe, but should be suitable for tests.
+    if (!uwbStatusOpt.has_value()) {
+        std::vector<::uwb::protocol::fira::UwbStatus> uwbStatus{};
+        auto uwbStatusGeneric = magic_enum::enum_values<::uwb::protocol::fira::UwbStatusGeneric>();
+        auto uwbStatusSession = magic_enum::enum_values<::uwb::protocol::fira::UwbStatusSession>();
+        auto uwbStatusRanging = magic_enum::enum_values<::uwb::protocol::fira::UwbStatusRanging>();
+        uwbStatus.insert(std::end(uwbStatus), std::make_move_iterator(std::begin(uwbStatusGeneric)), std::make_move_iterator(std::end(uwbStatusGeneric)));
+        uwbStatus.insert(std::end(uwbStatus), std::make_move_iterator(std::begin(uwbStatusSession)), std::make_move_iterator(std::end(uwbStatusSession)));
+        uwbStatus.insert(std::end(uwbStatus), std::make_move_iterator(std::begin(uwbStatusRanging)), std::make_move_iterator(std::end(uwbStatusRanging)));
+        uwbStatusOpt = std::move(uwbStatus);
+    }
+
+    return uwbStatusOpt.value();
+}
+
 } // namespace windows::devices::uwb::ddi::lrp::test
 
 TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][windows][ddi]")
@@ -96,9 +122,8 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
 
     SECTION("UwbStatus is stable")
     {
-        for (const auto& uwbStatusGeneric : magic_enum::enum_values<UwbStatusGeneric>()) {
-            const UwbStatus status{ uwbStatusGeneric };
-            test::ValidateRoundtrip(status);
+        for (const auto& uwbStatus : test::AllUwbStatusValues()) {
+            test::ValidateRoundtrip(uwbStatus);
         }
     }
 
@@ -291,16 +316,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
 
     SECTION("UwbRangingMeasurement is stable")
     {
-        // Build a vector of all possible UwbStatus values.
-        std::vector<UwbStatus> uwbStatus{};
-        auto uwbStatusGeneric = magic_enum::enum_values<UwbStatusGeneric>();
-        auto uwbStatusSession = magic_enum::enum_values<UwbStatusSession>();
-        auto uwbStatusRanging = magic_enum::enum_values<UwbStatusRanging>();
-        uwbStatus.insert(std::end(uwbStatus), std::make_move_iterator(std::begin(uwbStatusGeneric)), std::make_move_iterator(std::end(uwbStatusGeneric)));
-        uwbStatus.insert(std::end(uwbStatus), std::make_move_iterator(std::begin(uwbStatusSession)), std::make_move_iterator(std::end(uwbStatusSession)));
-        uwbStatus.insert(std::end(uwbStatus), std::make_move_iterator(std::begin(uwbStatusRanging)), std::make_move_iterator(std::end(uwbStatusRanging)));
-
-        for (const auto& status : uwbStatus) {
+        for (const auto& status : test::AllUwbStatusValues()) {
             for (const auto& uwbLineOfSightIndicator : magic_enum::enum_values<UwbLineOfSightIndicator>()) {
                 for (const auto& uwbMacAddressType : magic_enum::enum_values<::uwb::UwbMacAddressType>()) {
                     const UwbRangingMeasurement uwbRangingMeasurement{
