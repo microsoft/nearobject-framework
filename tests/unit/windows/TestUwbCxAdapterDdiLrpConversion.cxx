@@ -72,6 +72,13 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         }
     }
 
+    SECTION("UwbLineOfSightIndicator is stable")
+    {
+        for (const auto& uwbLineOfSightIndicator : magic_enum::enum_values<UwbLineOfSightIndicator>()) {
+            test::ValidateRoundtrip(uwbLineOfSightIndicator);
+        }
+    }
+
     SECTION("UwbMulticastAction is stable")
     {
         for (const auto& uwbMulticastAction : magic_enum::enum_values<UwbMulticastAction>()) {
@@ -216,11 +223,35 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         }
     }
 
+    SECTION("UwbMacAddressType is stable")
+    {
+        for (const auto& uwbMacAddressType : magic_enum::enum_values<::uwb::UwbMacAddressType>()) {
+            test::ValidateRoundtrip(uwbMacAddressType);
+        }
+    }
+
+    SECTION("UwbMacAddress (short) is stable")
+    {
+        const auto uwbMacAddress = ::uwb::UwbMacAddress::Random<::uwb::UwbMacAddressType::Short>();
+        test::ValidateRoundtrip(uwbMacAddress);
+    }
+
+    SECTION("UwbMacAddress (extended) is stable")
+    {
+        const auto uwbMacAddress = ::uwb::UwbMacAddress::Random<::uwb::UwbMacAddressType::Extended>();
+        test::ValidateRoundtrip(uwbMacAddress);
+    }
+
     SECTION("UwbDeviceConfigurationParameterType is stable")
     {
         for (const auto& uwbDeviceConfigurationParameterType : magic_enum::enum_values<UwbDeviceConfigurationParameterType>()) {
             test::ValidateRoundtrip(uwbDeviceConfigurationParameterType);
         }
+    }
+
+    SECTION("UwbRangingMeasurement is stable")
+    {
+
     }
 
     SECTION("UwbRangingData is stable")
