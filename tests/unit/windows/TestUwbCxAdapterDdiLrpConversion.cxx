@@ -440,7 +440,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
             .Status = std::move(uwbMulticastListStatus)
         };
         const UwbNotificationData uwbNotificationDataSessionUpdateMulicastListStatus{ uwbSessionUpdateMulicastListStatus };
-        // test::ValidateRoundtrip(uwbNotificationDataSessionUpdateMulicastListStatus);
+        test::ValidateRoundtrip(uwbNotificationDataSessionUpdateMulicastListStatus);
     }
 
     SECTION("UwbNotificationData UwbRangingData variant is stable")
@@ -476,6 +476,6 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
             },
         };
         const UwbNotificationData uwbNotificationDataRangingData{ uwbRangingData };
-        // test::ValidateRoundtrip(uwbNotificationDataRangingData);
+        test::ValidateRoundtrip(uwbNotificationDataRangingData);
     }
 }

@@ -504,9 +504,23 @@ windows::devices::uwb::ddi::lrp::From(const UwbNotificationData &uwbNotification
             notificationData.notificationType = NotificationTypeMap.at(typeid(arg));
             notificationData.sessionStatus = From(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionUpdateMulicastListStatus>) {
-            // notificationData.sessionUpdateControllerMulticastList = From(arg);
+            auto uwbSessionUpdateMulicastListStatusWrapper = From(arg);
+            totalSize += std::size(uwbSessionUpdateMulicastListStatusWrapper);
+            notificationDataWrapper = std::make_unique<UwbNotificationDataWrapper>(totalSize);
+            UWB_NOTIFICATION_DATA &notificationData = notificationDataWrapper->value();
+            notificationData.size = totalSize;
+            notificationData.notificationType = NotificationTypeMap.at(typeid(arg));
+            auto data = uwbSessionUpdateMulicastListStatusWrapper.data();
+            std::memcpy(&notificationData.sessionUpdateControllerMulticastList, std::data(data), std::size(data));
         } else if constexpr (std::is_same_v<ValueType, UwbRangingData>) {
-            // notificationData.rangingData = From(arg);
+            auto uwbRangingDataWrapper = From(arg);
+            totalSize += std::size(uwbRangingDataWrapper);
+            notificationDataWrapper = std::make_unique<UwbNotificationDataWrapper>(totalSize);
+            UWB_NOTIFICATION_DATA &notificationData = notificationDataWrapper->value();
+            notificationData.size = totalSize;
+            notificationData.notificationType = NotificationTypeMap.at(typeid(arg));
+            auto data = uwbRangingDataWrapper.data();
+            std::memcpy(&notificationData.rangingData, std::data(data), std::size(data));
         }
         // Note: no else clause is needed here since if the type is not
         // supported, the at() call above will throw std::out_of_range, ensuring
