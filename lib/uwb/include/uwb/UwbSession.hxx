@@ -6,7 +6,10 @@
 #include <cstdint>
 #include <memory>
 #include <mutex>
+#include <ranges>
 #include <unordered_set>
+
+#include <plog/Log.h>
 
 #include <uwb/UwbMacAddress.hxx>
 #include <uwb/protocols/fira/UwbSessionData.hxx>
@@ -118,12 +121,22 @@ public:
     SetSessionStatus(const uwb::protocol::fira::UwbSessionStatus& status);
 
     /**
-     * @brief Temporarily public function to directly add a peer to m_peers
+     * @brief Temporarily public function to directly add a list of peers to m_peers
      *
-     * @param peerAddress
+     * @param peers
      */
+    template <std::ranges::input_range V,
+        std::indirect_unary_predicate<std::ranges::iterator_t<V>> Pred>
+        requires std::ranges::view<V> && std::is_object_v<Pred> && std::same_as<std::decay_t<std::ranges::range_reference_t<V>>, uwb::protocol::fira::UwbMulticastListStatus>
     void
-    InsertPeer(const uwb::UwbMacAddress& peerAddress);
+    InsertPeers(std::ranges::filter_view<V, Pred> peers)
+    {
+        std::scoped_lock peersLock{ m_peerGate };
+        for (const auto& peer : peers) {
+            m_peers.insert(peer.ControleeMacAddress);
+            PLOG_VERBOSE << "Added peer " << peer.ControleeMacAddress.ToString();
+        }
+    }
 
 private:
     virtual void

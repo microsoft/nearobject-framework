@@ -43,6 +43,7 @@ target_link_libraries(nearobject-service
         notstd
         Threads::Threads
         uwb
+        plog::plog
     PUBLIC
         jsonify
         nearobject

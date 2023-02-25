@@ -19,6 +19,7 @@ target_include_directories(nearobject-service-windows
 target_link_libraries(nearobject-service-windows
     PRIVATE
         windev-uwb
+        plog::plog
     PUBLIC
         nearobject-service
         WIL::WIL
