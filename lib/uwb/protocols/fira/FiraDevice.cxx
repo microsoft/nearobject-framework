@@ -138,7 +138,7 @@ std::string
 UwbRangingMeasurementData::ToString() const
 {
     std::ostringstream ss{};
-    ss << Result << " (FoM=" << FigureOfMerit.value_or(0) << ")";
+    ss << Result << " (FoM=" << +FigureOfMerit.value_or(0) << ")";
     return ss.str();
 }
 
@@ -158,11 +158,11 @@ std::string
 UwbRangingMeasurement::ToString() const
 {
     std::ostringstream ss{};
-    ss << "SlotIndex: " << SlotIndex << ", "
+    ss << "SlotIndex: " << +SlotIndex << ", "
        << "Distance: " << Distance << ", "
        << "Status: " << ::ToString(Status) << ", "
        << "Peer Mac Address: " << PeerMacAddress << ", "
-       << "Line Of Sight Indicator: " << magic_enum::enum_name(LineOfSignIndicator) << ", "
+       << "Line Of Sight Indicator: " << magic_enum::enum_name(LineOfSightIndicator) << ", "
        << "Angle of Arrival Azimuth: " << AoAAzimuth << ", "
        << "Angle of Arrival Elevation: " << AoAElevation << ", "
        << "Angle of Arrival Destination Azimuth: " << AoaDestinationAzimuth << ", "

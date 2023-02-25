@@ -415,24 +415,30 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::UwbMacAddress &uwbMacAddress)
 UWB_RANGING_MEASUREMENT
 windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingMeasurement &uwbRangingMeasurement)
 {
-    UWB_RANGING_MEASUREMENT rangingMeasurement{};
-    rangingMeasurement.size = sizeof rangingMeasurement;
-    rangingMeasurement.macAddrPeer = From(uwbRangingMeasurement.PeerMacAddress);
-    rangingMeasurement.lineOfSightIndicator = From(uwbRangingMeasurement.LineOfSignIndicator);
-    rangingMeasurement.distance = uwbRangingMeasurement.Distance;
-    rangingMeasurement.aoaAzimuth[0] = (uwbRangingMeasurement.AoAAzimuth.Result & 0x00FFU);
-    rangingMeasurement.aoaAzimuth[1] = (uwbRangingMeasurement.AoAAzimuth.Result & 0xFF00U) >> 8U;
-    rangingMeasurement.aoaAzimuthFigureOfMerit = uwbRangingMeasurement.AoAAzimuth.FigureOfMerit.value_or(0);
-    rangingMeasurement.aoaElevation[0] = (uwbRangingMeasurement.AoAElevation.Result & 0x00FFU);
-    rangingMeasurement.aoaElevation[1] = (uwbRangingMeasurement.AoAElevation.Result & 0xFF00U) >> 8U;
-    rangingMeasurement.aoaElevationFigureOfMerit = uwbRangingMeasurement.AoAElevation.FigureOfMerit.value_or(0);
-    rangingMeasurement.aoaDestinationAzimuth[0] = (uwbRangingMeasurement.AoaDestinationAzimuth.Result & 0x00FFU);
-    rangingMeasurement.aoaDestinationAzimuth[1] = (uwbRangingMeasurement.AoaDestinationAzimuth.Result & 0xFF00U) >> 8U;
-    rangingMeasurement.aoaElevationFigureOfMerit = uwbRangingMeasurement.AoaDestinationAzimuth.FigureOfMerit.value_or(0);
-    rangingMeasurement.aoaDestinationElevation[0] = (uwbRangingMeasurement.AoaDestinationElevation.Result & 0x00FFU);
-    rangingMeasurement.aoaDestinationElevation[1] = (uwbRangingMeasurement.AoaDestinationElevation.Result & 0xFF00U) >> 8U;
-    rangingMeasurement.aoaDestinationElevationFigureOfMerit = uwbRangingMeasurement.AoaDestinationElevation.FigureOfMerit.value_or(0);
-    rangingMeasurement.slotIndex = uwbRangingMeasurement.SlotIndex;
+    UWB_RANGING_MEASUREMENT rangingMeasurement{
+        .size = sizeof rangingMeasurement,
+        .macAddrPeer = From(uwbRangingMeasurement.PeerMacAddress),
+        .status = From(uwbRangingMeasurement.Status),
+        .lineOfSightIndicator = From(uwbRangingMeasurement.LineOfSightIndicator),
+        .distance = uwbRangingMeasurement.Distance,
+        .aoaAzimuth = {
+            (uwbRangingMeasurement.AoAAzimuth.Result & 0x00FFU),
+            (uwbRangingMeasurement.AoAAzimuth.Result & 0xFF00U) >> 8U },
+        .aoaAzimuthFigureOfMerit = uwbRangingMeasurement.AoAAzimuth.FigureOfMerit.value_or(0),
+        .aoaElevation = { 
+            (uwbRangingMeasurement.AoAElevation.Result & 0x00FFU),
+            (uwbRangingMeasurement.AoAElevation.Result & 0xFF00U) >> 8U },
+        .aoaElevationFigureOfMerit = uwbRangingMeasurement.AoAElevation.FigureOfMerit.value_or(0),
+        .aoaDestinationAzimuth = {
+            (uwbRangingMeasurement.AoaDestinationAzimuth.Result & 0x00FFU),
+            (uwbRangingMeasurement.AoaDestinationAzimuth.Result & 0xFF00U) >> 8U },
+        .aoaDestinationAzimuthFigureOfMerit = uwbRangingMeasurement.AoaDestinationAzimuth.FigureOfMerit.value_or(0),
+        .aoaDestinationElevation = {
+            (uwbRangingMeasurement.AoaDestinationElevation.Result & 0x00FFU),
+            (uwbRangingMeasurement.AoaDestinationElevation.Result & 0xFF00U) >> 8U },
+        .aoaDestinationElevationFigureOfMerit = uwbRangingMeasurement.AoaDestinationElevation.FigureOfMerit.value_or(0),
+        .slotIndex = uwbRangingMeasurement.SlotIndex
+    };
 
     return rangingMeasurement;
 }
@@ -448,6 +454,11 @@ windows::devices::uwb::ddi::lrp::From(const UwbRangingData &uwbRangingData)
     rangingData.currentRangingInterval = uwbRangingData.CurrentRangingInterval;
     rangingData.rangingMeasurementType = From(uwbRangingData.RangingMeasurementType);
     rangingData.numberOfRangingMeasurements = std::size(uwbRangingData.RangingMeasurements);
+
+    for (std::size_t i = 0; i < rangingData.numberOfRangingMeasurements; i++) {
+        auto &rangingMeasurement = rangingData.rangingMeasurements[i];
+        rangingMeasurement = From(uwbRangingData.RangingMeasurements[i]);
+    }
 
     return rangingDataWrapper;
 }
@@ -965,12 +976,26 @@ windows::devices::uwb::ddi::lrp::To(const UWB_RANGING_MEASUREMENT &rangingMeasur
         .Distance = rangingMeasurement.distance,
         .Status = To(rangingMeasurement.status),
         .PeerMacAddress = To(rangingMeasurement.macAddrPeer),
-        .LineOfSignIndicator = To(rangingMeasurement.lineOfSightIndicator),
+        .LineOfSightIndicator = To(rangingMeasurement.lineOfSightIndicator),
         .AoAAzimuth = { .Result = std::bit_cast<uint16_t>(rangingMeasurement.aoaAzimuth) },
         .AoAElevation = { .Result = std::bit_cast<uint16_t>(rangingMeasurement.aoaElevation) },
         .AoaDestinationAzimuth = { .Result = std::bit_cast<uint16_t>(rangingMeasurement.aoaDestinationAzimuth) },
         .AoaDestinationElevation = { .Result = std::bit_cast<uint16_t>(rangingMeasurement.aoaDestinationElevation) },
     };
+
+    if (rangingMeasurement.aoaAzimuthFigureOfMerit != 0) {
+        uwbRangingMeasurement.AoAAzimuth.FigureOfMerit = rangingMeasurement.aoaAzimuthFigureOfMerit;
+    }
+    if (rangingMeasurement.aoaElevationFigureOfMerit != 0) {
+        uwbRangingMeasurement.AoAElevation.FigureOfMerit = rangingMeasurement.aoaElevationFigureOfMerit;
+    }
+    if (rangingMeasurement.aoaDestinationAzimuthFigureOfMerit != 0) {
+        uwbRangingMeasurement.AoaDestinationAzimuth.FigureOfMerit = rangingMeasurement.aoaDestinationAzimuthFigureOfMerit;
+    }
+    if (rangingMeasurement.aoaDestinationElevationFigureOfMerit != 0) {
+        uwbRangingMeasurement.AoaDestinationElevation.FigureOfMerit = rangingMeasurement.aoaDestinationElevationFigureOfMerit;
+    }
+
     return uwbRangingMeasurement;
 }
 
@@ -1018,8 +1043,9 @@ windows::devices::uwb::ddi::lrp::To(const UWB_NOTIFICATION_DATA &notificationDat
     case UWB_NOTIFICATION_TYPE_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST: {
         return To(notificationData.sessionUpdateControllerMulticastList);
     }
-    case UWB_NOTIFICATION_TYPE_RANGING_DATA:
+    case UWB_NOTIFICATION_TYPE_RANGING_DATA: {
         return To(notificationData.rangingData);
+    }
     }
 
     PLOG_WARNING << "unknown UwbNotificationData type encountered; returning default constructed instance";

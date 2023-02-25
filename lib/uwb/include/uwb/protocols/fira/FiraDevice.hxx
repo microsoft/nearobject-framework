@@ -512,7 +512,6 @@ struct UwbRangingMeasurementData
 {
     uint16_t Result;
     std::optional<uint8_t> FigureOfMerit;
-    decltype(FigureOfMerit)& FoM = FigureOfMerit;
 
     auto
     operator<=>(const UwbRangingMeasurementData&) const noexcept = default;
@@ -532,7 +531,7 @@ struct UwbRangingMeasurement
     uint16_t Distance;
     UwbStatus Status;
     UwbMacAddress PeerMacAddress;
-    UwbLineOfSightIndicator LineOfSignIndicator;
+    UwbLineOfSightIndicator LineOfSightIndicator;
     UwbRangingMeasurementData AoAAzimuth;
     UwbRangingMeasurementData AoAElevation;
     UwbRangingMeasurementData AoaDestinationAzimuth;
