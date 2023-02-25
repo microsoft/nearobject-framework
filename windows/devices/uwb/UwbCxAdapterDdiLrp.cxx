@@ -160,7 +160,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulticastListEntry &
 UwbSessionUpdateMulicastListWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulicastList &uwbSessionUpdateMulicastList)
 {
-    auto sessionUpdateControllerMulticastListWrapper = UwbSessionUpdateMulicastListWrapper::from_num_elements(std::size(uwbSessionUpdateMulicastList.Controlees));
+    auto sessionUpdateControllerMulticastListWrapper = UwbSessionUpdateMulicastListWrapper::from_num_elements<decltype(UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST::controleeList)>(std::size(uwbSessionUpdateMulicastList.Controlees));
     UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST &sessionUpdateControllerMulticastList = sessionUpdateControllerMulticastListWrapper;
     sessionUpdateControllerMulticastList.size = sessionUpdateControllerMulticastListWrapper.size();
     sessionUpdateControllerMulticastList.sessionId = uwbSessionUpdateMulicastList.SessionId;
@@ -178,7 +178,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulicastList &uwbSes
 UwbSessionUpdateMulicastListStatusWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulicastListStatus &uwbSessionUpdateMulicastListStatus)
 {
-    auto multicastListStatusWrapper = UwbSessionUpdateMulicastListStatusWrapper::from_num_elements(std::size(uwbSessionUpdateMulicastListStatus.Status));
+    auto multicastListStatusWrapper = UwbSessionUpdateMulicastListStatusWrapper::from_num_elements<decltype(UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF::statusList)>(std::size(uwbSessionUpdateMulicastListStatus.Status));
     UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF &multicastListStatus = multicastListStatusWrapper;
     multicastListStatus.size = multicastListStatusWrapper.size();
     multicastListStatus.sessionId = uwbSessionUpdateMulicastListStatus.SessionId;
@@ -327,7 +327,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbDeviceInformation &uwbDeviceInfo)
         numElements = 1;
     }
 
-    auto deviceInfoWrapper = UwbDeviceInformationWrapper::from_num_elements(numElements);
+    auto deviceInfoWrapper = UwbDeviceInformationWrapper::from_num_elements<decltype(UWB_DEVICE_INFO::vendorSpecificInfo)>(numElements);
     UWB_DEVICE_INFO &deviceInfo = deviceInfoWrapper;
     deviceInfo.size = deviceInfoWrapper.size();
     deviceInfo.status = From(uwbDeviceInfo.Status);
@@ -351,7 +351,7 @@ UwbDeviceCapabilitiesWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbCapability &uwbDeviceCapabilities)
 {
     std::size_t numElements = 2; // TODO: calculate this from uwbDeviceCapabilities
-    auto deviceCapabilitiesWrapper = UwbDeviceCapabilitiesWrapper::from_num_elements(numElements);
+    auto deviceCapabilitiesWrapper = UwbDeviceCapabilitiesWrapper::from_num_elements<decltype(UWB_DEVICE_CAPABILITIES::capabilityParams)>(numElements);
 
     UWB_DEVICE_CAPABILITIES &deviceCapabilities = deviceCapabilitiesWrapper;
     deviceCapabilities.size = deviceCapabilitiesWrapper.size();
@@ -446,7 +446,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingMea
 UwbRangingDataWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbRangingData &uwbRangingData)
 {
-    auto rangingDataWrapper = UwbRangingDataWrapper::from_num_elements(std::size(uwbRangingData.RangingMeasurements));
+    auto rangingDataWrapper = UwbRangingDataWrapper::from_num_elements<decltype(UWB_RANGING_DATA::rangingMeasurements)>(std::size(uwbRangingData.RangingMeasurements));
     UWB_RANGING_DATA &rangingData = rangingDataWrapper;
     rangingData.size = rangingDataWrapper.size();
     rangingData.sequenceNumber = uwbRangingData.SequenceNumber;
@@ -463,7 +463,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbRangingData &uwbRangingData)
     return rangingDataWrapper;
 }
 
-UWB_NOTIFICATION_DATA
+UwbNotificationDataWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbNotificationData &uwbNotificationData)
 {
     static const std::unordered_map<std::type_index, UWB_NOTIFICATION_TYPE> NotificationTypeMap{
@@ -474,31 +474,45 @@ windows::devices::uwb::ddi::lrp::From(const UwbNotificationData &uwbNotification
         { std::type_index(typeid(UwbRangingData)), UWB_NOTIFICATION_TYPE_RANGING_DATA },
     };
 
-    UWB_NOTIFICATION_DATA notificationData{};
+    std::unique_ptr<UwbNotificationDataWrapper> notificationDataWrapper;
+    std::size_t totalSize = sizeof(UWB_NOTIFICATION_DATA);
 
-    std::visit([&notificationData](auto &&arg) {
+    std::visit([&](auto &&arg) {
         using ValueType = std::decay_t<decltype(arg)>;
 
-        notificationData.notificationType = NotificationTypeMap.at(typeid(arg));
-
         if constexpr (std::is_same_v<ValueType, UwbStatus>) {
+            totalSize += sizeof(UWB_NOTIFICATION_DATA::genericError);
+            notificationDataWrapper = std::make_unique<UwbNotificationDataWrapper>(totalSize);
+            UWB_NOTIFICATION_DATA& notificationData = notificationDataWrapper->value();
+            notificationData.size = totalSize;
+            notificationData.notificationType = NotificationTypeMap.at(typeid(arg));
             notificationData.genericError = From(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbStatusDevice>) {
+            totalSize += sizeof(UWB_NOTIFICATION_DATA::deviceStatus);
+            notificationDataWrapper = std::make_unique<UwbNotificationDataWrapper>(totalSize);
+            UWB_NOTIFICATION_DATA& notificationData = notificationDataWrapper->value();
+            notificationData.size = totalSize;
+            notificationData.notificationType = NotificationTypeMap.at(typeid(arg));
             notificationData.deviceStatus = From(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionStatus>) {
+            totalSize += sizeof(UWB_NOTIFICATION_DATA::sessionStatus);
+            notificationDataWrapper = std::make_unique<UwbNotificationDataWrapper>(totalSize);
+            UWB_NOTIFICATION_DATA& notificationData = notificationDataWrapper->value();
+            notificationData.size = totalSize;
+            notificationData.notificationType = NotificationTypeMap.at(typeid(arg));
             notificationData.sessionStatus = From(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionUpdateMulicastListStatus>) {
-            notificationData.sessionUpdateControllerMulticastList = From(arg);
+            // notificationData.sessionUpdateControllerMulticastList = From(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbRangingData>) {
-            notificationData.rangingData = From(arg);
-        }
+            // notificationData.rangingData = From(arg);
+        } 
         // Note: no else clause is needed here since if the type is not
         // supported, the at() call above will throw std::out_of_range, ensuring
         // this code will never be reached.
     },
         uwbNotificationData);
 
-    return notificationData;
+    return std::move(*notificationDataWrapper);
 }
 
 namespace detail

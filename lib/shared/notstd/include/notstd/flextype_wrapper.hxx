@@ -51,14 +51,12 @@ enum class flex_array_type : std::size_t {
  */
 template <
     typename ValueT,
-    typename FlexElementT,
     flex_array_type FlexElementAdjuster = flex_array_type::anysize>
     requires std::is_standard_layout_v<ValueT>
 struct flextype_wrapper
 {
     using value_type = ValueT;
     using wrapped_type = ValueT;
-    using element_type = FlexElementT;
     static constexpr flex_array_type array_adjuster = FlexElementAdjuster;
 
     virtual ~flextype_wrapper() = default;
@@ -96,6 +94,7 @@ struct flextype_wrapper
      * @param num_flex_elements Desired number of flex-array elements to store.
      * @return constexpr auto
      */
+    template <typename element_type>
     static inline constexpr auto
     required_buffer_size(std::size_t num_flex_elements)
     {
@@ -119,10 +118,11 @@ struct flextype_wrapper
      * @param num_flex_elements Desired number of flex-array elements to store.
      * @return flextype_wrapper
      */
+    template <typename element_type>
     static flextype_wrapper
     from_num_elements(std::size_t num_flex_elements)
     {
-        return flextype_wrapper{ required_buffer_size(num_flex_elements) };
+        return flextype_wrapper{ required_buffer_size<element_type>(num_flex_elements) };
     }
 
     /**
