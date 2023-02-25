@@ -1043,8 +1043,9 @@ windows::devices::uwb::ddi::lrp::To(const UWB_NOTIFICATION_DATA &notificationDat
     case UWB_NOTIFICATION_TYPE_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST: {
         return To(notificationData.sessionUpdateControllerMulticastList);
     }
-    case UWB_NOTIFICATION_TYPE_RANGING_DATA:
+    case UWB_NOTIFICATION_TYPE_RANGING_DATA: {
         return To(notificationData.rangingData);
+    }
     }
 
     PLOG_WARNING << "unknown UwbNotificationData type encountered; returning default constructed instance";
