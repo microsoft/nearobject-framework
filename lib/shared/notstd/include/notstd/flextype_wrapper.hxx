@@ -216,6 +216,16 @@ struct flextype_wrapper
     }
 
     /**
+     * @brief Return a reference to the wrapped value. 
+     * 
+     * @return value_type& 
+     */
+    value_type& value()
+    {
+        return m_value;
+    }
+
+    /**
      * @brief The total size of the value. Note, the buffer may be larger than
      * this value since it has enough space to guarantee correct alignment.
      *
