@@ -415,6 +415,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::UwbMacAddress &uwbMacAddress)
 UWB_RANGING_MEASUREMENT
 windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingMeasurement &uwbRangingMeasurement)
 {
+    // clang-format off
     UWB_RANGING_MEASUREMENT rangingMeasurement{
         .size = sizeof rangingMeasurement,
         .macAddrPeer = From(uwbRangingMeasurement.PeerMacAddress),
@@ -425,7 +426,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingMea
             (uwbRangingMeasurement.AoAAzimuth.Result & 0x00FFU),
             (uwbRangingMeasurement.AoAAzimuth.Result & 0xFF00U) >> 8U },
         .aoaAzimuthFigureOfMerit = uwbRangingMeasurement.AoAAzimuth.FigureOfMerit.value_or(0),
-        .aoaElevation = { 
+        .aoaElevation = {
             (uwbRangingMeasurement.AoAElevation.Result & 0x00FFU),
             (uwbRangingMeasurement.AoAElevation.Result & 0xFF00U) >> 8U },
         .aoaElevationFigureOfMerit = uwbRangingMeasurement.AoAElevation.FigureOfMerit.value_or(0),
@@ -439,6 +440,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingMea
         .aoaDestinationElevationFigureOfMerit = uwbRangingMeasurement.AoaDestinationElevation.FigureOfMerit.value_or(0),
         .slotIndex = uwbRangingMeasurement.SlotIndex
     };
+    // clang-format on
 
     return rangingMeasurement;
 }
@@ -483,21 +485,21 @@ windows::devices::uwb::ddi::lrp::From(const UwbNotificationData &uwbNotification
         if constexpr (std::is_same_v<ValueType, UwbStatus>) {
             totalSize += sizeof(UWB_NOTIFICATION_DATA::genericError);
             notificationDataWrapper = std::make_unique<UwbNotificationDataWrapper>(totalSize);
-            UWB_NOTIFICATION_DATA& notificationData = notificationDataWrapper->value();
+            UWB_NOTIFICATION_DATA &notificationData = notificationDataWrapper->value();
             notificationData.size = totalSize;
             notificationData.notificationType = NotificationTypeMap.at(typeid(arg));
             notificationData.genericError = From(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbStatusDevice>) {
             totalSize += sizeof(UWB_NOTIFICATION_DATA::deviceStatus);
             notificationDataWrapper = std::make_unique<UwbNotificationDataWrapper>(totalSize);
-            UWB_NOTIFICATION_DATA& notificationData = notificationDataWrapper->value();
+            UWB_NOTIFICATION_DATA &notificationData = notificationDataWrapper->value();
             notificationData.size = totalSize;
             notificationData.notificationType = NotificationTypeMap.at(typeid(arg));
             notificationData.deviceStatus = From(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionStatus>) {
             totalSize += sizeof(UWB_NOTIFICATION_DATA::sessionStatus);
             notificationDataWrapper = std::make_unique<UwbNotificationDataWrapper>(totalSize);
-            UWB_NOTIFICATION_DATA& notificationData = notificationDataWrapper->value();
+            UWB_NOTIFICATION_DATA &notificationData = notificationDataWrapper->value();
             notificationData.size = totalSize;
             notificationData.notificationType = NotificationTypeMap.at(typeid(arg));
             notificationData.sessionStatus = From(arg);
@@ -505,7 +507,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbNotificationData &uwbNotification
             // notificationData.sessionUpdateControllerMulticastList = From(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbRangingData>) {
             // notificationData.rangingData = From(arg);
-        } 
+        }
         // Note: no else clause is needed here since if the type is not
         // supported, the at() call above will throw std::out_of_range, ensuring
         // this code will never be reached.
