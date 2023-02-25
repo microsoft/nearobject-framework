@@ -702,41 +702,14 @@ windows::devices::uwb::ddi::lrp::To(const UWB_STATUS &status)
         { UWB_STATUS_ERROR_ADDRESS_ALREADY_PRESENT, UwbStatusSession::AddressAlreadyPresent },
     };
 
-    switch (status) {
-    case UWB_STATUS_OK:
-    case UWB_STATUS_REJECTED:
-    case UWB_STATUS_FAILED:
-    case UWB_STATUS_SYNTAX_ERROR:
-    case UWB_STATUS_INVALID_PARAM:
-    case UWB_STATUS_INVALID_RANGE:
-    case UWB_STATUS_INVALID_MESSAGE_SIZE:
-    case UWB_STATUS_UNKNOWN_GID:
-    case UWB_STATUS_UNKNOWN_OID:
-    case UWB_STATUS_READ_ONLY:
-    case UWB_STATUS_COMMAND_RETRY:
+    auto enumId = notstd::to_underlying(status);
+    if (enumId < notstd::to_underlying(UWB_STATUS_ERROR_SESSION_NOT_EXIST)) {
         return StatusToMapGeneric.at(status);
-    case UWB_STATUS_ERROR_SESSION_NOT_EXIST:
-    case UWB_STATUS_ERROR_SESSION_DUPLICATE:
-    case UWB_STATUS_ERROR_SESSION_ACTIVE:
-    case UWB_STATUS_ERROR_MAX_SESSIONS_EXCEEDED:
-    case UWB_STATUS_ERROR_SESSION_NOT_CONFIGURED:
-    case UWB_STATUS_ERROR_ACTIVE_SESSIONS_ONGOING:
-    case UWB_STATUS_ERROR_MULTICAST_LIST_FULL:
-    case UWB_STATUS_ERROR_ADDRESS_NOT_FOUND:
-    case UWB_STATUS_ERROR_ADDRESS_ALREADY_PRESENT:
-        return StatusToMapSession.at(status);
-    case UWB_STATUS_RANGING_TX_FAILED:
-    case UWB_STATUS_RANGING_RX_TIMEOUT:
-    case UWB_STATUS_RANGING_RX_PHY_DEC_FAILED:
-    case UWB_STATUS_RANGING_RX_PHY_TOA_FAILED:
-    case UWB_STATUS_RANGING_RX_PHY_STS_FAILED:
-    case UWB_STATUS_RANGING_RX_MAC_DEC_FAILED:
-    case UWB_STATUS_RANGING_RX_MAC_IE_DEC_FAILED:
-    case UWB_STATUS_RANGING_RX_MAC_IE_MISSING:
-        return StatusToMapRanging.at(status);
     }
-
-    throw std::runtime_error("unknown UwbStatus value");
+    if (enumId < notstd::to_underlying(UWB_STATUS_RANGING_TX_FAILED)) {
+        return StatusToMapSession.at(status);
+    }
+    return StatusToMapRanging.at(status);
 }
 
 UwbStatusDevice
