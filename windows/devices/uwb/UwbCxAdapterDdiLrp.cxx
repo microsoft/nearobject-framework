@@ -485,7 +485,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbNotificationData &uwbNotification
     // structure here, which will include the size of the largest union member,
     // resulting in an overestimate. While this wastes some memory, it provides
     // a strong guarantee that enough memory will be allocated, avoiding the
-    // possibility of buffer overrun and heap corruption.  
+    // possibility of buffer overrun and heap corruption.
     std::size_t totalSize = sizeof(UWB_NOTIFICATION_DATA);
     std::unique_ptr<UwbNotificationDataWrapper> notificationDataWrapper;
 
