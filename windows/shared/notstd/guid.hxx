@@ -1,4 +1,7 @@
 
+#ifndef NOTSTD_GUID_HXX
+#define NOTSTD_GUID_HXX
+
 #include <algorithm>
 #include <cstring>
 #include <iterator>
@@ -201,3 +204,5 @@ struct hash<GUID>
     }
 };
 } // namespace std
+
+#endif // NOTSTD_GUID_HXX
