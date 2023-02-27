@@ -111,7 +111,7 @@ try {
     // Keep a container of known devices. Once initialized,
     std::vector<std::unique_ptr<windows::devices::uwb::UwbDevice>> uwbDevices{};
 
-    DevicePresenceMonitor presenceMonitor(windows::devices::uwb::InterfaceClassUwb, [&](auto&& presenceEvent, auto&& deviceName) {
+    DevicePresenceMonitor presenceMonitor(windows::devices::uwb::InterfaceClassUwb, [&](auto&& deviceGuid, auto&& presenceEvent, auto&& deviceName) {
         const auto presenceEventName = magic_enum::enum_name(presenceEvent);
         PLOG_INFO << deviceName << " " << presenceEventName << std::endl;
 
