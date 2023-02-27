@@ -55,9 +55,11 @@ ValidateRoundtrip(const NeutralT& instance)
  * @tparam ReturnT
  */
 template <typename ReturnT = uint32_t>
-    requires(std::is_same_v<ReturnT, uint8_t> || std::is_same_v<ReturnT, uint16_t> || std::is_same_v<ReturnT, uint32_t>)
+// clang-format off
+requires std::is_convertible_v<uint32_t, ReturnT>
 ReturnT
-    GetRandom()
+GetRandom()
+// clang-format on
 {
     static std::mt19937 engine{ std::random_device{}() };
     static std::uniform_int_distribution<uint32_t> distribution{};
