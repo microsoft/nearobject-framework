@@ -1,8 +1,8 @@
 
 #include <concepts>
 #include <iterator>
-#include <ranges>
 #include <random>
+#include <ranges>
 #include <type_traits>
 
 #include <catch2/catch_test_macros.hpp>
@@ -51,13 +51,15 @@ ValidateRoundtrip(const NeutralT& instance)
 
 /**
  * @brief Generate a random integral value.
- * 
- * @tparam ReturnT 
+ *
+ * @tparam ReturnT
  */
 template <typename ReturnT = uint32_t>
-requires (std::is_same_v<ReturnT, uint8_t> || std::is_same_v<ReturnT, uint16_t> || std::is_same_v<ReturnT, uint32_t>)
+// clang-format off
+requires std::is_convertible_v<uint32_t, ReturnT>
 ReturnT
 GetRandom()
+// clang-format on
 {
     static std::mt19937 engine{ std::random_device{}() };
     static std::uniform_int_distribution<uint32_t> distribution{};
@@ -67,13 +69,13 @@ GetRandom()
 
 /**
  * @brief Generate a random uwb ranging measurement.
- * 
- * @return ::uwb::protocol::fira::UwbRangingMeasurementData 
+ *
+ * @return ::uwb::protocol::fira::UwbRangingMeasurementData
  */
-::uwb::protocol::fira::UwbRangingMeasurementData 
+::uwb::protocol::fira::UwbRangingMeasurementData
 GetRandomUwbMeasurementData()
 {
-    ::uwb::protocol::fira::UwbRangingMeasurementData uwbRangingMeasurementData {
+    ::uwb::protocol::fira::UwbRangingMeasurementData uwbRangingMeasurementData{
         .Result = GetRandom<uint16_t>(),
         .FigureOfMerit = GetRandom<uint8_t>(),
     };
@@ -87,9 +89,9 @@ GetRandomUwbMeasurementData()
 }
 
 /**
- * @brief Returns a vector of all possible UwbStatus values. 
- * 
- * @return const std::vector<::uwb::protocol::fira::UwbStatus>& 
+ * @brief Returns a vector of all possible UwbStatus values.
+ *
+ * @return const std::vector<::uwb::protocol::fira::UwbStatus>&
  */
 const std::vector<::uwb::protocol::fira::UwbStatus>&
 AllUwbStatusValues()
@@ -347,7 +349,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
                 .CurrentRangingInterval = test::GetRandom<uint32_t>(),
                 .RangingMeasurementType = uwbRangingMeasurementType,
                 .RangingMeasurements = {
-                    UwbRangingMeasurement {
+                    UwbRangingMeasurement{
                         .SlotIndex = test::GetRandom<uint8_t>(),
                         .Distance = test::GetRandom<uint16_t>(),
                         .Status = UwbStatusGeneric::Rejected,
@@ -358,7 +360,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
                         .AoaDestinationAzimuth = test::GetRandomUwbMeasurementData(),
                         .AoaDestinationElevation = test::GetRandomUwbMeasurementData(),
                     },
-                    UwbRangingMeasurement {
+                    UwbRangingMeasurement{
                         .SlotIndex = test::GetRandom<uint8_t>(),
                         .Distance = test::GetRandom<uint16_t>(),
                         .Status = UwbStatusGeneric::Rejected,
@@ -369,7 +371,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
                         .AoaDestinationAzimuth = test::GetRandomUwbMeasurementData(),
                         .AoaDestinationElevation = test::GetRandomUwbMeasurementData(),
                     },
-                    UwbRangingMeasurement {
+                    UwbRangingMeasurement{
                         .SlotIndex = test::GetRandom<uint8_t>(),
                         .Distance = test::GetRandom<uint16_t>(),
                         .Status = UwbStatusGeneric::Rejected,
@@ -385,7 +387,6 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
 
             test::ValidateRoundtrip(uwbRangingData);
         }
-
     }
 
     SECTION("UwbNotificationData UwbStatus variant is stable")
@@ -440,7 +441,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
             .Status = std::move(uwbMulticastListStatus)
         };
         const UwbNotificationData uwbNotificationDataSessionUpdateMulicastListStatus{ uwbSessionUpdateMulicastListStatus };
-        // test::ValidateRoundtrip(uwbNotificationDataSessionUpdateMulicastListStatus);
+        test::ValidateRoundtrip(uwbNotificationDataSessionUpdateMulicastListStatus);
     }
 
     SECTION("UwbNotificationData UwbRangingData variant is stable")
@@ -451,7 +452,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
             .CurrentRangingInterval = test::GetRandom<uint32_t>(),
             .RangingMeasurementType = UwbRangingMeasurementType::TwoWay,
             .RangingMeasurements = {
-                UwbRangingMeasurement {
+                UwbRangingMeasurement{
                     .SlotIndex = test::GetRandom<uint8_t>(),
                     .Distance = test::GetRandom<uint16_t>(),
                     .Status = UwbStatusGeneric::Rejected,
@@ -462,7 +463,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
                     .AoaDestinationAzimuth = test::GetRandomUwbMeasurementData(),
                     .AoaDestinationElevation = test::GetRandomUwbMeasurementData(),
                 },
-                UwbRangingMeasurement {
+                UwbRangingMeasurement{
                     .SlotIndex = test::GetRandom<uint8_t>(),
                     .Distance = test::GetRandom<uint16_t>(),
                     .Status = UwbStatusGeneric::Rejected,
@@ -476,6 +477,6 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
             },
         };
         const UwbNotificationData uwbNotificationDataRangingData{ uwbRangingData };
-        // test::ValidateRoundtrip(uwbNotificationDataRangingData);
+        test::ValidateRoundtrip(uwbNotificationDataRangingData);
     }
 }

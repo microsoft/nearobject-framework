@@ -160,7 +160,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulticastListEntry &
 UwbSessionUpdateMulicastListWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulicastList &uwbSessionUpdateMulicastList)
 {
-    auto sessionUpdateControllerMulticastListWrapper = UwbSessionUpdateMulicastListWrapper::from_num_elements(std::size(uwbSessionUpdateMulicastList.Controlees));
+    auto sessionUpdateControllerMulticastListWrapper = UwbSessionUpdateMulicastListWrapper::from_num_elements<decltype(UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST::controleeList)>(std::size(uwbSessionUpdateMulicastList.Controlees));
     UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST &sessionUpdateControllerMulticastList = sessionUpdateControllerMulticastListWrapper;
     sessionUpdateControllerMulticastList.size = sessionUpdateControllerMulticastListWrapper.size();
     sessionUpdateControllerMulticastList.sessionId = uwbSessionUpdateMulicastList.SessionId;
@@ -178,7 +178,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulicastList &uwbSes
 UwbSessionUpdateMulicastListStatusWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulicastListStatus &uwbSessionUpdateMulicastListStatus)
 {
-    auto multicastListStatusWrapper = UwbSessionUpdateMulicastListStatusWrapper::from_num_elements(std::size(uwbSessionUpdateMulicastListStatus.Status));
+    auto multicastListStatusWrapper = UwbSessionUpdateMulicastListStatusWrapper::from_num_elements<decltype(UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF::statusList)>(std::size(uwbSessionUpdateMulicastListStatus.Status));
     UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF &multicastListStatus = multicastListStatusWrapper;
     multicastListStatus.size = multicastListStatusWrapper.size();
     multicastListStatus.sessionId = uwbSessionUpdateMulicastListStatus.SessionId;
@@ -327,7 +327,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbDeviceInformation &uwbDeviceInfo)
         numElements = 1;
     }
 
-    auto deviceInfoWrapper = UwbDeviceInformationWrapper::from_num_elements(numElements);
+    auto deviceInfoWrapper = UwbDeviceInformationWrapper::from_num_elements<decltype(UWB_DEVICE_INFO::vendorSpecificInfo)>(numElements);
     UWB_DEVICE_INFO &deviceInfo = deviceInfoWrapper;
     deviceInfo.size = deviceInfoWrapper.size();
     deviceInfo.status = From(uwbDeviceInfo.Status);
@@ -351,7 +351,7 @@ UwbDeviceCapabilitiesWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbCapability &uwbDeviceCapabilities)
 {
     std::size_t numElements = 2; // TODO: calculate this from uwbDeviceCapabilities
-    auto deviceCapabilitiesWrapper = UwbDeviceCapabilitiesWrapper::from_num_elements(numElements);
+    auto deviceCapabilitiesWrapper = UwbDeviceCapabilitiesWrapper::from_num_elements<decltype(UWB_DEVICE_CAPABILITIES::capabilityParams)>(numElements);
 
     UWB_DEVICE_CAPABILITIES &deviceCapabilities = deviceCapabilitiesWrapper;
     deviceCapabilities.size = deviceCapabilitiesWrapper.size();
@@ -415,6 +415,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::UwbMacAddress &uwbMacAddress)
 UWB_RANGING_MEASUREMENT
 windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingMeasurement &uwbRangingMeasurement)
 {
+    // clang-format off
     UWB_RANGING_MEASUREMENT rangingMeasurement{
         .size = sizeof rangingMeasurement,
         .macAddrPeer = From(uwbRangingMeasurement.PeerMacAddress),
@@ -425,7 +426,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingMea
             (uwbRangingMeasurement.AoAAzimuth.Result & 0x00FFU),
             (uwbRangingMeasurement.AoAAzimuth.Result & 0xFF00U) >> 8U },
         .aoaAzimuthFigureOfMerit = uwbRangingMeasurement.AoAAzimuth.FigureOfMerit.value_or(0),
-        .aoaElevation = { 
+        .aoaElevation = {
             (uwbRangingMeasurement.AoAElevation.Result & 0x00FFU),
             (uwbRangingMeasurement.AoAElevation.Result & 0xFF00U) >> 8U },
         .aoaElevationFigureOfMerit = uwbRangingMeasurement.AoAElevation.FigureOfMerit.value_or(0),
@@ -439,6 +440,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingMea
         .aoaDestinationElevationFigureOfMerit = uwbRangingMeasurement.AoaDestinationElevation.FigureOfMerit.value_or(0),
         .slotIndex = uwbRangingMeasurement.SlotIndex
     };
+    // clang-format on
 
     return rangingMeasurement;
 }
@@ -446,7 +448,7 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingMea
 UwbRangingDataWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbRangingData &uwbRangingData)
 {
-    auto rangingDataWrapper = UwbRangingDataWrapper::from_num_elements(std::size(uwbRangingData.RangingMeasurements));
+    auto rangingDataWrapper = UwbRangingDataWrapper::from_num_elements<decltype(UWB_RANGING_DATA::rangingMeasurements)>(std::size(uwbRangingData.RangingMeasurements));
     UWB_RANGING_DATA &rangingData = rangingDataWrapper;
     rangingData.size = rangingDataWrapper.size();
     rangingData.sequenceNumber = uwbRangingData.SequenceNumber;
@@ -463,7 +465,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbRangingData &uwbRangingData)
     return rangingDataWrapper;
 }
 
-UWB_NOTIFICATION_DATA
+UwbNotificationDataWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbNotificationData &uwbNotificationData)
 {
     static const std::unordered_map<std::type_index, UWB_NOTIFICATION_TYPE> NotificationTypeMap{
@@ -474,23 +476,56 @@ windows::devices::uwb::ddi::lrp::From(const UwbNotificationData &uwbNotification
         { std::type_index(typeid(UwbRangingData)), UWB_NOTIFICATION_TYPE_RANGING_DATA },
     };
 
-    UWB_NOTIFICATION_DATA notificationData{};
+    // The total size required must be calculated, which includes the size of
+    // all the non-discriminated strcuture members plus the size of the
+    // discriminated type within the union. Taking the sum of each individual
+    // member is error-prone because 1) if the structure is ever updated, this
+    // code will break, and 2) such a calculation would not include compiler
+    // added padding for alignment. Conseauently, we take the size of the entire
+    // structure here, which will include the size of the largest union member,
+    // resulting in an overestimate. While this wastes some memory, it provides
+    // a strong guarantee that enough memory will be allocated, avoiding the
+    // possibility of buffer overrun and heap corruption.
+    std::size_t totalSize = sizeof(UWB_NOTIFICATION_DATA);
+    std::unique_ptr<UwbNotificationDataWrapper> notificationDataWrapper;
 
-    std::visit([&notificationData](auto &&arg) {
+    std::visit([&](auto &&arg) {
         using ValueType = std::decay_t<decltype(arg)>;
 
-        notificationData.notificationType = NotificationTypeMap.at(typeid(arg));
-
         if constexpr (std::is_same_v<ValueType, UwbStatus>) {
+            totalSize += sizeof(UWB_NOTIFICATION_DATA::genericError);
+            notificationDataWrapper = std::make_unique<UwbNotificationDataWrapper>(totalSize);
+            UWB_NOTIFICATION_DATA &notificationData = notificationDataWrapper->value();
+            notificationData.notificationType = NotificationTypeMap.at(typeid(arg));
             notificationData.genericError = From(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbStatusDevice>) {
+            totalSize += sizeof(UWB_NOTIFICATION_DATA::deviceStatus);
+            notificationDataWrapper = std::make_unique<UwbNotificationDataWrapper>(totalSize);
+            UWB_NOTIFICATION_DATA &notificationData = notificationDataWrapper->value();
+            notificationData.notificationType = NotificationTypeMap.at(typeid(arg));
             notificationData.deviceStatus = From(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionStatus>) {
+            totalSize += sizeof(UWB_NOTIFICATION_DATA::sessionStatus);
+            notificationDataWrapper = std::make_unique<UwbNotificationDataWrapper>(totalSize);
+            UWB_NOTIFICATION_DATA &notificationData = notificationDataWrapper->value();
+            notificationData.notificationType = NotificationTypeMap.at(typeid(arg));
             notificationData.sessionStatus = From(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionUpdateMulicastListStatus>) {
-            notificationData.sessionUpdateControllerMulticastList = From(arg);
+            auto uwbSessionUpdateMulicastListStatusWrapper = From(arg);
+            totalSize += std::size(uwbSessionUpdateMulicastListStatusWrapper);
+            notificationDataWrapper = std::make_unique<UwbNotificationDataWrapper>(totalSize);
+            UWB_NOTIFICATION_DATA &notificationData = notificationDataWrapper->value();
+            notificationData.notificationType = NotificationTypeMap.at(typeid(arg));
+            auto data = uwbSessionUpdateMulicastListStatusWrapper.data();
+            std::memcpy(&notificationData.sessionUpdateControllerMulticastList, std::data(data), std::size(data));
         } else if constexpr (std::is_same_v<ValueType, UwbRangingData>) {
-            notificationData.rangingData = From(arg);
+            auto uwbRangingDataWrapper = From(arg);
+            totalSize += std::size(uwbRangingDataWrapper);
+            notificationDataWrapper = std::make_unique<UwbNotificationDataWrapper>(totalSize);
+            UWB_NOTIFICATION_DATA &notificationData = notificationDataWrapper->value();
+            notificationData.notificationType = NotificationTypeMap.at(typeid(arg));
+            auto data = uwbRangingDataWrapper.data();
+            std::memcpy(&notificationData.rangingData, std::data(data), std::size(data));
         }
         // Note: no else clause is needed here since if the type is not
         // supported, the at() call above will throw std::out_of_range, ensuring
@@ -498,7 +533,8 @@ windows::devices::uwb::ddi::lrp::From(const UwbNotificationData &uwbNotification
     },
         uwbNotificationData);
 
-    return notificationData;
+    notificationDataWrapper->value().size = totalSize;
+    return std::move(*notificationDataWrapper);
 }
 
 namespace detail
