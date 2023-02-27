@@ -1,5 +1,6 @@
 
 #include <filesystem>
+#include <sstream>
 
 #include <windows/devices/DevicePresenceMonitor.hxx>
 
@@ -98,4 +99,31 @@ void
 DevicePresenceMonitor::Stop()
 {
     UnregisterForDeviceClassNotifications();
+}
+
+DevicePresenceMonitor::StartException::StartException(const GUID &deviceGuid, CONFIGRET configurationManagerResult) :
+    m_deviceGuid(deviceGuid),
+    m_configurationManagerResult(configurationManagerResult)
+{
+    std::ostringstream ss;
+    ss << "configuration manager registration failed for device guid " << notstd::GuidToString<std::string>(deviceGuid) << " with CONFIGRET=" << std::hex << configurationManagerResult;
+    m_what = ss.str();
+}
+
+GUID
+DevicePresenceMonitor::StartException::Guid() const noexcept
+{
+    return m_deviceGuid;
+}
+
+CONFIGRET
+DevicePresenceMonitor::StartException::ConfigurationManagerResult() const noexcept
+{
+    return m_configurationManagerResult;
+}
+
+const char *
+DevicePresenceMonitor::StartException::what() const noexcept
+{
+    return m_what.c_str();
 }
