@@ -68,7 +68,7 @@ main(int argc, char* argv[])
         }
     }
 
-    windows::devices::DevicePresenceMonitor monitor{deviceGuid.value(), [](auto&& deviceGuid, auto&& presenceEvent, auto&& deviceName) {
+    windows::devices::DevicePresenceMonitor monitor(deviceGuid.value(), [](auto&& deviceGuid, auto&& presenceEvent, auto&& deviceName) {
         const auto presenceEventName = magic_enum::enum_name(presenceEvent);
         std::cout << deviceName << " " << presenceEventName << std::endl;
     });
