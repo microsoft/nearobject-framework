@@ -91,6 +91,7 @@ struct flextype_wrapper
      * a template argument. Thus, the calculation method described above is used
      * instead as a compromise.
      *
+     * @tparam element_type The type of the flex-array elements.
      * @param num_flex_elements Desired number of flex-array elements to store.
      * @return constexpr auto
      */
@@ -115,6 +116,7 @@ struct flextype_wrapper
      * size of the wrapped type and pass this to the constructor accepting the
      * total size instead.
      *
+     * @tparam element_type The type of the flex-array elements.
      * @param num_flex_elements Desired number of flex-array elements to store.
      * @return flextype_wrapper
      */
