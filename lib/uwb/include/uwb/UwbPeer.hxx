@@ -44,6 +44,11 @@ public:
      */
     explicit UwbPeer(UwbMacAddress address);
 
+    /**
+     * @brief Construct a new Uwb Peer object from UwbRangingMeasurement data
+     * 
+     * @param data 
+     */
     explicit UwbPeer(const uwb::protocol::fira::UwbRangingMeasurement& data);
 
     /**
