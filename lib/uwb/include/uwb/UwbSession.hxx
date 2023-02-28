@@ -118,6 +118,14 @@ public:
         }
     }
 
+    /**
+     * @brief Temporarily public function to call the UwbSessionEventCallbacks callback for new ranging data 
+     * 
+     * @param peerRangingData 
+     */
+    void
+    ProcessRangingData(const std::vector<uwb::UwbPeer>& peerRangingData);
+
 private:
     /**
      * @brief Internal function to insert a peer address to this session
