@@ -32,11 +32,7 @@ UwbSession::AddPeer(UwbMacAddress peerMacAddress)
 {
     std::scoped_lock peersLock{ m_peerGate };
     PLOG_VERBOSE << "adding peer with address " << peerMacAddress.ToString();
-    auto [_, inserted] = m_peers.insert(peerMacAddress);
-
-    if (inserted) {
-        AddPeerImpl(std::move(peerMacAddress));
-    }
+    AddPeerImpl(std::move(peerMacAddress));
     PLOG_VERBOSE << "peer added";
 }
 
