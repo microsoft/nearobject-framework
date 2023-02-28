@@ -89,6 +89,16 @@ UwbDevice::OnSessionMulticastListStatus(UwbSessionUpdateMulicastListStatus statu
     });
 
     session->InsertPeers(peersAdded);
+
+    // Now log the bad status
+    IF_PLOG(plog::verbose)
+    {
+        for (const auto& peer : statusMulticastList.Status) {
+            if (peer.Status != UwbStatusMulticast::OkUpdate) {
+                PLOG_VERBOSE << "peer has bad status: " << peer.ToString();
+            }
+        }
+    }
 }
 
 void
