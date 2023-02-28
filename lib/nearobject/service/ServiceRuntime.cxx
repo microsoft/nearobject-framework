@@ -7,10 +7,6 @@ using namespace nearobject::service;
 ServiceRuntime::~ServiceRuntime()
 {
     Stop();
-
-    if (m_threadMain.joinable()) {
-        m_threadMain.join();
-    }
 }
 
 ServiceRuntime&
@@ -31,7 +27,7 @@ ServiceRuntime::Start()
         }
     }
 
-    m_threadMain = std::thread([&]() {
+    m_threadMain = std::jthread([&]() {
         Run();
     });
 }

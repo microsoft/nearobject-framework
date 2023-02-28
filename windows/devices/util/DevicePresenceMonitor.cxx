@@ -1,5 +1,6 @@
 
 #include <filesystem>
+#include <sstream>
 
 #include <windows/devices/DevicePresenceMonitor.hxx>
 
@@ -7,31 +8,41 @@
 
 using namespace windows::devices;
 
-DevicePresenceMonitor::DevicePresenceMonitor(const GUID &deviceGuid, std::function<void(DevicePresenceEvent presenceEvent, std::string deviceName)> callback) noexcept :
-    m_deviceGuid(deviceGuid),
-    m_callback(callback)
+DevicePresenceMonitor::DevicePresenceMonitor(const GUID &deviceGuid, std::function<void(const GUID &deviceGuid, DevicePresenceEvent presenceEvent, std::string deviceName)> callback) noexcept :
+    DevicePresenceMonitor(std::vector<GUID>{ deviceGuid }, std::move(callback))
+{}
+
+DevicePresenceMonitor::DevicePresenceMonitor(std::vector<GUID> deviceGuids, std::function<void(const GUID &deviceGuid, DevicePresenceEvent presenceEvent, std::string deviceName)> callback) noexcept :
+    m_callback(std::move(callback))
 {
+    for (auto &deviceGuid : deviceGuids) {
+        m_deviceGuids.insert({ std::move(deviceGuid), unique_hcmnotification{} });
+    }
 }
 
 void
 DevicePresenceMonitor::RegisterForDeviceClassNotifications()
 {
-    CM_NOTIFY_FILTER interfaceFilter = {};
-    interfaceFilter.cbSize = sizeof interfaceFilter;
-    interfaceFilter.FilterType = CM_NOTIFY_FILTER_TYPE_DEVICEINTERFACE;
-    interfaceFilter.u.DeviceInterface.ClassGuid = m_deviceGuid;
+    for (auto &[deviceGuid, hcmNotificationHandle] : m_deviceGuids) {
+        CM_NOTIFY_FILTER interfaceFilter = {};
+        interfaceFilter.cbSize = sizeof interfaceFilter;
+        interfaceFilter.FilterType = CM_NOTIFY_FILTER_TYPE_DEVICEINTERFACE;
+        interfaceFilter.u.DeviceInterface.ClassGuid = deviceGuid;
 
-    auto notifyRegistrationResult = CM_Register_Notification(&interfaceFilter, this, OnDeviceInterfaceNotificationCallback, &m_hcmNotificationHandle);
-    if (notifyRegistrationResult != CR_SUCCESS) {
-        PLOG_ERROR << "failed to register notification callback";
-        throw DevicePresenceMonitor::StartException{ notifyRegistrationResult };
+        auto notifyRegistrationResult = CM_Register_Notification(&interfaceFilter, this, OnDeviceInterfaceNotificationCallback, &hcmNotificationHandle);
+        if (notifyRegistrationResult != CR_SUCCESS) {
+            PLOG_ERROR << "failed to register notification callback for device guid " << notstd::GuidToString<std::string>(deviceGuid);
+            throw DevicePresenceMonitor::StartException{ deviceGuid, notifyRegistrationResult };
+        }
     }
 }
 
 void
 DevicePresenceMonitor::UnregisterForDeviceClassNotifications()
 {
-    m_hcmNotificationHandle.reset();
+    for (auto &[_, hcmNotificationHandle] : m_deviceGuids) {
+        hcmNotificationHandle.reset();
+    }
 }
 
 void
@@ -50,18 +61,18 @@ DevicePresenceMonitor::OnDeviceInterfaceNotification(HCMNOTIFICATION hcmNotifica
     // assumed that the path names provided by this API (from the win32
     // namespace) contain only ASCII characters, and so, the conversion should
     // be safe.
-    
+
     switch (action) {
     case CM_NOTIFY_ACTION_DEVICEINTERFACEARRIVAL: {
         devicePath = std::filesystem::path(std::wstring(eventData->u.DeviceInterface.SymbolicLink));
         deviceName = devicePath.string();
-        m_callback(DevicePresenceEvent::Arrived, std::move(deviceName));
+        m_callback(eventData->u.DeviceInterface.ClassGuid, DevicePresenceEvent::Arrived, std::move(deviceName));
         break;
     }
     case CM_NOTIFY_ACTION_DEVICEINTERFACEREMOVAL: {
         devicePath = std::filesystem::path(std::wstring(eventData->u.DeviceInterface.SymbolicLink));
         deviceName = devicePath.string();
-        m_callback(DevicePresenceEvent::Departed, std::move(deviceName));
+        m_callback(eventData->u.DeviceInterface.ClassGuid, DevicePresenceEvent::Departed, std::move(deviceName));
         break;
     }
     default:
@@ -88,4 +99,31 @@ void
 DevicePresenceMonitor::Stop()
 {
     UnregisterForDeviceClassNotifications();
+}
+
+DevicePresenceMonitor::StartException::StartException(const GUID &deviceGuid, CONFIGRET configurationManagerResult) :
+    m_deviceGuid(deviceGuid),
+    m_configurationManagerResult(configurationManagerResult)
+{
+    std::ostringstream ss;
+    ss << "configuration manager registration failed for device guid " << notstd::GuidToString<std::string>(deviceGuid) << " with CONFIGRET=" << std::hex << configurationManagerResult;
+    m_what = ss.str();
+}
+
+GUID
+DevicePresenceMonitor::StartException::Guid() const noexcept
+{
+    return m_deviceGuid;
+}
+
+CONFIGRET
+DevicePresenceMonitor::StartException::ConfigurationManagerResult() const noexcept
+{
+    return m_configurationManagerResult;
+}
+
+const char *
+DevicePresenceMonitor::StartException::what() const noexcept
+{
+    return m_what.c_str();
 }

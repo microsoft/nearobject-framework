@@ -340,6 +340,16 @@ public:
     }
 
     /**
+     * @brief Construct a new, randomly generated UwbMacAddress object based on
+     * runtime provided arguments.
+     * 
+     * @param type The type of random address to generate.
+     * @return UwbMacAddress The randomly generated address value.
+     */
+    static UwbMacAddress
+    Random(UwbMacAddressType type);
+
+    /**
      * @brief Construct a default UwbMacAddress.
      */
     UwbMacAddress();

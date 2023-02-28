@@ -29,12 +29,32 @@ const GUID GUID_DEVINTERFACE_UWB_SIMULATOR = { 0x21663d8d, 0x2dd6, 0x45c7, { 0xa
 #define IOCTL_UWB_DEVICE_SIM_GET_CAPABILITIES CTL_CODE(FILE_DEVICE_UNKNOWN, 0x1000, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
 /**
+ * @brief 
+ * 
+ * Input: UwbSimulatorTriggerSessionEventArgs
+ * Output:
+ */
+#define IOCTL_UWB_DEVICE_SIM_TRIGGER_SESSION_EVENT CTL_CODE(FILE_DEVICE_UNKNOWN, 0x1001, METHOD_BUFFERED, FILE_ANY_ACCESS)
+
+/**
  * @brief Describes the capabilities of the simulator driver, including
  * versioning and protocol information.
  */
 struct UwbSimulatorCapabilities
 {
     uint32_t Version;
+};
+
+enum UwbSimulatorSessionEventAction
+{
+    None = 0x00,
+    RandomRangingMeasurementGenerationStart = 0x01,
+    RandomRangingMeasurementGenerationStop = 0x02,
+};
+
+struct UwbSimulatorTriggerSessionEventArgs
+{
+    UwbSimulatorSessionEventAction Action;
 };
 
 #ifdef __cplusplus

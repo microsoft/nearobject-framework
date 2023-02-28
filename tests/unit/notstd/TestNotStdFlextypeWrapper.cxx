@@ -74,10 +74,10 @@ template <
     typename ElementT,
     flex_array_type FlexElementAdjuster = flex_array_type::anysize>
 struct test_flex_wrapper :
-    public notstd::flextype_wrapper<test_flex_type<ElementT, FlexElementAdjuster>, ElementT, FlexElementAdjuster>
+    public notstd::flextype_wrapper<test_flex_type<ElementT, FlexElementAdjuster>, FlexElementAdjuster>
 {
     using value_type = test_flex_type<ElementT, FlexElementAdjuster>;
-    using flex_wrapper_type = flextype_wrapper<value_type, ElementT, FlexElementAdjuster>;
+    using flex_wrapper_type = flextype_wrapper<value_type, FlexElementAdjuster>;
 
     test_flex_wrapper(std::size_t numElements) :
         flex_wrapper_type(numElements)
@@ -117,7 +117,7 @@ TEST_CASE("flextype_wrapper can be used as a value container with element-based 
     {
         using flex_wrapper_type = test_flex_wrapper<test_flex_type_element_byte>;
 
-        auto wrapper = flex_wrapper_type::from_num_elements(num_elements);
+        auto wrapper = flex_wrapper_type::from_num_elements<test_flex_type_element_byte>(num_elements);
 
         // Ensure there's enough room to store the complete type including flex array elements.
         REQUIRE(wrapper.size() >= flex_wrapper_type::value_type::total_size<num_elements>());
@@ -138,7 +138,7 @@ TEST_CASE("flextype_wrapper can be used as a value container with element-based 
     {
         using flex_wrapper_type = test_flex_wrapper<test_flex_type_element_compound>;
 
-        auto wrapper = flex_wrapper_type::from_num_elements(num_elements);
+        auto wrapper = flex_wrapper_type::from_num_elements<test_flex_type_element_compound>(num_elements);
 
         // Ensure there's enough room to store the complete type including flex array elements.
         REQUIRE(wrapper.size() >= flex_wrapper_type::value_type::total_size<num_elements>());
@@ -161,7 +161,7 @@ TEST_CASE("flextype_wrapper can be used as a value container with element-based 
     {
         using flex_wrapper_type = test_flex_wrapper<test_flex_type_element_compound>;
 
-        auto wrapper = flex_wrapper_type::from_num_elements(num_elements);
+        auto wrapper = flex_wrapper_type::from_num_elements<test_flex_type_element_compound>(num_elements);
         flex_wrapper_type::value_type& value = wrapper;
         value.value = 0xFEEDF00DU;
         value.num_elements = num_elements;
@@ -184,7 +184,7 @@ TEST_CASE("flextype_wrapper can be used as a value container with element-based 
     {
         using flex_wrapper_type = test_flex_wrapper<test_flex_type_element_compound>;
 
-        auto wrapper = flex_wrapper_type::from_num_elements(num_elements);
+        auto wrapper = flex_wrapper_type::from_num_elements<test_flex_type_element_compound>(num_elements);
         flex_wrapper_type::value_type& value = wrapper;
         value.value = 0xFEEDF00DU;
         value.num_elements = num_elements;

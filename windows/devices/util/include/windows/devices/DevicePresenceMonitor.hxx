@@ -4,9 +4,11 @@
 
 #include <functional>
 #include <ios>
-#include <sstream>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
+
+#include <notstd/guid.hxx>
 
 // NB: This must come before any other Windows include
 #include <windows.h>
@@ -41,46 +43,52 @@ public:
      * @param callback The callback function to invoke when a device presence
      * change event occurs.
      */
-    explicit DevicePresenceMonitor(const GUID &deviceGuid, std::function<void(DevicePresenceEvent presenceEvent, std::string deviceName)> callback) noexcept;
+    explicit DevicePresenceMonitor(const GUID& deviceGuid, std::function<void(const GUID& deviceGuid, DevicePresenceEvent presenceEvent, std::string deviceName)> callback) noexcept;
+
+    /**
+     * @brief Construct a new Device Presence Monitor object
+     *
+     * @param deviceGuids A list of deveice guids to monitor for presence changes.
+     * @param callback The callback function to invoke when a device presence change event occurs.
+     */
+    explicit DevicePresenceMonitor(std::vector<GUID> deviceGuids, std::function<void(const GUID& deviceGuid, DevicePresenceEvent presenceEvent, std::string deviceName)> callback) noexcept;
 
     /**
      * @brief Exception thrown when there is an error starting the monitor.
      */
-    class StartException : public std::exception
+    class StartException :
+        public std::exception
     {
     public:
-        StartException(CONFIGRET configurationManagerResult) :
-            m_configurationManagerResult(configurationManagerResult)
-        {
-            std::ostringstream ss;
-            ss << "configuration manager registration failed with CONFIGRET=" << std::hex << configurationManagerResult;
-            m_what = ss.str();
-        }
+        StartException(const GUID& deviceGuid, CONFIGRET configurationManagerResult);
+
+        /**
+         * @brief The device guid associated with the error.
+         *
+         * @return GUID
+         */
+        GUID
+        Guid() const noexcept;
 
         /**
          * @brief The Windows Configuration Manager (CM) return value from the
-         * failed operation. 
-         * 
-         * @return CONFIGRET 
+         * failed operation.
+         *
+         * @return CONFIGRET
          */
         CONFIGRET
-        ConfigurationManagerResult() const noexcept
-        {
-            return m_configurationManagerResult;
-        }
+        ConfigurationManagerResult() const noexcept;
 
         /**
          * @brief A description of what caused the failure.
-         * 
-         * @return const char* 
+         *
+         * @return const char*
          */
-        const char *
-        what() const noexcept
-        {
-            return m_what.c_str();
-        }
+        const char*
+        what() const noexcept override;
 
     private:
+        GUID m_deviceGuid;
         std::string m_what;
         CONFIGRET m_configurationManagerResult;
     };
@@ -119,7 +127,7 @@ private:
      * @param eventDataSize
      */
     void
-    OnDeviceInterfaceNotification(HCMNOTIFICATION hcmNotificationHandle, CM_NOTIFY_ACTION action, CM_NOTIFY_EVENT_DATA *eventData, DWORD eventDataSize);
+    OnDeviceInterfaceNotification(HCMNOTIFICATION hcmNotificationHandle, CM_NOTIFY_ACTION action, CM_NOTIFY_EVENT_DATA* eventData, DWORD eventDataSize);
 
     /**
      * @brief Unbound callback function for when a class driver event occurs.
@@ -132,12 +140,11 @@ private:
      * @return DWORD
      */
     static DWORD CALLBACK
-    OnDeviceInterfaceNotificationCallback(HCMNOTIFICATION hcmNotificationHandle, void *context, CM_NOTIFY_ACTION action, CM_NOTIFY_EVENT_DATA *eventData, DWORD eventDataSize);
+    OnDeviceInterfaceNotificationCallback(HCMNOTIFICATION hcmNotificationHandle, void* context, CM_NOTIFY_ACTION action, CM_NOTIFY_EVENT_DATA* eventData, DWORD eventDataSize);
 
 private:
-    GUID m_deviceGuid;
-    unique_hcmnotification m_hcmNotificationHandle;
-    std::function<void(DevicePresenceEvent presenceEvent, std::string deviceName)> m_callback;
+    std::function<void(const GUID& deviceGuid, DevicePresenceEvent presenceEvent, std::string deviceName)> m_callback;
+    std::unordered_map<GUID, unique_hcmnotification> m_deviceGuids{};
 };
 } // namespace windows::devices
 

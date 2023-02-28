@@ -11,7 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="UwbSimulatorDdiCallbacksSimulatorImpl.cxx" />
     <ClCompile Include="UwbSimulatorDdiHandlerLrp.cxx" />
+    <ClCompile Include="UwbSimulatorDdiHandlerSimulator.cxx" />
     <ClCompile Include="UwbSimulatorDriver.cxx" />
     <ClCompile Include="UwbSimulatorDdiCallbacksLrpNoop.cxx" />
     <ClCompile Include="UwbSimulatorIoQueue.cxx" />
@@ -20,8 +22,11 @@
     <ClCompile Include="UwbSimulatorTracelogging.cxx" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="UwbSimulatorDdiCallbacksSimulator.hxx" />
+    <ClInclude Include="UwbSimulatorDdiCallbacksSimulatorImpl.hxx" />
     <ClInclude Include="UwbSimulatorDdiHandler.hxx" />
     <ClInclude Include="UwbSimulatorDdiHandlerLrp.hxx" />
+    <ClInclude Include="UwbSimulatorDdiHandlerSimulator.hxx" />
     <ClInclude Include="UwbSimulatorDispatchEntry.hxx" />
     <ClInclude Include="UwbSimulatorDriver.hxx" />
     <ClInclude Include="include\UwbSimulatorDdi.h" />
