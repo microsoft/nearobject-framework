@@ -2,6 +2,7 @@
 #include <type_traits>
 #include <variant>
 
+#include <magic_enum.hpp>
 #include <plog/Log.h>
 #include <ranges>
 #include <uwb/UwbDevice.hxx>
