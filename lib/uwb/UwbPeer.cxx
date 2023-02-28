@@ -37,8 +37,8 @@ UwbPeer::UwbPeer(UwbMacAddress address) :
  * @brief Assuming the Arm definition of Qm.n formatting, the most significant bit is the sign, the next
  * (m-1) bits are an integer, and the next n bits is the number to be multiplied by pow(2,n)
  * The double equivalent will be the sum of those two results
- * TODO double check this conversion
- * 
+ * TODO double check this conversion, write tests for it
+ *
  * @param q97 a number in Q9.7 format
  * @return double
  */
@@ -46,13 +46,17 @@ double
 ConvertQ9_7FormatToIEEE(uint16_t q97)
 {
     static const double pow2 = std::pow(2, -7);
-    static const uint16_t integer_mask = 0b1111'1111'1000'0000U;
-    static const uint16_t fraction_mask = ~integer_mask;
+    static const uint16_t sign_mask =               0b1000'0000'0000'0000U;
+    static const uint16_t unsigned_integer_mask =   0b0111'1111'1000'0000U;
+    static const uint16_t fraction_mask = ~(sign_mask | unsigned_integer_mask);
 
-    int integer_part = (q97 & integer_mask) >> 7U;
+    bool sign = q97 & sign_mask;
+    int unsigned_integer_part = (q97 & unsigned_integer_mask) >> 7U;
     int fraction_part = q97 & fraction_mask;
 
-    return ((double)integer_part) + (((double)fraction_part) * pow2);
+    double unsigned_number = ((double)unsigned_integer_part) + (((double)fraction_part) * pow2);
+
+    return (sign ? -1 : 1) * unsigned_number;
 }
 
 UwbPeer::UwbPeer(const uwb::protocol::fira::UwbRangingMeasurement& data) :
