@@ -16,8 +16,6 @@
 
 namespace uwb
 {
-struct UwbSessionEventCallbacks;
-
 /**
  * @brief Represents a UWB session.
  */
