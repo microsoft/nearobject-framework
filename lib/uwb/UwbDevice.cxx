@@ -111,7 +111,7 @@ UwbDevice::OnSessionRangingData(UwbRangingData rangingData)
         return;
     }
 
-    // TODO: implement this
+    PLOG_VERBOSE << "Adding ranging data to session " << rangingData.SessionId;
 }
 
 void
