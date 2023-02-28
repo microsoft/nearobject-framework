@@ -2,7 +2,7 @@
 #ifndef NEAR_OBJECT_CLI_UWB_SESSION_EVENT_CALLBACKS_HXX
 #define NEAR_OBJECT_CLI_UWB_SESSION_EVENT_CALLBACKS_HXX
 
-#include <uwb/UwbSessionEventCallbacks.hxx>
+#include <uwb/UwbSession.hxx>
 
 namespace nearobject::cli
 {
