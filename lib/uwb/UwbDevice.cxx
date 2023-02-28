@@ -88,7 +88,7 @@ UwbDevice::OnSessionMulticastListStatus(UwbSessionUpdateMulicastListStatus statu
         return peerAddStatus.Status == UwbStatusMulticast::OkUpdate;
     });
 
-    PLOG_VERBOSE << "adding peers to session: " << statusMulticastList.SessionId;
+    PLOG_VERBOSE << "Session with id " << statusMulticastList.SessionId << " adding peers";
     session->InsertPeers(peersAdded);
 
     // Now log the bad status

@@ -10,9 +10,9 @@
 #include <unordered_set>
 
 #include <uwb/UwbMacAddress.hxx>
-#include <uwb/protocols/fira/UwbSessionData.hxx>
 #include <uwb/UwbPeer.hxx>
 #include <uwb/UwbSessionEventCallbacks.hxx>
+#include <uwb/protocols/fira/UwbSessionData.hxx>
 
 namespace uwb
 {
@@ -113,7 +113,9 @@ public:
             }
         }
         auto callbacks = m_callbacks.lock();
-        callbacks->OnSessionMembershipChanged(this, uwbPeers, std::vector<UwbPeer>{});
+        if (!callbacks) {
+            callbacks->OnSessionMembershipChanged(this, uwbPeers, {});
+        }
     }
 
 private:
