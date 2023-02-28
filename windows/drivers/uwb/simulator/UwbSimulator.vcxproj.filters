@@ -72,6 +72,15 @@
     <ClInclude Include="UwbSimulatorSession.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="UwbSimulatorDdiHandlerSimulator.hxx">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UwbSimulatorDdiCallbacksSimulator.hxx">
+      <Filter>Header Files\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="UwbSimulatorDdiCallbacksSimulatorImpl.hxx">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UwbSimulatorIoQueue.cxx">
@@ -93,6 +102,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UwbSimulatorDdiHandlerLrp.cxx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UwbSimulatorDdiHandlerSimulator.cxx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UwbSimulatorDdiCallbacksSimulatorImpl.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
