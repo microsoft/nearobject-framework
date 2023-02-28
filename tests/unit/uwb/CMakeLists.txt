@@ -24,7 +24,6 @@ target_link_libraries(uwb-test
         Catch2::Catch2WithMain
         uwb
         uwb-proto-fira
-        plog::plog
 )
 
 catch_discover_tests(uwb-test)

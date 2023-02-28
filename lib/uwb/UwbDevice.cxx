@@ -89,12 +89,6 @@ UwbDevice::OnSessionMulticastListStatus(UwbSessionUpdateMulicastListStatus statu
     });
 
     session->InsertPeers(peersAdded);
-
-    // for (const auto& peerAddStatus : statusMulticastList.Status) {
-    //     if (peerAddStatus.Status == UwbStatusMulticast::OkUpdate) {
-    //         session->InsertPeer(peerAddStatus.ControleeMacAddress);
-    //     }
-    // }
 }
 
 void

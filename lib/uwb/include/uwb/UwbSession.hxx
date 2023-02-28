@@ -9,8 +9,6 @@
 #include <ranges>
 #include <unordered_set>
 
-#include <plog/Log.h>
-
 #include <uwb/UwbMacAddress.hxx>
 #include <uwb/protocols/fira/UwbSessionData.hxx>
 
@@ -125,20 +123,29 @@ public:
      *
      * @param peers
      */
-    template <std::ranges::input_range V,
-        std::indirect_unary_predicate<std::ranges::iterator_t<V>> Pred>
-        requires std::ranges::view<V> && std::is_object_v<Pred> && std::same_as<std::decay_t<std::ranges::range_reference_t<V>>, uwb::protocol::fira::UwbMulticastListStatus>
+    template <class View>
+    // clang-format off
+    requires std::ranges::view<View> &&
+    std::same_as<std::decay_t<std::ranges::range_reference_t<View>>, uwb::protocol::fira::UwbMulticastListStatus>
+    // clang-format on
     void
-    InsertPeers(std::ranges::filter_view<V, Pred> peers)
+    InsertPeers(View peers)
     {
         std::scoped_lock peersLock{ m_peerGate };
         for (const auto& peer : peers) {
-            m_peers.insert(peer.ControleeMacAddress);
-            PLOG_VERBOSE << "Added peer " << peer.ControleeMacAddress.ToString();
+            InsertPeerImpl(peer.ControleeMacAddress);
         }
     }
 
 private:
+    /**
+     * @brief Internal function to insert a peer address to this session
+     *
+     * @param peerAddress
+     */
+    void
+    InsertPeerImpl(const uwb::UwbMacAddress& peerAddress);
+
     virtual void
     ConfigureImpl(const protocol::fira::UwbSessionData& uwbSessionData) = 0;
 
