@@ -113,7 +113,7 @@ public:
             }
         }
         auto callbacks = m_callbacks.lock();
-        if (!callbacks) {
+        if (callbacks) {
             callbacks->OnSessionMembershipChanged(this, uwbPeers, {});
         }
     }
