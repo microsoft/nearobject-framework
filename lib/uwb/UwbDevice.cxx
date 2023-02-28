@@ -117,7 +117,7 @@ UwbDevice::OnSessionRangingData(UwbRangingData rangingData)
     for (const auto& peerData : rangingData.RangingMeasurements) {
         UwbPeer data{ peerData };
         PLOG_VERBOSE << "Peer data: " << data.ToString();
-        peersData.emplace_back(data);
+        peersData.push_back(std::move(data));
     }
     session->ProcessRangingData(peersData);
 }
