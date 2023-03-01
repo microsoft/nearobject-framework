@@ -320,5 +320,6 @@ UwbSimulatorDdiCallbacks::SessionRandomMeasurementGenerationConfigure(uint32_t s
         session.RandomRangingMeasurementGenerationStart([&](UwbRangingData rangingData) {
             RaiseUwbNotification(std::move(rangingData));
         });
+        break;
     }
 }
