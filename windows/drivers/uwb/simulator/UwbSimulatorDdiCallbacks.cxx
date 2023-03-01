@@ -317,8 +317,8 @@ UwbSimulatorDdiCallbacks::SessionRandomMeasurementGenerationConfigure(uint32_t s
         session.RandomRangingMeasurementGenerationStop();
         break;
     case RandomMeasurementGeneration::Enable:
-        session.RandomRangingMeasurementGenerationStart([&](UwbNotificationData notificationData) {
-            RaiseUwbNotification(std::move(notificationData));
+        session.RandomRangingMeasurementGenerationStart([&](UwbRangingData rangingData) {
+            RaiseUwbNotification(std::move(rangingData));
         });
     }
 }

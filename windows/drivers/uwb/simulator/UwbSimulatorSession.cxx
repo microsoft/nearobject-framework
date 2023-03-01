@@ -12,12 +12,13 @@ UwbSimulatorSession::UwbSimulatorSession(uint32_t sessionId, UwbSessionType sess
 {}
 
 void
-UwbSimulatorSession::RandomRangingMeasurementGenerationStart(std::function<void(UwbNotificationData)> onMeasurementEvent)
+UwbSimulatorSession::RandomRangingMeasurementGenerationStart(std::function<void(UwbRangingData)> onMeasurementEvent)
 {
     if (m_randomRangingMeasurementsEnabled) {
         return;
     }
 
+    m_randomRangingMeasurementsEnabled = true;
     m_randomRangingMeasurementsThread = std::jthread([this, onMeasurementEvent = std::move(onMeasurementEvent)](std::stop_token stopToken) {
         RandomRangingMeasurementGenerator(std::move(onMeasurementEvent), stopToken);
     });
@@ -26,6 +27,11 @@ UwbSimulatorSession::RandomRangingMeasurementGenerationStart(std::function<void(
 void
 UwbSimulatorSession::RandomRangingMeasurementGenerationStop()
 {
+    if (!m_randomRangingMeasurementsEnabled) {
+        return;
+    }
+
+    m_randomRangingMeasurementsEnabled = true;
     m_randomRangingMeasurementsThread.request_stop();
 }
 
@@ -76,11 +82,13 @@ UwbSimulatorSession::GenerateNextRangingData()
 }
 
 void
-UwbSimulatorSession::RandomRangingMeasurementGenerator(std::function<void(UwbNotificationData)> onMeasurementEvent, std::stop_token stopToken)
+UwbSimulatorSession::RandomRangingMeasurementGenerator(std::function<void(UwbRangingData)> onMeasurementEvent, std::stop_token stopToken)
 {
     while (!stopToken.stop_requested()) {
         std::this_thread::sleep_for(m_randomRangingMeasurementsDuration);
         auto rangingData = GenerateNextRangingData();
         onMeasurementEvent(std::move(rangingData));
     }
+
+    m_sequenceNumber = 0;
 }

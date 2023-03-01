@@ -104,6 +104,12 @@ protected:
     void
     SessionUpdateState(UwbSimulatorSession &session, UwbSessionState sessionState, std::optional<UwbSessionReasonCode> reasonCode);
 
+    /**
+     * @brief Configure a session for random measurement generation.
+     *
+     * @param sessionId The session to configure.
+     * @param action The action to take.
+     */
     void
     SessionRandomMeasurementGenerationConfigure(uint32_t sessionId, RandomMeasurementGeneration action);
 

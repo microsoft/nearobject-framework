@@ -27,26 +27,54 @@ struct UwbSimulatorSession :
 {
     UwbSimulatorSession(uint32_t sessionId, UwbSessionType sessionType);
 
+    /**
+     * @brief Start generation of random uwb ranging data for this session.
+     *
+     * @param onMeasurementEvent The callback to invoke with the random uwb ranging data.
+     */
     void
-    RandomRangingMeasurementGenerationStart(std::function<void(UwbNotificationData)> onMeasurementEvent);
+    RandomRangingMeasurementGenerationStart(std::function<void(UwbRangingData)> onMeasurementEvent);
 
+    /**
+     *@brief Stop generation of random uwb ranging measurements for this session.
+     */
     void
     RandomRangingMeasurementGenerationStop();
 
 private:
+    /**
+     * @brief Thread function which generates randomg uwb ranging measurements.
+     *
+     * The thread generates 1 UwbRangingData (encoded within)
+     *
+     * @param onMeasurementEvent The callback to invoke with each ranging data set.
+     * @param stopToken
+     */
     void
-    RandomRangingMeasurementGenerator(std::function<void(UwbNotificationData)> onMeasurementEvent, std::stop_token stopToken);
-    
+    RandomRangingMeasurementGenerator(std::function<void(UwbRangingData)> onMeasurementEvent, std::stop_token stopToken);
+
+    /**
+     * @brief Generate a random UwbRangingMeasurement.
+     *
+     * @return UwbRangingMeasurement
+     */
     UwbRangingMeasurement
     GenerateRandomRangingMeasurement();
 
+    /**
+     * @brief Generate the next set of uwb ranging data.
+     *
+     * @return UwbRangingData
+     */
     UwbRangingData
     GenerateNextRangingData();
 
 private:
+    static constexpr auto DefaultRandomRangingMeasurementsDuration = 1000ms;
+
     bool m_randomRangingMeasurementsEnabled{ false };
     std::jthread m_randomRangingMeasurementsThread;
-    std::chrono::milliseconds m_randomRangingMeasurementsDuration{ 1000ms };
+    std::chrono::milliseconds m_randomRangingMeasurementsDuration{ DefaultRandomRangingMeasurementsDuration };
     uint32_t m_sequenceNumber{ 0 };
 };
 } // namespace windows::devices::uwb::simulator
