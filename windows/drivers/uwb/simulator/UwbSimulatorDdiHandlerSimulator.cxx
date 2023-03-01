@@ -44,39 +44,36 @@ const std::initializer_list<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerSimu
 
 // IOCTL_UWB_DEVICE_RESET
 NTSTATUS
-UwbSimulatorDdiHandlerSimulator::OnUwbSimulatorCapabilities(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandlerSimulator::OnUwbSimulatorCapabilities(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
 {
     NTSTATUS status = STATUS_SUCCESS;
 
-    //// Execute callback.
-    // auto statusUwb = m_callbacks->DeviceReset();
+    // Execute callback.
+    auto uwbSimulatorCapabilities = m_callbacks->GetSimulatorCapabilities();
 
-    //// Convert neutral types to DDI types.
-    // auto &outputValue = *reinterpret_cast<UWB_STATUS *>(std::data(outputBuffer));
-    // outputValue = UwbCxDdi::From(statusUwb);
+    // Copy output value to output buffer.
+    auto &outputValue = *reinterpret_cast<decltype(uwbSimulatorCapabilities) *>(std::data(outputBuffer));
+    outputValue = uwbSimulatorCapabilities;
 
-    //// Complete the request.
-    // WdfRequestCompleteWithInformation(request, status, sizeof outputValue);
+    // Complete the request.
+    WdfRequestCompleteWithInformation(request, status, sizeof outputValue);
 
     return status;
 }
 
 // IOCTL_UWB_GET_DEVICE_INFO
 NTSTATUS
-UwbSimulatorDdiHandlerSimulator::OnUwbSimulatorTriggerSessionEvent(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandlerSimulator::OnUwbSimulatorTriggerSessionEvent(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> /*outputBuffer*/)
 {
     NTSTATUS status = STATUS_SUCCESS;
 
-    //// Execute callback.
-    // UwbDeviceInformation deviceInformation{};
-    // auto statusUwb = m_callbacks->DeviceGetInformation(deviceInformation);
+    auto &triggerSessionEventArgs = *reinterpret_cast<UwbSimulatorTriggerSessionEventArgs *>(std::data(inputBuffer));
 
-    //// Convert neutral types to DDI types.
-    // auto &outputValue = *reinterpret_cast<UWB_DEVICE_INFO *>(std::data(outputBuffer));
-    // outputValue = UwbCxDdi::From(deviceInformation);
+    // Execute callback.
+    m_callbacks->TriggerSessionEvent(triggerSessionEventArgs);
 
-    //// Complete the request.
-    // WdfRequestCompleteWithInformation(request, status, outputValue.size);
+    // Complete the request.
+    WdfRequestComplete(request, STATUS_SUCCESS);
 
     return status;
 }

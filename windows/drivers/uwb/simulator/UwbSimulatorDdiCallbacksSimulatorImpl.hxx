@@ -17,8 +17,8 @@ struct UwbSimulatorDdiCallbacksSimulatorImpl :
 {
     virtual ~UwbSimulatorDdiCallbacksSimulatorImpl() = default;
 
-    virtual void
-    GetSimulatorCapabilities(UwbSimulatorCapabilities &uwbSimulatorCapabilities) override;
+    virtual UwbSimulatorCapabilities
+    GetSimulatorCapabilities() override;
 
     virtual void
     TriggerSessionEvent(const UwbSimulatorTriggerSessionEventArgs &triggerSessionEventArgs) override;

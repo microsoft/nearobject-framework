@@ -7,9 +7,10 @@
 using namespace windows::devices::uwb;
 using namespace windows::devices::uwb::simulator;
 
-void
-UwbSimulatorDdiCallbacksSimulatorImpl::GetSimulatorCapabilities(UwbSimulatorCapabilities & /*uwbSimulatorCapabilities*/)
+UwbSimulatorCapabilities
+UwbSimulatorDdiCallbacksSimulatorImpl::GetSimulatorCapabilities()
 {
+	return {};
 }
 
 void

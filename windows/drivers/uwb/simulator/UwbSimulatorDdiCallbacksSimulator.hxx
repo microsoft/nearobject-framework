@@ -20,8 +20,8 @@ struct UwbSimulatorDdiCallbacksSimulator
      *
      * @return UwbStatus
      */
-    virtual void
-    GetSimulatorCapabilities(UwbSimulatorCapabilities& uwbSimulatorCapabilities) = 0;
+    virtual UwbSimulatorCapabilities
+    GetSimulatorCapabilities() = 0;
 
     /**
      * @brief
