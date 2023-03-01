@@ -89,18 +89,28 @@ UwbSimulatorDdiHandler::OnUwbDeviceReset(WDFREQUEST request, std::span<uint8_t> 
 NTSTATUS
 UwbSimulatorDdiHandler::OnUwbGetDeviceInformation(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
 {
+    std::size_t outputSize = 0;
     NTSTATUS status = STATUS_SUCCESS;
 
     // Execute callback.
     UwbDeviceInformation deviceInformation{};
     auto statusUwb = m_callbacks->DeviceGetInformation(deviceInformation);
 
-    // Convert neutral types to DDI types.
-    auto &outputValue = *reinterpret_cast<UWB_DEVICE_INFO *>(std::data(outputBuffer));
-    outputValue = UwbCxDdi::From(deviceInformation);
+    // Convert neutral type to DDI output type.
+    auto uwbDeviceInformation = UwbCxDdi::From(deviceInformation);
+    outputSize = uwbDeviceInformation.size();
+
+    // Update output buffer if sufficiently sized.
+    if (std::size(outputBuffer) >= outputSize) {
+        auto &outputValue = *reinterpret_cast<UWB_DEVICE_INFO *>(std::data(outputBuffer));
+        outputValue = std::move(uwbDeviceInformation);
+    }
+    else {
+        status = STATUS_BUFFER_TOO_SMALL;
+    }
 
     // Complete the request.
-    WdfRequestCompleteWithInformation(request, status, outputValue.size);
+    WdfRequestCompleteWithInformation(request, status, outputSize);
 
     return status;
 }
@@ -109,18 +119,27 @@ UwbSimulatorDdiHandler::OnUwbGetDeviceInformation(WDFREQUEST request, std::span<
 NTSTATUS
 UwbSimulatorDdiHandler::OnUwbGetDeviceCapabilities(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
 {
+    std::size_t outputSize = 0;
     NTSTATUS status = STATUS_SUCCESS;
 
     // Execute callback.
     UwbCapability deviceCapabilities{};
     auto statusUwb = m_callbacks->DeviceGetCapabilities(deviceCapabilities);
 
-    // Convert neutral types to DDI types.
-    auto &outputValue = *reinterpret_cast<UWB_DEVICE_CAPABILITIES *>(std::data(outputBuffer));
-    outputValue = UwbCxDdi::From(deviceCapabilities);
+    // Convert neutral type to DDI output type.
+    auto uwbCapabilities = UwbCxDdi::From(deviceCapabilities);
+    outputSize = uwbCapabilities.size();
 
+    // Update output buffer if sufficiently sized.
+    if (std::size(outputBuffer) >= outputSize) {
+        auto &outputValue = *reinterpret_cast<UWB_DEVICE_CAPABILITIES *>(std::data(outputBuffer));
+        outputValue = std::move(uwbCapabilities);
+    } else {
+        status = STATUS_BUFFER_TOO_SMALL;
+    }
+ 
     // Complete the request.
-    WdfRequestCompleteWithInformation(request, status, outputValue.size);
+    WdfRequestCompleteWithInformation(request, status, outputSize);
 
     return status;
 }
