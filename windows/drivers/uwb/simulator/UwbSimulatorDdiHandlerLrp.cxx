@@ -198,7 +198,7 @@ UwbSimulatorDdiHandler::OnUwbGetSessionCount(WDFREQUEST request, std::span<uint8
     // Invoke callback.
     uint32_t sessionCount = 0;
     auto statusUwb = m_callbacks->GetSessionCount(sessionCount);
-    
+
     // Convert neutral type to DDI output type.
     auto &outputValue = *reinterpret_cast<UWB_GET_SESSION_COUNT *>(std::data(outputBuffer));
     outputValue.size = sizeof outputValue;
@@ -313,7 +313,7 @@ UwbSimulatorDdiHandler::OnUwbSessionGetRangingCount(WDFREQUEST request, std::spa
     // Convert DDI input type to neutral type.
     auto &getRangingCountIn = *reinterpret_cast<UWB_GET_RANGING_COUNT *>(std::data(inputBuffer));
     auto sessionId = getRangingCountIn.sessionId;
-    
+
     // Invoke callback.
     uint32_t rangingCount = 0;
     auto statusUwb = m_callbacks->SessionGetRangingCount(sessionId, rangingCount);
