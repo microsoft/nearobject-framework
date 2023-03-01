@@ -6,10 +6,38 @@
 #include <vector>
 
 #include <uwb/UwbPeer.hxx>
-#include <uwb/UwbSession.hxx>
 
 namespace uwb
 {
+struct UwbSession;
+
+/**
+ * @brief The possible reasons for a session ending.
+ */
+enum class UwbSessionEndReason {
+    /**
+     * @brief The session owner stopped the session.
+     *
+     * This is the reason used when the session ends naturally.
+     */
+    Stopped,
+
+    /**
+     * @brief The session was locally canceled.
+     */
+    Canceled,
+
+    /**
+     * @brief The session timed out due to policy.
+     */
+    Timeout,
+
+    /**
+     * @brief The session ended for an unknown or unspecified reason.
+     */
+    Unspecified,
+};
+
 /**
  * @brief Interface for receiving events from a UwbSession. This is the primary
  * method to receive information from near peers.

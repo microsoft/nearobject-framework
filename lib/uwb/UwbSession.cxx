@@ -31,13 +31,8 @@ void
 UwbSession::AddPeer(UwbMacAddress peerMacAddress)
 {
     std::scoped_lock peersLock{ m_peerGate };
-    PLOG_VERBOSE << "adding peer with address " << peerMacAddress.ToString();
-    auto [_, inserted] = m_peers.insert(peerMacAddress);
-
-    if (inserted) {
-        AddPeerImpl(std::move(peerMacAddress));
-    }
-    PLOG_VERBOSE << "peer added";
+    PLOG_VERBOSE << "Session with id " << m_sessionId << " requesting to add peer via DDI with mac address " << peerMacAddress.ToString();
+    AddPeerImpl(std::move(peerMacAddress));
 }
 
 void
@@ -79,9 +74,8 @@ UwbSession::SetSessionStatus(const uwb::protocol::fira::UwbSessionStatus& status
 }
 
 void
-UwbSession::InsertPeer(const uwb::UwbMacAddress& peerAddress)
+UwbSession::InsertPeerImpl(const uwb::UwbMacAddress& peerAddress)
 {
-    std::scoped_lock peersLock{ m_peerGate };
     m_peers.insert(peerAddress);
-    PLOG_VERBOSE << "Added peer " << peerAddress.ToString();
+    PLOG_VERBOSE << "Session with id " << m_sessionId << " added peer via DDI with mac address " << peerAddress.ToString();
 }

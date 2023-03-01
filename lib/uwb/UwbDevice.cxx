@@ -2,10 +2,10 @@
 #include <type_traits>
 #include <variant>
 
-#include <plog/Log.h>
-#include <uwb/UwbDevice.hxx>
-
 #include <magic_enum.hpp>
+#include <plog/Log.h>
+#include <ranges>
+#include <uwb/UwbDevice.hxx>
 
 using namespace uwb;
 using namespace uwb::protocol::fira;
@@ -84,9 +84,20 @@ UwbDevice::OnSessionMulticastListStatus(UwbSessionUpdateMulicastListStatus statu
         return;
     }
 
-    for (const auto& peerAddStatus : statusMulticastList.Status) {
-        if (peerAddStatus.Status == UwbStatusMulticast::OkUpdate) {
-            session->InsertPeer(peerAddStatus.ControleeMacAddress);
+    auto peersAdded = std::views::filter(statusMulticastList.Status, [](const auto& peerAddStatus) -> bool {
+        return peerAddStatus.Status == UwbStatusMulticast::OkUpdate;
+    });
+
+    PLOG_VERBOSE << "Session with id " << statusMulticastList.SessionId << " adding peers";
+    session->InsertPeers(peersAdded);
+
+    // Now log the bad status
+    IF_PLOG(plog::verbose)
+    {
+        for (const auto& peer : statusMulticastList.Status) {
+            if (peer.Status != UwbStatusMulticast::OkUpdate) {
+                PLOG_VERBOSE << "peer has bad status: " << peer.ToString();
+            }
         }
     }
 }
