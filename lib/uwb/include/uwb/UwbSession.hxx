@@ -6,42 +6,16 @@
 #include <cstdint>
 #include <memory>
 #include <mutex>
+#include <ranges>
 #include <unordered_set>
 
 #include <uwb/UwbMacAddress.hxx>
+#include <uwb/UwbPeer.hxx>
+#include <uwb/UwbSessionEventCallbacks.hxx>
 #include <uwb/protocols/fira/UwbSessionData.hxx>
 
 namespace uwb
 {
-struct UwbSessionEventCallbacks;
-
-/**
- * @brief The possible reasons for a session ending.
- */
-enum class UwbSessionEndReason {
-    /**
-     * @brief The session owner stopped the session.
-     *
-     * This is the reason used when the session ends naturally.
-     */
-    Stopped,
-
-    /**
-     * @brief The session was locally canceled.
-     */
-    Canceled,
-
-    /**
-     * @brief The session timed out due to policy.
-     */
-    Timeout,
-
-    /**
-     * @brief The session ended for an unknown or unspecified reason.
-     */
-    Unspecified,
-};
-
 /**
  * @brief Represents a UWB session.
  */
@@ -118,14 +92,41 @@ public:
     SetSessionStatus(const uwb::protocol::fira::UwbSessionStatus& status);
 
     /**
-     * @brief Temporarily public function to directly add a peer to m_peers
+     * @brief Temporarily public function to directly add a list of peers to m_peers
+     *
+     * @param peers
+     */
+    template <class View>
+    // clang-format off
+    requires std::ranges::view<View> &&
+    std::same_as<std::decay_t<std::ranges::range_reference_t<View>>, uwb::protocol::fira::UwbMulticastListStatus>
+    // clang-format on
+    void
+    InsertPeers(View peers)
+    {
+        std::vector<UwbPeer> uwbPeers;
+        {
+            std::scoped_lock peersLock{ m_peerGate };
+            for (const auto& peer : peers) {
+                InsertPeerImpl(peer.ControleeMacAddress);
+                uwbPeers.push_back(UwbPeer{ peer.ControleeMacAddress });
+            }
+        }
+        auto callbacks = m_callbacks.lock();
+        if (callbacks) {
+            callbacks->OnSessionMembershipChanged(this, uwbPeers, {});
+        }
+    }
+
+private:
+    /**
+     * @brief Internal function to insert a peer address to this session
      *
      * @param peerAddress
      */
     void
-    InsertPeer(const uwb::UwbMacAddress& peerAddress);
+    InsertPeerImpl(const uwb::UwbMacAddress& peerAddress);
 
-private:
     virtual void
     ConfigureImpl(const protocol::fira::UwbSessionData& uwbSessionData) = 0;
 

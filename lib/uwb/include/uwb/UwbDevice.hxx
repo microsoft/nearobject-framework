@@ -6,7 +6,7 @@
 #include <shared_mutex>
 #include <unordered_map>
 
-#include <uwb/UwbSessionEventCallbacks.hxx>
+#include <uwb/UwbSession.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
 

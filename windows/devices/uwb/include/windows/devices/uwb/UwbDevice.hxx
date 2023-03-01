@@ -13,7 +13,7 @@
 #include <wil/resource.h>
 
 #include <uwb/UwbDevice.hxx>
-#include <uwb/UwbSessionEventCallbacks.hxx>
+#include <uwb/UwbSession.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <windows/devices/DeviceResource.hxx>
 
