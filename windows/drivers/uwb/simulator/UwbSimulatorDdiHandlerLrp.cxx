@@ -191,9 +191,24 @@ UwbSimulatorDdiHandler::OnUwbSetApplicationConfigurationParameters(WDFREQUEST re
 
 // IOCTL_UWB_GET_SESSION_COUNT
 NTSTATUS
-UwbSimulatorDdiHandler::OnUwbGetSessionCount(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandler::OnUwbGetSessionCount(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
 {
-    return STATUS_NOT_IMPLEMENTED;
+    NTSTATUS status = STATUS_SUCCESS;
+
+    // Invvoke callback.
+    uint32_t sessionCount = 0;
+    auto statusUwb = m_callbacks->GetSessionCount(sessionCount);
+    
+    // Convert neutral types to DDI types.
+    auto &outputValue = *reinterpret_cast<UWB_GET_SESSION_COUNT *>(std::data(outputBuffer));
+    outputValue.size = sizeof outputValue;
+    outputValue.status = UwbCxDdi::From(statusUwb);
+    outputValue.sessionCount = sessionCount;
+
+    // Complete the request.
+    WdfRequestCompleteWithInformation(request, status, outputValue.size);
+
+    return status;
 }
 
 // IOCTL_UWB_SESSION_INIT
