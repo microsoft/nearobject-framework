@@ -140,6 +140,13 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         }
     }
 
+    SECTION("UwbSessionType is stable")
+    {
+        for (const auto& uwbSessionType : magic_enum::enum_values<UwbSessionType>()) {
+            test::ValidateRoundtrip(uwbSessionType);
+        }
+    }
+
     SECTION("UwbLineOfSightIndicator is stable")
     {
         for (const auto& uwbLineOfSightIndicator : magic_enum::enum_values<UwbLineOfSightIndicator>()) {

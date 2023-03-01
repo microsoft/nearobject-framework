@@ -90,6 +90,17 @@ windows::devices::uwb::ddi::lrp::From(const UwbDeviceState &uwbDeviceState)
     return DeviceStateMap.at(uwbDeviceState);
 }
 
+UWB_SESSION_TYPE
+windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbSessionType &uwbSessionType)
+{
+    static const std::unordered_map<UwbSessionType, UWB_SESSION_TYPE> SessionTypeMap{
+        { UwbSessionType::RangingSession, UWB_SESSION_TYPE_RANGING_SESSION },
+        { UwbSessionType::TestMode, UWB_SESSION_TYPE_DEVICE_TEST_MODE },
+    };
+
+    return SessionTypeMap.at(uwbSessionType);
+}
+
 UWB_LINE_OF_SIGHT_INDICATOR
 windows::devices::uwb::ddi::lrp::From(const UwbLineOfSightIndicator &uwbLineOfSightIndicator)
 {
@@ -744,6 +755,17 @@ windows::devices::uwb::ddi::lrp::To(const UWB_DEVICE_STATUS &deviceStatus)
     return UwbStatusDevice{
         .State = DeviceStateToMap.at(deviceStatus.deviceState)
     };
+}
+
+UwbSessionType
+windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_TYPE &sessionType)
+{
+    static const std::unordered_map<UWB_SESSION_TYPE, UwbSessionType> SessionTypeMap{
+        { UWB_SESSION_TYPE_RANGING_SESSION, UwbSessionType::RangingSession },
+        { UWB_SESSION_TYPE_DEVICE_TEST_MODE, UwbSessionType::TestMode },
+    };
+
+    return SessionTypeMap.at(sessionType);
 }
 
 UwbDeviceConfigurationParameterType
