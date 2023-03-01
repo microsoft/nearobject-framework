@@ -65,9 +65,9 @@ UwbPeer::UwbPeer(const uwb::protocol::fira::UwbRangingMeasurement& data) :
     m_address{ data.PeerMacAddress },
     m_spatialProperties{
         .Distance{ data.Distance }, // TODO is this also q97
-        .AngleAzimuth{ ConvertQ9_7FormatToIEEE(data.AoAAzimuth.Result) },
-        .AngleElevation{ ConvertQ9_7FormatToIEEE(data.AoAElevation.Result) },
-        .Elevation{ ConvertQ9_7FormatToIEEE(data.AoaDestinationElevation.Result) }, // TODO is this right?
+        .AngleAzimuth{ ConvertQ97FormatToIEEE(data.AoAAzimuth.Result) },
+        .AngleElevation{ ConvertQ97FormatToIEEE(data.AoAElevation.Result) },
+        .Elevation{ ConvertQ97FormatToIEEE(data.AoaDestinationElevation.Result) }, // TODO is this right?
 
         .AngleAzimuthFom{ data.AoAAzimuth.FigureOfMerit },
         .AngleElevationFom{ data.AoAElevation.FigureOfMerit },
