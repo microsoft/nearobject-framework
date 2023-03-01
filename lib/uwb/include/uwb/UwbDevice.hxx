@@ -82,7 +82,7 @@ protected:
 private:
     /**
      * @brief Handles a single UwbNotificationData instance.
-     * 
+     *
      * @param uwbNotificationData The notification data to handle.
      */
     void
