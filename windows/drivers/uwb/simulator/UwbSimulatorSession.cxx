@@ -31,7 +31,7 @@ UwbSimulatorSession::RandomRangingMeasurementGenerationStop()
         return;
     }
 
-    m_randomRangingMeasurementsEnabled = true;
+    m_randomRangingMeasurementsEnabled = false;
     m_randomRangingMeasurementsThread.request_stop();
 }
 
