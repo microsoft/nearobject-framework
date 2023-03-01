@@ -93,20 +93,11 @@ UwbDevice::HandleNotifications()
         }
 
         // Convert to neutral type and process the notification.
-        UWB_NOTIFICATION_DATA& notificationData = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
+        const UWB_NOTIFICATION_DATA& notificationData = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
         auto uwbNotificationData = UwbCxDdi::To(notificationData);
 
-        // Handle the notification in a fire-and-forget fashion. This may change
-        // later. Since std::async returns a future, and the future's
-        // destructor waits for it to complete, we cannot just ignore the
-        // returned future. To work around this, we move the returned future
-        // into a shared_ptr, then pass this by value to the std::async's
-        // lambda, increasing its reference count. This will ensure the future
-        // is automatically destructed once the async lambda has completed.
-        auto notificationHandlerFuture = std::make_shared<std::future<void>>();
-        *notificationHandlerFuture = std::async(std::launch::async, [this, notificationHandlerFuture, uwbNotificationData = std::move(uwbNotificationData)]() {
-            ::UwbDevice::OnUwbNotification(std::move(uwbNotificationData));
-        });
+        // Invoke base class notification handler which takes care of threading.
+        ::UwbDevice::OnUwbNotification(std::move(uwbNotificationData));
     }
 }
 

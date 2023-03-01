@@ -81,6 +81,14 @@ protected:
 
 private:
     /**
+     * @brief Handles a single UwbNotificationData instance.
+     * 
+     * @param uwbNotificationData The notification data to handle.
+     */
+    void
+    HandleUwbNotification(::uwb::protocol::fira::UwbNotificationData uwbNotificationData);
+
+    /**
      * @brief Get a reference to the specified session.
      *
      * @param sessionId
