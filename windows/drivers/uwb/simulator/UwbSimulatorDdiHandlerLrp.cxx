@@ -292,16 +292,48 @@ UwbSimulatorDdiHandler::OnUwbSessionUpdateControllerMulticastList(WDFREQUEST /*r
 
 // IOCTL_UWB_START_RANGING_SESSION
 NTSTATUS
-UwbSimulatorDdiHandler::OnUwbSessionStartRanging(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandler::OnUwbSessionStartRanging(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer)
 {
-    return STATUS_NOT_IMPLEMENTED;
+    NTSTATUS status = STATUS_SUCCESS;
+
+    // Convert DDI input type to neutral type.
+    auto &startRangingSessionIn = *reinterpret_cast<UWB_START_RANGING_SESSION *>(std::data(inputBuffer));
+    auto sessionId = startRangingSessionIn.sessionId;
+
+    // Invoke callback.
+    auto statusUwb = m_callbacks->SessionStartRanging(sessionId);
+
+    // Convert neutral types to DDI types.
+    auto &outputValue = *reinterpret_cast<UWB_STATUS *>(std::data(outputBuffer));
+    outputValue = UwbCxDdi::From(statusUwb);
+
+    // Complete the request.
+    WdfRequestCompleteWithInformation(request, status, sizeof outputValue);
+
+    return status;
 }
 
 // IOCTL_UWB_STOP_RANGING_SESSION
 NTSTATUS
-UwbSimulatorDdiHandler::OnUwbSessionStopRanging(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandler::OnUwbSessionStopRanging(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer)
 {
-    return STATUS_NOT_IMPLEMENTED;
+    NTSTATUS status = STATUS_SUCCESS;
+
+    // Convert DDI input type to neutral type.
+    auto &stopRangingSessionIn = *reinterpret_cast<UWB_STOP_RANGING_SESSION *>(std::data(inputBuffer));
+    auto sessionId = stopRangingSessionIn.sessionId;
+
+    // Invoke callback.
+    auto statusUwb = m_callbacks->SessionStopRanging(sessionId);
+
+    // Convert neutral types to DDI types.
+    auto &outputValue = *reinterpret_cast<UWB_STATUS *>(std::data(outputBuffer));
+    outputValue = UwbCxDdi::From(statusUwb);
+
+    // Complete the request.
+    WdfRequestCompleteWithInformation(request, status, sizeof outputValue);
+
+    return status;
 }
 
 // IOCTL_UWB_GET_RANGING_COUNT
