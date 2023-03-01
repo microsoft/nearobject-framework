@@ -1,6 +1,6 @@
 
-#ifndef UWB_SIMULATOR_DDI_HANDLER_LRP_HXX
-#define UWB_SIMULATOR_DDI_HANDLER_LRP_HXX
+#ifndef UWB_SIMULATOR_DDI_HANDLER
+#define UWB_SIMULATOR_DDI_HANDLER
 
 #include <initializer_list>
 #include <memory>
@@ -58,9 +58,7 @@ public:
     HandleRequest(WDFREQUEST request, ULONG ioControlCode, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer) override;
 
 private:
-
-// GUID_UWB_DEVICE_INTERFACE Handlers
-
+    // GUID_UWB_DEVICE_INTERFACE Handlers
     NTSTATUS
     OnUwbDeviceReset(WDFREQUEST, std::span<uint8_t>, std::span<uint8_t>);
 
@@ -109,7 +107,7 @@ private:
     NTSTATUS
     OnUwbNotification(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer);
 
-// GUID_DEVINTERFACE_UWB_SIMULATOR Handlers
+    // GUID_DEVINTERFACE_UWB_SIMULATOR Handlers
 
     NTSTATUS
     OnUwbSimulatorCapabilities(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer);
@@ -129,4 +127,4 @@ private:
 };
 } // namespace windows::devices::uwb::simulator
 
-#endif // UWB_SIMULATOR_DDI_HANDLER_LRP_HXX
+#endif // UWB_SIMULATOR_DDI_HANDLER

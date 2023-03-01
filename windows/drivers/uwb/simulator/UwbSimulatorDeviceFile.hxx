@@ -21,10 +21,10 @@ public:
 
     /**
      * @brief Device i/o control handler function.
-     * 
+     *
      * This is invoked when the driver receives an i/o control request on the
      * file handle associated with this instance.
-     * 
+     *
      * @param request The WDF driver request.
      * @param ioControlCode The i/o control code for the request.
      * @param inputBufferLength The input buffer length.

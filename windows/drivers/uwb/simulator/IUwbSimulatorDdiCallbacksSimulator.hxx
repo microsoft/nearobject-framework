@@ -1,6 +1,6 @@
 
-#ifndef UWB_SIMULATOR_DDI_CALLBACKS_SIMULATOR
-#define UWB_SIMULATOR_DDI_CALLBACKS_SIMULATOR
+#ifndef I_UWB_SIMULATOR_DDI_CALLBACKS_SIMULATOR
+#define I_UWB_SIMULATOR_DDI_CALLBACKS_SIMULATOR
 
 #include <windows.h>
 
@@ -34,4 +34,4 @@ struct IUwbSimulatorDdiCallbacksSimulator
 };
 } // namespace windows::devices::uwb::simulator
 
-#endif // UWB_SIMULATOR_DDI_CALLBACKS_SIMULATOR
+#endif // I_UWB_SIMULATOR_DDI_CALLBACKS_SIMULATOR

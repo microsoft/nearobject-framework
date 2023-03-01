@@ -1,6 +1,6 @@
 
-#ifndef UWB_SIMULATOR_DDI_HANDLER_HXX
-#define UWB_SIMULATOR_DDI_HANDLER_HXX
+#ifndef I_UWB_SIMULATOR_DDI_HANDLER_HXX
+#define I_UWB_SIMULATOR_DDI_HANDLER_HXX
 
 #include <cstddef>
 #include <span>
@@ -58,4 +58,4 @@ struct IUwbSimulatorDdiHandler
 };
 } // namespace windows::devices::uwb::simulator
 
-#endif // UWB_SIMULATOR_DDI_HANDLER_HXX
+#endif // I_UWB_SIMULATOR_DDI_HANDLER_HXX

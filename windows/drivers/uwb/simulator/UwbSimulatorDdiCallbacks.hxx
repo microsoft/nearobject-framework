@@ -1,6 +1,6 @@
 
-#ifndef UWB_SIMULATOR_DDI_CALLBACKS_LRP_NOOP
-#define UWB_SIMULATOR_DDI_CALLBACKS_LRP_NOOP
+#ifndef UWB_SIMULATOR_DDI_CALLBACKS_HXX
+#define UWB_SIMULATOR_DDI_CALLBACKS_HXX
 
 #include <cstdint>
 #include <future>
@@ -125,4 +125,4 @@ private:
 };
 } // namespace windows::devices::uwb::simulator
 
-#endif // UWB_SIMULATOR_DDI_CALLBACKS_LRP_NOOP
+#endif // UWB_SIMULATOR_DDI_CALLBACKS_HXX

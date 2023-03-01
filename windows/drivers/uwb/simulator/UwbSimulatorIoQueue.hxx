@@ -39,9 +39,9 @@ public:
     Initialize();
 
     /**
-     * @brief 
-     * 
-     * @return NTSTATUS 
+     * @brief
+     *
+     * @return NTSTATUS
      */
     NTSTATUS
     Uninitialize();

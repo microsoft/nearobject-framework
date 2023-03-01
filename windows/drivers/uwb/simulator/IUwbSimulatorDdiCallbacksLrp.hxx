@@ -1,6 +1,6 @@
 
-#ifndef UWB_SIMULATOR_DDI_CALLBACKS_LRP
-#define UWB_SIMULATOR_DDI_CALLBACKS_LRP
+#ifndef I_UWB_SIMULATOR_DDI_CALLBACKS_LRP
+#define I_UWB_SIMULATOR_DDI_CALLBACKS_LRP
 
 #include <cstdint>
 #include <memory>
@@ -181,4 +181,4 @@ struct IUwbSimulatorDdiCallbacksLrp
 };
 } // namespace windows::devices::uwb::simulator
 
-#endif // UWB_SIMULATOR_DDI_CALLBACKS_LRP
+#endif // I_UWB_SIMULATOR_DDI_CALLBACKS_LRP
