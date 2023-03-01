@@ -177,6 +177,8 @@ UwbSimulatorDdiHandler::OnUwbGetApplicationConfigurationParameters(WDFREQUEST re
     outputValue.size = sizeof outputValue;
     outputValue.status = UwbCxDdi::From(statusUwb);
 
+    // TODO: the output value needs to be filled in with applicationConfigurationParameterResults
+
     // Complete the request.
     WdfRequestCompleteWithInformation(request, status, outputValue.size);
 
@@ -201,6 +203,8 @@ UwbSimulatorDdiHandler::OnUwbSetApplicationConfigurationParameters(WDFREQUEST re
     auto &outputValue = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS_STATUS *>(std::data(outputBuffer));
     outputValue.size = sizeof outputValue;
     outputValue.status = UwbCxDdi::From(statusUwb);
+
+    // TODO: the output value needs to be filled in with applicationConfigurationParameterResults
 
     // Complete the request.
     WdfRequestCompleteWithInformation(request, status, outputValue.size);
@@ -304,9 +308,28 @@ UwbSimulatorDdiHandler::OnUwbGetSessionState(WDFREQUEST request, std::span<uint8
 
 // IOCTL_UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST
 NTSTATUS
-UwbSimulatorDdiHandler::OnUwbSessionUpdateControllerMulticastList(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandler::OnUwbSessionUpdateControllerMulticastList(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer)
 {
-    return STATUS_NOT_IMPLEMENTED;
+    NTSTATUS status = STATUS_SUCCESS;
+
+    // Convert DDI input type to neutral types.
+    auto &sessionUupdateControllerMuliticastListInRaw = *reinterpret_cast<UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST *>(std::data(inputBuffer));
+    auto sessionUpdateControllerMuliticastListIn = UwbCxDdi::To(sessionUupdateControllerMuliticastListInRaw);
+    auto sessionId = sessionUpdateControllerMuliticastListIn.SessionId;
+    auto updateMulticastListEntries = std::move(sessionUpdateControllerMuliticastListIn.Controlees);
+    auto action = sessionUpdateControllerMuliticastListIn.Action;
+
+    // Invoke callback.
+    auto statusUwb = m_callbacks->SessionUpdateControllerMulticastList(sessionId, action, std::move(updateMulticastListEntries));
+
+    // Convert neutral types to DDI types.
+    auto &outputValue = *reinterpret_cast<UWB_STATUS *>(std::data(outputBuffer));
+    outputValue = UwbCxDdi::From(statusUwb);
+
+    // Complete the request.
+    WdfRequestCompleteWithInformation(request, status, sizeof outputValue);
+
+    return status;
 }
 
 // IOCTL_UWB_START_RANGING_SESSION
