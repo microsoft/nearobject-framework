@@ -10,7 +10,7 @@
 
 #include <wdf.h>
 
-#include "UwbSimulatorDdiCallbacksLrp.hxx"
+#include "UwbSimulatorDdiCallbacksLrpNoop.hxx"
 #include "UwbSimulatorDdiHandler.hxx"
 #include "UwbSimulatorDispatchEntry.hxx"
 
@@ -58,6 +58,9 @@ public:
     HandleRequest(WDFREQUEST request, ULONG ioControlCode, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer) override;
 
 private:
+
+// GUID_UWB_DEVICE_INTERFACE Handlers
+
     NTSTATUS
     OnUwbDeviceReset(WDFREQUEST, std::span<uint8_t>, std::span<uint8_t>);
 
@@ -106,6 +109,15 @@ private:
     NTSTATUS
     OnUwbNotification(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer);
 
+// GUID_DEVINTERFACE_UWB_SIMULATOR Handlers
+
+    NTSTATUS
+    OnUwbSimulatorCapabilities(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer);
+
+    NTSTATUS
+    OnUwbSimulatorTriggerSessionEvent(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer);
+
+private:
     std::optional<windows::devices::uwb::simulator::UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>>
     TryGetDispatchEntry(ULONG ioControlCode);
 
@@ -113,7 +125,7 @@ private:
     static const std::initializer_list<windows::devices::uwb::simulator::UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>> Dispatch;
 
 private:
-    std::unique_ptr<windows::devices::uwb::simulator::UwbSimulatorDdiCallbacksLrp> m_callbacks;
+    std::unique_ptr<windows::devices::uwb::simulator::UwbSimulatorDdiCallbacksLrpNoop> m_callbacks;
 };
 } // namespace windows::devices::uwb::simulator
 

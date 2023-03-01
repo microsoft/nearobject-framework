@@ -15,7 +15,9 @@
 
 #include <wdf.h>
 
+#include "UwbSimulatorDdi.h"
 #include "UwbSimulatorDdiCallbacksLrp.hxx"
+#include "UwbSimulatorDdiCallbacksSimulator.hxx"
 #include "UwbSimulatorSession.hxx"
 
 #include <uwb/protocols/fira/UwbApplicationConfiguration.hxx>
@@ -25,8 +27,11 @@
 namespace windows::devices::uwb::simulator
 {
 struct UwbSimulatorDdiCallbacksLrpNoop :
-    public UwbSimulatorDdiCallbacksLrp
+    public UwbSimulatorDdiCallbacksLrp,
+    public UwbSimulatorDdiCallbacksSimulator
 {
+    // UwbSimulatorDdiCallbacksLrp
+
     virtual UwbStatus
     DeviceReset() override;
 
@@ -74,6 +79,14 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
 
     virtual NTSTATUS
     UwbNotification(UwbNotificationData &notificationData) override;
+
+    // UwbSimulatorDdiCallbacksSimulator
+
+    virtual UwbSimulatorCapabilities
+    GetSimulatorCapabilities() override;
+
+    virtual void
+    TriggerSessionEvent(const UwbSimulatorTriggerSessionEventArgs &triggerSessionEventArgs) override;
 
 protected:
     /**

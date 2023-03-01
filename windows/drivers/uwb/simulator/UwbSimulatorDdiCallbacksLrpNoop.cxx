@@ -268,3 +268,28 @@ UwbSimulatorDdiCallbacksLrpNoop::UwbNotification(UwbNotificationData &notificati
 
     return STATUS_SUCCESS;
 }
+
+UwbSimulatorCapabilities
+UwbSimulatorDdiCallbacksLrpNoop::GetSimulatorCapabilities()
+{
+    return {};
+}
+
+void
+UwbSimulatorDdiCallbacksLrpNoop::TriggerSessionEvent(const UwbSimulatorTriggerSessionEventArgs &triggerSessionEventArgs)
+{
+    switch (triggerSessionEventArgs.Action) {
+    case UwbSimulatorSessionEventAction::RandomRangingMeasurementGenerationStart: {
+        break;
+    }
+    case UwbSimulatorSessionEventAction::RandomRangingMeasurementGenerationStop: {
+        break;
+    }
+    case UwbSimulatorSessionEventAction::None: {
+        break;
+    }
+    default: {
+        break;
+    }
+    }
+}
