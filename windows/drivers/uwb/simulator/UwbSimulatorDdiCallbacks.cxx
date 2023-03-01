@@ -50,7 +50,7 @@ UwbSimulatorDdiCallbacks::RaiseUwbNotification(UwbNotificationData uwbNotificati
 }
 
 void
-UwbSimulatorDdiCallbacks::SessionUpdateState(IUwbSimulatorSession &session, UwbSessionState sessionState, std::optional<UwbSessionReasonCode> reasonCode = std::nullopt)
+UwbSimulatorDdiCallbacks::SessionUpdateState(UwbSimulatorSession &session, UwbSessionState sessionState, std::optional<UwbSessionReasonCode> reasonCode = std::nullopt)
 {
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
@@ -285,9 +285,11 @@ UwbSimulatorDdiCallbacks::TriggerSessionEvent(const UwbSimulatorTriggerSessionEv
 {
     switch (triggerSessionEventArgs.Action) {
     case UwbSimulatorSessionEventAction::RandomRangingMeasurementGenerationStart: {
+        SessionRandomMeasurementGenerationConfigure(triggerSessionEventArgs.SessionId, RandomMeasurementGeneration::Enable);
         break;
     }
     case UwbSimulatorSessionEventAction::RandomRangingMeasurementGenerationStop: {
+        SessionRandomMeasurementGenerationConfigure(triggerSessionEventArgs.SessionId, RandomMeasurementGeneration::Disable);
         break;
     }
     case UwbSimulatorSessionEventAction::None: {
@@ -296,5 +298,27 @@ UwbSimulatorDdiCallbacks::TriggerSessionEvent(const UwbSimulatorTriggerSessionEv
     default: {
         break;
     }
+    }
+}
+
+void
+UwbSimulatorDdiCallbacks::SessionRandomMeasurementGenerationConfigure(uint32_t sessionId, RandomMeasurementGeneration action)
+{
+    std::unique_lock sessionsWriteLock{ m_sessionsGate };
+    auto sessionIt = m_sessions.find(sessionId);
+    if (sessionIt == std::cend(m_sessions)) {
+        return;
+    }
+
+    auto &[_, session] = *sessionIt;
+
+    switch (action) {
+    case RandomMeasurementGeneration::Disable:
+        session.RandomRangingMeasurementGenerationStop();
+        break;
+    case RandomMeasurementGeneration::Enable:
+        session.RandomRangingMeasurementGenerationStart([&](UwbNotificationData notificationData) {
+            RaiseUwbNotification(std::move(notificationData));
+        });
     }
 }

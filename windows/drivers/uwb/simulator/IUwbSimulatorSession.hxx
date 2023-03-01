@@ -12,13 +12,16 @@
 
 namespace windows::devices::uwb::simulator
 {
+using ::uwb::protocol::fira::UwbSessionState;
+using ::uwb::protocol::fira::UwbSessionType;
+
 struct IUwbSimulatorSession
 {
     uint32_t Id;
     UwbSessionType Type{ UwbSessionType::RangingSession };
     UwbSessionState State{ UwbSessionState::Deinitialized };
     uint32_t Sequence{ 0 };
-    std::unordered_set<UwbMacAddress> Controlees;
+    std::unordered_set<::uwb::UwbMacAddress> Controlees;
     std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> ApplicationConfigurationParameters;
 };
 } // namespace windows::devices::uwb::simulator
