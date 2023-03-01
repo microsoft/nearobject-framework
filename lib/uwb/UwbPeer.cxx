@@ -48,17 +48,17 @@ double
 ConvertQ97FormatToIEEE(uint16_t q97)
 {
     static const double pow2 = std::pow(2, -7);
-    static const uint16_t sign_mask =               0b1000'0000'0000'0000U;
-    static const uint16_t unsigned_integer_mask =   0b0111'1111'1000'0000U;
-    static const uint16_t fraction_mask = ~(sign_mask | unsigned_integer_mask);
+    static const uint16_t signMask =            0b1000'0000'0000'0000U;
+    static const uint16_t unsignedIntegerMask = 0b0111'1111'1000'0000U;
+    static const uint16_t fractionMask = ~(signMask | unsignedIntegerMask);
 
-    bool sign = q97 & sign_mask;
-    int unsigned_integer_part = (q97 & unsigned_integer_mask) >> 7U;
-    int fraction_part = q97 & fraction_mask;
+    bool sign = q97 & signMask;
+    int unsignedIntegerPart = (q97 & unsignedIntegerMask) >> 7U;
+    int fractionPart = q97 & fractionMask;
 
-    double unsigned_number = ((double)unsigned_integer_part) + (((double)fraction_part) * pow2);
+    double unsignedNumber = ((double)unsignedIntegerPart) + (((double)fractionPart) * pow2);
 
-    return (sign ? -1 : 1) * unsigned_number;
+    return (sign ? -1 : 1) * unsignedNumber;
 }
 
 UwbPeer::UwbPeer(const uwb::protocol::fira::UwbRangingMeasurement& data) :
