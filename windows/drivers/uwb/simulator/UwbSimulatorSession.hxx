@@ -2,24 +2,12 @@
 #ifndef UWB_SIMULATOR_SESSION_HXX
 #define UWB_SIMULATOR_SESSION_HXX
 
-#include <memory>
-#include <unordered_set>
-#include <vector>
-
-#include <uwb/UwbMacAddress.hxx>
-#include <uwb/protocols/fira/FiraDevice.hxx>
-#include <windows/devices/uwb/UwbAppConfiguration.hxx>
-
 namespace windows::devices::uwb::simulator
 {
-struct UwbSimulatorSession
+struct UwbSimulatorSession :
+    public UwbSimulatorSession
 {
-    uint32_t Id;
-    UwbSessionType Type{ UwbSessionType::RangingSession };
-    UwbSessionState State{ UwbSessionState::Deinitialized };
-    uint32_t Sequence{ 0 };
-    std::unordered_set<UwbMacAddress> Controlees;
-    std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> ApplicationConfigurationParameters;
+    bool RandomRangingMeasurementsEnabled{ false };
 };
 } // namespace windows::devices::uwb::simulator
 

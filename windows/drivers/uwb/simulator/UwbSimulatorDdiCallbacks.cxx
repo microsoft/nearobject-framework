@@ -50,7 +50,7 @@ UwbSimulatorDdiCallbacks::RaiseUwbNotification(UwbNotificationData uwbNotificati
 }
 
 void
-UwbSimulatorDdiCallbacks::SessionUpdateState(UwbSimulatorSession &session, UwbSessionState sessionState, std::optional<UwbSessionReasonCode> reasonCode = std::nullopt)
+UwbSimulatorDdiCallbacks::SessionUpdateState(IUwbSimulatorSession &session, UwbSessionState sessionState, std::optional<UwbSessionReasonCode> reasonCode = std::nullopt)
 {
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,

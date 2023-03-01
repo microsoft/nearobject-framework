@@ -19,7 +19,7 @@
 
 #include "IUwbSimulatorDdiCallbacksLrp.hxx"
 #include "IUwbSimulatorDdiCallbacksSimulator.hxx"
-#include "UwbSimulatorSession.hxx"
+#include "IUwbSimulatorSession.hxx"
 
 #include <uwb/protocols/fira/UwbApplicationConfiguration.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
@@ -102,7 +102,7 @@ protected:
      * @param reasonCode The reason code for the update, if sessionState == UwbSessionState::Idle.
      */
     void
-    SessionUpdateState(UwbSimulatorSession &session, UwbSessionState sessionState, std::optional<UwbSessionReasonCode> reasonCode);
+    SessionUpdateState(IUwbSimulatorSession &session, UwbSessionState sessionState, std::optional<UwbSessionReasonCode> reasonCode);
 
     /**
      * @brief Raise a UWB notification.
@@ -119,7 +119,7 @@ private:
 
     // Session state and associated lock that protects it.
     std::shared_mutex m_sessionsGate;
-    std::unordered_map<uint32_t, UwbSimulatorSession> m_sessions{};
+    std::unordered_map<uint32_t, IUwbSimulatorSession> m_sessions{};
 
     // Notification promise and associated lock that protects it.
     std::mutex m_notificationGate;
