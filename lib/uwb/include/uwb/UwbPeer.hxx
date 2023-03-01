@@ -6,6 +6,7 @@
 #include <optional>
 
 #include <uwb/UwbMacAddress.hxx>
+#include <uwb/protocols/fira/FiraDevice.hxx>
 
 namespace uwb
 {
@@ -18,6 +19,10 @@ struct UwbPeerSpatialProperties
     std::optional<double> AngleAzimuth;
     std::optional<double> AngleElevation;
     std::optional<double> Elevation;
+
+    std::optional<uint8_t> AngleAzimuthFom;
+    std::optional<uint8_t> AngleElevationFom;
+    std::optional<uint8_t> ElevationFom;
 
     std::string
     ToString() const;
@@ -38,6 +43,13 @@ public:
      * @param address
      */
     explicit UwbPeer(UwbMacAddress address);
+
+    /**
+     * @brief Construct a new Uwb Peer object from UwbRangingMeasurement data
+     * 
+     * @param data 
+     */
+    explicit UwbPeer(const uwb::protocol::fira::UwbRangingMeasurement& data);
 
     /**
      * @brief Construct a new UwbPeer object from another.

@@ -111,7 +111,15 @@ UwbDevice::OnSessionRangingData(UwbRangingData rangingData)
         return;
     }
 
-    // TODO: implement this
+    PLOG_VERBOSE << "Session with id " << rangingData.SessionId << " processing new ranging data";
+    std::vector<UwbPeer> peersData;
+    peersData.reserve(rangingData.RangingMeasurements.size());
+    for (const auto& peerData : rangingData.RangingMeasurements) {
+        UwbPeer data{ peerData };
+        PLOG_VERBOSE << "Peer data: " << data.ToString();
+        peersData.push_back(std::move(data));
+    }
+    session->ProcessRangingData(peersData);
 }
 
 void
