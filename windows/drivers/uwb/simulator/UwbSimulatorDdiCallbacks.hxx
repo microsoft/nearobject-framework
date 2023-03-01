@@ -31,6 +31,8 @@ struct UwbSimulatorDdiCallbacks :
     public IUwbSimulatorDdiCallbacksLrp,
     public IUwbSimulatorDdiCallbacksSimulator
 {
+    UwbSimulatorDdiCallbacks();
+
     // IUwbSimulatorDdiCallbacksLrp
 
     virtual UwbStatus
@@ -122,6 +124,9 @@ private:
     // Notification promise and associated lock that protects it.
     std::mutex m_notificationGate;
     std::optional<std::promise<UwbNotificationData>> m_notificationPromise;
+
+private:
+    UwbSimulatorCapabilities m_simulatorCapabilities{};
 };
 } // namespace windows::devices::uwb::simulator
 

@@ -20,6 +20,7 @@
     <ClCompile Include="UwbSimulatorTracelogging.cxx" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="IUwbSimulator.hxx" />
     <ClInclude Include="IUwbSimulatorDdiCallbacksSimulator.hxx" />
     <ClInclude Include="IUwbSimulatorDdiHandler.hxx" />
     <ClInclude Include="UwbSimulatorDdiHandler.hxx" />

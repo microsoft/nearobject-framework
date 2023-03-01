@@ -7,6 +7,7 @@
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 
+#include "IUwbSimulator.hxx"
 #include "UwbSimulatorDdiCallbacks.hxx"
 #include "UwbSimulatorTracelogging.hxx"
 
@@ -18,6 +19,10 @@ using namespace windows::devices::uwb::simulator;
  * conversion.
  */
 namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
+
+UwbSimulatorDdiCallbacks::UwbSimulatorDdiCallbacks() :
+    m_simulatorCapabilities({ IUwbSimulator::Version })
+{}
 
 NTSTATUS
 UwbSimulatorDdiCallbacks::RaiseUwbNotification(UwbNotificationData uwbNotificationData)
@@ -272,7 +277,7 @@ UwbSimulatorDdiCallbacks::UwbNotification(UwbNotificationData &notificationData)
 UwbSimulatorCapabilities
 UwbSimulatorDdiCallbacks::GetSimulatorCapabilities()
 {
-    return {};
+    return m_simulatorCapabilities;
 }
 
 void
