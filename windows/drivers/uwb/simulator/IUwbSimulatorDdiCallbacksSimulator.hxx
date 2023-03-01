@@ -1,6 +1,6 @@
 
-#ifndef UWB_SIMULATOR_DDI_CALLBACKS_SIMULATOR
-#define UWB_SIMULATOR_DDI_CALLBACKS_SIMULATOR
+#ifndef I_UWB_SIMULATOR_DDI_CALLBACKS_SIMULATOR
+#define I_UWB_SIMULATOR_DDI_CALLBACKS_SIMULATOR
 
 #include <windows.h>
 
@@ -11,17 +11,17 @@ namespace windows::devices::uwb::simulator
 /**
  * @brief
  */
-struct UwbSimulatorDdiCallbacksSimulator
+struct IUwbSimulatorDdiCallbacksSimulator
 {
-    virtual ~UwbSimulatorDdiCallbacksSimulator() = default;
+    virtual ~IUwbSimulatorDdiCallbacksSimulator() = default;
 
     /**
      * @brief
      *
      * @return UwbStatus
      */
-    virtual void
-    GetSimulatorCapabilities(UwbSimulatorCapabilities& uwbSimulatorCapabilities) = 0;
+    virtual UwbSimulatorCapabilities
+    GetSimulatorCapabilities() = 0;
 
     /**
      * @brief
@@ -34,4 +34,4 @@ struct UwbSimulatorDdiCallbacksSimulator
 };
 } // namespace windows::devices::uwb::simulator
 
-#endif // UWB_SIMULATOR_DDI_CALLBACKS_SIMULATOR
+#endif // I_UWB_SIMULATOR_DDI_CALLBACKS_SIMULATOR

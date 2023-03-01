@@ -15,7 +15,7 @@
 
 #include <wdf.h>
 
-#include "UwbSimulatorDdiCallbacksLrp.hxx"
+#include "IUwbSimulatorDdiCallbacksLrp.hxx"
 
 /**
  * @brief Per-queue context object.
@@ -39,9 +39,9 @@ public:
     Initialize();
 
     /**
-     * @brief 
-     * 
-     * @return NTSTATUS 
+     * @brief
+     *
+     * @return NTSTATUS
      */
     NTSTATUS
     Uninitialize();

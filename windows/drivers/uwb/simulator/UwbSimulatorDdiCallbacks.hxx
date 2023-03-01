@@ -1,6 +1,6 @@
 
-#ifndef UWB_SIMULATOR_DDI_CALLBACKS_LRP_NOOP
-#define UWB_SIMULATOR_DDI_CALLBACKS_LRP_NOOP
+#ifndef UWB_SIMULATOR_DDI_CALLBACKS_HXX
+#define UWB_SIMULATOR_DDI_CALLBACKS_HXX
 
 #include <cstdint>
 #include <future>
@@ -15,7 +15,10 @@
 
 #include <wdf.h>
 
-#include "UwbSimulatorDdiCallbacksLrp.hxx"
+#include "UwbSimulatorDdi.h"
+
+#include "IUwbSimulatorDdiCallbacksLrp.hxx"
+#include "IUwbSimulatorDdiCallbacksSimulator.hxx"
 #include "UwbSimulatorSession.hxx"
 
 #include <uwb/protocols/fira/UwbApplicationConfiguration.hxx>
@@ -24,9 +27,14 @@
 
 namespace windows::devices::uwb::simulator
 {
-struct UwbSimulatorDdiCallbacksLrpNoop :
-    public UwbSimulatorDdiCallbacksLrp
+struct UwbSimulatorDdiCallbacks :
+    public IUwbSimulatorDdiCallbacksLrp,
+    public IUwbSimulatorDdiCallbacksSimulator
 {
+    UwbSimulatorDdiCallbacks();
+
+    // IUwbSimulatorDdiCallbacksLrp
+
     virtual UwbStatus
     DeviceReset() override;
 
@@ -75,6 +83,14 @@ struct UwbSimulatorDdiCallbacksLrpNoop :
     virtual NTSTATUS
     UwbNotification(UwbNotificationData &notificationData) override;
 
+    // IUwbSimulatorDdiCallbacksSimulator
+
+    virtual UwbSimulatorCapabilities
+    GetSimulatorCapabilities() override;
+
+    virtual void
+    TriggerSessionEvent(const UwbSimulatorTriggerSessionEventArgs &triggerSessionEventArgs) override;
+
 protected:
     /**
      * @brief Update the state of the specified session.
@@ -87,6 +103,15 @@ protected:
      */
     void
     SessionUpdateState(UwbSimulatorSession &session, UwbSessionState sessionState, std::optional<UwbSessionReasonCode> reasonCode);
+
+    /**
+     * @brief Configure a session for random measurement generation.
+     *
+     * @param sessionId The session to configure.
+     * @param action The action to take.
+     */
+    void
+    SessionRandomMeasurementGenerationConfigure(uint32_t sessionId, RandomMeasurementGeneration action);
 
     /**
      * @brief Raise a UWB notification.
@@ -108,7 +133,10 @@ private:
     // Notification promise and associated lock that protects it.
     std::mutex m_notificationGate;
     std::optional<std::promise<UwbNotificationData>> m_notificationPromise;
+
+private:
+    UwbSimulatorCapabilities m_simulatorCapabilities{};
 };
 } // namespace windows::devices::uwb::simulator
 
-#endif // UWB_SIMULATOR_DDI_CALLBACKS_LRP_NOOP
+#endif // UWB_SIMULATOR_DDI_CALLBACKS_HXX

@@ -9,7 +9,7 @@
 
 #include <wdf.h>
 
-#include "UwbSimulatorDdiHandler.hxx"
+#include "IUwbSimulatorDdiHandler.hxx"
 
 /**
  * @brief Device driver open file abstraction.
@@ -21,10 +21,10 @@ public:
 
     /**
      * @brief Device i/o control handler function.
-     * 
+     *
      * This is invoked when the driver receives an i/o control request on the
      * file handle associated with this instance.
-     * 
+     *
      * @param request The WDF driver request.
      * @param ioControlCode The i/o control code for the request.
      * @param inputBufferLength The input buffer length.
@@ -55,7 +55,7 @@ private:
 
 private:
     WDFFILEOBJECT m_wdfFile;
-    std::vector<std::unique_ptr<windows::devices::uwb::simulator::UwbSimulatorDdiHandler>> m_ddiHandlers{};
+    std::vector<std::unique_ptr<windows::devices::uwb::simulator::IUwbSimulatorDdiHandler>> m_ddiHandlers{};
 };
 
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(UwbSimulatorDeviceFile, GetUwbSimulatorFile);

@@ -54,6 +54,7 @@ enum UwbSimulatorSessionEventAction
 
 struct UwbSimulatorTriggerSessionEventArgs
 {
+    uint32_t SessionId;
     UwbSimulatorSessionEventAction Action;
 };
 
