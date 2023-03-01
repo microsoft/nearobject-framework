@@ -45,7 +45,7 @@ UwbPeer::UwbPeer(UwbMacAddress address) :
  * @return double
  */
 double
-ConvertQ9_7FormatToIEEE(uint16_t q97)
+ConvertQ97FormatToIEEE(uint16_t q97)
 {
     static const double pow2 = std::pow(2, -7);
     static const uint16_t sign_mask =               0b1000'0000'0000'0000U;
