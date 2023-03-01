@@ -136,8 +136,6 @@ UwbSimulatorDdiCallbacks::SessionDeninitialize(uint32_t sessionId)
     auto &session = nodeHandle.mapped();
     SessionUpdateState(session, UwbSessionState::Deinitialized);
 
-    // TODO: do whatever else is needed for deinitialization
-
     return UwbStatusOk;
 }
 
@@ -210,7 +208,7 @@ UwbSimulatorDdiCallbacks::SessionStartRanging(uint32_t sessionId)
     }
 
     auto &[_, session] = *sessionIt;
-    session.Sequence++;
+    session.RangingCount++;
     return UwbStatusOk;
 }
 
@@ -229,8 +227,17 @@ UwbSimulatorDdiCallbacks::SessionStopRanging(uint32_t sessionId)
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacks::SessionGetRangingCount(uint32_t /* sessionId */, uint32_t & /* rangingCount */)
+UwbSimulatorDdiCallbacks::SessionGetRangingCount(uint32_t sessionId, uint32_t &rangingCount)
 {
+    std::unique_lock sessionsWriteLock{ m_sessionsGate };
+    auto sessionIt = m_sessions.find(sessionId);
+    if (sessionIt == std::cend(m_sessions)) {
+        return UwbStatusSession::NotExist;
+    }
+
+    auto &[_, session] = *sessionIt;
+    rangingCount = session.RangingCount;
+
     return UwbStatusOk;
 }
 

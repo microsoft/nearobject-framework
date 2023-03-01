@@ -21,6 +21,7 @@ struct IUwbSimulatorSession
     UwbSessionType Type{ UwbSessionType::RangingSession };
     UwbSessionState State{ UwbSessionState::Deinitialized };
     uint32_t Sequence{ 0 };
+    uint32_t RangingCount{ 0 };
     std::unordered_set<::uwb::UwbMacAddress> Controlees;
     std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> ApplicationConfigurationParameters;
 };
