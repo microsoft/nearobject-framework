@@ -15,7 +15,7 @@
 
 #include <wdf.h>
 
-#include "UwbSimulatorDdiCallbacksLrp.hxx"
+#include "IUwbSimulatorDdiCallbacksLrp.hxx"
 
 /**
  * @brief Per-queue context object.

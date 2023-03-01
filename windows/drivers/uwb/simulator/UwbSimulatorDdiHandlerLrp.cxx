@@ -5,8 +5,8 @@
 #include <type_traits>
 #include <unordered_map>
 
-#include "UwbSimulatorDdiCallbacksLrpNoop.hxx"
-#include "UwbSimulatorDdiHandlerLrp.hxx"
+#include "UwbSimulatorDdiCallbacks.hxx"
+#include "UwbSimulatorDdiHandler.hxx"
 
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
@@ -21,7 +21,7 @@ namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
 
 /**
  * @brief Template function alias which partially specializes the
- * UwbSimulatorDispatchEntry template with ClassT = UwbSimulatorDdiHandlerLrp.
+ * UwbSimulatorDispatchEntry template with ClassT = UwbSimulatorDdiHandler.
  * This reduces some typing.
  *
  * It's not possible to create an alias to a templated function, however, it is
@@ -35,7 +35,7 @@ namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
 template <
     typename InputT = Unrestricted,
     typename OutputT = Unrestricted>
-UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp> (*MakeLrpDispatchEntry)(ULONG, typename UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>::HandlerFuncT) = &MakeDispatchEntry<UwbSimulatorDdiHandlerLrp, InputT, OutputT>;
+UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler> (*MakeLrpDispatchEntry)(ULONG, typename UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>::HandlerFuncT) = &MakeDispatchEntry<UwbSimulatorDdiHandler, InputT, OutputT>;
 
 /**
  * @brief Dispatch table for the LRP DDI driver IOCTLs.
@@ -43,32 +43,32 @@ UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp> (*MakeLrpDispatchEntry)(ULO
  * This defines the expected input and output buffer sizes and the corresponding
  * member function that will handle the IOCTL.
  */
-const std::initializer_list<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>> UwbSimulatorDdiHandlerLrp::Dispatch{
+const std::initializer_list<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>> UwbSimulatorDdiHandler::Dispatch{
     // GUID_UWB_DEVICE_INTERFACE Handlers
-    MakeLrpDispatchEntry<UWB_DEVICE_RESET, UWB_STATUS>(IOCTL_UWB_DEVICE_RESET, &UwbSimulatorDdiHandlerLrp::OnUwbDeviceReset),
-    MakeLrpDispatchEntry<Unrestricted, UWB_DEVICE_INFO>(IOCTL_UWB_GET_DEVICE_INFO, &UwbSimulatorDdiHandlerLrp::OnUwbGetDeviceInformation),
-    MakeLrpDispatchEntry<Unrestricted, UWB_DEVICE_CAPABILITIES>(IOCTL_UWB_GET_DEVICE_CAPABILITIES, &UwbSimulatorDdiHandlerLrp::OnUwbGetDeviceCapabilities),
-    MakeLrpDispatchEntry<UWB_SET_DEVICE_CONFIG_PARAMS, UWB_SET_DEVICE_CONFIG_PARAMS_STATUS>(IOCTL_UWB_GET_DEVICE_CONFIG_PARAMS, &UwbSimulatorDdiHandlerLrp::OnUwbGetDeviceConfigurationParameters),
-    MakeLrpDispatchEntry<UWB_GET_DEVICE_CONFIG_PARAMS, UWB_DEVICE_CONFIG_PARAMS>(IOCTL_UWB_SET_DEVICE_CONFIG_PARAMS, &UwbSimulatorDdiHandlerLrp::OnUwbSetDeviceConfigurationParameters),
-    MakeLrpDispatchEntry<UWB_GET_APP_CONFIG_PARAMS, UWB_APP_CONFIG_PARAMS>(IOCTL_UWB_GET_APP_CONFIG_PARAMS, &UwbSimulatorDdiHandlerLrp::OnUwbGetApplicationConfigurationParameters),
-    MakeLrpDispatchEntry<UWB_SET_APP_CONFIG_PARAMS, UWB_SET_APP_CONFIG_PARAMS_STATUS>(IOCTL_UWB_SET_APP_CONFIG_PARAMS, &UwbSimulatorDdiHandlerLrp::OnUwbSetApplicationConfigurationParameters),
-    MakeLrpDispatchEntry<Unrestricted, UWB_GET_SESSION_COUNT>(IOCTL_UWB_GET_SESSION_COUNT, &UwbSimulatorDdiHandlerLrp::OnUwbGetSessionCount),
-    MakeLrpDispatchEntry<UWB_SESSION_INIT, UWB_STATUS>(IOCTL_UWB_SESSION_INIT, &UwbSimulatorDdiHandlerLrp::OnUwbSessionInitialize),
-    MakeLrpDispatchEntry<UWB_SESSION_DEINIT, UWB_STATUS>(IOCTL_UWB_SESSION_DEINIT, &UwbSimulatorDdiHandlerLrp::OnUwbSessionDeinitialize),
-    MakeLrpDispatchEntry<UWB_GET_SESSION_STATE, UWB_SESSION_STATE_STATUS>(IOCTL_UWB_GET_SESSION_STATE, &UwbSimulatorDdiHandlerLrp::OnUwbGetSessionState),
-    MakeLrpDispatchEntry<UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST, UWB_STATUS>(IOCTL_UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST, &UwbSimulatorDdiHandlerLrp::OnUwbSessionUpdateControllerMulticastList),
-    MakeLrpDispatchEntry<UWB_START_RANGING_SESSION, UWB_STATUS>(IOCTL_UWB_START_RANGING_SESSION, &UwbSimulatorDdiHandlerLrp::OnUwbSessionStartRanging),
-    MakeLrpDispatchEntry<UWB_STOP_RANGING_SESSION, UWB_STATUS>(IOCTL_UWB_STOP_RANGING_SESSION, &UwbSimulatorDdiHandlerLrp::OnUwbSessionStopRanging),
-    MakeLrpDispatchEntry<UWB_GET_RANGING_COUNT, UWB_RANGING_COUNT>(IOCTL_UWB_GET_RANGING_COUNT, &UwbSimulatorDdiHandlerLrp::OnUwbSessionGetRangingCount),
-    MakeLrpDispatchEntry<Unrestricted, UWB_NOTIFICATION_DATA>(IOCTL_UWB_NOTIFICATION, &UwbSimulatorDdiHandlerLrp::OnUwbNotification),
+    MakeLrpDispatchEntry<UWB_DEVICE_RESET, UWB_STATUS>(IOCTL_UWB_DEVICE_RESET, &UwbSimulatorDdiHandler::OnUwbDeviceReset),
+    MakeLrpDispatchEntry<Unrestricted, UWB_DEVICE_INFO>(IOCTL_UWB_GET_DEVICE_INFO, &UwbSimulatorDdiHandler::OnUwbGetDeviceInformation),
+    MakeLrpDispatchEntry<Unrestricted, UWB_DEVICE_CAPABILITIES>(IOCTL_UWB_GET_DEVICE_CAPABILITIES, &UwbSimulatorDdiHandler::OnUwbGetDeviceCapabilities),
+    MakeLrpDispatchEntry<UWB_SET_DEVICE_CONFIG_PARAMS, UWB_SET_DEVICE_CONFIG_PARAMS_STATUS>(IOCTL_UWB_GET_DEVICE_CONFIG_PARAMS, &UwbSimulatorDdiHandler::OnUwbGetDeviceConfigurationParameters),
+    MakeLrpDispatchEntry<UWB_GET_DEVICE_CONFIG_PARAMS, UWB_DEVICE_CONFIG_PARAMS>(IOCTL_UWB_SET_DEVICE_CONFIG_PARAMS, &UwbSimulatorDdiHandler::OnUwbSetDeviceConfigurationParameters),
+    MakeLrpDispatchEntry<UWB_GET_APP_CONFIG_PARAMS, UWB_APP_CONFIG_PARAMS>(IOCTL_UWB_GET_APP_CONFIG_PARAMS, &UwbSimulatorDdiHandler::OnUwbGetApplicationConfigurationParameters),
+    MakeLrpDispatchEntry<UWB_SET_APP_CONFIG_PARAMS, UWB_SET_APP_CONFIG_PARAMS_STATUS>(IOCTL_UWB_SET_APP_CONFIG_PARAMS, &UwbSimulatorDdiHandler::OnUwbSetApplicationConfigurationParameters),
+    MakeLrpDispatchEntry<Unrestricted, UWB_GET_SESSION_COUNT>(IOCTL_UWB_GET_SESSION_COUNT, &UwbSimulatorDdiHandler::OnUwbGetSessionCount),
+    MakeLrpDispatchEntry<UWB_SESSION_INIT, UWB_STATUS>(IOCTL_UWB_SESSION_INIT, &UwbSimulatorDdiHandler::OnUwbSessionInitialize),
+    MakeLrpDispatchEntry<UWB_SESSION_DEINIT, UWB_STATUS>(IOCTL_UWB_SESSION_DEINIT, &UwbSimulatorDdiHandler::OnUwbSessionDeinitialize),
+    MakeLrpDispatchEntry<UWB_GET_SESSION_STATE, UWB_SESSION_STATE_STATUS>(IOCTL_UWB_GET_SESSION_STATE, &UwbSimulatorDdiHandler::OnUwbGetSessionState),
+    MakeLrpDispatchEntry<UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST, UWB_STATUS>(IOCTL_UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST, &UwbSimulatorDdiHandler::OnUwbSessionUpdateControllerMulticastList),
+    MakeLrpDispatchEntry<UWB_START_RANGING_SESSION, UWB_STATUS>(IOCTL_UWB_START_RANGING_SESSION, &UwbSimulatorDdiHandler::OnUwbSessionStartRanging),
+    MakeLrpDispatchEntry<UWB_STOP_RANGING_SESSION, UWB_STATUS>(IOCTL_UWB_STOP_RANGING_SESSION, &UwbSimulatorDdiHandler::OnUwbSessionStopRanging),
+    MakeLrpDispatchEntry<UWB_GET_RANGING_COUNT, UWB_RANGING_COUNT>(IOCTL_UWB_GET_RANGING_COUNT, &UwbSimulatorDdiHandler::OnUwbSessionGetRangingCount),
+    MakeLrpDispatchEntry<Unrestricted, UWB_NOTIFICATION_DATA>(IOCTL_UWB_NOTIFICATION, &UwbSimulatorDdiHandler::OnUwbNotification),
     // GUID_DEVINTERFACE_UWB_SIMULATOR Handlers
-    MakeLrpDispatchEntry<UwbSimulatorCapabilities, Unrestricted>(IOCTL_UWB_DEVICE_SIM_GET_CAPABILITIES, &UwbSimulatorDdiHandlerLrp::OnUwbSimulatorCapabilities),
-    MakeLrpDispatchEntry<UwbSimulatorTriggerSessionEventArgs, Unrestricted>(IOCTL_UWB_DEVICE_SIM_TRIGGER_SESSION_EVENT, &UwbSimulatorDdiHandlerLrp::OnUwbSimulatorTriggerSessionEvent),
+    MakeLrpDispatchEntry<UwbSimulatorCapabilities, Unrestricted>(IOCTL_UWB_DEVICE_SIM_GET_CAPABILITIES, &UwbSimulatorDdiHandler::OnUwbSimulatorCapabilities),
+    MakeLrpDispatchEntry<UwbSimulatorTriggerSessionEventArgs, Unrestricted>(IOCTL_UWB_DEVICE_SIM_TRIGGER_SESSION_EVENT, &UwbSimulatorDdiHandler::OnUwbSimulatorTriggerSessionEvent),
 };
 
 // IOCTL_UWB_DEVICE_RESET
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbDeviceReset(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
+UwbSimulatorDdiHandler::OnUwbDeviceReset(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
 {
     NTSTATUS status = STATUS_SUCCESS;
 
@@ -87,7 +87,7 @@ UwbSimulatorDdiHandlerLrp::OnUwbDeviceReset(WDFREQUEST request, std::span<uint8_
 
 // IOCTL_UWB_GET_DEVICE_INFO
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbGetDeviceInformation(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
+UwbSimulatorDdiHandler::OnUwbGetDeviceInformation(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
 {
     NTSTATUS status = STATUS_SUCCESS;
 
@@ -107,7 +107,7 @@ UwbSimulatorDdiHandlerLrp::OnUwbGetDeviceInformation(WDFREQUEST request, std::sp
 
 // IOCTL_UWB_GET_DEVICE_CAPABILITIES
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbGetDeviceCapabilities(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
+UwbSimulatorDdiHandler::OnUwbGetDeviceCapabilities(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
 {
     NTSTATUS status = STATUS_SUCCESS;
 
@@ -127,21 +127,21 @@ UwbSimulatorDdiHandlerLrp::OnUwbGetDeviceCapabilities(WDFREQUEST request, std::s
 
 // IOCTL_UWB_GET_DEVICE_CONFIG_PARAMS
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbGetDeviceConfigurationParameters(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandler::OnUwbGetDeviceConfigurationParameters(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
 {
     return STATUS_NOT_IMPLEMENTED;
 }
 
 // IOCTL_UWB_SET_DEVICE_CONFIG_PARAMS
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbSetDeviceConfigurationParameters(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandler::OnUwbSetDeviceConfigurationParameters(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
 {
     return STATUS_NOT_IMPLEMENTED;
 }
 
 // IOCTL_UWB_GET_APP_CONFIG_PARAMS
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbGetApplicationConfigurationParameters(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer)
+UwbSimulatorDdiHandler::OnUwbGetApplicationConfigurationParameters(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer)
 {
     NTSTATUS status = STATUS_SUCCESS;
 
@@ -166,7 +166,7 @@ UwbSimulatorDdiHandlerLrp::OnUwbGetApplicationConfigurationParameters(WDFREQUEST
 
 // IOCTL_UWB_SET_APP_CONFIG_PARAMS
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbSetApplicationConfigurationParameters(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer)
+UwbSimulatorDdiHandler::OnUwbSetApplicationConfigurationParameters(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer)
 {
     NTSTATUS status = STATUS_SUCCESS;
 
@@ -191,28 +191,28 @@ UwbSimulatorDdiHandlerLrp::OnUwbSetApplicationConfigurationParameters(WDFREQUEST
 
 // IOCTL_UWB_GET_SESSION_COUNT
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbGetSessionCount(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandler::OnUwbGetSessionCount(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
 {
     return STATUS_NOT_IMPLEMENTED;
 }
 
 // IOCTL_UWB_SESSION_INIT
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbSessionInitialize(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandler::OnUwbSessionInitialize(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
 {
     return STATUS_NOT_IMPLEMENTED;
 }
 
 // IOCTL_UWB_SESSION_DEINIT
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbSessionDeinitialize(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandler::OnUwbSessionDeinitialize(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
 {
     return STATUS_NOT_IMPLEMENTED;
 }
 
 // IOCTL_UWB_GET_SESSION_STATE
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbGetSessionState(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer)
+UwbSimulatorDdiHandler::OnUwbGetSessionState(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer)
 {
     NTSTATUS status = STATUS_SUCCESS;
 
@@ -235,35 +235,35 @@ UwbSimulatorDdiHandlerLrp::OnUwbGetSessionState(WDFREQUEST request, std::span<ui
 
 // IOCTL_UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbSessionUpdateControllerMulticastList(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandler::OnUwbSessionUpdateControllerMulticastList(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
 {
     return STATUS_NOT_IMPLEMENTED;
 }
 
 // IOCTL_UWB_START_RANGING_SESSION
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbSessionStartRanging(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandler::OnUwbSessionStartRanging(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
 {
     return STATUS_NOT_IMPLEMENTED;
 }
 
 // IOCTL_UWB_STOP_RANGING_SESSION
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbSessionStopRanging(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandler::OnUwbSessionStopRanging(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
 {
     return STATUS_NOT_IMPLEMENTED;
 }
 
 // IOCTL_UWB_GET_RANGING_COUNT
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbSessionGetRangingCount(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandler::OnUwbSessionGetRangingCount(WDFREQUEST /*request*/, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
 {
     return STATUS_NOT_IMPLEMENTED;
 }
 
 // IOCTL_UWB_NOTIFICATION
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbNotification(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
+UwbSimulatorDdiHandler::OnUwbNotification(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
 {
     UwbNotificationData uwbNotificationData{};
     NTSTATUS status = m_callbacks->UwbNotification(uwbNotificationData);
@@ -284,7 +284,7 @@ UwbSimulatorDdiHandlerLrp::OnUwbNotification(WDFREQUEST request, std::span<uint8
 
 // IOCTL_UWB_DEVICE_SIM_GET_CAPABILITIES
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbSimulatorCapabilities(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
+UwbSimulatorDdiHandler::OnUwbSimulatorCapabilities(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
 {
     NTSTATUS status = STATUS_SUCCESS;
 
@@ -303,7 +303,7 @@ UwbSimulatorDdiHandlerLrp::OnUwbSimulatorCapabilities(WDFREQUEST request, std::s
 
 // IOCTL_UWB_DEVICE_SIM_TRIGGER_SESSION_EVENT
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::OnUwbSimulatorTriggerSessionEvent(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> /*outputBuffer*/)
+UwbSimulatorDdiHandler::OnUwbSimulatorTriggerSessionEvent(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> /*outputBuffer*/)
 {
     NTSTATUS status = STATUS_SUCCESS;
 
@@ -318,13 +318,13 @@ UwbSimulatorDdiHandlerLrp::OnUwbSimulatorTriggerSessionEvent(WDFREQUEST request,
     return status;
 }
 
-UwbSimulatorDdiHandlerLrp::UwbSimulatorDdiHandlerLrp() :
-    m_callbacks(std::make_unique<UwbSimulatorDdiCallbacksLrpNoop>())
+UwbSimulatorDdiHandler::UwbSimulatorDdiHandler() :
+    m_callbacks(std::make_unique<UwbSimulatorDdiCallbacks>())
 {
 }
 
-std::optional<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>>
-UwbSimulatorDdiHandlerLrp::TryGetDispatchEntry(ULONG ioControlCode)
+std::optional<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>>
+UwbSimulatorDdiHandler::TryGetDispatchEntry(ULONG ioControlCode)
 {
     const auto dispatchEntryIt = std::ranges::find_if(Dispatch, [&](const auto &dispatchEntry) {
         return (dispatchEntry.IoControlCode == ioControlCode);
@@ -332,11 +332,11 @@ UwbSimulatorDdiHandlerLrp::TryGetDispatchEntry(ULONG ioControlCode)
 
     return (dispatchEntryIt != std::end(Dispatch))
         ? *dispatchEntryIt
-        : std::optional<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandlerLrp>>(std::nullopt);
+        : std::optional<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>>(std::nullopt);
 }
 
 bool
-UwbSimulatorDdiHandlerLrp::HandlesIoControlCode(ULONG ioControlCode)
+UwbSimulatorDdiHandler::HandlesIoControlCode(ULONG ioControlCode)
 {
     return std::ranges::any_of(Dispatch, [&](const auto &dispatchEntry) {
         return (dispatchEntry.IoControlCode == ioControlCode);
@@ -344,7 +344,7 @@ UwbSimulatorDdiHandlerLrp::HandlesIoControlCode(ULONG ioControlCode)
 }
 
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::ValidateRequest(WDFREQUEST /* request */, ULONG ioControlCode, std::size_t inputBufferLength, std::size_t outputBufferLength)
+UwbSimulatorDdiHandler::ValidateRequest(WDFREQUEST /* request */, ULONG ioControlCode, std::size_t inputBufferLength, std::size_t outputBufferLength)
 {
     const auto dispatchEntry = TryGetDispatchEntry(ioControlCode);
     NTSTATUS status = dispatchEntry.has_value()
@@ -354,7 +354,7 @@ UwbSimulatorDdiHandlerLrp::ValidateRequest(WDFREQUEST /* request */, ULONG ioCon
 }
 
 NTSTATUS
-UwbSimulatorDdiHandlerLrp::HandleRequest(WDFREQUEST request, ULONG ioControlCode, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer)
+UwbSimulatorDdiHandler::HandleRequest(WDFREQUEST request, ULONG ioControlCode, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer)
 {
     auto dispatchEntry = TryGetDispatchEntry(ioControlCode);
     if (!dispatchEntry.has_value()) {

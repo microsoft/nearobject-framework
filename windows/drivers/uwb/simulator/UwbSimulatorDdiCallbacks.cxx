@@ -7,7 +7,7 @@
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 
-#include "UwbSimulatorDdiCallbacksLrpNoop.hxx"
+#include "UwbSimulatorDdiCallbacks.hxx"
 #include "UwbSimulatorTracelogging.hxx"
 
 using namespace windows::devices::uwb;
@@ -20,7 +20,7 @@ using namespace windows::devices::uwb::simulator;
 namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
 
 NTSTATUS
-UwbSimulatorDdiCallbacksLrpNoop::RaiseUwbNotification(UwbNotificationData uwbNotificationData)
+UwbSimulatorDdiCallbacks::RaiseUwbNotification(UwbNotificationData uwbNotificationData)
 {
     // Acquire the notification lock to ensure the notification proimise can be safely inspected and updated.
     std::unique_lock notificationLock{ m_notificationGate };
@@ -45,7 +45,7 @@ UwbSimulatorDdiCallbacksLrpNoop::RaiseUwbNotification(UwbNotificationData uwbNot
 }
 
 void
-UwbSimulatorDdiCallbacksLrpNoop::SessionUpdateState(UwbSimulatorSession &session, UwbSessionState sessionState, std::optional<UwbSessionReasonCode> reasonCode = std::nullopt)
+UwbSimulatorDdiCallbacks::SessionUpdateState(UwbSimulatorSession &session, UwbSessionState sessionState, std::optional<UwbSessionReasonCode> reasonCode = std::nullopt)
 {
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
@@ -68,41 +68,41 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionUpdateState(UwbSimulatorSession &session
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::DeviceReset()
+UwbSimulatorDdiCallbacks::DeviceReset()
 {
     return UwbStatusOk;
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::DeviceGetInformation(UwbDeviceInformation &deviceInformation)
+UwbSimulatorDdiCallbacks::DeviceGetInformation(UwbDeviceInformation &deviceInformation)
 {
     deviceInformation = m_deviceInformation;
     return UwbStatusOk;
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::DeviceGetCapabilities(UwbCapability &deviceCapabilities)
+UwbSimulatorDdiCallbacks::DeviceGetCapabilities(UwbCapability &deviceCapabilities)
 {
     deviceCapabilities = m_deviceCapabilities;
     return UwbStatusOk;
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::DeviceGetConfigurationParameters(std::vector<UwbDeviceConfigurationParameterType> & /* deviceConfigurationParameterTypes */, std::vector<std::tuple<UwbDeviceConfigurationParameterType, UwbStatus, std::optional<UwbDeviceConfigurationParameter>>> &deviceConfigurationParameterResults)
+UwbSimulatorDdiCallbacks::DeviceGetConfigurationParameters(std::vector<UwbDeviceConfigurationParameterType> & /* deviceConfigurationParameterTypes */, std::vector<std::tuple<UwbDeviceConfigurationParameterType, UwbStatus, std::optional<UwbDeviceConfigurationParameter>>> &deviceConfigurationParameterResults)
 {
     deviceConfigurationParameterResults = {};
     return UwbStatusOk;
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::DeviceSetConfigurationParameters(const std::vector<UwbDeviceConfigurationParameter> & /* deviceConfigurationParameters */, std::vector<std::tuple<UwbDeviceConfigurationParameterType, UwbStatus>> &deviceConfigurationParameterResults)
+UwbSimulatorDdiCallbacks::DeviceSetConfigurationParameters(const std::vector<UwbDeviceConfigurationParameter> & /* deviceConfigurationParameters */, std::vector<std::tuple<UwbDeviceConfigurationParameterType, UwbStatus>> &deviceConfigurationParameterResults)
 {
     deviceConfigurationParameterResults = {};
     return UwbStatusOk;
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SessionInitialize(uint32_t sessionId, UwbSessionType sessionType)
+UwbSimulatorDdiCallbacks::SessionInitialize(uint32_t sessionId, UwbSessionType sessionType)
 {
     std::unique_lock sessionsWriteLock{ m_sessionsGate };
     auto [sessionIt, inserted] = m_sessions.try_emplace(sessionId, sessionId, sessionType);
@@ -117,7 +117,7 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionInitialize(uint32_t sessionId, UwbSessio
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SessionDeninitialize(uint32_t sessionId)
+UwbSimulatorDdiCallbacks::SessionDeninitialize(uint32_t sessionId)
 {
     decltype(m_sessions)::node_type nodeHandle;
     {
@@ -137,7 +137,7 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionDeninitialize(uint32_t sessionId)
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SetApplicationConfigurationParameters(uint32_t /*sessionId*/, const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> & /* applicationConfigurationParameters */, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::shared_ptr<IUwbAppConfigurationParameter>>> &applicationConfigurationParameterResults)
+UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t /*sessionId*/, const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> & /* applicationConfigurationParameters */, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::shared_ptr<IUwbAppConfigurationParameter>>> &applicationConfigurationParameterResults)
 {
     std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::shared_ptr<IUwbAppConfigurationParameter>>> results{};
     applicationConfigurationParameterResults = std::move(results);
@@ -145,7 +145,7 @@ UwbSimulatorDdiCallbacksLrpNoop::SetApplicationConfigurationParameters(uint32_t 
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters)
+UwbSimulatorDdiCallbacks::GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters)
 {
     std::shared_lock sessionsReadLock{ m_sessionsGate };
     auto sessionIt = m_sessions.find(sessionId);
@@ -160,7 +160,7 @@ UwbSimulatorDdiCallbacksLrpNoop::GetApplicationConfigurationParameters(uint32_t 
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::GetSessionCount(uint32_t &sessionCount)
+UwbSimulatorDdiCallbacks::GetSessionCount(uint32_t &sessionCount)
 {
     std::shared_lock sessionsReadLock{ m_sessionsGate };
     sessionCount = static_cast<uint32_t>(std::size(m_sessions));
@@ -168,7 +168,7 @@ UwbSimulatorDdiCallbacksLrpNoop::GetSessionCount(uint32_t &sessionCount)
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SessionGetState(uint32_t sessionId, UwbSessionState &sessionState)
+UwbSimulatorDdiCallbacks::SessionGetState(uint32_t sessionId, UwbSessionState &sessionState)
 {
     std::shared_lock sessionsReadLock{ m_sessionsGate };
     auto sessionIt = m_sessions.find(sessionId);
@@ -182,7 +182,7 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionGetState(uint32_t sessionId, UwbSessionS
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SessionUpdateControllerMulticastList(uint32_t sessionId, std::vector<UwbMacAddress> controlees)
+UwbSimulatorDdiCallbacks::SessionUpdateControllerMulticastList(uint32_t sessionId, std::vector<UwbMacAddress> controlees)
 {
     std::unique_lock sessionsWriteLock{ m_sessionsGate };
     auto sessionIt = m_sessions.find(sessionId);
@@ -196,7 +196,7 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionUpdateControllerMulticastList(uint32_t s
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SessionStartRanging(uint32_t sessionId)
+UwbSimulatorDdiCallbacks::SessionStartRanging(uint32_t sessionId)
 {
     std::unique_lock sessionsWriteLock{ m_sessionsGate };
     auto sessionIt = m_sessions.find(sessionId);
@@ -210,7 +210,7 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionStartRanging(uint32_t sessionId)
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SessionStopRanging(uint32_t sessionId)
+UwbSimulatorDdiCallbacks::SessionStopRanging(uint32_t sessionId)
 {
     std::unique_lock sessionsWriteLock{ m_sessionsGate };
     auto sessionIt = m_sessions.find(sessionId);
@@ -224,13 +224,13 @@ UwbSimulatorDdiCallbacksLrpNoop::SessionStopRanging(uint32_t sessionId)
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacksLrpNoop::SessionGetRangingCount(uint32_t /* sessionId */, uint32_t & /* rangingCount */)
+UwbSimulatorDdiCallbacks::SessionGetRangingCount(uint32_t /* sessionId */, uint32_t & /* rangingCount */)
 {
     return UwbStatusOk;
 }
 
 NTSTATUS
-UwbSimulatorDdiCallbacksLrpNoop::UwbNotification(UwbNotificationData &notificationData)
+UwbSimulatorDdiCallbacks::UwbNotification(UwbNotificationData &notificationData)
 {
     // Acquire the notification lock to ensure the notification proimise can be safely inspected and updated.
     std::unique_lock notificationLock{ m_notificationGate };
@@ -270,13 +270,13 @@ UwbSimulatorDdiCallbacksLrpNoop::UwbNotification(UwbNotificationData &notificati
 }
 
 UwbSimulatorCapabilities
-UwbSimulatorDdiCallbacksLrpNoop::GetSimulatorCapabilities()
+UwbSimulatorDdiCallbacks::GetSimulatorCapabilities()
 {
     return {};
 }
 
 void
-UwbSimulatorDdiCallbacksLrpNoop::TriggerSessionEvent(const UwbSimulatorTriggerSessionEventArgs &triggerSessionEventArgs)
+UwbSimulatorDdiCallbacks::TriggerSessionEvent(const UwbSimulatorTriggerSessionEventArgs &triggerSessionEventArgs)
 {
     switch (triggerSessionEventArgs.Action) {
     case UwbSimulatorSessionEventAction::RandomRangingMeasurementGenerationStart: {

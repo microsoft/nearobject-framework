@@ -9,7 +9,7 @@
 
 #include <wdf.h>
 
-#include "UwbSimulatorDdiHandler.hxx"
+#include "IUwbSimulatorDdiHandler.hxx"
 
 /**
  * @brief Device driver open file abstraction.
@@ -55,7 +55,7 @@ private:
 
 private:
     WDFFILEOBJECT m_wdfFile;
-    std::vector<std::unique_ptr<windows::devices::uwb::simulator::UwbSimulatorDdiHandler>> m_ddiHandlers{};
+    std::vector<std::unique_ptr<windows::devices::uwb::simulator::IUwbSimulatorDdiHandler>> m_ddiHandlers{};
 };
 
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(UwbSimulatorDeviceFile, GetUwbSimulatorFile);

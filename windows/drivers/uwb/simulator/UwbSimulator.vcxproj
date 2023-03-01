@@ -13,22 +13,22 @@
   <ItemGroup>
     <ClCompile Include="UwbSimulatorDdiHandlerLrp.cxx" />
     <ClCompile Include="UwbSimulatorDriver.cxx" />
-    <ClCompile Include="UwbSimulatorDdiCallbacksLrpNoop.cxx" />
+    <ClCompile Include="UwbSimulatorDdiCallbacks.cxx" />
     <ClCompile Include="UwbSimulatorIoQueue.cxx" />
     <ClCompile Include="UwbSimulatorDevice.cxx" />
     <ClCompile Include="UwbSimulatorDeviceFile.cxx" />
     <ClCompile Include="UwbSimulatorTracelogging.cxx" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="UwbSimulatorDdiCallbacksSimulator.hxx" />
+    <ClInclude Include="IUwbSimulatorDdiCallbacksSimulator.hxx" />
+    <ClInclude Include="IUwbSimulatorDdiHandler.hxx" />
     <ClInclude Include="UwbSimulatorDdiHandler.hxx" />
-    <ClInclude Include="UwbSimulatorDdiHandlerLrp.hxx" />
     <ClInclude Include="UwbSimulatorDispatchEntry.hxx" />
     <ClInclude Include="UwbSimulatorDriver.hxx" />
     <ClInclude Include="include\UwbSimulatorDdi.h" />
     <ClInclude Include="UwbCxLrpDevice.h" />
-    <ClInclude Include="UwbSimulatorDdiCallbacksLrp.hxx" />
-    <ClInclude Include="UwbSimulatorDdiCallbacksLrpNoop.hxx" />
+    <ClInclude Include="IUwbSimulatorDdiCallbacksLrp.hxx" />
+    <ClInclude Include="UwbSimulatorDdiCallbacks.hxx" />
     <ClInclude Include="UwbSimulatorIoQueue.hxx" />
     <ClInclude Include="UwbSimulatorDevice.hxx" />
     <ClInclude Include="UwbSimulatorDeviceFile.hxx" />

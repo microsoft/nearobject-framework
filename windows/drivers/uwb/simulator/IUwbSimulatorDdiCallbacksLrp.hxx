@@ -25,9 +25,9 @@ namespace windows::devices::uwb::simulator
 /**
  * @brief
  */
-struct UwbSimulatorDdiCallbacksLrp
+struct IUwbSimulatorDdiCallbacksLrp
 {
-    virtual ~UwbSimulatorDdiCallbacksLrp() = default;
+    virtual ~IUwbSimulatorDdiCallbacksLrp() = default;
 
     /**
      * @brief
