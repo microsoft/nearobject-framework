@@ -70,7 +70,7 @@ UwbDevice::HandleNotifications()
 
         // Determine the amount of memory required for the UWB_NOTIFICATION_DATA from the driver.
         DWORD bytesRequired = 0;
-        BOOL ioResult = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, nullptr, 0, &bytesRequired, nullptr);
+        BOOL ioResult = DeviceIoControl(m_handleDriverNotifications.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, nullptr, 0, &bytesRequired, nullptr);
         if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
             HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
             PLOG_ERROR << "error determining output buffer size for UWB notification, hr=" << std::showbase << std::hex << hr;
@@ -80,7 +80,7 @@ UwbDevice::HandleNotifications()
         // Allocate memory for the UWB_NOTIFICATION_DATA structure, and pass this to the driver request.
         DWORD uwbNotificationDataSize = bytesRequired;
         std::vector<uint8_t> uwbNotificationDataBuffer(uwbNotificationDataSize);
-        ioResult = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, std::data(uwbNotificationDataBuffer), uwbNotificationDataSize, &bytesRequired, nullptr);
+        ioResult = DeviceIoControl(m_handleDriverNotifications.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, std::data(uwbNotificationDataBuffer), uwbNotificationDataSize, &bytesRequired, nullptr);
         if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
             HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
             PLOG_ERROR << "error obtaining UWB notification buffer, hr=" << std::showbase << std::hex << hr;
