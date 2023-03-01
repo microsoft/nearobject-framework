@@ -30,7 +30,7 @@ main(int argc, char* argv[])
 
     CLI::App app{};
     app.name("uwbsim");
-    app.description("control and interact uwb simulator devices");
+    app.description("control and interact with uwb simulator devices");
 
     std::string deviceName{};
     app.add_option("--deviceName, -d", deviceName, "The uwb simulator device name (path)");
