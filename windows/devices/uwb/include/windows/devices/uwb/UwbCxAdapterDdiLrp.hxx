@@ -41,6 +41,15 @@ UWB_DEVICE_STATE
 From(const ::uwb::protocol::fira::UwbDeviceState &uwbDeviceState);
 
 /**
+ * @brief Converts UwbSessionType to UWB_SESSION_TYPE.
+ * 
+ * @param uwbSessionType 
+ * @return UWB_SESSION_TYPE 
+ */
+UWB_SESSION_TYPE
+From(const ::uwb::protocol::fira::UwbSessionType &uwbSessionType);
+
+/**
  * @brief Converts UwbLineOfSightIndicator to UWB_LINE_OF_SIGHT_INDICATOR.
  *
  * @param uwbLineOfSightIndicator
@@ -285,6 +294,16 @@ To(const UWB_STATUS &status);
  */
 ::uwb::protocol::fira::UwbDeviceState
 To(const UWB_DEVICE_STATE &deviceState);
+
+
+/**
+ * @brief Converts UWB_SESSION_TYPE to UwbSessionType. 
+ * 
+ * @param sessionType 
+ * @return ::uwb::protocol::fira::UwbSessionType 
+ */
+::uwb::protocol::fira::UwbSessionType
+To(const UWB_SESSION_TYPE &sessionType);
 
 /**
  * @brief Converts UWB_LINE_OF_SIGHT_INDICATOR to UwbLineOfSightIndicator.
