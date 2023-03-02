@@ -11,10 +11,12 @@
 #include <cfgmgr32.h>
 #include <wil/resource.h>
 #include <windows/devices/DeviceResource.hxx>
+#include <windows/devices/uwb/UwbDevice.hxx>
 
 namespace windows::devices::uwb::simulator
 {
-class UwbDeviceSimulator
+class UwbDeviceSimulator :
+    public windows::devices::uwb::UwbDevice
 {
 public:
     /**
@@ -41,7 +43,6 @@ public:
 private:
     const std::string m_deviceName;
 
-    unique_hcmnotification m_hcmNotificationHandle;
     wil::unique_hfile m_handleDriver;
 };
 
