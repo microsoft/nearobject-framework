@@ -137,11 +137,13 @@ struct IUwbSimulatorDdiCallbacksLrp
     /**
      * @brief
      *
-     * @param controlees
+     * @param sessionId
+     * @param action
+     * @param updateMulticastListEntries
      * @return UwbStatus
      */
     virtual UwbStatus
-    SessionUpdateControllerMulticastList(uint32_t sessionId, std::vector<UwbMacAddress> controlees) = 0;
+    SessionUpdateControllerMulticastList(uint32_t sessionId, UwbMulticastAction action, std::vector<UwbSessionUpdateMulticastListEntry> updateMulticastListEntries) = 0;
 
     /**
      * @brief

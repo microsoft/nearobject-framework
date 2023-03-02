@@ -1,6 +1,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <ranges>
 
 #include <magic_enum.hpp>
 
@@ -185,7 +186,7 @@ UwbSimulatorDdiCallbacks::SessionGetState(uint32_t sessionId, UwbSessionState &s
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacks::SessionUpdateControllerMulticastList(uint32_t sessionId, std::vector<UwbMacAddress> controlees)
+UwbSimulatorDdiCallbacks::SessionUpdateControllerMulticastList(uint32_t sessionId, UwbMulticastAction action, std::vector<UwbSessionUpdateMulticastListEntry> updateMulticastListEntries)
 {
     std::unique_lock sessionsWriteLock{ m_sessionsGate };
     auto sessionIt = m_sessions.find(sessionId);
@@ -194,7 +195,30 @@ UwbSimulatorDdiCallbacks::SessionUpdateControllerMulticastList(uint32_t sessionI
     }
 
     auto &[_, session] = *sessionIt;
-    std::move(std::begin(controlees), std::end(controlees), std::inserter(session.Controlees, std::end(session.Controlees)));
+
+    const auto getControlee = [](const UwbSessionUpdateMulticastListEntry &entry) {
+        return entry.ControleeMacAddress;
+    };
+
+    switch (action) {
+    case UwbMulticastAction::AddShortAddress: {
+        // TODO: updateMulticastListEntry.SubSessionId needs to be handled in future.
+        std::ranges::move(updateMulticastListEntries | std::views::transform(getControlee), std::inserter(session.Controlees, std::end(session.Controlees)));
+        break;
+    }
+    case UwbMulticastAction::DeleteShortAddress: {
+        // TODO: updateMulticastListEntry.SubSessionId needs to be handled in future.
+        std::erase_if(session.Controlees, [&](const auto &controleeToRemove) {
+            return std::ranges::any_of(updateMulticastListEntries | std::views::transform(getControlee), [&](const auto &controlee) {
+                return controleeToRemove == controlee;
+            });
+        });
+        break;
+    }
+    default:
+        return UwbStatusGeneric::InvalidParameter;
+    }
+
     return UwbStatusOk;
 }
 

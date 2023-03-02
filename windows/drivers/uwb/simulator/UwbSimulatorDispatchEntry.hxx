@@ -63,10 +63,15 @@ struct UwbSimulatorDispatchEntry
      * @return NTSTATUS
      */
     NTSTATUS
-    GetRequestValidityStatus(std::size_t inputBufferSize, std::size_t outputBufferSize, std::size_t inputBufferVariableSize = 0, std::size_t outputBufferVariableSize = 0) const noexcept
+    GetRequestValidityStatus(std::size_t inputBufferSize, std::size_t &outputBufferSize, std::size_t inputBufferVariableSize = 0, std::size_t outputBufferVariableSize = 0) const noexcept
     {
-        return (inputBufferSize >= (InputSizeMinimum + inputBufferVariableSize)) &&
-            (outputBufferSize >= (OutputSizeMinimum + outputBufferVariableSize));
+        if (inputBufferSize < (InputSizeMinimum + inputBufferVariableSize)) {
+            return STATUS_INVALID_PARAMETER;
+        } else if (outputBufferSize < (OutputSizeMinimum + outputBufferVariableSize)) {
+            return STATUS_BUFFER_TOO_SMALL;
+        } else {
+            return STATUS_SUCCESS;
+        }
     }
 };
 

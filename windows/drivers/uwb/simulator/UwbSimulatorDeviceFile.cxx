@@ -59,7 +59,13 @@ UwbSimulatorDeviceFile::OnRequest(WDFREQUEST request, ULONG ioControlCode, size_
     // Use the handler to validate the request.
     auto &ddiHandler = *ddiHandlerIt;
     auto status = ddiHandler->ValidateRequest(request, ioControlCode, inputBufferLength, outputBufferLength);
-    if (status != STATUS_SUCCESS) {
+    switch (status) {
+    case STATUS_SUCCESS:
+        break;
+    case STATUS_BUFFER_TOO_SMALL:
+        WdfRequestCompleteWithInformation(request, status, outputBufferLength);
+        // intentional fall-through
+    default:
         return status;
     }
 
