@@ -396,7 +396,8 @@ UwbSimulatorDdiCallbacks::GetSimulatorCapabilities()
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
         "GetSimulatorCapabilities",
-        TraceLoggingLevel(TRACE_LEVEL_INFORMATION));
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingHexUInt32(m_simulatorCapabilities.Version, "Version"));
     return m_simulatorCapabilities;
 }
 
