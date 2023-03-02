@@ -1,5 +1,6 @@
 
 #include <windows/devices/uwb/simulator/UwbDeviceSimulator.hxx>
+#include <windows/devices/uwb/simulator/UwbSessionSimulator.hxx>
 
 using namespace windows::devices::uwb::simulator;
 
@@ -26,6 +27,12 @@ UwbDeviceSimulator::Initialize()
     UwbDevice::Initialize();
     m_handleDriver = UwbDevice::DriverHandle();
     return true;
+}
+
+std::shared_ptr<::uwb::UwbSession>
+UwbDeviceSimulator::CreateSessionImpl(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
+{
+    return UwbDevice::CreateSessionImpl<UwbSessionSimulator>(std::move(callbacks));
 }
 
 UwbSimulatorCapabilities

@@ -2,9 +2,11 @@
 #ifndef WINDOWS_DEVICE_UWB_HXX
 #define WINDOWS_DEVICE_UWB_HXX
 
+#include <concepts>
 #include <memory>
 #include <string>
 #include <thread>
+#include <type_traits>
 
 // NB: This must come before any other Windows include
 #include <windows.h>
@@ -26,7 +28,7 @@ namespace windows::devices::uwb
 {
 /**
  * @brief Helper class to interact with Windows UWB devices using the Windows
- * UWB DDI. The DDI is to be determined.
+ * UWB DDI.
  */
 class UwbDevice :
     public ::uwb::UwbDevice
@@ -63,6 +65,31 @@ public:
      */
     bool
     IsEqual(const ::uwb::UwbDevice& other) const noexcept override;
+
+protected:
+    /**
+     * @brief Helper function to create a typed (derived) UwbSession object,
+     * capturing the common code that is required in all sub-classes.
+     *
+     * @tparam UwbSessionT The type of session to create.
+     * @param callbacks The session callbacks.
+     * @return requires
+     */
+    template <typename UwbSessionT>
+    // clang-format off
+    requires std::is_base_of_v<::uwb::UwbSession, UwbSessionT>
+    // clang-format on
+    std::shared_ptr<::uwb::UwbSession>
+    CreateSessionImpl(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
+    {
+        // Create a duplicate handle to the driver for use by the session.
+        wil::shared_hfile handleDriverForSession;
+        if (!DuplicateHandle(GetCurrentProcess(), m_handleDriver.get(), GetCurrentProcess(), &handleDriverForSession, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+            return nullptr;
+        }
+
+        return std::make_shared<UwbSessionT>(std::move(callbacks), std::move(handleDriverForSession));
+    }
 
 private:
     /**

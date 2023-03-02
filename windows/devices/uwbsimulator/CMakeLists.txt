@@ -9,6 +9,7 @@ target_sources(windev-uwb-simulator
         ${CMAKE_CURRENT_LIST_DIR}/UwbDeviceSimulator.cxx
     PUBLIC
         ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceSimulator.hxx
+        ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionSimulator.hxx
 )
 
 target_include_directories(windev-uwb-simulator
@@ -28,6 +29,7 @@ target_link_libraries(windev-uwb-simulator
 
 list(APPEND WINDEVUWBSIM_PUBLIC_HEADERS
     ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceSimulator.hxx
+    ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionSimulator.hxx
 )
 
 set_target_properties(windev-uwb-simulator PROPERTIES FOLDER windows/devices/uwb)
