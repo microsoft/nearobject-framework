@@ -25,18 +25,7 @@ UwbDeviceSimulator::DeviceName() const noexcept
 bool
 UwbDeviceSimulator::Initialize()
 {
-    wil::unique_hfile handleDriver(CreateFileA(
-        m_deviceName.c_str(),
-        GENERIC_READ | GENERIC_WRITE,
-        FILE_SHARE_READ | FILE_SHARE_WRITE,
-        nullptr,
-        OPEN_EXISTING,
-        FILE_FLAG_OVERLAPPED,
-        nullptr));
-    if (!handleDriver.is_valid()) {
-        return false;
-    }
-
-    m_handleDriver = std::move(handleDriver);
+    UwbDevice::Initialize();
+    m_handleDriver = UwbDevice::DriverHandle();
     return true;
 }

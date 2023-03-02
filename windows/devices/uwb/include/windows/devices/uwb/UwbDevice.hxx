@@ -89,11 +89,28 @@ private:
     void
     HandleNotifications();
 
+protected:
+    /**
+     * @brief Obtain a shared instance of the primary driver handle.
+     *
+     * @return wil::shared_hfile
+     */
+    wil::shared_hfile
+    DriverHandle() noexcept;
+
+    /**
+     * @brief Obtain a shared instance of the notification driver handle.
+     *
+     * @return wil::shared_hfile
+     */
+    wil::shared_hfile
+    DriverHandleNotifications() noexcept;
+
 private:
     const std::string m_deviceName;
 
-    wil::unique_hfile m_handleDriver;
-    wil::unique_hfile m_handleDriverNotifications;
+    wil::shared_hfile m_handleDriver;
+    wil::shared_hfile m_handleDriverNotifications;
     std::jthread m_notificationThread;
 };
 } // namespace windows::devices::uwb

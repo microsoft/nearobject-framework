@@ -24,6 +24,18 @@ UwbDevice::UwbDevice(std::string deviceName) :
     m_deviceName(std::move(deviceName))
 {}
 
+wil::shared_hfile
+UwbDevice::DriverHandle() noexcept
+{
+    return m_handleDriver;
+}
+
+wil::shared_hfile
+UwbDevice::DriverHandleNotifications() noexcept
+{
+    return m_handleDriverNotifications;
+}
+
 const std::string&
 UwbDevice::DeviceName() const noexcept
 {
@@ -33,7 +45,7 @@ UwbDevice::DeviceName() const noexcept
 void
 UwbDevice::Initialize()
 {
-    wil::unique_hfile handleDriver(CreateFileA(
+    wil::shared_hfile handleDriver(CreateFileA(
         m_deviceName.c_str(),
         GENERIC_READ | GENERIC_WRITE,
         FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -42,7 +54,7 @@ UwbDevice::Initialize()
         FILE_FLAG_OVERLAPPED,
         nullptr));
 
-    wil::unique_hfile handleDriverNotifications(CreateFileA(
+    wil::shared_hfile handleDriverNotifications(CreateFileA(
         m_deviceName.c_str(),
         GENERIC_READ | GENERIC_WRITE,
         FILE_SHARE_READ | FILE_SHARE_WRITE,

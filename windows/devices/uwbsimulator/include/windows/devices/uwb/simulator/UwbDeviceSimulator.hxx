@@ -42,8 +42,7 @@ public:
 
 private:
     const std::string m_deviceName;
-
-    wil::unique_hfile m_handleDriver;
+    wil::shared_hfile m_handleDriver;
 };
 
 } // namespace windows::devices::uwb::simulator
