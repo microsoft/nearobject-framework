@@ -342,7 +342,7 @@ UwbSimulatorDdiCallbacks::SessionGetRangingCount(uint32_t sessionId, uint32_t &r
 
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
-        "SessionStopRanging",
+        "SessionGetRangingCount",
         TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
         TraceLoggingUInt32(sessionId, "Session Id"),
         TraceLoggingUInt32(rangingCount, "Session Ranging Count"));
