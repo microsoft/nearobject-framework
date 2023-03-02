@@ -70,7 +70,7 @@ UwbDevice::HandleNotifications()
 
         // Determine the amount of memory required for the UWB_NOTIFICATION_DATA from the driver.
         DWORD bytesRequired = 0;
-        BOOL ioResult = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, nullptr, 0, &bytesRequired, nullptr);
+        BOOL ioResult = DeviceIoControl(m_handleDriverNotifications.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, nullptr, 0, &bytesRequired, nullptr);
         if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
             HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
             PLOG_ERROR << "error determining output buffer size for UWB notification, hr=" << std::showbase << std::hex << hr;
@@ -80,7 +80,7 @@ UwbDevice::HandleNotifications()
         // Allocate memory for the UWB_NOTIFICATION_DATA structure, and pass this to the driver request.
         DWORD uwbNotificationDataSize = bytesRequired;
         std::vector<uint8_t> uwbNotificationDataBuffer(uwbNotificationDataSize);
-        ioResult = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, std::data(uwbNotificationDataBuffer), uwbNotificationDataSize, &bytesRequired, nullptr);
+        ioResult = DeviceIoControl(m_handleDriverNotifications.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, std::data(uwbNotificationDataBuffer), uwbNotificationDataSize, &bytesRequired, nullptr);
         if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
             HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
             PLOG_ERROR << "error obtaining UWB notification buffer, hr=" << std::showbase << std::hex << hr;
@@ -93,20 +93,11 @@ UwbDevice::HandleNotifications()
         }
 
         // Convert to neutral type and process the notification.
-        UWB_NOTIFICATION_DATA& notificationData = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
+        const UWB_NOTIFICATION_DATA& notificationData = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
         auto uwbNotificationData = UwbCxDdi::To(notificationData);
 
-        // Handle the notification in a fire-and-forget fashion. This may change
-        // later. Since std::async returns a future, and the future's
-        // destructor waits for it to complete, we cannot just ignore the
-        // returned future. To work around this, we move the returned future
-        // into a shared_ptr, then pass this by value to the std::async's
-        // lambda, increasing its reference count. This will ensure the future
-        // is automatically destructed once the async lambda has completed.
-        auto notificationHandlerFuture = std::make_shared<std::future<void>>();
-        *notificationHandlerFuture = std::async(std::launch::async, [this, notificationHandlerFuture, uwbNotificationData = std::move(uwbNotificationData)]() {
-            ::UwbDevice::OnUwbNotification(std::move(uwbNotificationData));
-        });
+        // Invoke base class notification handler which takes care of threading.
+        ::UwbDevice::OnUwbNotification(std::move(uwbNotificationData));
     }
 }
 
