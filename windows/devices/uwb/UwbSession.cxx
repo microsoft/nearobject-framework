@@ -18,6 +18,12 @@ UwbSession::UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks,
     m_handleDriver(std::move(handleDriver))
 {}
 
+wil::shared_hfile
+UwbSession::HandleDriver() noexcept
+{
+    return m_handleDriver;
+}
+
 void
 UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData &uwbSessionData)
 {

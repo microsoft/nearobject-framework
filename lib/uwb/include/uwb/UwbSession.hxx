@@ -72,13 +72,13 @@ public:
     AddPeer(UwbMacAddress peerMacAddress);
 
     /**
-     * @brief
+     * @brief Start ranging.
      */
     void
     StartRanging();
 
     /**
-     * @brief
+     * @brief Stop ranging.
      */
     void
     StopRanging();
@@ -119,9 +119,9 @@ public:
     }
 
     /**
-     * @brief Temporarily public function to call the UwbSessionEventCallbacks callback for new ranging data 
-     * 
-     * @param peerRangingData 
+     * @brief Temporarily public function to call the UwbSessionEventCallbacks callback for new ranging data
+     *
+     * @param peerRangingData
      */
     void
     ProcessRangingData(const std::vector<uwb::UwbPeer>& peerRangingData);
@@ -135,15 +135,31 @@ private:
     void
     InsertPeerImpl(const uwb::UwbMacAddress& peerAddress);
 
+    /**
+     * @brief Configures the session for use.
+     *
+     * @param uwbSessionData The session data to configure the session with.
+     */
     virtual void
     ConfigureImpl(const protocol::fira::UwbSessionData& uwbSessionData) = 0;
 
+    /**
+     * @brief Start ranging.
+     */
     virtual void
     StartRangingImpl() = 0;
 
+    /**
+     * @brief Stop ranging.
+     */
     virtual void
     StopRangingImpl() = 0;
 
+    /**
+     * @brief Add a new peer to the session.
+     *
+     * @param peerMacAddress
+     */
     virtual void
     AddPeerImpl(UwbMacAddress peerMacAddress) = 0;
 

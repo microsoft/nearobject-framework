@@ -33,28 +33,39 @@ public:
 
 private:
     /**
-     * @brief TODO
+     * @brief Configure the session for use.
+     *
+     * @param uwbSessionData The session data to configure the session with.
      */
-    void
+    virtual void
     ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData& uwbSessionData) override;
 
     /**
-     * @brief TODO
+     * @brief Start ranging.
      */
-    void
+    virtual void
     StartRangingImpl() override;
 
     /**
-     * @brief TODO
+     * @brief Stop ranging.
      */
-    void
+    virtual void
     StopRangingImpl() override;
 
     /**
-     * @brief TODO
+     * @brief Add a new peer to the session.
      */
-    void
+    virtual void
     AddPeerImpl(::uwb::UwbMacAddress peerMacAddress) override;
+
+protected:
+    /**
+     * @brief Obtain a shared instance of the primary driver handle.
+     *
+     * @return wil::shared_hfile
+     */
+    wil::shared_hfile
+    HandleDriver() noexcept;
 
 private:
     wil::shared_hfile m_handleDriver;
