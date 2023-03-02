@@ -3,6 +3,7 @@
 #include <bit>
 #include <climits>
 #include <iterator>
+#include <sstream>
 #include <stdexcept>
 #include <type_traits>
 
@@ -133,11 +134,11 @@ const std::unordered_map<HprfParameter, std::size_t> UwbCapability::HprfParamete
 
 /**
  * @brief Get the Bytes Big Endian From std::size_t
- * 
+ *
  * @param value the bitmap to encode
- * @param desiredLength the desired number of bytes in the encoding, padding with zeros if necessary. 
+ * @param desiredLength the desired number of bytes in the encoding, padding with zeros if necessary.
  *                      If the value is too large, this will only encode the lowest desiredLength bytes
- * @return std::vector<uint8_t> 
+ * @return std::vector<uint8_t>
  */
 std::vector<uint8_t>
 GetBytesBigEndianFromBitMap(std::size_t value, std::size_t desiredLength)
@@ -167,13 +168,13 @@ GetBytesBigEndianFromBitMap(std::size_t value, std::size_t desiredLength)
 
 /**
  * @brief Parses a span of bytes as a std::size_t number encoded in big endian.
- * 
+ *
  * @tparam IntegerT The type of output integer.
  * @param bytes The buffer to parse.
  * @return
  */
 template <typename IntegerT = std::size_t>
-requires std::is_unsigned_v<IntegerT>
+    requires std::is_unsigned_v<IntegerT>
 IntegerT
 ReadSizeTFromBytesBigEndian(std::span<const uint8_t> bytes)
 {
@@ -193,9 +194,9 @@ ReadSizeTFromBytesBigEndian(std::span<const uint8_t> bytes)
 // TODO find a better place for this function
 /**
  * @brief Get the Bit Mask From Bit Index object
- * 
- * @param bitIndex 
- * @return std::size_t 
+ *
+ * @param bitIndex
+ * @return std::size_t
  */
 std::size_t
 GetBitMaskFromBitIndex(std::size_t bitIndex)
@@ -207,10 +208,10 @@ GetBitMaskFromBitIndex(std::size_t bitIndex)
 }
 
 /**
- * @brief Get the Bit Index From Bit Mask object. 
- * 
- * @param bitMask 
- * @return std::size_t 
+ * @brief Get the Bit Index From Bit Mask object.
+ *
+ * @param bitMask
+ * @return std::size_t
  */
 std::size_t
 GetBitIndexFromBitMask(std::size_t bitMask)
@@ -226,12 +227,12 @@ GetBitIndexFromBitMask(std::size_t bitMask)
 // TODO find a better place for this function
 /**
  * @brief helper function to encode a given valueSet into a bitset according to bitIndexMap, using desiredLength bytes
- * 
- * @tparam T 
- * @param valueSet 
- * @param bitIndexMap 
- * @param desiredLength 
- * @return std::vector<uint8_t> 
+ *
+ * @tparam T
+ * @param valueSet
+ * @param bitIndexMap
+ * @param desiredLength
+ * @return std::vector<uint8_t>
  */
 template <class T>
 std::vector<uint8_t>
@@ -248,11 +249,11 @@ EncodeValuesAsBytes(const std::vector<T>& valueSet, const std::unordered_map<T, 
 // TODO find a better place for this function
 /**
  * @brief helper function that writes the bitset for a given valueSet according to bitIndexMap, using desiredLength bytes
- * 
- * @tparam T 
+ *
+ * @tparam T
  * @param assignee the destination of the bitset
- * @param bitIndexMap 
- * @param bytes 
+ * @param bitIndexMap
+ * @param bytes
  */
 template <class T>
 std::vector<T>
@@ -279,6 +280,14 @@ ToOobDataObjectHelper(encoding::TlvBer::Builder& builder, encoding::TlvBer::Buil
                    .SetValue(bytes)
                    .Build();
     builder.AddTlv(tlv);
+}
+
+std::string
+UwbCapability::ToString() const
+{
+    std::ostringstream ss;
+    // TODO
+    return ss.str();
 }
 
 std::unique_ptr<encoding::TlvBer>
@@ -550,7 +559,7 @@ uwb::protocol::fira::operator==(const UwbCapability& lhs, const UwbCapability& r
         return ::detail::leftUnorderedEquals(v1, v2);
     };
 
-    const bool basicFieldsEqual = 
+    const bool basicFieldsEqual =
         std::tie(lhs.FiraPhyVersionRange, lhs.FiraMacVersionRange, lhs.ExtendedMacAddress, lhs.UwbInitiationTime, lhs.AngleOfArrivalFom, lhs.BlockStriding, lhs.HoppingMode) ==
         std::tie(rhs.FiraPhyVersionRange, rhs.FiraMacVersionRange, rhs.ExtendedMacAddress, rhs.UwbInitiationTime, rhs.AngleOfArrivalFom, rhs.BlockStriding, rhs.HoppingMode);
 

@@ -28,6 +28,14 @@ struct UwbVersion
     operator uint32_t() const noexcept;
 
     /**
+     * @brief Returns a string representation of the version number.
+     *
+     * @return std::string
+     */
+    std::string
+    ToString() const;
+
+    /**
      * @brief Parses the specified string and converts it to a UwbVersion
      * object, if valid.
      *

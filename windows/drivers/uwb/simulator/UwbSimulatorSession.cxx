@@ -1,5 +1,6 @@
 
 #include "UwbSimulatorSession.hxx"
+#include "UwbSimulatorTracelogging.hxx"
 
 using namespace windows::devices::uwb::simulator;
 using namespace uwb::protocol::fira;
@@ -84,6 +85,12 @@ UwbSimulatorSession::GenerateNextRangingData()
 void
 UwbSimulatorSession::RandomRangingMeasurementGenerator(std::function<void(UwbRangingData)> onMeasurementEvent, std::stop_token stopToken)
 {
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "RandomRangingMeasurementGenerationThreadStarted",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingUInt32(Id, "Session Id"));
+
     while (!stopToken.stop_requested()) {
         std::this_thread::sleep_for(m_randomRangingMeasurementsDuration);
         auto rangingData = GenerateNextRangingData();
@@ -91,4 +98,10 @@ UwbSimulatorSession::RandomRangingMeasurementGenerator(std::function<void(UwbRan
     }
 
     m_sequenceNumber = 0;
+
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "RandomRangingMeasurementGenerationThreadStopped",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingUInt32(Id, "Session Id"));
 }
