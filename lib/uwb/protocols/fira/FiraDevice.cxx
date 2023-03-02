@@ -102,6 +102,23 @@ uwb::protocol::fira::StringToResultReportConfiguration(const std::string& input)
 }
 
 std::string
+UwbDeviceInformation::ToString() const
+{
+    std::ostringstream ss;
+    const auto* status = std::get_if<UwbStatusGeneric>(&Status);
+    if (*status == UwbStatusOk) {
+        ss << "FiRa Uci v" << VersionUci << ", "
+           << "FiRa Uci Test v" << VersionUciTest << ", "
+           << "FiRa MAC v" << VersionMac << ", "
+           << "FiRa PHY v" << VersionPhy;
+    } else {
+        ss << "(error=" << ::ToString(Status) << ")";
+    }
+
+    return ss.str();
+}
+
+std::string
 UwbStatusDevice::ToString() const
 {
     std::ostringstream ss;

@@ -6,6 +6,7 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -217,6 +218,14 @@ struct UwbCapability
     std::vector<Channel> Channels{ ChannelsDefault };
     std::vector<BprfParameter> BprfParameterSets{ BprfParameterSetsDefault };
     std::vector<HprfParameter> HprfParameterSets{ HprfParameterSetsDefault };
+
+    /**
+     * @brief Return a string representation of the object.
+     *
+     * @return std::string
+     */
+    std::string
+    ToString() const;
 
     /**
      * @brief Convert this object into a FiRa Data Object (DO).

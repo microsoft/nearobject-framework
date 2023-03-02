@@ -376,6 +376,9 @@ struct UwbDeviceInformation
     UwbStatus Status;
     std::shared_ptr<UwbDeviceInfoVendor> VendorSpecificInfo;
 
+    std::string
+    ToString() const;
+
     auto
     operator<=>(const UwbDeviceInformation&) const noexcept = default;
 };
