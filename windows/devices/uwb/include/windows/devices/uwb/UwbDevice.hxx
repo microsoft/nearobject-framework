@@ -18,6 +18,7 @@
 #include <uwb/UwbSession.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <windows/devices/DeviceResource.hxx>
+#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 
 namespace uwb
 {
@@ -139,6 +140,7 @@ private:
     wil::shared_hfile m_handleDriver;
     wil::shared_hfile m_handleDriverNotifications;
     std::jthread m_notificationThread;
+    std::shared_ptr<UwbDeviceConnector> m_uwbDeviceConnector;
 };
 } // namespace windows::devices::uwb
 

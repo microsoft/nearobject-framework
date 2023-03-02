@@ -45,6 +45,8 @@ UwbDevice::DeviceName() const noexcept
 void
 UwbDevice::Initialize()
 {
+    m_uwbDeviceConnector = std::make_shared<UwbDeviceConnector>(m_deviceName);
+
     wil::shared_hfile handleDriver(CreateFileA(
         m_deviceName.c_str(),
         GENERIC_READ | GENERIC_WRITE,
