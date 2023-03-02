@@ -1,8 +1,6 @@
 
 #include <windows/devices/uwb/simulator/UwbDeviceSimulator.hxx>
 
-#include <UwbSimulatorDdiGlue.h>
-
 using namespace windows::devices::uwb::simulator;
 
 UwbDeviceSimulator::UwbDeviceSimulator(std::string deviceName) :
@@ -28,4 +26,12 @@ UwbDeviceSimulator::Initialize()
     UwbDevice::Initialize();
     m_handleDriver = UwbDevice::DriverHandle();
     return true;
+}
+
+UwbSimulatorCapabilities
+UwbDeviceSimulator::GetSimulatorCapabilities()
+{
+    UwbSimulatorCapabilities uwbSimulatorCapabilities{};
+    // TODO: invoke IOCTL_UWB_DEVICE_SIM_GET_CAPABILITIES IOCTL
+    return uwbSimulatorCapabilities;
 }

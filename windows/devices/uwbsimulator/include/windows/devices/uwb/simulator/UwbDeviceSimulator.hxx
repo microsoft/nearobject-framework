@@ -8,6 +8,8 @@
 // NB: This must come before any other Windows include
 #include <windows.h>
 
+#include <UwbSimulatorDdiGlue.h>
+
 #include <cfgmgr32.h>
 #include <wil/resource.h>
 #include <windows/devices/DeviceResource.hxx>
@@ -39,6 +41,17 @@ public:
      */
     bool
     Initialize();
+
+    /**
+     * @brief Obtain the capabilities of the simulator driver.
+     * 
+     * Internally, this invokes IOCTL_UWB_DEVICE_SIM_GET_CAPABILITIES on the
+     * primary driver handle.
+     * 
+     * @return UwbSimulatorCapabilities
+     */
+    UwbSimulatorCapabilities
+    GetSimulatorCapabilities();
 
 private:
     const std::string m_deviceName;
