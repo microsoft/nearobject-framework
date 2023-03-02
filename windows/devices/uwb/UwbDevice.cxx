@@ -117,7 +117,7 @@ std::shared_ptr<uwb::UwbSession>
 UwbDevice::CreateSessionImpl(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
 {
     // Create a duplicate handle to the driver for use by the session.
-    wil::unique_hfile handleDriverForSession;
+    wil::shared_hfile handleDriverForSession;
     if (!DuplicateHandle(GetCurrentProcess(), m_handleDriver.get(), GetCurrentProcess(), &handleDriverForSession, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
         return nullptr;
     }

@@ -29,7 +29,7 @@ public:
      * @param callbacks The event callback instance.
      * @param handleDriver File handle for a UWB-CX driver instance.
      */
-    UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, wil::unique_hfile handleDriver);
+    UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, wil::shared_hfile handleDriver);
 
 private:
     /**
@@ -57,7 +57,7 @@ private:
     AddPeerImpl(::uwb::UwbMacAddress peerMacAddress) override;
 
 private:
-    wil::unique_hfile m_handleDriver;
+    wil::shared_hfile m_handleDriver;
 };
 
 } // namespace windows::devices::uwb
