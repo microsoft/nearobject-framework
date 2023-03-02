@@ -9,6 +9,7 @@
 #include <uwb/UwbSession.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
+#include <uwb/UwbDeviceEventCallbacks.hxx>
 
 namespace uwb
 {
@@ -142,6 +143,7 @@ private:
     ::uwb::protocol::fira::UwbStatus m_lastError{ ::uwb::protocol::fira::UwbStatusGeneric::Ok };
     std::shared_mutex m_sessionsGate;
     std::unordered_map<uint32_t, std::weak_ptr<uwb::UwbSession>> m_sessions{};
+    std::vector<UwbDeviceEventCallbacks> m_callbacks;
 };
 
 bool

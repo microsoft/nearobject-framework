@@ -2,6 +2,8 @@
 #ifndef UWB_DEVICE_EVENT_CALLBACKS_HXX
 #define UWB_DEVICE_EVENT_CALLBACKS_HXX
 
+#include <functional>
+
 #include <uwb/protocols/fira/FiraDevice.hxx>
 
 namespace uwb
@@ -13,50 +15,39 @@ namespace uwb
 struct UwbDeviceEventCallbacks
 {
     /**
-     * @brief Destroy the UwbDeviceEventCallbacks object, defined to support
-     * polymorphic deletion.
-     */
-    virtual ~UwbDeviceEventCallbacks() = default;
-
-    /**
      * @brief Invoked when a generic error occurs.
      *
      * @param status The generic error that occurred.
      */
-    virtual void
-    OnStatusChanged(::uwb::protocol::fira::UwbStatus status) = 0;
+    std::function<void(::uwb::protocol::fira::UwbStatus)> OnStatusChanged;
 
     /**
      * @brief Invoked when the device status changes.
      *
      * @param statusDevice
      */
-    virtual void
-    OnDeviceStatusChanged(::uwb::protocol::fira::UwbStatusDevice statusDevice) = 0;
+    std::function<void(::uwb::protocol::fira::UwbStatusDevice)> OnDeviceStatusChanged;
 
     /**
      * @brief Invoked when the status of a session changes.
      *
      * @param statusSession The new status of the session.
      */
-    virtual void
-    OnSessionStatusChanged(::uwb::protocol::fira::UwbSessionStatus statusSession) = 0;
+    std::function<void(::uwb::protocol::fira::UwbSessionStatus)> OnSessionStatusChanged;
 
     /**
      * @brief Invoked when the multicast list for a session has a status update.
      *
      * @param statusMulticastList The status of the session's multicast list.
      */
-    virtual void
-    OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList) = 0;
+    std::function<void(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus)> OnSessionMulticastListStatus;
 
     /**
      * @brief Invoked when a session has a ranging data update.
      *
      * @param rangingData The new ranging data.
      */
-    virtual void
-    OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData) = 0;
+    std::function<void(::uwb::protocol::fira::UwbRangingData)> OnSessionRangingData;
 };
 } // namespace uwb
 

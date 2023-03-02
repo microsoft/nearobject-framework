@@ -48,6 +48,9 @@ UwbDevice::OnStatusChanged(UwbStatus status)
         }
     },
         status);
+    for (const auto& callback : m_callbacks) {
+        callback.OnStatusChanged(status);
+    }
 }
 
 void
@@ -62,6 +65,9 @@ UwbDevice::OnDeviceStatusChanged(UwbStatusDevice statusDevice)
         PLOG_VERBOSE << "changed state: " << m_status.ToString() << " --> " << statusDevice.ToString();
         m_status = statusDevice;
     }
+    for (const auto& callback : m_callbacks) {
+        callback.OnDeviceStatusChanged(statusDevice);
+    }
 }
 
 void
@@ -74,6 +80,9 @@ UwbDevice::OnSessionStatusChanged(UwbSessionStatus statusSession)
     }
 
     session->SetSessionStatus(statusSession);
+    for (const auto& callback : m_callbacks) {
+        callback.OnSessionStatusChanged(statusSession); // TODO session needs to register itself here
+    }
 }
 
 void
@@ -101,6 +110,10 @@ UwbDevice::OnSessionMulticastListStatus(UwbSessionUpdateMulicastListStatus statu
             }
         }
     }
+
+    for (const auto& callback : m_callbacks) {
+        callback.OnSessionMulticastListStatus(statusMulticastList); // TODO register session callback for this
+    }
 }
 
 void
@@ -121,6 +134,9 @@ UwbDevice::OnSessionRangingData(UwbRangingData rangingData)
         peersData.push_back(std::move(data));
     }
     session->ProcessRangingData(peersData);
+    for (const auto& callback : m_callbacks) {
+        callback.OnSessionRangingData(rangingData); // TODO register session callback for this
+    }
 }
 
 void
