@@ -71,7 +71,7 @@ struct UwbSimulatorDispatchEntry
             return STATUS_BUFFER_TOO_SMALL;
         } else {
             return STATUS_SUCCESS;
-        } 
+        }
     }
 };
 

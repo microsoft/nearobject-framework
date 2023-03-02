@@ -198,7 +198,7 @@ UwbSimulatorDdiCallbacks::SessionUpdateControllerMulticastList(uint32_t sessionI
 
     const auto getControlee = [](const UwbSessionUpdateMulticastListEntry &entry) {
         return entry.ControleeMacAddress;
-    };   
+    };
 
     switch (action) {
     case UwbMulticastAction::AddShortAddress: {
@@ -207,7 +207,7 @@ UwbSimulatorDdiCallbacks::SessionUpdateControllerMulticastList(uint32_t sessionI
         break;
     }
     case UwbMulticastAction::DeleteShortAddress: {
-        // TODO: updateMulticastListEntry.SubSessionId needs to be handled in future. 
+        // TODO: updateMulticastListEntry.SubSessionId needs to be handled in future.
         std::erase_if(session.Controlees, [&](const auto &controleeToRemove) {
             return std::ranges::any_of(updateMulticastListEntries | std::views::transform(getControlee), [&](const auto &controlee) {
                 return controleeToRemove == controlee;
@@ -218,7 +218,7 @@ UwbSimulatorDdiCallbacks::SessionUpdateControllerMulticastList(uint32_t sessionI
     default:
         return UwbStatusGeneric::InvalidParameter;
     }
-    
+
     return UwbStatusOk;
 }
 

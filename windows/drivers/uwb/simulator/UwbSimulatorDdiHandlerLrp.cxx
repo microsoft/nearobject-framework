@@ -104,8 +104,7 @@ UwbSimulatorDdiHandler::OnUwbGetDeviceInformation(WDFREQUEST request, std::span<
     // Update output buffer if sufficiently sized.
     if (std::size(outputBuffer) >= outputSize) {
         std::memcpy(std::data(outputBuffer), std::data(std::data(uwbDeviceInformation)), outputSize);
-    }
-    else {
+    } else {
         status = STATUS_BUFFER_TOO_SMALL;
     }
 
@@ -136,7 +135,7 @@ UwbSimulatorDdiHandler::OnUwbGetDeviceCapabilities(WDFREQUEST request, std::span
     } else {
         status = STATUS_BUFFER_TOO_SMALL;
     }
- 
+
     // Complete the request.
     WdfRequestCompleteWithInformation(request, status, outputSize);
 
