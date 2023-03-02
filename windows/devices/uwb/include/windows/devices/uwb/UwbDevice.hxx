@@ -2,9 +2,11 @@
 #ifndef WINDOWS_DEVICE_UWB_HXX
 #define WINDOWS_DEVICE_UWB_HXX
 
+#include <concepts>
 #include <memory>
 #include <string>
 #include <thread>
+#include <type_traits>
 
 // NB: This must come before any other Windows include
 #include <windows.h>
@@ -26,7 +28,7 @@ namespace windows::devices::uwb
 {
 /**
  * @brief Helper class to interact with Windows UWB devices using the Windows
- * UWB DDI. The DDI is to be determined.
+ * UWB DDI.
  */
 class UwbDevice :
     public ::uwb::UwbDevice
@@ -64,6 +66,31 @@ public:
     bool
     IsEqual(const ::uwb::UwbDevice& other) const noexcept override;
 
+protected:
+    /**
+     * @brief Helper function to create a typed (derived) UwbSession object,
+     * capturing the common code that is required in all sub-classes.
+     *
+     * @tparam UwbSessionT The type of session to create.
+     * @param callbacks The session callbacks.
+     * @return requires
+     */
+    template <typename UwbSessionT>
+    // clang-format off
+    requires std::is_base_of_v<::uwb::UwbSession, UwbSessionT>
+    // clang-format on
+    std::shared_ptr<::uwb::UwbSession>
+    CreateSessionImpl(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
+    {
+        // Create a duplicate handle to the driver for use by the session.
+        wil::shared_hfile handleDriverForSession;
+        if (!DuplicateHandle(GetCurrentProcess(), m_handleDriver.get(), GetCurrentProcess(), &handleDriverForSession, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+            return nullptr;
+        }
+
+        return std::make_shared<UwbSessionT>(std::move(callbacks), std::move(handleDriverForSession));
+    }
+
 private:
     /**
      * @brief Create a new UWB session.
@@ -71,7 +98,7 @@ private:
      * @param callbacks The event callback instance.
      * @return std::shared_ptr<uwb::UwbSession>
      */
-    std::shared_ptr<::uwb::UwbSession>
+    virtual std::shared_ptr<::uwb::UwbSession>
     CreateSessionImpl(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks) override;
 
     /**
@@ -79,7 +106,7 @@ private:
      *
      * @return uwb::protocol::fira::UwbCapability
      */
-    ::uwb::protocol::fira::UwbCapability
+    virtual ::uwb::protocol::fira::UwbCapability
     GetCapabilitiesImpl() override;
 
 private:
@@ -89,12 +116,28 @@ private:
     void
     HandleNotifications();
 
+protected:
+    /**
+     * @brief Obtain a shared instance of the primary driver handle.
+     *
+     * @return wil::shared_hfile
+     */
+    wil::shared_hfile
+    DriverHandle() noexcept;
+
+    /**
+     * @brief Obtain a shared instance of the notification driver handle.
+     *
+     * @return wil::shared_hfile
+     */
+    wil::shared_hfile
+    DriverHandleNotifications() noexcept;
+
 private:
     const std::string m_deviceName;
 
-    unique_hcmnotification m_hcmNotificationHandle;
-    wil::unique_hfile m_handleDriver;
-    wil::unique_hfile m_handleDriverNotifications;
+    wil::shared_hfile m_handleDriver;
+    wil::shared_hfile m_handleDriverNotifications;
     std::jthread m_notificationThread;
 };
 } // namespace windows::devices::uwb

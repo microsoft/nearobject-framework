@@ -19,7 +19,8 @@
 
 #include <logging/LogUtils.hxx>
 
-using namespace windows::devices;
+using windows::devices::DeviceEnumerator;
+using namespace windows::devices::uwb::simulator;
 
 int
 main(int argc, char* argv[])
@@ -56,7 +57,7 @@ main(int argc, char* argv[])
 
     std::cout << "creating uwb simulator device " << deviceName << std::endl;
 
-    auto uwbDeviceSimulator = std::make_unique<uwb::simulator::UwbDeviceSimulator>(deviceName);
+    auto uwbDeviceSimulator = std::make_unique<UwbDeviceSimulator>(deviceName);
     if (!uwbDeviceSimulator) {
         std::cerr << "failed to create uwb simulator device instance" << std::endl;
         return -2;
