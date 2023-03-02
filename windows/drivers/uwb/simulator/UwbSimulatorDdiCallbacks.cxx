@@ -76,6 +76,11 @@ UwbSimulatorDdiCallbacks::SessionUpdateState(UwbSimulatorSession &session, UwbSe
 UwbStatus
 UwbSimulatorDdiCallbacks::DeviceReset()
 {
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "DeviceReset",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION));
+
     return UwbStatusOk;
 }
 
@@ -83,6 +88,13 @@ UwbStatus
 UwbSimulatorDdiCallbacks::DeviceGetInformation(UwbDeviceInformation &deviceInformation)
 {
     deviceInformation = m_deviceInformation;
+
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "DeviceGetInformation",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingString(deviceInformation.ToString().c_str(), "DeviceInformation"));
+
     return UwbStatusOk;
 }
 
@@ -90,6 +102,13 @@ UwbStatus
 UwbSimulatorDdiCallbacks::DeviceGetCapabilities(UwbCapability &deviceCapabilities)
 {
     deviceCapabilities = m_deviceCapabilities;
+
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "DeviceGetCapabilities",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingString(deviceCapabilities.ToString().c_str(), "DeviceCapabilities"));
+
     return UwbStatusOk;
 }
 
@@ -110,6 +129,13 @@ UwbSimulatorDdiCallbacks::DeviceSetConfigurationParameters(const std::vector<Uwb
 UwbStatus
 UwbSimulatorDdiCallbacks::SessionInitialize(uint32_t sessionId, UwbSessionType sessionType)
 {
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "SessionInitialize",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingUInt32(sessionId, "Session Id"),
+        TraceLoggingString(std::data(magic_enum::enum_name(sessionType)), "Session Type"));
+
     std::unique_lock sessionsWriteLock{ m_sessionsGate };
     auto [sessionIt, inserted] = m_sessions.try_emplace(sessionId, sessionId, sessionType);
     if (!inserted) {
@@ -125,6 +151,12 @@ UwbSimulatorDdiCallbacks::SessionInitialize(uint32_t sessionId, UwbSessionType s
 UwbStatus
 UwbSimulatorDdiCallbacks::SessionDeninitialize(uint32_t sessionId)
 {
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "SessionDeninitialize",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingUInt32(sessionId, "Session Id"));
+
     decltype(m_sessions)::node_type nodeHandle;
     {
         std::unique_lock sessionsWriteLock{ m_sessionsGate };
@@ -141,8 +173,14 @@ UwbSimulatorDdiCallbacks::SessionDeninitialize(uint32_t sessionId)
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t /*sessionId*/, const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> & /* applicationConfigurationParameters */, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::shared_ptr<IUwbAppConfigurationParameter>>> &applicationConfigurationParameterResults)
+UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t sessionId, const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> & /* applicationConfigurationParameters */, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::shared_ptr<IUwbAppConfigurationParameter>>> &applicationConfigurationParameterResults)
 {
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "SetApplicationConfigurationParameters",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingUInt32(sessionId, "Session Id"));
+
     std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::shared_ptr<IUwbAppConfigurationParameter>>> results{};
     applicationConfigurationParameterResults = std::move(results);
     return UwbStatusOk;
@@ -151,6 +189,12 @@ UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t /*sessi
 UwbStatus
 UwbSimulatorDdiCallbacks::GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters)
 {
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "GetApplicationConfigurationParameters",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingUInt32(sessionId, "Session Id"));
+
     std::shared_lock sessionsReadLock{ m_sessionsGate };
     auto sessionIt = m_sessions.find(sessionId);
     if (sessionIt == std::cend(m_sessions)) {
@@ -168,6 +212,13 @@ UwbSimulatorDdiCallbacks::GetSessionCount(uint32_t &sessionCount)
 {
     std::shared_lock sessionsReadLock{ m_sessionsGate };
     sessionCount = static_cast<uint32_t>(std::size(m_sessions));
+
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "GetSessionCount",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingUInt32(sessionCount, "Session Count"));
+
     return UwbStatusOk;
 }
 
@@ -182,12 +233,27 @@ UwbSimulatorDdiCallbacks::SessionGetState(uint32_t sessionId, UwbSessionState &s
 
     const auto &[_, session] = *sessionIt;
     sessionState = session.State;
+
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "SessionGetState",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingUInt32(sessionId, "Session Id"),
+        TraceLoggingString(std::data(magic_enum::enum_name(sessionState)), "Session State"));
+
     return UwbStatusOk;
 }
 
 UwbStatus
 UwbSimulatorDdiCallbacks::SessionUpdateControllerMulticastList(uint32_t sessionId, UwbMulticastAction action, std::vector<UwbSessionUpdateMulticastListEntry> updateMulticastListEntries)
 {
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "SessionUpdateControllerMulticastList",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingUInt32(sessionId, "Session Id"),
+        TraceLoggingString(std::data(magic_enum::enum_name(action)), "Multicast Action"));
+
     std::unique_lock sessionsWriteLock{ m_sessionsGate };
     auto sessionIt = m_sessions.find(sessionId);
     if (sessionIt == std::cend(m_sessions)) {
@@ -225,6 +291,12 @@ UwbSimulatorDdiCallbacks::SessionUpdateControllerMulticastList(uint32_t sessionI
 UwbStatus
 UwbSimulatorDdiCallbacks::SessionStartRanging(uint32_t sessionId)
 {
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "SessionStartRanging",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingUInt32(sessionId, "Session Id"));
+
     std::unique_lock sessionsWriteLock{ m_sessionsGate };
     auto sessionIt = m_sessions.find(sessionId);
     if (sessionIt == std::cend(m_sessions)) {
@@ -239,6 +311,12 @@ UwbSimulatorDdiCallbacks::SessionStartRanging(uint32_t sessionId)
 UwbStatus
 UwbSimulatorDdiCallbacks::SessionStopRanging(uint32_t sessionId)
 {
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "SessionStopRanging",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingUInt32(sessionId, "Session Id"));
+
     std::unique_lock sessionsWriteLock{ m_sessionsGate };
     auto sessionIt = m_sessions.find(sessionId);
     if (sessionIt == std::cend(m_sessions)) {
@@ -261,6 +339,13 @@ UwbSimulatorDdiCallbacks::SessionGetRangingCount(uint32_t sessionId, uint32_t &r
 
     auto &[_, session] = *sessionIt;
     rangingCount = session.RangingCount;
+
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "SessionStopRanging",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingUInt32(sessionId, "Session Id"),
+        TraceLoggingUInt32(rangingCount, "Session Ranging Count"));
 
     return UwbStatusOk;
 }
@@ -308,12 +393,23 @@ UwbSimulatorDdiCallbacks::UwbNotification(UwbNotificationData &notificationData)
 UwbSimulatorCapabilities
 UwbSimulatorDdiCallbacks::GetSimulatorCapabilities()
 {
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "GetSimulatorCapabilities",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION));
     return m_simulatorCapabilities;
 }
 
 void
 UwbSimulatorDdiCallbacks::TriggerSessionEvent(const UwbSimulatorTriggerSessionEventArgs &triggerSessionEventArgs)
 {
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "TriggerSessionEvent",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingUInt32(triggerSessionEventArgs.SessionId, "Session Id"),
+        TraceLoggingString(std::data(magic_enum::enum_name(triggerSessionEventArgs.Action)), "Action"));
+
     switch (triggerSessionEventArgs.Action) {
     case UwbSimulatorSessionEventAction::RandomRangingMeasurementGenerationStart: {
         SessionRandomMeasurementGenerationConfigure(triggerSessionEventArgs.SessionId, RandomMeasurementGeneration::Enable);
