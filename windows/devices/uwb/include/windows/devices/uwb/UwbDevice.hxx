@@ -71,7 +71,7 @@ private:
      * @param callbacks The event callback instance.
      * @return std::shared_ptr<uwb::UwbSession>
      */
-    std::shared_ptr<::uwb::UwbSession>
+    virtual std::shared_ptr<::uwb::UwbSession>
     CreateSessionImpl(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks) override;
 
     /**
@@ -79,7 +79,7 @@ private:
      *
      * @return uwb::protocol::fira::UwbCapability
      */
-    ::uwb::protocol::fira::UwbCapability
+    virtual ::uwb::protocol::fira::UwbCapability
     GetCapabilitiesImpl() override;
 
 private:
@@ -92,7 +92,6 @@ private:
 private:
     const std::string m_deviceName;
 
-    unique_hcmnotification m_hcmNotificationHandle;
     wil::unique_hfile m_handleDriver;
     wil::unique_hfile m_handleDriverNotifications;
     std::jthread m_notificationThread;

@@ -17,4 +17,3 @@ target_link_libraries(uwbsim-win
 
 set_target_properties(uwbsim-win PROPERTIES OUTPUT_NAME uwbsim)
 set_target_properties(uwbsim-win PROPERTIES FOLDER windows/tools)
-

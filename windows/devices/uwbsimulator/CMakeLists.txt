@@ -23,6 +23,7 @@ target_link_libraries(windev-uwb-simulator
         uwb-proto-fira
         uwbsim-driver
         WIL::WIL
+        windev-uwb
 )
 
 list(APPEND WINDEVUWBSIM_PUBLIC_HEADERS
