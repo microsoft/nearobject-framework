@@ -46,6 +46,11 @@ void
 UwbDevice::Initialize()
 {
     m_uwbDeviceConnector = std::make_shared<UwbDeviceConnector>(m_deviceName);
+    m_uwbDeviceConnector->NotificationListenerStart([this](auto&& uwbNotificationData)
+    {
+        // Invoke base class notification handler which takes care of threading.
+        ::UwbDevice::OnUwbNotification(std::move(uwbNotificationData));
+    });
 
     wil::shared_hfile handleDriver(CreateFileA(
         m_deviceName.c_str(),
@@ -124,29 +129,24 @@ UwbDevice::CreateSessionImpl(std::weak_ptr<::uwb::UwbSessionEventCallbacks> call
 UwbCapability
 UwbDevice::GetCapabilitiesImpl()
 {
-    // Determine the amount of memory required for the UWB_DEVICE_CAPABILITIES from the driver.
-    DWORD bytesRequired = 0;
-    BOOL ioResult = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_GET_DEVICE_CAPABILITIES, nullptr, 0, nullptr, 0, &bytesRequired, nullptr);
-    if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
-        // TODO: need to do something different here
-        HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-        PLOG_ERROR << "error when sending IOCTL_UWB_GET_DEVICE_CAPABILITIES, hr=" << std::showbase << std::hex << hr;
+    auto resultFuture = m_uwbDeviceConnector->GetCapabilities();
+    if (!resultFuture.valid()) {
+        // TODO: need to do something different than just return a default-constructed object here
+        PLOG_ERROR << "failed to obtain capabilities from driver";
         return {};
     }
 
-    // Allocate memory for the UWB_DEVICE_CAPABILITIES structure, and pass this to the driver request.
-    DWORD uwbCapabilitiesSize = bytesRequired;
-    auto uwbDeviceCapabilitiesBuffer = std::make_unique<uint8_t[]>(uwbCapabilitiesSize);
-    ioResult = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_GET_DEVICE_CAPABILITIES, nullptr, 0, uwbDeviceCapabilitiesBuffer.get(), uwbCapabilitiesSize, &bytesRequired, nullptr);
-    if (!ioResult) {
-        // TODO: need to do something different here
-        HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-        PLOG_ERROR << "error when sending IOCTL_UWB_GET_DEVICE_CAPABILITIES, hr=" << std::showbase << std::hex << hr;
+    try {
+        auto [uwbStatus, uwbCapability] = resultFuture.get();
+        if (!IsUwbStatusOk(uwbStatus)) {
+            PLOG_ERROR << "uwb device reported an error obtaining uwb capabilities, status =" << ::ToString(uwbStatus);
+            return {};
+        }
+        return std::move(uwbCapability);
+    } catch (std::exception& e) {
+        PLOG_ERROR << "caught exception obtaining uwb capabilities (" << e.what() << ")";
         return {};
     }
-
-    const UWB_DEVICE_CAPABILITIES& uwbDeviceCapabilities = *reinterpret_cast<UWB_DEVICE_CAPABILITIES*>(uwbDeviceCapabilitiesBuffer.get());
-    return UwbCxDdi::To(uwbDeviceCapabilities);
 }
 
 bool
