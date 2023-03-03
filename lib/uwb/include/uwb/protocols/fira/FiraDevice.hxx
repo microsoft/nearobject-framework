@@ -292,6 +292,16 @@ constexpr auto UwbStatusOk = UwbStatusGeneric::Ok;
 
 using UwbStatus = std::variant<UwbStatusGeneric, UwbStatusSession, UwbStatusRanging>;
 
+/**
+ * @brief Determines if the specified UWB status describes a successfuly result.
+ *
+ * @param uwbStatus The status to check.
+ * @return true
+ * @return false
+ */
+bool
+IsUwbStatusOk(const UwbStatus& uwbStatus) noexcept;
+
 enum class UwbStatusMulticast {
     OkUpdate,
     ErrorListFull,
