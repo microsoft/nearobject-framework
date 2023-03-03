@@ -105,8 +105,7 @@ std::string
 UwbDeviceInformation::ToString() const
 {
     std::ostringstream ss;
-    const auto* status = std::get_if<UwbStatusGeneric>(&Status);
-    if (*status == UwbStatusOk) {
+    if (IsUwbStatusOk(Status)) {
         ss << "FiRa Uci v" << VersionUci << ", "
            << "FiRa Uci Test v" << VersionUciTest << ", "
            << "FiRa MAC v" << VersionMac << ", "
@@ -244,4 +243,11 @@ uwb::protocol::fira::ToString(const UwbNotificationData& uwbNotificationData)
         uwbNotificationData);
 
     return ss.str();
+}
+
+bool
+uwb::protocol::fira::IsUwbStatusOk(const UwbStatus& uwbStatus) noexcept
+{
+    const auto* status = std::get_if<UwbStatusGeneric>(&uwbStatus);
+    return (status != nullptr) && (*status == UwbStatusGeneric::Ok);
 }

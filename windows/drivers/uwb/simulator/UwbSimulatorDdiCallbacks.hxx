@@ -57,10 +57,10 @@ struct UwbSimulatorDdiCallbacks :
     SessionDeninitialize(uint32_t sessionId) override;
 
     virtual UwbStatus
-    SetApplicationConfigurationParameters(uint32_t sessionId, const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::shared_ptr<IUwbAppConfigurationParameter>>> &applicationConfigurationParameterResults) override;
+    SetApplicationConfigurationParameters(uint32_t sessionId, const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus>> &applicationConfigurationParameterResults) override;
 
     virtual UwbStatus
-    GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters) override;
+    GetApplicationConfigurationParameters(uint32_t sessionId, const std::vector<UwbApplicationConfigurationParameterType> &applicationConfigurationParameterTypes, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters) override;
 
     virtual UwbStatus
     GetSessionCount(uint32_t &sessionCount) override;
