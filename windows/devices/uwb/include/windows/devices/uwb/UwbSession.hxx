@@ -3,16 +3,13 @@
 #define WINDOWS_UWB_SESSION_HXX
 
 #include <cstdint>
-
-// NB: This must come before any other Windows include
-#include <windows.h>
-
-#include <wil/resource.h>
+#include <memory>
 
 #include <uwb/UwbMacAddress.hxx>
 #include <uwb/UwbSession.hxx>
 #include <uwb/UwbSessionEventCallbacks.hxx>
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
+#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 
 namespace windows::devices::uwb
 {
@@ -27,9 +24,9 @@ public:
      * @brief Construct a new UwbSession object.
      *
      * @param callbacks The event callback instance.
-     * @param handleDriver File handle for a UWB-CX driver instance.
+     * @param uwbDeviceConnector The connector to the UWB-CX driver instance.
      */
-    UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, wil::shared_hfile handleDriver);
+    UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, std::shared_ptr<UwbDeviceConnector> uwbDeviceConnector);
 
 private:
     /**
@@ -60,15 +57,15 @@ private:
 
 protected:
     /**
-     * @brief Obtain a shared instance of the primary driver handle.
+     * @brief Obtain a shared instance of the device driver connector.
      *
-     * @return wil::shared_hfile
+     * @return std::shared_ptr<UwbDeviceConnector>
      */
-    wil::shared_hfile
-    HandleDriver() noexcept;
+    std::shared_ptr<UwbDeviceConnector>
+    GetUwbDeviceConnector() noexcept;
 
 private:
-    wil::shared_hfile m_handleDriver;
+    std::shared_ptr<UwbDeviceConnector> m_uwbDeviceConnector;
 };
 
 } // namespace windows::devices::uwb
