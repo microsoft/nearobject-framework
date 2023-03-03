@@ -1,4 +1,5 @@
 
+#include <exception>
 #include <ios>
 #include <ranges>
 #include <stdexcept>
@@ -6,6 +7,7 @@
 #include <plog/Log.h>
 #include <wil/result.h>
 
+#include <uwb/protocols/fira/UwbException.hxx>
 #include <windows/devices/DeviceHandle.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
@@ -31,15 +33,30 @@ UwbDeviceConnector::DeviceName() const noexcept
     return m_deviceName;
 }
 
-std::future<UwbStatus>
+std::future<void>
 UwbDeviceConnector::Reset()
 {
-    std::promise<UwbStatus> resultPromise{};
+    std::promise<void> resultPromise{};
     auto resultFuture = resultPromise.get_future();
-    // TODO: invoke IOCTL_UWB_DEVICE_RESET
 
-    UwbStatus uwbStatus{}; // TODO: set this to value obtained from IOCTL
-    resultPromise.set_value(uwbStatus);
+    wil::unique_hfile handleDriver;
+    auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
+    if (FAILED(hr)) {
+        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
+        return resultFuture;
+    }
+
+    UWB_STATUS status;
+    BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_DEVICE_RESET, nullptr, 0, &status, sizeof status, nullptr, nullptr);
+    if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
+        HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
+        PLOG_ERROR << "error when sending IOCTL_UWB_DEVICE_RESET, hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Failed)));
+        return resultFuture;
+    }
+
+    resultPromise.set_value();
 
     return resultFuture;
 }
@@ -81,9 +98,9 @@ UwbDeviceConnector::GetDeviceInformation()
             continue;
         } else {
             PLOG_DEBUG << "IOCTL_UWB_GET_DEVICE_INFO succeeded";
-            const auto &deviceInformation = *reinterpret_cast<UWB_DEVICE_INFO*>(std::data(deviceInformationBuffer));
-            const auto uwbDeviceInformation = UwbCxDdi::To(deviceInformation);
-            const auto uwbStatus = UwbCxDdi::To(deviceInformation.status);
+            auto &deviceInformation = *reinterpret_cast<UWB_DEVICE_INFO*>(std::data(deviceInformationBuffer));
+            auto uwbDeviceInformation = UwbCxDdi::To(deviceInformation);
+            auto uwbStatus = UwbCxDdi::To(deviceInformation.status);
             resultPromise.set_value(std::make_tuple(std::move(uwbStatus), std::move(uwbDeviceInformation)));
             break;
         }

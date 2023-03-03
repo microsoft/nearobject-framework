@@ -46,6 +46,12 @@ public:
     GetDeviceInformation();
 
     /**
+     * @brief Reset the device to an initial clean state. 
+     */
+    void
+    Reset();
+
+    /**
      * @brief Determine if this device is the same as another.
      *
      * @param other
@@ -85,6 +91,12 @@ private:
      */
     virtual ::uwb::protocol::fira::UwbDeviceInformation
     GetDeviceInformationImpl() = 0;
+
+    /**
+     * @brief Reset the device to an initial clean state. 
+     */
+    virtual void
+    ResetImpl() = 0;
 
 protected:
     /**

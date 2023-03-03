@@ -191,6 +191,13 @@ UwbDevice::GetDeviceInformation()
     return GetDeviceInformationImpl();
 }
 
+void
+UwbDevice::Reset()
+{
+    PLOG_INFO << "Reset";
+    ResetImpl();
+}
+
 bool
 uwb::operator==(const UwbDevice& lhs, const UwbDevice& rhs) noexcept
 {

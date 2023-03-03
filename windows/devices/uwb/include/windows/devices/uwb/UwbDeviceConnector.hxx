@@ -58,7 +58,7 @@ public:
 
 public:
     // IUwbDeviceDdi
-    virtual std::future<::uwb::protocol::fira::UwbStatus>
+    virtual std::future<void>
     Reset() override;
 
     virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbDeviceInformation>>

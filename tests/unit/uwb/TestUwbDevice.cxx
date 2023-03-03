@@ -37,6 +37,11 @@ struct UwbDeviceTestBase : public uwb::UwbDevice
     {
         return {};
     }
+
+    void
+    ResetImpl() override
+    {
+    }
 };
 
 struct UwbDeviceTestDerivedOne : UwbDeviceTestBase

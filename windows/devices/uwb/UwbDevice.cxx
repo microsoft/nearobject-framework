@@ -3,6 +3,8 @@
 #include <ios>
 #include <stdexcept>
 
+#include <uwb/protocols/fira/FiraDevice.hxx>
+#include <uwb/protocols/fira/UwbException.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
@@ -89,6 +91,24 @@ UwbDevice::GetDeviceInformationImpl()
     } catch (std::exception& e) {
         PLOG_ERROR << "caught exception obtaining uwb device information (" << e.what() << ")";
         return {};
+    }
+}
+
+void
+UwbDevice::ResetImpl()
+{
+    auto resultFuture = m_uwbDeviceConnector->Reset();
+    if (!resultFuture.valid()) {
+        // TODO: need to do something different than just return a default-constructed object here
+        PLOG_ERROR << "failed to reset the uwb device";
+        throw UwbException(UwbStatusGeneric::Failed);
+    }
+
+    try {
+        resultFuture.get();
+    } catch (const UwbException& e) {
+        PLOG_ERROR << "caught exception resetting the uwb device (" << ::ToString(e.Status) << ")";
+        throw e;
     }
 }
 
