@@ -48,6 +48,14 @@ private:
      */
     uwb::protocol::fira::UwbCapability
     GetCapabilitiesImpl() override;
+
+    /**
+     * @brief Get the FiRa device information of the device.
+     * 
+     * @return uwb::protocol::fira::UwbDeviceInformation 
+     */
+    uwb::protocol::fira::UwbDeviceInformation
+    GetDeviceInformationImpl() override;
 };
 
 } // namespace devices

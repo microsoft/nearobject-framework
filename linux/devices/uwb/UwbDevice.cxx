@@ -2,6 +2,7 @@
 #include <linux/uwb/UwbDevice.hxx>
 
 using namespace linux::devices;
+using namespace uwb::protocol::fira;
 
 std::shared_ptr<uwb::UwbSession>
 UwbDevice::CreateSessionImpl(std::weak_ptr<uwb::UwbSessionEventCallbacks> /* callbacks */)
@@ -10,8 +11,15 @@ UwbDevice::CreateSessionImpl(std::weak_ptr<uwb::UwbSessionEventCallbacks> /* cal
     return nullptr;
 }
 
-uwb::protocol::fira::UwbCapability
+UwbCapability
 UwbDevice::GetCapabilitiesImpl()
+{
+    // TODO
+    return {};
+}
+
+UwbDeviceInformation
+GetDeviceInformationImpl()
 {
     // TODO
     return {};
