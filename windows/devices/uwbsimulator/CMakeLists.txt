@@ -7,8 +7,13 @@ set(WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE}/wi
 target_sources(windev-uwb-simulator
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/UwbDeviceSimulator.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/UwbDeviceSimulatorConnector.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/UwbSessionSimulator.cxx
     PUBLIC
+        ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/IUwbDeviceSimulatorDdi.hxx
         ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceSimulator.hxx
+        ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceSimulatorConnector.hxx
+        ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionSimulator.hxx
 )
 
 target_include_directories(windev-uwb-simulator
@@ -18,15 +23,20 @@ target_include_directories(windev-uwb-simulator
 
 target_link_libraries(windev-uwb-simulator
     PRIVATE
+        plog::plog
         windev-util
     PUBLIC
         uwb-proto-fira
         uwbsim-driver
         WIL::WIL
+        windev-uwb
 )
 
 list(APPEND WINDEVUWBSIM_PUBLIC_HEADERS
+    ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/IUwbDeviceSimulatorDdi.hxx
     ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceSimulator.hxx
+    ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceSimulatorConnector.hxx
+    ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionSimulator.hxx
 )
 
 set_target_properties(windev-uwb-simulator PROPERTIES FOLDER windows/devices/uwb)

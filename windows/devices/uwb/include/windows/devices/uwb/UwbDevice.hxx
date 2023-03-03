@@ -2,9 +2,11 @@
 #ifndef WINDOWS_DEVICE_UWB_HXX
 #define WINDOWS_DEVICE_UWB_HXX
 
+#include <concepts>
 #include <memory>
 #include <string>
 #include <thread>
+#include <type_traits>
 
 // NB: This must come before any other Windows include
 #include <windows.h>
@@ -16,6 +18,7 @@
 #include <uwb/UwbSession.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <windows/devices/DeviceResource.hxx>
+#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 
 namespace uwb
 {
@@ -26,7 +29,7 @@ namespace windows::devices::uwb
 {
 /**
  * @brief Helper class to interact with Windows UWB devices using the Windows
- * UWB DDI. The DDI is to be determined.
+ * UWB DDI.
  */
 class UwbDevice :
     public ::uwb::UwbDevice
@@ -71,7 +74,7 @@ private:
      * @param callbacks The event callback instance.
      * @return std::shared_ptr<uwb::UwbSession>
      */
-    std::shared_ptr<::uwb::UwbSession>
+    virtual std::shared_ptr<::uwb::UwbSession>
     CreateSessionImpl(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks) override;
 
     /**
@@ -79,23 +82,12 @@ private:
      *
      * @return uwb::protocol::fira::UwbCapability
      */
-    ::uwb::protocol::fira::UwbCapability
+    virtual ::uwb::protocol::fira::UwbCapability
     GetCapabilitiesImpl() override;
 
 private:
-    /**
-     * @brief Thread function for handling UWB notifications from the driver.
-     */
-    void
-    HandleNotifications();
-
-private:
     const std::string m_deviceName;
-
-    unique_hcmnotification m_hcmNotificationHandle;
-    wil::unique_hfile m_handleDriver;
-    wil::unique_hfile m_handleDriverNotifications;
-    std::jthread m_notificationThread;
+    std::shared_ptr<UwbDeviceConnector> m_uwbDeviceConnector;
 };
 } // namespace windows::devices::uwb
 

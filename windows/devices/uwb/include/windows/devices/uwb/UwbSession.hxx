@@ -3,16 +3,13 @@
 #define WINDOWS_UWB_SESSION_HXX
 
 #include <cstdint>
-
-// NB: This must come before any other Windows include
-#include <windows.h>
-
-#include <wil/resource.h>
+#include <memory>
 
 #include <uwb/UwbMacAddress.hxx>
 #include <uwb/UwbSession.hxx>
 #include <uwb/UwbSessionEventCallbacks.hxx>
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
+#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 
 namespace windows::devices::uwb
 {
@@ -27,37 +24,48 @@ public:
      * @brief Construct a new UwbSession object.
      *
      * @param callbacks The event callback instance.
-     * @param handleDriver File handle for a UWB-CX driver instance.
+     * @param uwbDeviceConnector The connector to the UWB-CX driver instance.
      */
-    UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, wil::unique_hfile handleDriver);
+    UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, std::shared_ptr<UwbDeviceConnector> uwbDeviceConnector);
 
 private:
     /**
-     * @brief TODO
+     * @brief Configure the session for use.
+     *
+     * @param uwbSessionData The session data to configure the session with.
      */
-    void
+    virtual void
     ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData& uwbSessionData) override;
 
     /**
-     * @brief TODO
+     * @brief Start ranging.
      */
-    void
+    virtual void
     StartRangingImpl() override;
 
     /**
-     * @brief TODO
+     * @brief Stop ranging.
      */
-    void
+    virtual void
     StopRangingImpl() override;
 
     /**
-     * @brief TODO
+     * @brief Add a new peer to the session.
      */
-    void
+    virtual void
     AddPeerImpl(::uwb::UwbMacAddress peerMacAddress) override;
 
+protected:
+    /**
+     * @brief Obtain a shared instance of the device driver connector.
+     *
+     * @return std::shared_ptr<UwbDeviceConnector>
+     */
+    std::shared_ptr<UwbDeviceConnector>
+    GetUwbDeviceConnector() noexcept;
+
 private:
-    wil::unique_hfile m_handleDriver;
+    std::shared_ptr<UwbDeviceConnector> m_uwbDeviceConnector;
 };
 
 } // namespace windows::devices::uwb

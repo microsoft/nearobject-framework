@@ -5,13 +5,16 @@ set(UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE}/wi
 
 target_sources(uwbcxadapter
     PRIVATE
-        ${CMAKE_CURRENT_LIST_DIR}/UwbCxAdapter.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbAppConfiguration.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/UwbCxAdapter.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbCxAdapterDdiLrp.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/UwbDeviceConnector.cxx
     PUBLIC
+        ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/IUwbDeviceDdi.hxx
         ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbAppConfiguration.hxx
         ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCxAdapter.hxx
         ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCxAdapterDdiLrp.hxx
+        ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceConnector.hxx
 )
 
 target_include_directories(uwbcxadapter
@@ -32,9 +35,11 @@ target_link_libraries(uwbcxadapter
 )
 
 list(APPEND UWBCXADAPTER_PUBLIC_HEADERS
+    ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/IUwbDeviceDdi.hxx
     ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbAppConfiguration.hxx
     ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCxAdapter.hxx
     ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCxAdapterDdiLrp.hxx
+    ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceConnector.hxx
 )
 
 set_target_properties(uwbcxadapter PROPERTIES FOLDER windows/devices/uwb)
