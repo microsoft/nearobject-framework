@@ -23,7 +23,7 @@ struct IUwbDeviceDdi
     Reset() = 0;
 
     // IOCTL_UWB_GET_DEVICE_INFO
-    virtual std::future<::uwb::protocol::fira::UwbDeviceInformation>
+    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbDeviceInformation>>
     GetDeviceInformation() = 0;
 
     // IOCTL_UWB_GET_DEVICE_CAPABILITIES

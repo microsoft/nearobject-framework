@@ -44,10 +44,10 @@ UwbDeviceConnector::Reset()
     return resultFuture;
 }
 
-std::future<::uwb::protocol::fira::UwbDeviceInformation>
+std::future<std::tuple<UwbStatus, UwbDeviceInformation>>
 UwbDeviceConnector::GetDeviceInformation()
 {
-    std::promise<UwbDeviceInformation> resultPromise;
+    std::promise<std::tuple<UwbStatus, UwbDeviceInformation>> resultPromise;
     auto resultFuture = resultPromise.get_future();
 
     wil::unique_hfile handleDriver;
@@ -83,7 +83,8 @@ UwbDeviceConnector::GetDeviceInformation()
             PLOG_DEBUG << "IOCTL_UWB_GET_DEVICE_INFO succeeded";
             const auto &deviceInformation = *reinterpret_cast<UWB_DEVICE_INFO*>(std::data(deviceInformationBuffer));
             const auto uwbDeviceInformation = UwbCxDdi::To(deviceInformation);
-            resultPromise.set_value(std::move(uwbDeviceInformation));
+            const auto uwbStatus = UwbCxDdi::To(deviceInformation.status);
+            resultPromise.set_value(std::make_tuple(std::move(uwbStatus), std::move(uwbDeviceInformation)));
             break;
         }
     }
