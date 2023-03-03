@@ -29,12 +29,6 @@ public:
     explicit UwbDeviceConnector(std::string deviceName);
     
     /**
-     * @brief Initialize the device.
-     */
-    void
-    Initialize();
-
-    /**
      * @brief Get the name of this device.
      *
      * @return const std::string&
@@ -79,32 +73,28 @@ public:
 
 protected:
     /**
-     * @brief Obtain a shared instance of the primary driver handle.
-     *
-     * @return wil::shared_hfile
+     * @brief Open a new handle to the driver. 
+     * 
+     * @param driverHandle The driver handle to update.
+     * @param isOverlapped Whether overlapped (async) i/o is requested on the handle.
+     * @return HRESULT 
      */
-    wil::shared_hfile
-    DriverHandle() noexcept;
-
-    /**
-     * @brief Obtain a shared instance of the notification driver handle.
-     *
-     * @return wil::shared_hfile
-     */
-    wil::shared_hfile
-    DriverHandleNotifications() noexcept;
+    HRESULT
+    OpenDriverHandle(wil::shared_hfile &driverHandle, bool isOverlapped) noexcept;
 
 private:
     /**
      * @brief Thread function for handling UWB notifications from the driver.
+     * 
+     * @param handleDriver The handle to the driver to use for listening for notifications.
+     * @param stopToken The token used to request the notification loop to stop.
+     * @param onNotification The callback function to invoke for each notification.
      */
     void
-    HandleNotifications();
+    HandleNotifications(wil::shared_hfile handleDriver, std::stop_token stopToken, std::function<void(::uwb::protocol::fira::UwbNotificationData)> onNotification);
 
 private:
     std::string m_deviceName{};
-    wil::shared_hfile m_handleDriver;
-    wil::shared_hfile m_handleDriverNotifications;
     std::jthread m_notificationThread;
 };
 } // namespace windows::devices::uwb
