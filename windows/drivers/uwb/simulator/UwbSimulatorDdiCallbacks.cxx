@@ -187,7 +187,7 @@ UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t session
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacks::GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters)
+UwbSimulatorDdiCallbacks::GetApplicationConfigurationParameters(uint32_t sessionId, [[maybe_unused]] const std::vector<UwbApplicationConfigurationParameterType> &applicationConfigurationParameterTypes, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters)
 {
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
@@ -204,6 +204,7 @@ UwbSimulatorDdiCallbacks::GetApplicationConfigurationParameters(uint32_t session
 
     const auto &[_, session] = *sessionIt;
     applicationConfigurationParameters = session.ApplicationConfigurationParameters;
+    // TODO: filter above with applicationConfigurationParameterTypes
     return UwbStatusOk;
 }
 
