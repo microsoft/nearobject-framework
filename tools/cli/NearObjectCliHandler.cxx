@@ -34,3 +34,9 @@ NearObjectCliHandler::HandleMonitorMode() noexcept
 {
     // TODO
 }
+
+void
+NearObjectCliHandler::HandleGetDeviceInfo() noexcept
+{
+    // TODO
+}

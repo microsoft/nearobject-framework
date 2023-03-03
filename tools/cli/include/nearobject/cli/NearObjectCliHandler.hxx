@@ -56,6 +56,12 @@ struct NearObjectCliHandler
      */
     virtual void
     HandleMonitorMode() noexcept;
+
+    /**
+    * @brief Invoked by the command-line driver when the request is to get device info.
+    */
+    virtual void
+    HandleGetDeviceInfo() noexcept;
 };
 
 } // namespace nearobject::cli

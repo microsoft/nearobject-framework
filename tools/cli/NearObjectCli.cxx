@@ -62,6 +62,12 @@ NearObjectCli::GetRangeApp() noexcept
 }
 
 CLI::App&
+NearObjectCli::GetRawApp() noexcept
+{
+    return *m_rawApp;
+}
+
+CLI::App&
 NearObjectCli::GetRangeStartApp() noexcept
 {
     return *m_rangeStartApp;
@@ -71,6 +77,12 @@ CLI::App&
 NearObjectCli::GetRangeStopApp() noexcept
 {
     return *m_rangeStopApp;
+}
+
+CLI::App&
+NearObjectCli::GetRawGetDeviceInfoApp() noexcept
+{
+    return *m_rawGetDeviceInfoApp;
 }
 
 std::shared_ptr<uwb::UwbDevice>
@@ -162,6 +174,7 @@ NearObjectCli::AddSubcommandUwb(CLI::App* parent)
     // sub-commands
     m_monitorApp = AddSubcommandUwbMonitor(uwbApp);
     m_rangeApp = AddSubcommandUwbRange(uwbApp);
+    m_rawApp = AddSubcommandUwbRaw(uwbApp);
 
     return uwbApp;
 }
@@ -194,6 +207,18 @@ NearObjectCli::AddSubcommandUwbRange(CLI::App* parent)
     m_rangeStopApp = AddSubcommandUwbRangeStop(rangeApp);
 
     return rangeApp;
+}
+
+CLI::App*
+NearObjectCli::AddSubcommandUwbRaw(CLI::App* parent)
+{
+    // top-level command
+    auto rawApp = parent->add_subcommand("raw", "individual commands")->require_subcommand()->fallthrough();
+
+    // sub-commands
+    m_rawGetDeviceInfoApp = AddSubcommandUwbRawGetDeviceInfo(rawApp);
+
+    return rawApp;
 }
 
 CLI::App*
@@ -291,4 +316,18 @@ NearObjectCli::AddSubcommandUwbRangeStop(CLI::App* parent)
     });
 
     return rangeStopApp;
+}
+
+CLI::App*
+NearObjectCli::AddSubcommandUwbRawGetDeviceInfo(CLI::App* parent)
+{
+    // top-level command
+    auto rawGetDeviceInfoApp = parent->add_subcommand("getdeviceinfo", "GetDeviceInfo")->fallthrough();
+
+    rawGetDeviceInfoApp->parse_complete_callback([this] {
+        std::cout << "get device info" << std::endl;
+        m_cliHandler->HandleGetDeviceInfo();
+    });
+
+    return rawGetDeviceInfoApp;
 }
