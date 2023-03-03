@@ -52,6 +52,20 @@ struct UwbVersion
      */
     static std::optional<UwbVersion>
     Parse(const std::string& str) noexcept;
+
+    /**
+     * @brief Create an instance from a pari of UCI encoded version values. 
+     * 
+     * This assumes the minor and maintenance value are encoded per FiRa UCI
+     * Specification v1.1.0, page 18, Table 5: 'Control Messages to get the
+     * Device Information'.
+     *
+     * @param major The major version value.
+     * @param minorAndMaintenance The minor and maintenance version values.
+     * @return UwbVersion 
+     */
+    static UwbVersion
+    FromUci(uint8_t major, uint8_t minorAndMaintenance);
 };
 } // namespace uwb
 
