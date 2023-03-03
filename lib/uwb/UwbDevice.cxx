@@ -175,7 +175,8 @@ UwbDevice::CreateSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks)
 UwbCapability
 UwbDevice::GetCapabilities()
 {
-    return {};
+    PLOG_INFO << "GetCapabilities()";
+    return GetCapabilitiesImpl();
 }
 
 /**
@@ -186,7 +187,8 @@ UwbDevice::GetCapabilities()
 UwbDeviceInformation
 UwbDevice::GetDeviceInformation()
 {
-    return {};
+    PLOG_INFO << "GetDeviceInformation";
+    return GetDeviceInformationImpl();
 }
 
 bool
