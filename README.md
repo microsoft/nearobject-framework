@@ -39,7 +39,7 @@ To help keep the code consistent, please follow these general guidelines:
 
 While not required, it is strongly recommended to configure git with a [GNU Privacy Guard (GPG)](https://gnupg.org/) signing key. This allows GitHub to verify commits were pushed by a specific user and will show a green `Verified` status beside each verified commit. Follow these steps to configure a signing key for commit verification:
 
-1. Install the gpg tools for the target operating system (see the OS-specific `README` files for details).
+1. Install the gpg tools for the target operating system (see the OS-specific `README` files for details: [Windows](./windows/README.md#2-configure-commit-signing-optional), [Linux](./linux/README.md#development-environment-setup)).
 2. [Generate a gpg key](https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key)
 3. [Add the gpg key to your github account](https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-gpg-key-to-your-github-account)
 4. [Configure git to use the gpg key](https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key). This link will also tell you how to use gpg signing with an ssh key. Additionally, if you wish tell git to use a type any type of signing by default, be it gpg, ssh or X.509, you need to run the following command ```git config --global commit.gpgsign true```
