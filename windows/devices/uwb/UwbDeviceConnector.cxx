@@ -228,6 +228,30 @@ UwbDeviceConnector::HandleNotifications(wil::shared_hfile handleDriver, std::sto
         const UWB_NOTIFICATION_DATA& notificationData = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
         auto uwbNotificationData = UwbCxDdi::To(notificationData);
 
+        // Invoke callback with notification data.
         onNotification(std::move(uwbNotificationData));
     }
+}
+
+bool
+UwbDeviceConnector::NotificationListenerStart(std::function<void(::uwb::protocol::fira::UwbNotificationData)> onNotification)
+{
+    wil::shared_hfile handleDriver;
+    auto hr = OpenDriverHandle(handleDriver);
+    if (FAILED(hr)) {
+        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << hr;
+        return false;
+    }
+    
+    m_notificationThread = std::jthread([this, handleDriver = std::move(handleDriver), onNotification = std::move(onNotification)](std::stop_token stopToken) {
+        HandleNotifications(std::move(handleDriver), stopToken, std::move(onNotification));
+    });
+
+    return true;
+}
+
+void
+UwbDeviceConnector::NotificationListenerStop()
+{
+    m_notificationThread.request_stop();
 }

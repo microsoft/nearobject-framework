@@ -36,6 +36,26 @@ public:
     const std::string&
     DeviceName() const noexcept;
 
+    /**
+     * @brief Start listening for notifications.
+     * 
+     * Note: this is a rudimentary implementation and is only present to
+     * preserve existing behavior. It will eventually be replaced by a
+     * fine-grained publication/subscription model.
+     * 
+     * @param onNotification The handler to invoke for each notification.
+     * @return true If listening for notifications started successfully.
+     * @return false If listening for notifications could not be started.
+     */
+    bool
+    NotificationListenerStart(std::function<void(::uwb::protocol::fira::UwbNotificationData)> onNotification);
+
+    /**
+     * @brief Stop listening for notifications.
+     */
+    void
+    NotificationListenerStop();
+
 public:
     // IUwbDeviceDdi
     virtual std::future<::uwb::protocol::fira::UwbStatus>
