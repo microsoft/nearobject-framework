@@ -46,7 +46,7 @@ template <typename HandleSmartT>
 requires detail::HasReset<HandleSmartT, HANDLE>
 // clang-format on
 HRESULT
-OpenDriverHandle(HandleSmartT &driverHandle, const char *deviceName, bool isOverlapped)
+OpenDriverHandle(HandleSmartT &driverHandle, const char *deviceName, bool isOverlapped = false)
 {
     driverHandle.reset(CreateFileA(
         deviceName,
@@ -80,7 +80,7 @@ OpenDriverHandleShared(wil::shared_hfile &driverHandle, const char *deviceName, 
  * @return HRESULT S_OK if successful.
  */
 HRESULT
-OpenDriverHandle(wil::unique_hfile &driverHandle, const char *deviceName, bool isOverlapped = false);
+OpenDriverHandleUnique(wil::unique_hfile &driverHandle, const char *deviceName, bool isOverlapped = false);
 
 } // namespace windows::devices
 

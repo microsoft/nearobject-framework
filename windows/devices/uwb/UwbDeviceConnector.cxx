@@ -10,6 +10,7 @@
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 #include <windows/devices/uwb/UwbDeviceConnector.hxx>
 
+using namespace windows::devices;
 using namespace windows::devices::uwb;
 using namespace ::uwb::protocol::fira;
 

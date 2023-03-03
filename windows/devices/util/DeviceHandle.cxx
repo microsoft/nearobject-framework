@@ -8,7 +8,7 @@ windows::devices::OpenDriverHandleShared(wil::shared_hfile &driverHandle, const 
 }
 
 HRESULT
-windows::devices::OpenDriverHandle(wil::unique_hfile &driverHandle, const char *deviceName, bool isOverlapped)
+windows::devices::OpenDriverHandleUnique(wil::unique_hfile &driverHandle, const char *deviceName, bool isOverlapped)
 {
     return OpenDriverHandle<wil::unique_hfile>(driverHandle, deviceName, isOverlapped);
 }
