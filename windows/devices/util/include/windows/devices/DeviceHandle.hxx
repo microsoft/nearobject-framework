@@ -8,7 +8,6 @@
 #include <windows.h>
 
 #include <fileapi.h>
-
 #include <wil/resource.h>
 #include <wil/result.h>
 
@@ -18,14 +17,17 @@ namespace detail
 {
 /**
  * @brief Helper concept to check whether a type has a reset() function for a
- * particular contained type. 
- * 
+ * particular contained type.
+ *
  * @tparam HandleSmartT The smart type managing a contained type.
  * @tparam ContainedT The contained type managed by the smart type.
  */
-template <typename HandleSmartT, typename ContainedT> concept HasReset = requires (HandleSmartT handleSmart, ContainedT handle) {
+// clang-format off
+template <typename HandleSmartT, typename ContainedT>
+concept HasReset = requires (HandleSmartT handleSmart, ContainedT handle) {
     handleSmart.reset(handle);
 };
+// clang-format on
 } // namespace detail
 
 /**
@@ -39,8 +41,10 @@ template <typename HandleSmartT, typename ContainedT> concept HasReset = require
  * @param deviceName The device interface path to open.
  * @param isOverlapped Whether the handle should be opened in overlapped (async) mode or not.
  */
+// clang-format off
 template <typename HandleSmartT>
 requires detail::HasReset<HandleSmartT, HANDLE>
+// clang-format on
 HRESULT
 OpenDriverHandle(HandleSmartT &driverHandle, const char *deviceName, bool isOverlapped)
 {
