@@ -131,10 +131,10 @@ UwbDeviceConnector::GetCapabilities()
     return resultFuture;
 }
 
-std::future<UwbStatus>
-UwbDeviceConnector::GetSessionCount(uint32_t& sessionCount)
+std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<uint32_t>>>
+UwbDeviceConnector::GetSessionCount()
 {
-    std::promise<UwbStatus> resultPromise;
+    std::promise<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<uint32_t>>> resultPromise;
     auto resultFuture = resultPromise.get_future();
     // TODO: invoke IOCTL_UWB_GET_SESSION_COUNT
 

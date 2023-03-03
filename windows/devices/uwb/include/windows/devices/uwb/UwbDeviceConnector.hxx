@@ -53,8 +53,8 @@ public:
     virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbCapability>>
     GetCapabilities() override;
 
-    virtual std::future<::uwb::protocol::fira::UwbStatus>
-    GetSessionCount(uint32_t &sessionCount) override;
+    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<uint32_t>>>
+    GetSessionCount() override;
 
     virtual std::future<::uwb::protocol::fira::UwbStatus>
     SessionIntitialize(uint32_t sessionId, ::uwb::protocol::fira::UwbSessionType sessionType) override;

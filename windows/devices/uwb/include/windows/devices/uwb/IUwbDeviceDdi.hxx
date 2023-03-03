@@ -28,8 +28,8 @@ struct IUwbDeviceDdi
     GetCapabilities() = 0;
 
     // IOCTL_UWB_GET_SESSION_COUNT
-    virtual std::future<::uwb::protocol::fira::UwbStatus>
-    GetSessionCount(uint32_t &sessionCount) = 0;
+    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<uint32_t>>>
+    GetSessionCount() = 0;
 
     // IOCTL_UWB_SESSION_INIT
     virtual std::future<::uwb::protocol::fira::UwbStatus>
