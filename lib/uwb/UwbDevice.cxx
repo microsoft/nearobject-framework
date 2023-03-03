@@ -36,6 +36,11 @@ UwbDevice::GetSession(uint32_t sessionId)
 }
 
 void
+UwbDevice::AddCallbacks(UwbDeviceEventCallbacks callbacks){
+    m_callbacks.push_back(callbacks);
+}
+
+void
 UwbDevice::OnStatusChanged(UwbStatus status)
 {
     m_lastError = status;

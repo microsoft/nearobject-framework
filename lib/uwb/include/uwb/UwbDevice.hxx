@@ -31,6 +31,16 @@ public:
     CreateSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks);
 
     /**
+     * @brief Public interface to add callbacks for this UwbDevice
+     * 
+     * TODO decide if it makes sense to pass in the callbacks via pointer or reference, or simply by copy
+     * 
+     * @param callbacks 
+     */
+    void
+    AddCallbacks(UwbDeviceEventCallbacks callbacks);
+
+    /**
      * @brief Get the FiRa capabilities of the device.
      *
      * @return uwb::protocol::fira::UwbCapability
