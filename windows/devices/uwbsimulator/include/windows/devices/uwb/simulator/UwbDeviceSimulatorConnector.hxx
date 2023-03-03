@@ -23,8 +23,8 @@ class UwbDeviceSimulatorConnector :
 public:
     /**
      * @brief Construct a new Uwb Device Simulator Connector object.
-     * 
-     * @param deviceName 
+     *
+     * @param deviceName
      */
     explicit UwbDeviceSimulatorConnector(std::string deviceName);
 
@@ -40,6 +40,6 @@ private:
     wil::shared_hfile m_driverHandle;
     std::string m_deviceName{};
 };
-} //namespace windows::devices::uwb::simulator
+} // namespace windows::devices::uwb::simulator
 
 #endif // UWB_DEVICE_SIMULATOR_CONNECTOR_HXX
