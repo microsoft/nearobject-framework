@@ -371,9 +371,9 @@ struct UwbDeviceInfoVendor
     /**
      * @brief Provides a view of the vendor-specific data.
      *
-     * @return std::span<uint8_t>
+     * @return std::span<const uint8_t>
      */
-    virtual std::span<uint8_t>
+    virtual std::span<const uint8_t>
     GetData() const noexcept = 0;
 };
 
