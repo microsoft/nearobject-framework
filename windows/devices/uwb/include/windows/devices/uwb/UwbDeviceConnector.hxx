@@ -91,6 +91,9 @@ public:
     virtual std::future<::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus>
     SessionUpdateControllerMulticastList(uint32_t sessionId, ::uwb::protocol::fira::UwbMulticastAction multicastAction, std::vector<::uwb::UwbMacAddress> controlees) override;
 
+    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>>>>
+    GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes) override;
+
     virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>>>>
     SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> applicationConfigurationParameters) override;
 

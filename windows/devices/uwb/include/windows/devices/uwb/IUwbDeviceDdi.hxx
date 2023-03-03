@@ -62,15 +62,17 @@ struct IUwbDeviceDdi
     virtual std::future<::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus>
     SessionUpdateControllerMulticastList(uint32_t sessionId, ::uwb::protocol::fira::UwbMulticastAction multicastAction, std::vector<::uwb::UwbMacAddress> controlees) = 0;
 
-    // TODO: unspecified IOCTLs below
-    // IOCTL_UWB_SET_DEVICE_CONFIG_PARAMS
-    // IOCTL_UWB_GET_DEVICE_CONFIG_PARAMS
+    // IOCTL_UWB_GET_APP_CONFIG_PARAMS
+    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>>>>
+    GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes) = 0;
 
     // IOCTL_UWB_SET_APP_CONFIG_PARAMS
     virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>>>>
     SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> applicationConfigurationParameters) = 0;
 
-    // IOCTL_UWB_GET_APP_CONFIG_PARAMS
+    // TODO: unspecified IOCTLs below
+    // IOCTL_UWB_SET_DEVICE_CONFIG_PARAMS
+    // IOCTL_UWB_GET_DEVICE_CONFIG_PARAMS
 };
 } // namespace windows::devices::uwb
 
