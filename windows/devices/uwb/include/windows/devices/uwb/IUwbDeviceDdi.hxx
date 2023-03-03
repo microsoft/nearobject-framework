@@ -67,7 +67,7 @@ struct IUwbDeviceDdi
     // IOCTL_UWB_GET_DEVICE_CONFIG_PARAMS
 
     // IOCTL_UWB_SET_APP_CONFIG_PARAMS
-    virtual std::future<std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus, std::shared_ptr<IUwbAppConfigurationParameter>>>>
+    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>>>>
     SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> applicationConfigurationParameters) = 0;
 
     // IOCTL_UWB_GET_APP_CONFIG_PARAMS
