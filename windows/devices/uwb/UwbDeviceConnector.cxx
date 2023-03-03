@@ -23,7 +23,7 @@ UwbDeviceConnector::UwbDeviceConnector(std::string deviceName) :
 {}
 
 HRESULT
-UwbDeviceConnector::OpenDriverHandle(wil::shared_hfile &driverHandle, bool isOverlapped = false) noexcept
+UwbDeviceConnector::OpenDriverHandle(wil::shared_hfile& driverHandle, bool isOverlapped = false) noexcept
 {
     driverHandle.reset(CreateFileA(
         m_deviceName.c_str(),
@@ -262,7 +262,7 @@ UwbDeviceConnector::NotificationListenerStart(std::function<void(::uwb::protocol
         PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << hr;
         return false;
     }
-    
+
     m_notificationThread = std::jthread([this, handleDriver = std::move(handleDriver), onNotification = std::move(onNotification)](std::stop_token stopToken) {
         HandleNotifications(std::move(handleDriver), stopToken, std::move(onNotification));
     });

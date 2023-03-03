@@ -23,11 +23,11 @@ class UwbDeviceConnector :
 public:
     /**
      * @brief Construct a new UwbDeviceConnector object.
-     * 
+     *
      * @param deviceName The interface path name.
      */
     explicit UwbDeviceConnector(std::string deviceName);
-    
+
     /**
      * @brief Get the name of this device.
      *
@@ -38,11 +38,11 @@ public:
 
     /**
      * @brief Start listening for notifications.
-     * 
+     *
      * Note: this is a rudimentary implementation and is only present to
      * preserve existing behavior. It will eventually be replaced by a
      * fine-grained publication/subscription model.
-     * 
+     *
      * @param onNotification The handler to invoke for each notification.
      * @return true If listening for notifications started successfully.
      * @return false If listening for notifications could not be started.
@@ -72,7 +72,7 @@ public:
 
     virtual std::future<::uwb::protocol::fira::UwbStatus>
     SessionIntitialize(uint32_t sessionId, ::uwb::protocol::fira::UwbSessionType sessionType) override;
-    
+
     virtual std::future<::uwb::protocol::fira::UwbStatus>
     SessionDeinitialize(uint32_t sessionId) override;
 
@@ -99,19 +99,19 @@ public:
 
 protected:
     /**
-     * @brief Open a new handle to the driver. 
-     * 
+     * @brief Open a new handle to the driver.
+     *
      * @param driverHandle The driver handle to update.
      * @param isOverlapped Whether overlapped (async) i/o is requested on the handle.
-     * @return HRESULT 
+     * @return HRESULT
      */
     HRESULT
-    OpenDriverHandle(wil::shared_hfile &driverHandle, bool isOverlapped) noexcept;
+    OpenDriverHandle(wil::shared_hfile& driverHandle, bool isOverlapped) noexcept;
 
 private:
     /**
      * @brief Thread function for handling UWB notifications from the driver.
-     * 
+     *
      * @param handleDriver The handle to the driver to use for listening for notifications.
      * @param stopToken The token used to request the notification loop to stop.
      * @param onNotification The callback function to invoke for each notification.

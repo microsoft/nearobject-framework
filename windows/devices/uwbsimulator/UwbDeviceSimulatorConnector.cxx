@@ -26,5 +26,4 @@ UwbDeviceSimulatorConnector::TriggerSessionEvent([[maybe_unused]] const UwbSimul
     // TODO: invoke IOCTL_UWB_DEVICE_SIM_TRIGGER_SESSION_EVENT
 
     return resultFuture;
-
 }
