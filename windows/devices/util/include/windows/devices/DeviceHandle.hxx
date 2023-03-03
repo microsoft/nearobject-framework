@@ -2,6 +2,7 @@
 #ifndef DEVICE_HANDLE_HXX
 #define DEVICE_HANDLE_HXX
 
+#include <concepts>
 #include <memory>
 
 #include <windows.h>
@@ -13,6 +14,20 @@
 
 namespace windows::devices
 {
+namespace detail
+{
+/**
+ * @brief Helper concept to check whether a type has a reset() function for a
+ * particular contained type. 
+ * 
+ * @tparam HandleSmartT The smart type managing a contained type.
+ * @tparam ContainedT The contained type managed by the smart type.
+ */
+template <typename HandleSmartT, typename ContainedT> concept HasReset = requires (HandleSmartT handleSmart, ContainedT handle) {
+    handleSmart.reset(handle);
+};
+} // namespace detail
+
 /**
  * @brief Open a HANDLE to a device interface path, using an RAII-wrapper.
  *
@@ -25,6 +40,7 @@ namespace windows::devices
  * @param isOverlapped Whether the handle should be opened in overlapped (async) mode or not.
  */
 template <typename HandleSmartT>
+requires detail::HasReset<HandleSmartT, HANDLE>
 HRESULT
 OpenDriverHandle(HandleSmartT &driverHandle, const char *deviceName, bool isOverlapped)
 {
