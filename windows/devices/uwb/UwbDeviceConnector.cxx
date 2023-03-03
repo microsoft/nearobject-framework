@@ -5,6 +5,7 @@
 #include <plog/Log.h>
 #include <wil/result.h>
 
+#include <windows/devices/DeviceHandle.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 #include <windows/devices/uwb/UwbDeviceConnector.hxx>
@@ -21,21 +22,6 @@ namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
 UwbDeviceConnector::UwbDeviceConnector(std::string deviceName) :
     m_deviceName(std::move(deviceName))
 {}
-
-HRESULT
-UwbDeviceConnector::OpenDriverHandle(wil::shared_hfile& driverHandle, bool isOverlapped = false) noexcept
-{
-    driverHandle.reset(CreateFileA(
-        m_deviceName.c_str(),
-        GENERIC_READ | GENERIC_WRITE,
-        FILE_SHARE_READ | FILE_SHARE_WRITE,
-        nullptr,
-        OPEN_EXISTING,
-        isOverlapped ? FILE_FLAG_OVERLAPPED : FILE_ATTRIBUTE_NORMAL,
-        nullptr));
-    RETURN_LAST_ERROR_IF(driverHandle.get() == INVALID_HANDLE_VALUE);
-    return S_OK;
-}
 
 const std::string&
 UwbDeviceConnector::DeviceName() const noexcept
@@ -73,7 +59,7 @@ UwbDeviceConnector::GetCapabilities()
     auto resultFuture = resultPromise.get_future();
 
     wil::shared_hfile handleDriver;
-    auto hr = OpenDriverHandle(handleDriver);
+    auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
         PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << hr;
         return resultFuture;
@@ -257,7 +243,7 @@ bool
 UwbDeviceConnector::NotificationListenerStart(std::function<void(::uwb::protocol::fira::UwbNotificationData)> onNotification)
 {
     wil::shared_hfile handleDriver;
-    auto hr = OpenDriverHandle(handleDriver);
+    auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
         PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << hr;
         return false;
