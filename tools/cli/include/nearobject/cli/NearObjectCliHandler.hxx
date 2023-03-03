@@ -61,7 +61,7 @@ struct NearObjectCliHandler
     * @brief Invoked by the command-line driver when the request is to get device info.
     */
     virtual void
-    HandleGetDeviceInfo() noexcept;
+    HandleGetDeviceInfo(std::shared_ptr<uwb::UwbDevice> uwbDevice) noexcept;
 };
 
 } // namespace nearobject::cli

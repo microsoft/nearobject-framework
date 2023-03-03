@@ -326,7 +326,16 @@ NearObjectCli::AddSubcommandUwbRawGetDeviceInfo(CLI::App* parent)
 
     rawGetDeviceInfoApp->parse_complete_callback([this] {
         std::cout << "get device info" << std::endl;
-        m_cliHandler->HandleGetDeviceInfo();
+    });
+
+    rawGetDeviceInfoApp->final_callback([this] {
+        auto uwbDevice = GetUwbDevice();
+        if (!uwbDevice) {
+            std::cerr << "no device found" << std::endl;
+            return;
+        }
+
+        m_cliHandler->HandleGetDeviceInfo(uwbDevice);
     });
 
     return rawGetDeviceInfoApp;
