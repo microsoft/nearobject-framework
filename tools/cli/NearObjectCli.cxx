@@ -269,6 +269,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     rangeStartApp->final_callback([this] {
         auto uwbDevice = GetUwbDevice();
         if (!uwbDevice) {
+            std::cerr << "no device found" << std::endl;
             return;
         }
 
