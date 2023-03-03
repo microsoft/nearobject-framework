@@ -189,8 +189,18 @@ UwbDeviceConnector::SessionUpdateControllerMulticastList(uint32_t sessionId, Uwb
     return resultFuture;
 }
 
+std::future<std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::shared_ptr<IUwbAppConfigurationParameter>>>>
+UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> applicationConfigurationParameters)
+{
+    std::promise<std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus, std::shared_ptr<IUwbAppConfigurationParameter>>>> resultPromise;
+    auto resultFuture = resultPromise.get_future();
+    // TODO: invoke IOCTL_UWB_SET_APP_CONFIG_PARAMS
+
+    return resultFuture;
+}
+
 void
-UwbDeviceConnector::HandleNotifications(wil::shared_hfile handleDriver, std::stop_token stopToken, std::function<void(::uwb::protocol::fira::UwbNotificationData)> onNotification)
+UwbDeviceConnector::HandleNotifications(wil::shared_hfile handleDriver, std::stop_token stopToken, std::function<void(UwbNotificationData)> onNotification)
 {
     // TODO: the below loop invokes the IOCTL synchronously, blocking on a
     // result. There is no known way to cancel the blocking call on the client
