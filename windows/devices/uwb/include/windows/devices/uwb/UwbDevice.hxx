@@ -67,31 +67,6 @@ public:
     bool
     IsEqual(const ::uwb::UwbDevice& other) const noexcept override;
 
-protected:
-    /**
-     * @brief Helper function to create a typed (derived) UwbSession object,
-     * capturing the common code that is required in all sub-classes.
-     *
-     * @tparam UwbSessionT The type of session to create.
-     * @param callbacks The session callbacks.
-     * @return requires
-     */
-    template <typename UwbSessionT>
-    // clang-format off
-    requires std::is_base_of_v<::uwb::UwbSession, UwbSessionT>
-    // clang-format on
-    std::shared_ptr<::uwb::UwbSession>
-    CreateSessionImpl(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
-    {
-        // Create a duplicate handle to the driver for use by the session.
-        wil::shared_hfile handleDriverForSession;
-        if (!DuplicateHandle(GetCurrentProcess(), m_handleDriver.get(), GetCurrentProcess(), &handleDriverForSession, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-            return nullptr;
-        }
-
-        return std::make_shared<UwbSessionT>(std::move(callbacks), std::move(handleDriverForSession));
-    }
-
 private:
     /**
      * @brief Create a new UWB session.
@@ -111,35 +86,7 @@ private:
     GetCapabilitiesImpl() override;
 
 private:
-    /**
-     * @brief Thread function for handling UWB notifications from the driver.
-     */
-    void
-    HandleNotifications();
-
-protected:
-    /**
-     * @brief Obtain a shared instance of the primary driver handle.
-     *
-     * @return wil::shared_hfile
-     */
-    wil::shared_hfile
-    DriverHandle() noexcept;
-
-    /**
-     * @brief Obtain a shared instance of the notification driver handle.
-     *
-     * @return wil::shared_hfile
-     */
-    wil::shared_hfile
-    DriverHandleNotifications() noexcept;
-
-private:
     const std::string m_deviceName;
-
-    wil::shared_hfile m_handleDriver;
-    wil::shared_hfile m_handleDriverNotifications;
-    std::jthread m_notificationThread;
     std::shared_ptr<UwbDeviceConnector> m_uwbDeviceConnector;
 };
 } // namespace windows::devices::uwb

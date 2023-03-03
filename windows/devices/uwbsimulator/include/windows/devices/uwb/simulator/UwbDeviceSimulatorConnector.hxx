@@ -9,13 +9,16 @@
 
 #include <wil/resource.h>
 
+#include <windows/devices/uwb/simulator/IUwbDeviceSimulatorDdi.hxx>
+
 namespace windows::devices::uwb::simulator
 {
 /**
  * @brief Provides access to the DDI exposed by GUID_DEVINTERFACE_UWB_SIMULATOR
  * described in UwbSimulatorDdi.h.
  */
-class UwbDeviceSimulatorConnector
+class UwbDeviceSimulatorConnector :
+    public IUwbDeviceSimulatorDdi
 {
 public:
     /**
@@ -24,6 +27,14 @@ public:
      * @param deviceName 
      */
     explicit UwbDeviceSimulatorConnector(std::string deviceName);
+
+public:
+    // IUwbDeviceSimulatorDdi
+    virtual std::future<UwbSimulatorCapabilities>
+    GetCapabilites() override;
+
+    virtual std::future<UwbSimulatorTriggerSessionEventResult>
+    TriggerSessionEvent(const UwbSimulatorTriggerSessionEventArgs& triggerSessionEventArgs) override;
 
 private:
     wil::shared_hfile m_driverHandle;

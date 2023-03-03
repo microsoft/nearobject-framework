@@ -24,15 +24,15 @@ UwbDeviceSimulator::DeviceName() const noexcept
 bool
 UwbDeviceSimulator::Initialize()
 {
-    UwbDevice::Initialize();
-    m_handleDriver = UwbDevice::DriverHandle();
+    m_uwbDeviceConnector = std::make_shared<UwbDeviceConnector>(m_deviceName);
+    m_uwbDeviceSimulatorConnector = std::make_shared<UwbDeviceSimulatorConnector>(m_deviceName);
     return true;
 }
 
 std::shared_ptr<::uwb::UwbSession>
 UwbDeviceSimulator::CreateSessionImpl(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
 {
-    return UwbDevice::CreateSessionImpl<UwbSessionSimulator>(std::move(callbacks));
+    return std::make_shared<UwbSessionSimulator>(std::move(callbacks), m_uwbDeviceConnector, m_uwbDeviceSimulatorConnector);
 }
 
 UwbSimulatorCapabilities

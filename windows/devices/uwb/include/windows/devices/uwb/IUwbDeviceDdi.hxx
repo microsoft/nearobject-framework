@@ -34,7 +34,7 @@ struct IUwbDeviceDdi
     // IOCTL_UWB_SESSION_INIT
     virtual std::future<::uwb::protocol::fira::UwbStatus>
     SessionIntitialize(uint32_t sessionId, ::uwb::protocol::fira::UwbSessionType sessionType) = 0;
-    
+
     // IOCTL_UWB_SESSION_DEINIT
     virtual std::future<::uwb::protocol::fira::UwbStatus>
     SessionDeinitialize(uint32_t sessionId) = 0;

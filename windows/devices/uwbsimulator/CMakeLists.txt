@@ -10,6 +10,7 @@ target_sources(windev-uwb-simulator
         ${CMAKE_CURRENT_LIST_DIR}/UwbDeviceSimulatorConnector.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbSessionSimulator.cxx
     PUBLIC
+        ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/IUwbDeviceSimulatorDdi.hxx
         ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceSimulator.hxx
         ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceSimulatorConnector.hxx
         ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionSimulator.hxx
@@ -32,6 +33,7 @@ target_link_libraries(windev-uwb-simulator
 )
 
 list(APPEND WINDEVUWBSIM_PUBLIC_HEADERS
+    ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/IUwbDeviceSimulatorDdi.hxx
     ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceSimulator.hxx
     ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceSimulatorConnector.hxx
     ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionSimulator.hxx

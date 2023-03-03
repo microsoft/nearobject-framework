@@ -3,6 +3,7 @@
 #define UWB_DEVICE_SIMULATOR_HXX
 
 #include <cstdint>
+#include <memory>
 #include <string>
 
 // NB: This must come before any other Windows include
@@ -14,6 +15,8 @@
 #include <wil/resource.h>
 #include <windows/devices/DeviceResource.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
+#include <windows/devices/uwb/UwbDeviceConnector.hxx>
+#include <windows/devices/uwb/simulator/UwbDeviceSimulatorConnector.hxx>
 
 namespace windows::devices::uwb::simulator
 {
@@ -62,7 +65,8 @@ private:
 
 private:
     const std::string m_deviceName;
-    wil::shared_hfile m_handleDriver;
+    std::shared_ptr<UwbDeviceConnector> m_uwbDeviceConnector;
+    std::shared_ptr<UwbDeviceSimulatorConnector> m_uwbDeviceSimulatorConnector;
 };
 
 } // namespace windows::devices::uwb::simulator
