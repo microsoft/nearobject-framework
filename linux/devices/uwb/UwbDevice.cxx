@@ -25,6 +25,11 @@ GetDeviceInformationImpl()
     return {};
 }
 
+void
+ResetImpl()
+{
+}
+
 bool
 UwbDevice::IsEqual(const uwb::UwbDevice& other) const noexcept
 {

@@ -56,6 +56,12 @@ private:
      */
     uwb::protocol::fira::UwbDeviceInformation
     GetDeviceInformationImpl() override;
+
+    /**
+     * @brief Reset the device to an initial clean state. 
+     */
+    void
+    ResetImpl() override;
 };
 
 } // namespace devices
