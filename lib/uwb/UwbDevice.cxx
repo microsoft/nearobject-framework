@@ -172,6 +172,23 @@ UwbDevice::CreateSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks)
     return session;
 }
 
+UwbCapability
+UwbDevice::GetCapabilities()
+{
+    return {};
+}
+
+/**
+ * @brief Get the FiRa device information of the device.
+ * 
+ * @return ::uwb::protocol::fira::UwbDeviceInformation 
+ */
+UwbDeviceInformation
+UwbDevice::GetDeviceInformation()
+{
+    return {};
+}
+
 bool
 uwb::operator==(const UwbDevice& lhs, const UwbDevice& rhs) noexcept
 {

@@ -38,6 +38,14 @@ public:
     GetCapabilities();
 
     /**
+     * @brief Get the FiRa device information of the device.
+     * 
+     * @return ::uwb::protocol::fira::UwbDeviceInformation 
+     */
+    ::uwb::protocol::fira::UwbDeviceInformation
+    GetDeviceInformation();
+
+    /**
      * @brief Determine if this device is the same as another.
      *
      * @param other
@@ -69,6 +77,14 @@ private:
      */
     virtual uwb::protocol::fira::UwbCapability
     GetCapabilitiesImpl() = 0;
+
+    /**
+     * @brief Get the FiRa device information of the device.
+     * 
+     * @return ::uwb::protocol::fira::UwbDeviceInformation 
+     */
+    virtual ::uwb::protocol::fira::UwbDeviceInformation
+    GetDeviceInformationImpl() = 0;
 
 protected:
     /**
