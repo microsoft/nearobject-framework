@@ -1,5 +1,6 @@
 
 #include <cstdint>
+#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -8,6 +9,8 @@
 #include <notstd/guid.hxx>
 
 #include <UwbSimulatorDdiGlue.h>
+#include <uwb/protocols/fira/FiraDevice.hxx>
+#include <uwb/protocols/fira/UwbException.hxx>
 #include <windows/devices/DeviceEnumerator.hxx>
 #include <windows/devices/uwb/simulator/UwbDeviceSimulator.hxx>
 
@@ -20,6 +23,7 @@
 #include <logging/LogUtils.hxx>
 
 using windows::devices::DeviceEnumerator;
+using namespace ::uwb::protocol::fira;
 using namespace windows::devices::uwb::simulator;
 
 int
@@ -32,9 +36,11 @@ main(int argc, char* argv[])
     CLI::App app{};
     app.name("uwbsim");
     app.description("control and interact with uwb simulator devices");
+    bool getCapabilities{ false };
 
     std::string deviceName{};
     app.add_option("--deviceName, -d", deviceName, "The uwb simulator device name (path)");
+    app.add_flag("--getCapabilities", getCapabilities, "enumerate the capabilities of the simulator");
 
     try {
         app.parse(argc, argv);
@@ -66,6 +72,16 @@ main(int argc, char* argv[])
     if (!uwbDeviceSimulator->Initialize()) {
         std::cerr << "failed to initialize uwb simulator device" << std::endl;
         return -2;
+    }
+
+    if (getCapabilities) {
+        try {
+            auto capabilities = uwbDeviceSimulator->GetSimulatorCapabilities();
+            std::cout << "Capabilities: Version " << std::showbase << std::hex << capabilities.Version << std::endl;
+        } catch (const UwbException &e) {
+            std::cerr << "failed to obtain uwb simulator capabilities (error=" << ::ToString(e.Status) << ")";
+            return -3;
+        }
     }
 
     std::cout << "initialization succeeded" << std::endl;
