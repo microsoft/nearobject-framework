@@ -61,7 +61,7 @@ public:
     virtual std::future<void>
     Reset() override;
 
-    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbDeviceInformation>>
+    virtual std::future<::uwb::protocol::fira::UwbDeviceInformation>
     GetDeviceInformation() override;
 
     virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbCapability>>

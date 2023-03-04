@@ -61,16 +61,17 @@ UwbDeviceConnector::Reset()
     return resultFuture;
 }
 
-std::future<std::tuple<UwbStatus, UwbDeviceInformation>>
+std::future<UwbDeviceInformation>
 UwbDeviceConnector::GetDeviceInformation()
 {
-    std::promise<std::tuple<UwbStatus, UwbDeviceInformation>> resultPromise;
+    std::promise<UwbDeviceInformation> resultPromise;
     auto resultFuture = resultPromise.get_future();
 
     wil::unique_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
         PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     }
 
@@ -92,6 +93,7 @@ UwbDeviceConnector::GetDeviceInformation()
             if (lastError != ERROR_INSUFFICIENT_BUFFER) {
                 HRESULT hr = HRESULT_FROM_WIN32(lastError);
                 PLOG_ERROR << "error when sending IOCTL_UWB_GET_DEVICE_INFO, hr=" << std::showbase << std::hex << hr;
+                resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Failed)));
                 break;
             }
             // Attempt to retry the ioctl with the appropriate buffer size, which is now held in bytesRequired.
@@ -99,9 +101,13 @@ UwbDeviceConnector::GetDeviceInformation()
         } else {
             PLOG_DEBUG << "IOCTL_UWB_GET_DEVICE_INFO succeeded";
             auto &deviceInformation = *reinterpret_cast<UWB_DEVICE_INFO*>(std::data(deviceInformationBuffer));
-            auto uwbDeviceInformation = UwbCxDdi::To(deviceInformation);
             auto uwbStatus = UwbCxDdi::To(deviceInformation.status);
-            resultPromise.set_value(std::make_tuple(std::move(uwbStatus), std::move(uwbDeviceInformation)));
+            if (!IsUwbStatusOk(uwbStatus)) {
+                resultPromise.set_exception(std::make_exception_ptr(UwbException(std::move(uwbStatus))));
+            } else {
+                auto uwbDeviceInformation = UwbCxDdi::To(deviceInformation);
+                resultPromise.set_value(std::move(uwbDeviceInformation));
+            }
             break;
         }
     }

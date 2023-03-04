@@ -76,21 +76,16 @@ UwbDevice::GetDeviceInformationImpl()
 {
     auto resultFuture = m_uwbDeviceConnector->GetDeviceInformation();
     if (!resultFuture.valid()) {
-        // TODO: need to do something different than just return a default-constructed object here
         PLOG_ERROR << "failed to obtain capabilities from driver";
-        return {};
+        throw std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected));
     }
 
     try {
-        auto [uwbStatus, uwbDeviceInformation] = resultFuture.get();
-        if (!IsUwbStatusOk(uwbStatus)) {
-            PLOG_ERROR << "uwb device reported an error obtaining uwb device information, status =" << ::ToString(uwbStatus);
-            return {};
-        }
+        auto uwbDeviceInformation = resultFuture.get();
         return std::move(uwbDeviceInformation);
-    } catch (std::exception& e) {
-        PLOG_ERROR << "caught exception obtaining uwb device information (" << e.what() << ")";
-        return {};
+    } catch (const UwbException& e) {
+        PLOG_ERROR << "caught exception obtaining uwb device information (" << ::ToString(e.Status) << ")";
+        throw e;
     }
 }
 
