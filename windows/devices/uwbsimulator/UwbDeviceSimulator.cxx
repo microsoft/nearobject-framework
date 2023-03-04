@@ -53,7 +53,7 @@ UwbDeviceSimulator::GetSimulatorCapabilities()
     try {
         auto simulatorCapabilities = resultFuture.get();
         return std::move(simulatorCapabilities);
-    } catch (const UwbException &e) {
+    } catch (const UwbException& e) {
         PLOG_ERROR << "caught exception obtaining simulator capabilities";
         throw e;
     }

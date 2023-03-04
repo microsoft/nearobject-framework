@@ -36,8 +36,8 @@ main(int argc, char* argv[])
     CLI::App app{};
     app.name("uwbsim");
     app.description("control and interact with uwb simulator devices");
-    bool getCapabilities{ false };
 
+    bool getCapabilities{ false };
     std::string deviceName{};
     app.add_option("--deviceName, -d", deviceName, "The uwb simulator device name (path)");
     app.add_flag("--getCapabilities", getCapabilities, "enumerate the capabilities of the simulator");
@@ -78,7 +78,7 @@ main(int argc, char* argv[])
         try {
             auto capabilities = uwbDeviceSimulator->GetSimulatorCapabilities();
             std::cout << "Capabilities: Version " << std::showbase << std::hex << capabilities.Version << std::endl;
-        } catch (const UwbException &e) {
+        } catch (const UwbException& e) {
             std::cerr << "failed to obtain uwb simulator capabilities (error=" << ::ToString(e.Status) << ")";
             return -3;
         }
