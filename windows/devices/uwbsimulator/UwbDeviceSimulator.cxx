@@ -1,7 +1,13 @@
 
+#include <exception>
+
+#include <plog/Log.h>
+
+#include <uwb/protocols/fira/UwbException.hxx>
 #include <windows/devices/uwb/simulator/UwbDeviceSimulator.hxx>
 #include <windows/devices/uwb/simulator/UwbSessionSimulator.hxx>
 
+using namespace ::uwb::protocol::fira;
 using namespace windows::devices::uwb::simulator;
 
 UwbDeviceSimulator::UwbDeviceSimulator(std::string deviceName) :
@@ -38,7 +44,17 @@ UwbDeviceSimulator::CreateSessionImpl(std::weak_ptr<::uwb::UwbSessionEventCallba
 UwbSimulatorCapabilities
 UwbDeviceSimulator::GetSimulatorCapabilities()
 {
-    UwbSimulatorCapabilities uwbSimulatorCapabilities{};
-    // TODO: invoke IOCTL_UWB_DEVICE_SIM_GET_CAPABILITIES IOCTL
-    return uwbSimulatorCapabilities;
+    auto resultFuture = m_uwbDeviceSimulatorConnector->GetCapabilites();
+    if (!resultFuture.valid()) {
+        PLOG_ERROR << "failed to obtain simulator capabilities";
+        throw UwbException(UwbStatusGeneric::Failed);
+    }
+
+    try {
+        auto simulatorCapabilities = resultFuture.get();
+        return std::move(simulatorCapabilities);
+    } catch (const UwbException& e) {
+        PLOG_ERROR << "caught exception obtaining simulator capabilities";
+        throw e;
+    }
 }
