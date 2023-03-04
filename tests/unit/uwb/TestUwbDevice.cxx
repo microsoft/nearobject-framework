@@ -31,6 +31,17 @@ struct UwbDeviceTestBase : public uwb::UwbDevice
     {
         return {};
     }
+
+    uwb::protocol::fira::UwbDeviceInformation
+    GetDeviceInformationImpl() override
+    {
+        return {};
+    }
+
+    void
+    ResetImpl() override
+    {
+    }
 };
 
 struct UwbDeviceTestDerivedOne : UwbDeviceTestBase
