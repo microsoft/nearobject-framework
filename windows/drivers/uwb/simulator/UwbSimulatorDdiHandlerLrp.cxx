@@ -499,7 +499,8 @@ UwbSimulatorDdiHandler::OnUwbSimulatorTriggerSessionEvent(WDFREQUEST request, st
     return status;
 }
 
-UwbSimulatorDdiHandler::UwbSimulatorDdiHandler() :
+UwbSimulatorDdiHandler::UwbSimulatorDdiHandler(WDFFILEOBJECT wdfFile) :
+    m_wdfFile(wdfFile),
     m_callbacks(std::make_unique<UwbSimulatorDdiCallbacks>())
 {
 }

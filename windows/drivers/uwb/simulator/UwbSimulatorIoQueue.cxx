@@ -86,6 +86,8 @@ UwbSimulatorIoQueue::OnIoDeviceControl(WDFREQUEST request, size_t outputBufferLe
     UwbSimulatorDeviceFile *uwbSimulatorDeviceFile = GetUwbSimulatorFile(WdfRequestGetFileObject(request));
     if (uwbSimulatorDeviceFile != nullptr) {
         status = uwbSimulatorDeviceFile->OnRequest(request, ioControlCode, inputBufferLength, outputBufferLength);
+    } else {
+        WdfRequestComplete(request, status);
     }
 
     TraceLoggingWrite(
