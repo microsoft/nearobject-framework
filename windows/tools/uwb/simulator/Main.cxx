@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <tuple>
 
 #include <CLI/CLI.hpp>
 #include <notstd/guid.hxx>
@@ -25,6 +26,29 @@
 using windows::devices::DeviceEnumerator;
 using namespace ::uwb::protocol::fira;
 using namespace windows::devices::uwb::simulator;
+
+namespace detail
+{
+/**
+ * @brief Decode a uwb simulator capabilities version into its component parts.
+ *
+ * @param capabilities The capabilities whose version is to be decoded.
+ * @return std::tuple<uint16_t, uint16_t> The major and minor version components, in that order.
+ */
+std::tuple<uint16_t, uint16_t>
+decodeSimulatorCapabilitiesVersion(const UwbSimulatorCapabilities& capabilities)
+{
+    static constexpr uint32_t VersionMajorMask = 0xFFFF0000U;
+    static constexpr uint32_t VersionMinorMask = 0x0000FFFFU;
+    static constexpr auto VersionMajorShift = 16U;
+    static constexpr auto VersionMinorShift = 0U;
+
+    const auto& version = capabilities.Version;
+    const uint16_t versionMajor = static_cast<uint16_t>((version & VersionMajorMask) >> VersionMajorShift);
+    const uint16_t versionMinor = static_cast<uint16_t>((version & VersionMinorMask) >> VersionMinorShift);
+    return std::make_tuple(versionMajor, versionMinor);
+}
+} // namespace detail
 
 int
 main(int argc, char* argv[])
@@ -77,7 +101,8 @@ main(int argc, char* argv[])
     if (getCapabilities) {
         try {
             auto capabilities = uwbDeviceSimulator->GetSimulatorCapabilities();
-            std::cout << "Capabilities: Version " << std::showbase << std::hex << capabilities.Version << std::endl;
+            auto [versionMajor, versionMinor] = detail::decodeSimulatorCapabilitiesVersion(capabilities);
+            std::cout << "Capabilities: Version v" << versionMajor << '.' << versionMinor << std::endl;
         } catch (const UwbException& e) {
             std::cerr << "failed to obtain uwb simulator capabilities (error=" << ::ToString(e.Status) << ")";
             return -3;
