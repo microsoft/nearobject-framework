@@ -101,8 +101,12 @@ MakeDispatchEntry(ULONG ioControlCode, typename UwbSimulatorDispatchEntry<ClassT
     };
 }
 
-namespace detail
-{
+/**
+ * @brief Sentinel type to denote that the buffer size should be unrestricted.
+ */
+struct Unrestricted
+{};
+
 /**
  * @brief Type trait to define the minimum size for a dispatch entry.
  *
@@ -111,16 +115,10 @@ namespace detail
  * @tparam T The expected type contained in the buffer.
  */
 template <typename BufferT>
-struct DispatchEntryMinimumSizeImpl
+struct DispatchEntryMinimumSize
 {
     static constexpr std::size_t value = sizeof(BufferT);
 };
-
-/**
- * @brief Sentinel type to denote that the buffer size should be unrestricted.
- */
-struct Unrestricted
-{};
 
 /**
  * @brief Specialization to enforce no minimum buffer size (0).
@@ -128,26 +126,10 @@ struct Unrestricted
  * @tparam Sentinel Unrestricted type.
  */
 template <>
-struct DispatchEntryMinimumSizeImpl<Unrestricted>
+struct DispatchEntryMinimumSize<Unrestricted>
 {
     static constexpr std::size_t value = 0;
 };
-
-/**
- * @brief Helper alias to resolve the type value of the
- * DispatchEntryMinimumSizeImpl trait, which denotes the size of the buffer.
- *
- * @tparam T The expected type contained in the buffer.
- */
-template <typename BufferT>
-inline constexpr std::size_t DispatchEntryMinimumSizeImpl_v = DispatchEntryMinimumSizeImpl<BufferT>::value;
-
-} // namespace detail
-
-/**
- * @brief Helper type to denote that the buffer size should not be restricted.
- */
-using Unrestricted = detail::DispatchEntryMinimumSizeImpl<detail::Unrestricted>;
 
 /**
  * @brief Helper function to create a UwbSimulatorDispatchEntry that uses the
@@ -174,8 +156,8 @@ MakeDispatchEntry(ULONG ioControlCode, typename UwbSimulatorDispatchEntry<ClassT
     return MakeDispatchEntry<ClassT>(
         ioControlCode,
         handler,
-        detail::DispatchEntryMinimumSizeImpl_v<InputT>,
-        detail::DispatchEntryMinimumSizeImpl_v<OutputT>);
+        DispatchEntryMinimumSize<InputT>::value,
+        DispatchEntryMinimumSize<OutputT>::value);
 }
 } // namespace windows::devices::uwb::simulator
 
