@@ -44,8 +44,8 @@ decodeSimulatorCapabilitiesVersion(const UwbSimulatorCapabilities& capabilities)
     static constexpr auto VersionMinorShift = 0U;
 
     const auto& version = capabilities.Version;
-    const uint16_t versionMajor = static_cast<uint16_t>((version & VersionMajorMask) >> VersionMajorShift);
-    const uint16_t versionMinor = static_cast<uint16_t>((version & VersionMinorMask) >> VersionMinorShift);
+    const auto versionMajor = static_cast<uint16_t>((version & VersionMajorMask) >> VersionMajorShift);
+    const auto versionMinor = static_cast<uint16_t>((version & VersionMinorMask) >> VersionMinorShift);
     return std::make_tuple(versionMajor, versionMinor);
 }
 } // namespace detail
