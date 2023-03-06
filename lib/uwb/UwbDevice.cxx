@@ -199,6 +199,14 @@ UwbDevice::Reset()
 }
 
 bool
+UwbDevice::Initialize()
+{
+    // TODO: Either make this do something useful, or make function pure virtual
+    // and have every derived class implement it
+    return true;
+}
+
+bool
 uwb::operator==(const UwbDevice& lhs, const UwbDevice& rhs) noexcept
 {
     return (typeid(lhs) == typeid(rhs)) && lhs.IsEqual(rhs);

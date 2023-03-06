@@ -32,7 +32,7 @@ UwbDevice::DeviceName() const noexcept
     return m_deviceName;
 }
 
-void
+bool
 UwbDevice::Initialize()
 {
     m_uwbDeviceConnector = std::make_shared<UwbDeviceConnector>(m_deviceName);
@@ -40,6 +40,7 @@ UwbDevice::Initialize()
         // Invoke base class notification handler which takes care of threading.
         ::UwbDevice::OnUwbNotification(std::move(uwbNotificationData));
     });
+    return true;
 }
 
 std::shared_ptr<uwb::UwbSession>

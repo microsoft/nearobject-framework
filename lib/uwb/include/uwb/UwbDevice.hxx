@@ -52,6 +52,12 @@ public:
     Reset();
 
     /**
+     * @brief Initializes a new UWB device
+     */
+    virtual bool
+    Initialize();
+
+    /**
      * @brief Determine if this device is the same as another.
      *
      * @param other

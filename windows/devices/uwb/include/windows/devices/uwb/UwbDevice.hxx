@@ -52,10 +52,11 @@ public:
 
     /**
      * @brief Initialize the device.
-     * TODO: return type needs to convey whether this worked.
+     *
+     * @return bool
      */
-    void
-    Initialize();
+    bool
+    Initialize() override;
 
     /**
      * @brief Determine if this device is the same as another.
