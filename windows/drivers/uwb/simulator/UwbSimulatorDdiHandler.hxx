@@ -20,7 +20,7 @@ class UwbSimulatorDdiHandler :
     public IUwbSimulatorDdiHandler
 {
 public:
-    UwbSimulatorDdiHandler();
+    explicit UwbSimulatorDdiHandler(WDFFILEOBJECT wdfFile);
 
     /**
      * @brief Indicates whether the specified i/o control code is handled by
@@ -123,6 +123,7 @@ private:
     static const std::initializer_list<windows::devices::uwb::simulator::UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>> Dispatch;
 
 private:
+    WDFFILEOBJECT m_wdfFile;
     std::unique_ptr<windows::devices::uwb::simulator::UwbSimulatorDdiCallbacks> m_callbacks;
 };
 } // namespace windows::devices::uwb::simulator

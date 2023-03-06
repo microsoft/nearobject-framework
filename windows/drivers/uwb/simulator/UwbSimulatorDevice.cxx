@@ -1,9 +1,12 @@
 
 #include <memory>
 
+#include "UwbSimulatorDdiHandler.hxx"
 #include "UwbSimulatorDevice.hxx"
 #include "UwbSimulatorDeviceFile.hxx"
 #include "UwbSimulatorTracelogging.hxx"
+
+using windows::devices::uwb::simulator::UwbSimulatorDdiHandler;
 
 UwbSimulatorDevice::UwbSimulatorDevice(WDFDEVICE wdfDevice) :
     m_wdfDevice(wdfDevice)
@@ -167,6 +170,8 @@ UwbSimulatorDevice::OnFileCreate(WDFDEVICE device, WDFREQUEST request, WDFFILEOB
 
     auto uwbSimulatorFileBuffer = GetUwbSimulatorFile(file);
     auto uwbSimulatorFile [[maybe_unused]] = new (uwbSimulatorFileBuffer) UwbSimulatorDeviceFile(file);
+    auto uwbSimulatorHandler = std::make_unique<UwbSimulatorDdiHandler>(file);
+    uwbSimulatorFile->RegisterHandler(std::move(uwbSimulatorHandler));
 
     // TODO: Here, uwbSimulatorFile should be associated with the DDI it is responsible for handling.
     // It could make sense for it to use the pimpl idiom since the storage for the class is pre-allocated
