@@ -85,6 +85,20 @@ private:
     virtual ::uwb::protocol::fira::UwbCapability
     GetCapabilitiesImpl() override;
 
+    /**
+     * @brief Get the FiRa device information of the device.
+     * 
+     * @return ::uwb::protocol::fira::UwbDeviceInformation 
+     */
+    virtual ::uwb::protocol::fira::UwbDeviceInformation
+    GetDeviceInformationImpl() override;
+
+    /**
+     * @brief Reset the device to an initial clean state. 
+     */
+    virtual void
+    ResetImpl() override;
+
 private:
     const std::string m_deviceName;
     std::shared_ptr<UwbDeviceConnector> m_uwbDeviceConnector;

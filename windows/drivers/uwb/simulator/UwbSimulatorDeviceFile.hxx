@@ -20,6 +20,14 @@ public:
     explicit UwbSimulatorDeviceFile(WDFFILEOBJECT wdfFile);
 
     /**
+     * @brief Register a DDI handler with this file instance.
+     *
+     * @param handler The handler to register.
+     */
+    void
+    RegisterHandler(std::unique_ptr<windows::devices::uwb::simulator::IUwbSimulatorDdiHandler> handler);
+
+    /**
      * @brief Device i/o control handler function.
      *
      * This is invoked when the driver receives an i/o control request on the

@@ -329,7 +329,7 @@ UwbDeviceInformationWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbDeviceInformation &uwbDeviceInfo)
 {
     std::size_t numElements = 0;
-    std::span<uint8_t> vendorSpecificInfo;
+    std::span<const uint8_t> vendorSpecificInfo;
 
     if (uwbDeviceInfo.VendorSpecificInfo != nullptr) {
         vendorSpecificInfo = uwbDeviceInfo.VendorSpecificInfo->GetData();
@@ -1083,6 +1083,48 @@ windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_STATUS &sessionStatus)
         .State = To(sessionStatus.state),
         .ReasonCode = To(sessionStatus.reasonCode)
     };
+}
+
+namespace detail
+{
+/**
+ * @brief Untyped UwbDeviceInfoVendor implementation that stores the data in a vector.
+ */
+class UwbDeviceInfoVendorImpl :
+    public UwbDeviceInfoVendor
+{
+public:
+    UwbDeviceInfoVendorImpl(const uint8_t *data, std::size_t length) :
+        m_data(data, data + length)
+    {}
+
+    std::span<const uint8_t>
+    GetData() const noexcept override
+    {
+        return std::span<const uint8_t>(std::data(m_data), std::size(m_data));
+    }
+
+private:
+    std::vector<uint8_t> m_data;
+};
+} // namespace detail
+
+UwbDeviceInformation
+windows::devices::uwb::ddi::lrp::To(const UWB_DEVICE_INFO &deviceInfo)
+{
+    UwbDeviceInformation uwbDeviceInformation{
+        .VersionUci = UwbVersion::FromUci(deviceInfo.uciGenericVersionMajor, deviceInfo.uciGenericVersionMinorAndMaintenance),
+        .VersionUciTest = UwbVersion::FromUci(deviceInfo.uciTestVersionMajor, deviceInfo.uciTestVersionMinorAndMaintenance),
+        .VersionMac = UwbVersion::FromUci(deviceInfo.macVersionMajor, deviceInfo.macVersionMinorAndMaintenance),
+        .VersionPhy = UwbVersion::FromUci(deviceInfo.phyVersionMajor, deviceInfo.phyVersionMinorAndMaintenance),
+        .Status = To(deviceInfo.status),
+    };
+
+    if (deviceInfo.vendorSpecificInfoLength > 0) {
+        uwbDeviceInformation.VendorSpecificInfo = std::make_shared<detail::UwbDeviceInfoVendorImpl>(&deviceInfo.vendorSpecificInfo[0], deviceInfo.vendorSpecificInfoLength);
+    }
+
+    return uwbDeviceInformation;
 }
 
 UwbNotificationData

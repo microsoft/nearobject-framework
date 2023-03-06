@@ -58,7 +58,7 @@ public:
 
 public:
     // IUwbDeviceDdi
-    virtual std::future<::uwb::protocol::fira::UwbStatus>
+    virtual std::future<void>
     Reset() override;
 
     virtual std::future<::uwb::protocol::fira::UwbDeviceInformation>
@@ -96,17 +96,6 @@ public:
 
     virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>>>>
     SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> applicationConfigurationParameters) override;
-
-protected:
-    /**
-     * @brief Open a new handle to the driver.
-     *
-     * @param driverHandle The driver handle to update.
-     * @param isOverlapped Whether overlapped (async) i/o is requested on the handle.
-     * @return HRESULT
-     */
-    HRESULT
-    OpenDriverHandle(wil::shared_hfile& driverHandle, bool isOverlapped) noexcept;
 
 private:
     /**

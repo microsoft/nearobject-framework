@@ -11,9 +11,6 @@
 
 #include <nearobject/cli/NearObjectCli.hxx>
 #include <nearobject/cli/NearObjectCliUwbSessionEventCallbacks.hxx>
-#include <windows/devices/DeviceEnumerator.hxx>
-#include <windows/devices/DevicePresenceMonitor.hxx>
-#include <windows/devices/uwb/UwbDevice.hxx>
 
 #include <plog/Appenders/ColorConsoleAppender.h>
 #include <plog/Appenders/DebugOutputAppender.h>

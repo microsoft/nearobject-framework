@@ -7,9 +7,11 @@ set(WINDEVUTIL_DIR_PUBLIC_INCLUDE_PREFIX ${WINDEVUTIL_DIR_PUBLIC_INCLUDE}/window
 target_sources(windev-util
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/DeviceEnumerator.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/DeviceHandle.cxx
         ${CMAKE_CURRENT_LIST_DIR}/DevicePresenceMonitor.cxx
     PUBLIC
         ${WINDEVUTIL_DIR_PUBLIC_INCLUDE_PREFIX}/DeviceEnumerator.hxx
+        ${WINDEVUTIL_DIR_PUBLIC_INCLUDE_PREFIX}/DeviceHandle.hxx
         ${WINDEVUTIL_DIR_PUBLIC_INCLUDE_PREFIX}/DevicePresenceMonitor.hxx
         ${WINDEVUTIL_DIR_PUBLIC_INCLUDE_PREFIX}/DeviceResource.hxx
 )
@@ -30,6 +32,7 @@ target_link_libraries(windev-util
 
 list(APPEND WINDEVUTIL_PUBLIC_HEADERS
     ${WINDEVUTIL_DIR_PUBLIC_INCLUDE_PREFIX}/DeviceEnumerator.hxx
+    ${WINDEVUTIL_DIR_PUBLIC_INCLUDE_PREFIX}/DeviceHandle.hxx
     ${WINDEVUTIL_DIR_PUBLIC_INCLUDE_PREFIX}/DevicePresenceMonitor.hxx
     ${WINDEVUTIL_DIR_PUBLIC_INCLUDE_PREFIX}/DeviceResource.hxx
 )

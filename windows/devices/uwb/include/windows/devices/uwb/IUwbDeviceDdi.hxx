@@ -19,7 +19,7 @@ namespace windows::devices::uwb
 struct IUwbDeviceDdi
 {
     // IOCTL_UWB_DEVICE_RESET
-    virtual std::future<::uwb::protocol::fira::UwbStatus>
+    virtual std::future<void>
     Reset() = 0;
 
     // IOCTL_UWB_GET_DEVICE_INFO
