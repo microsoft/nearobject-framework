@@ -106,7 +106,6 @@ UwbDeviceInformation::ToString() const
 {
     std::ostringstream ss;
     if (IsUwbStatusOk(Status)) {
-        ss << "Status: " << ::ToString(Status) << "\n";
         ss << "FiRa Uci v" << VersionUci << ", "
            << "FiRa Uci Test v" << VersionUciTest << ", "
            << "FiRa MAC v" << VersionMac << ", "

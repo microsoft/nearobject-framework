@@ -53,6 +53,8 @@ public:
 
     /**
      * @brief Initializes a new UWB device
+     * 
+     * @return bool
      */
     virtual bool
     Initialize();

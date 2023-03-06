@@ -333,13 +333,12 @@ NearObjectCli::AddSubcommandUwbRawGetDeviceInfo(CLI::App* parent)
         if (!uwbDevice) {
             std::cerr << "no device found" << std::endl;
             return;
-        }
-        
-        if (uwbDevice->Initialize()) {
-            m_cliHandler->HandleGetDeviceInfo(uwbDevice);
-        } else {
+        }      
+        if (!uwbDevice->Initialize()) {
             std::cerr << "device not initialized" << std::endl;
         }
+
+        m_cliHandler->HandleGetDeviceInfo(uwbDevice);
     });
 
     return rawGetDeviceInfoApp;
