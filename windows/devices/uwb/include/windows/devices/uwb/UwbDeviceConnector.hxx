@@ -9,10 +9,12 @@
 #include <thread>
 #include <tuple>
 #include <vector>
+#include <unordered_map>
 
-#include <wil/resource.h>
-
+#include <uwb/UwbDeviceEventCallbacks.hxx>
+#include <uwb/UwbSessionEventCallbacks.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
+#include <wil/resource.h>
 #include <windows/devices/uwb/IUwbDeviceDdi.hxx>
 
 namespace windows::devices::uwb
@@ -55,6 +57,23 @@ public:
      */
     void
     NotificationListenerStop();
+
+    /**
+     * @brief Registers the callbacks for a particular session
+     *
+     * @param sessionId
+     * @param callbacks
+     */
+    void
+    RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbSessionEventCallbacks callbacks);
+
+    /**
+     * @brief Sets the callbacks for the UwbDevice that owns this UwbDeviceConnector
+     *
+     * @param callbacks
+     */
+    void
+    RegisterDeviceEventCallbacks(::uwb::UwbDeviceEventCallbacks callbacks);
 
 public:
     // IUwbDeviceDdi
@@ -109,6 +128,8 @@ private:
     HandleNotifications(wil::shared_hfile handleDriver, std::stop_token stopToken, std::function<void(::uwb::protocol::fira::UwbNotificationData)> onNotification);
 
 private:
+    std::unordered_map<uint32_t, ::uwb::UwbSessionEventCallbacks> m_sessionEventCallbacks;
+    ::uwb::UwbDeviceEventCallbacks m_deviceEventCallbacks;
     std::string m_deviceName{};
     std::jthread m_notificationThread;
 };

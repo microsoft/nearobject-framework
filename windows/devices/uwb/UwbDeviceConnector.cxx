@@ -83,7 +83,7 @@ UwbDeviceConnector::GetDeviceInformation()
     // the case, the first attempt will succeed. Otherwise, the buffer is grown
     // to account for the vendor specific information, and the IOCTL attempted a
     // second time.
-    for (const auto i : std::ranges::iota_view{1,2}) {
+    for (const auto i : std::ranges::iota_view{ 1, 2 }) {
         deviceInformationBuffer.resize(bytesRequired);
         PLOG_DEBUG << "IOCTL_UWB_GET_DEVICE_INFO attempt #" << i << " with " << std::size(deviceInformationBuffer) << "-byte buffer";
         BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_DEVICE_INFO, nullptr, 0, std::data(deviceInformationBuffer), std::size(deviceInformationBuffer), &bytesRequired, nullptr);
@@ -100,7 +100,7 @@ UwbDeviceConnector::GetDeviceInformation()
             continue;
         } else {
             PLOG_DEBUG << "IOCTL_UWB_GET_DEVICE_INFO succeeded";
-            auto &deviceInformation = *reinterpret_cast<UWB_DEVICE_INFO*>(std::data(deviceInformationBuffer));
+            auto& deviceInformation = *reinterpret_cast<UWB_DEVICE_INFO*>(std::data(deviceInformationBuffer));
             auto uwbStatus = UwbCxDdi::To(deviceInformation.status);
             if (!IsUwbStatusOk(uwbStatus)) {
                 resultPromise.set_exception(std::make_exception_ptr(UwbException(std::move(uwbStatus))));
@@ -323,4 +323,16 @@ void
 UwbDeviceConnector::NotificationListenerStop()
 {
     m_notificationThread.request_stop();
+}
+
+void
+UwbDeviceConnector::RegisterDeviceEventCallbacks(::uwb::UwbDeviceEventCallbacks callbacks)
+{
+    m_deviceEventCallbacks = callbacks;
+}
+
+void
+UwbDeviceConnector::RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbSessionEventCallbacks callbacks)
+{
+    m_sessionEventCallbacks.insert_or_assign(sessionId, callbacks);
 }
