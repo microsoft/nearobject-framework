@@ -47,16 +47,27 @@ UwbDeviceConnector::Reset()
         return resultFuture;
     }
 
+    const UWB_DEVICE_RESET deviceReset{
+        .size = sizeof(UWB_DEVICE_RESET),
+        .resetConfig = UWB_RESET_CONFIG_UWBS_RESET,
+    };
     UWB_STATUS status;
-    BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_DEVICE_RESET, nullptr, 0, &status, sizeof status, nullptr, nullptr);
+
+    BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_DEVICE_RESET, const_cast<UWB_DEVICE_RESET*>(&deviceReset), sizeof deviceReset, &status, sizeof status, nullptr, nullptr);
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
         PLOG_ERROR << "error when sending IOCTL_UWB_DEVICE_RESET, hr=" << std::showbase << std::hex << hr;
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Failed)));
         return resultFuture;
+    } else {
+        PLOG_DEBUG << "IOCTL_UWB_DEVICE_RESET succeeded";
+        auto uwbStatus = UwbCxDdi::To(status);
+        if (!IsUwbStatusOk(uwbStatus)) {
+            resultPromise.set_exception(std::make_exception_ptr(UwbException(std::move(uwbStatus))));
+        } else {
+            resultPromise.set_value();
+        }
     }
-
-    resultPromise.set_value();
 
     return resultFuture;
 }
