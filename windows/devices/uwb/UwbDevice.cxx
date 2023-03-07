@@ -101,6 +101,7 @@ bool
 UwbDevice::InitializeImpl()
 {
     m_uwbDeviceConnector = std::make_shared<UwbDeviceConnector>(m_deviceName);
+    m_uwbDeviceConnector->RegisterDeviceEventCallbacks(m_callbacks);
     m_uwbDeviceConnector->NotificationListenerStart([this](auto&& uwbNotificationData) {
         // Invoke base class notification handler which takes care of threading.
         ::UwbDevice::OnUwbNotification(std::move(uwbNotificationData));

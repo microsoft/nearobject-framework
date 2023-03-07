@@ -42,11 +42,6 @@ enum class UwbSessionEndReason {
  * @brief Interface for receiving events from a UwbSession. This is the primary
  * method to receive information from near peers.
  *
- * A pointer to the UwbSession for which the callbacks are bound is provided in
- * each callback. This enables using the same callback object instance with
- * multiple sessions where the pointer value can be used to lookup the
- * associated session for the event. This pointer must not be cached nor used
- * beyond execution of the callback.
  */
 struct UwbSessionEventCallbacks
 {
@@ -56,21 +51,21 @@ struct UwbSessionEventCallbacks
      * @param session The session for which the event occurred.
      * @param reason The reason the session ended.
      */
-    std::function<void(UwbSession *session, UwbSessionEndReason reason)> OnSessionEnded;
+    std::function<void(UwbSessionEndReason reason)> OnSessionEnded;
 
     /**
      * @brief Invoked when active ranging starts.
      *
      * @param session The session for which the event occurred.
      */
-    std::function<void(UwbSession *session)> OnRangingStarted;
+    std::function<void()> OnRangingStarted;
 
     /**
      * @brief Invoked when active ranging stops.
      *
      * @param session The session for which the event occurred.
      */
-    std::function<void(UwbSession *session)> OnRangingStopped;
+    std::function<void()> OnRangingStopped;
 
     /**
      * @brief Invoked when the properties of a peer involved in the session
@@ -79,7 +74,7 @@ struct UwbSessionEventCallbacks
      * @param session The session for which the event occurred.
      * @param peersChanged A list of peers whose properties changed.
      */
-    std::function<void(UwbSession *session, const std::vector<UwbPeer> peersChanged)> OnPeerPropertiesChanged;
+    std::function<void(const std::vector<UwbPeer> peersChanged)> OnPeerPropertiesChanged;
 
     /**
      * @brief Invoked when membership of one or more near peers involved in
@@ -90,7 +85,7 @@ struct UwbSessionEventCallbacks
      * @param peersAdded A list of peers that were added to the session.
      * @param peersRemoved A list of peers that were removed from the session.
      */
-    std::function<void(UwbSession *session, const std::vector<UwbPeer> peersAdded, const std::vector<UwbPeer> peersRemoved)> OnSessionMembershipChanged;
+    std::function<void(const std::vector<UwbPeer> peersAdded, const std::vector<UwbPeer> peersRemoved)> OnSessionMembershipChanged;
 };
 } // namespace uwb
 

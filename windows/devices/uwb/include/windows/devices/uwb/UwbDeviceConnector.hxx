@@ -65,7 +65,7 @@ public:
      * @param callbacks
      */
     void
-    RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbSessionEventCallbacks callbacks);
+    RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks);
 
     /**
      * @brief Sets the callbacks for the UwbDevice that owns this UwbDeviceConnector
@@ -73,7 +73,7 @@ public:
      * @param callbacks
      */
     void
-    RegisterDeviceEventCallbacks(::uwb::UwbDeviceEventCallbacks callbacks);
+    RegisterDeviceEventCallbacks(std::vector<::uwb::UwbDeviceEventCallbacks> callbacks);
 
 public:
     // IUwbDeviceDdi
@@ -125,11 +125,35 @@ private:
      * @param onNotification The callback function to invoke for each notification.
      */
     void
-    HandleNotifications(wil::shared_hfile handleDriver, std::stop_token stopToken, std::function<void(::uwb::protocol::fira::UwbNotificationData)> onNotification);
+    HandleNotifications(wil::shared_hfile handleDriver, std::stop_token stopToken);
+
+    /**
+     * @brief Responsible for calling the relevant registered callbacks for the uwbNotificationData
+     * 
+     * @param uwbNotificationData 
+     */
+    void
+    DispatchCallbacks(UwbNotificationData uwbNotificationData);
+
+    /**
+     * @brief Internal function that prepares the notification for processing by the m_sessionEventCallbacks
+     * 
+     * @param statusMulticastList 
+     */
+    void
+    OnSessionMulticastListStatus(UwbSessionUpdateMulicastListStatus statusMulticastList);
+
+    /**
+     * @brief Internal function that prepares the notification for processing by the m_sessionEventCallbacks
+     * 
+     * @param rangingData 
+     */
+    void
+    OnSessionRangingData(UwbRangingData rangingData);
 
 private:
-    std::unordered_map<uint32_t, ::uwb::UwbSessionEventCallbacks> m_sessionEventCallbacks;
-    ::uwb::UwbDeviceEventCallbacks m_deviceEventCallbacks;
+    std::unordered_map<uint32_t, std::weak_ptr<::uwb::UwbSessionEventCallbacks>> m_sessionEventCallbacks;
+    std::vector<::uwb::UwbDeviceEventCallbacks> m_deviceEventCallbacks;
     std::string m_deviceName{};
     std::jthread m_notificationThread;
 };

@@ -7,6 +7,7 @@
 #include <plog/Log.h>
 #include <wil/result.h>
 
+#include <uwb/UwbPeer.hxx>
 #include <uwb/protocols/fira/UwbException.hxx>
 #include <windows/devices/DeviceHandle.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
@@ -259,7 +260,7 @@ UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, st
 }
 
 void
-UwbDeviceConnector::HandleNotifications(wil::shared_hfile handleDriver, std::stop_token stopToken, std::function<void(UwbNotificationData)> onNotification)
+UwbDeviceConnector::HandleNotifications(wil::shared_hfile handleDriver, std::stop_token stopToken)
 {
     // TODO: the below loop invokes the IOCTL synchronously, blocking on a
     // result. There is no known way to cancel the blocking call on the client
@@ -297,9 +298,123 @@ UwbDeviceConnector::HandleNotifications(wil::shared_hfile handleDriver, std::sto
         const UWB_NOTIFICATION_DATA& notificationData = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
         auto uwbNotificationData = UwbCxDdi::To(notificationData);
 
-        // Invoke callback with notification data.
-        onNotification(std::move(uwbNotificationData));
+        // Invoke callbacks with notification data.
+        // Handle the notification in a fire-and-forget fashion. This may change
+        // later. Since std::async returns a future, and the future's
+        // destructor waits for it to complete, we cannot just ignore the
+        // returned future. To work around this, we move the returned future
+        // into a shared_ptr, then pass this by value to the std::async's
+        // lambda, increasing its reference count. This will ensure the future
+        // is automatically destructed once the async lambda has completed.
+        auto notificationHandlerFuture = std::make_shared<std::future<void>>();
+        *notificationHandlerFuture = std::async(std::launch::async, [this, notificationHandlerFuture, uwbNotificationData = std::move(uwbNotificationData)]() {
+            DispatchCallbacks(std::move(uwbNotificationData));
+        });
     }
+}
+
+void
+UwbDeviceConnector::OnSessionMulticastListStatus(UwbSessionUpdateMulicastListStatus statusMulticastList)
+{
+    uint32_t sessionId = statusMulticastList.SessionId;
+    auto it = m_sessionEventCallbacks.find(sessionId);
+    if (it == std::end(m_sessionEventCallbacks)) {
+        PLOG_WARNING << "Ignoring MulticastListStatus event due to missing session callback";
+        return;
+    }
+
+    auto callbacks = it->second.lock();
+    if (not(callbacks->OnSessionMembershipChanged)) {
+        PLOG_WARNING << "Ignoring MulticastListStatus event due to missing session callback";
+        return;
+    }
+
+    std::vector<::uwb::UwbPeer> peersAdded;
+    for (const auto& peer : statusMulticastList.Status) {
+        if (peer.Status == UwbStatusMulticast::OkUpdate) {
+            peersAdded.push_back(::uwb::UwbPeer{ peer.ControleeMacAddress });
+        }
+    }
+
+    PLOG_VERBOSE << "Session with id " << statusMulticastList.SessionId << " executing callback for adding peers";
+    callbacks->OnSessionMembershipChanged(peersAdded, {});
+
+    // Now log the bad status
+    IF_PLOG(plog::verbose)
+    {
+        for (const auto& peer : statusMulticastList.Status) {
+            if (peer.Status != UwbStatusMulticast::OkUpdate) {
+                PLOG_VERBOSE << "peer has bad status: " << peer.ToString();
+            }
+        }
+    }
+}
+
+void
+UwbDeviceConnector::OnSessionRangingData(UwbRangingData rangingData)
+{
+    uint32_t sessionId = rangingData.SessionId;
+    auto it = m_sessionEventCallbacks.find(sessionId);
+    if (it == std::end(m_sessionEventCallbacks)) {
+        PLOG_WARNING << "Ignoring RangingData event due to missing session callback";
+        return;
+    }
+    auto callbacks = it->second.lock();
+    if (not(callbacks->OnPeerPropertiesChanged)) {
+        PLOG_WARNING << "Ignoring RangingData event due to missing session callback";
+        return;
+    }
+
+    PLOG_VERBOSE << "Session with id " << rangingData.SessionId << " processing new ranging data";
+    std::vector<::uwb::UwbPeer> peersData;
+    peersData.reserve(rangingData.RangingMeasurements.size());
+    for (const auto& peerData : rangingData.RangingMeasurements) {
+        ::uwb::UwbPeer data{ peerData };
+        PLOG_VERBOSE << "Peer data: " << data.ToString();
+        peersData.push_back(std::move(data));
+    }
+
+    callbacks->OnPeerPropertiesChanged(peersData);
+}
+
+void
+UwbDeviceConnector::DispatchCallbacks(UwbNotificationData uwbNotificationData)
+{
+    std::visit([this](auto&& arg) {
+        using ValueType = std::decay_t<decltype(arg)>;
+
+        if constexpr (std::is_same_v<ValueType, UwbStatus>) {
+            for (const auto& deviceEventCallback : m_deviceEventCallbacks) {
+                if (not deviceEventCallback.OnStatusChanged) {
+                    PLOG_WARNING << "Ignoring StatusChanged event due to missing callback";
+                    continue;
+                }
+                deviceEventCallback.OnStatusChanged(arg);
+            }
+
+        } else if constexpr (std::is_same_v<ValueType, UwbStatusDevice>) {
+            for (const auto& deviceEventCallback : m_deviceEventCallbacks) {
+                if (not deviceEventCallback.OnDeviceStatusChanged) {
+                    PLOG_WARNING << "Ignoring OnDeviceStatusChanged event due to missing callback";
+                    continue;
+                }
+                deviceEventCallback.OnDeviceStatusChanged(arg);
+            }
+        } else if constexpr (std::is_same_v<ValueType, UwbSessionStatus>) {
+            for (const auto& deviceEventCallback : m_deviceEventCallbacks) {
+                if (not deviceEventCallback.OnSessionStatusChanged) {
+                    PLOG_WARNING << "Ignoring OnSessionStatusChanged event due to missing callback";
+                    continue;
+                }
+                deviceEventCallback.OnSessionStatusChanged(arg);
+            }
+        } else if constexpr (std::is_same_v<ValueType, UwbSessionUpdateMulicastListStatus>) {
+            OnSessionMulticastListStatus(arg);
+        } else if constexpr (std::is_same_v<ValueType, UwbRangingData>) {
+            OnSessionRangingData(arg);
+        }
+    },
+        uwbNotificationData);
 }
 
 bool
@@ -313,7 +428,7 @@ UwbDeviceConnector::NotificationListenerStart(std::function<void(::uwb::protocol
     }
 
     m_notificationThread = std::jthread([this, handleDriver = std::move(handleDriver), onNotification = std::move(onNotification)](std::stop_token stopToken) {
-        HandleNotifications(std::move(handleDriver), stopToken, std::move(onNotification));
+        HandleNotifications(std::move(handleDriver), stopToken);
     });
 
     return true;
@@ -326,13 +441,13 @@ UwbDeviceConnector::NotificationListenerStop()
 }
 
 void
-UwbDeviceConnector::RegisterDeviceEventCallbacks(::uwb::UwbDeviceEventCallbacks callbacks)
+UwbDeviceConnector::RegisterDeviceEventCallbacks(std::vector<::uwb::UwbDeviceEventCallbacks> callbacks)
 {
     m_deviceEventCallbacks = callbacks;
 }
 
 void
-UwbDeviceConnector::RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbSessionEventCallbacks callbacks)
+UwbDeviceConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
 {
     m_sessionEventCallbacks.insert_or_assign(sessionId, callbacks);
 }
