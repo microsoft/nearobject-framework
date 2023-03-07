@@ -272,6 +272,9 @@ UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, st
 void
 UwbDeviceConnector::HandleNotifications(wil::shared_hfile handleDriver, std::stop_token stopToken, std::function<void(UwbNotificationData)> onNotification)
 {
+    std::vector<uint8_t> uwbNotificationDataBuffer{};
+    DWORD bytesRequired = 0;
+
     // TODO: the below loop invokes the IOCTL synchronously, blocking on a
     // result. There is no known way to cancel the blocking call on the client
     // side; as such, even when stop is requested on the stop token, it cannot
@@ -280,36 +283,26 @@ UwbDeviceConnector::HandleNotifications(wil::shared_hfile handleDriver, std::sto
     // The correct solution here is to open the handle in overlapped mode, and
     // make a non-blocking call. This is not trivial, so will be done later.
     while (!stopToken.stop_requested()) {
-        // Determine the amount of memory required for the UWB_NOTIFICATION_DATA from the driver.
-        DWORD bytesRequired = 0;
-        BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, nullptr, 0, &bytesRequired, nullptr);
-        if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
-            HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-            PLOG_ERROR << "error determining output buffer size for UWB notification, hr=" << std::showbase << std::hex << hr;
-            continue;
+        for (const auto i : std::ranges::iota_view{1,2}) {
+            uwbNotificationDataBuffer.resize(bytesRequired);
+            PLOG_DEBUG << "IOCTL_UWB_NOTIFICATION attempt #" << i << " with " << std::size(uwbNotificationDataBuffer) << "-byte buffer";
+            BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_DEVICE_INFO, nullptr, 0, std::data(uwbNotificationDataBuffer), std::size(uwbNotificationDataBuffer), &bytesRequired, nullptr);
+            if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
+                DWORD lastError = GetLastError();
+                // Treat all errors other than insufficient buffer size as fatal.
+                if (lastError != ERROR_INSUFFICIENT_BUFFER) {
+                    HRESULT hr = HRESULT_FROM_WIN32(lastError);
+                    PLOG_ERROR << "error when sending IOCTL_UWB_NOTIFICATION, hr=" << std::showbase << std::hex << hr;
+                    break;
+                }
+                // Attempt to retry the ioctl with the appropriate buffer size, which is now held in bytesRequired.
+                continue;
+            } else {
+                // Convert to neutral type and process the notification.
+                const UWB_NOTIFICATION_DATA& notificationData = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
+                auto uwbNotificationData = UwbCxDdi::To(notificationData);
+            }
         }
-
-        // Allocate memory for the UWB_NOTIFICATION_DATA structure, and pass this to the driver request.
-        DWORD uwbNotificationDataSize = bytesRequired;
-        std::vector<uint8_t> uwbNotificationDataBuffer(uwbNotificationDataSize);
-        ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, std::data(uwbNotificationDataBuffer), uwbNotificationDataSize, &bytesRequired, nullptr);
-        if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
-            HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-            PLOG_ERROR << "error obtaining UWB notification buffer, hr=" << std::showbase << std::hex << hr;
-            continue;
-        }
-
-        // Log a message if the output buffer is not aligned to UWB_NOTIFICATION_DATA. Ignore it for now as this should not occur often.
-        if (reinterpret_cast<uintptr_t>(std::data(uwbNotificationDataBuffer)) % alignof(UWB_NOTIFICATION_DATA) != 0) {
-            PLOG_ERROR << "driver output buffer is unaligned! undefined behavior may result";
-        }
-
-        // Convert to neutral type and process the notification.
-        const UWB_NOTIFICATION_DATA& notificationData = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
-        auto uwbNotificationData = UwbCxDdi::To(notificationData);
-
-        // Invoke callback with notification data.
-        onNotification(std::move(uwbNotificationData));
     }
 }
 
