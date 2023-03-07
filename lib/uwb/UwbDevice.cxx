@@ -201,6 +201,13 @@ UwbDevice::Reset()
 bool
 UwbDevice::Initialize()
 {
+    PLOG_INFO << "Initialize";
+    return InitializeImpl();
+}
+
+bool
+UwbDevice::InitializeImpl()
+{
     return true;
 }
 

@@ -56,7 +56,7 @@ public:
      * 
      * @return bool
      */
-    virtual bool
+    bool
     Initialize();
 
     /**
@@ -105,6 +105,14 @@ private:
      */
     virtual void
     ResetImpl() = 0;
+
+    /**
+     * @brief Initializes a new UWB device.
+     * 
+     * @return bool
+     */
+    virtual bool
+    InitializeImpl();
 
 protected:
     /**

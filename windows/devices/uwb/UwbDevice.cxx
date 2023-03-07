@@ -32,17 +32,6 @@ UwbDevice::DeviceName() const noexcept
     return m_deviceName;
 }
 
-bool
-UwbDevice::Initialize()
-{
-    m_uwbDeviceConnector = std::make_shared<UwbDeviceConnector>(m_deviceName);
-    m_uwbDeviceConnector->NotificationListenerStart([this](auto&& uwbNotificationData) {
-        // Invoke base class notification handler which takes care of threading.
-        ::UwbDevice::OnUwbNotification(std::move(uwbNotificationData));
-    });
-    return true;
-}
-
 std::shared_ptr<uwb::UwbSession>
 UwbDevice::CreateSessionImpl(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
 {
@@ -106,6 +95,17 @@ UwbDevice::ResetImpl()
         PLOG_ERROR << "caught exception resetting the uwb device (" << ::ToString(e.Status) << ")";
         throw e;
     }
+}
+
+bool
+UwbDevice::InitializeImpl()
+{
+    m_uwbDeviceConnector = std::make_shared<UwbDeviceConnector>(m_deviceName);
+    m_uwbDeviceConnector->NotificationListenerStart([this](auto&& uwbNotificationData) {
+        // Invoke base class notification handler which takes care of threading.
+        ::UwbDevice::OnUwbNotification(std::move(uwbNotificationData));
+    });
+    return true;
 }
 
 bool
