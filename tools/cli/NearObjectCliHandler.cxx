@@ -34,3 +34,10 @@ NearObjectCliHandler::HandleMonitorMode() noexcept
 {
     // TODO
 }
+
+void
+NearObjectCliHandler::HandleGetDeviceInfo(std::shared_ptr<uwb::UwbDevice> uwbDevice) noexcept
+{
+    auto deviceInfo = uwbDevice->GetDeviceInformation();
+    std::cout << deviceInfo.ToString() << std::endl;
+}

@@ -74,6 +74,14 @@ public:
     GetRangeApp() noexcept;
 
     /**
+    * @brief Get the app object associated with the "uwb raw" sub-command.
+    *
+    * @return CLI::App&
+    */
+    CLI::App&
+    GetRawApp() noexcept;
+
+    /**
      * @brief Get the app object associated with the "uwb range start" sub-command.
      *
      * @return CLI::App&
@@ -88,6 +96,14 @@ public:
      */
     CLI::App&
     GetRangeStopApp() noexcept;
+
+    /**
+    * @brief Get the app object associated with the "uwb raw getdeviceinfo" sub-command.
+    *
+    * @return CLI::App&
+    */
+    CLI::App&
+    GetRawGetDeviceInfoApp() noexcept;
 
 private:
     /**
@@ -142,6 +158,15 @@ private:
     AddSubcommandUwbRange(CLI::App* parent);
 
     /**
+    * @brief Add the 'uwb raw' sub-command.
+    *
+    * @param parent The parent app to add the command to.
+    * @return CLI::App*
+    */
+    CLI::App*
+    AddSubcommandUwbRaw(CLI::App* parent);
+
+    /**
      * @brief Add the 'uwb range start' sub-command.
      *
      * @param parent
@@ -159,6 +184,15 @@ private:
     CLI::App*
     AddSubcommandUwbRangeStop(CLI::App* parent);
 
+    /**
+    * @brief Add the 'uwb raw getdeviceinfo' sub-command.
+    *
+    * @param parent The parent app to add the command to.
+    * @return CLI::App*
+    */
+    CLI::App*
+    AddSubcommandUwbRawGetDeviceInfo(CLI::App* parent);
+
 private:
     std::shared_ptr<NearObjectCliData> m_cliData;
     std::shared_ptr<NearObjectCliHandler> m_cliHandler;
@@ -171,8 +205,10 @@ private:
     CLI::App* m_uwbApp;
     CLI::App* m_monitorApp;
     CLI::App* m_rangeApp;
+    CLI::App* m_rawApp;
     CLI::App* m_rangeStartApp;
     CLI::App* m_rangeStopApp;
+    CLI::App* m_rawGetDeviceInfoApp;
 };
 } // namespace nearobject::cli
 

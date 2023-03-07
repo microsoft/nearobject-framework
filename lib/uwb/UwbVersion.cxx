@@ -14,7 +14,7 @@ std::string
 UwbVersion::ToString() const
 {
     std::ostringstream ss;
-    ss << Major << '.' << Minor << '.' << Maintenance;
+    ss << +Major << '.' << +Minor << '.' << +Maintenance;
     return ss.str();
 }
 
