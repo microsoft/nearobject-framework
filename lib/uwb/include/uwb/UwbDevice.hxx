@@ -24,11 +24,11 @@ public:
     /**
      * @brief Creates a new UWB session with no configuration nor peers.
      *
-     * @param callbacks
+     * @param 
      * @return std::shared_ptr<UwbSession>
      */
     std::shared_ptr<UwbSession>
-    CreateSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks);
+    CreateSession();
 
     /**
      * @brief Public interface to add callbacks for this UwbDevice
@@ -93,7 +93,7 @@ private:
      * @return std::shared_ptr<UwbSession>
      */
     virtual std::shared_ptr<UwbSession>
-    CreateSessionImpl(std::weak_ptr<UwbSessionEventCallbacks> callbacks) = 0;
+    CreateSessionImpl() = 0;
 
     /**
      * @brief Get the FiRa capabilities of the device.
@@ -125,24 +125,7 @@ private:
     virtual bool
     InitializeImpl();
 
-protected:
-    /**
-     * @brief Invoked when a UWB notification has been received.
-     *
-     * @param uwbNotificationData
-     */
-    void
-    OnUwbNotification(::uwb::protocol::fira::UwbNotificationData uwbNotificationData);
-
 private:
-    /**
-     * @brief Handles a single UwbNotificationData instance.
-     *
-     * @param uwbNotificationData The notification data to handle.
-     */
-    void
-    HandleUwbNotification(::uwb::protocol::fira::UwbNotificationData uwbNotificationData);
-
     /**
      * @brief Get a reference to the specified session.
      *
@@ -175,22 +158,6 @@ private:
      */
     void
     OnSessionStatusChanged(::uwb::protocol::fira::UwbSessionStatus statusSession);
-
-    /**
-     * @brief Invoked when the multicast list for a session has a status update.
-     *
-     * @param statusMulticastList The status of the session's multicast list.
-     */
-    void
-    OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList);
-
-    /**
-     * @brief Invoked when a session has a ranging data update.
-     *
-     * @param rangingData The new ranging data.
-     */
-    void
-    OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData);
 
 protected:
     std::vector<UwbDeviceEventCallbacks> m_callbacks;

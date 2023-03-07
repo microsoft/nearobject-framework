@@ -50,7 +50,7 @@ public:
      * @return false If listening for notifications could not be started.
      */
     bool
-    NotificationListenerStart(std::function<void(::uwb::protocol::fira::UwbNotificationData)> onNotification);
+    NotificationListenerStart();
 
     /**
      * @brief Stop listening for notifications.
@@ -133,7 +133,7 @@ private:
      * @param uwbNotificationData 
      */
     void
-    DispatchCallbacks(UwbNotificationData uwbNotificationData);
+    DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNotificationData);
 
     /**
      * @brief Internal function that prepares the notification for processing by the m_sessionEventCallbacks
@@ -141,7 +141,7 @@ private:
      * @param statusMulticastList 
      */
     void
-    OnSessionMulticastListStatus(UwbSessionUpdateMulicastListStatus statusMulticastList);
+    OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList);
 
     /**
      * @brief Internal function that prepares the notification for processing by the m_sessionEventCallbacks
@@ -149,7 +149,7 @@ private:
      * @param rangingData 
      */
     void
-    OnSessionRangingData(UwbRangingData rangingData);
+    OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData);
 
 private:
     std::unordered_map<uint32_t, std::weak_ptr<::uwb::UwbSessionEventCallbacks>> m_sessionEventCallbacks;

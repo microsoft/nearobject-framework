@@ -33,9 +33,9 @@ UwbDevice::DeviceName() const noexcept
 }
 
 std::shared_ptr<uwb::UwbSession>
-UwbDevice::CreateSessionImpl(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
+UwbDevice::CreateSessionImpl()
 {
-    return std::make_shared<UwbSession>(std::move(callbacks), m_uwbDeviceConnector);
+    return std::make_shared<UwbSession>(m_uwbDeviceConnector);
 }
 
 UwbCapability
@@ -102,10 +102,7 @@ UwbDevice::InitializeImpl()
 {
     m_uwbDeviceConnector = std::make_shared<UwbDeviceConnector>(m_deviceName);
     m_uwbDeviceConnector->RegisterDeviceEventCallbacks(m_callbacks);
-    m_uwbDeviceConnector->NotificationListenerStart([this](auto&& uwbNotificationData) {
-        // Invoke base class notification handler which takes care of threading.
-        ::UwbDevice::OnUwbNotification(std::move(uwbNotificationData));
-    });
+    m_uwbDeviceConnector->NotificationListenerStart();
     return true;
 }
 

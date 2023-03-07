@@ -26,7 +26,7 @@ public:
      * @param callbacks The event callback instance.
      * @param uwbDeviceConnector The connector to the UWB-CX driver instance.
      */
-    UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, std::shared_ptr<UwbDeviceConnector> uwbDeviceConnector);
+    UwbSession(std::shared_ptr<UwbDeviceConnector> uwbDeviceConnector);
 
 private:
     /**

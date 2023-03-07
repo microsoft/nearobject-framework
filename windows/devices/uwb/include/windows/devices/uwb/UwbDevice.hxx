@@ -64,11 +64,11 @@ private:
     /**
      * @brief Create a new UWB session.
      *
-     * @param callbacks The event callback instance.
+     * @param
      * @return std::shared_ptr<uwb::UwbSession>
      */
     virtual std::shared_ptr<::uwb::UwbSession>
-    CreateSessionImpl(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks) override;
+    CreateSessionImpl() override;
 
     /**
      * @brief Get the capabilities of the device.

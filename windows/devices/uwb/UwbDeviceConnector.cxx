@@ -314,7 +314,7 @@ UwbDeviceConnector::HandleNotifications(wil::shared_hfile handleDriver, std::sto
 }
 
 void
-UwbDeviceConnector::OnSessionMulticastListStatus(UwbSessionUpdateMulicastListStatus statusMulticastList)
+UwbDeviceConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList)
 {
     uint32_t sessionId = statusMulticastList.SessionId;
     auto it = m_sessionEventCallbacks.find(sessionId);
@@ -351,7 +351,7 @@ UwbDeviceConnector::OnSessionMulticastListStatus(UwbSessionUpdateMulicastListSta
 }
 
 void
-UwbDeviceConnector::OnSessionRangingData(UwbRangingData rangingData)
+UwbDeviceConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData)
 {
     uint32_t sessionId = rangingData.SessionId;
     auto it = m_sessionEventCallbacks.find(sessionId);
@@ -378,7 +378,7 @@ UwbDeviceConnector::OnSessionRangingData(UwbRangingData rangingData)
 }
 
 void
-UwbDeviceConnector::DispatchCallbacks(UwbNotificationData uwbNotificationData)
+UwbDeviceConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNotificationData)
 {
     std::visit([this](auto&& arg) {
         using ValueType = std::decay_t<decltype(arg)>;
@@ -418,7 +418,7 @@ UwbDeviceConnector::DispatchCallbacks(UwbNotificationData uwbNotificationData)
 }
 
 bool
-UwbDeviceConnector::NotificationListenerStart(std::function<void(::uwb::protocol::fira::UwbNotificationData)> onNotification)
+UwbDeviceConnector::NotificationListenerStart()
 {
     wil::shared_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
@@ -427,7 +427,7 @@ UwbDeviceConnector::NotificationListenerStart(std::function<void(::uwb::protocol
         return false;
     }
 
-    m_notificationThread = std::jthread([this, handleDriver = std::move(handleDriver), onNotification = std::move(onNotification)](std::stop_token stopToken) {
+    m_notificationThread = std::jthread([this, handleDriver = std::move(handleDriver)](std::stop_token stopToken) {
         HandleNotifications(std::move(handleDriver), stopToken);
     });
 

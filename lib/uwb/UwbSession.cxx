@@ -9,9 +9,8 @@
 
 using namespace uwb;
 
-UwbSession::UwbSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks) :
-    m_uwbMacAddressSelf(UwbMacAddress::Random<UwbMacAddressType::Extended>()),
-    m_callbacks(std::move(callbacks))
+UwbSession::UwbSession() :
+    m_uwbMacAddressSelf(UwbMacAddress::Random<UwbMacAddressType::Extended>())
 {}
 
 uint32_t
@@ -36,9 +35,10 @@ UwbSession::AddPeer(UwbMacAddress peerMacAddress)
 }
 
 void
-UwbSession::Configure(const uwb::protocol::fira::UwbSessionData& uwbSessionData)
+UwbSession::Configure(const uwb::protocol::fira::UwbSessionData& uwbSessionData, std::weak_ptr<UwbSessionEventCallbacks> callbacks)
 {
     PLOG_VERBOSE << "configure";
+    m_callbacks = std::move(callbacks);
     ConfigureImpl(uwbSessionData);
 }
 
@@ -78,14 +78,4 @@ UwbSession::InsertPeerImpl(const uwb::UwbMacAddress& peerAddress)
 {
     m_peers.insert(peerAddress);
     PLOG_VERBOSE << "Session with id " << m_sessionId << " added peer via DDI with mac address " << peerAddress.ToString();
-}
-
-void
-UwbSession::ProcessRangingData(const std::vector<uwb::UwbPeer>& peerRangingData)
-{
-    auto callbacks = m_callbacks.lock();
-    if (callbacks) {
-        PLOG_VERBOSE << "Session with id " << m_sessionId << " processing peer ranging data";
-        callbacks->OnPeerPropertiesChanged(this, peerRangingData);
-    }
 }
