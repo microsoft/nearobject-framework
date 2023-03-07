@@ -39,7 +39,6 @@ void
 NearObjectCliHandler::HandleDeviceReset(std::shared_ptr<uwb::UwbDevice> uwbDevice) noexcept
 {
     uwbDevice->Reset();
-    std::cout << "Device reset successful" << std::endl;
 }
 
 void

@@ -64,9 +64,16 @@ UwbDeviceConnector::Reset()
         PLOG_ERROR << "error when sending IOCTL_UWB_DEVICE_RESET, hr=" << std::showbase << std::hex << hr;
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Failed)));
         return resultFuture;
+    } else {
+        PLOG_DEBUG << "IOCTL_UWB_DEVICE_RESET succeeded";
+        auto& deviceResetStatus = *reinterpret_cast<UWB_STATUS*>(std::data(deviceResetStatusBuffer));
+        auto uwbStatus = UwbCxDdi::To(deviceResetStatus);
+        if (!IsUwbStatusOk(uwbStatus)) {
+            resultPromise.set_exception(std::make_exception_ptr(UwbException(std::move(uwbStatus))));
+        } else {
+            resultPromise.set_value();
+        }
     }
-
-    resultPromise.set_value();
 
     return resultFuture;
 }
