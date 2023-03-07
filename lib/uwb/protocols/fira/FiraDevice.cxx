@@ -110,6 +110,12 @@ UwbDeviceInformation::ToString() const
            << "FiRa Uci Test v" << VersionUciTest << ", "
            << "FiRa MAC v" << VersionMac << ", "
            << "FiRa PHY v" << VersionPhy;
+        if (VendorSpecificInfo != nullptr) {
+            ss << "\nVendor Specific Info: ";
+            for (auto& val : VendorSpecificInfo->GetData()) {
+                ss << val << " ";
+            }
+        }
     } else {
         ss << "(error=" << ::ToString(Status) << ")";
     }

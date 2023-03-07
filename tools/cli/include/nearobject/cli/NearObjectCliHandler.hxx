@@ -56,6 +56,14 @@ struct NearObjectCliHandler
      */
     virtual void
     HandleMonitorMode() noexcept;
+
+    /**
+    * @brief Invoked by the command-line driver when the request is to get device info.
+    * 
+    * @param uwbDevice The resolved uwb device to get device info from.
+    */
+    virtual void
+    HandleGetDeviceInfo(std::shared_ptr<uwb::UwbDevice> uwbDevice) noexcept;
 };
 
 } // namespace nearobject::cli

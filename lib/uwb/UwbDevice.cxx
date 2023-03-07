@@ -220,6 +220,19 @@ UwbDevice::Reset()
 }
 
 bool
+UwbDevice::Initialize()
+{
+    PLOG_INFO << "Initialize";
+    return InitializeImpl();
+}
+
+bool
+UwbDevice::InitializeImpl()
+{
+    return true;
+}
+
+bool
 uwb::operator==(const UwbDevice& lhs, const UwbDevice& rhs) noexcept
 {
     return (typeid(lhs) == typeid(rhs)) && lhs.IsEqual(rhs);

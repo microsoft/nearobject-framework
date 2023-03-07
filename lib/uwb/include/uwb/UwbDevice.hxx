@@ -63,6 +63,14 @@ public:
     Reset();
 
     /**
+     * @brief Initializes a new UWB device
+     * 
+     * @return bool
+     */
+    bool
+    Initialize();
+
+    /**
      * @brief Determine if this device is the same as another.
      *
      * @param other
@@ -108,6 +116,14 @@ private:
      */
     virtual void
     ResetImpl() = 0;
+
+    /**
+     * @brief Initializes a new UWB device.
+     * 
+     * @return bool
+     */
+    virtual bool
+    InitializeImpl();
 
 protected:
     /**

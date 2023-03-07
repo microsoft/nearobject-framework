@@ -51,13 +51,6 @@ public:
     DeviceName() const noexcept;
 
     /**
-     * @brief Initialize the device.
-     * TODO: return type needs to convey whether this worked.
-     */
-    void
-    Initialize();
-
-    /**
      * @brief Determine if this device is the same as another.
      *
      * @param other
@@ -98,6 +91,14 @@ private:
      */
     virtual void
     ResetImpl() override;
+
+    /**
+     * @brief Initialize the device.
+     *
+     * @return bool
+     */
+    virtual bool
+    InitializeImpl() override;
 
 private:
     const std::string m_deviceName;
