@@ -79,18 +79,6 @@ NearObjectCli::GetRangeStopApp() noexcept
     return *m_rangeStopApp;
 }
 
-CLI::App&
-NearObjectCli::GetRawDeviceResetApp() noexcept
-{
-    return *m_rawDeviceResetApp;
-}
-
-CLI::App&
-NearObjectCli::GetRawGetDeviceInfoApp() noexcept
-{
-    return *m_rawGetDeviceInfoApp;
-}
-
 std::shared_ptr<uwb::UwbDevice>
 NearObjectCli::GetUwbDevice() noexcept
 {
@@ -222,8 +210,8 @@ NearObjectCli::AddSubcommandUwbRaw(CLI::App* parent)
     auto rawApp = parent->add_subcommand("raw", "individual commands")->require_subcommand()->fallthrough();
 
     // sub-commands
-    m_rawDeviceResetApp = AddSubcommandUwbRawDeviceReset(rawApp);
-    m_rawGetDeviceInfoApp = AddSubcommandUwbRawGetDeviceInfo(rawApp);
+    AddSubcommandUwbRawDeviceReset(rawApp);
+    AddSubcommandUwbRawGetDeviceInfo(rawApp);
 
     return rawApp;
 }
