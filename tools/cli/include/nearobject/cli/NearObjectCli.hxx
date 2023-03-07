@@ -98,6 +98,14 @@ public:
     GetRangeStopApp() noexcept;
 
     /**
+     * @brief Get the app object associated with the "uwb raw devicereset" sub-command.
+     * 
+     * @return CLI::App&
+     */
+    CLI::App&
+    GetRawDeviceResetApp() noexcept;
+
+    /**
     * @brief Get the app object associated with the "uwb raw getdeviceinfo" sub-command.
     *
     * @return CLI::App&
@@ -185,6 +193,15 @@ private:
     AddSubcommandUwbRangeStop(CLI::App* parent);
 
     /**
+     * @brief Add the 'uwb raw devicereset' sub-command.
+     * 
+     * @param parent The parent app to add the command to.
+     * @return CLI::App*
+     */
+    CLI::App*
+    AddSubcommandUwbRawDeviceReset(CLI::App* parent);
+
+    /**
     * @brief Add the 'uwb raw getdeviceinfo' sub-command.
     *
     * @param parent The parent app to add the command to.
@@ -208,6 +225,7 @@ private:
     CLI::App* m_rawApp;
     CLI::App* m_rangeStartApp;
     CLI::App* m_rangeStopApp;
+    CLI::App* m_rawDeviceResetApp;
     CLI::App* m_rawGetDeviceInfoApp;
 };
 } // namespace nearobject::cli

@@ -47,8 +47,18 @@ UwbDeviceConnector::Reset()
         return resultFuture;
     }
 
-    UWB_STATUS status;
-    BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_DEVICE_RESET, nullptr, 0, &status, sizeof status, nullptr, nullptr);
+    ULONG deviceResetInputBufferLength = sizeof(UWB_DEVICE_RESET);
+    std::vector<uint8_t> deviceResetInputBuffer(deviceResetInputBufferLength);
+    auto reset = reinterpret_cast<UWB_DEVICE_RESET*>(std::data(deviceResetInputBuffer));
+
+    reset->size = deviceResetInputBufferLength;
+    reset->resetConfig = UWB_RESET_CONFIG_UWBS_RESET;
+
+    std::vector<uint8_t> deviceResetStatusBuffer{};
+    DWORD bytesRequired = sizeof(UWB_STATUS);
+    deviceResetStatusBuffer.resize(bytesRequired);
+
+    BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_DEVICE_RESET, std::data(deviceResetInputBuffer), deviceResetInputBufferLength, std::data(deviceResetStatusBuffer), std::size(deviceResetStatusBuffer), &bytesRequired, nullptr);
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
         PLOG_ERROR << "error when sending IOCTL_UWB_DEVICE_RESET, hr=" << std::showbase << std::hex << hr;
