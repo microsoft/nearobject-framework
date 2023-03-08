@@ -79,12 +79,6 @@ NearObjectCli::GetRangeStopApp() noexcept
     return *m_rangeStopApp;
 }
 
-CLI::App&
-NearObjectCli::GetRawGetDeviceInfoApp() noexcept
-{
-    return *m_rawGetDeviceInfoApp;
-}
-
 std::shared_ptr<uwb::UwbDevice>
 NearObjectCli::GetUwbDevice() noexcept
 {
@@ -216,7 +210,8 @@ NearObjectCli::AddSubcommandUwbRaw(CLI::App* parent)
     auto rawApp = parent->add_subcommand("raw", "individual commands")->require_subcommand()->fallthrough();
 
     // sub-commands
-    m_rawGetDeviceInfoApp = AddSubcommandUwbRawGetDeviceInfo(rawApp);
+    AddSubcommandUwbRawDeviceReset(rawApp);
+    AddSubcommandUwbRawGetDeviceInfo(rawApp);
 
     return rawApp;
 }
@@ -316,6 +311,32 @@ NearObjectCli::AddSubcommandUwbRangeStop(CLI::App* parent)
     });
 
     return rangeStopApp;
+}
+
+CLI::App*
+NearObjectCli::AddSubcommandUwbRawDeviceReset(CLI::App* parent)
+{
+    // top-level command
+    auto rawDeviceResetApp = parent->add_subcommand("devicereset", "DeviceReset")->fallthrough();
+
+    rawDeviceResetApp->parse_complete_callback([this] {
+        std::cout << "device reset" << std::endl;
+    });
+
+    rawDeviceResetApp->final_callback([this] {
+        auto uwbDevice = GetUwbDevice();
+        if (!uwbDevice) {
+            std::cerr << "no device found" << std::endl;
+            return;
+        }
+        if (!uwbDevice->Initialize()) {
+            std::cerr << "device not initialized" << std::endl;
+        }
+
+        m_cliHandler->HandleDeviceReset(uwbDevice);
+    });
+
+    return rawDeviceResetApp;
 }
 
 CLI::App*

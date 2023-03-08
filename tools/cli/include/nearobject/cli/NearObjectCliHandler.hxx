@@ -58,6 +58,14 @@ struct NearObjectCliHandler
     HandleMonitorMode() noexcept;
 
     /**
+     * @brief Invoked by the command-line driver when the request is to reset the device.
+     *
+     * @param uwbDevice The resolved uwb device to reset.
+     */
+    virtual void
+    HandleDeviceReset(std::shared_ptr<uwb::UwbDevice> uwbDevice) noexcept;
+
+    /**
     * @brief Invoked by the command-line driver when the request is to get device info.
     * 
     * @param uwbDevice The resolved uwb device to get device info from.
