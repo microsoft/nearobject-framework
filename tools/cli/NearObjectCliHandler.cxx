@@ -1,6 +1,6 @@
-#include <notstd/tostring.hxx>
-#include <nearobject/cli/NearObjectCliHandler.hxx>
 #include <iomanip>
+#include <nearobject/cli/NearObjectCliHandler.hxx>
+#include <notstd/tostring.hxx>
 #include <uwb/UwbDevice.hxx>
 #include <uwb/UwbSession.hxx>
 
@@ -49,8 +49,7 @@ NearObjectCliHandler::HandleStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevi
             for (const auto& peer : peersRemoved) {
                 std::cout << "-" << peer.GetAddress().ToString() << std::endl;
             }
-        }
-    );
+        });
     session->Configure(sessionData, callbacks);
     session->StartRanging();
 }

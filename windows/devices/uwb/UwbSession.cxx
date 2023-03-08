@@ -43,7 +43,7 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData& uwbSessio
     m_sessionId = sessionId;
 
     m_uwbDeviceConnector->RegisterSessionEventCallbacks(m_sessionId, m_callbacks);
-    
+
     // TODO: convert code below to invoke IOCTL_UWB_SET_APP_CONFIG_PARAMS to use connector
 
     // // Populate the PUWB_SET_APP_CONFIG_PARAMS

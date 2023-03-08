@@ -18,6 +18,5 @@ TEST_CASE("uwb device callbacks can be created", "[basic]")
     auto callbacks = std::make_unique<UwbDeviceEventCallbacks>(
         [](auto&& status) {},
         [](auto&& deviceStatus) {},
-        [](auto&& sessionStatus) {}
-    );
+        [](auto&& sessionStatus) {});
 }
