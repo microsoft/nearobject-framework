@@ -36,11 +36,6 @@ UwbDevice::GetSession(uint32_t sessionId)
 }
 
 void
-UwbDevice::AddCallbacks(UwbDeviceEventCallbacks callbacks){
-    m_callbacks.push_back(callbacks);
-}
-
-void
 UwbDevice::OnStatusChanged(UwbStatus status)
 {
     m_lastError = status;
@@ -53,9 +48,6 @@ UwbDevice::OnStatusChanged(UwbStatus status)
         }
     },
         status);
-    for (const auto& callback : m_callbacks) {
-        callback.OnStatusChanged(status);
-    }
 }
 
 void
@@ -70,14 +62,12 @@ UwbDevice::OnDeviceStatusChanged(UwbStatusDevice statusDevice)
         PLOG_VERBOSE << "changed state: " << m_status.ToString() << " --> " << statusDevice.ToString();
         m_status = statusDevice;
     }
-    for (const auto& callback : m_callbacks) {
-        callback.OnDeviceStatusChanged(statusDevice);
-    }
 }
 
 void
 UwbDevice::OnSessionStatusChanged(UwbSessionStatus statusSession)
 {
+    // TODO should this be something that the session handles itself?
     auto session = GetSession(statusSession.SessionId);
     if (!session) {
         PLOG_WARNING << "Ignoring StatusChanged event due to missing session";
@@ -85,9 +75,6 @@ UwbDevice::OnSessionStatusChanged(UwbSessionStatus statusSession)
     }
 
     session->SetSessionStatus(statusSession);
-    for (const auto& callback : m_callbacks) {
-        callback.OnSessionStatusChanged(statusSession); // TODO session needs to register itself here
-    }
 }
 
 std::shared_ptr<UwbSession>

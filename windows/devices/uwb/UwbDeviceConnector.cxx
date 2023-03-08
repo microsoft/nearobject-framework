@@ -395,30 +395,24 @@ UwbDeviceConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData
         using ValueType = std::decay_t<decltype(arg)>;
 
         if constexpr (std::is_same_v<ValueType, UwbStatus>) {
-            for (const auto& deviceEventCallback : m_deviceEventCallbacks) {
-                if (not deviceEventCallback.OnStatusChanged) {
-                    PLOG_WARNING << "Ignoring StatusChanged event due to missing callback";
-                    continue;
-                }
-                deviceEventCallback.OnStatusChanged(arg);
+            if (not m_deviceEventCallbacks.OnStatusChanged) {
+                PLOG_WARNING << "Ignoring StatusChanged event due to missing callback";
+                return;
             }
+            m_deviceEventCallbacks.OnStatusChanged(arg);
 
         } else if constexpr (std::is_same_v<ValueType, UwbStatusDevice>) {
-            for (const auto& deviceEventCallback : m_deviceEventCallbacks) {
-                if (not deviceEventCallback.OnDeviceStatusChanged) {
-                    PLOG_WARNING << "Ignoring OnDeviceStatusChanged event due to missing callback";
-                    continue;
-                }
-                deviceEventCallback.OnDeviceStatusChanged(arg);
+            if (not m_deviceEventCallbacks.OnDeviceStatusChanged) {
+                PLOG_WARNING << "Ignoring OnDeviceStatusChanged event due to missing callback";
+                return;
             }
+            m_deviceEventCallbacks.OnDeviceStatusChanged(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionStatus>) {
-            for (const auto& deviceEventCallback : m_deviceEventCallbacks) {
-                if (not deviceEventCallback.OnSessionStatusChanged) {
-                    PLOG_WARNING << "Ignoring OnSessionStatusChanged event due to missing callback";
-                    continue;
-                }
-                deviceEventCallback.OnSessionStatusChanged(arg);
+            if (not m_deviceEventCallbacks.OnSessionStatusChanged) {
+                PLOG_WARNING << "Ignoring OnSessionStatusChanged event due to missing callback";
+                return;
             }
+            m_deviceEventCallbacks.OnSessionStatusChanged(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionUpdateMulicastListStatus>) {
             OnSessionMulticastListStatus(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbRangingData>) {
@@ -452,7 +446,7 @@ UwbDeviceConnector::NotificationListenerStop()
 }
 
 void
-UwbDeviceConnector::RegisterDeviceEventCallbacks(std::vector<::uwb::UwbDeviceEventCallbacks> callbacks)
+UwbDeviceConnector::RegisterDeviceEventCallbacks(::uwb::UwbDeviceEventCallbacks callbacks)
 {
     m_deviceEventCallbacks = callbacks;
 }

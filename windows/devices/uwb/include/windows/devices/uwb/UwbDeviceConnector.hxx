@@ -8,8 +8,8 @@
 #include <string>
 #include <thread>
 #include <tuple>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include <uwb/UwbDeviceEventCallbacks.hxx>
 #include <uwb/UwbSessionEventCallbacks.hxx>
@@ -73,7 +73,7 @@ public:
      * @param callbacks
      */
     void
-    RegisterDeviceEventCallbacks(std::vector<::uwb::UwbDeviceEventCallbacks> callbacks);
+    RegisterDeviceEventCallbacks(::uwb::UwbDeviceEventCallbacks callbacks);
 
 public:
     // IUwbDeviceDdi
@@ -129,31 +129,31 @@ private:
 
     /**
      * @brief Responsible for calling the relevant registered callbacks for the uwbNotificationData
-     * 
-     * @param uwbNotificationData 
+     *
+     * @param uwbNotificationData
      */
     void
     DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNotificationData);
 
     /**
      * @brief Internal function that prepares the notification for processing by the m_sessionEventCallbacks
-     * 
-     * @param statusMulticastList 
+     *
+     * @param statusMulticastList
      */
     void
     OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList);
 
     /**
      * @brief Internal function that prepares the notification for processing by the m_sessionEventCallbacks
-     * 
-     * @param rangingData 
+     *
+     * @param rangingData
      */
     void
     OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData);
 
 private:
     std::unordered_map<uint32_t, std::weak_ptr<::uwb::UwbSessionEventCallbacks>> m_sessionEventCallbacks;
-    std::vector<::uwb::UwbDeviceEventCallbacks> m_deviceEventCallbacks;
+    ::uwb::UwbDeviceEventCallbacks m_deviceEventCallbacks;
     std::string m_deviceName{};
     std::jthread m_notificationThread;
 };

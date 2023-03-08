@@ -31,16 +31,6 @@ public:
     CreateSession();
 
     /**
-     * @brief Public interface to add callbacks for this UwbDevice
-     * 
-     * TODO decide if it makes sense to pass in the callbacks via pointer or reference, or simply by copy
-     * 
-     * @param callbacks 
-     */
-    void
-    AddCallbacks(UwbDeviceEventCallbacks callbacks);
-
-    /**
      * @brief Get the FiRa capabilities of the device.
      *
      * @return uwb::protocol::fira::UwbCapability
@@ -136,7 +126,7 @@ private:
     GetSession(uint32_t sessionId);
 
     /**
-     * @brief Invoked when a generic error occurs.
+     * @brief Invoked when a generic error occurs. TODO this callback needs to be invoked by a UwbDeviceConnector
      *
      * @param status The generic error that occurred.
      */
@@ -160,7 +150,7 @@ private:
     OnSessionStatusChanged(::uwb::protocol::fira::UwbSessionStatus statusSession);
 
 protected:
-    std::vector<UwbDeviceEventCallbacks> m_callbacks;
+    UwbDeviceEventCallbacks m_callbacks;
 
 private:
     ::uwb::protocol::fira::UwbStatusDevice m_status{ .State = ::uwb::protocol::fira::UwbDeviceState::Uninitialized };
