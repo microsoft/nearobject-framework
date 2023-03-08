@@ -24,7 +24,19 @@ namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
 
 UwbDevice::UwbDevice(std::string deviceName) :
     m_deviceName(std::move(deviceName))
-{}
+{
+    m_callbacks = ::uwb::UwbDeviceEventCallbacks{
+        .OnStatusChanged = [this](::uwb::protocol::fira::UwbStatus status) {
+            return this->OnStatusChanged(status);
+        },
+        .OnDeviceStatusChanged = [this](::uwb::protocol::fira::UwbStatusDevice status) {
+            return this->OnDeviceStatusChanged(status);
+        },
+        .OnSessionStatusChanged = [this](::uwb::protocol::fira::UwbSessionStatus status) {
+            return this->OnSessionStatusChanged(status);
+        }
+    };
+}
 
 const std::string&
 UwbDevice::DeviceName() const noexcept

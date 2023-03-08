@@ -115,7 +115,7 @@ private:
     virtual bool
     InitializeImpl();
 
-private:
+protected:
     /**
      * @brief Get a reference to the specified session.
      *

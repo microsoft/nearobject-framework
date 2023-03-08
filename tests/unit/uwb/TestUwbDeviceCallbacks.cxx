@@ -14,14 +14,10 @@ TEST_CASE("uwb device callbacks can be created", "[basic]")
         .OnStatusChanged = [](auto&& status) {},
         .OnDeviceStatusChanged = [](auto&& status) {},
         .OnSessionStatusChanged = [](auto&& status) {},
-        .OnSessionMulticastListStatus = [](auto&& status) {},
-        .OnSessionRangingData = [](auto&& rangingData) {}
     };
     auto callbacks = std::make_unique<UwbDeviceEventCallbacks>(
         [](auto&& status) {},
         [](auto&& deviceStatus) {},
-        [](auto&& sessionStatus) {},
-        [](auto&& sessionMulticastListStatus) {},
-        [](auto&& rangingData) {}
+        [](auto&& sessionStatus) {}
     );
 }

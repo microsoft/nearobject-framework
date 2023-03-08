@@ -34,20 +34,6 @@ struct UwbDeviceEventCallbacks
      * @param statusSession The new status of the session.
      */
     std::function<void(::uwb::protocol::fira::UwbSessionStatus)> OnSessionStatusChanged;
-
-    /**
-     * @brief Invoked when the multicast list for a session has a status update.
-     *
-     * @param statusMulticastList The status of the session's multicast list.
-     */
-    std::function<void(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus)> OnSessionMulticastListStatus;
-
-    /**
-     * @brief Invoked when a session has a ranging data update.
-     *
-     * @param rangingData The new ranging data.
-     */
-    std::function<void(::uwb::protocol::fira::UwbRangingData)> OnSessionRangingData;
 };
 } // namespace uwb
 
