@@ -39,7 +39,7 @@ private:
      * @return std::shared_ptr<uwb::UwbSession> 
      */
     std::shared_ptr<uwb::UwbSession>
-    CreateSessionImpl(std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks) override;
+    CreateSessionImpl() override;
 
     /**
      * @brief Get the capabilities of the device.
