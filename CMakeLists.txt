@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.16)
 option(NOF_USE_MSVC_STATIC_RUNTIME, "Statically link against the VC++ runtime library" OFF)
 option(NOF_CODE_COVERAGE "Enable instrumenting the build with code coverage" OFF)
 option(NOF_BUILD_WINDOWS_UWB_SIMULATOR_DRIVER "Enable building the Windows UWB Simulator driver" OFF)
+option(NOF_OFFICIAL_RELEASE "Enable building the project for an official release" OFF)
 
 # Build environment definitions.
 # 
@@ -115,6 +116,10 @@ include(CheckPIESupported)
 include(CTest)
 include(GNUInstallDirs)
 include(FetchContent)
+
+if (NOF_OFFICIAL_RELEASE)
+  include(cmake/cpack.cmake)
+endif()
 
 # Set external dependency target versions.
 set(VERSION_NLOHMANN_JSON 3.11.2)
