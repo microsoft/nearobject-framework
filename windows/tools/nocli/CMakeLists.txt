@@ -24,3 +24,9 @@ target_link_libraries(nocli-win
 
 set_target_properties(nocli-win PROPERTIES OUTPUT_NAME nocli)
 set_target_properties(nocli-win PROPERTIES FOLDER windows/tools)
+
+install(
+    TARGETS nocli-win
+    EXPORT nocli-win
+    RUNTIME
+)
