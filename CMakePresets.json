@@ -124,6 +124,17 @@
             "cacheVariables": {
                 "NOF_VCPKG_TARGET": "release"
             }
+        },
+        {
+            "name": "official-release",
+            "displayName": "Offcial Release",
+            "description": "official release build",
+            "inherits": [
+                "dev-vcpkg"
+            ],
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "install"
+            }
         }
     ],
     "buildPresets": [
