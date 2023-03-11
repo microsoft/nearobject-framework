@@ -54,7 +54,7 @@ sudo apt-get install -y build-essential git ninja-build clang clang-format clang
 
 The above will install all the tools required to compile, lint, and debug the project, except for CMake. The build requires CMake version 3.25+ and the version shipping with Ubuntu 22.04 doesn't meet this requirement. Therefore, it must be installed manually using Kitware's standalone apt repository. Perform the following steps:
 
-1. Remove the default version provided by CMake, in case it was installed:
+1. Remove the default version provided by Ubuntu, in case it was installed:
 
 ```bash
 sudo apt purge --auto-remove cmake
