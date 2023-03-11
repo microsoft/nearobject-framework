@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.25)
 
 # Project configuration options.
 option(NOF_USE_MSVC_STATIC_RUNTIME, "Statically link against the VC++ runtime library" OFF)
