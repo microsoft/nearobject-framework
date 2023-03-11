@@ -175,5 +175,21 @@
                 "outputOnFailure": true
             }
         }
+    ],
+    "packagePresets": [
+        {
+            "name": "official-release",
+            "displayName": "Official Release",
+            "configurePreset": "official-release",
+            "packageName": "nearobjectframework",
+            "vendorName": "Microsoft",
+            "generators": [
+                "TXZ",
+                "ZIP"
+            ],
+            "variables": {
+                "CPACK_PACKAGE_DIRECTORY": "${sourceParentDir}/${sourceDirName}-cmake/out/package/${presetName}"
+            }
+        }
     ]
 }
