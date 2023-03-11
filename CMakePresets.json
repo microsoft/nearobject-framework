@@ -133,7 +133,8 @@
                 "dev-vcpkg"
             ],
             "cacheVariables": {
-                "CMAKE_INSTALL_PREFIX": "install"
+                "CMAKE_INSTALL_PREFIX": "install",
+                "NOF_OFFICIAL_RELEASE": true
             }
         }
     ],
