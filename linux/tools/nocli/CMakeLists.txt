@@ -17,3 +17,9 @@ target_link_libraries(nocli-linux
 
 set_target_properties(nocli-linux PROPERTIES OUTPUT_NAME nocli)
 set_target_properties(nocli-linux PROPERTIES FOLDER linux/tools)
+
+install(
+    TARGETS nocli-linux
+    EXPORT nocli-linux
+    RUNTIME
+)
