@@ -49,7 +49,54 @@ You should now be logged on as `mycoolusername`.
 Execute the following commands in a shell:
 ```bash
 sudo apt update
-sudo apt-get install -y build-essential git cmake ninja-build clang clang-format clang-tidy llvm lldb gnupg gdb
+sudo apt-get install -y build-essential git ninja-build clang clang-format clang-tidy llvm lldb gnupg gdb zip unzip tar curl pkg-config wget
 ```
 
-The above will install all the tools required to compile, lint, and debug the project.
+The above will install all the tools required to compile, lint, and debug the project, except for CMake. The build requires CMake version 3.25+ and the version shipping with Ubuntu 22.04 doesn't meet this requirement. Therefore, it must be installed manually using Kitware's standalone apt repository. Perform the following steps:
+
+1. Remove the default version provided by CMake, in case it was installed:
+
+```bash
+sudo apt purge --auto-remove cmake
+```
+
+2. Update apt sources and install dependencies:
+
+```bash
+sudo apt update && \
+sudo apt install -y software-properties-common lsb-release && \
+sudo apt clean all
+```
+
+3. Add the Kitware apt repository:
+
+```bash
+wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+sudo apt-add-repository -y "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main"
+```
+
+4. Add Kitware's keyring packaging to keep their signing key up to date:
+
+```bash
+sudo apt update
+sudo apt install kitware-archive-keyring
+sudo rm /etc/apt/trusted.gpg.d/kitware.gpg
+```
+
+5. Install the CMake package:
+
+```bash
+sudo apt update
+sudo apt install cmake
+```
+
+If running `sudo apt update` outputs the following error regarding signature verification:
+> W: An error occurred during the signature verification. The repository is not updated and the previous index files will be used. GPG error: https://apt.kitware.com/ubuntu jammy InRelease: The following signatures couldn't be verified because the public key is not available: NO_PUBKEY 42D5A192B819C5DA
+
+copy the public key (here `42D5A192B819C5DA`), and issue the following command to add it, then re-run apt update and install:
+
+```bash
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 42D5A192B819C5DA
+sudo apt update
+sudo apt install cmake
+```
