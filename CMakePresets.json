@@ -42,6 +42,13 @@
             }
         },
         {
+            "name": "out-of-source-build",
+            "hidden": true,
+            "displayName": "Out of source build",
+            "description": "Configure to build outside of the source tree",
+            "binaryDir": "${sourceParentDir}/${sourceDirName}-cmake/out/build/${presetName}"
+        },
+        {
             "name": "dev-base",
             "hidden": true,
             "displayName": "Development (base)",
@@ -129,11 +136,12 @@
             "name": "official-release",
             "displayName": "Offcial Release",
             "description": "official release build",
+            "installDir": "${sourceParentDir}/${sourceDirName}-cmake/out/install/${presetName}",
             "inherits": [
-                "dev-vcpkg"
+                "dev-vcpkg",
+                "out-of-source-build"
             ],
             "cacheVariables": {
-                "CMAKE_INSTALL_PREFIX": "install",
                 "NOF_OFFICIAL_RELEASE": true
             }
         }
