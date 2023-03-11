@@ -13,7 +13,7 @@ target_sources(nocli-win
 target_link_libraries(nocli-win
     PRIVATE
         CLI11::CLI11
-        logutils
+        logging-utils
         magic_enum::magic_enum
         nocli-core
         notstd-windows
