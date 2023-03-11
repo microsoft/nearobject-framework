@@ -52,7 +52,7 @@ jobs:
       run: cmake --build --preset ${{ env.preset-name }} --config ${{ matrix.build-type }}
 
     - name: CMake Test (ctest)
-      run: ctest --preset $${ env.preset-name }} -C ${{ matrix.build-type }}
+      run: ctest --preset ${{ env.preset-name }} -C ${{ matrix.build-type }}
 
     - name: CMake Install
       if: inputs.install == true
