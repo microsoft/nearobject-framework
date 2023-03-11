@@ -14,6 +14,14 @@ on:
         required: false
         default: true
         type: boolean
+      install:
+        required: false
+        default: false
+        type: boolean
+      package:
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build:
@@ -23,7 +31,9 @@ jobs:
       matrix:
         os: [ ubuntu-22.04, windows-2022 ]
         build-type: ${{ fromJson(inputs.build-types) }}
-    runs-on: ${{ matrix.os }} 
+    runs-on: ${{ matrix.os }}
+    env:
+      preset-name: cicd
     
     steps:
     - name: Checkout repository
@@ -36,14 +46,21 @@ jobs:
         languages: 'cpp'
 
     - name: CMake Configure
-      run: cmake -B ${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
+      run: cmake --preset ${{ env.preset-name }} -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
 
     - name: CMake Build
-      run: cmake --build ${{ github.workspace }}/build --config ${{ matrix.build-type }}
+      run: cmake --build --preset ${{ env.preset-name }} --config ${{ matrix.build-type }}
 
     - name: CMake Test (ctest)
-      working-directory: ${{ github.workspace }}/build
-      run: ctest -C ${{ matrix.build-types }}
+      run: ctest --preset $${ env.preset-name }} -C ${{ matrix.build-type }}
+
+    - name: CMake Install
+      if: inputs.install == true
+      run: cmake --install --preset ${{ env.preset-name }} --config ${{ matrix.build-type }}
+
+    - name: CMake Package (cpack)
+      if: inputs.package == true
+      run: cpack --preset ${{ env.preset-name }} -C $${{ matrix.build-type }}
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
