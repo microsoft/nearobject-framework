@@ -9,7 +9,7 @@ target_sources(uwbsim-win
 target_link_libraries(uwbsim-win
     PRIVATE
         CLI11::CLI11
-        logutils
+        logging-utils
         plog::plog
         windev-util
         windev-uwb-simulator

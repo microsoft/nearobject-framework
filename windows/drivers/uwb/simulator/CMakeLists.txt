@@ -17,7 +17,7 @@ if (NOF_BUILD_WINDOWS_UWB_SIMULATOR_DRIVER)
   include_external_msproject(uwbsim-driver-msbuild 
     ${CMAKE_CURRENT_LIST_DIR}/UwbSimulator.sln
     uwb
-    uwbcxadapter
     windev-uwb
+    windev-uwb-cx-adapter
   )
 endif()

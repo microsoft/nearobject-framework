@@ -2,7 +2,7 @@
     "version": 6,
     "cmakeMinimumRequired": {
         "major": 3,
-        "minor": 16
+        "minor": 25
     },
     "configurePresets": [
         {
@@ -40,6 +40,13 @@
             "cacheVariables": {
                 "NOF_DEPENDENCY_RESOLUTION_METHOD": "vcpkg"
             }
+        },
+        {
+            "name": "out-of-source-build",
+            "hidden": true,
+            "displayName": "Out of source build",
+            "description": "Configure to build outside of the source tree",
+            "binaryDir": "${sourceParentDir}/${sourceDirName}-cmake/out/build/${presetName}"
         },
         {
             "name": "dev-base",
@@ -123,6 +130,19 @@
             ],
             "cacheVariables": {
                 "NOF_VCPKG_TARGET": "release"
+            }
+        },
+        {
+            "name": "official-release",
+            "displayName": "Offcial Release",
+            "description": "official release build",
+            "installDir": "${sourceParentDir}/${sourceDirName}-cmake/out/install/${presetName}",
+            "inherits": [
+                "dev-vcpkg",
+                "out-of-source-build"
+            ],
+            "cacheVariables": {
+                "NOF_OFFICIAL_RELEASE": true
             }
         }
     ],
