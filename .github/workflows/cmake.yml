@@ -32,8 +32,16 @@ on:
       preset-name:
         required: true
         default: 'cicd'
-        type: string
-        description: 'CMake preset to use for all CMake operations (configure, build, test, install, package)'
+        type: choice
+        options:
+          - 'dev'
+          - 'dev-vcpkg'
+          - 'dev-driver'
+          - 'vcpkg-dev'
+          - 'vcpkg-release'
+          - 'cicd'
+          - 'official-release'
+        description: 'The name of the preset to use for all CMake operations (configure, build, test, install, package)'
   workflow_call:
     inputs:
       build-types:
