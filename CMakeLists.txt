@@ -116,10 +116,7 @@ include(CheckPIESupported)
 include(CTest)
 include(GNUInstallDirs)
 include(FetchContent)
-
-if (NOF_OFFICIAL_RELEASE)
-  include(cmake/cpack.cmake)
-endif()
+include(cmake/cpack.cmake)
 
 # Set external dependency target versions.
 set(VERSION_NLOHMANN_JSON 3.11.2)
