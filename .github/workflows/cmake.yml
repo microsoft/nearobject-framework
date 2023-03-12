@@ -26,7 +26,7 @@ on:
       build-types:
         required: true
         # Note the string here contains a JSON array. This is later converted to an array using fromJson.
-        default: "[ 'Debug' ]"
+        default: "[ 'debug' ]"
         type: string
         description: 'The CMake build types (CMAKE_BUILD_TYPE) to run (must be encoded as a JSON array)'
       preset-name:
@@ -47,7 +47,7 @@ on:
       build-types:
         required: false
         # Note the string here contains a JSON array. This is later converted to an array using fromJson.
-        default: "[ 'Debug' ]"
+        default: "[ 'debug' ]"
         type: string
         description: 'The CMake build type (CMAKE_BUILD_TYPE) to run.'
       analyze-codeql:
