@@ -17,4 +17,5 @@ jobs:
       build-types: "[ 'Debug', 'Release' ]"
       install: true
       package: true
+      publish-artifacts: true
       preset-name: official-release
