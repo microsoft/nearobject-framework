@@ -24,7 +24,7 @@ on:
         default: false
         type: boolean
         description: 'Invoke CMake CPack for the project'
-      publish:
+      publish-artifacts:
         required: false
         default: false
         type: boolean
@@ -54,7 +54,7 @@ on:
         required: false
         default: false
         type: boolean
-      publish:
+      publish-artifacts:
         required: false
         default: false
         type: boolean
@@ -104,7 +104,7 @@ jobs:
       uses: github/codeql-action/analyze@v2
 
     - name: Publish Artifacts
-      if: inputs.publish == true
+      if: inputs.publish-artifacts == true
       uses: actions/upload-artifact@v3
       with:
         name: release-package-${{ matrix.build-type }}
