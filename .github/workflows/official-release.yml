@@ -1,6 +1,6 @@
 # Workflow to generate official release builds.
 
-name: Official Release Build
+name: Build [Official Release]
 
 # Run on workflow dispatch to allow manual triggering of the workflow, and run
 # on PRs to the release branches.
@@ -15,6 +15,7 @@ jobs:
     uses: ./.github/workflows/cmake.yml
     with:
       build-types: "[ 'Debug', 'Release' ]"
+      analyze-codeql: true
       install: true
       package: true
       publish-artifacts: true
