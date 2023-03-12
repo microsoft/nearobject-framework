@@ -2,6 +2,38 @@ name: Build [CMake]
 
 on:
   workflow_dispatch:
+    inputs:
+      build-types:
+        required: false
+        # Note the string here contains a JSON array. This is later converted to an array using fromJson.
+        default: "[ 'Debug' ]"
+        type: string
+        description: 'The CMake build type (CMAKE_BUILD_TYPE) to run.'
+      analyze-codeql:
+        required: false
+        default: true
+        type: boolean
+        description: 'Peform static analysis with CodeQL'
+      install:
+        required: false
+        default: false
+        type: boolean
+        description: 'Invoke CMake install for the project'
+      package:
+        required: false
+        default: false
+        type: boolean
+        description: 'Invoke CMake CPack for the project'
+      publish:
+        required: false
+        default: false
+        type: boolean
+        description: 'Publish build artifcats'
+      preset-name:
+        required: false
+        default: 'cicd'
+        type: string
+        description: 'The name of the preset to use for all CMake operations (configure, build, test, install, package)'
   workflow_call:
     inputs:
       build-types:
