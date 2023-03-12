@@ -75,5 +75,5 @@ jobs:
       if: inputs.publish == true
       uses: actions/upload-artifact@v3
       with:
-        name: release-package-${{ matrix-build-type }}
+        name: release-package-${{ matrix.build-type }}
         path: ${{ github.workspace }}/nearobject-framework-cmake/out/package/${{ inputs.preset-name }}/*.(.xz|zip)
