@@ -82,7 +82,10 @@ endif()
 
 MESSAGE(STATUS "using build environment '${NOF_BUILD_ENVIRONMENT}' with dependency resolution method '${NOF_DEPENDENCY_RESOLUTION_METHOD}'")
 
-project(nearobject-framework LANGUAGES CXX)
+project(nearobject-framework 
+  LANGUAGES CXX
+  VERSION 0.2.4  
+)
 
 # Conditional inclusion of OS-dependent source trees.
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")

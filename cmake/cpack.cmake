@@ -10,7 +10,7 @@ if(CMAKE_GENERATOR STREQUAL Xcode OR
    CMAKE_GENERATOR MATCHES "^Visual Studio.*")
     # Multi-config generator, so we don't know the build config right now.
     # Delay evaluation of the build config until CPack runs.
-    set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-\${CPACK_BUILD_CONFIG}")
+    # set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-\${CPACK_BUILD_CONFIG}")
 else()
     # We know the build config now, so use it directly
     set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_BUILD_TYPE}")
