@@ -1,5 +1,6 @@
 
 # Metadata related varaibles.
+set(CPACK_PACKAGE_NAME ${CMAKE_PROJECT_NAME})
 set(CPACK_PACKAGE_VENDOR "Microsoft")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Near Object Framework - A framework for interacting with short-range devices")
 
