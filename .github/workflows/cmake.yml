@@ -116,4 +116,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: release-package-${{ matrix.build-type }}
-        path: nearobject-framework-cmake/out/package/${{ inputs.preset-name }}/*.(.xz|zip)
+        path: ${{ github.workspace }}/../nearobject-framework-cmake/out/package/${{ inputs.preset-name }}/*.(.xz|zip)
