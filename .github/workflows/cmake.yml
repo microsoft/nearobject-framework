@@ -122,4 +122,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: release-package-${{ matrix.build-type }}
-        path: out/package/${{ inputs.preset-name }}/*.(.xz|zip)
+        path: ${{ github.workspace }}/out/package/${{ inputs.preset-name }}/*.(.xz|zip)
