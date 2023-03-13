@@ -115,6 +115,7 @@ jobs:
       run: cpack --preset ${{ inputs.preset-name }} -C ${{ matrix.build-type }}
 
     - name: Perform CodeQL Analysis
+      if: inputs.analyze-codeql == true
       uses: github/codeql-action/analyze@v2
 
     - name: Publish Artifacts
