@@ -94,7 +94,7 @@ jobs:
         languages: 'cpp'
 
     - name: CMake Configure
-      run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -G ${{ matrix.config.generator }}
+      run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -G\"${{ matrix.config.generator }}\"
 
     - name: CMake Build
       run: cmake --build --preset ${{ inputs.preset-name }} --config ${{ matrix.build-type }}
