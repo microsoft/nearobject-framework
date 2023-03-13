@@ -9,8 +9,9 @@
 
 using namespace uwb;
 
-UwbSession::UwbSession() :
-    m_uwbMacAddressSelf(UwbMacAddress::Random<UwbMacAddressType::Extended>())
+UwbSession::UwbSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks) :
+    m_uwbMacAddressSelf(UwbMacAddress::Random<UwbMacAddressType::Extended>()),
+    m_callbacks(std::move(callbacks))
 {}
 
 uint32_t
@@ -35,10 +36,11 @@ UwbSession::AddPeer(UwbMacAddress peerMacAddress)
 }
 
 void
-UwbSession::Configure(const uwb::protocol::fira::UwbSessionData& uwbSessionData, std::weak_ptr<UwbSessionEventCallbacks> callbacks)
+UwbSession::Configure(const uwb::protocol::fira::UwbSessionData& uwbSessionData)
 {
     PLOG_VERBOSE << "configure";
-    m_callbacks = std::move(callbacks);
+    // m_callbacks = std::move(callbacks);
+    // TODO create the RegisteredCallbacks
     ConfigureImpl(uwbSessionData);
 }
 

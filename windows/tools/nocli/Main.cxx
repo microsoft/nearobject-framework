@@ -10,6 +10,7 @@
 #include "NearObjectCliHandlerWindows.hxx"
 
 #include <nearobject/cli/NearObjectCli.hxx>
+#include <nearobject/cli/NearObjectCliUwbSessionEventCallbacks.hxx>
 
 #include <plog/Appenders/ColorConsoleAppender.h>
 #include <plog/Appenders/DebugOutputAppender.h>

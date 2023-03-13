@@ -6,17 +6,42 @@
 #include <uwb/UwbDeviceEventCallbacks.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
 
+namespace uwb::test
+{
+struct UwbDeviceCallbacksTest : public UwbDeviceEventCallbacks
+{
+    ~UwbDeviceCallbacksTest() = default;
+
+    void
+    OnStatusChanged([[maybe_unused]] ::uwb::protocol::fira::UwbStatus status) override
+    {
+    }
+
+    void
+    OnDeviceStatusChanged([[maybe_unused]] ::uwb::protocol::fira::UwbStatusDevice statusDevice) override
+    {
+    }
+
+    void
+    OnSessionStatusChanged([[maybe_unused]] ::uwb::protocol::fira::UwbSessionStatus statusSession) override
+    {
+    }
+
+    void
+    OnSessionMulticastListStatus([[maybe_unused]] ::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList) override
+    {
+    }
+
+    void
+    OnSessionRangingData([[maybe_unused]] ::uwb::protocol::fira::UwbRangingData rangingData) override
+    {
+    }
+};
+} // namespace uwb::test
+
 TEST_CASE("uwb device callbacks can be created", "[basic]")
 {
     using namespace uwb;
 
-    UwbDeviceEventCallbacks cb{
-        .OnStatusChanged = [](auto&& status) {},
-        .OnDeviceStatusChanged = [](auto&& status) {},
-        .OnSessionStatusChanged = [](auto&& status) {},
-    };
-    auto callbacks = std::make_unique<UwbDeviceEventCallbacks>(
-        [](auto&& status) {},
-        [](auto&& deviceStatus) {},
-        [](auto&& sessionStatus) {});
+    auto callbacks = std::make_unique<test::UwbDeviceCallbacksTest>();
 }

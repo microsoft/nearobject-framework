@@ -61,7 +61,7 @@ public:
 
 private:
     virtual std::shared_ptr<::uwb::UwbSession>
-    CreateSessionImpl() override;
+    CreateSessionImpl(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks) override;
 
 private:
     const std::string m_deviceName;

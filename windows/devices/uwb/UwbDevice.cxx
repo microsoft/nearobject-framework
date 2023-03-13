@@ -45,9 +45,9 @@ UwbDevice::DeviceName() const noexcept
 }
 
 std::shared_ptr<uwb::UwbSession>
-UwbDevice::CreateSessionImpl()
+UwbDevice::CreateSessionImpl(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
 {
-    return std::make_shared<UwbSession>(m_uwbDeviceConnector);
+    return std::make_shared<UwbSession>(std::move(callbacks), m_uwbDeviceConnector);
 }
 
 UwbCapability

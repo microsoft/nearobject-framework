@@ -24,9 +24,10 @@ class UwbSession
 public:
     /**
      * @brief Construct a new UwbSession object.
-     *
+     * 
+     * @param callbacks The callbacks to invoke for session events.
      */
-    UwbSession();
+    UwbSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks);
 
     /**
      * @brief Destroy the UwbSession object.
@@ -42,17 +43,16 @@ public:
     GetId() const noexcept;
 
     /**
-     * @brief Configure the session for use. Also moves the callbacks into ownership here
+     * @brief Configure the session for use.
      *
      * TODO: This probably needs to return something to indicate whether it was
      * successful or not.
      *
      * @param uwbSessionData The session configuration to use. This should have
      * been obtained as a result of out-of-band negotiation.
-     * @param callbacks The callbacks to invoke for session events.
      */
     void
-    Configure(const protocol::fira::UwbSessionData& uwbSessionData, std::weak_ptr<UwbSessionEventCallbacks> callbacks);
+    Configure(const protocol::fira::UwbSessionData& uwbSessionData);
 
     /**
      * @brief Set the type of mac address to be used for session participants.

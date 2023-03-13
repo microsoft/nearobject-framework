@@ -1,6 +1,6 @@
-#include <iomanip>
+
 #include <nearobject/cli/NearObjectCliHandler.hxx>
-#include <notstd/tostring.hxx>
+#include <nearobject/cli/NearObjectCliUwbSessionEventCallbacks.hxx>
 #include <uwb/UwbDevice.hxx>
 #include <uwb/UwbSession.hxx>
 
@@ -17,40 +17,9 @@ NearObjectCliHandler::ResolveUwbDevice(const nearobject::cli::NearObjectCliData&
 void
 NearObjectCliHandler::HandleStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevice, uwb::protocol::fira::UwbSessionData& sessionData) noexcept
 {
-    auto session = uwbDevice->CreateSession();
-    auto callbacks = std::make_shared<::uwb::UwbSessionEventCallbacks>(
-        [session](::uwb::UwbSessionEndReason) {
-            std::cout << "Session with id="
-                      << std::hex << std::setw(8) << std::setfill('0') << std::showbase << std::internal << session->GetId() << ": Session Ended" << std::endl;
-        },
-        [session]() {
-            std::cout << "Session with id="
-                      << std::hex << std::setw(8) << std::setfill('0') << std::showbase << std::internal << session->GetId() << ": Ranging Started" << std::endl;
-        },
-        [session]() {
-            std::cout << "Session with id="
-                      << std::hex << std::setw(8) << std::setfill('0') << std::showbase << std::internal << session->GetId() << ": Ranging Stopped" << std::endl;
-        },
-        [session](const std::vector<::uwb::UwbPeer> peersChanged) {
-            std::cout << "Session with id="
-                      << std::hex << std::setw(8) << std::setfill('0') << std::showbase << std::internal << session->GetId() << ": Peer Properties Changed" << std::endl;
-
-            for (const auto& peer : peersChanged) {
-                std::cout << peer.ToString() << std::endl;
-            }
-        },
-        [session](const std::vector<::uwb::UwbPeer> peersAdded, const std::vector<::uwb::UwbPeer> peersRemoved) {
-            std::cout << "Session with id="
-                      << std::hex << std::setw(8) << std::setfill('0') << std::showbase << std::internal << session->GetId() << ": Membership Changed" << std::endl;
-
-            for (const auto& peer : peersAdded) {
-                std::cout << "+" << peer.GetAddress().ToString() << std::endl;
-            }
-            for (const auto& peer : peersRemoved) {
-                std::cout << "-" << peer.GetAddress().ToString() << std::endl;
-            }
-        });
-    session->Configure(sessionData, callbacks);
+    auto callbacks = std::make_shared<nearobject::cli::NearObjectCliUwbSessionEventCallbacks>();
+    auto session = uwbDevice->CreateSession(callbacks);
+    session->Configure(sessionData);
     session->StartRanging();
 }
 

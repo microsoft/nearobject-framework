@@ -24,11 +24,11 @@ public:
     /**
      * @brief Creates a new UWB session with no configuration nor peers.
      *
-     * @param 
+     * @param callbacks
      * @return std::shared_ptr<UwbSession>
      */
     std::shared_ptr<UwbSession>
-    CreateSession();
+    CreateSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks);
 
     /**
      * @brief Get the FiRa capabilities of the device.
@@ -83,7 +83,7 @@ private:
      * @return std::shared_ptr<UwbSession>
      */
     virtual std::shared_ptr<UwbSession>
-    CreateSessionImpl() = 0;
+    CreateSessionImpl(std::weak_ptr<UwbSessionEventCallbacks> callbacks) = 0;
 
     /**
      * @brief Get the FiRa capabilities of the device.
