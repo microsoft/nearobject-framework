@@ -87,6 +87,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Install build tools
+      if: ${{ matrix.config.os }} == "ubuntu-22.04"
+      run: sudo apt-get install ninja-build
+
     - name: Initialize CodeQL
       if: inputs.analyze-codeql == true
       uses: github/codeql-action/init@v2
@@ -94,7 +98,7 @@ jobs:
         languages: 'cpp'
 
     - name: CMake Configure
-      run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -G\"${{ matrix.config.generator }}\"
+      run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -G"${{ matrix.config.generator }}"
 
     - name: CMake Build
       run: cmake --build --preset ${{ inputs.preset-name }} --config ${{ matrix.build-type }}
