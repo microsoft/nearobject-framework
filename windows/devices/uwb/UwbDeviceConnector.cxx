@@ -180,7 +180,7 @@ UwbDeviceConnector::GetSessionCount()
 }
 
 std::future<UwbStatus>
-UwbDeviceConnector::SessionIntitialize(uint32_t sessionId, UwbSessionType sessionType)
+UwbDeviceConnector::SessionInitialize(uint32_t sessionId, UwbSessionType sessionType)
 {
     std::promise<UwbStatus> resultPromise;
     auto resultFuture = resultPromise.get_future();
