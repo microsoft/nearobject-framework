@@ -50,6 +50,14 @@
             "installDir": "${sourceParentDir}/${sourceDirName}-cmake/out/install/${presetName}"
         },
         {
+            "name": "in-source-build",
+            "hidden": true,
+            "displayName": "In source build",
+            "description": "Configure to build inside the source tree",
+            "binaryDir": "${sourceDirName}/out/build/${presetName}",
+            "installDir": "${sourceDirName}/out/install/${presetName}"
+        },
+        {
             "name": "dev-base",
             "hidden": true,
             "displayName": "Development (base)",
@@ -57,7 +65,10 @@
             "cacheVariables": {
                 "NOF_BUILD_ENVIRONMENT": "development",
                 "NOF_VCPKG_TARGET": "development"
-            }
+            },
+            "inherits": [
+                "in-source-build"
+            ]
         },
         {
             "name": "vcpkg-base",
@@ -65,7 +76,8 @@
             "displayName": "vcpkg (base)",
             "description": "Base options for all vcpkg presets",
             "inherits":[
-                "resolve-deps-vcpkg"
+                "resolve-deps-vcpkg",
+                "in-source-build"
             ],
             "cacheVariables": {
                 "NOF_BUILD_ENVIRONMENT": "vcpkg"
@@ -138,8 +150,7 @@
             "displayName": "CI/CD",
             "description": "Continuous integration and continuous delivery (CI/CD) based build",
             "inherits": [
-                "dev-vcpkg",
-                "out-of-source-build"
+                "dev-vcpkg"
             ]
         },
         {
@@ -245,12 +256,19 @@
             }
         },
         {
+            "name": "package-in-source",
+            "hidden": true,
+            "variables": {
+                "CPACK_PACKAGE_DIRECTORY": "${sourceDirName}/out/package/${presetName}"
+            }
+        },
+        {
             "name": "cicd",
             "displayName": "CI/CD",
             "configurePreset": "cicd",
             "inherits": [
                 "package-common",
-                "package-out-of-source"
+                "package-in-source"
             ]
         },
         {
@@ -259,7 +277,7 @@
             "configurePreset": "official-release",
             "inherits": [
                 "package-common",
-                "package-out-of-source"
+                "package-in-source"
             ]
         }
     ]

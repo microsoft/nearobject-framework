@@ -92,7 +92,7 @@ jobs:
         languages: 'cpp'
 
     - name: CMake Configure
-      run: cmake --preset ${{ inputs.preset-name }} -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
+      run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
 
     - name: CMake Build
       run: cmake --build --preset ${{ inputs.preset-name }} --config ${{ matrix.build-type }}
@@ -116,4 +116,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: release-package-${{ matrix.build-type }}
-        path: ${{ github.workspace }}/../nearobject-framework-cmake/out/package/${{ inputs.preset-name }}/*.(.xz|zip)
+        path: ${{ github.workspace }}/out/package/${{ inputs.preset-name }}/*.(.xz|zip)
