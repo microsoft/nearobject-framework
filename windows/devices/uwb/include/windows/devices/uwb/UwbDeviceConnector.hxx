@@ -11,8 +11,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <uwb/UwbDeviceEventCallbacks.hxx>
-#include <uwb/UwbSessionEventCallbacks.hxx>
+#include <uwb/UwbRegisteredCallbacks.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
 #include <wil/resource.h>
 #include <windows/devices/uwb/IUwbDeviceDdi.hxx>
@@ -65,7 +64,7 @@ public:
      * @param callbacks
      */
     void
-    RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks);
+    RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks);
 
     /**
      * @brief Sets the callbacks for the UwbDevice that owns this UwbDeviceConnector
@@ -73,7 +72,7 @@ public:
      * @param callbacks
      */
     void
-    RegisterDeviceEventCallbacks(::uwb::UwbDeviceEventCallbacks callbacks);
+    RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks);
 
 public:
     // IUwbDeviceDdi
@@ -152,8 +151,8 @@ private:
     OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData);
 
 private:
-    std::unordered_map<uint32_t, std::weak_ptr<::uwb::UwbSessionEventCallbacks>> m_sessionEventCallbacks;
-    ::uwb::UwbDeviceEventCallbacks m_deviceEventCallbacks;
+    std::unordered_map<uint32_t, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks>> m_sessionEventCallbacks;
+    std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> m_deviceEventCallbacks;
     std::string m_deviceName{};
     std::jthread m_notificationThread;
 };

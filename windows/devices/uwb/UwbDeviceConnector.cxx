@@ -395,24 +395,27 @@ UwbDeviceConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData
         using ValueType = std::decay_t<decltype(arg)>;
 
         if constexpr (std::is_same_v<ValueType, UwbStatus>) {
-            if (not m_deviceEventCallbacks.OnStatusChanged) {
+            auto callbacks = m_deviceEventCallbacks.lock();
+            if (not callbacks->OnStatusChanged) {
                 PLOG_WARNING << "Ignoring StatusChanged event due to missing callback";
                 return;
             }
-            m_deviceEventCallbacks.OnStatusChanged(arg);
+            callbacks->OnStatusChanged(arg);
 
         } else if constexpr (std::is_same_v<ValueType, UwbStatusDevice>) {
-            if (not m_deviceEventCallbacks.OnDeviceStatusChanged) {
+            auto callbacks = m_deviceEventCallbacks.lock();
+            if (not callbacks->OnDeviceStatusChanged) {
                 PLOG_WARNING << "Ignoring OnDeviceStatusChanged event due to missing callback";
                 return;
             }
-            m_deviceEventCallbacks.OnDeviceStatusChanged(arg);
+            callbacks->OnDeviceStatusChanged(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionStatus>) {
-            if (not m_deviceEventCallbacks.OnSessionStatusChanged) {
+            auto callbacks = m_deviceEventCallbacks.lock();
+            if (not callbacks->OnSessionStatusChanged) {
                 PLOG_WARNING << "Ignoring OnSessionStatusChanged event due to missing callback";
                 return;
             }
-            m_deviceEventCallbacks.OnSessionStatusChanged(arg);
+            callbacks->OnSessionStatusChanged(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionUpdateMulicastListStatus>) {
             OnSessionMulticastListStatus(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbRangingData>) {
@@ -446,13 +449,13 @@ UwbDeviceConnector::NotificationListenerStop()
 }
 
 void
-UwbDeviceConnector::RegisterDeviceEventCallbacks(::uwb::UwbDeviceEventCallbacks callbacks)
+UwbDeviceConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks)
 {
     m_deviceEventCallbacks = callbacks;
 }
 
 void
-UwbDeviceConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
+UwbDeviceConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks)
 {
     m_sessionEventCallbacks.insert_or_assign(sessionId, callbacks);
 }
