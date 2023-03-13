@@ -54,8 +54,8 @@
             "hidden": true,
             "displayName": "In source build",
             "description": "Configure to build inside the source tree",
-            "binaryDir": "${sourceDirName}/out/build/${presetName}",
-            "installDir": "${sourceDirName}/out/install/${presetName}"
+            "binaryDir": "out/build/${presetName}",
+            "installDir": "out/install/${presetName}"
         },
         {
             "name": "dev-base",
@@ -259,7 +259,7 @@
             "name": "package-in-source",
             "hidden": true,
             "variables": {
-                "CPACK_PACKAGE_DIRECTORY": "${sourceDirName}/out/package/${presetName}"
+                "CPACK_PACKAGE_DIRECTORY": "out/package/${presetName}"
             }
         },
         {
