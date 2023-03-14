@@ -8,6 +8,11 @@ on:
         default: true
         type: boolean
         description: 'Peform static analysis with CodeQL'
+      build-arm64:
+        required: false
+        default: false
+        type: boolean
+        description: 'Build ARM64 architecture'
       install:
         required: true
         default: false
@@ -54,6 +59,10 @@ on:
         required: false
         default: true
         type: boolean
+      build-arm64:
+        required: false
+        default: false
+        type: boolean
       install:
         required: false
         default: false
@@ -79,10 +88,12 @@ jobs:
       matrix:
         config:
           - { os: windows-2022, generator: 'Visual Studio 17 2022' }
+          - { os: windows-2022, generator: 'Visual Studio 17 2022', arch: 'ARM64' }
           - { os: ubuntu-22.04, generator: 'Ninja Multi-Config' }
         build-type: ${{ fromJson(inputs.build-types) }}
     runs-on: ${{ matrix.config.os }}
-    
+    if: ${{ (matrix.config.arch == 'ARM64' && inputs.build-arm64) || matrix.config.arch != 'ARM64' }}
+ 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -100,10 +111,16 @@ jobs:
     - name: CMake Configure
       run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -G"${{ matrix.config.generator }}"
 
+    - name: CMake Build ${{ matrix.config.arch }}
+      if: ${{ matrix.config.arch }}
+      run: cmake --build --preset ${{ inputs.preset-name }} --config ${{ matrix.build-type }} -A ${{ matrix.config.arch }}
+
     - name: CMake Build
+      if: ${{ ! matrix.config.arch }}
       run: cmake --build --preset ${{ inputs.preset-name }} --config ${{ matrix.build-type }}
 
     - name: CMake Test (ctest)
+      if: ${{ matrix.config.arch != 'ARM64' }}
       run: ctest --preset ${{ inputs.preset-name }} -C ${{ matrix.build-type }}
 
     - name: CMake Install
