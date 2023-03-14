@@ -188,7 +188,8 @@ UwbDeviceConnector::SessionInitialize(uint32_t sessionId, UwbSessionType session
     wil::shared_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
-        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << hr;
+        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     }
 
@@ -202,9 +203,9 @@ UwbDeviceConnector::SessionInitialize(uint32_t sessionId, UwbSessionType session
     // Determine the amount of memory required for the UWB_SESSION_INIT from the driver.
     BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_SESSION_INIT, const_cast<UWB_SESSION_INIT*>(&sessionInit), sizeof sessionInit, &status, sizeof status, nullptr, nullptr);
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
-        // TODO: need to do something different here
         HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-        PLOG_ERROR << "error when sending IOCTL_UWB_SESSION_INIT, hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << "error when sending IOCTL_UWB_SESSION_INIT for session id " << sessionId << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     } else {
         PLOG_DEBUG << "IOCTL_UWB_SESSION_INIT succeeded";
@@ -228,7 +229,8 @@ UwbDeviceConnector::SessionDeinitialize(uint32_t sessionId)
     wil::shared_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
-        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << hr;
+        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     }
 
@@ -243,7 +245,8 @@ UwbDeviceConnector::SessionDeinitialize(uint32_t sessionId)
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         // TODO: need to do something different here
         HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-        PLOG_ERROR << "error when sending IOCTL_UWB_SESSION_DEINIT, hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << "error when sending IOCTL_UWB_SESSION_DEINIT for session id " << sessionId << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     } else {
         PLOG_DEBUG << "IOCTL_UWB_SESSION_DEINIT succeeded";
