@@ -6,9 +6,9 @@
 #include <memory>
 
 #include <uwb/UwbMacAddress.hxx>
+#include <uwb/UwbRegisteredCallbacks.hxx>
 #include <uwb/UwbSession.hxx>
 #include <uwb/UwbSessionEventCallbacks.hxx>
-#include <uwb/UwbRegisteredCallbacks.hxx>
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
 #include <windows/devices/uwb/UwbDeviceConnector.hxx>
 
@@ -69,6 +69,7 @@ protected:
 private:
     std::shared_ptr<UwbDeviceConnector> m_uwbDeviceConnector;
     std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks> m_registeredCallbacks;
+    RegisteredCallbackToken* m_registeredCallbacksToken;
 };
 
 } // namespace windows::devices::uwb

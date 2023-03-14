@@ -59,7 +59,7 @@ UwbSession::UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks,
             }
             return callbacks->OnPeerPropertiesChanged(this, peersAdded);
         });
-    m_uwbDeviceConnector->RegisterSessionEventCallbacks(m_sessionId, m_registeredCallbacks);
+    m_registeredCallbacksToken = m_uwbDeviceConnector->RegisterSessionEventCallbacks(m_sessionId, m_registeredCallbacks);
 }
 
 std::shared_ptr<UwbDeviceConnector>

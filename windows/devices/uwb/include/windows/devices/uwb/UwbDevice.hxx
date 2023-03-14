@@ -15,8 +15,8 @@
 #include <wil/resource.h>
 
 #include <uwb/UwbDevice.hxx>
-#include <uwb/UwbSession.hxx>
 #include <uwb/UwbRegisteredCallbacks.hxx>
+#include <uwb/UwbSession.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <windows/devices/DeviceResource.hxx>
 #include <windows/devices/uwb/UwbDeviceConnector.hxx>
@@ -81,14 +81,14 @@ private:
 
     /**
      * @brief Get the FiRa device information of the device.
-     * 
-     * @return ::uwb::protocol::fira::UwbDeviceInformation 
+     *
+     * @return ::uwb::protocol::fira::UwbDeviceInformation
      */
     virtual ::uwb::protocol::fira::UwbDeviceInformation
     GetDeviceInformationImpl() override;
 
     /**
-     * @brief Reset the device to an initial clean state. 
+     * @brief Reset the device to an initial clean state.
      */
     virtual void
     ResetImpl() override;
@@ -105,6 +105,7 @@ private:
     const std::string m_deviceName;
     std::shared_ptr<UwbDeviceConnector> m_uwbDeviceConnector;
     std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> m_callbacks;
+    RegisteredCallbackToken* m_callbacksToken;
 };
 } // namespace windows::devices::uwb
 

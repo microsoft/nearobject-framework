@@ -84,7 +84,8 @@ public:
     RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks);
 
     /**
-     * @brief De-registers the callback associated with the token
+     * @brief De-registers the callback associated with the 
+     * If you pass in a token that is no longer valid, this function does nothing
      *
      * @param token
      */

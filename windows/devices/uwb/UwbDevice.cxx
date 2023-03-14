@@ -112,7 +112,7 @@ bool
 UwbDevice::InitializeImpl()
 {
     m_uwbDeviceConnector = std::make_shared<UwbDeviceConnector>(m_deviceName);
-    m_uwbDeviceConnector->RegisterDeviceEventCallbacks(m_callbacks);
+    m_callbacksToken = m_uwbDeviceConnector->RegisterDeviceEventCallbacks(m_callbacks);
     m_uwbDeviceConnector->NotificationListenerStart();
     return true;
 }
