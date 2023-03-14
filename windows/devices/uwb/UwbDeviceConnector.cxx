@@ -18,6 +18,14 @@ using namespace windows::devices;
 using namespace windows::devices::uwb;
 using namespace ::uwb::protocol::fira;
 
+namespace windows::devices::uwb
+{
+class RegisteredCallbackToken
+{
+    uint32_t callbackId;
+}
+}; // namespace windows::devices::uwb
+
 /**
  * @brief Namespace alias to reduce typing but preserve clarity regarding DDI
  * conversion.
@@ -328,12 +336,13 @@ void
 UwbDeviceConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList)
 {
     uint32_t sessionId = statusMulticastList.SessionId;
-    auto& [_, callbacksWeak] = m_sessionEventCallbacks.find(sessionId);
+    auto it = m_sessionEventCallbacks.find(sessionId);
     if (it == std::end(m_sessionEventCallbacks)) {
         PLOG_WARNING << "Ignoring MulticastListStatus event due to missing session callback";
         return;
     }
 
+    auto& [_, callbacksWeak] = it;
     auto callbacks = callbacksWeak.lock();
     if (not(callbacks->OnSessionMembershipChanged)) {
         PLOG_WARNING << "Ignoring MulticastListStatus event due to missing session callback";
@@ -448,14 +457,16 @@ UwbDeviceConnector::NotificationListenerStop()
     m_notificationThread.request_stop();
 }
 
-void
+RegisteredCallbackToken
 UwbDeviceConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks)
 {
     m_deviceEventCallbacks = callbacks;
+    return {};
 }
 
-void
+RegisteredCallbackToken
 UwbDeviceConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks)
 {
     m_sessionEventCallbacks.insert_or_assign(sessionId, callbacks);
+    return {};
 }

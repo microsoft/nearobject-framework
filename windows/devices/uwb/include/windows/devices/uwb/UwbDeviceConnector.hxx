@@ -18,6 +18,8 @@
 
 namespace windows::devices::uwb
 {
+class RegisteredCallbackToken;
+
 class UwbDeviceConnector :
     public IUwbDeviceDdi
 {
@@ -63,7 +65,7 @@ public:
      * @param sessionId
      * @param callbacks
      */
-    void
+    RegisteredCallbackToken
     RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks);
 
     /**
@@ -71,7 +73,7 @@ public:
      *
      * @param callbacks
      */
-    void
+    RegisteredCallbackToken
     RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks);
 
 public:
