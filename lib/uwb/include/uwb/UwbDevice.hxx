@@ -149,9 +149,6 @@ protected:
     void
     OnSessionStatusChanged(::uwb::protocol::fira::UwbSessionStatus statusSession);
 
-protected:
-    UwbDeviceEventCallbacks m_callbacks;
-
 private:
     ::uwb::protocol::fira::UwbStatusDevice m_status{ .State = ::uwb::protocol::fira::UwbDeviceState::Uninitialized };
     ::uwb::protocol::fira::UwbStatus m_lastError{ ::uwb::protocol::fira::UwbStatusGeneric::Ok };
