@@ -11,8 +11,6 @@
 
 namespace uwb
 {
-struct UwbSession;
-
 /**
  * @brief Interface for receiving events from a UwbSession. This is the primary
  * method to receive information from near peers.

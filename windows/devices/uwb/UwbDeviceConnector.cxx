@@ -328,13 +328,13 @@ void
 UwbDeviceConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList)
 {
     uint32_t sessionId = statusMulticastList.SessionId;
-    auto it = m_sessionEventCallbacks.find(sessionId);
+    auto& [_, callbacksWeak] = m_sessionEventCallbacks.find(sessionId);
     if (it == std::end(m_sessionEventCallbacks)) {
         PLOG_WARNING << "Ignoring MulticastListStatus event due to missing session callback";
         return;
     }
 
-    auto callbacks = it->second.lock();
+    auto callbacks = callbacksWeak.lock();
     if (not(callbacks->OnSessionMembershipChanged)) {
         PLOG_WARNING << "Ignoring MulticastListStatus event due to missing session callback";
         return;

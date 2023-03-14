@@ -39,8 +39,6 @@ void
 UwbSession::Configure(const uwb::protocol::fira::UwbSessionData& uwbSessionData)
 {
     PLOG_VERBOSE << "configure";
-    // m_callbacks = std::move(callbacks);
-    // TODO create the RegisteredCallbacks
     ConfigureImpl(uwbSessionData);
 }
 

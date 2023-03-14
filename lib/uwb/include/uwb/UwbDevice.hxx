@@ -6,10 +6,10 @@
 #include <shared_mutex>
 #include <unordered_map>
 
+#include <uwb/UwbDeviceEventCallbacks.hxx>
 #include <uwb/UwbSession.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
-#include <uwb/UwbDeviceEventCallbacks.hxx>
 
 namespace uwb
 {
@@ -40,21 +40,21 @@ public:
 
     /**
      * @brief Get the FiRa device information of the device.
-     * 
-     * @return ::uwb::protocol::fira::UwbDeviceInformation 
+     *
+     * @return ::uwb::protocol::fira::UwbDeviceInformation
      */
     ::uwb::protocol::fira::UwbDeviceInformation
     GetDeviceInformation();
 
     /**
-     * @brief Reset the device to an initial clean state. 
+     * @brief Reset the device to an initial clean state.
      */
     void
     Reset();
 
     /**
      * @brief Initializes a new UWB device
-     * 
+     *
      * @return bool
      */
     bool
@@ -95,21 +95,21 @@ private:
 
     /**
      * @brief Get the FiRa device information of the device.
-     * 
-     * @return ::uwb::protocol::fira::UwbDeviceInformation 
+     *
+     * @return ::uwb::protocol::fira::UwbDeviceInformation
      */
     virtual ::uwb::protocol::fira::UwbDeviceInformation
     GetDeviceInformationImpl() = 0;
 
     /**
-     * @brief Reset the device to an initial clean state. 
+     * @brief Reset the device to an initial clean state.
      */
     virtual void
     ResetImpl() = 0;
 
     /**
      * @brief Initializes a new UWB device.
-     * 
+     *
      * @return bool
      */
     virtual bool
@@ -126,7 +126,7 @@ protected:
     GetSession(uint32_t sessionId);
 
     /**
-     * @brief Invoked when a generic error occurs. TODO this callback needs to be invoked by a UwbDeviceConnector
+     * @brief Invoked when a generic error occurs. TODO this callback needs to be invoked by a UwbDeviceConnector for the linux portion too
      *
      * @param status The generic error that occurred.
      */

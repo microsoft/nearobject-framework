@@ -34,8 +34,7 @@ UwbDevice::UwbDevice(std::string deviceName) :
         },
         [this](::uwb::protocol::fira::UwbSessionStatus status) {
             return this->OnSessionStatusChanged(status);
-        }
-    );
+        });
 }
 
 const std::string&
