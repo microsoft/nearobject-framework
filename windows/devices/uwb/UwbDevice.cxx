@@ -27,13 +27,13 @@ UwbDevice::UwbDevice(std::string deviceName) :
 {
     m_callbacks = std::make_shared<::uwb::UwbRegisteredDeviceEventCallbacks>(
         [this](::uwb::protocol::fira::UwbStatus status) {
-            return this->OnStatusChanged(status);
+            return OnStatusChanged(status);
         },
         [this](::uwb::protocol::fira::UwbStatusDevice status) {
-            return this->OnDeviceStatusChanged(status);
+            return OnDeviceStatusChanged(status);
         },
         [this](::uwb::protocol::fira::UwbSessionStatus status) {
-            return this->OnSessionStatusChanged(status);
+            return OnSessionStatusChanged(status);
         });
 }
 

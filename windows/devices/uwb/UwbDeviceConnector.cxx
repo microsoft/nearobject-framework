@@ -24,7 +24,7 @@ class RegisteredCallbackToken
 {
     uint32_t callbackId;
 };
-}; // namespace windows::devices::uwb
+} // namespace windows::devices::uwb
 
 /**
  * @brief Namespace alias to reduce typing but preserve clarity regarding DDI

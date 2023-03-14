@@ -2,6 +2,7 @@
 #ifndef UWB_DEVICE_CONNECTOR_HXX
 #define UWB_DEVICE_CONNECTOR_HXX
 
+#include <cstdint>
 #include <future>
 #include <memory>
 #include <optional>
