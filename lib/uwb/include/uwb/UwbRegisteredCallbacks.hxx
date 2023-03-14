@@ -89,8 +89,6 @@ struct UwbRegisteredDeviceEventCallbacks
     std::function<void(::uwb::protocol::fira::UwbSessionStatus)> OnSessionStatusChanged;
 };
 
-using UwbRegisteredEventCallbacks = std::variant<UwbRegisteredSessionEventCallbacks, UwbRegisteredDeviceEventCallbacks>;
-
 } // namespace uwb
 
 #endif //  UWB_REGISTERED_CALLBACKS_HXX
