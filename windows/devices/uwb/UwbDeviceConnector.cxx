@@ -239,8 +239,7 @@ UwbDeviceConnector::SessionDeinitialize(uint32_t sessionId)
     UWB_STATUS status;
 
     // Determine the amount of memory required for the UWB_SESSION_DEINIT from the driver.
-    DWORD bytesRequired = 0;
-    BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_SESSION_DEINIT, const_cast<UWB_SESSION_DEINIT*>(&sessionDeinit), sizeof sessionDeinit, &status, sizeof status, &bytesRequired, nullptr);
+    BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_SESSION_DEINIT, const_cast<UWB_SESSION_DEINIT*>(&sessionDeinit), sizeof sessionDeinit, &status, sizeof status, nullptr, nullptr);
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         // TODO: need to do something different here
         HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
