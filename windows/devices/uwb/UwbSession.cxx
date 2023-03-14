@@ -43,26 +43,14 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData& uwbSessio
 
     m_sessionId = sessionId;
 
-    // TODO: convert code below to invoke IOCTL_UWB_SET_APP_CONFIG_PARAMS to use connector
-
-    // // Populate the PUWB_SET_APP_CONFIG_PARAMS
-    // auto setParamsAdaptor = GenerateUwbSetAppConfigParameterDdi(uwbSessionData);
-    // auto &setParamsBuffer = setParamsAdaptor.DdiBuffer();
-    // auto &setParams = setParamsAdaptor.DdiParameters();
-
-    // // Allocate memory for the PUWB_SET_APP_CONFIG_PARAMS_STATUS
-    // auto statusSize = offsetof(UWB_SET_APP_CONFIG_PARAMS_STATUS, appConfigParamsStatus[setParams.appConfigParamsCount]);
-    // auto statusBuffer = std::make_unique<uint8_t[]>(statusSize);
-    // auto &statusHolder = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS_STATUS *>(statusBuffer.get());
-    // statusHolder.size = statusSize;
-    // statusHolder.appConfigParamsCount = setParams.appConfigParamsCount;
-
-    // ioResult = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_SET_APP_CONFIG_PARAMS, std::data(setParamsBuffer), std::size(setParamsBuffer), statusBuffer.get(), statusSize, nullptr, nullptr);
-    // if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
-    //     // TODO: handle this
-    //     HRESULT hr = GetLastError();
-    //     PLOG_ERROR << "could not send params to driver, hr=" << std::showbase << std::hex << hr;
-    // }
+    // Set the application configuration parameters for the session.
+    auto setParamsAdaptor = GenerateUwbSetAppConfigParameterDdi(uwbSessionData);
+    auto setAppConfigParamsFuture = m_uwbDeviceConnector->SetApplicationConfigurationParameters(sessionId, setParamsAdaptor);
+    if (!setAppConfigParamsFuture.valid()) {
+        // TODO: need to signal to upper layer that this failed instead of just returning
+        PLOG_ERROR << "failed to set the application configuration parameters";
+        return;
+    }
 }
 
 void
