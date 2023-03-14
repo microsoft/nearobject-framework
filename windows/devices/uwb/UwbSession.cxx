@@ -78,7 +78,7 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData& uwbSessio
     UwbSessionType sessionType = UwbSessionType::RangingSession;
 
     // Request a new session from the driver.
-    auto sessionInitResultFuture = m_uwbDeviceConnector->SessionIntitialize(sessionId, sessionType);
+    auto sessionInitResultFuture = m_uwbDeviceConnector->SessionInitialize(sessionId, sessionType);
     if (!sessionInitResultFuture.valid()) {
         // TODO: need to signal to upper layer that this failed instead of just returning
         PLOG_ERROR << "failed to initialize session";

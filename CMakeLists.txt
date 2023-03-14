@@ -1,9 +1,10 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.25)
 
 # Project configuration options.
 option(NOF_USE_MSVC_STATIC_RUNTIME, "Statically link against the VC++ runtime library" OFF)
 option(NOF_CODE_COVERAGE "Enable instrumenting the build with code coverage" OFF)
 option(NOF_BUILD_WINDOWS_UWB_SIMULATOR_DRIVER "Enable building the Windows UWB Simulator driver" OFF)
+option(NOF_OFFICIAL_RELEASE "Enable building the project for an official release" OFF)
 
 # Build environment definitions.
 # 
@@ -81,7 +82,10 @@ endif()
 
 MESSAGE(STATUS "using build environment '${NOF_BUILD_ENVIRONMENT}' with dependency resolution method '${NOF_DEPENDENCY_RESOLUTION_METHOD}'")
 
-project(nearobject-framework LANGUAGES CXX)
+project(nearobject-framework 
+  LANGUAGES CXX
+  VERSION 0.2.4  
+)
 
 # Conditional inclusion of OS-dependent source trees.
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -115,6 +119,7 @@ include(CheckPIESupported)
 include(CTest)
 include(GNUInstallDirs)
 include(FetchContent)
+include(cmake/cpack.cmake)
 
 # Set external dependency target versions.
 set(VERSION_NLOHMANN_JSON 3.11.2)

@@ -93,7 +93,7 @@ std::unique_ptr<CLI::App>
 NearObjectCli::CreateParser() noexcept
 {
     // top-level command
-    auto app = std::make_unique<CLI::App>("nocli", "A command line tool to assist with all things nearobject");
+    auto app = std::make_unique<CLI::App>("A command line tool to assist with all things nearobject", "nocli");
     app->require_subcommand();
 
     // sub-commands
@@ -354,7 +354,7 @@ NearObjectCli::AddSubcommandUwbRawGetDeviceInfo(CLI::App* parent)
         if (!uwbDevice) {
             std::cerr << "no device found" << std::endl;
             return;
-        }      
+        }
         if (!uwbDevice->Initialize()) {
             std::cerr << "device not initialized" << std::endl;
         }

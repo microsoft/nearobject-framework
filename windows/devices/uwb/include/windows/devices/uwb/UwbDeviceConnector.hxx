@@ -89,7 +89,7 @@ public:
     GetSessionCount() override;
 
     virtual std::future<::uwb::protocol::fira::UwbStatus>
-    SessionIntitialize(uint32_t sessionId, ::uwb::protocol::fira::UwbSessionType sessionType) override;
+    SessionInitialize(uint32_t sessionId, ::uwb::protocol::fira::UwbSessionType sessionType) override;
 
     virtual std::future<::uwb::protocol::fira::UwbStatus>
     SessionDeinitialize(uint32_t sessionId) override;

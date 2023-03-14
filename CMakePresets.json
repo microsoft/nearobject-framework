@@ -2,7 +2,7 @@
     "version": 6,
     "cmakeMinimumRequired": {
         "major": 3,
-        "minor": 16
+        "minor": 25
     },
     "configurePresets": [
         {
@@ -42,6 +42,22 @@
             }
         },
         {
+            "name": "out-of-source-build",
+            "hidden": true,
+            "displayName": "Out of source build",
+            "description": "Configure to build outside of the source tree",
+            "binaryDir": "${sourceParentDir}/${sourceDirName}-cmake/out/build/${presetName}",
+            "installDir": "${sourceParentDir}/${sourceDirName}-cmake/out/install/${presetName}"
+        },
+        {
+            "name": "in-source-build",
+            "hidden": true,
+            "displayName": "In source build",
+            "description": "Configure to build inside the source tree",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "installDir": "${sourceDir}/out/install/${presetName}"
+        },
+        {
             "name": "dev-base",
             "hidden": true,
             "displayName": "Development (base)",
@@ -49,7 +65,10 @@
             "cacheVariables": {
                 "NOF_BUILD_ENVIRONMENT": "development",
                 "NOF_VCPKG_TARGET": "development"
-            }
+            },
+            "inherits": [
+                "in-source-build"
+            ]
         },
         {
             "name": "vcpkg-base",
@@ -57,7 +76,8 @@
             "displayName": "vcpkg (base)",
             "description": "Base options for all vcpkg presets",
             "inherits":[
-                "resolve-deps-vcpkg"
+                "resolve-deps-vcpkg",
+                "in-source-build"
             ],
             "cacheVariables": {
                 "NOF_BUILD_ENVIRONMENT": "vcpkg"
@@ -83,7 +103,7 @@
         },
         {
             "name": "dev-driver",
-            "displayName": "Development (driver)",
+            "displayName": "Development (simulator driver)",
             "description": "Development for the simulator driver",
             "inherits": [
                 "os-windows",
@@ -124,6 +144,25 @@
             "cacheVariables": {
                 "NOF_VCPKG_TARGET": "release"
             }
+        },
+        {
+            "name": "cicd",
+            "displayName": "CI/CD",
+            "description": "Continuous integration and continuous delivery (CI/CD) based build",
+            "inherits": [
+                "dev-vcpkg"
+            ]
+        },
+        {
+            "name": "official-release",
+            "displayName": "Offcial Release",
+            "description": "Official release build",
+            "inherits": [
+                "cicd"
+            ],
+            "cacheVariables": {
+                "NOF_OFFICIAL_RELEASE": true
+            }
         }
     ],
     "buildPresets": [
@@ -145,15 +184,101 @@
         {
             "name": "driver",
             "configurePreset": "dev-driver"
+        },
+        {
+            "name": "cicd",
+            "configurePreset": "cicd"
+        },
+        {
+            "name": "official-release",
+            "configurePreset": "official-release"
         }
     ],
     "testPresets": [
         {
-            "name": "dev",
-            "configurePreset": "dev",
+            "name": "test-common",
+            "hidden": true,
             "output": {
                 "outputOnFailure": true
             }
+        },
+        {
+            "name": "dev",
+            "configurePreset": "dev",
+            "inherits": [
+                "test-common"
+            ]
+        },
+        {
+            "name": "cicd",
+            "configurePreset": "cicd",
+            "inherits": [
+                "test-common"
+            ]
+        },
+        {
+            "name": "official-release",
+            "configurePreset": "official-release",
+            "inherits": [
+                "test-common"
+            ]
+        }
+    ],
+    "packagePresets": [
+        {
+            "name": "package-metadata",
+            "hidden": true,
+            "packageName": "nearobjectframework",
+            "vendorName": "microsoft"
+        },
+        {
+            "name": "package-generators",
+            "hidden": true,
+            "generators": [
+                "TXZ",
+                "ZIP"
+            ]
+        },
+        {
+            "name": "package-common",
+            "hidden": true,
+            "description": "Settings common to all packaging presets",
+            "inherits": [
+                "package-metadata",
+                "package-generators"
+            ]
+        },
+        {
+            "name": "package-out-of-source",
+            "hidden": true,
+            "variables": {
+                "CPACK_PACKAGE_DIRECTORY": "${sourceParentDir}/${sourceDirName}-cmake/out/package/${presetName}"
+            }
+        },
+        {
+            "name": "package-in-source",
+            "hidden": true,
+            "variables": {
+                "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
+            }
+        },
+        {
+            "name": "cicd",
+            "displayName": "CI/CD",
+            "configurePreset": "cicd",
+            "inherits": [
+                "package-common",
+                "package-in-source"
+            ]
+        },
+        {
+            "name": "official-release",
+            "displayName": "Official Release",
+            "configurePreset": "official-release",
+            "inherits": [
+                "package-common",
+                "package-in-source"
+            ]
         }
     ]
 }
