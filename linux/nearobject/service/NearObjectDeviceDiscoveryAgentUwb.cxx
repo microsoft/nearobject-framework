@@ -4,8 +4,6 @@
 
 using namespace linux::nearobject::service;
 using ::nearobject::service::NearObjectDeviceController;
-using ::nearobject::service::NearObjectDevicePresence;
-using ::nearobject::service::NearObjectDeviceControllerUwb;
 
 std::vector<std::shared_ptr<::nearobject::service::NearObjectDeviceController>>
 NearObjectDeviceDiscoveryAgentUwb::Probe()
@@ -20,7 +18,7 @@ NearObjectDeviceDiscoveryAgentUwb::ProbeAsyncImpl()
 {
     // TODO: this instance must be kept alive/valid until the async operation is
     // complete since it accesses members.
-    return std::async(std::launch::async, [&](){
+    return std::async(std::launch::async, [&]() {
         return Probe();
     });
 }

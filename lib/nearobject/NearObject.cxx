@@ -5,6 +5,16 @@
 
 using namespace nearobject;
 
+NearObject::NearObject(std::shared_ptr<NearObjectIdentityToken> identityToken) :
+    m_identityToken(std::move(identityToken))
+{}
+
+std::shared_ptr<NearObjectIdentityToken>
+NearObject::GetIdentityToken() const noexcept
+{
+    return m_identityToken;
+}
+
 NearObjectSpatialProperties
 NearObject::GetSpatialProperties() const noexcept
 {
@@ -15,7 +25,7 @@ NearObject::GetSpatialProperties() const noexcept
 bool
 nearobject::operator==(const NearObject& lhs, const NearObject& rhs) noexcept
 {
-    return std::tie(lhs.m_spatialProperties) 
+    return std::tie(lhs.m_spatialProperties)
         == std::tie(rhs.m_spatialProperties); 
 }
 

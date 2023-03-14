@@ -49,6 +49,11 @@ struct NearObjectService :
     std::shared_ptr<NearObjectDeviceControllerManager> DeviceManager;
 
     /**
+     * @brief Session id generator.
+     */
+    std::unique_ptr<NearObjectSessionIdGenerator> SessionIdGenerator;
+
+    /**
      * @brief Destroy the Near Object Service object
      */
     virtual ~NearObjectService() = default;

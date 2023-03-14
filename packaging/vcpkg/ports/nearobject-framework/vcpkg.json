@@ -1,0 +1,37 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "nearobject-framework",
+  "version-string": "1.0.0",
+  "dependencies": [
+    "catch2",
+    "nlohmann-json",
+    "magic-enum",
+    "cli11",
+    "plog",
+    "wil",
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    }
+  ],
+  "features": {
+    "msvc-link-static-runtime": {
+      "description": "Enables statically linking against the VC++ runtime, required for UMDF drivers",
+      "dependencies": [
+        "nearobject-framework"
+      ],
+      "supports": "windows"
+    },
+    "enable-development": {
+      "description": "Enables development using the latest sources instead of the last published release",
+      "dependencies": [
+        "nearobject-framework"
+      ]
+    }
+  },
+  "builtin-baseline": "ac12118f02e127ef1fe9806ffe1a23e7db7ef988"
+}

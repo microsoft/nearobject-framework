@@ -1,16 +1,21 @@
 
-#include <nearobject/service/NearObjectService.hxx>
 #include <nearobject/service/NearObjectDeviceControllerManager.hxx>
 #include <nearobject/service/NearObjectProfileManager.hxx>
+#include <nearobject/service/NearObjectService.hxx>
+#include <nearobject/service/NearObjectSessionIdGeneratorRandom.hxx>
 
 #include <notstd/memory.hxx>
 
 using namespace nearobject::service;
 
 NearObjectService::NearObjectService(NearObjectServiceInjector injector) :
-    DeviceManager(injector.DeviceManager),
-    ProfileManager(injector.ProfileManager)
+    ProfileManager(std::move(injector.ProfileManager)),
+    DeviceManager(std::move(injector.DeviceManager)),
+    SessionIdGenerator(std::move(injector.SessionIdGenerator))
 {
+    if (SessionIdGenerator == nullptr) {
+        SessionIdGenerator = std::make_unique<NearObjectSessionIdGeneratorRandom>();
+    }
 }
 
 std::shared_ptr<NearObjectService>

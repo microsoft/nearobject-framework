@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "uwb-simulator-driver-windows",
+  "version": "1.0",
+  "dependencies": [
+    {
+      "name": "nearobject-framework",
+      "features": [
+        "enable-development",
+        "msvc-link-static-runtime"
+      ]
+    }
+  ]
+}

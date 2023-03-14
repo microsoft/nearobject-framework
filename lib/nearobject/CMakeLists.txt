@@ -7,12 +7,16 @@ set(NO_DIR_PUBLIC_INCLUDE_PREFIX ${NO_DIR_PUBLIC_INCLUDE}/nearobject)
 target_sources(nearobject
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/NearObject.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/NearObjectIdentityToken.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/NearObjectIdentityTokenUwb.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectManager.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectProfile.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectProfileSecurity.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectSession.cxx
     PUBLIC
         ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/NearObject.hxx
+        ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectIdentityToken.hxx
+        ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectIdentityTokenUwb.hxx
         ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectCapabilities.hxx
         ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectManager.hxx
         ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectProfile.hxx
@@ -33,11 +37,12 @@ target_link_libraries(nearobject
         notstd
     PUBLIC
         jsonify
+        uwb
 )
 
 set_target_properties(nearobject PROPERTIES FOLDER lib/nearobject)
 
 add_subdirectory(discovery)
 add_subdirectory(persist)
-add_subdirectory(protocols)
+add_subdirectory(serialization)
 add_subdirectory(service)

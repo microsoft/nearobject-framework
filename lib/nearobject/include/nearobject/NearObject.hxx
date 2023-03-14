@@ -2,8 +2,11 @@
 #ifndef NEAR_OBJECT_HXX
 #define NEAR_OBJECT_HXX
 
+#include <memory>
 #include <mutex>
 #include <optional>
+
+#include <nearobject/NearObjectIdentityToken.hxx>
 
 namespace nearobject
 {
@@ -35,7 +38,22 @@ class NearObject
 {
 public:
     /**
-     * @brief Retrieves the latest spatial properties for these near object.
+     * @brief Construct a new NearObject with an identity token.
+     * 
+     * @param identityToken The identityToken to initialize.
+     */
+    explicit NearObject(std::shared_ptr<NearObjectIdentityToken> identityToken);
+
+    /**
+     * @brief Retrieves the identity token of this near object.
+     * 
+     * @return std::shared_ptr<NearObjectIdentityToken> 
+     */
+    std::shared_ptr<NearObjectIdentityToken>
+    GetIdentityToken() const noexcept;
+
+    /**
+     * @brief Retrieves the latest spatial properties for this near object.
      *
      * @return NearObjectSpatialProperties
      */
@@ -54,6 +72,7 @@ public:
 private:
     mutable std::mutex m_spatialPropertiesGate;
     NearObjectSpatialProperties m_spatialProperties{};
+    std::shared_ptr<NearObjectIdentityToken> m_identityToken;
 };
 
 bool

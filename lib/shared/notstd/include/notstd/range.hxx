@@ -56,7 +56,8 @@ private:
  * @return constexpr auto 
  */
 template <typename IteratorT>
-constexpr auto make_range(IteratorT begin, IteratorT end) noexcept
+constexpr auto
+make_range(IteratorT begin, IteratorT end) noexcept
 {
     return iterator_range<IteratorT>(begin, end);
 }
@@ -71,7 +72,8 @@ constexpr auto make_range(IteratorT begin, IteratorT end) noexcept
  * @return constexpr auto 
  */
 template <typename IteratorT>
-constexpr auto make_range(IteratorT begin, std::size_t count) noexcept
+constexpr auto
+make_range(IteratorT begin, std::size_t count) noexcept
 {
     return iterator_range<IteratorT>(begin, begin + count);
 }
