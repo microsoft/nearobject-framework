@@ -184,7 +184,37 @@ UwbDeviceConnector::SessionInitialize(uint32_t sessionId, UwbSessionType session
 {
     std::promise<UwbStatus> resultPromise;
     auto resultFuture = resultPromise.get_future();
-    // TODO: invoke IOCTL_UWB_SESSION_INIT
+
+    wil::shared_hfile handleDriver;
+    auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
+    if (FAILED(hr)) {
+        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
+        return resultFuture;
+    }
+
+    const UWB_SESSION_INIT sessionInit{
+        .size = sizeof(UWB_SESSION_INIT),
+        .sessionId = sessionId,
+        .sessionType = UwbCxDdi::From(sessionType),
+    };
+    UWB_STATUS status;
+
+    BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_SESSION_INIT, const_cast<UWB_SESSION_INIT*>(&sessionInit), sizeof sessionInit, &status, sizeof status, nullptr, nullptr);
+    if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
+        HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
+        PLOG_ERROR << "error when sending IOCTL_UWB_SESSION_INIT for session id " << sessionId << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
+        return resultFuture;
+    } else {
+        PLOG_DEBUG << "IOCTL_UWB_SESSION_INIT succeeded";
+        auto uwbStatus = UwbCxDdi::To(status);
+        if (!IsUwbStatusOk(uwbStatus)) {
+            resultPromise.set_exception(std::make_exception_ptr(UwbException(std::move(uwbStatus))));
+        } else {
+            resultPromise.set_value(std::move(uwbStatus));
+        }
+    }
 
     return resultFuture;
 }
@@ -194,7 +224,36 @@ UwbDeviceConnector::SessionDeinitialize(uint32_t sessionId)
 {
     std::promise<UwbStatus> resultPromise;
     auto resultFuture = resultPromise.get_future();
-    // TODO: invoke IOCTL_UWB_SESSION_DEINIT
+    
+    wil::shared_hfile handleDriver;
+    auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
+    if (FAILED(hr)) {
+        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
+        return resultFuture;
+    }
+
+    const UWB_SESSION_DEINIT sessionDeinit{
+        .size = sizeof(UWB_SESSION_DEINIT),
+        .sessionId = sessionId,
+    };
+    UWB_STATUS status;
+
+    BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_SESSION_DEINIT, const_cast<UWB_SESSION_DEINIT*>(&sessionDeinit), sizeof sessionDeinit, &status, sizeof status, nullptr, nullptr);
+    if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
+        HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
+        PLOG_ERROR << "error when sending IOCTL_UWB_SESSION_DEINIT for session id " << sessionId << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
+        return resultFuture;
+    } else {
+        PLOG_DEBUG << "IOCTL_UWB_SESSION_DEINIT succeeded";
+        auto uwbStatus = UwbCxDdi::To(status);
+        if (!IsUwbStatusOk(uwbStatus)) {
+            resultPromise.set_exception(std::make_exception_ptr(UwbException(std::move(uwbStatus))));
+        } else {
+            resultPromise.set_value(std::move(uwbStatus));
+        }
+    }
 
     return resultFuture;
 }
