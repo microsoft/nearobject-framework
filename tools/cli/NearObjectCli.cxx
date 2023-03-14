@@ -292,6 +292,9 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
             std::cerr << "no device found" << std::endl;
             return;
         }
+        if (!uwbDevice->Initialize()) {
+            std::cerr << "device not initialized" << std::endl;
+        }
 
         m_cliHandler->HandleStartRanging(uwbDevice, m_cliData->SessionData);
     });
