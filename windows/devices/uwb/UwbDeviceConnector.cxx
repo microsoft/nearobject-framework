@@ -397,6 +397,33 @@ UwbDeviceConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData r
     callbacks->OnPeerPropertiesChanged(peersData);
 }
 
+#define ClassName(x) #x
+
+/**
+ * @brief Helper function to handle the deregistration of missing callbacks
+ *
+ * @tparam ArgT the argument type of the specific callback
+ * @param callbacks the structure holding the callbacks
+ * @param callbackAccessor the lambda that returns the specific callback in question
+ * @return bool True if the callback gets executed, False if the callback gets deregistered
+ */
+template <class ArgT>
+bool
+Accessor(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks, std::function<std::function<void(ArgT)>*(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>)> callbackAccessor, ArgT& arg)
+{
+    if (not callbacks) {
+        PLOG_WARNING << "Ignoring" << ClassName(ArgT) << "event due to missing callback";
+        return false;
+    }
+    auto callback = *(callbackAccessor(callbacks));
+    if (not callback) {
+        PLOG_WARNING << "Ignoring" << ClassName(ArgT) << "event due to missing callback";
+        return false;
+    }
+    callback(arg);
+    return true;
+}
+
 void
 UwbDeviceConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNotificationData)
 {
@@ -405,26 +432,25 @@ UwbDeviceConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData
 
         if constexpr (std::is_same_v<ValueType, UwbStatus>) {
             auto callbacks = m_deviceEventCallbacks.lock();
-            if (not callbacks->OnStatusChanged) {
-                PLOG_WARNING << "Ignoring StatusChanged event due to missing callback";
-                return;
-            }
-            callbacks->OnStatusChanged(arg);
-
+            Accessor<UwbStatus>(
+                callbacks, [](auto callbacks) {
+                    return &(callbacks->OnStatusChanged);
+                },
+                arg);
         } else if constexpr (std::is_same_v<ValueType, UwbStatusDevice>) {
             auto callbacks = m_deviceEventCallbacks.lock();
-            if (not callbacks->OnDeviceStatusChanged) {
-                PLOG_WARNING << "Ignoring OnDeviceStatusChanged event due to missing callback";
-                return;
-            }
-            callbacks->OnDeviceStatusChanged(arg);
+            Accessor<UwbStatusDevice>(
+                callbacks, [](auto callbacks) {
+                    return &(callbacks->OnDeviceStatusChanged);
+                },
+                arg);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionStatus>) {
             auto callbacks = m_deviceEventCallbacks.lock();
-            if (not callbacks->OnSessionStatusChanged) {
-                PLOG_WARNING << "Ignoring OnSessionStatusChanged event due to missing callback";
-                return;
-            }
-            callbacks->OnSessionStatusChanged(arg);
+            Accessor<UwbSessionStatus>(
+                callbacks, [](auto callbacks) {
+                    return &(callbacks->OnSessionStatusChanged);
+                },
+                arg);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionUpdateMulicastListStatus>) {
             OnSessionMulticastListStatus(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbRangingData>) {
