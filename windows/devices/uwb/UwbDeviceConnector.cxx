@@ -380,7 +380,7 @@ UwbDeviceConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData r
         PLOG_WARNING << "Ignoring RangingData event due to missing session callback";
         return;
     }
-    
+
     auto& [_, callbacksWeak] = *it;
     auto callbacks = callbacksWeak.lock();
     if (not(callbacks->OnPeerPropertiesChanged)) {
