@@ -457,16 +457,22 @@ UwbDeviceConnector::NotificationListenerStop()
     m_notificationThread.request_stop();
 }
 
-RegisteredCallbackToken *
+RegisteredCallbackToken*
 UwbDeviceConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks)
 {
     m_deviceEventCallbacks = callbacks;
     return nullptr;
 }
 
-RegisteredCallbackToken *
+RegisteredCallbackToken*
 UwbDeviceConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks)
 {
     m_sessionEventCallbacks.insert_or_assign(sessionId, callbacks);
     return nullptr;
+}
+
+void
+UwbDeviceConnector::DeregisterEventCallback(RegisteredCallbackToken* token)
+{
+    // TODO implement
 }

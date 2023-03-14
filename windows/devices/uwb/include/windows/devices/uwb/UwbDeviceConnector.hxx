@@ -18,6 +18,10 @@
 
 namespace windows::devices::uwb
 {
+/**
+ * @brief Opaque class forward declaration to help with the deregistration
+ *
+ */
 class RegisteredCallbackToken;
 
 class UwbDeviceConnector :
@@ -64,17 +68,27 @@ public:
      *
      * @param sessionId
      * @param callbacks
+     * @return RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback
      */
-    RegisteredCallbackToken *
+    RegisteredCallbackToken*
     RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks);
 
     /**
      * @brief Sets the callbacks for the UwbDevice that owns this UwbDeviceConnector
      *
      * @param callbacks
+     * @return RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback
      */
-    RegisteredCallbackToken *
+    RegisteredCallbackToken*
     RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks);
+
+    /**
+     * @brief De-registers the callback associated with the token
+     *
+     * @param token
+     */
+    void
+    DeregisterEventCallback(RegisteredCallbackToken* token);
 
 public:
     // IUwbDeviceDdi
