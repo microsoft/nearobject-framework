@@ -286,7 +286,7 @@ UwbDeviceConnector::HandleNotifications(wil::shared_hfile handleDriver, std::sto
         for (const auto i : std::ranges::iota_view{1,2}) {
             uwbNotificationDataBuffer.resize(bytesRequired);
             PLOG_DEBUG << "IOCTL_UWB_NOTIFICATION attempt #" << i << " with " << std::size(uwbNotificationDataBuffer) << "-byte buffer";
-            BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_DEVICE_INFO, nullptr, 0, std::data(uwbNotificationDataBuffer), std::size(uwbNotificationDataBuffer), &bytesRequired, nullptr);
+            BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, std::data(uwbNotificationDataBuffer), std::size(uwbNotificationDataBuffer), &bytesRequired, nullptr);
             if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
                 DWORD lastError = GetLastError();
                 // Treat all errors other than insufficient buffer size as fatal.
