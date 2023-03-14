@@ -65,7 +65,7 @@ public:
      * @param sessionId
      * @param callbacks
      */
-    RegisteredCallbackToken
+    RegisteredCallbackToken *
     RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks);
 
     /**
@@ -73,7 +73,7 @@ public:
      *
      * @param callbacks
      */
-    RegisteredCallbackToken
+    RegisteredCallbackToken *
     RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks);
 
 public:

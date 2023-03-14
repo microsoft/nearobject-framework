@@ -23,7 +23,7 @@ namespace windows::devices::uwb
 class RegisteredCallbackToken
 {
     uint32_t callbackId;
-}
+};
 }; // namespace windows::devices::uwb
 
 /**
@@ -342,7 +342,7 @@ UwbDeviceConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessi
         return;
     }
 
-    auto& [_, callbacksWeak] = it;
+    auto& [_, callbacksWeak] = *it;
     auto callbacks = callbacksWeak.lock();
     if (not(callbacks->OnSessionMembershipChanged)) {
         PLOG_WARNING << "Ignoring MulticastListStatus event due to missing session callback";
@@ -457,16 +457,16 @@ UwbDeviceConnector::NotificationListenerStop()
     m_notificationThread.request_stop();
 }
 
-RegisteredCallbackToken
+RegisteredCallbackToken *
 UwbDeviceConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks)
 {
     m_deviceEventCallbacks = callbacks;
-    return {};
+    return nullptr;
 }
 
-RegisteredCallbackToken
+RegisteredCallbackToken *
 UwbDeviceConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks)
 {
     m_sessionEventCallbacks.insert_or_assign(sessionId, callbacks);
-    return {};
+    return nullptr;
 }
