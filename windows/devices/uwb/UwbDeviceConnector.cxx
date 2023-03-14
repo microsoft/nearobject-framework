@@ -200,7 +200,6 @@ UwbDeviceConnector::SessionInitialize(uint32_t sessionId, UwbSessionType session
     };
     UWB_STATUS status;
 
-    // Determine the amount of memory required for the UWB_SESSION_INIT from the driver.
     BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_SESSION_INIT, const_cast<UWB_SESSION_INIT*>(&sessionInit), sizeof sessionInit, &status, sizeof status, nullptr, nullptr);
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
@@ -240,10 +239,8 @@ UwbDeviceConnector::SessionDeinitialize(uint32_t sessionId)
     };
     UWB_STATUS status;
 
-    // Determine the amount of memory required for the UWB_SESSION_DEINIT from the driver.
     BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_SESSION_DEINIT, const_cast<UWB_SESSION_DEINIT*>(&sessionDeinit), sizeof sessionDeinit, &status, sizeof status, nullptr, nullptr);
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
-        // TODO: need to do something different here
         HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
         PLOG_ERROR << "error when sending IOCTL_UWB_SESSION_DEINIT for session id " << sessionId << ", hr=" << std::showbase << std::hex << hr;
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
