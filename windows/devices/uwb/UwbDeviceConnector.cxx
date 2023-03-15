@@ -297,11 +297,11 @@ UwbDeviceConnector::HandleNotifications(wil::shared_hfile handleDriver, std::sto
                 }
                 // Attempt to retry the ioctl with the appropriate buffer size, which is now held in bytesRequired.
                 continue;
-            } else {
-                // Convert to neutral type and process the notification.
-                const UWB_NOTIFICATION_DATA& notificationData = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
-                auto uwbNotificationData = UwbCxDdi::To(notificationData);
             }
+
+            // Convert to neutral type and process the notification.
+            const UWB_NOTIFICATION_DATA& notificationData = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
+            auto uwbNotificationData = UwbCxDdi::To(notificationData);
         }
     }
 }
