@@ -94,7 +94,7 @@ UwbDeviceConnector::GetDeviceInformation()
     // the case, the first attempt will succeed. Otherwise, the buffer is grown
     // to account for the vendor specific information, and the IOCTL attempted a
     // second time.
-    for (const auto i : std::ranges::iota_view{1,2}) {
+    for (const auto i : std::ranges::iota_view{ 1, 2 }) {
         deviceInformationBuffer.resize(bytesRequired);
         PLOG_DEBUG << "IOCTL_UWB_GET_DEVICE_INFO attempt #" << i << " with " << std::size(deviceInformationBuffer) << "-byte buffer";
         BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_DEVICE_INFO, nullptr, 0, std::data(deviceInformationBuffer), std::size(deviceInformationBuffer), &bytesRequired, nullptr);
@@ -111,7 +111,7 @@ UwbDeviceConnector::GetDeviceInformation()
             continue;
         } else {
             PLOG_DEBUG << "IOCTL_UWB_GET_DEVICE_INFO succeeded";
-            auto &deviceInformation = *reinterpret_cast<UWB_DEVICE_INFO*>(std::data(deviceInformationBuffer));
+            auto& deviceInformation = *reinterpret_cast<UWB_DEVICE_INFO*>(std::data(deviceInformationBuffer));
             auto uwbStatus = UwbCxDdi::To(deviceInformation.status);
             if (!IsUwbStatusOk(uwbStatus)) {
                 resultPromise.set_exception(std::make_exception_ptr(UwbException(std::move(uwbStatus))));
@@ -283,7 +283,7 @@ UwbDeviceConnector::HandleNotifications(wil::shared_hfile handleDriver, std::sto
     // The correct solution here is to open the handle in overlapped mode, and
     // make a non-blocking call. This is not trivial, so will be done later.
     while (!stopToken.stop_requested()) {
-        for (const auto i : std::ranges::iota_view{1,2}) {
+        for (const auto i : std::ranges::iota_view{ 1, 2 }) {
             uwbNotificationDataBuffer.resize(bytesRequired);
             PLOG_DEBUG << "IOCTL_UWB_NOTIFICATION attempt #" << i << " with " << std::size(uwbNotificationDataBuffer) << "-byte buffer";
             BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, std::data(uwbNotificationDataBuffer), std::size(uwbNotificationDataBuffer), &bytesRequired, nullptr);
