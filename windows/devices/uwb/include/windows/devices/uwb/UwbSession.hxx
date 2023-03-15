@@ -6,6 +6,7 @@
 #include <memory>
 
 #include <uwb/UwbMacAddress.hxx>
+#include <uwb/UwbRegisteredCallbacks.hxx>
 #include <uwb/UwbSession.hxx>
 #include <uwb/UwbSessionEventCallbacks.hxx>
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
@@ -22,6 +23,7 @@ class UwbSession :
 public:
     /**
      * @brief Construct a new UwbSession object.
+     * This also registers the callbacks with the UwbDeviceConnector
      *
      * @param callbacks The event callback instance.
      * @param uwbDeviceConnector The connector to the UWB-CX driver instance.
@@ -66,6 +68,8 @@ protected:
 
 private:
     std::shared_ptr<UwbDeviceConnector> m_uwbDeviceConnector;
+    std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks> m_registeredCallbacks;
+    RegisteredCallbackToken* m_registeredCallbacksToken;
 };
 
 } // namespace windows::devices::uwb

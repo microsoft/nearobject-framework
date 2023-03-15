@@ -6,6 +6,7 @@
 #include <shared_mutex>
 #include <unordered_map>
 
+#include <uwb/UwbDeviceEventCallbacks.hxx>
 #include <uwb/UwbSession.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
@@ -39,21 +40,21 @@ public:
 
     /**
      * @brief Get the FiRa device information of the device.
-     * 
-     * @return ::uwb::protocol::fira::UwbDeviceInformation 
+     *
+     * @return ::uwb::protocol::fira::UwbDeviceInformation
      */
     ::uwb::protocol::fira::UwbDeviceInformation
     GetDeviceInformation();
 
     /**
-     * @brief Reset the device to an initial clean state. 
+     * @brief Reset the device to an initial clean state.
      */
     void
     Reset();
 
     /**
      * @brief Initializes a new UWB device
-     * 
+     *
      * @return bool
      */
     bool
@@ -94,44 +95,27 @@ private:
 
     /**
      * @brief Get the FiRa device information of the device.
-     * 
-     * @return ::uwb::protocol::fira::UwbDeviceInformation 
+     *
+     * @return ::uwb::protocol::fira::UwbDeviceInformation
      */
     virtual ::uwb::protocol::fira::UwbDeviceInformation
     GetDeviceInformationImpl() = 0;
 
     /**
-     * @brief Reset the device to an initial clean state. 
+     * @brief Reset the device to an initial clean state.
      */
     virtual void
     ResetImpl() = 0;
 
     /**
      * @brief Initializes a new UWB device.
-     * 
+     *
      * @return bool
      */
     virtual bool
     InitializeImpl();
 
 protected:
-    /**
-     * @brief Invoked when a UWB notification has been received.
-     *
-     * @param uwbNotificationData
-     */
-    void
-    OnUwbNotification(::uwb::protocol::fira::UwbNotificationData uwbNotificationData);
-
-private:
-    /**
-     * @brief Handles a single UwbNotificationData instance.
-     *
-     * @param uwbNotificationData The notification data to handle.
-     */
-    void
-    HandleUwbNotification(::uwb::protocol::fira::UwbNotificationData uwbNotificationData);
-
     /**
      * @brief Get a reference to the specified session.
      *
@@ -142,7 +126,7 @@ private:
     GetSession(uint32_t sessionId);
 
     /**
-     * @brief Invoked when a generic error occurs.
+     * @brief Invoked when a generic error occurs. TODO this callback needs to be invoked by a UwbDeviceConnector for the linux portion too
      *
      * @param status The generic error that occurred.
      */
@@ -164,22 +148,6 @@ private:
      */
     void
     OnSessionStatusChanged(::uwb::protocol::fira::UwbSessionStatus statusSession);
-
-    /**
-     * @brief Invoked when the multicast list for a session has a status update.
-     *
-     * @param statusMulticastList The status of the session's multicast list.
-     */
-    void
-    OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList);
-
-    /**
-     * @brief Invoked when a session has a ranging data update.
-     *
-     * @param rangingData The new ranging data.
-     */
-    void
-    OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData);
 
 private:
     ::uwb::protocol::fira::UwbStatusDevice m_status{ .State = ::uwb::protocol::fira::UwbDeviceState::Uninitialized };
