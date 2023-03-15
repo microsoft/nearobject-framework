@@ -343,7 +343,7 @@ UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, Uw
     }
 
     auto& setParamsBuffer = applicationConfigurationParameters.DdiBuffer();
-    auto &setParams = applicationConfigurationParameters.DdiParameters();
+    auto& setParams = applicationConfigurationParameters.DdiParameters();
 
     // Allocate memory for the UWB_SET_APP_CONFIG_PARAMS_STATUS structure, and pass this to the driver request
     auto statusSize = offsetof(UWB_SET_APP_CONFIG_PARAMS_STATUS, appConfigParamsStatus[setParams.appConfigParamsCount]);
