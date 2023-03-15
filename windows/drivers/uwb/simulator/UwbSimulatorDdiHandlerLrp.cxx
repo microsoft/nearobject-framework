@@ -443,6 +443,7 @@ UwbSimulatorDdiHandler::OnUwbNotification(WDFREQUEST request, std::span<uint8_t>
     // Invoke the callback.
     NTSTATUS status = m_callbacks->UwbNotification(uwbNotificationData);
     if (status != STATUS_SUCCESS) {
+        WdfRequestComplete(request, status);
         return status;
     }
 
