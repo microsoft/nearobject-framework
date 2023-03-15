@@ -400,13 +400,6 @@ UwbDeviceConnector::HandleNotifications(std::stop_token stopToken)
     std::vector<uint8_t> uwbNotificationDataBuffer{};
     auto handleDriver = m_notificationHandleDriver;
 
-    // TODO: the below loop invokes the IOCTL synchronously, blocking on a
-    // result. There is no known way to cancel the blocking call on the client
-    // side; as such, even when stop is requested on the stop token, it cannot
-    // be evaluated since the blocking call won't be interrupted.
-    //
-    // The correct solution here is to open the handle in overlapped mode, and
-    // make a non-blocking call. This is not trivial, so will be done later.
     while (!stopToken.stop_requested()) {
         m_notificationOverlapped = {};
         for (const auto i : std::ranges::iota_view{ 1, 2 }) {
