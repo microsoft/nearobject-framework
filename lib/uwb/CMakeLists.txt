@@ -18,6 +18,7 @@ target_sources(uwb
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbPeer.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSession.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionEventCallbacks.hxx
+        ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbRegisteredCallbacks.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbVersion.hxx
 )
 
@@ -43,6 +44,7 @@ list(APPEND UWB_PUBLIC_HEADERS
     ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbPeer.hxx
     ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSession.hxx
     ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionEventCallbacks.hxx
+    ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbRegisteredCallbacks.hxx
     ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbVersion.hxx
 )
 
