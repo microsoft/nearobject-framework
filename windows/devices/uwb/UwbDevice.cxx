@@ -24,7 +24,18 @@ namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
 
 UwbDevice::UwbDevice(std::string deviceName) :
     m_deviceName(std::move(deviceName))
-{}
+{
+    m_callbacks = std::make_shared<::uwb::UwbRegisteredDeviceEventCallbacks>(
+        [this](::uwb::protocol::fira::UwbStatus status) {
+            return OnStatusChanged(status);
+        },
+        [this](::uwb::protocol::fira::UwbStatusDevice status) {
+            return OnDeviceStatusChanged(status);
+        },
+        [this](::uwb::protocol::fira::UwbSessionStatus status) {
+            return OnSessionStatusChanged(status);
+        });
+}
 
 const std::string&
 UwbDevice::DeviceName() const noexcept
@@ -101,10 +112,8 @@ bool
 UwbDevice::InitializeImpl()
 {
     m_uwbDeviceConnector = std::make_shared<UwbDeviceConnector>(m_deviceName);
-    m_uwbDeviceConnector->NotificationListenerStart([this](auto&& uwbNotificationData) {
-        // Invoke base class notification handler which takes care of threading.
-        ::UwbDevice::OnUwbNotification(std::move(uwbNotificationData));
-    });
+    m_callbacksToken = m_uwbDeviceConnector->RegisterDeviceEventCallbacks(m_callbacks);
+    m_uwbDeviceConnector->NotificationListenerStart();
     return true;
 }
 

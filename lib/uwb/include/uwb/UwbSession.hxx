@@ -24,7 +24,7 @@ class UwbSession
 public:
     /**
      * @brief Construct a new UwbSession object.
-     *
+     * 
      * @param callbacks The callbacks to invoke for session events.
      */
     UwbSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks);
@@ -90,41 +90,6 @@ public:
      */
     void
     SetSessionStatus(const uwb::protocol::fira::UwbSessionStatus& status);
-
-    /**
-     * @brief Temporarily public function to directly add a list of peers to m_peers
-     *
-     * @param peers
-     */
-    template <class View>
-    // clang-format off
-    requires std::ranges::view<View> &&
-    std::same_as<std::decay_t<std::ranges::range_reference_t<View>>, uwb::protocol::fira::UwbMulticastListStatus>
-    // clang-format on
-    void
-    InsertPeers(View peers)
-    {
-        std::vector<UwbPeer> uwbPeers;
-        {
-            std::scoped_lock peersLock{ m_peerGate };
-            for (const auto& peer : peers) {
-                InsertPeerImpl(peer.ControleeMacAddress);
-                uwbPeers.push_back(UwbPeer{ peer.ControleeMacAddress });
-            }
-        }
-        auto callbacks = m_callbacks.lock();
-        if (callbacks) {
-            callbacks->OnSessionMembershipChanged(this, uwbPeers, {});
-        }
-    }
-
-    /**
-     * @brief Temporarily public function to call the UwbSessionEventCallbacks callback for new ranging data
-     *
-     * @param peerRangingData
-     */
-    void
-    ProcessRangingData(const std::vector<uwb::UwbPeer>& peerRangingData);
 
 private:
     /**

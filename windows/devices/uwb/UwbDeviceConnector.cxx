@@ -7,6 +7,7 @@
 #include <plog/Log.h>
 #include <wil/result.h>
 
+#include <uwb/UwbPeer.hxx>
 #include <uwb/protocols/fira/UwbException.hxx>
 #include <windows/devices/DeviceHandle.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
@@ -16,6 +17,14 @@
 using namespace windows::devices;
 using namespace windows::devices::uwb;
 using namespace ::uwb::protocol::fira;
+
+namespace windows::devices::uwb
+{
+class RegisteredCallbackToken
+{
+    uint32_t callbackId;
+};
+} // namespace windows::devices::uwb
 
 /**
  * @brief Namespace alias to reduce typing but preserve clarity regarding DDI
@@ -94,7 +103,7 @@ UwbDeviceConnector::GetDeviceInformation()
     // the case, the first attempt will succeed. Otherwise, the buffer is grown
     // to account for the vendor specific information, and the IOCTL attempted a
     // second time.
-    for (const auto i : std::ranges::iota_view{1,2}) {
+    for (const auto i : std::ranges::iota_view{ 1, 2 }) {
         deviceInformationBuffer.resize(bytesRequired);
         PLOG_DEBUG << "IOCTL_UWB_GET_DEVICE_INFO attempt #" << i << " with " << std::size(deviceInformationBuffer) << "-byte buffer";
         BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_DEVICE_INFO, nullptr, 0, std::data(deviceInformationBuffer), std::size(deviceInformationBuffer), &bytesRequired, nullptr);
@@ -111,7 +120,7 @@ UwbDeviceConnector::GetDeviceInformation()
             continue;
         } else {
             PLOG_DEBUG << "IOCTL_UWB_GET_DEVICE_INFO succeeded";
-            auto &deviceInformation = *reinterpret_cast<UWB_DEVICE_INFO*>(std::data(deviceInformationBuffer));
+            auto& deviceInformation = *reinterpret_cast<UWB_DEVICE_INFO*>(std::data(deviceInformationBuffer));
             auto uwbStatus = UwbCxDdi::To(deviceInformation.status);
             if (!IsUwbStatusOk(uwbStatus)) {
                 resultPromise.set_exception(std::make_exception_ptr(UwbException(std::move(uwbStatus))));
@@ -380,8 +389,11 @@ UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, Uw
 }
 
 void
-UwbDeviceConnector::HandleNotifications(wil::shared_hfile handleDriver, std::stop_token stopToken, std::function<void(UwbNotificationData)> onNotification)
+UwbDeviceConnector::HandleNotifications(wil::shared_hfile handleDriver, std::stop_token stopToken)
 {
+    std::vector<uint8_t> uwbNotificationDataBuffer{};
+    DWORD bytesRequired = 0;
+
     // TODO: the below loop invokes the IOCTL synchronously, blocking on a
     // result. There is no known way to cancel the blocking call on the client
     // side; as such, even when stop is requested on the stop token, it cannot
@@ -390,41 +402,176 @@ UwbDeviceConnector::HandleNotifications(wil::shared_hfile handleDriver, std::sto
     // The correct solution here is to open the handle in overlapped mode, and
     // make a non-blocking call. This is not trivial, so will be done later.
     while (!stopToken.stop_requested()) {
-        // Determine the amount of memory required for the UWB_NOTIFICATION_DATA from the driver.
-        DWORD bytesRequired = 0;
-        BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, nullptr, 0, &bytesRequired, nullptr);
-        if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
-            HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-            PLOG_ERROR << "error determining output buffer size for UWB notification, hr=" << std::showbase << std::hex << hr;
-            continue;
+        for (const auto i : std::ranges::iota_view{ 1, 2 }) {
+            uwbNotificationDataBuffer.resize(bytesRequired);
+            PLOG_DEBUG << "IOCTL_UWB_NOTIFICATION attempt #" << i << " with " << std::size(uwbNotificationDataBuffer) << "-byte buffer";
+            BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, std::data(uwbNotificationDataBuffer), std::size(uwbNotificationDataBuffer), &bytesRequired, nullptr);
+            if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
+                DWORD lastError = GetLastError();
+                // Treat all errors other than insufficient buffer size as fatal.
+                if (lastError != ERROR_INSUFFICIENT_BUFFER) {
+                    HRESULT hr = HRESULT_FROM_WIN32(lastError);
+                    PLOG_ERROR << "error when sending IOCTL_UWB_NOTIFICATION, hr=" << std::showbase << std::hex << hr;
+                    break;
+                }
+                // Attempt to retry the ioctl with the appropriate buffer size, which is now held in bytesRequired.
+                continue;
+            }
+
+            // Convert to neutral type and process the notification.
+            const UWB_NOTIFICATION_DATA& notificationData = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
+            auto uwbNotificationData = UwbCxDdi::To(notificationData);
+
+            // Invoke callbacks with notification data.
+            // Handle the notification in a fire-and-forget fashion. This may change
+            // later. Since std::async returns a future, and the future's
+            // destructor waits for it to complete, we cannot just ignore the
+            // returned future. To work around this, we move the returned future
+            // into a shared_ptr, then pass this by value to the std::async's
+            // lambda, increasing its reference count. This will ensure the future
+            // is automatically destructed once the async lambda has completed.
+            auto notificationHandlerFuture = std::make_shared<std::future<void>>();
+            *notificationHandlerFuture = std::async(std::launch::async, [this, notificationHandlerFuture, uwbNotificationData = std::move(uwbNotificationData)]() {
+                DispatchCallbacks(std::move(uwbNotificationData));
+            });
         }
-
-        // Allocate memory for the UWB_NOTIFICATION_DATA structure, and pass this to the driver request.
-        DWORD uwbNotificationDataSize = bytesRequired;
-        std::vector<uint8_t> uwbNotificationDataBuffer(uwbNotificationDataSize);
-        ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, std::data(uwbNotificationDataBuffer), uwbNotificationDataSize, &bytesRequired, nullptr);
-        if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
-            HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-            PLOG_ERROR << "error obtaining UWB notification buffer, hr=" << std::showbase << std::hex << hr;
-            continue;
-        }
-
-        // Log a message if the output buffer is not aligned to UWB_NOTIFICATION_DATA. Ignore it for now as this should not occur often.
-        if (reinterpret_cast<uintptr_t>(std::data(uwbNotificationDataBuffer)) % alignof(UWB_NOTIFICATION_DATA) != 0) {
-            PLOG_ERROR << "driver output buffer is unaligned! undefined behavior may result";
-        }
-
-        // Convert to neutral type and process the notification.
-        const UWB_NOTIFICATION_DATA& notificationData = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
-        auto uwbNotificationData = UwbCxDdi::To(notificationData);
-
-        // Invoke callback with notification data.
-        onNotification(std::move(uwbNotificationData));
     }
 }
 
+void
+UwbDeviceConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList)
+{
+    uint32_t sessionId = statusMulticastList.SessionId;
+    auto it = m_sessionEventCallbacks.find(sessionId);
+    if (it == std::end(m_sessionEventCallbacks)) {
+        PLOG_WARNING << "Ignoring MulticastListStatus event due to missing session callback";
+        return;
+    }
+
+    auto& [_, callbacksWeak] = *it;
+    auto callbacks = callbacksWeak.lock();
+    if (not(callbacks->OnSessionMembershipChanged)) {
+        PLOG_WARNING << "Ignoring MulticastListStatus event due to missing session callback";
+        m_sessionEventCallbacks.erase(it);
+        return;
+    }
+
+    std::vector<::uwb::UwbPeer> peersAdded;
+    for (const auto& peer : statusMulticastList.Status) {
+        if (peer.Status == UwbStatusMulticast::OkUpdate) {
+            peersAdded.push_back(::uwb::UwbPeer{ peer.ControleeMacAddress });
+        }
+    }
+
+    PLOG_VERBOSE << "Session with id " << statusMulticastList.SessionId << " executing callback for adding peers";
+    callbacks->OnSessionMembershipChanged(peersAdded, {});
+
+    // Now log the bad status
+    IF_PLOG(plog::verbose)
+    {
+        for (const auto& peer : statusMulticastList.Status) {
+            if (peer.Status != UwbStatusMulticast::OkUpdate) {
+                PLOG_VERBOSE << "peer has bad status: " << peer.ToString();
+            }
+        }
+    }
+}
+
+void
+UwbDeviceConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData)
+{
+    uint32_t sessionId = rangingData.SessionId;
+    auto it = m_sessionEventCallbacks.find(sessionId);
+    if (it == std::end(m_sessionEventCallbacks)) {
+        PLOG_WARNING << "Ignoring RangingData event due to missing session callback";
+        return;
+    }
+
+    auto& [_, callbacksWeak] = *it;
+    auto callbacks = callbacksWeak.lock();
+    if (not(callbacks->OnPeerPropertiesChanged)) {
+        PLOG_WARNING << "Ignoring RangingData event due to missing session callback";
+        m_sessionEventCallbacks.erase(it);
+        return;
+    }
+
+    PLOG_VERBOSE << "Session with id " << rangingData.SessionId << " processing new ranging data";
+    std::vector<::uwb::UwbPeer> peersData;
+    peersData.reserve(rangingData.RangingMeasurements.size());
+    for (const auto& peerData : rangingData.RangingMeasurements) {
+        ::uwb::UwbPeer data{ peerData };
+        PLOG_VERBOSE << "Peer data: " << data.ToString();
+        peersData.push_back(std::move(data));
+    }
+
+    callbacks->OnPeerPropertiesChanged(peersData);
+}
+
+#define ClassName(x) #x
+
+/**
+ * @brief Helper function to handle the deregistration of missing callbacks
+ *
+ * @tparam ArgT the argument type of the specific callback
+ * @param callbacks the structure holding the callbacks
+ * @param callbackAccessor the lambda that returns the specific callback in question. This function assumes that callbackAccessor(callbacks) is a valid pointer
+ * @return bool True if the callback gets executed, False if the callback needs to be deregistered
+ */
+template <typename ArgT>
 bool
-UwbDeviceConnector::NotificationListenerStart(std::function<void(::uwb::protocol::fira::UwbNotificationData)> onNotification)
+Accessor(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks, std::function<std::function<void(ArgT)>(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>)> callbackAccessor, ArgT& arg)
+{
+    if (not callbacks) {
+        PLOG_WARNING << "Ignoring" << ClassName(ArgT) << "event due to missing callback";
+        return false;
+    }
+    auto callback = callbackAccessor(callbacks);
+    if (not callback) {
+        PLOG_WARNING << "Ignoring" << ClassName(ArgT) << "event due to missing callback";
+        return false;
+    }
+    callback(arg);
+    return true;
+}
+
+void
+UwbDeviceConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNotificationData)
+{
+    std::visit([this](auto&& arg) {
+        using ValueType = std::decay_t<decltype(arg)>;
+
+        if constexpr (std::is_same_v<ValueType, UwbStatus>) {
+            auto callbacks = m_deviceEventCallbacks.lock();
+            Accessor<UwbStatus>(
+                callbacks, [](auto callbacks) {
+                    return callbacks->OnStatusChanged;
+                },
+                arg);
+        } else if constexpr (std::is_same_v<ValueType, UwbStatusDevice>) {
+            auto callbacks = m_deviceEventCallbacks.lock();
+            Accessor<UwbStatusDevice>(
+                callbacks, [](auto callbacks) {
+                    return callbacks->OnDeviceStatusChanged;
+                },
+                arg);
+        } else if constexpr (std::is_same_v<ValueType, UwbSessionStatus>) {
+            auto callbacks = m_deviceEventCallbacks.lock();
+            Accessor<UwbSessionStatus>(
+                callbacks, [](auto callbacks) {
+                    return callbacks->OnSessionStatusChanged;
+                },
+                arg);
+        } else if constexpr (std::is_same_v<ValueType, UwbSessionUpdateMulicastListStatus>) {
+            OnSessionMulticastListStatus(arg);
+        } else if constexpr (std::is_same_v<ValueType, UwbRangingData>) {
+            OnSessionRangingData(arg);
+        }
+    },
+        uwbNotificationData);
+}
+
+bool
+UwbDeviceConnector::NotificationListenerStart()
 {
     wil::shared_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
@@ -433,8 +580,8 @@ UwbDeviceConnector::NotificationListenerStart(std::function<void(::uwb::protocol
         return false;
     }
 
-    m_notificationThread = std::jthread([this, handleDriver = std::move(handleDriver), onNotification = std::move(onNotification)](std::stop_token stopToken) {
-        HandleNotifications(std::move(handleDriver), stopToken, std::move(onNotification));
+    m_notificationThread = std::jthread([this, handleDriver = std::move(handleDriver)](std::stop_token stopToken) {
+        HandleNotifications(std::move(handleDriver), stopToken);
     });
 
     return true;
@@ -444,4 +591,24 @@ void
 UwbDeviceConnector::NotificationListenerStop()
 {
     m_notificationThread.request_stop();
+}
+
+RegisteredCallbackToken*
+UwbDeviceConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks)
+{
+    m_deviceEventCallbacks = callbacks;
+    return nullptr;
+}
+
+RegisteredCallbackToken*
+UwbDeviceConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks)
+{
+    m_sessionEventCallbacks.insert_or_assign(sessionId, callbacks);
+    return nullptr;
+}
+
+void
+UwbDeviceConnector::DeregisterEventCallback(RegisteredCallbackToken* token)
+{
+    // TODO implement
 }
