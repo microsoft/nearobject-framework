@@ -26,16 +26,6 @@ struct UwbDeviceCallbacksTest : public UwbDeviceEventCallbacks
     OnSessionStatusChanged([[maybe_unused]] ::uwb::protocol::fira::UwbSessionStatus statusSession) override
     {
     }
-
-    void
-    OnSessionMulticastListStatus([[maybe_unused]] ::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList) override
-    {
-    }
-
-    void
-    OnSessionRangingData([[maybe_unused]] ::uwb::protocol::fira::UwbRangingData rangingData) override
-    {
-    }
 };
 } // namespace uwb::test
 

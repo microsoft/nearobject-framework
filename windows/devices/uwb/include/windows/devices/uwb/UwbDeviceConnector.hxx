@@ -2,21 +2,29 @@
 #ifndef UWB_DEVICE_CONNECTOR_HXX
 #define UWB_DEVICE_CONNECTOR_HXX
 
+#include <cstdint>
 #include <future>
 #include <memory>
 #include <optional>
 #include <string>
 #include <thread>
 #include <tuple>
+#include <unordered_map>
 #include <vector>
 
-#include <wil/resource.h>
-
+#include <uwb/UwbRegisteredCallbacks.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
+#include <wil/resource.h>
 #include <windows/devices/uwb/IUwbDeviceDdi.hxx>
 
 namespace windows::devices::uwb
 {
+/**
+ * @brief Opaque class forward declaration to help with the deregistration
+ *
+ */
+class RegisteredCallbackToken;
+
 class UwbDeviceConnector :
     public IUwbDeviceDdi
 {
@@ -48,13 +56,41 @@ public:
      * @return false If listening for notifications could not be started.
      */
     bool
-    NotificationListenerStart(std::function<void(::uwb::protocol::fira::UwbNotificationData)> onNotification);
+    NotificationListenerStart();
 
     /**
      * @brief Stop listening for notifications.
      */
     void
     NotificationListenerStop();
+
+    /**
+     * @brief Registers the callbacks for a particular session
+     *
+     * @param sessionId
+     * @param callbacks
+     * @return RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback
+     */
+    RegisteredCallbackToken*
+    RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks);
+
+    /**
+     * @brief Sets the callbacks for the UwbDevice that owns this UwbDeviceConnector
+     *
+     * @param callbacks
+     * @return RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback
+     */
+    RegisteredCallbackToken*
+    RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks);
+
+    /**
+     * @brief De-registers the callback associated with the 
+     * If you pass in a token that is no longer valid, this function does nothing
+     *
+     * @param token
+     */
+    void
+    DeregisterEventCallback(RegisteredCallbackToken* token);
 
 public:
     // IUwbDeviceDdi
@@ -106,9 +142,35 @@ private:
      * @param onNotification The callback function to invoke for each notification.
      */
     void
-    HandleNotifications(wil::shared_hfile handleDriver, std::stop_token stopToken, std::function<void(::uwb::protocol::fira::UwbNotificationData)> onNotification);
+    HandleNotifications(wil::shared_hfile handleDriver, std::stop_token stopToken);
+
+    /**
+     * @brief Responsible for calling the relevant registered callbacks for the uwbNotificationData
+     *
+     * @param uwbNotificationData
+     */
+    void
+    DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNotificationData);
+
+    /**
+     * @brief Internal function that prepares the notification for processing by the m_sessionEventCallbacks
+     *
+     * @param statusMulticastList
+     */
+    void
+    OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList);
+
+    /**
+     * @brief Internal function that prepares the notification for processing by the m_sessionEventCallbacks
+     *
+     * @param rangingData
+     */
+    void
+    OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData);
 
 private:
+    std::unordered_map<uint32_t, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks>> m_sessionEventCallbacks;
+    std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> m_deviceEventCallbacks;
     std::string m_deviceName{};
     std::jthread m_notificationThread;
 };

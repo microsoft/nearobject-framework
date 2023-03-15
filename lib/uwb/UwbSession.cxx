@@ -79,13 +79,3 @@ UwbSession::InsertPeerImpl(const uwb::UwbMacAddress& peerAddress)
     m_peers.insert(peerAddress);
     PLOG_VERBOSE << "Session with id " << m_sessionId << " added peer via DDI with mac address " << peerAddress.ToString();
 }
-
-void
-UwbSession::ProcessRangingData(const std::vector<uwb::UwbPeer>& peerRangingData)
-{
-    auto callbacks = m_callbacks.lock();
-    if (callbacks) {
-        PLOG_VERBOSE << "Session with id " << m_sessionId << " processing peer ranging data";
-        callbacks->OnPeerPropertiesChanged(this, peerRangingData);
-    }
-}

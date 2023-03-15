@@ -17,7 +17,50 @@ using namespace ::uwb::protocol::fira;
 UwbSession::UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, std::shared_ptr<UwbDeviceConnector> uwbDeviceConnector) :
     ::uwb::UwbSession(std::move(callbacks)),
     m_uwbDeviceConnector(std::move(uwbDeviceConnector))
-{}
+{
+    m_registeredCallbacks = std::make_shared<::uwb::UwbRegisteredSessionEventCallbacks>(
+        [this](::uwb::UwbSessionEndReason reason) {
+            auto callbacks = m_callbacks.lock();
+            if (not callbacks) {
+                PLOG_WARNING << "missing session event callback for UwbSessionEndReason, skipping";
+                // TODO deregister
+            }
+            return callbacks->OnSessionEnded(this, reason);
+        },
+        [this]() {
+            auto callbacks = m_callbacks.lock();
+            if (not callbacks) {
+                PLOG_WARNING << "missing session event callback for ranging started, skipping";
+                // TODO deregister
+            }
+            return callbacks->OnRangingStarted(this);
+        },
+        [this]() {
+            auto callbacks = m_callbacks.lock();
+            if (not callbacks) {
+                PLOG_WARNING << "missing session event callback for ranging stopped, skipping";
+                // TODO deregister
+            }
+            return callbacks->OnRangingStopped(this);
+        },
+        [this](const std::vector<::uwb::UwbPeer> peersChanged) {
+            auto callbacks = m_callbacks.lock();
+            if (not callbacks) {
+                PLOG_WARNING << "missing session event callback for ranging data, skipping";
+                // TODO deregister
+            }
+            return callbacks->OnPeerPropertiesChanged(this, peersChanged);
+        },
+        [this](const std::vector<::uwb::UwbPeer> peersAdded, const std::vector<::uwb::UwbPeer> peersRemoved) {
+            auto callbacks = m_callbacks.lock();
+            if (not callbacks) {
+                PLOG_WARNING << "missing session event callback for ranging data, skipping";
+                // TODO deregister
+            }
+            return callbacks->OnPeerPropertiesChanged(this, peersAdded);
+        });
+    m_registeredCallbacksToken = m_uwbDeviceConnector->RegisterSessionEventCallbacks(m_sessionId, m_registeredCallbacks);
+}
 
 std::shared_ptr<UwbDeviceConnector>
 UwbSession::GetUwbDeviceConnector() noexcept
