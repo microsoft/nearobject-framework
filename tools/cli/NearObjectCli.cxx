@@ -109,20 +109,20 @@ namespace detail
  * corresponding values.
  *
  * @tparam EnumType The type of the enumeration.
- * @return std::map<std::string, int>
+ * @return std::unordered_map<std::string, EnumType>
  */
 template <typename EnumType>
 // clang-format off
 requires std::is_enum_v<EnumType>
-const std::unordered_map<std::string, int>
+const std::unordered_map<std::string, EnumType>
 CreateEnumerationStringMap() noexcept
 // clang-format on
 {
     const auto& reverseMap = magic_enum::enum_entries<EnumType>();
-    std::unordered_map<std::string, int> map;
+    std::unordered_map<std::string, EnumType> map;
 
     for (const auto& [enumValue, enumName] : reverseMap) {
-        map.emplace(enumName, static_cast<int>(enumValue));
+        map.emplace(enumName, enumValue);
     }
 
     return map;
@@ -148,13 +148,15 @@ AddEnumOption(CLI::App* app, std::optional<EnumType>& assignTo)
 {
     std::string optionName{ std::string("--").append(magic_enum::enum_type_name<EnumType>()) };
 
-    const auto& map = CreateEnumerationStringMap<EnumType>();
+    const auto map = CreateEnumerationStringMap<EnumType>();
     std::ostringstream enumUsage;
 
     auto it = std::cbegin(map);
-    enumUsage << "value in { " << it->second << "(" << it->first << ")";
-    for (it = std::next(std::cbegin(map)); it != std::cend(map); ++it) {
-        enumUsage << ", " << it->second << "(" << it->first << ")";
+    const auto& [name, value] = *it;
+    enumUsage << "value in { " << static_cast<int>(value) << "(" << name << ")";
+    for (it = std::next(std::cbegin(map)); it != std::cend(map); std::advance(it, 1)) {
+        const auto& [name, value] = *it;
+        enumUsage << ", " << static_cast<int>(value) << "(" << name << ")";
     }
     enumUsage << " }";
 
