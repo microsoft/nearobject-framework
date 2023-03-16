@@ -67,6 +67,12 @@ const std::initializer_list<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>> U
     MakeLrpDispatchEntry<UwbSimulatorTriggerSessionEventArgs, Unrestricted>(IOCTL_UWB_DEVICE_SIM_TRIGGER_SESSION_EVENT, &UwbSimulatorDdiHandler::OnUwbSimulatorTriggerSessionEvent),
 };
 
+UwbSimulatorDdiHandler::UwbSimulatorDdiHandler(UwbSimulatorDeviceFile *deviceFile) :
+    m_deviceFile(deviceFile),
+    m_callbacks(std::make_unique<UwbSimulatorDdiCallbacks>(deviceFile))
+{
+}
+
 // IOCTL_UWB_DEVICE_RESET
 NTSTATUS
 UwbSimulatorDdiHandler::OnUwbDeviceReset(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
@@ -437,29 +443,21 @@ UwbSimulatorDdiHandler::OnUwbSessionGetRangingCount(WDFREQUEST request, std::spa
 NTSTATUS
 UwbSimulatorDdiHandler::OnUwbNotification(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
 {
-    std::size_t outputSize = 0;
+    std::size_t outputSize = std::size(outputBuffer);
     UwbNotificationData uwbNotificationData{};
 
     // Invoke the callback.
-    NTSTATUS status = m_callbacks->UwbNotification(uwbNotificationData);
-    if (status != STATUS_SUCCESS) {
-        WdfRequestComplete(request, status);
-        return status;
-    }
-
-    // Convert neutral type to DDI output type.
-    auto notificationData = UwbCxDdi::From(uwbNotificationData);
-    outputSize = std::size(notificationData);
-
-    // Update output buffer if sufficiently sized.
-    if (std::size(outputBuffer) >= outputSize) {
+    NTSTATUS status = m_callbacks->UwbNotification(uwbNotificationData, outputSize);
+    if (NT_SUCCESS(status)) {
+        // Convert neutral type to DDI output type, and copy to output buffer.
+        auto notificationData = UwbCxDdi::From(uwbNotificationData);
         std::memcpy(std::data(outputBuffer), std::data(std::data(notificationData)), outputSize);
-    } else {
-        status = STATUS_BUFFER_TOO_SMALL;
     }
 
-    // Complete the request.
-    WdfRequestCompleteWithInformation(request, status, outputSize);
+    // Complete the request only if it has not been pended by the driver.
+    if (status != STATUS_PENDING) {
+        WdfRequestCompleteWithInformation(request, status, outputSize);
+    }
 
     return status;
 }
@@ -498,12 +496,6 @@ UwbSimulatorDdiHandler::OnUwbSimulatorTriggerSessionEvent(WDFREQUEST request, st
     WdfRequestComplete(request, STATUS_SUCCESS);
 
     return status;
-}
-
-UwbSimulatorDdiHandler::UwbSimulatorDdiHandler(UwbSimulatorDeviceFile *deviceFile) :
-    m_deviceFile(deviceFile),
-    m_callbacks(std::make_unique<UwbSimulatorDdiCallbacks>())
-{
 }
 
 std::optional<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>>

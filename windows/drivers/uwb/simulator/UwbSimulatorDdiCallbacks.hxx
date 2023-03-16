@@ -19,6 +19,7 @@
 
 #include "IUwbSimulatorDdiCallbacksLrp.hxx"
 #include "IUwbSimulatorDdiCallbacksSimulator.hxx"
+#include "UwbSimulatorDeviceFile.hxx"
 #include "UwbSimulatorSession.hxx"
 
 #include <uwb/protocols/fira/UwbApplicationConfiguration.hxx>
@@ -31,7 +32,7 @@ struct UwbSimulatorDdiCallbacks :
     public IUwbSimulatorDdiCallbacksLrp,
     public IUwbSimulatorDdiCallbacksSimulator
 {
-    UwbSimulatorDdiCallbacks();
+    UwbSimulatorDdiCallbacks(UwbSimulatorDeviceFile *deviceFile);
 
     // IUwbSimulatorDdiCallbacksLrp
 
@@ -81,7 +82,7 @@ struct UwbSimulatorDdiCallbacks :
     SessionGetRangingCount(uint32_t sessionId, uint32_t &rangingCount) override;
 
     virtual NTSTATUS
-    UwbNotification(UwbNotificationData &notificationData) override;
+    UwbNotification(UwbNotificationData &notificationData, std::size_t &notificationDataSize) override;
 
     // IUwbSimulatorDdiCallbacksSimulator
 
@@ -136,6 +137,7 @@ private:
 
 private:
     UwbSimulatorCapabilities m_simulatorCapabilities{};
+    UwbSimulatorDeviceFile *m_deviceFile;
 };
 } // namespace windows::devices::uwb::simulator
 

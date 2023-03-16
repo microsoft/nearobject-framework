@@ -12,6 +12,18 @@ UwbSimulatorDeviceFile::UwbSimulatorDeviceFile(WDFFILEOBJECT wdfFile) :
     m_wdfFile(wdfFile)
 {}
 
+WDFFILEOBJECT
+UwbSimulatorDeviceFile::GetWdfFile() const noexcept
+{
+    return m_wdfFile;
+}
+
+UwbSimulatorIoEventQueue *
+UwbSimulatorDeviceFile::GetIoEventQueue() noexcept
+{
+    return m_ioEventQueue;
+}
+
 NTSTATUS
 UwbSimulatorDeviceFile::Initialize()
 {

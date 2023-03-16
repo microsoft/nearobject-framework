@@ -51,6 +51,17 @@ public:
     NTSTATUS
     OnRequest(WDFREQUEST request, ULONG ioControlCode, size_t inputBufferLength, size_t outputBufferLength);
 
+    /**
+     * @brief Get the associated wdf file handle.
+     * 
+     * @return WDFFILEOBJECT 
+     */
+    WDFFILEOBJECT
+    GetWdfFile() const noexcept;
+
+    UwbSimulatorIoEventQueue*
+    GetIoEventQueue() noexcept;
+
 public:
     static EVT_WDF_OBJECT_CONTEXT_DESTROY OnWdfDestroy;
     static EVT_WDF_REQUEST_CANCEL OnWdfRequestCancel;

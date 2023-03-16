@@ -10,12 +10,15 @@
 
 #include <cstddef>
 #include <memory>
+#include <optional>
+#include <queue>
 
 #include <windows.h>
 
 #include <wdf.h>
 
 #include "IUwbSimulatorDdiCallbacksLrp.hxx"
+#include <uwb/protocols/fira/FiraDevice.hxx>
 
 /**
  * @brief Per-event-queue context object.
@@ -48,8 +51,20 @@ public:
     NTSTATUS
     Uninitialize();
 
+    WDFQUEUE
+    GetWdfQueue() const noexcept;
+
+    NTSTATUS
+    PendRequest(WDFREQUEST request, std::size_t outputBufferSize);
+
+    NTSTATUS
+    GetNextQueuedRequest(std::optional<::uwb::protocol::fira::UwbNotificationData> notificationData, std::size_t &outputBufferSize);
+
 private:
     WDFQUEUE m_wdfQueue;
+    WDFWAITLOCK m_wdfQueueLock{ nullptr };
+    std::optional<std::size_t> m_pendingRequestOutputBufferSize;
+    std::queue<::uwb::protocol::fira::UwbNotificationData> m_notificationQueue;
 };
 
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(UwbSimulatorIoEventQueue, GetUwbSimulatorIoEventQueue)

@@ -176,12 +176,14 @@ struct IUwbSimulatorDdiCallbacksLrp
     SessionGetRangingCount(uint32_t sessionId, uint32_t &rangingCount) = 0;
 
     /**
-     * @brief
-     *
-     * @param notificationData
+     * @brief 
+     * 
+     * @param notificationData 
+     * @param notificationDataSize 
+     * @return NTSTATUS 
      */
     virtual NTSTATUS
-    UwbNotification(UwbNotificationData &notificationData) = 0;
+    UwbNotification(UwbNotificationData &notificationData, std::size_t &notificationDataSize) = 0;
 };
 } // namespace windows::devices::uwb::simulator
 
