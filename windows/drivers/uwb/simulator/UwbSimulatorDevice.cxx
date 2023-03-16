@@ -172,7 +172,7 @@ UwbSimulatorDevice::OnFileCreate(WDFDEVICE device, WDFREQUEST request, WDFFILEOB
     auto uwbSimulatorFile = new (uwbSimulatorFileBuffer) UwbSimulatorDeviceFile(file);
     auto uwbSimulatorFileStatus = uwbSimulatorFile->Initialize();
     if (uwbSimulatorFileStatus == STATUS_SUCCESS) {
-        auto uwbSimulatorHandler = std::make_unique<UwbSimulatorDdiHandler>(file);
+        auto uwbSimulatorHandler = std::make_unique<UwbSimulatorDdiHandler>(uwbSimulatorFile);
         uwbSimulatorFile->RegisterHandler(std::move(uwbSimulatorHandler));
     } else {
         uwbSimulatorFile->~UwbSimulatorDeviceFile();

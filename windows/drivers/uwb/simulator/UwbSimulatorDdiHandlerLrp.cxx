@@ -500,8 +500,8 @@ UwbSimulatorDdiHandler::OnUwbSimulatorTriggerSessionEvent(WDFREQUEST request, st
     return status;
 }
 
-UwbSimulatorDdiHandler::UwbSimulatorDdiHandler(WDFFILEOBJECT wdfFile) :
-    m_wdfFile(wdfFile),
+UwbSimulatorDdiHandler::UwbSimulatorDdiHandler(UwbSimulatorDeviceFile *deviceFile) :
+    m_deviceFile(deviceFile),
     m_callbacks(std::make_unique<UwbSimulatorDdiCallbacks>())
 {
 }
