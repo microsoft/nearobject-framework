@@ -36,6 +36,11 @@ UwbDeviceConnector::UwbDeviceConnector(std::string deviceName) :
     m_deviceName(std::move(deviceName))
 {}
 
+UwbDeviceConnector::~UwbDeviceConnector()
+{
+    NotificationListenerStop();
+}
+
 const std::string&
 UwbDeviceConnector::DeviceName() const noexcept
 {
@@ -233,7 +238,7 @@ UwbDeviceConnector::SessionDeinitialize(uint32_t sessionId)
 {
     std::promise<UwbStatus> resultPromise;
     auto resultFuture = resultPromise.get_future();
-    
+
     wil::shared_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
@@ -389,33 +394,37 @@ UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, Uw
 }
 
 void
-UwbDeviceConnector::HandleNotifications(wil::shared_hfile handleDriver, std::stop_token stopToken)
+UwbDeviceConnector::HandleNotifications(std::stop_token stopToken)
 {
-    std::vector<uint8_t> uwbNotificationDataBuffer{};
     DWORD bytesRequired = 0;
+    std::vector<uint8_t> uwbNotificationDataBuffer{};
+    auto handleDriver = m_notificationHandleDriver;
 
-    // TODO: the below loop invokes the IOCTL synchronously, blocking on a
-    // result. There is no known way to cancel the blocking call on the client
-    // side; as such, even when stop is requested on the stop token, it cannot
-    // be evaluated since the blocking call won't be interrupted.
-    //
-    // The correct solution here is to open the handle in overlapped mode, and
-    // make a non-blocking call. This is not trivial, so will be done later.
     while (!stopToken.stop_requested()) {
+        m_notificationOverlapped = {};
         for (const auto i : std::ranges::iota_view{ 1, 2 }) {
             uwbNotificationDataBuffer.resize(bytesRequired);
             PLOG_DEBUG << "IOCTL_UWB_NOTIFICATION attempt #" << i << " with " << std::size(uwbNotificationDataBuffer) << "-byte buffer";
-            BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, std::data(uwbNotificationDataBuffer), std::size(uwbNotificationDataBuffer), &bytesRequired, nullptr);
+            BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, std::data(uwbNotificationDataBuffer), std::size(uwbNotificationDataBuffer), &bytesRequired, &m_notificationOverlapped);
             if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
                 DWORD lastError = GetLastError();
-                // Treat all errors other than insufficient buffer size as fatal.
-                if (lastError != ERROR_INSUFFICIENT_BUFFER) {
+                if (lastError == ERROR_IO_PENDING) {
+                    // I/O has been pended, wait for it synchronously
+                    if (!LOG_IF_WIN32_BOOL_FALSE(GetOverlappedResult(handleDriver.get(), &m_notificationOverlapped, &bytesRequired, TRUE /* wait */))) {
+                        lastError = GetLastError();
+                        HRESULT hr = HRESULT_FROM_WIN32(lastError);
+                        PLOG_ERROR << "error waiting for IOCTL_UWB_NOTIFICATION completion, hr=" << std::showbase << std::hex << hr;
+                        break; // for({1,2})
+                    }
+                } else if (lastError == ERROR_INSUFFICIENT_BUFFER) {
+                    // Attempt to retry the ioctl with the appropriate buffer size, which is now held in bytesRequired.
+                    continue;
+                } else {
+                    // Treat all other errors as fatal.
                     HRESULT hr = HRESULT_FROM_WIN32(lastError);
                     PLOG_ERROR << "error when sending IOCTL_UWB_NOTIFICATION, hr=" << std::showbase << std::hex << hr;
-                    break;
+                    break; // for({1,2})
                 }
-                // Attempt to retry the ioctl with the appropriate buffer size, which is now held in bytesRequired.
-                continue;
             }
 
             // Convert to neutral type and process the notification.
@@ -573,15 +582,16 @@ UwbDeviceConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData
 bool
 UwbDeviceConnector::NotificationListenerStart()
 {
-    wil::shared_hfile handleDriver;
-    auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
+    wil::shared_hfile notificationHandleDriver;
+    auto hr = OpenDriverHandle(notificationHandleDriver, m_deviceName.c_str(), true);
     if (FAILED(hr)) {
         PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << hr;
         return false;
     }
 
-    m_notificationThread = std::jthread([this, handleDriver = std::move(handleDriver)](std::stop_token stopToken) {
-        HandleNotifications(std::move(handleDriver), stopToken);
+    m_notificationHandleDriver = std::move(notificationHandleDriver);
+    m_notificationThread = std::jthread([this](std::stop_token stopToken) {
+        HandleNotifications(std::move(stopToken));
     });
 
     return true;
@@ -590,6 +600,7 @@ UwbDeviceConnector::NotificationListenerStart()
 void
 UwbDeviceConnector::NotificationListenerStop()
 {
+    LOG_IF_WIN32_BOOL_FALSE(CancelIoEx(m_notificationHandleDriver.get(), &m_notificationOverlapped));
     m_notificationThread.request_stop();
 }
 

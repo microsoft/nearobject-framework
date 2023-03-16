@@ -82,11 +82,8 @@ NearObjectCli::GetRangeStopApp() noexcept
 std::shared_ptr<uwb::UwbDevice>
 NearObjectCli::GetUwbDevice() noexcept
 {
-    if (m_uwbDevice == nullptr) {
-        m_uwbDevice = m_cliHandler->ResolveUwbDevice(*m_cliData);
-    }
-
-    return m_uwbDevice;
+    auto uwbDevice = m_cliHandler->ResolveUwbDevice(*m_cliData);
+    return std::move(uwbDevice);
 }
 
 std::unique_ptr<CLI::App>
