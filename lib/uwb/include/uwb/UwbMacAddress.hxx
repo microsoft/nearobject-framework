@@ -362,6 +362,15 @@ public:
     UwbMacAddress(const UwbMacAddress& other);
 
     /**
+     * @brief Construct a new UwbMacAddress object given an input string of
+     * semicolon-delimited bytes.
+     *
+     * @param addressString The semicolon-delimited address string.
+     * @param addressType The type of mac address that addressString represents.
+     */
+    UwbMacAddress(std::string addressString, UwbMacAddressType addressType);
+
+    /**
      * @brief Copy assignment operator.
      *
      * @param other

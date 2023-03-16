@@ -233,9 +233,9 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     detail::AddEnumOption(rangeStartApp, uwbConfig.multiNodeMode);
     rangeStartApp->add_option("--NumberOfControlees", uwbConfig.numberOfControlees, "1 <= N <= 8")->capture_default_str(); // TODO: Input validation
     if (uwbConfig.macAddressMode == uwb::UwbMacAddressType::Extended) {
-        rangeStartApp->add_option("--ControllerMacAddress", m_cliData->controllerExtendedMac, "8-byte extended MAC address of UWBS: e.g. 12:34:56:78:87:65:43:21")->delimiter(':'); // TODO: Input validation
-    } else {
-        rangeStartApp->add_option("--ControllerMacAddress", m_cliData->controllerShortMac, "2-byte short MAC address of UWBS: e.g. 12:34")->delimiter(':'); // TODO: Input validation
+        rangeStartApp->add_option("--ControllerMacAddress", m_cliData->controllerMacAddress, "8-byte extended MAC address of UWBS: e.g. 12:34:56:78:87:65:43:21")->capture_default_str();
+    } else { // uwb::UwbMacAddressType::Short OR empty (default)
+        rangeStartApp->add_option("--ControllerMacAddress", m_cliData->controllerMacAddress, "2-byte short MAC address of UWBS: e.g. 12:34")->capture_default_str();
     }
     // TODO: Find out if there is a way to have extended controlee mac address
     // TODO: Fix this
@@ -282,11 +282,11 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     rangeStartApp->parse_complete_callback([this] {
         // Set MAC addresses
         if (m_cliData->uwbConfiguration.macAddressMode == uwb::UwbMacAddressType::Extended) {
-            uwb::UwbMacAddress controllerExtendedMacAddress(m_cliData->controllerExtendedMac);
-            m_cliData->uwbConfiguration.controllerMacAddress = controllerExtendedMacAddress;
+            uwb::UwbMacAddress controllerMacAddress(m_cliData->controllerMacAddress, uwb::UwbMacAddressType::Extended);
+            m_cliData->uwbConfiguration.controllerMacAddress = controllerMacAddress;
         } else {
-            uwb::UwbMacAddress controllerShortMacAddress(m_cliData->controllerShortMac);
-            m_cliData->uwbConfiguration.controllerMacAddress = controllerShortMacAddress;
+            uwb::UwbMacAddress controllerMacAddress(m_cliData->controllerMacAddress, uwb::UwbMacAddressType::Short);
+            m_cliData->uwbConfiguration.controllerMacAddress = controllerMacAddress;
         }
         // TODO: Controlee
 

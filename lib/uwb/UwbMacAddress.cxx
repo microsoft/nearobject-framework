@@ -25,6 +25,34 @@ UwbMacAddress::UwbMacAddress(const UwbMacAddress& other) :
     InitializeView();
 }
 
+UwbMacAddress::UwbMacAddress(std::string addressString, UwbMacAddressType addressType)
+{
+    std::array<uint8_t, ShortLength> shortAddress{};
+    std::array<uint8_t, ExtendedLength> extendedAddress{};
+
+    std::stringstream ss(addressString);
+    for (auto i = 0; i < (addressType == UwbMacAddressType::Short ? ShortLength : ExtendedLength); i++) {
+        if (ss) {
+            std::string addressByte;
+            getline(ss, addressByte, ':');
+            const auto byteValue = static_cast<uint8_t>(std::stoi(addressByte));
+            if (addressType == UwbMacAddressType::Short) {
+                shortAddress[i] = byteValue;
+            } else {
+                extendedAddress[i] = byteValue;
+            }
+        } else {
+            break;
+        }
+    }
+
+    if (addressType == UwbMacAddressType::Short) {
+        *this = UwbMacAddress(shortAddress);
+    } else {
+        *this = UwbMacAddress(extendedAddress);
+    }
+}
+
 UwbMacAddress&
 UwbMacAddress::operator=(UwbMacAddress other)
 {

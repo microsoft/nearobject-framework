@@ -75,9 +75,7 @@ struct NearObjectCliData
     virtual ~NearObjectCliData() = default;
 
     bool HostIsController{ false };
-    // TODO: Make this better
-    uwb::UwbMacAddress::ShortType controllerShortMac{};
-    uwb::UwbMacAddress::ExtendedType controllerExtendedMac{};
+    std::string controllerMacAddress{};
     UwbConfigurationData uwbConfiguration{};
     uwb::protocol::fira::StaticRangingInfo StaticRanging{};
     uwb::protocol::fira::UwbSessionData SessionData{};
