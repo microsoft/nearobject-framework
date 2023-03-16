@@ -6,6 +6,8 @@
 
 #include <CLI/CLI.hpp>
 
+#include <windows/devices/uwb/UwbDevice.hxx>
+
 #include "NearObjectCliDataWindows.hxx"
 #include "NearObjectCliHandlerWindows.hxx"
 
