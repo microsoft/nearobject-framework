@@ -233,9 +233,9 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     detail::AddEnumOption(rangeStartApp, uwbConfig.multiNodeMode);
     rangeStartApp->add_option("--NumberOfControlees", uwbConfig.numberOfControlees, "1 <= N <= 8")->capture_default_str(); // TODO: Input validation
     if (uwbConfig.macAddressMode == uwb::UwbMacAddressType::Extended) {
-        rangeStartApp->add_option("--ControllerMacAddress", m_cliData->controllerExtendedMac, "8-byte extended MAC address of UWBS: e.g. 0x12:0x34:0x56:0x78:0x87:0x65:0x43:0x21")->delimiter(':'); // TODO: Input validation
+        rangeStartApp->add_option("--ControllerMacAddress", m_cliData->controllerExtendedMac, "8-byte extended MAC address of UWBS: e.g. 12:34:56:78:87:65:43:21")->delimiter(':'); // TODO: Input validation
     } else {
-        rangeStartApp->add_option("--ControllerMacAddress", m_cliData->controllerShortMac, "2-byte short MAC address of UWBS: e.g. 0x12:0x34")->delimiter(':'); // TODO: Input validation
+        rangeStartApp->add_option("--ControllerMacAddress", m_cliData->controllerShortMac, "2-byte short MAC address of UWBS: e.g. 12:34")->delimiter(':'); // TODO: Input validation
     }
     // TODO: Find out if there is a way to have extended controlee mac address
     // TODO: Fix this
