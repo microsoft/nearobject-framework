@@ -42,16 +42,18 @@ public:
      * @param deviceGuid The GUID of the device to monitor for presence changes.
      * @param callback The callback function to invoke when a device presence
      * change event occurs.
+     * @param enumerateInitialDevicesOnStart Flag to indicate whether pre-existing devices should be enumerated on start.
      */
-    explicit DevicePresenceMonitor(const GUID& deviceGuid, std::function<void(const GUID& deviceGuid, DevicePresenceEvent presenceEvent, std::string deviceName)> callback) noexcept;
+    explicit DevicePresenceMonitor(const GUID& deviceGuid, std::function<void(const GUID& deviceGuid, DevicePresenceEvent presenceEvent, std::string deviceName)> callback, bool enumerateInitialDevicesOnStart = false) noexcept;
 
     /**
      * @brief Construct a new Device Presence Monitor object
      *
      * @param deviceGuids A list of deveice guids to monitor for presence changes.
      * @param callback The callback function to invoke when a device presence change event occurs.
+     * @param enumerateInitialDevicesOnStart Flag to indicate whether pre-existing devices should be enumerated on start.
      */
-    explicit DevicePresenceMonitor(std::vector<GUID> deviceGuids, std::function<void(const GUID& deviceGuid, DevicePresenceEvent presenceEvent, std::string deviceName)> callback) noexcept;
+    explicit DevicePresenceMonitor(std::vector<GUID> deviceGuids, std::function<void(const GUID& deviceGuid, DevicePresenceEvent presenceEvent, std::string deviceName)> callback, bool enumerateInitialDevicesOnStart = false) noexcept;
 
     /**
      * @brief Exception thrown when there is an error starting the monitor.
@@ -145,6 +147,7 @@ private:
 private:
     std::function<void(const GUID& deviceGuid, DevicePresenceEvent presenceEvent, std::string deviceName)> m_callback;
     std::unordered_map<GUID, unique_hcmnotification> m_deviceGuids{};
+    bool m_enumerateInitialDevicesOnStart{ false };
 };
 } // namespace windows::devices
 

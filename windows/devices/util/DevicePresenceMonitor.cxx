@@ -3,17 +3,19 @@
 #include <sstream>
 
 #include <windows/devices/DevicePresenceMonitor.hxx>
+#include <windows/devices/DeviceEnumerator.hxx>
 
 #include <plog/Log.h>
 
 using namespace windows::devices;
 
-DevicePresenceMonitor::DevicePresenceMonitor(const GUID &deviceGuid, std::function<void(const GUID &deviceGuid, DevicePresenceEvent presenceEvent, std::string deviceName)> callback) noexcept :
-    DevicePresenceMonitor(std::vector<GUID>{ deviceGuid }, std::move(callback))
+DevicePresenceMonitor::DevicePresenceMonitor(const GUID &deviceGuid, std::function<void(const GUID &deviceGuid, DevicePresenceEvent presenceEvent, std::string deviceName)> callback, bool enumerateInitialDevicesOnStart) noexcept :
+    DevicePresenceMonitor(std::vector<GUID>{ deviceGuid }, std::move(callback), enumerateInitialDevicesOnStart)
 {}
 
-DevicePresenceMonitor::DevicePresenceMonitor(std::vector<GUID> deviceGuids, std::function<void(const GUID &deviceGuid, DevicePresenceEvent presenceEvent, std::string deviceName)> callback) noexcept :
-    m_callback(std::move(callback))
+DevicePresenceMonitor::DevicePresenceMonitor(std::vector<GUID> deviceGuids, std::function<void(const GUID &deviceGuid, DevicePresenceEvent presenceEvent, std::string deviceName)> callback, bool enumerateInitialDevicesOnStart) noexcept :
+    m_callback(std::move(callback)),
+    m_enumerateInitialDevicesOnStart(enumerateInitialDevicesOnStart)
 {
     for (auto &deviceGuid : deviceGuids) {
         m_deviceGuids.insert({ std::move(deviceGuid), unique_hcmnotification{} });
@@ -92,6 +94,15 @@ DevicePresenceMonitor::OnDeviceInterfaceNotificationCallback(HCMNOTIFICATION hcm
 void
 DevicePresenceMonitor::Start()
 {
+    if (m_enumerateInitialDevicesOnStart) {
+        for (auto &[deviceGuid, _] : m_deviceGuids) {
+            auto deviceNames = DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(deviceGuid);
+            for (auto& deviceName : deviceNames) {
+                m_callback(deviceGuid, DevicePresenceEvent::Arrived, std::move(deviceName));
+            }
+        }
+    }
+
     RegisterForDeviceClassNotifications();
 }
 
