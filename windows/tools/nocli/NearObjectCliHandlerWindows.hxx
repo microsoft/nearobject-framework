@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 
-#include <nearobject/cli/NearObjectCliHandler.hxx>
 #include <nearobject/cli/NearObjectCliData.hxx>
+#include <nearobject/cli/NearObjectCliHandler.hxx>
 #include <uwb/UwbDevice.hxx>
 
 namespace windows::devices::uwb

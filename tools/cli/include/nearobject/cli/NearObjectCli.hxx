@@ -6,8 +6,8 @@
 #include <memory>
 
 #include <CLI/CLI.hpp>
-#include <nearobject/cli/NearObjectCliHandler.hxx>
 #include <nearobject/cli/NearObjectCliData.hxx>
+#include <nearobject/cli/NearObjectCliHandler.hxx>
 #include <uwb/UwbDevice.hxx>
 
 namespace nearobject::cli
@@ -74,10 +74,10 @@ public:
     GetRangeApp() noexcept;
 
     /**
-    * @brief Get the app object associated with the "uwb raw" sub-command.
-    *
-    * @return CLI::App&
-    */
+     * @brief Get the app object associated with the "uwb raw" sub-command.
+     *
+     * @return CLI::App&
+     */
     CLI::App&
     GetRawApp() noexcept;
 
@@ -108,7 +108,7 @@ private:
      *  2. Device name as specified on the command line.
      *  3. Default device name (first device found).
      *
-     * @return std::shared_ptr<uwb::UwbDevice> 
+     * @return std::shared_ptr<uwb::UwbDevice>
      */
     std::shared_ptr<uwb::UwbDevice>
     GetUwbDevice() noexcept;
@@ -132,10 +132,10 @@ private:
     AddSubcommandUwb(CLI::App* parent);
 
     /**
-     * @brief Add the 'uwb monitor' sub-command. 
-     * 
+     * @brief Add the 'uwb monitor' sub-command.
+     *
      * @param parent The parent app to add the command to.
-     * @return CLI::App* 
+     * @return CLI::App*
      */
     CLI::App*
     AddSubcommandUwbMonitor(CLI::App* parent);
@@ -150,11 +150,11 @@ private:
     AddSubcommandUwbRange(CLI::App* parent);
 
     /**
-    * @brief Add the 'uwb raw' sub-command.
-    *
-    * @param parent The parent app to add the command to.
-    * @return CLI::App*
-    */
+     * @brief Add the 'uwb raw' sub-command.
+     *
+     * @param parent The parent app to add the command to.
+     * @return CLI::App*
+     */
     CLI::App*
     AddSubcommandUwbRaw(CLI::App* parent);
 
@@ -178,7 +178,7 @@ private:
 
     /**
      * @brief Add the 'uwb raw devicereset' sub-command.
-     * 
+     *
      * @param parent The parent app to add the command to.
      * @return CLI::App*
      */
@@ -186,11 +186,11 @@ private:
     AddSubcommandUwbRawDeviceReset(CLI::App* parent);
 
     /**
-    * @brief Add the 'uwb raw getdeviceinfo' sub-command.
-    *
-    * @param parent The parent app to add the command to.
-    * @return CLI::App*
-    */
+     * @brief Add the 'uwb raw getdeviceinfo' sub-command.
+     *
+     * @param parent The parent app to add the command to.
+     * @return CLI::App*
+     */
     CLI::App*
     AddSubcommandUwbRawGetDeviceInfo(CLI::App* parent);
 

@@ -2,8 +2,8 @@
 #include <filesystem>
 #include <sstream>
 
-#include <windows/devices/DevicePresenceMonitor.hxx>
 #include <windows/devices/DeviceEnumerator.hxx>
+#include <windows/devices/DevicePresenceMonitor.hxx>
 
 #include <plog/Log.h>
 
@@ -95,9 +95,9 @@ void
 DevicePresenceMonitor::Start()
 {
     if (m_enumerateInitialDevicesOnStart) {
-        for (auto &[deviceGuid, _] : m_deviceGuids) {
+        for (const auto &[deviceGuid, _] : m_deviceGuids) {
             auto deviceNames = DeviceEnumerator::GetDeviceInterfaceClassInstanceNames(deviceGuid);
-            for (auto& deviceName : deviceNames) {
+            for (auto &deviceName : deviceNames) {
                 m_callback(deviceGuid, DevicePresenceEvent::Arrived, std::move(deviceName));
             }
         }

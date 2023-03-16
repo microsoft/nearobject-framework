@@ -238,7 +238,7 @@ UwbDeviceConnector::SessionDeinitialize(uint32_t sessionId)
 {
     std::promise<UwbStatus> resultPromise;
     auto resultFuture = resultPromise.get_future();
-    
+
     wil::shared_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
@@ -419,8 +419,8 @@ UwbDeviceConnector::HandleNotifications(std::stop_token stopToken)
                 } else if (lastError == ERROR_INSUFFICIENT_BUFFER) {
                     // Attempt to retry the ioctl with the appropriate buffer size, which is now held in bytesRequired.
                     continue;
-                // Treat all other errors as fatal.
                 } else {
+                    // Treat all other errors as fatal.
                     HRESULT hr = HRESULT_FROM_WIN32(lastError);
                     PLOG_ERROR << "error when sending IOCTL_UWB_NOTIFICATION, hr=" << std::showbase << std::hex << hr;
                     break; // for({1,2})
