@@ -88,7 +88,7 @@ ResolveUwbDevice(const nearobject::cli::NearObjectCliDataWindows& cliData)
         return nullptr;
     }
 
-    return std::make_unique<windows::devices::uwb::UwbDevice>(deviceName);
+    return std::make_shared<windows::devices::uwb::UwbDevice>(deviceName);
 }
 } // namespace detail
 
