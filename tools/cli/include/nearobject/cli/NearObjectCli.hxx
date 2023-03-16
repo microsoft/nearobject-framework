@@ -198,9 +198,6 @@ private:
     std::shared_ptr<NearObjectCliData> m_cliData;
     std::shared_ptr<NearObjectCliHandler> m_cliHandler;
 
-    // Resolved device instance, if applicable to the selected command.
-    std::shared_ptr<uwb::UwbDevice> m_uwbDevice;
-
     std::unique_ptr<CLI::App> m_cliApp;
     // The following are helper references to the subcommands of m_cliApp, the memory is managed by CLI11.
     CLI::App* m_uwbApp;
