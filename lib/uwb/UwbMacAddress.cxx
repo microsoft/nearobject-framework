@@ -1,6 +1,8 @@
 
+#include <cassert>
 #include <iomanip>
 #include <ios>
+#include <regex>
 #include <sstream>
 #include <stdexcept>
 
@@ -27,29 +29,37 @@ UwbMacAddress::UwbMacAddress(const UwbMacAddress& other) :
 
 UwbMacAddress::UwbMacAddress(std::string addressString, UwbMacAddressType addressType)
 {
+    std::regex macRegex("^(([0-9A-Fa-f]{2}:){7}[0-9A-Fa-f]{2})|([0-9A-Fa-f]{2}:){1}([0-9A-Fa-f]{2})$");
+    assert(std::regex_match(addressString, macRegex));
+
     std::array<uint8_t, ShortLength> shortAddress{};
     std::array<uint8_t, ExtendedLength> extendedAddress{};
-
-    std::stringstream ss(addressString);
-    for (auto i = 0; i < (addressType == UwbMacAddressType::Short ? ShortLength : ExtendedLength); i++) {
-        if (ss) {
-            std::string addressByte;
-            getline(ss, addressByte, ':');
-            const auto byteValue = static_cast<uint8_t>(std::stoi(addressByte));
-            if (addressType == UwbMacAddressType::Short) {
-                shortAddress[i] = byteValue;
+    try {
+        std::stringstream ss(addressString);
+        for (auto i = 0; i < (addressType == UwbMacAddressType::Short ? ShortLength : ExtendedLength); i++) {
+            if (ss) {
+                std::string addressByte;
+                getline(ss, addressByte, ':');
+                const auto byteValue = static_cast<uint8_t>(std::stoi(addressByte));
+                if (addressType == UwbMacAddressType::Short) {
+                    shortAddress[i] = byteValue;
+                } else {
+                    extendedAddress[i] = byteValue;
+                }
             } else {
-                extendedAddress[i] = byteValue;
+                throw std::runtime_error("invalid mac address string");
             }
+        }
+
+        if (addressType == UwbMacAddressType::Short) {
+            *this = UwbMacAddress(shortAddress);
         } else {
-            break;
+            *this = UwbMacAddress(extendedAddress);
         }
     }
-
-    if (addressType == UwbMacAddressType::Short) {
-        *this = UwbMacAddress(shortAddress);
-    } else {
-        *this = UwbMacAddress(extendedAddress);
+    catch (const std::exception& e)
+    {
+        throw std::invalid_argument("Invalid mac address string: " + addressString);
     }
 }
 
