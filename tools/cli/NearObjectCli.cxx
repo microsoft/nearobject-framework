@@ -232,14 +232,14 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     detail::AddEnumOption(rangeStartApp, uwbConfig.deviceRole);
     detail::AddEnumOption(rangeStartApp, uwbConfig.multiNodeMode);
     rangeStartApp->add_option("--NumberOfControlees", uwbConfig.numberOfControlees, "1 <= N <= 8")->capture_default_str(); // TODO: Input validation
+    // TODO: Accept multiple controlees
     if (uwbConfig.macAddressMode == uwb::UwbMacAddressType::Extended) {
-        rangeStartApp->add_option("--ControllerMacAddress", m_cliData->controllerMacAddress, "8-byte extended MAC address of UWBS: e.g. 12:34:56:78:87:65:43:21")->capture_default_str();
+        rangeStartApp->add_option("--ControllerMacAddress", m_cliData->controllerMacAddress, "8-byte extended MAC address of controller: e.g. 12:34:56:78:87:65:43:21")->capture_default_str();
+        rangeStartApp->add_option("--ControleeMacAddress", m_cliData->controleeMacAddress, "8-byte extended MAC address of controlee: e.g. 12:34:56:78:87:65:43:21")->capture_default_str();
     } else { // uwb::UwbMacAddressType::Short OR empty (default)
-        rangeStartApp->add_option("--ControllerMacAddress", m_cliData->controllerMacAddress, "2-byte short MAC address of UWBS: e.g. 12:34")->capture_default_str();
+        rangeStartApp->add_option("--ControllerMacAddress", m_cliData->controllerMacAddress, "2-byte short MAC address of controller: e.g. 12:34")->capture_default_str();
+        rangeStartApp->add_option("--ControleeMacAddress", m_cliData->controleeMacAddress, "2-byte short MAC address of controlee: e.g. 12:34")->capture_default_str();
     }
-    // TODO: Find out if there is a way to have extended controlee mac address
-    // TODO: Fix this
-    rangeStartApp->add_option("--ControleeMacAddress", uwbConfig.controleeShortMacAddress, "2-byte MAC address of controlee")->delimiter(':'); // TODO: Input validation
     detail::AddEnumOption(rangeStartApp, uwbConfig.deviceType);
     // enumerations
     // detail::AddEnumOption(rangeStartApp, uwbConfig.rangingDirection);
@@ -283,18 +283,25 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
         // Set MAC addresses
         if (m_cliData->uwbConfiguration.macAddressMode == uwb::UwbMacAddressType::Extended) {
             uwb::UwbMacAddress controllerMacAddress(m_cliData->controllerMacAddress, uwb::UwbMacAddressType::Extended);
+            uwb::UwbMacAddress controleeMacAddress(m_cliData->controleeMacAddress, uwb::UwbMacAddressType::Extended);
+
             m_cliData->uwbConfiguration.controllerMacAddress = controllerMacAddress;
+            // TODO: Figure out where to store extended controlee mac address
+            //m_cliData->uwbConfiguration.??? = controleeMacAddress;
         } else {
             uwb::UwbMacAddress controllerMacAddress(m_cliData->controllerMacAddress, uwb::UwbMacAddressType::Short);
+            uwb::UwbMacAddress controleeMacAddress(m_cliData->controleeMacAddress, uwb::UwbMacAddressType::Short);
+
             m_cliData->uwbConfiguration.controllerMacAddress = controllerMacAddress;
+            m_cliData->uwbConfiguration.controleeShortMacAddress = controleeMacAddress;
         }
-        // TODO: Controlee
 
         m_cliData->SessionData.uwbConfiguration = m_cliData->uwbConfiguration;
         m_cliData->SessionData.staticRangingInfo = m_cliData->StaticRanging;
 
         // TEST
         std::cout << "ControllerMacAddress: " << m_cliData->SessionData.uwbConfiguration.GetControllerMacAddress().value().ToString() << std::endl;
+        std::cout << "ControleeMacAddress: " << m_cliData->SessionData.uwbConfiguration.GetControleeShortMacAddress().value().ToString() << std::endl;
 
         std::cout << "Selected parameters:" << std::endl;
 

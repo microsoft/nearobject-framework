@@ -76,6 +76,7 @@ struct NearObjectCliData
 
     bool HostIsController{ false };
     std::string controllerMacAddress{};
+    std::string controleeMacAddress{};
     UwbConfigurationData uwbConfiguration{};
     uwb::protocol::fira::StaticRangingInfo StaticRanging{};
     uwb::protocol::fira::UwbSessionData SessionData{};
