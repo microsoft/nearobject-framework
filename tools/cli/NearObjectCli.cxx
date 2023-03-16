@@ -105,14 +105,11 @@ NearObjectCli::CreateParser() noexcept
 namespace detail
 {
 /**
- * @brief Helper function to produce a mapping of enumeration strings to their
- * corresponding field names.
- *
- * This is used for CLI11 CheckedTransformer which validates string inputs and
- * maps them to their corresponding enumeration value.
+ * @brief Helper function to produce a mapping of enumeration field names to their
+ * corresponding values.
  *
  * @tparam EnumType The type of the enumeration.
- * @return std::map<std::string, EnumType>
+ * @return std::unordered_map<std::string, EnumType>
  */
 template <typename EnumType>
 // clang-format off
@@ -134,9 +131,8 @@ CreateEnumerationStringMap() noexcept
 /**
  * @brief Adds a cli option based on an enumeration.
  *
- * This uses the name of the enumeration as the option name and configures to
- * ignore case. For example, if the enum type MyEnum is used, then an option is
- * added with name --MyEnum and it can be specified with any case.
+ * This uses the name of the enumeration as the option name and gives
+ * the usage as the description.
  *
  * @tparam EnumType The enumeration type to add as an option.
  * @param app The target CLI11 application to add the option to.
@@ -152,9 +148,19 @@ AddEnumOption(CLI::App* app, std::optional<EnumType>& assignTo)
 {
     std::string optionName{ std::string("--").append(magic_enum::enum_type_name<EnumType>()) };
 
-    return app->add_option(std::move(optionName), assignTo)
-        ->transform(CLI::CheckedTransformer(CreateEnumerationStringMap<EnumType>(), CLI::ignore_case))
-        ->capture_default_str();
+    const auto map = CreateEnumerationStringMap<EnumType>();
+    std::ostringstream enumUsage;
+
+    auto it = std::cbegin(map);
+    const auto& [name, value] = *it;
+    enumUsage << "value in { " << static_cast<int>(value) << "(" << name << ")";
+    for (it = std::next(std::cbegin(map)); it != std::cend(map); std::advance(it, 1)) {
+        const auto& [name, value] = *it;
+        enumUsage << ", " << static_cast<int>(value) << "(" << name << ")";
+    }
+    enumUsage << " }";
+
+    return app->add_option(std::move(optionName), assignTo, enumUsage.str())->capture_default_str();
 }
 
 } // namespace detail
