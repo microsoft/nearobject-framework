@@ -51,6 +51,8 @@ struct UwbConfigurationData
     std::optional<uint8_t> keyRotationRate;
     std::optional<uwb::UwbMacAddressFcsType> macAddressFcsType;
     std::optional<uint16_t> maxRangingRoundRetry;
+    std::optional<uint8_t> numberOfControlees;
+    std::optional<uwb::protocol::fira::DeviceType> deviceType;
 
     // Free-form string arugments that will be manually parsed to their target format(s).
     std::string firaPhyVersionString;
@@ -73,6 +75,9 @@ struct NearObjectCliData
     virtual ~NearObjectCliData() = default;
 
     bool HostIsController{ false };
+    // TODO: Make this better
+    uwb::UwbMacAddress::ShortType controllerShortMac{};
+    uwb::UwbMacAddress::ExtendedType controllerExtendedMac{};
     UwbConfigurationData uwbConfiguration{};
     uwb::protocol::fira::StaticRangingInfo StaticRanging{};
     uwb::protocol::fira::UwbSessionData SessionData{};

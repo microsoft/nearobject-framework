@@ -227,50 +227,74 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
 
     // TODO is there a way to put all the enums into a list of [optionName, optionDestination, optionMap] so we don't have to create the initializer list each time
 
-    // enumerations
+    // List mandatory params first
+    // TODO: --help should output that these params are mandatory
     detail::AddEnumOption(rangeStartApp, uwbConfig.deviceRole);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingDirection);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingMeasurementReportMode);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.stsConfiguration);
     detail::AddEnumOption(rangeStartApp, uwbConfig.multiNodeMode);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingTimeStruct);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.schedulingMode);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.channel);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.rframeConfig);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.convolutionalCodeConstraintLength);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.prfMode);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.macAddressFcsType);
+    rangeStartApp->add_option("--NumberOfControlees", uwbConfig.numberOfControlees, "1 <= N <= 8")->capture_default_str(); // TODO: Input validation
+    if (uwbConfig.macAddressMode == uwb::UwbMacAddressType::Extended) {
+        rangeStartApp->add_option("--ControllerMacAddress", m_cliData->controllerExtendedMac, "8-byte extended MAC address of UWBS: e.g. 0x12:0x34:0x56:0x78:0x87:0x65:0x43:0x21")->delimiter(':'); // TODO: Input validation
+    } else {
+        rangeStartApp->add_option("--ControllerMacAddress", m_cliData->controllerShortMac, "2-byte short MAC address of UWBS: e.g. 0x12:0x34")->delimiter(':'); // TODO: Input validation
+    }
+    // TODO: Find out if there is a way to have extended controlee mac address
+    // TODO: Fix this
+    rangeStartApp->add_option("--ControleeMacAddress", uwbConfig.controleeShortMacAddress, "2-byte MAC address of controlee")->delimiter(':'); // TODO: Input validation
+    detail::AddEnumOption(rangeStartApp, uwbConfig.deviceType);
+    // enumerations
+    // detail::AddEnumOption(rangeStartApp, uwbConfig.rangingDirection);
+    // detail::AddEnumOption(rangeStartApp, uwbConfig.rangingMeasurementReportMode);
+    // detail::AddEnumOption(rangeStartApp, uwbConfig.stsConfiguration);
+    // detail::AddEnumOption(rangeStartApp, uwbConfig.rangingTimeStruct);
+    // detail::AddEnumOption(rangeStartApp, uwbConfig.schedulingMode);
+    // detail::AddEnumOption(rangeStartApp, uwbConfig.channel);
+    // detail::AddEnumOption(rangeStartApp, uwbConfig.rframeConfig);
+    // detail::AddEnumOption(rangeStartApp, uwbConfig.convolutionalCodeConstraintLength);
+    // detail::AddEnumOption(rangeStartApp, uwbConfig.prfMode);
+    // detail::AddEnumOption(rangeStartApp, uwbConfig.macAddressFcsType);
 
     // booleans
-    rangeStartApp->add_flag("--controller,!--controlee", m_cliData->HostIsController, "default is controlee")->capture_default_str();
-    rangeStartApp->add_flag("--HoppingMode", uwbConfig.hoppingMode)->capture_default_str();
-    rangeStartApp->add_flag("--BlockStriding", uwbConfig.blockStriding)->capture_default_str();
+    // rangeStartApp->add_flag("--HoppingMode", uwbConfig.hoppingMode)->capture_default_str();
+    // rangeStartApp->add_flag("--BlockStriding", uwbConfig.blockStriding)->capture_default_str();
 
     // TODO check for int sizes when parsing input
-    rangeStartApp->add_option("--UwbInitiationTime", uwbConfig.uwbInitiationTime, "uint32_t")->capture_default_str();
-    rangeStartApp->add_option("--Sp0PhySetNumber", uwbConfig.sp0PhySetNumber, "uint8_t")->capture_default_str();
-    rangeStartApp->add_option("--Sp1PhySetNumber", uwbConfig.sp1PhySetNumber, "uint8_t")->capture_default_str();
-    rangeStartApp->add_option("--Sp3PhySetNumber", uwbConfig.sp3PhySetNumber, "uint8_t")->capture_default_str();
-    rangeStartApp->add_option("--PreableCodeIndex", uwbConfig.preableCodeIndex, "uint8_t")->capture_default_str();
-    rangeStartApp->add_option("--SlotsPerRangingRound", uwbConfig.slotsPerRangingRound, "uint8_t")->capture_default_str();
-    rangeStartApp->add_option("--MaxContentionPhaseLength", uwbConfig.maxContentionPhaseLength, "uint8_t")->capture_default_str();
-    rangeStartApp->add_option("--SlotDuration", uwbConfig.slotDuration, "uint8_t")->capture_default_str();
-    rangeStartApp->add_option("--RangingInterval", uwbConfig.rangingInterval, "uint16_t")->capture_default_str();
-    rangeStartApp->add_option("--KeyRotationRate", uwbConfig.keyRotationRate, "uint8_t")->capture_default_str();
-    rangeStartApp->add_option("--MaxRangingRoundRetry", uwbConfig.maxRangingRoundRetry, "uint16_t")->capture_default_str();
-    rangeStartApp->add_option("--StaticRangingInfoVendorId", m_cliData->StaticRanging.VendorId, "uint16_t. If --SecureRangingInfo* options are used, this option will be overridden")->capture_default_str();
+    // rangeStartApp->add_option("--UwbInitiationTime", uwbConfig.uwbInitiationTime, "uint32_t")->capture_default_str();
+    // rangeStartApp->add_option("--Sp0PhySetNumber", uwbConfig.sp0PhySetNumber, "uint8_t")->capture_default_str();
+    // rangeStartApp->add_option("--Sp1PhySetNumber", uwbConfig.sp1PhySetNumber, "uint8_t")->capture_default_str();
+    // rangeStartApp->add_option("--Sp3PhySetNumber", uwbConfig.sp3PhySetNumber, "uint8_t")->capture_default_str();
+    // rangeStartApp->add_option("--PreableCodeIndex", uwbConfig.preableCodeIndex, "uint8_t")->capture_default_str();
+    // rangeStartApp->add_option("--SlotsPerRangingRound", uwbConfig.slotsPerRangingRound, "uint8_t")->capture_default_str();
+    // rangeStartApp->add_option("--MaxContentionPhaseLength", uwbConfig.maxContentionPhaseLength, "uint8_t")->capture_default_str();
+    // rangeStartApp->add_option("--SlotDuration", uwbConfig.slotDuration, "uint8_t")->capture_default_str();
+    // rangeStartApp->add_option("--RangingInterval", uwbConfig.rangingInterval, "uint16_t")->capture_default_str();
+    // rangeStartApp->add_option("--KeyRotationRate", uwbConfig.keyRotationRate, "uint8_t")->capture_default_str();
+    // rangeStartApp->add_option("--MaxRangingRoundRetry", uwbConfig.maxRangingRoundRetry, "uint16_t")->capture_default_str();
+    // rangeStartApp->add_option("--StaticRangingInfoVendorId", m_cliData->StaticRanging.VendorId, "uint16_t. If --SecureRangingInfo* options are used, this option will be overridden")->capture_default_str();
 
     // arrays
-    rangeStartApp->add_option("--StaticRangingInfoInitializationVector", m_cliData->StaticRanging.InitializationVector, "array of uint8_t. If --SecureRangingInfo* options are used, this option will be overridden")->delimiter(':');
+    // rangeStartApp->add_option("--StaticRangingInfoInitializationVector", m_cliData->StaticRanging.InitializationVector, "array of uint8_t. If --SecureRangingInfo* options are used, this option will be overridden")->delimiter(':');
 
     // strings
-    rangeStartApp->add_option("--FiraPhyVersion", uwbConfig.firaPhyVersionString)->capture_default_str();
-    rangeStartApp->add_option("--FiraMacVersion", uwbConfig.firaMacVersionString)->capture_default_str();
-    rangeStartApp->add_option("--ResultReportConfiguration", uwbConfig.resultReportConfigurationString)->capture_default_str();
+    // rangeStartApp->add_option("--FiraPhyVersion", uwbConfig.firaPhyVersionString)->capture_default_str();
+    // rangeStartApp->add_option("--FiraMacVersion", uwbConfig.firaMacVersionString)->capture_default_str();
+    // rangeStartApp->add_option("--ResultReportConfiguration", uwbConfig.resultReportConfigurationString)->capture_default_str();
 
     rangeStartApp->parse_complete_callback([this] {
+        // Set MAC addresses
+        if (m_cliData->uwbConfiguration.macAddressMode == uwb::UwbMacAddressType::Extended) {
+            uwb::UwbMacAddress controllerExtendedMacAddress(m_cliData->controllerExtendedMac);
+            m_cliData->uwbConfiguration.controllerMacAddress = controllerExtendedMacAddress;
+        } else {
+            uwb::UwbMacAddress controllerShortMacAddress(m_cliData->controllerShortMac);
+            m_cliData->uwbConfiguration.controllerMacAddress = controllerShortMacAddress;
+        }
+        // TODO: Controlee
+
         m_cliData->SessionData.uwbConfiguration = m_cliData->uwbConfiguration;
         m_cliData->SessionData.staticRangingInfo = m_cliData->StaticRanging;
+
+        // TEST
+        std::cout << "ControllerMacAddress: " << m_cliData->SessionData.uwbConfiguration.GetControllerMacAddress().value().ToString() << std::endl;
 
         std::cout << "Selected parameters:" << std::endl;
 
