@@ -60,7 +60,20 @@ enum class DeviceType : uint8_t {
 };
 
 /**
- * @brief TODO Add spec reference.
+ * @brief See FiRa Consortium UWB Command Interface Generic Technical
+ * Specification v1.1.0, Section 8.3, Table 29.
+ */
+enum class RangingRoundUsage : uint8_t {
+    Rfu = 0x00U,
+    SingleSidedTwoWayRangingWithDeferredMode = 0x01U,
+    DoubleSidedTwoWayRangingWithDeferredMode = 0x02U,
+    SingleSidedTwoWayRangingNonDeferredMode = 0x03U,
+    DoubleSidedTwoWayRangingNonDeferredMode = 0x04U,
+};
+
+/**
+ * @brief See FiRa Consortium UWB Command Interface Generic Technical
+ * Specification v1.1.0, Section 8.3, Table 29.
  */
 enum class StsConfiguration : uint8_t {
     Static = 0,
@@ -431,6 +444,14 @@ enum class PrfModeDetailed : uint8_t {
 enum class KeyRotation : uint8_t {
     Disable = 0U,
     Enable = 1U,
+};
+
+enum class PsduDataRate : uint8_t {
+    Rate6810kbps = 0x00U,
+    Rate7800kbps = 0x01U,
+    Rate2720kbps = 0x02U,
+    Rate3120kbps = 0x03U,
+    Rate850kbps = 0x04U,
 };
 
 enum class BprfPhrDataRate : uint8_t {

@@ -4,6 +4,8 @@
 
 #include <bitset>
 #include <cstdint>
+#include <unordered_set>
+#include <variant>
 #include <vector>
 
 #include <uwb/UwbMacAddress.hxx>
@@ -25,7 +27,7 @@ enum class UwbApplicationConfigurationParameterType : uint8_t {
     ChannelNumber = 0x04U,
     NumberOfControlees = 0x05U,
     DeviceMacAddress = 0x06U,
-    ControleeMacAddress = 0x07U,
+    DestinationMacAddresses = 0x07U,
     SlotDuration = 0x08U,
     RangingInterval = 0x09U,
     StsIndex = 0x0AU,
@@ -65,6 +67,37 @@ enum class UwbApplicationConfigurationParameterType : uint8_t {
     MaxNumberOfMeasurements = 0x32U,
     StsLength = 0x35U,
 };
+
+using UwbApplicationConfigurationParameterValue = std::variant<
+    bool, // HOPPING_MODE, tag 0x2C, size 1
+    uint8_t, // NUMBER_OF_CONTROLLEES, tag 0x05, PREAMBLE_CODE_INDEX, tag 0x14, SFD_ID, tag 0x15, SLOTS_PER_RR, tag 0x1B, RESPONDER_SLOT_INDEX, tag 0x1E, KEY_ROTATION_RATE, tag 0x24, SESSION_PRIORITY, tag 0x25, NUMBER_OF_STS_SEGMENTS, tag 0x29, BLOCK_STRIDE_LENGTH, tag 0x2D, IN_BAND_TERMMINATION_ATTEMPT_COUNT, tag 0x2F, size 1
+    uint16_t, // SLOT_DURATION, tag 0x08, RANGE_DATA_NTF_PROXIMITY_NEAR, tag 0x0F, RANGE_DATA_NTF_PROXIMITY_FAR, tag 0x10, VENDOR_ID, tag 0x27, MAX_RR_RETRY, tag 0x2A, MAX_NUMBER_OF_MEASUREMENTS, tag 0x32, size 2
+    uint32_t, // RANGING_INTERVAL, tag 0x09, STS_INDEX, tag 0x0A, UWB_INITIATION_TIME, tag 0x2B, SUB_SESSION_ID, tag 0x30, size 4
+    ::uwb::protocol::fira::AoAResult, // AOA_RESULT_REQ, tag 0x0D, size 1
+    ::uwb::protocol::fira::BprfPhrDataRate, // BPRF_PHR_DATA_RATE, tag 0x31, size 1
+    ::uwb::protocol::fira::Channel, // CHANNEL_NUMBER, tag 0x04, size 1
+    ::uwb::protocol::fira::DeviceRole, // DEVICE_ROLE, tag 0x11, size 1
+    ::uwb::protocol::fira::DeviceType, // DEVICE_TYPE, tag 0x00, size 1
+    ::uwb::protocol::fira::KeyRotation, // KEY_ROTATION, tag 0x23, size 1
+    ::uwb::protocol::fira::MultiNodeMode, // MULTI_NODE_MODE, tag 0x03, size 1
+    ::uwb::protocol::fira::PreambleDuration, // PREAMBLE_DURATION, tag 0x17, size 1
+    ::uwb::protocol::fira::PrfMode, // PRF_MODE, tag 0x1F, size 1
+    ::uwb::protocol::fira::PsduDataRate, // PSDU_DATA_RATE, tag 0x16, size 1
+    ::uwb::protocol::fira::RangeDataNotificationConfiguration, // RANGE_DATA_NTF_CONFIG, tag 0x0E, size 1
+    ::uwb::protocol::fira::RangingRoundUsage, // RANGING_ROUND_USAGE, tag0x01, size 1
+    ::uwb::protocol::fira::RangingMode, // RANGING_TIME_STRUCT, tag 0x1A, size 1
+    ::uwb::protocol::fira::RangingRoundControl, // RANGING_ROUND_CONTROL, tag 0x0C, size 1,
+    ::uwb::protocol::fira::ResultReportConfiguration, // RESULT_REPORT_CONFIG, tag 0x2E, size 1
+    ::uwb::protocol::fira::SchedulingMode, // SCHEDULED_MODE, tag 0x22, size 1
+    ::uwb::protocol::fira::StsConfiguration, // STS_CONFIG, tag 0x02, size 1
+    ::uwb::protocol::fira::StsLength, // STS_LENGTH, tag 0x035, length 1,
+    ::uwb::protocol::fira::StsPacketConfiguration, // RFRAME_CONFIG, tag 0x12, size 1
+    ::uwb::protocol::fira::TxAdaptivePayloadPower, // TX_ADAPTIVE_PAYLOAD_POWER, tag 0x1C, size 1
+    ::uwb::UwbMacAddress, // DEVICE_MAC_ADDRESS, tag 0x06, size 2/8
+    ::uwb::UwbMacAddressFcsType, // MAC_FCS_TYPE, tag 0x0B, size 1
+    ::uwb::UwbMacAddressType, // MAC_ADDRESS_MODE, tag 0x26, size 1
+    std::array<uint8_t, StaticRangingInfo::InitializationVectorLength>, // STATIC_STS_IV, tag 0x28, size 6
+    std::unordered_set<::uwb::UwbMacAddress>>; // DST_MAC_ADDRESS, tag 0x07, size 2/8*N
 
 /**
  * @brief Session configuration controlled by the application.
