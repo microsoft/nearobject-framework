@@ -134,13 +134,14 @@ CreateEnumerationStringMap() noexcept
  * @tparam EnumType The enumeration type to add as an option.
  * @param app The target CLI11 application to add the option to.
  * @param assignTo The destination variable to store the parsed option in.
+ * @param isMandatory Flag that determines whether or not the option is mandatory.
  * @return The added option, which additional configuration can be applied to.
  */
 template <typename EnumType>
 // clang-format off
 requires std::is_enum_v<EnumType>
 CLI::Option*
-AddEnumOption(CLI::App* app, std::optional<EnumType>& assignTo)
+AddEnumOption(CLI::App* app, std::optional<EnumType>& assignTo, bool isMandatory)
 // clang-format on
 {
     std::string optionName{ std::string("--").append(magic_enum::enum_type_name<EnumType>()) };
@@ -156,6 +157,10 @@ AddEnumOption(CLI::App* app, std::optional<EnumType>& assignTo)
         enumUsage << ", " << static_cast<int>(value) << "(" << name << ")";
     }
     enumUsage << " }";
+
+    if (isMandatory) {
+        enumUsage << " This parameter is mandatory for a ranging session";
+    }
 
     return app->add_option(std::move(optionName), assignTo, enumUsage.str())->capture_default_str();
 }
@@ -228,31 +233,30 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     // TODO is there a way to put all the enums into a list of [optionName, optionDestination, optionMap] so we don't have to create the initializer list each time
 
     // List mandatory params first
-    // TODO: --help should output that these params are mandatory
-    detail::AddEnumOption(rangeStartApp, uwbConfig.deviceRole);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.multiNodeMode);
-    rangeStartApp->add_option("--NumberOfControlees", uwbConfig.numberOfControlees, "1 <= N <= 8")->capture_default_str(); // TODO: Input validation
+    detail::AddEnumOption(rangeStartApp, uwbConfig.deviceRole, true);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.multiNodeMode, true);
+    rangeStartApp->add_option("--NumberOfControlees", uwbConfig.numberOfControlees, "1 <= N <= 8 This parameter is mandatory for a ranging session")->capture_default_str(); // TODO: Input validation
     // TODO: Accept multiple controlees
     if (uwbConfig.macAddressMode == uwb::UwbMacAddressType::Extended) {
-        rangeStartApp->add_option("--ControllerMacAddress", m_cliData->controllerMacAddress, "8-byte extended MAC address of controller: e.g. 12:34:56:78:87:65:43:21")->capture_default_str();
-        rangeStartApp->add_option("--ControleeMacAddress", m_cliData->controleeMacAddress, "8-byte extended MAC address of controlee: e.g. 12:34:56:78:87:65:43:21")->capture_default_str();
+        rangeStartApp->add_option("--ControllerMacAddress", m_cliData->controllerMacAddress, "8-byte extended MAC address of controller: e.g. 12:34:56:78:87:65:43:21 This parameter is mandatory for a ranging session")->capture_default_str();
+        rangeStartApp->add_option("--ControleeMacAddress", m_cliData->controleeMacAddress, "8-byte extended MAC address of controlee: e.g. 12:34:56:78:87:65:43:21 This parameter is mandatory for a ranging session")->capture_default_str();
     } else { // uwb::UwbMacAddressType::Short OR empty (default)
-        rangeStartApp->add_option("--ControllerMacAddress", m_cliData->controllerMacAddress, "2-byte short MAC address of controller: e.g. 12:34")->capture_default_str();
-        rangeStartApp->add_option("--ControleeMacAddress", m_cliData->controleeMacAddress, "2-byte short MAC address of controlee: e.g. 12:34")->capture_default_str();
+        rangeStartApp->add_option("--ControllerMacAddress", m_cliData->controllerMacAddress, "2-byte short MAC address of controller: e.g. 12:34 This parameter is mandatory for a ranging session")->capture_default_str();
+        rangeStartApp->add_option("--ControleeMacAddress", m_cliData->controleeMacAddress, "2-byte short MAC address of controlee: e.g. 12:34 This parameter is mandatory for a ranging session")->capture_default_str();
     }
-    detail::AddEnumOption(rangeStartApp, uwbConfig.deviceType);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.deviceType, true);
 
     // enumerations
-    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingDirection);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingMeasurementReportMode);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.stsConfiguration);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingTimeStruct);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.schedulingMode);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.channel);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.rframeConfig);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.convolutionalCodeConstraintLength);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.prfMode);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.macAddressFcsType);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingDirection, false);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingMeasurementReportMode, false);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.stsConfiguration, false);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingTimeStruct, false);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.schedulingMode, false);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.channel, false);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.rframeConfig, false);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.convolutionalCodeConstraintLength, false);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.prfMode, false);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.macAddressFcsType, false);
 
     // booleans
     rangeStartApp->add_flag("--HoppingMode", uwbConfig.hoppingMode)->capture_default_str();
