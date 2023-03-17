@@ -61,7 +61,7 @@ struct UwbConfiguration
         Sp0PhySetNumber = 0x8F,
         Sp1PhySetNumber = 0x90,
         Sp3PhySetNumber = 0x91,
-        PreableCodeIndex = 0x92, // TODO fix the typo here
+        PreambleCodeIndex = 0x92,
         ResultReportConfig = 0x93,
         MacAddressMode = 0x94,
         ControleeShortMacAddress = 0x95,
@@ -98,7 +98,7 @@ struct UwbConfiguration
     static constexpr auto Sp0PhySetNumberDefault = 1;
     static constexpr auto Sp1PhySetNumberDefault = 1;
     static constexpr auto Sp3PhySetNumberDefault = 0;
-    static constexpr auto PreableCodeIndexDefault = 0;
+    static constexpr auto PreambleCodeIndexDefault = 0;
     static constexpr auto MacAddressModeDefault = UwbMacAddressType::Short;
     static constexpr auto KeyRotationRateDefault = 0UL;
     static constexpr auto MacFcsTypeDefault = UwbMacAddressFcsType::Crc16;
@@ -226,7 +226,7 @@ struct UwbConfiguration
     GetSp3PhySetNumber() const noexcept;
 
     std::optional<uint8_t>
-    GetPreableCodeIndex() const noexcept;
+    GetPreambleCodeIndex() const noexcept;
 
     std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>
     GetResultReportConfigurations() const noexcept;
@@ -316,7 +316,7 @@ struct hash<uwb::protocol::fira::UwbConfiguration>
             uwbConfiguration.GetSp0PhySetNumber(),
             uwbConfiguration.GetSp1PhySetNumber(),
             uwbConfiguration.GetSp3PhySetNumber(),
-            uwbConfiguration.GetPreableCodeIndex(),
+            uwbConfiguration.GetPreambleCodeIndex(),
             notstd::hash_range(std::cbegin(resultReportConfigurations), std::cend(resultReportConfigurations)),
             uwbConfiguration.GetMacAddressMode(),
             uwbConfiguration.GetControleeShortMacAddress(),

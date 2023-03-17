@@ -79,7 +79,7 @@ public:
     SetSp3PhySetNumber(uint8_t sp3PhySetNumber) noexcept;
 
     UwbConfiguration::Builder&
-    SetPreableCodeIndex(uint8_t preambleCodeIndex) noexcept;
+    SetPreambleCodeIndex(uint8_t preambleCodeIndex) noexcept;
 
     UwbConfiguration::Builder&
     AddResultReportConfiguration(uwb::protocol::fira::ResultReportConfiguration resultReportConfiguration) noexcept;
@@ -187,7 +187,7 @@ public:
     Sp3(uint8_t sp3PhySetNumber) noexcept;
 
     UwbConfiguration::Builder&
-    PreableCodeIndex(uint8_t preambleCodeIndex) noexcept;
+    PreambleCodeIndex(uint8_t preambleCodeIndex) noexcept;
 
     /**
      * @brief No-op helper to supply more semantic information while chaining arguments.

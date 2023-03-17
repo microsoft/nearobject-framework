@@ -78,8 +78,8 @@ UwbConfigurationData::operator UwbConfiguration() const noexcept
     if (sp3PhySetNumber.has_value()) {
         builder.SetSp3PhySetNumber(sp3PhySetNumber.value());
     }
-    if (preableCodeIndex.has_value()) {
-        builder.SetPreableCodeIndex(preableCodeIndex.value());
+    if (preambleCodeIndex.has_value()) {
+        builder.SetPreambleCodeIndex(preambleCodeIndex.value());
     }
     if (macAddressMode.has_value()) {
         builder.SetMacAddressType(macAddressMode.value());

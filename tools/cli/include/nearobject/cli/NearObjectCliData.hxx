@@ -40,7 +40,7 @@ struct UwbConfigurationData
     std::optional<uint8_t> sp0PhySetNumber;
     std::optional<uint8_t> sp1PhySetNumber;
     std::optional<uint8_t> sp3PhySetNumber;
-    std::optional<uint8_t> preableCodeIndex;
+    std::optional<uint8_t> preambleCodeIndex;
     std::optional<uwb::UwbMacAddressType> macAddressMode;
     std::optional<uwb::UwbMacAddress> controleeShortMacAddress;
     std::optional<uwb::UwbMacAddress> controllerMacAddress;
