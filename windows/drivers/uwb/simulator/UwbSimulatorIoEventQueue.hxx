@@ -67,7 +67,7 @@ public:
      * @return NTSTATUS
      */
     NTSTATUS
-    HandleNotificationRequest(WDFREQUEST request, std::optional<::uwb::protocol::fira::UwbNotificationData> notificationData, std::size_t &outputBufferSize);
+    HandleNotificationRequest(WDFREQUEST request, std::optional<::uwb::protocol::fira::UwbNotificationData> &notificationData, std::size_t &outputBufferSize);
 
     /**
      * @brief Push new notification request data onto the queue.

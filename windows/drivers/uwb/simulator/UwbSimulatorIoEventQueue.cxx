@@ -45,7 +45,7 @@ UwbSimulatorIoEventQueue::Uninitialize()
 }
 
 NTSTATUS
-UwbSimulatorIoEventQueue::HandleNotificationRequest(WDFREQUEST request, std::optional<UwbNotificationData> notificationDataOpt, std::size_t &outputBufferSize)
+UwbSimulatorIoEventQueue::HandleNotificationRequest(WDFREQUEST request, std::optional<UwbNotificationData> &notificationDataOpt, std::size_t &outputBufferSize)
 {
     NTSTATUS status = WdfWaitLockAcquire(m_wdfQueueLock, nullptr);
     if (!NT_SUCCESS(status)) {
@@ -59,7 +59,7 @@ UwbSimulatorIoEventQueue::HandleNotificationRequest(WDFREQUEST request, std::opt
         if (outputBufferSize < outputBufferSizeRequired) {
             status = STATUS_BUFFER_TOO_SMALL;
         } else {
-            notificationData = std::move(notificationData);
+            notificationDataOpt = std::move(notificationData);
             m_notificationQueue.pop();
             status = STATUS_SUCCESS;
         }
