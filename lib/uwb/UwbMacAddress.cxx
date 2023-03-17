@@ -29,8 +29,9 @@ UwbMacAddress::UwbMacAddress(const UwbMacAddress& other) :
 
 UwbMacAddress::UwbMacAddress(std::string addressString, UwbMacAddressType addressType)
 {
-    std::regex macRegex("^(([0-9A-Fa-f]{2}:){7}[0-9A-Fa-f]{2})|([0-9A-Fa-f]{2}:){1}([0-9A-Fa-f]{2})$");
-    assert(std::regex_match(addressString, macRegex));
+    std::regex shortRegex("^([0-9A-Fa-f]{2}:){1}([0-9A-Fa-f]{2})$");
+    std::regex extendedRegex("^(([0-9A-Fa-f]{2}:){7}[0-9A-Fa-f]{2})$");
+    assert(std::regex_match(addressString, shortRegex) || std::regex_match(addressString, extendedRegex));
 
     std::array<uint8_t, ShortLength> shortAddress{};
     std::array<uint8_t, ExtendedLength> extendedAddress{};
