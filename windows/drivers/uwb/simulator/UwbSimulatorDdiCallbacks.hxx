@@ -82,7 +82,7 @@ struct UwbSimulatorDdiCallbacks :
     SessionGetRangingCount(uint32_t sessionId, uint32_t &rangingCount) override;
 
     virtual NTSTATUS
-    UwbNotification(UwbNotificationData &notificationData, std::size_t &notificationDataSize) override;
+    UwbNotification(UwbNotificationData &notificationData) override;
 
     // IUwbSimulatorDdiCallbacksSimulator
 

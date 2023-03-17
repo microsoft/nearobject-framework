@@ -26,14 +26,21 @@
 class UwbSimulatorIoEventQueue
 {
 public:
+    static constexpr std::size_t MaximumQueueSizeDefault = 1024;
+
     /**
      * @brief Construct a new UwbSimulatorIoEventQueue object.
      *
      * @param wdfQueue
+     * @param maximumQueueSize The maximum size of the notification queue before
+     * data is dropped.
      */
-    explicit UwbSimulatorIoEventQueue(WDFQUEUE wdfQueue);
+    explicit UwbSimulatorIoEventQueue(WDFQUEUE wdfQueue, std::size_t maximumQueueSize = MaximumQueueSizeDefault);
 
-    ~UwbSimulatorIoEventQueue();
+    /**
+     * @brief Destroy the UwbSimulatorIoEventQueue object.
+     */
+    ~UwbSimulatorIoEventQueue() = default;
 
     /**
      * @brief
@@ -51,20 +58,32 @@ public:
     NTSTATUS
     Uninitialize();
 
-    WDFQUEUE
-    GetWdfQueue() const noexcept;
-
+    /**
+     * @brief Handle a WDF request for notification data.
+     *
+     * @param request The WDF request handle.
+     * @param notificationData The output argument to hold notification request data, if available.
+     * @param outputBufferSize The size of the DDI output buffer that will eventually be populated.
+     * @return NTSTATUS
+     */
     NTSTATUS
-    PendRequest(WDFREQUEST request, std::size_t outputBufferSize);
+    HandleNotificationRequest(WDFREQUEST request, std::optional<::uwb::protocol::fira::UwbNotificationData> notificationData, std::size_t &outputBufferSize);
 
+    /**
+     * @brief Push new notification request data onto the queue.
+     *
+     * @param notificationData The notification data.
+     * @return NTSTATUS
+     */
     NTSTATUS
-    GetNextQueuedRequest(std::optional<::uwb::protocol::fira::UwbNotificationData> notificationData, std::size_t &outputBufferSize);
+    PushNotificationData(::uwb::protocol::fira::UwbNotificationData notificationData);
 
 private:
     WDFQUEUE m_wdfQueue;
     WDFWAITLOCK m_wdfQueueLock{ nullptr };
     std::optional<std::size_t> m_pendingRequestOutputBufferSize;
     std::queue<::uwb::protocol::fira::UwbNotificationData> m_notificationQueue;
+    const std::size_t m_maximumQueueSize{ MaximumQueueSizeDefault };
 };
 
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(UwbSimulatorIoEventQueue, GetUwbSimulatorIoEventQueue)

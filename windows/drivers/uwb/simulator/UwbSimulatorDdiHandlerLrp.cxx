@@ -171,11 +171,11 @@ UwbSimulatorDdiHandler::OnUwbGetDeviceConfigurationParameters(WDFREQUEST request
 
     // Convert neutral type to DDI output type.
     // TODO: auto deviceConfigParams = UwbCxDdi::From(deviceConfigurationParameterResults);
-    // TODO: outputSize = deviceConfigParams.size();
+    // TODO: outputBufferSize = deviceConfigParams.size();
 
     // Update output buffer if sufficiently sized.
     if (std::size(outputBuffer) >= outputSize) {
-        // TODO: std::memcpy(std::data(outputBuffer), std::data(std::data(<neutal wrapper>)), outputSize);
+        // TODO: std::memcpy(std::data(outputBuffer), std::data(std::data(<neutal wrapper>)), outputBufferSize);
     } else {
         status = STATUS_BUFFER_TOO_SMALL;
     }
@@ -443,20 +443,20 @@ UwbSimulatorDdiHandler::OnUwbSessionGetRangingCount(WDFREQUEST request, std::spa
 NTSTATUS
 UwbSimulatorDdiHandler::OnUwbNotification(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
 {
-    std::size_t outputSize = std::size(outputBuffer);
-    UwbNotificationData uwbNotificationData{};
+    std::size_t outputBufferSize = std::size(outputBuffer);
 
-    // Invoke the callback.
-    NTSTATUS status = m_callbacks->UwbNotification(uwbNotificationData, outputSize);
+    std::optional<UwbNotificationData> uwbNotificationData;
+    auto *ioEventQueue = m_deviceFile->GetIoEventQueue();
+    NTSTATUS status = ioEventQueue->HandleNotificationRequest(request, uwbNotificationData, outputBufferSize);
     if (NT_SUCCESS(status)) {
         // Convert neutral type to DDI output type, and copy to output buffer.
-        auto notificationData = UwbCxDdi::From(uwbNotificationData);
-        std::memcpy(std::data(outputBuffer), std::data(std::data(notificationData)), outputSize);
+        auto notificationData = UwbCxDdi::From(uwbNotificationData.value());
+        std::memcpy(std::data(outputBuffer), std::data(std::data(notificationData)), outputBufferSize);
     }
 
     // Complete the request only if it has not been pended by the driver.
     if (status != STATUS_PENDING) {
-        WdfRequestCompleteWithInformation(request, status, outputSize);
+        WdfRequestCompleteWithInformation(request, status, outputBufferSize);
     }
 
     return status;
