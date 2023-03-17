@@ -29,24 +29,15 @@ UwbSimulatorDdiCallbacks::UwbSimulatorDdiCallbacks(UwbSimulatorDeviceFile *devic
 NTSTATUS
 UwbSimulatorDdiCallbacks::RaiseUwbNotification(UwbNotificationData uwbNotificationData)
 {
-    // Acquire the notification lock to ensure the notification proimise can be safely inspected and updated.
-    std::unique_lock notificationLock{ m_notificationGate };
-
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
         "UwbNotification",
         TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
         TraceLoggingString("EventRaised", "Action"),
-        TraceLoggingBool(m_notificationPromise.has_value(), "WaitPending"),
         TraceLoggingString(std::data(ToString(uwbNotificationData)), "Data"));
 
-    if (!m_notificationPromise.has_value()) {
-        // No outstanding client waiting for a result, so nothing to do.
-        return STATUS_INVALID_DEVICE_REQUEST;
-    }
-
-    m_notificationPromise->set_value(std::move(uwbNotificationData));
-    m_notificationPromise.reset();
+    auto ioEventQueue = m_deviceFile->GetIoEventQueue();
+    ioEventQueue->PushNotificationData(std::move(uwbNotificationData));
 
     return STATUS_SUCCESS;
 }
@@ -361,6 +352,7 @@ UwbSimulatorDdiCallbacks::UwbNotification(UwbNotificationData & /*notificationDa
         TraceLoggingLevel(TRACE_LEVEL_VERBOSE),
         TraceLoggingString("Wait", "Action"));
 
+    // This callback should not be invoked directly.
     NTSTATUS status = STATUS_NOT_IMPLEMENTED;
 
     TraceLoggingWrite(

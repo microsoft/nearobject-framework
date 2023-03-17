@@ -3,7 +3,6 @@
 #define UWB_SIMULATOR_DDI_CALLBACKS_HXX
 
 #include <cstdint>
-#include <future>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -130,10 +129,6 @@ private:
     // Session state and associated lock that protects it.
     std::shared_mutex m_sessionsGate;
     std::unordered_map<uint32_t, UwbSimulatorSession> m_sessions{};
-
-    // Notification promise and associated lock that protects it.
-    std::mutex m_notificationGate;
-    std::optional<std::promise<UwbNotificationData>> m_notificationPromise;
 
 private:
     UwbSimulatorCapabilities m_simulatorCapabilities{};
