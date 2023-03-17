@@ -112,7 +112,7 @@ TEST_CASE("uwb configuration objects can be created with builder", "[basic]")
         REQUIRE(uwbConfiguration.GetSp0PhySetNumber() == test::Sp0Value);
         REQUIRE(uwbConfiguration.GetSp1PhySetNumber() == test::Sp1Value);
         REQUIRE(uwbConfiguration.GetSp3PhySetNumber() == test::Sp3Value);
-        REQUIRE(uwbConfiguration.GetPreableCodeIndex() == test::PreableCodeIndexValue);
+        REQUIRE(uwbConfiguration.GetPreambleCodeIndex() == test::PreableCodeIndexValue);
         REQUIRE(uwbConfiguration.GetMacAddressMode() == test::UwbMacAddressTypeValue);
         REQUIRE(uwbConfiguration.GetMacAddressFcsType() == test::UwbMacAddressFcsTypeValue);
         REQUIRE(uwbConfiguration.GetControleeShortMacAddress() == test::UwbMacAddressControleeShortValue);

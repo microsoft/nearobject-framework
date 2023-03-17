@@ -274,7 +274,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
 
         std::cout << "Selected parameters:" << std::endl;
 
-        for (const auto& [parameterTag, parameterValue] : m_cliData->SessionData.uwbConfiguration.GetValueMap()) {
+        for (const auto& [parameterTag, parameterValue] : m_cliData->SessionData.uwbConfiguration.GetValueMapOob()) {
             std::visit([](auto&& arg) {
                 using ParameterValueT = std::decay_t<decltype(arg)>;
                 if constexpr (std::is_enum_v<ParameterValueT>) {

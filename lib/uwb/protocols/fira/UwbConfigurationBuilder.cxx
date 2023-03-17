@@ -4,7 +4,8 @@
 using namespace uwb::protocol::fira;
 
 UwbConfiguration::Builder::Builder() :
-    m_values(m_uwbConfiguration.m_values)
+    m_valuesOob(m_uwbConfiguration.m_valuesOob),
+    m_valuesUci(m_uwbConfiguration.m_valuesUci)
 {}
 
 UwbConfiguration::Builder::operator UwbConfiguration() noexcept
@@ -23,7 +24,7 @@ UwbConfiguration::Builder::With() noexcept
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetDeviceRole(uwb::protocol::fira::DeviceRole deviceRole) noexcept
 {
-    m_values[ParameterTag::DeviceRole] = deviceRole;
+    m_valuesUci[UwbApplicationConfigurationParameterType::DeviceRole] = deviceRole;
     return *this;
 }
 
@@ -42,7 +43,7 @@ UwbConfiguration::Builder::FiraVersion() noexcept
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetFiraVersionPhy(uint16_t firaPhyVersion) noexcept
 {
-    m_values[ParameterTag::FiraPhyVersion] = firaPhyVersion;
+    m_valuesOob[ParameterTag::FiraPhyVersion] = firaPhyVersion;
     return *this;
 }
 
@@ -55,7 +56,7 @@ UwbConfiguration::Builder::Phy(uint16_t firaPhyVersion) noexcept
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetFiraVersionMac(uint16_t firaMacVersion) noexcept
 {
-    m_values[ParameterTag::FiraMacVersion] = firaMacVersion;
+    m_valuesOob[ParameterTag::FiraMacVersion] = firaMacVersion;
     return *this;
 }
 
@@ -68,7 +69,7 @@ UwbConfiguration::Builder::Mac(uint16_t firaMacVersion) noexcept
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetRangingMethod(uwb::protocol::fira::RangingMethod rangingMethod) noexcept
 {
-    m_values[ParameterTag::RangingMethod] = rangingMethod;
+    m_valuesOob[ParameterTag::RangingMethod] = rangingMethod;
     return *this;
 }
 
@@ -81,7 +82,7 @@ UwbConfiguration::Builder::RangingMethod(uwb::protocol::fira::RangingMethod rang
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetStsConfiguration(uwb::protocol::fira::StsConfiguration stsConfiguration) noexcept
 {
-    m_values[ParameterTag::StsConfig] = stsConfiguration;
+    m_valuesOob[ParameterTag::StsConfig] = stsConfiguration;
     return *this;
 }
 
@@ -94,7 +95,7 @@ UwbConfiguration::Builder::StsConfiguration(uwb::protocol::fira::StsConfiguratio
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetMultiNodeMode(uwb::protocol::fira::MultiNodeMode multiNodeMode) noexcept
 {
-    m_values[ParameterTag::MultiNodeMode] = multiNodeMode;
+    m_valuesUci[UwbApplicationConfigurationParameterType::MultiNodeMode] = multiNodeMode;
     return *this;
 }
 
@@ -107,7 +108,7 @@ UwbConfiguration::Builder::MultiNodeMode(uwb::protocol::fira::MultiNodeMode mult
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetRangingTimeStruct(uwb::protocol::fira::RangingMode rangingTimeStruct) noexcept
 {
-    m_values[ParameterTag::RangingTimeStruct] = rangingTimeStruct;
+    m_valuesUci[UwbApplicationConfigurationParameterType::RangingTimeStruct] = rangingTimeStruct;
     return *this;
 }
 
@@ -120,7 +121,7 @@ UwbConfiguration::Builder::RangingTimeStruct(uwb::protocol::fira::RangingMode ra
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetSchedulingMode(uwb::protocol::fira::SchedulingMode schedulingMode) noexcept
 {
-    m_values[ParameterTag::ScheduledMode] = schedulingMode;
+    m_valuesUci[UwbApplicationConfigurationParameterType::ScheduledMode] = schedulingMode;
     return *this;
 }
 
@@ -133,21 +134,21 @@ UwbConfiguration::Builder::SchedulingMode(uwb::protocol::fira::SchedulingMode sc
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetHoppingMode(bool hoppingMode) noexcept
 {
-    m_values[ParameterTag::HoppingMode] = hoppingMode;
+    m_valuesOob[ParameterTag::HoppingMode] = hoppingMode;
     return *this;
 }
 
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetBlockStriding(bool blockStriding) noexcept
 {
-    m_values[ParameterTag::BlockStriding] = blockStriding;
+    m_valuesOob[ParameterTag::BlockStriding] = blockStriding;
     return *this;
 }
 
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetUwbInitiationTime(uint32_t uwbInitiationTime) noexcept
 {
-    m_values[ParameterTag::UwbInitiationTime] = uwbInitiationTime;
+    m_valuesOob[ParameterTag::UwbInitiationTime] = uwbInitiationTime;
     return *this;
 }
 
@@ -160,7 +161,7 @@ UwbConfiguration::Builder::UwbInitiationTime(uint32_t uwbInitiationTime) noexcep
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetChannel(uwb::protocol::fira::Channel channel) noexcept
 {
-    m_values[ParameterTag::ChannelNumber] = channel;
+    m_valuesUci[UwbApplicationConfigurationParameterType::ChannelNumber] = channel;
     return *this;
 }
 
@@ -173,7 +174,7 @@ UwbConfiguration::Builder::OnChannel(uwb::protocol::fira::Channel channel) noexc
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetStsPacketConfiguration(uwb::protocol::fira::StsPacketConfiguration rframeConfiguration) noexcept
 {
-    m_values[ParameterTag::RFrameConfig] = rframeConfiguration;
+    m_valuesUci[UwbApplicationConfigurationParameterType::RFrameConfiguration] = rframeConfiguration;
     return *this;
 }
 
@@ -186,7 +187,7 @@ UwbConfiguration::Builder::StsPacketConfiguration(uwb::protocol::fira::StsPacket
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetConvolutionalCodeConstraintLength(uwb::protocol::fira::ConvolutionalCodeConstraintLength convolutionalCodeConstraintLength) noexcept
 {
-    m_values[ParameterTag::CcConstraintLength] = convolutionalCodeConstraintLength;
+    m_valuesOob[ParameterTag::CcConstraintLength] = convolutionalCodeConstraintLength;
     return *this;
 }
 
@@ -199,7 +200,7 @@ UwbConfiguration::Builder::ConvolutionalCodeConstraintLength(uwb::protocol::fira
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetPrfMode(uwb::protocol::fira::PrfMode prfMode) noexcept
 {
-    m_values[ParameterTag::PrfMode] = prfMode;
+    m_valuesUci[UwbApplicationConfigurationParameterType::PrfMode] = prfMode;
     return *this;
 }
 
@@ -218,7 +219,7 @@ UwbConfiguration::Builder::PhySetNumber() noexcept
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetSp0PhySetNumber(uint8_t sp0PhySetNumber) noexcept
 {
-    m_values[ParameterTag::Sp0PhySetNumber] = sp0PhySetNumber;
+    m_valuesOob[ParameterTag::Sp0PhySetNumber] = sp0PhySetNumber;
     return *this;
 }
 
@@ -231,7 +232,7 @@ UwbConfiguration::Builder::Sp0(uint8_t sp0) noexcept
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetSp1PhySetNumber(uint8_t sp1PhySetNumber) noexcept
 {
-    m_values[ParameterTag::Sp1PhySetNumber] = sp1PhySetNumber;
+    m_valuesOob[ParameterTag::Sp1PhySetNumber] = sp1PhySetNumber;
     return *this;
 }
 
@@ -244,7 +245,7 @@ UwbConfiguration::Builder::Sp1(uint8_t sp1PhySetNumber) noexcept
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetSp3PhySetNumber(uint8_t sp3PhySetNumber) noexcept
 {
-    m_values[ParameterTag::Sp3PhySetNumber] = sp3PhySetNumber;
+    m_valuesOob[ParameterTag::Sp3PhySetNumber] = sp3PhySetNumber;
     return *this;
 }
 
@@ -257,7 +258,7 @@ UwbConfiguration::Builder::Sp3(uint8_t sp3PhySetNumber) noexcept
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetPreableCodeIndex(uint8_t preambleCodeIndex) noexcept
 {
-    m_values[ParameterTag::PreableCodeIndex] = preambleCodeIndex;
+    m_valuesOob[ParameterTag::PreableCodeIndex] = preambleCodeIndex;
     return *this;
 }
 
@@ -274,10 +275,10 @@ UwbConfiguration::Builder::Supports() noexcept
 }
 
 UwbConfiguration::Builder&
-UwbConfiguration::Builder::AddResultReportConfiguration(uwb::protocol::fira::ResultReportConfiguration resultReportConfiguration) noexcept
+UwbConfiguration::Builder::AddResultReportConfiguration(::uwb::protocol::fira::ResultReportConfiguration resultReportConfiguration) noexcept
 {
-    auto [it, _] = m_values.insert({ ParameterTag::ResultReportConfig, std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>{} });
-    auto& resultReportConfigurations = std::get<std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>>(it->second);
+    auto [it, _] = m_valuesUci.insert({ UwbApplicationConfigurationParameterType::ResultReportConfig, std::unordered_set<::uwb::protocol::fira::ResultReportConfiguration>{} });
+    auto& resultReportConfigurations = std::get<std::unordered_set<::uwb::protocol::fira::ResultReportConfiguration>>(it->second);
     resultReportConfigurations.insert(std::move(resultReportConfiguration));
 
     return *this;
@@ -298,7 +299,7 @@ UwbConfiguration::Builder::MacAddress() noexcept
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetMacAddressType(uwb::UwbMacAddressType macAddressType) noexcept
 {
-    m_values[ParameterTag::MacAddressMode] = macAddressType;
+    m_valuesUci[UwbApplicationConfigurationParameterType::MacAddressMode] = macAddressType;
     return *this;
 }
 
@@ -312,7 +313,7 @@ UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetMacAddressControleeShort(uwb::UwbMacAddress macAddress) noexcept
 {
     if (macAddress.GetType() == UwbMacAddressType::Short) {
-        m_values[ParameterTag::ControleeShortMacAddress] = macAddress;
+        m_valuesOob[ParameterTag::ControleeShortMacAddress] = macAddress;
     }
     return *this;
 }
@@ -326,7 +327,7 @@ UwbConfiguration::Builder::OfControleeShort(uwb::UwbMacAddress macAddress) noexc
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetMacAddressController(uwb::UwbMacAddress macAddress) noexcept
 {
-    m_values[ParameterTag::ControllerMacAddress] = macAddress;
+    m_valuesOob[ParameterTag::ControllerMacAddress] = macAddress;
     return *this;
 }
 
@@ -339,7 +340,7 @@ UwbConfiguration::Builder::OfController(uwb::UwbMacAddress macAddress) noexcept
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetMacAddressFcsType(uwb::UwbMacAddressFcsType fcsType) noexcept
 {
-    m_values[ParameterTag::MacFcsType] = fcsType;
+    m_valuesUci[UwbApplicationConfigurationParameterType::MacFcsType] = fcsType;
     return *this;
 }
 
@@ -352,7 +353,7 @@ UwbConfiguration::Builder::FcsType(uwb::UwbMacAddressFcsType fcsType) noexcept
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetMaxSlotsPerRangingRound(uint8_t slotsPerRangingRound) noexcept
 {
-    m_values[ParameterTag::SlotsPerRr] = slotsPerRangingRound;
+    m_valuesOob[ParameterTag::SlotsPerRr] = slotsPerRangingRound;
     return *this;
 }
 
@@ -371,7 +372,7 @@ UwbConfiguration::Builder::Maximum() noexcept
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetMaxContentionPhaseLength(uint8_t maxContentionPhaseLength) noexcept
 {
-    m_values[ParameterTag::MaxContentionPhaseLength] = maxContentionPhaseLength;
+    m_valuesOob[ParameterTag::MaxContentionPhaseLength] = maxContentionPhaseLength;
     return *this;
 }
 
@@ -384,7 +385,7 @@ UwbConfiguration::Builder::ContentionPhaseLength(uint8_t maxContentionPhaseLengt
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetSlotDuration(uint16_t slotDuration) noexcept
 {
-    m_values[ParameterTag::SlotDuration] = slotDuration;
+    m_valuesOob[ParameterTag::SlotDuration] = slotDuration;
     return *this;
 }
 
@@ -397,7 +398,7 @@ UwbConfiguration::Builder::SlotDuration(uint16_t slotDuration) noexcept
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetRangingInterval(uint16_t rangingInterval) noexcept
 {
-    m_values[ParameterTag::RangingInterval] = rangingInterval;
+    m_valuesOob[ParameterTag::RangingInterval] = rangingInterval;
     return *this;
 }
 
@@ -410,7 +411,7 @@ UwbConfiguration::Builder::RangingInterval(uint16_t rangingInterval) noexcept
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetKeyRotationRate(uint8_t keyRotationRate) noexcept
 {
-    m_values[ParameterTag::KeyRotationRate] = keyRotationRate;
+    m_valuesOob[ParameterTag::KeyRotationRate] = keyRotationRate;
     return *this;
 }
 
@@ -423,7 +424,7 @@ UwbConfiguration::Builder::KeyRotationRate(uint8_t keyRotationRate) noexcept
 UwbConfiguration::Builder&
 UwbConfiguration::Builder::SetMaxRangingRoundRetry(uint16_t maxRangingRoundRetry) noexcept
 {
-    m_values[ParameterTag::MaxRrRetry] = maxRangingRoundRetry;
+    m_valuesOob[ParameterTag::MaxRrRetry] = maxRangingRoundRetry;
     return *this;
 }
 

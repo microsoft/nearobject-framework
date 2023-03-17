@@ -34,122 +34,128 @@ UwbConfiguration::FromDataObject(const encoding::TlvBer& /* tlv */)
 std::optional<uint16_t>
 UwbConfiguration::GetFiraPhyVersion() const noexcept
 {
-    return GetValue<uint16_t>(ParameterTag::FiraPhyVersion);
+    return GetOobValue<uint16_t>(ParameterTag::FiraPhyVersion);
 }
 
 std::optional<uint16_t>
 UwbConfiguration::GetFiraMacVersion() const noexcept
 {
-    return GetValue<uint16_t>(ParameterTag::FiraMacVersion);
+    return GetOobValue<uint16_t>(ParameterTag::FiraMacVersion);
 }
 
 std::optional<DeviceRole>
 UwbConfiguration::GetDeviceRole() const noexcept
 {
-    return GetValue<DeviceRole>(ParameterTag::DeviceRole);
+    return GetUciValue<DeviceRole>(UwbApplicationConfigurationParameterType::DeviceRole);
 }
 
 std::optional<RangingMethod>
 UwbConfiguration::GetRangingMethod() const noexcept
 {
-    return GetValue<RangingMethod>(ParameterTag::RangingMethod);
+    return GetOobValue<RangingMethod>(ParameterTag::RangingMethod);
 }
 
 std::optional<StsConfiguration>
 UwbConfiguration::GetStsConfiguration() const noexcept
 {
-    return GetValue<StsConfiguration>(ParameterTag::StsConfig);
+    return GetOobValue<StsConfiguration>(ParameterTag::StsConfig);
 }
 
 std::optional<MultiNodeMode>
 UwbConfiguration::GetMultiNodeMode() const noexcept
 {
-    return GetValue<MultiNodeMode>(ParameterTag::MultiNodeMode);
+    return GetUciValue<MultiNodeMode>(UwbApplicationConfigurationParameterType::MultiNodeMode);
 }
 
 std::optional<RangingMode>
 UwbConfiguration::GetRangingTimeStruct() const noexcept
 {
-    return GetValue<RangingMode>(ParameterTag::RangingTimeStruct);
+    return GetUciValue<RangingMode>(UwbApplicationConfigurationParameterType::RangingTimeStruct);
 }
 
 std::optional<SchedulingMode>
 UwbConfiguration::GetSchedulingMode() const noexcept
 {
-    return GetValue<SchedulingMode>(ParameterTag::ScheduledMode);
+    return GetUciValue<SchedulingMode>(UwbApplicationConfigurationParameterType::ScheduledMode);
 }
 
 std::optional<bool>
 UwbConfiguration::GetHoppingMode() const noexcept
 {
-    return GetValue<bool>(ParameterTag::HoppingMode);
+    return GetUciValue<bool>(UwbApplicationConfigurationParameterType::HoppingMode);
 }
 
 std::optional<bool>
 UwbConfiguration::GetBlockStriding() const noexcept
 {
-    return GetValue<bool>(ParameterTag::BlockStriding);
+    return GetOobValue<bool>(ParameterTag::BlockStriding);
+}
+
+std::optional<uint8_t>
+UwbConfiguration::GetBlockStrideLength() const noexcept
+{
+    return GetUciValue<uint8_t>(UwbApplicationConfigurationParameterType::BlockStrideLength);
 }
 
 std::optional<uint32_t>
 UwbConfiguration::GetUwbInitiationTime() const noexcept
 {
-    return GetValue<uint32_t>(ParameterTag::UwbInitiationTime);
+    return GetUciValue<uint32_t>(UwbApplicationConfigurationParameterType::UwbInitiationTime);
 }
 
 std::optional<Channel>
 UwbConfiguration::GetChannel() const noexcept
 {
-    return GetValue<Channel>(ParameterTag::ChannelNumber);
+    return GetUciValue<Channel>(UwbApplicationConfigurationParameterType::ChannelNumber);
 }
 
 std::optional<StsPacketConfiguration>
 UwbConfiguration::GetRFrameConfig() const noexcept
 {
-    return GetValue<StsPacketConfiguration>(ParameterTag::RFrameConfig);
+    return GetUciValue<StsPacketConfiguration>(UwbApplicationConfigurationParameterType::RFrameConfiguration);
 }
 
 std::optional<ConvolutionalCodeConstraintLength>
 UwbConfiguration::GetConvolutionalCodeConstraintLength() const noexcept
 {
-    return GetValue<ConvolutionalCodeConstraintLength>(ParameterTag::CcConstraintLength);
+    return GetOobValue<ConvolutionalCodeConstraintLength>(ParameterTag::CcConstraintLength);
 }
 
 std::optional<PrfMode>
 UwbConfiguration::GetPrfMode() const noexcept
 {
-    return GetValue<PrfMode>(ParameterTag::PrfMode);
+    return GetUciValue<PrfMode>(UwbApplicationConfigurationParameterType::PrfMode);
 }
 
 std::optional<uint8_t>
 UwbConfiguration::GetSp0PhySetNumber() const noexcept
 {
-    return GetValue<uint8_t>(ParameterTag::Sp0PhySetNumber);
+    return GetOobValue<uint8_t>(ParameterTag::Sp0PhySetNumber);
 }
 
 std::optional<uint8_t>
 UwbConfiguration::GetSp1PhySetNumber() const noexcept
 {
-    return GetValue<uint8_t>(ParameterTag::Sp1PhySetNumber);
+    return GetOobValue<uint8_t>(ParameterTag::Sp1PhySetNumber);
 }
 
 std::optional<uint8_t>
 UwbConfiguration::GetSp3PhySetNumber() const noexcept
 {
-    return GetValue<uint8_t>(ParameterTag::Sp3PhySetNumber);
+    return GetOobValue<uint8_t>(ParameterTag::Sp3PhySetNumber);
 }
 
 std::optional<uint8_t>
-UwbConfiguration::GetPreableCodeIndex() const noexcept
+UwbConfiguration::GetPreambleCodeIndex() const noexcept
 {
-    return GetValue<uint8_t>(ParameterTag::PreableCodeIndex);
+    return GetUciValue<uint8_t>(UwbApplicationConfigurationParameterType::PreambleCodeIndex);
 }
 
 std::unordered_set<ResultReportConfiguration>
 UwbConfiguration::GetResultReportConfigurations() const noexcept
 {
-    auto it = m_values.find(ParameterTag::ResultReportConfig);
-    return (it != std::cend(m_values))
+    auto it = m_valuesUci.find(UwbApplicationConfigurationParameterType::ResultReportConfig);
+    return (it != std::cend(m_valuesUci))
         ? std::get<std::unordered_set<ResultReportConfiguration>>(it->second)
         : std::unordered_set<ResultReportConfiguration>{};
 }
@@ -157,65 +163,86 @@ UwbConfiguration::GetResultReportConfigurations() const noexcept
 std::optional<uwb::UwbMacAddressType>
 UwbConfiguration::GetMacAddressMode() const noexcept
 {
-    return GetValue<uwb::UwbMacAddressType>(ParameterTag::MacAddressMode);
+    return GetUciValue<::uwb::UwbMacAddressType>(UwbApplicationConfigurationParameterType::MacAddressMode);
+}
+
+std::optional<::uwb::UwbMacAddress>
+UwbConfiguration::GetDeviceMacAddress() const noexcept
+{
+    return GetUciValue<::uwb::UwbMacAddress>(UwbApplicationConfigurationParameterType::DeviceMacAddress);
+}
+
+std::unordered_set<::uwb::UwbMacAddress>
+UwbConfiguration::GetDestinationMacAddresses() const noexcept
+{
+    auto it = m_valuesUci.find(UwbApplicationConfigurationParameterType::DestinationMacAddresses);
+    return (it != std::cend(m_valuesUci))
+        ? std::get<std::unordered_set<::uwb::UwbMacAddress>>(it->second)
+        : std::unordered_set<::uwb::UwbMacAddress>{};
 }
 
 std::optional<uwb::UwbMacAddress>
 UwbConfiguration::GetControleeShortMacAddress() const noexcept
 {
-    return GetValue<uwb::UwbMacAddress>(ParameterTag::ControleeShortMacAddress);
+    return GetOobValue<::uwb::UwbMacAddress>(ParameterTag::ControleeShortMacAddress);
 }
 
 std::optional<uwb::UwbMacAddress>
 UwbConfiguration::GetControllerMacAddress() const noexcept
 {
-    return GetValue<uwb::UwbMacAddress>(ParameterTag::ControllerMacAddress);
+    return GetOobValue<uwb::UwbMacAddress>(ParameterTag::ControllerMacAddress);
 }
 
 std::optional<uint8_t>
 UwbConfiguration::GetSlotsPerRangingRound() const noexcept
 {
-    return GetValue<uint8_t>(ParameterTag::SlotsPerRr);
+    return GetUciValue<uint8_t>(UwbApplicationConfigurationParameterType::SlotsPerRangingRound);
 }
 
 std::optional<uint8_t>
 UwbConfiguration::GetMaxContentionPhaseLength() const noexcept
 {
-    return GetValue<uint8_t>(ParameterTag::MaxContentionPhaseLength);
+    return GetOobValue<uint8_t>(ParameterTag::MaxContentionPhaseLength);
 }
 
 std::optional<uint16_t>
 UwbConfiguration::GetSlotDuration() const noexcept
 {
-    return GetValue<uint16_t>(ParameterTag::SlotDuration);
+    return GetUciValue<uint16_t>(UwbApplicationConfigurationParameterType::SlotDuration);
 }
 
 std::optional<uint16_t>
 UwbConfiguration::GetRangingInterval() const noexcept
 {
-    return GetValue<uint16_t>(ParameterTag::RangingInterval);
+    return GetUciValue<uint16_t>(UwbApplicationConfigurationParameterType::RangingInterval);
 }
 
 std::optional<uint8_t>
 UwbConfiguration::GetKeyRotationRate() const noexcept
 {
-    return GetValue<uint8_t>(ParameterTag::KeyRotationRate);
+    return GetUciValue<uint8_t>(UwbApplicationConfigurationParameterType::KeyRotationRate);
 }
 
 std::optional<uwb::UwbMacAddressFcsType>
 UwbConfiguration::GetMacAddressFcsType() const noexcept
 {
-    return GetValue<uwb::UwbMacAddressFcsType>(ParameterTag::MacFcsType);
+    return GetUciValue<::uwb::UwbMacAddressFcsType>(UwbApplicationConfigurationParameterType::MacFcsType);
 }
 
 std::optional<uint16_t>
 UwbConfiguration::GetMaxRangingRoundRetry() const noexcept
 {
-    return GetValue<uint16_t>(ParameterTag::MaxRrRetry);
+    return GetUciValue<uint16_t>(UwbApplicationConfigurationParameterType::MaxRangingRoundRetry);
 }
 
-const std::unordered_map<UwbConfiguration::ParameterTag, UwbConfiguration::ParameterTypesVariant>&
-UwbConfiguration::GetValueMap() const noexcept
+const std::unordered_map<UwbConfiguration::ParameterTag, UwbConfiguration::ValueVariantOob>&
+UwbConfiguration::GetValueMapOob() const noexcept
 {
-    return m_values;
+    return m_valuesOob;
+}
+
+const std::unordered_map<UwbApplicationConfigurationParameterType, UwbConfiguration::ValueVariantUci>&
+UwbConfiguration::GetValueMapUci() const noexcept
+{
+    return m_valuesUci;
 }

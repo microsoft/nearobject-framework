@@ -248,7 +248,8 @@ public:
 
 private:
     UwbConfiguration m_uwbConfiguration;
-    std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, uwb::protocol::fira::UwbConfiguration::ParameterTypesVariant>& m_values;
+    std::unordered_map<::uwb::protocol::fira::UwbConfiguration::ParameterTag, ::uwb::protocol::fira::UwbConfiguration::ValueVariantOob>& m_valuesOob;
+    std::unordered_map<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbConfiguration::ValueVariantUci>& m_valuesUci;
 };
 
 } // namespace uwb::protocol::fira
