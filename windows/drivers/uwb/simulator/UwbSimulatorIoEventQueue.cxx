@@ -65,6 +65,10 @@ UwbSimulatorIoEventQueue::HandleNotificationRequest(WDFREQUEST request, std::opt
         }
     } else {
         status = WdfRequestForwardToIoQueue(request, m_wdfQueue);
+        if (!NT_SUCCESS(status)) {
+            // TODO: log
+        }
+        status = STATUS_PENDING;
     }
 
     WdfWaitLockRelease(m_wdfQueueLock);
