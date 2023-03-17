@@ -175,7 +175,7 @@ UwbConfiguration::GetDeviceMacAddress() const noexcept
 std::unordered_set<::uwb::UwbMacAddress>
 UwbConfiguration::GetDestinationMacAddresses() const noexcept
 {
-    auto it = m_valuesUci.find(UwbApplicationConfigurationParameterType::DestinationMacAddresses);
+    auto it = m_valuesUci.find(UwbApplicationConfigurationParameterType::ControleeMacAddress);
     return (it != std::cend(m_valuesUci))
         ? std::get<std::unordered_set<::uwb::UwbMacAddress>>(it->second)
         : std::unordered_set<::uwb::UwbMacAddress>{};
