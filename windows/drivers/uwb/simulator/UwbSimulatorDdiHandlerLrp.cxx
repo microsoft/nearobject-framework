@@ -448,7 +448,7 @@ UwbSimulatorDdiHandler::OnUwbNotification(WDFREQUEST request, std::span<uint8_t>
     std::optional<UwbNotificationData> uwbNotificationData;
     auto *ioEventQueue = m_deviceFile->GetIoEventQueue();
     NTSTATUS status = ioEventQueue->HandleNotificationRequest(request, uwbNotificationData, outputBufferSize);
-    if (NT_SUCCESS(status)) {
+    if (status == STATUS_SUCCESS) {
         // Convert neutral type to DDI output type, and copy to output buffer.
         auto notificationData = UwbCxDdi::From(uwbNotificationData.value());
         std::memcpy(std::data(outputBuffer), std::data(std::data(notificationData)), outputBufferSize);

@@ -413,7 +413,8 @@ UwbDeviceConnector::HandleNotifications(std::stop_token stopToken)
                     if (!LOG_IF_WIN32_BOOL_FALSE(GetOverlappedResult(handleDriver.get(), &m_notificationOverlapped, &bytesRequired, TRUE /* wait */))) {
                         lastError = GetLastError();
                         HRESULT hr = HRESULT_FROM_WIN32(lastError);
-                        PLOG_ERROR << "error waiting for IOCTL_UWB_NOTIFICATION completion, hr=" << std::showbase << std::hex << hr;
+                        PLOG(lastError == ERROR_OPERATION_ABORTED ? plog::debug : plog::error)
+                            << "error waiting for IOCTL_UWB_NOTIFICATION completion, hr=" << std::showbase << std::hex << hr;
                         break; // for({1,2})
                     }
                 } else if (lastError == ERROR_INSUFFICIENT_BUFFER) {
