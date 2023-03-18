@@ -2,13 +2,13 @@
 #ifndef FIRA_DEVICE_HXX
 #define FIRA_DEVICE_HXX
 
+#include <array>
 #include <cstdint>
 #include <iostream>
 #include <memory>
 #include <optional>
 #include <span>
 #include <string>
-#include <unordered_map>
 #include <unordered_set>
 #include <variant>
 #include <vector>
@@ -40,6 +40,17 @@ VersionToString(uint32_t input) noexcept;
  */
 std::optional<uint32_t>
 StringToVersion(const std::string& input) noexcept;
+
+/**
+ * @brief See FiRa Consortium MAC Technical Requirements v1.3.0,
+ * Section D.1.8 STS, Figure 19, page 70.
+ */
+constexpr std::size_t StaticStsInitializationVectorLength = 6;
+
+/**
+ * @brief Static STS initialization vector type.
+ */
+using StaticStsInitializationVector = std::array<uint8_t, StaticStsInitializationVectorLength>;
 
 /**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
@@ -463,6 +474,103 @@ enum class StsLength : uint8_t {
     Symbols32 = 0x00U,
     Symbols64 = 0x01U,
     Symbols128 = 0x02U,
+};
+
+/**
+ * @brief See FiRa Consortium - UCI Generic Specification v1.1.0, Section 8.3,
+ * Table 29, 'APP Configuration Parameter IDs'.
+ */
+enum class UwbApplicationConfigurationParameterType : uint8_t {
+    DeviceType = 0x00U,
+    RangingRoundUsage = 0x01U,
+    StsConfiguration = 0x02U,
+    MultiNodeMode = 0x03U,
+    ChannelNumber = 0x04U,
+    NumberOfControlees = 0x05U,
+    DeviceMacAddress = 0x06U,
+    DestinationMacAddresses = 0x07U,
+    SlotDuration = 0x08U,
+    RangingInterval = 0x09U,
+    StsIndex = 0x0AU,
+    MacFcsType = 0x0BU,
+    RangingRoundControl = 0x0CU,
+    AoAResultRequest = 0x0DU,
+    RangeDataNotificationConfig = 0x0EU,
+    RangeDataNotificationProximityNear = 0x0FU,
+    RangeDataNotificationProximityFar = 0x10U,
+    DeviceRole = 0x11U,
+    RFrameConfiguration = 0x12U,
+    PreambleCodeIndex = 0x14U,
+    SfdId = 0x15U,
+    PsduDataRate = 0x16U,
+    PreambleDuration = 0x17U,
+    RangingTimeStruct = 0x1AU,
+    SlotsPerRangingRound = 0x1BU,
+    TxAdaptivePayloadPower = 0x1CU,
+    ResponderSlotIndex = 0x1EU,
+    PrfMode = 0x1FU,
+    ScheduledMode = 0x22U,
+    KeyRotation = 0x23U,
+    KeyRotationRate = 0x24U,
+    SessionPriority = 0x25U,
+    MacAddressMode = 0x26U,
+    VendorId = 0x27U,
+    StaticStsIv = 0x28U,
+    NumberOfStsSegments = 0x29U,
+    MaxRangingRoundRetry = 0x2AU,
+    UwbInitiationTime = 0x2BU,
+    HoppingMode = 0x2CU,
+    BlockStrideLength = 0x2DU,
+    ResultReportConfig = 0x2EU,
+    InBandTerminationAttemptCount = 0x2FU,
+    SubSessionId = 0x30U,
+    BprfPhrDataRate = 0x31U,
+    MaxNumberOfMeasurements = 0x32U,
+    StsLength = 0x35U,
+};
+
+// clang-format off
+using UwbApplicationConfigurationParameterValue = std::variant<
+    bool, // HOPPING_MODE, tag 0x2C, size 1
+    uint8_t, // NUMBER_OF_CONTROLLEES, tag 0x05, PREAMBLE_CODE_INDEX, tag 0x14, SFD_ID, tag 0x15, SLOTS_PER_RR, tag 0x1B, RESPONDER_SLOT_INDEX, tag 0x1E, KEY_ROTATION_RATE, tag 0x24, SESSION_PRIORITY, tag 0x25, NUMBER_OF_STS_SEGMENTS, tag 0x29, BLOCK_STRIDE_LENGTH, tag 0x2D, IN_BAND_TERMMINATION_ATTEMPT_COUNT, tag 0x2F, size 1
+    uint16_t, // SLOT_DURATION, tag 0x08, RANGE_DATA_NTF_PROXIMITY_NEAR, tag 0x0F, RANGE_DATA_NTF_PROXIMITY_FAR, tag 0x10, VENDOR_ID, tag 0x27, MAX_RR_RETRY, tag 0x2A, MAX_NUMBER_OF_MEASUREMENTS, tag 0x32, size 2
+    uint32_t, // RANGING_INTERVAL, tag 0x09, STS_INDEX, tag 0x0A, UWB_INITIATION_TIME, tag 0x2B, SUB_SESSION_ID, tag 0x30, size 4
+    AoAResult, // AOA_RESULT_REQ, tag 0x0D, size 1
+    BprfPhrDataRate, // BPRF_PHR_DATA_RATE, tag 0x31, size 1
+    Channel, // CHANNEL_NUMBER, tag 0x04, size 1
+    DeviceRole, // DEVICE_ROLE, tag 0x11, size 1
+    DeviceType, // DEVICE_TYPE, tag 0x00, size 1
+    KeyRotation, // KEY_ROTATION, tag 0x23, size 1
+    MultiNodeMode, // MULTI_NODE_MODE, tag 0x03, size 1
+    PreambleDuration, // PREAMBLE_DURATION, tag 0x17, size 1
+    PrfMode, // PRF_MODE, tag 0x1F, size 1
+    PsduDataRate, // PSDU_DATA_RATE, tag 0x16, size 1
+    RangeDataNotificationConfiguration, // RANGE_DATA_NTF_CONFIG, tag 0x0E, size 1
+    RangingRoundUsage, // RANGING_ROUND_USAGE, tag0x01, size 1
+    RangingMode, // RANGING_TIME_STRUCT, tag 0x1A, size 1
+    RangingRoundControl, // RANGING_ROUND_CONTROL, tag 0x0C, size 1,
+    ResultReportConfiguration, // RESULT_REPORT_CONFIG, tag 0x2E, size 1
+    SchedulingMode, // SCHEDULED_MODE, tag 0x22, size 1
+    StsConfiguration, // STS_CONFIG, tag 0x02, size 1
+    StsLength, // STS_LENGTH, tag 0x035, length 1,
+    StsPacketConfiguration, // RFRAME_CONFIG, tag 0x12, size 1
+    TxAdaptivePayloadPower, // TX_ADAPTIVE_PAYLOAD_POWER, tag 0x1C, size 1
+    ::uwb::UwbMacAddress, // DEVICE_MAC_ADDRESS, tag 0x06, size 2/8
+    ::uwb::UwbMacAddressFcsType, // MAC_FCS_TYPE, tag 0x0B, size 1
+    ::uwb::UwbMacAddressType, // MAC_ADDRESS_MODE, tag 0x26, size 1
+    std::array<uint8_t, StaticStsInitializationVectorLength>, // STATIC_STS_IV, tag 0x28, size 6
+    std::unordered_set<::uwb::UwbMacAddress>>; // DST_MAC_ADDRESS, tag 0x07, size 2/8*N
+// clang-format on
+
+/**
+ * @brief Represents a FiRa UWB Application Configuration Parameter as
+ * described in the FiRa Consortium UWB Command Interface Generic Technical
+ * Specification.
+ */
+struct UwbApplicationConfigurationParameter
+{
+    UwbApplicationConfigurationParameterType Type;
+    UwbApplicationConfigurationParameterValue Value;
 };
 
 struct UwbMulticastListStatus
