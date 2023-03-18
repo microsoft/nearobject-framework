@@ -29,38 +29,31 @@ UwbMacAddress::UwbMacAddress(const UwbMacAddress& other) :
 
 UwbMacAddress::UwbMacAddress(std::string addressString, UwbMacAddressType addressType)
 {
-    std::regex shortRegex("^([0-9A-Fa-f]{2}:){1}([0-9A-Fa-f]{2})$");
-    std::regex extendedRegex("^(([0-9A-Fa-f]{2}:){7}[0-9A-Fa-f]{2})$");
-    assert(std::regex_match(addressString, shortRegex) || std::regex_match(addressString, extendedRegex));
+    // TODO: Make the delimiter configurable
 
     std::array<uint8_t, ShortLength> shortAddress{};
     std::array<uint8_t, ExtendedLength> extendedAddress{};
-    try {
-        std::stringstream ss(addressString);
-        for (auto i = 0; i < (addressType == UwbMacAddressType::Short ? ShortLength : ExtendedLength); i++) {
-            if (ss) {
-                std::string addressByte;
-                getline(ss, addressByte, ':');
-                const auto byteValue = static_cast<uint8_t>(std::stoi(addressByte));
-                if (addressType == UwbMacAddressType::Short) {
-                    shortAddress[i] = byteValue;
-                } else {
-                    extendedAddress[i] = byteValue;
-                }
-            } else {
-                throw std::runtime_error("invalid mac address string");
-            }
-        }
 
-        if (addressType == UwbMacAddressType::Short) {
-            *this = UwbMacAddress(shortAddress);
+    std::stringstream ss(addressString);
+    for (auto i = 0; i < (addressType == UwbMacAddressType::Short ? ShortLength : ExtendedLength); i++) {
+        if (ss) {
+            std::string addressByte;
+            getline(ss, addressByte, ':');
+            const auto byteValue = static_cast<uint8_t>(std::stoi(addressByte, nullptr, 16));
+            if (addressType == UwbMacAddressType::Short) {
+                shortAddress[i] = byteValue;
+            } else {
+                extendedAddress[i] = byteValue;
+            }
         } else {
-            *this = UwbMacAddress(extendedAddress);
+            throw std::invalid_argument("invalid mac address string");
         }
     }
-    catch (const std::exception& e)
-    {
-        throw std::invalid_argument("Invalid mac address string: " + addressString);
+
+    if (addressType == UwbMacAddressType::Short) {
+        *this = UwbMacAddress(shortAddress);
+    } else {
+        *this = UwbMacAddress(extendedAddress);
     }
 }
 
@@ -139,15 +132,34 @@ UwbMacAddress::Random(UwbMacAddressType type)
     }
 }
 
+/* static */
+std::optional<UwbMacAddress>
+UwbMacAddress::FromString(const std::string addressString, UwbMacAddressType addressType)
+{
+    std::regex shortRegex("^([0-9A-Fa-f]{2}:){1}([0-9A-Fa-f]{2})$");
+    std::regex extendedRegex("^(([0-9A-Fa-f]{2}:){7}[0-9A-Fa-f]{2})$");
+
+    if ((addressType == UwbMacAddressType::Short && !std::regex_match(addressString, shortRegex)) ||
+        (addressType == UwbMacAddressType::Extended && !std::regex_match(addressString, extendedRegex))) {
+        return std::nullopt;
+    }
+
+    try {
+        return UwbMacAddress(addressString, addressType);
+    } catch (...) {
+        return std::nullopt;
+    }
+}
+
 std::string
 UwbMacAddress::ToString() const
 {
     std::ostringstream macString{};
 
     for (const auto& b : m_view.first(m_view.size() - 1)) {
-        macString << +b << ':';
+        macString << std::hex << +b << ':';
     }
-    macString << +m_view[m_view.size() - 1];
+    macString << std::hex << +m_view[m_view.size() - 1];
 
     return macString.str();
 }

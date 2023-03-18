@@ -297,26 +297,35 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
         } else {
             // Set MAC addresses
             if (m_cliData->uwbConfiguration.macAddressMode == uwb::UwbMacAddressType::Extended) {
-                uwb::UwbMacAddress controllerMacAddress(m_cliData->controllerMacAddress, uwb::UwbMacAddressType::Extended);
-                uwb::UwbMacAddress controleeMacAddress(m_cliData->controleeMacAddress, uwb::UwbMacAddressType::Extended);
+                auto controllerMacAddress = uwb::UwbMacAddress::FromString(m_cliData->controllerMacAddress, uwb::UwbMacAddressType::Extended);
+                auto controleeMacAddress = uwb::UwbMacAddress::FromString(m_cliData->controleeMacAddress, uwb::UwbMacAddressType::Extended);
 
-                m_cliData->uwbConfiguration.controllerMacAddress = controllerMacAddress;
+                m_cliData->uwbConfiguration.controllerMacAddress = controllerMacAddress.value();
                 // TODO: Figure out where to store extended controlee mac address
                 // m_cliData->uwbConfiguration.??? = controleeMacAddress;
             } else {
-                uwb::UwbMacAddress controllerMacAddress(m_cliData->controllerMacAddress, uwb::UwbMacAddressType::Short);
-                uwb::UwbMacAddress controleeMacAddress(m_cliData->controleeMacAddress, uwb::UwbMacAddressType::Short);
+                auto controllerMacAddress = uwb::UwbMacAddress::FromString(m_cliData->controllerMacAddress, uwb::UwbMacAddressType::Short);
+                auto controleeMacAddress = uwb::UwbMacAddress::FromString(m_cliData->controleeMacAddress, uwb::UwbMacAddressType::Short);
 
-                m_cliData->uwbConfiguration.controllerMacAddress = controllerMacAddress;
-                m_cliData->uwbConfiguration.controleeShortMacAddress = controleeMacAddress;
+                if (!controllerMacAddress.has_value()) {
+                    std::cerr << "Invalid ControllerMacAddress" << std::endl;
+                } else {
+                    m_cliData->uwbConfiguration.controllerMacAddress = controllerMacAddress.value();
+                    // TEST
+                    std::cout << "ControllerMacAddress: " << m_cliData->uwbConfiguration.controllerMacAddress << std::endl;
+                }
+
+                if (!controleeMacAddress.has_value()) {
+                    std::cerr << "Invalid ControleeMacAddress" << std::endl;
+                } else {
+                    m_cliData->uwbConfiguration.controleeShortMacAddress = controleeMacAddress.value();
+                    // TEST
+                    std::cout << "ControleeMacAddress: " << m_cliData->uwbConfiguration.controleeShortMacAddress << std::endl;
+                }
             }
 
             m_cliData->SessionData.uwbConfiguration = m_cliData->uwbConfiguration;
             m_cliData->SessionData.staticRangingInfo = m_cliData->StaticRanging;
-
-            // TEST
-            std::cout << "ControllerMacAddress: " << m_cliData->SessionData.uwbConfiguration.GetControllerMacAddress().value().ToString() << std::endl;
-            std::cout << "ControleeMacAddress: " << m_cliData->SessionData.uwbConfiguration.GetControleeShortMacAddress().value().ToString() << std::endl;
 
             std::cout << "Selected parameters:" << std::endl;
 

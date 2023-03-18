@@ -350,6 +350,16 @@ public:
     Random(UwbMacAddressType type);
 
     /**
+     * @brief Creates a UwbMacAddress from a string representation of a mac address.
+     * 
+     * @param addressString The mac address string.
+     * @param addressType The type of mac address.
+     * @return std::optional<UwbMacAddress> The constructed optional UwbMacAddress.
+     */
+    static std::optional<UwbMacAddress>
+    FromString(const std::string addressString, UwbMacAddressType addressType);
+
+    /**
      * @brief Construct a default UwbMacAddress.
      */
     UwbMacAddress();
@@ -360,15 +370,6 @@ public:
      * @param other
      */
     UwbMacAddress(const UwbMacAddress& other);
-
-    /**
-     * @brief Construct a new UwbMacAddress object given an input string of
-     * semicolon-delimited bytes.
-     *
-     * @param addressString The semicolon-delimited address string.
-     * @param addressType The type of mac address that addressString represents.
-     */
-    UwbMacAddress(std::string addressString, UwbMacAddressType addressType);
 
     /**
      * @brief Copy assignment operator.
@@ -386,6 +387,15 @@ public:
     operator<=>(const UwbMacAddress& other) const noexcept;
 
 private:
+    /**
+     * @brief Construct a new UwbMacAddress object given an input string of
+     * semicolon-delimited bytes.
+     *
+     * @param addressString The semicolon-delimited address string.
+     * @param addressType The type of mac address that addressString represents.
+     */
+    UwbMacAddress(std::string addressString, UwbMacAddressType addressType);
+
     /**
      * @brief Swap the data members of this instance with another one.
      *
