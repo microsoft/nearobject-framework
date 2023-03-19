@@ -15,7 +15,6 @@
 #include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
-#include <uwb/protocols/fira/UwbApplicationConfiguration.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
 
 using namespace uwb::protocol::fira;

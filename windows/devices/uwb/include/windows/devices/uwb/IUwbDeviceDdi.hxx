@@ -10,7 +10,6 @@
 #include <vector>
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
-#include <uwb/protocols/fira/UwbApplicationConfiguration.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
 #include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
