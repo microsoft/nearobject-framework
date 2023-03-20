@@ -491,7 +491,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
     {
         // UWB_APP_CONFIG_PARAM_TYPE_HOPPING_MODE
         constexpr bool hoppingMode = true;
-        const UwbApplicationConfigurationParameter parameterHoppingMode = {
+        constexpr UwbApplicationConfigurationParameter parameterHoppingMode = {
             .Type = UwbApplicationConfigurationParameterType::HoppingMode,
             .Value = hoppingMode,  
         };
@@ -513,7 +513,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
     {
         // UWB_APP_CONFIG_PARAM_TYPE_SLOT_DURATION
         constexpr uint16_t slotDuration{ 0xAB };
-        const UwbApplicationConfigurationParameter parameterSlotDuration = {
+        constexpr UwbApplicationConfigurationParameter parameterSlotDuration = {
             .Type = UwbApplicationConfigurationParameterType::SlotDuration,
             .Value = slotDuration,  
         };
@@ -524,7 +524,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
     {
         // UWB_APP_CONFIG_PARAM_TYPE_RANGING_INTERVAL
         constexpr uint32_t rangingInterval{ 0xABCD };
-        const UwbApplicationConfigurationParameter parameterRangingInterval = {
+        constexpr UwbApplicationConfigurationParameter parameterRangingInterval = {
             .Type = UwbApplicationConfigurationParameterType::RangingInterval,
             .Value = rangingInterval,  
         };
@@ -535,11 +535,21 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
     {
         // UWB_APP_CONFIG_PARAM_TYPE_AOA_RESULT_REQ
         constexpr AoAResult aoaResult{ AoAResult::Enable };
-        const UwbApplicationConfigurationParameter parameterAoaResult = {
+        constexpr UwbApplicationConfigurationParameter parameterAoaResult = {
             .Type = UwbApplicationConfigurationParameterType::AoAResultRequest,
             .Value = aoaResult,  
         };
         test::ValidateRoundtrip(parameterAoaResult);
     }
 
+    SECTION("UwbApplicationConfigurationParameter std::array<uint8_t, N> variant is stable")
+    {
+        // UWB_APP_CONFIG_PARAM_TYPE_STATIC_STS_IV
+        constexpr std::array<uint8_t, StaticStsInitializationVectorLength> staticStsInitializationVector{ 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF };
+        constexpr UwbApplicationConfigurationParameter parameterstaticStsInitializationVector = {
+            .Type = UwbApplicationConfigurationParameterType::StaticStsIv,
+            .Value = staticStsInitializationVector,  
+        };
+        test::ValidateRoundtrip(parameterstaticStsInitializationVector);
+    }
 }

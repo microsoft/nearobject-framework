@@ -564,7 +564,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbApplicationConfigurationParameter
             UWB_APP_CONFIG_PARAM &applicationConfigurationParameter = applicationConfigurationParameterWrapper->value();
             applicationConfigurationParameter.paramLength = argSize;
             std::memcpy(&applicationConfigurationParameter.paramValue[0], &uvalue, sizeof uvalue);
-        } else if constexpr (std::is_integral_v<T>) {
+        } else if constexpr (std::is_integral_v<T> || std::is_same_v<T, std::array<uint8_t, StaticStsInitializationVectorLength>>) {
             constexpr auto argSize = sizeof(T);
             totalSize += argSize - 1;
             applicationConfigurationParameterWrapper = std::make_unique<UwbApplicationConfigurationParameterWrapper>(totalSize);
@@ -1355,7 +1355,7 @@ windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM &applicationConfi
         break;
     case UWB_APP_CONFIG_PARAM_TYPE_STATIC_STS_IV: {
         std::array<uint8_t, StaticStsInitializationVectorLength> value{};
-        // TODO: convert
+        std::memcpy(std::data(value), &applicationConfigurationParameter.paramValue[0], sizeof value);
         uwbApplicationConfigurationParameter.Value = std::move(value);
         break;
     }
