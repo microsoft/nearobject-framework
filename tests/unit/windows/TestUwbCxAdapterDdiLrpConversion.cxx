@@ -563,4 +563,15 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         };
         test::ValidateRoundtrip(parameterUwbMacAddressShort);
     }
+
+    SECTION("UwbApplicationConfigurationParameter ::uwb::UwbMacAddress (extended type)")
+    {
+        // UWB_APP_CONFIG_PARAM_TYPE_DEVICE_MAC_ADDRESS
+        constexpr ::uwb::UwbMacAddress uwbMacAddressExtended(std::array<uint8_t, ::uwb::UwbMacAddressLength::Extended>{ 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF });
+        constexpr UwbApplicationConfigurationParameter parameterUwbMacAddressExtended = {
+            .Type = UwbApplicationConfigurationParameterType::DeviceMacAddress,
+            .Value = std::move(uwbMacAddressExtended),
+        };
+        test::ValidateRoundtrip(parameterUwbMacAddressExtended);
+    }
 }
