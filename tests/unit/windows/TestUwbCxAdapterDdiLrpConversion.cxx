@@ -486,4 +486,60 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         const UwbNotificationData uwbNotificationDataRangingData{ uwbRangingData };
         test::ValidateRoundtrip(uwbNotificationDataRangingData);
     }
+
+    SECTION("UwbApplicationConfigurationParameter bool variant is stable")
+    {
+        // UWB_APP_CONFIG_PARAM_TYPE_HOPPING_MODE
+        constexpr bool hoppingMode = true;
+        const UwbApplicationConfigurationParameter parameterHoppingMode = {
+            .Type = UwbApplicationConfigurationParameterType::HoppingMode,
+            .Value = hoppingMode,  
+        };
+        test::ValidateRoundtrip(parameterHoppingMode);
+    }
+
+    SECTION("UwbApplicationConfigurationParameter uint8_t variant is stable")
+    {
+        // UWB_APP_CONFIG_PARAM_TYPE_NUMBER_OF_CONTROLEES
+        constexpr uint8_t numberOfControlees{ 100 };
+        constexpr UwbApplicationConfigurationParameter parameterNumberOfControlees = {
+            .Type = UwbApplicationConfigurationParameterType::NumberOfControlees,
+            .Value = numberOfControlees,  
+        };
+        test::ValidateRoundtrip(parameterNumberOfControlees);
+    }
+
+    SECTION("UwbApplicationConfigurationParameter uint16_t variant is stable")
+    {
+        // UWB_APP_CONFIG_PARAM_TYPE_SLOT_DURATION
+        constexpr uint16_t slotDuration{ 0xAB };
+        const UwbApplicationConfigurationParameter parameterSlotDuration = {
+            .Type = UwbApplicationConfigurationParameterType::SlotDuration,
+            .Value = slotDuration,  
+        };
+        test::ValidateRoundtrip(parameterSlotDuration);
+    }
+
+    SECTION("UwbApplicationConfigurationParameter uint32_t variant is stable")
+    {
+        // UWB_APP_CONFIG_PARAM_TYPE_RANGING_INTERVAL
+        constexpr uint32_t rangingInterval{ 0xABCD };
+        const UwbApplicationConfigurationParameter parameterRangingInterval = {
+            .Type = UwbApplicationConfigurationParameterType::RangingInterval,
+            .Value = rangingInterval,  
+        };
+        test::ValidateRoundtrip(parameterRangingInterval);
+    }
+
+    SECTION("UwbApplicationConfigurationParameter enum class variant is stable")
+    {
+        // UWB_APP_CONFIG_PARAM_TYPE_AOA_RESULT_REQ
+        constexpr AoAResult aoaResult{ AoAResult::Enable };
+        const UwbApplicationConfigurationParameter parameterAoaResult = {
+            .Type = UwbApplicationConfigurationParameterType::AoAResultRequest,
+            .Value = aoaResult,  
+        };
+        test::ValidateRoundtrip(parameterAoaResult);
+    }
+
 }
