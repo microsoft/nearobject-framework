@@ -10,7 +10,6 @@
 #include <vector>
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
-#include <uwb/protocols/fira/UwbApplicationConfiguration.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
 #include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
@@ -69,6 +68,10 @@ struct IUwbDeviceDdi
     // IOCTL_UWB_SET_APP_CONFIG_PARAMS
     virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>>>>
     SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> applicationConfigurationParameters) = 0;
+
+    // IOCTL_UWB_SET_APP_CONFIG_PARAMS
+    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>>>>
+    SetApplicationConfigurationParameters(uint32_t sessionId, UwbSetAppConfigurationParameters applicationConfigurationParameters) = 0;
 
     // TODO: unspecified IOCTLs below
     // IOCTL_UWB_SET_DEVICE_CONFIG_PARAMS

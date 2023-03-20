@@ -1,5 +1,5 @@
 /**
- * @file Queue.cxx
+ * @file UwbSimulatorIoQueue.cxx
  * @brief This file contains the queue entry points and callbacks.
  *
  * @copyright Copyright (c) 2022

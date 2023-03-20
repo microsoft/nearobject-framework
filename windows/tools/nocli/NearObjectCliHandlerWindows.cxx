@@ -88,7 +88,7 @@ ResolveUwbDevice(const nearobject::cli::NearObjectCliDataWindows& cliData)
         return nullptr;
     }
 
-    return std::make_unique<windows::devices::uwb::UwbDevice>(deviceName);
+    return std::make_shared<windows::devices::uwb::UwbDevice>(deviceName);
 }
 } // namespace detail
 
@@ -104,44 +104,50 @@ NearObjectCliHandlerWindows::ResolveUwbDevice(const nearobject::cli::NearObjectC
 }
 
 void
+NearObjectCliHandlerWindows::OnDeviceArrived(const std::string& deviceName)
+{
+    auto uwbDevice = std::make_unique<windows::devices::uwb::UwbDevice>(deviceName);
+    if (!uwbDevice) {
+        PLOG_ERROR << "Failed to instantiate UWB device with name " << deviceName;
+        return;
+    }
+
+    uwbDevice->Initialize();
+    m_uwbDevices.push_back(std::move(uwbDevice));
+}
+
+void
+NearObjectCliHandlerWindows::OnDeviceDeparted(const std::string& deviceName)
+{
+    auto numErased = std::erase_if(m_uwbDevices, [&](const auto& uwbDevice) {
+        return uwbDevice->DeviceName() == deviceName;
+    });
+    if (numErased == 0) {
+        PLOG_WARNING << "UWB device with name " << deviceName << " not found; ignoring removal event";
+    }
+}
+
+void
 NearObjectCliHandlerWindows::HandleMonitorMode() noexcept
 try {
-    // TODO: this should probably be moved into its own function
+    DevicePresenceMonitor presenceMonitor(
+        windows::devices::uwb::InterfaceClassUwb, [&](auto&& deviceGuid, auto&& presenceEvent, auto&& deviceName) {
+            const auto presenceEventName = magic_enum::enum_name(presenceEvent);
+            PLOG_INFO << deviceName << " " << presenceEventName << std::endl;
 
-    // Keep a container of known devices. Once initialized,
-    std::vector<std::unique_ptr<windows::devices::uwb::UwbDevice>> uwbDevices{};
-
-    DevicePresenceMonitor presenceMonitor(windows::devices::uwb::InterfaceClassUwb, [&](auto&& deviceGuid, auto&& presenceEvent, auto&& deviceName) {
-        const auto presenceEventName = magic_enum::enum_name(presenceEvent);
-        PLOG_INFO << deviceName << " " << presenceEventName << std::endl;
-
-        switch (presenceEvent) {
-        case DevicePresenceEvent::Arrived: {
-            auto uwbDevice = std::make_unique<windows::devices::uwb::UwbDevice>(deviceName);
-            if (!uwbDevice) {
-                PLOG_ERROR << "Failed to instantiate UWB device with name " << deviceName;
-                return;
+            switch (presenceEvent) {
+            case DevicePresenceEvent::Arrived:
+                OnDeviceArrived(deviceName);
+                break;
+            case DevicePresenceEvent::Departed:
+                OnDeviceDeparted(deviceName);
+                break;
+            default:
+                PLOG_ERROR << "Ignoring unknown presence event";
+                break;
             }
-
-            uwbDevice->Initialize();
-            uwbDevices.push_back(std::move(uwbDevice));
-            break;
-        }
-        case DevicePresenceEvent::Departed: {
-            auto numErased = std::erase_if(uwbDevices, [&](const auto& uwbDevice) {
-                return uwbDevice->DeviceName() == deviceName;
-            });
-            if (numErased == 0) {
-                PLOG_WARNING << "UWB device with name " << deviceName << " not found; ignoring removal event";
-            }
-            break;
-        }
-        default: {
-            PLOG_ERROR << "Ignoring unknown presence event";
-            break;
-        }
-        }
-    });
+        },
+        /* enumerateInitialDevicesOnStart = */ true);
 
     presenceMonitor.Start();
 

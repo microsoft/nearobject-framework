@@ -37,6 +37,11 @@ public:
     explicit UwbDeviceConnector(std::string deviceName);
 
     /**
+     * @brief Destroy the Uwb Device Connector object
+     */
+    ~UwbDeviceConnector();
+
+    /**
      * @brief Get the name of this device.
      *
      * @return const std::string&
@@ -133,16 +138,18 @@ public:
     virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>>>>
     SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> applicationConfigurationParameters) override;
 
+    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>>>>
+    SetApplicationConfigurationParameters(uint32_t sessionId, UwbSetAppConfigurationParameters applicationConfigurationParameters) override;
+
 private:
     /**
      * @brief Thread function for handling UWB notifications from the driver.
      *
-     * @param handleDriver The handle to the driver to use for listening for notifications.
      * @param stopToken The token used to request the notification loop to stop.
      * @param onNotification The callback function to invoke for each notification.
      */
     void
-    HandleNotifications(wil::shared_hfile handleDriver, std::stop_token stopToken);
+    HandleNotifications(std::stop_token stopToken);
 
     /**
      * @brief Responsible for calling the relevant registered callbacks for the uwbNotificationData
@@ -173,6 +180,8 @@ private:
     std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> m_deviceEventCallbacks;
     std::string m_deviceName{};
     std::jthread m_notificationThread;
+    wil::shared_hfile m_notificationHandleDriver;
+    OVERLAPPED m_notificationOverlapped;
 };
 } // namespace windows::devices::uwb
 

@@ -27,7 +27,7 @@ constexpr PrfMode PrfModeValue{ PrfMode::Bprf };
 constexpr uint8_t Sp0Value{ 10 };
 constexpr uint8_t Sp1Value{ 20 };
 constexpr uint8_t Sp3Value{ 30 };
-constexpr uint8_t PreableCodeIndexValue{ 25 };
+constexpr uint8_t PreambleCodeIndexValue{ 25 };
 constexpr uwb::UwbMacAddressType UwbMacAddressTypeValue{ uwb::UwbMacAddressType::Extended };
 constexpr uwb::UwbMacAddressFcsType UwbMacAddressFcsTypeValue{ uwb::UwbMacAddressFcsType::Crc32 };
 const uwb::UwbMacAddress UwbMacAddressControleeShortValue{ uwb::UwbMacAddress{ std::array<uint8_t, 2>{ 0x00, 0x01 } } };
@@ -73,7 +73,7 @@ TEST_CASE("uwb configuration objects can be created with builder", "[basic]")
                     .Sp0(test::Sp0Value)
                     .Sp1(test::Sp1Value)
                     .Sp3(test::Sp3Value)
-                .PreableCodeIndex(test::PreableCodeIndexValue)
+                .PreambleCodeIndex(test::PreambleCodeIndexValue)
                 .MacAddress()
                     .Type(test::UwbMacAddressTypeValue)
                     .FcsType(test::UwbMacAddressFcsTypeValue)
@@ -112,7 +112,7 @@ TEST_CASE("uwb configuration objects can be created with builder", "[basic]")
         REQUIRE(uwbConfiguration.GetSp0PhySetNumber() == test::Sp0Value);
         REQUIRE(uwbConfiguration.GetSp1PhySetNumber() == test::Sp1Value);
         REQUIRE(uwbConfiguration.GetSp3PhySetNumber() == test::Sp3Value);
-        REQUIRE(uwbConfiguration.GetPreableCodeIndex() == test::PreableCodeIndexValue);
+        REQUIRE(uwbConfiguration.GetPreambleCodeIndex() == test::PreambleCodeIndexValue);
         REQUIRE(uwbConfiguration.GetMacAddressMode() == test::UwbMacAddressTypeValue);
         REQUIRE(uwbConfiguration.GetMacAddressFcsType() == test::UwbMacAddressFcsTypeValue);
         REQUIRE(uwbConfiguration.GetControleeShortMacAddress() == test::UwbMacAddressControleeShortValue);

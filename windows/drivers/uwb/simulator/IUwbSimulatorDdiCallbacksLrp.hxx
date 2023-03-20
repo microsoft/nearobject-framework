@@ -15,7 +15,6 @@
 #include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
-#include <uwb/protocols/fira/UwbApplicationConfiguration.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
 
 using namespace uwb::protocol::fira;
@@ -79,11 +78,11 @@ struct IUwbSimulatorDdiCallbacksLrp
 
     /**
      * @brief Get the Application Configuration Parameters object
-     * 
-     * @param sessionId 
-     * @param applicationConfigurationParameterTypes 
-     * @param applicationConfigurationParameters 
-     * @return UwbStatus 
+     *
+     * @param sessionId
+     * @param applicationConfigurationParameterTypes
+     * @param applicationConfigurationParameters
+     * @return UwbStatus
      */
     virtual UwbStatus
     GetApplicationConfigurationParameters(uint32_t sessionId, const std::vector<UwbApplicationConfigurationParameterType> &applicationConfigurationParameterTypes, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters) = 0;
@@ -179,6 +178,7 @@ struct IUwbSimulatorDdiCallbacksLrp
      * @brief
      *
      * @param notificationData
+     * @return NTSTATUS
      */
     virtual NTSTATUS
     UwbNotification(UwbNotificationData &notificationData) = 0;

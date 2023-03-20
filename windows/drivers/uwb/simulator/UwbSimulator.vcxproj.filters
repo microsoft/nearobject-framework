@@ -48,12 +48,6 @@
     <ClInclude Include="include\UwbSimulatorDdi.h">
       <Filter>Header Files\Public</Filter>
     </ClInclude>
-    <ClInclude Include="UwbSimulatorDdiCallbacksLrp.hxx">
-      <Filter>Header Files\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="UwbSimulatorDdiCallbacksLrpNoop.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UwbCxLrpDevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -63,22 +57,31 @@
     <ClInclude Include="UwbSimulatorDdiHandler.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UwbSimulatorDdiHandlerLrp.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UwbSimulatorDispatchEntry.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UwbSimulatorSession.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UwbSimulatorDdiHandlerSimulator.hxx">
+    <ClInclude Include="IUwbSimulator.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UwbSimulatorDdiCallbacksSimulator.hxx">
-      <Filter>Header Files\Public</Filter>
+    <ClInclude Include="IUwbSimulatorDdiCallbacksSimulator.hxx">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UwbSimulatorDdiCallbacksSimulatorImpl.hxx">
+    <ClInclude Include="IUwbSimulatorDdiHandler.hxx">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IUwbSimulatorDdiCallbacksLrp.hxx">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UwbSimulatorDdiCallbacks.hxx">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IUwbSimulatorSession.hxx">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UwbSimulatorIoEventQueue.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -95,19 +98,19 @@
     <ClCompile Include="UwbSimulatorTracelogging.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UwbSimulatorDdiCallbacksLrpNoop.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="UwbSimulatorDriver.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UwbSimulatorDdiHandlerLrp.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UwbSimulatorDdiHandlerSimulator.cxx">
+    <ClCompile Include="UwbSimulatorDdiCallbacks.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UwbSimulatorDdiCallbacksSimulatorImpl.cxx">
+    <ClCompile Include="UwbSimulatorSession.cxx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UwbSimulatorIoEventQueue.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

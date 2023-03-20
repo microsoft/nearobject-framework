@@ -3,7 +3,6 @@
 #define UWB_SIMULATOR_DDI_CALLBACKS_HXX
 
 #include <cstdint>
-#include <future>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -19,9 +18,9 @@
 
 #include "IUwbSimulatorDdiCallbacksLrp.hxx"
 #include "IUwbSimulatorDdiCallbacksSimulator.hxx"
+#include "UwbSimulatorDeviceFile.hxx"
 #include "UwbSimulatorSession.hxx"
 
-#include <uwb/protocols/fira/UwbApplicationConfiguration.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
 #include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
@@ -31,7 +30,7 @@ struct UwbSimulatorDdiCallbacks :
     public IUwbSimulatorDdiCallbacksLrp,
     public IUwbSimulatorDdiCallbacksSimulator
 {
-    UwbSimulatorDdiCallbacks();
+    UwbSimulatorDdiCallbacks(UwbSimulatorDeviceFile *deviceFile);
 
     // IUwbSimulatorDdiCallbacksLrp
 
@@ -130,12 +129,9 @@ private:
     std::shared_mutex m_sessionsGate;
     std::unordered_map<uint32_t, UwbSimulatorSession> m_sessions{};
 
-    // Notification promise and associated lock that protects it.
-    std::mutex m_notificationGate;
-    std::optional<std::promise<UwbNotificationData>> m_notificationPromise;
-
 private:
     UwbSimulatorCapabilities m_simulatorCapabilities{};
+    UwbSimulatorDeviceFile *m_deviceFile;
 };
 } // namespace windows::devices::uwb::simulator
 

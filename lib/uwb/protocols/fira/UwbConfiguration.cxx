@@ -140,9 +140,9 @@ UwbConfiguration::GetSp3PhySetNumber() const noexcept
 }
 
 std::optional<uint8_t>
-UwbConfiguration::GetPreableCodeIndex() const noexcept
+UwbConfiguration::GetPreambleCodeIndex() const noexcept
 {
-    return GetValue<uint8_t>(ParameterTag::PreableCodeIndex);
+    return GetValue<uint8_t>(ParameterTag::PreambleCodeIndex);
 }
 
 std::unordered_set<ResultReportConfiguration>

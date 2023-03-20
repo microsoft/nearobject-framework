@@ -14,6 +14,7 @@
     <ClCompile Include="UwbSimulatorDdiHandlerLrp.cxx" />
     <ClCompile Include="UwbSimulatorDriver.cxx" />
     <ClCompile Include="UwbSimulatorDdiCallbacks.cxx" />
+    <ClCompile Include="UwbSimulatorIoEventQueue.cxx" />
     <ClCompile Include="UwbSimulatorIoQueue.cxx" />
     <ClCompile Include="UwbSimulatorDevice.cxx" />
     <ClCompile Include="UwbSimulatorDeviceFile.cxx" />
@@ -31,6 +32,7 @@
     <ClInclude Include="UwbCxLrpDevice.h" />
     <ClInclude Include="IUwbSimulatorDdiCallbacksLrp.hxx" />
     <ClInclude Include="UwbSimulatorDdiCallbacks.hxx" />
+    <ClInclude Include="UwbSimulatorIoEventQueue.hxx" />
     <ClInclude Include="UwbSimulatorIoQueue.hxx" />
     <ClInclude Include="UwbSimulatorDevice.hxx" />
     <ClInclude Include="UwbSimulatorDeviceFile.hxx" />

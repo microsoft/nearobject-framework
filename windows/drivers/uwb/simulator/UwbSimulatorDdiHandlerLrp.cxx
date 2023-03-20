@@ -47,12 +47,12 @@ UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler> (*MakeLrpDispatchEntry)(ULONG,
 const std::initializer_list<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>> UwbSimulatorDdiHandler::Dispatch{
     // GUID_UWB_DEVICE_INTERFACE Handlers
     MakeLrpDispatchEntry<UWB_DEVICE_RESET, UWB_STATUS>(IOCTL_UWB_DEVICE_RESET, &UwbSimulatorDdiHandler::OnUwbDeviceReset),
-    MakeLrpDispatchEntry<Unrestricted, UWB_DEVICE_INFO>(IOCTL_UWB_GET_DEVICE_INFO, &UwbSimulatorDdiHandler::OnUwbGetDeviceInformation),
-    MakeLrpDispatchEntry<Unrestricted, UWB_DEVICE_CAPABILITIES>(IOCTL_UWB_GET_DEVICE_CAPABILITIES, &UwbSimulatorDdiHandler::OnUwbGetDeviceCapabilities),
-    MakeLrpDispatchEntry<UWB_SET_DEVICE_CONFIG_PARAMS, UWB_SET_DEVICE_CONFIG_PARAMS_STATUS>(IOCTL_UWB_GET_DEVICE_CONFIG_PARAMS, &UwbSimulatorDdiHandler::OnUwbGetDeviceConfigurationParameters),
-    MakeLrpDispatchEntry<UWB_GET_DEVICE_CONFIG_PARAMS, UWB_DEVICE_CONFIG_PARAMS>(IOCTL_UWB_SET_DEVICE_CONFIG_PARAMS, &UwbSimulatorDdiHandler::OnUwbSetDeviceConfigurationParameters),
-    MakeLrpDispatchEntry<UWB_GET_APP_CONFIG_PARAMS, UWB_APP_CONFIG_PARAMS>(IOCTL_UWB_GET_APP_CONFIG_PARAMS, &UwbSimulatorDdiHandler::OnUwbGetApplicationConfigurationParameters),
-    MakeLrpDispatchEntry<UWB_SET_APP_CONFIG_PARAMS, UWB_SET_APP_CONFIG_PARAMS_STATUS>(IOCTL_UWB_SET_APP_CONFIG_PARAMS, &UwbSimulatorDdiHandler::OnUwbSetApplicationConfigurationParameters),
+    MakeLrpDispatchEntry<Unrestricted, Unrestricted>(IOCTL_UWB_GET_DEVICE_INFO, &UwbSimulatorDdiHandler::OnUwbGetDeviceInformation),
+    MakeLrpDispatchEntry<Unrestricted, Unrestricted>(IOCTL_UWB_GET_DEVICE_CAPABILITIES, &UwbSimulatorDdiHandler::OnUwbGetDeviceCapabilities),
+    MakeLrpDispatchEntry<UWB_SET_DEVICE_CONFIG_PARAMS, Unrestricted>(IOCTL_UWB_GET_DEVICE_CONFIG_PARAMS, &UwbSimulatorDdiHandler::OnUwbGetDeviceConfigurationParameters),
+    MakeLrpDispatchEntry<UWB_GET_DEVICE_CONFIG_PARAMS, Unrestricted>(IOCTL_UWB_SET_DEVICE_CONFIG_PARAMS, &UwbSimulatorDdiHandler::OnUwbSetDeviceConfigurationParameters),
+    MakeLrpDispatchEntry<UWB_GET_APP_CONFIG_PARAMS, Unrestricted>(IOCTL_UWB_GET_APP_CONFIG_PARAMS, &UwbSimulatorDdiHandler::OnUwbGetApplicationConfigurationParameters),
+    MakeLrpDispatchEntry<UWB_SET_APP_CONFIG_PARAMS, Unrestricted>(IOCTL_UWB_SET_APP_CONFIG_PARAMS, &UwbSimulatorDdiHandler::OnUwbSetApplicationConfigurationParameters),
     MakeLrpDispatchEntry<Unrestricted, UWB_GET_SESSION_COUNT>(IOCTL_UWB_GET_SESSION_COUNT, &UwbSimulatorDdiHandler::OnUwbGetSessionCount),
     MakeLrpDispatchEntry<UWB_SESSION_INIT, UWB_STATUS>(IOCTL_UWB_SESSION_INIT, &UwbSimulatorDdiHandler::OnUwbSessionInitialize),
     MakeLrpDispatchEntry<UWB_SESSION_DEINIT, UWB_STATUS>(IOCTL_UWB_SESSION_DEINIT, &UwbSimulatorDdiHandler::OnUwbSessionDeinitialize),
@@ -61,11 +61,17 @@ const std::initializer_list<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>> U
     MakeLrpDispatchEntry<UWB_START_RANGING_SESSION, UWB_STATUS>(IOCTL_UWB_START_RANGING_SESSION, &UwbSimulatorDdiHandler::OnUwbSessionStartRanging),
     MakeLrpDispatchEntry<UWB_STOP_RANGING_SESSION, UWB_STATUS>(IOCTL_UWB_STOP_RANGING_SESSION, &UwbSimulatorDdiHandler::OnUwbSessionStopRanging),
     MakeLrpDispatchEntry<UWB_GET_RANGING_COUNT, UWB_RANGING_COUNT>(IOCTL_UWB_GET_RANGING_COUNT, &UwbSimulatorDdiHandler::OnUwbSessionGetRangingCount),
-    MakeLrpDispatchEntry<Unrestricted, UWB_NOTIFICATION_DATA>(IOCTL_UWB_NOTIFICATION, &UwbSimulatorDdiHandler::OnUwbNotification),
+    MakeLrpDispatchEntry<Unrestricted, Unrestricted>(IOCTL_UWB_NOTIFICATION, &UwbSimulatorDdiHandler::OnUwbNotification),
     // GUID_DEVINTERFACE_UWB_SIMULATOR Handlers
     MakeLrpDispatchEntry<Unrestricted, UwbSimulatorCapabilities>(IOCTL_UWB_DEVICE_SIM_GET_CAPABILITIES, &UwbSimulatorDdiHandler::OnUwbSimulatorCapabilities),
     MakeLrpDispatchEntry<UwbSimulatorTriggerSessionEventArgs, Unrestricted>(IOCTL_UWB_DEVICE_SIM_TRIGGER_SESSION_EVENT, &UwbSimulatorDdiHandler::OnUwbSimulatorTriggerSessionEvent),
 };
+
+UwbSimulatorDdiHandler::UwbSimulatorDdiHandler(UwbSimulatorDeviceFile *deviceFile) :
+    m_deviceFile(deviceFile),
+    m_callbacks(std::make_unique<UwbSimulatorDdiCallbacks>(deviceFile))
+{
+}
 
 // IOCTL_UWB_DEVICE_RESET
 NTSTATUS
@@ -165,11 +171,11 @@ UwbSimulatorDdiHandler::OnUwbGetDeviceConfigurationParameters(WDFREQUEST request
 
     // Convert neutral type to DDI output type.
     // TODO: auto deviceConfigParams = UwbCxDdi::From(deviceConfigurationParameterResults);
-    // TODO: outputSize = deviceConfigParams.size();
+    // TODO: outputBufferSize = deviceConfigParams.size();
 
     // Update output buffer if sufficiently sized.
     if (std::size(outputBuffer) >= outputSize) {
-        // TODO: std::memcpy(std::data(outputBuffer), std::data(std::data(<neutal wrapper>)), outputSize);
+        // TODO: std::memcpy(std::data(outputBuffer), std::data(std::data(<neutal wrapper>)), outputBufferSize);
     } else {
         status = STATUS_BUFFER_TOO_SMALL;
     }
@@ -437,28 +443,21 @@ UwbSimulatorDdiHandler::OnUwbSessionGetRangingCount(WDFREQUEST request, std::spa
 NTSTATUS
 UwbSimulatorDdiHandler::OnUwbNotification(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
 {
-    std::size_t outputSize = 0;
-    UwbNotificationData uwbNotificationData{};
+    std::size_t outputBufferSize = std::size(outputBuffer);
 
-    // Invoke the callback.
-    NTSTATUS status = m_callbacks->UwbNotification(uwbNotificationData);
-    if (status != STATUS_SUCCESS) {
-        return status;
+    std::optional<UwbNotificationData> uwbNotificationData;
+    auto *ioEventQueue = m_deviceFile->GetIoEventQueue();
+    NTSTATUS status = ioEventQueue->HandleNotificationRequest(request, uwbNotificationData, outputBufferSize);
+    if (status == STATUS_SUCCESS) {
+        // Convert neutral type to DDI output type, and copy to output buffer.
+        auto notificationData = UwbCxDdi::From(uwbNotificationData.value());
+        std::memcpy(std::data(outputBuffer), std::data(std::data(notificationData)), outputBufferSize);
     }
 
-    // Convert neutral type to DDI output type.
-    auto notificationData = UwbCxDdi::From(uwbNotificationData);
-    outputSize = std::size(notificationData);
-
-    // Update output buffer if sufficiently sized.
-    if (std::size(outputBuffer) >= outputSize) {
-        std::memcpy(std::data(outputBuffer), std::data(std::data(notificationData)), outputSize);
-    } else {
-        status = STATUS_BUFFER_TOO_SMALL;
+    // Complete the request only if it has not been pended by the driver.
+    if (status != STATUS_PENDING) {
+        WdfRequestCompleteWithInformation(request, status, outputBufferSize);
     }
-
-    // Complete the request.
-    WdfRequestCompleteWithInformation(request, status, outputSize);
 
     return status;
 }
@@ -499,12 +498,6 @@ UwbSimulatorDdiHandler::OnUwbSimulatorTriggerSessionEvent(WDFREQUEST request, st
     return status;
 }
 
-UwbSimulatorDdiHandler::UwbSimulatorDdiHandler(WDFFILEOBJECT wdfFile) :
-    m_wdfFile(wdfFile),
-    m_callbacks(std::make_unique<UwbSimulatorDdiCallbacks>())
-{
-}
-
 std::optional<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>>
 UwbSimulatorDdiHandler::TryGetDispatchEntry(ULONG ioControlCode)
 {
@@ -526,7 +519,7 @@ UwbSimulatorDdiHandler::HandlesIoControlCode(ULONG ioControlCode)
 }
 
 NTSTATUS
-UwbSimulatorDdiHandler::ValidateRequest(WDFREQUEST /* request */, ULONG ioControlCode, std::size_t inputBufferLength, std::size_t outputBufferLength)
+UwbSimulatorDdiHandler::ValidateRequest(WDFREQUEST /*request*/, ULONG ioControlCode, std::size_t inputBufferLength, std::size_t outputBufferLength)
 {
     const auto dispatchEntry = TryGetDispatchEntry(ioControlCode);
     NTSTATUS status = dispatchEntry.has_value()

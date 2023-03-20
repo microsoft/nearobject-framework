@@ -255,16 +255,16 @@ UwbConfiguration::Builder::Sp3(uint8_t sp3PhySetNumber) noexcept
 }
 
 UwbConfiguration::Builder&
-UwbConfiguration::Builder::SetPreableCodeIndex(uint8_t preambleCodeIndex) noexcept
+UwbConfiguration::Builder::SetPreambleCodeIndex(uint8_t preambleCodeIndex) noexcept
 {
-    m_values[ParameterTag::PreableCodeIndex] = preambleCodeIndex;
+    m_values[ParameterTag::PreambleCodeIndex] = preambleCodeIndex;
     return *this;
 }
 
 UwbConfiguration::Builder&
-UwbConfiguration::Builder::PreableCodeIndex(uint8_t preambleCodeIndex) noexcept
+UwbConfiguration::Builder::PreambleCodeIndex(uint8_t preambleCodeIndex) noexcept
 {
-    return SetPreableCodeIndex(preambleCodeIndex);
+    return SetPreambleCodeIndex(preambleCodeIndex);
 }
 
 UwbConfiguration::Builder&
