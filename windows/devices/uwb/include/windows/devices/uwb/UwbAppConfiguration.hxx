@@ -63,10 +63,6 @@ protected:
     // order of members here is important to enforce proper initialization order.
     std::vector<uint8_t> m_buffer;
     UWB_APP_CONFIG_PARAM& m_parameter;
-
-    // TODO: this assert fails. Fix it with alignas(); tracked by github issue #67.
-    // Ensure the alignment of the vector data buffer can be safely used for UWB_APP_CONFIG_PARAM.
-    // static_assert(alignof(uint8_t) == alignof(UWB_APP_CONFIG_PARAM), "UWB_APP_CONFIG_PARAM alignment not satisfied");
 };
 
 namespace detail
@@ -92,7 +88,7 @@ const std::unordered_map<::uwb::protocol::fira::UwbConfiguration::ParameterTag, 
     { ::uwb::protocol::fira::UwbConfiguration::ParameterTag::Sp0PhySetNumber, UWB_APP_CONFIG_PARAM_TYPE_PSDU_DATA_RATE }, // TODO related but not directly the psdu data rate
     { ::uwb::protocol::fira::UwbConfiguration::ParameterTag::Sp1PhySetNumber, UWB_APP_CONFIG_PARAM_TYPE_PSDU_DATA_RATE }, // TODO related but not directly the psdu data rate
     { ::uwb::protocol::fira::UwbConfiguration::ParameterTag::Sp3PhySetNumber, UWB_APP_CONFIG_PARAM_TYPE_PSDU_DATA_RATE }, // TODO related but not directly the psdu data rate
-    { ::uwb::protocol::fira::UwbConfiguration::ParameterTag::PreableCodeIndex, UWB_APP_CONFIG_PARAM_TYPE_PREAMBLE_CODE_INDEX },
+    { ::uwb::protocol::fira::UwbConfiguration::ParameterTag::PreambleCodeIndex, UWB_APP_CONFIG_PARAM_TYPE_PREAMBLE_CODE_INDEX },
     { ::uwb::protocol::fira::UwbConfiguration::ParameterTag::ResultReportConfig, UWB_APP_CONFIG_PARAM_TYPE_RESULT_REPORT_CONFIG },
     { ::uwb::protocol::fira::UwbConfiguration::ParameterTag::MacAddressMode, UWB_APP_CONFIG_PARAM_TYPE_MAC_ADDRESS_MODE },
     { ::uwb::protocol::fira::UwbConfiguration::ParameterTag::ControleeShortMacAddress, UWB_APP_CONFIG_PARAM_TYPE_DST_MAC_ADDRESS },

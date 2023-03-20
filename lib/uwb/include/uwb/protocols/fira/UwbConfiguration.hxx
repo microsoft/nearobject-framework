@@ -61,7 +61,7 @@ struct UwbConfiguration
         Sp0PhySetNumber = 0x8F,
         Sp1PhySetNumber = 0x90,
         Sp3PhySetNumber = 0x91,
-        PreableCodeIndex = 0x92, // TODO fix the typo here
+        PreambleCodeIndex = 0x92,
         ResultReportConfig = 0x93,
         MacAddressMode = 0x94,
         ControleeShortMacAddress = 0x95,
@@ -98,7 +98,7 @@ struct UwbConfiguration
     static constexpr auto Sp0PhySetNumberDefault = 1;
     static constexpr auto Sp1PhySetNumberDefault = 1;
     static constexpr auto Sp3PhySetNumberDefault = 0;
-    static constexpr auto PreableCodeIndexDefault = 0;
+    static constexpr auto PreambleCodeIndexDefault = 0;
     static constexpr auto MacAddressModeDefault = UwbMacAddressType::Short;
     static constexpr auto KeyRotationRateDefault = 0UL;
     static constexpr auto MacFcsTypeDefault = UwbMacAddressFcsType::Crc16;
@@ -113,20 +113,20 @@ struct UwbConfiguration
         uint8_t,
         uint16_t,
         uint32_t,
-        uwb::protocol::fira::Channel,
-        uwb::protocol::fira::ConvolutionalCodeConstraintLength,
-        uwb::protocol::fira::DeviceRole,
-        uwb::protocol::fira::MultiNodeMode,
-        uwb::protocol::fira::PrfMode,
-        uwb::protocol::fira::RangingMethod,
-        uwb::protocol::fira::RangingMode,
-        uwb::protocol::fira::SchedulingMode,
-        uwb::protocol::fira::StsConfiguration,
-        uwb::protocol::fira::StsPacketConfiguration,
-        uwb::UwbMacAddress,
-        uwb::UwbMacAddressFcsType,
-        uwb::UwbMacAddressType,
-        std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>>;
+        ::uwb::protocol::fira::Channel,
+        ::uwb::protocol::fira::ConvolutionalCodeConstraintLength,
+        ::uwb::protocol::fira::DeviceRole,
+        ::uwb::protocol::fira::MultiNodeMode,
+        ::uwb::protocol::fira::PrfMode,
+        ::uwb::protocol::fira::RangingMethod,
+        ::uwb::protocol::fira::RangingMode,
+        ::uwb::protocol::fira::SchedulingMode,
+        ::uwb::protocol::fira::StsConfiguration,
+        ::uwb::protocol::fira::StsPacketConfiguration,
+        ::uwb::UwbMacAddress,
+        ::uwb::UwbMacAddressFcsType,
+        ::uwb::UwbMacAddressType,
+        std::unordered_set<::uwb::protocol::fira::ResultReportConfiguration>>;
 
     /**
      * @brief Creates a new UwbConfiguration builder object.
@@ -166,9 +166,9 @@ struct UwbConfiguration
     /**
      * @brief The map of parameter tags and their values from the configuration object.
      *
-     * @return const std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, ParameterTypesVariant>&
+     * @return const std::unordered_map<::uwb::protocol::fira::UwbConfiguration::ParameterTag, ParameterTypesVariant>&
      */
-    const std::unordered_map<uwb::protocol::fira::UwbConfiguration::ParameterTag, ParameterTypesVariant>&
+    const std::unordered_map<::uwb::protocol::fira::UwbConfiguration::ParameterTag, ParameterTypesVariant>&
     GetValueMap() const noexcept;
 
     std::optional<uint16_t>
@@ -177,22 +177,22 @@ struct UwbConfiguration
     std::optional<uint16_t>
     GetFiraMacVersion() const noexcept;
 
-    std::optional<uwb::protocol::fira::DeviceRole>
+    std::optional<::uwb::protocol::fira::DeviceRole>
     GetDeviceRole() const noexcept;
 
-    std::optional<uwb::protocol::fira::RangingMethod>
+    std::optional<::uwb::protocol::fira::RangingMethod>
     GetRangingMethod() const noexcept;
 
-    std::optional<uwb::protocol::fira::StsConfiguration>
+    std::optional<::uwb::protocol::fira::StsConfiguration>
     GetStsConfiguration() const noexcept;
 
-    std::optional<uwb::protocol::fira::MultiNodeMode>
+    std::optional<::uwb::protocol::fira::MultiNodeMode>
     GetMultiNodeMode() const noexcept;
 
-    std::optional<uwb::protocol::fira::RangingMode>
+    std::optional<::uwb::protocol::fira::RangingMode>
     GetRangingTimeStruct() const noexcept;
 
-    std::optional<uwb::protocol::fira::SchedulingMode>
+    std::optional<::uwb::protocol::fira::SchedulingMode>
     GetSchedulingMode() const noexcept;
 
     std::optional<bool>
@@ -204,16 +204,16 @@ struct UwbConfiguration
     std::optional<uint32_t>
     GetUwbInitiationTime() const noexcept;
 
-    std::optional<uwb::protocol::fira::Channel>
+    std::optional<::uwb::protocol::fira::Channel>
     GetChannel() const noexcept;
 
-    std::optional<uwb::protocol::fira::StsPacketConfiguration>
+    std::optional<::uwb::protocol::fira::StsPacketConfiguration>
     GetRFrameConfig() const noexcept;
 
-    std::optional<uwb::protocol::fira::ConvolutionalCodeConstraintLength>
+    std::optional<::uwb::protocol::fira::ConvolutionalCodeConstraintLength>
     GetConvolutionalCodeConstraintLength() const noexcept;
 
-    std::optional<uwb::protocol::fira::PrfMode>
+    std::optional<::uwb::protocol::fira::PrfMode>
     GetPrfMode() const noexcept;
 
     std::optional<uint8_t>
@@ -226,18 +226,18 @@ struct UwbConfiguration
     GetSp3PhySetNumber() const noexcept;
 
     std::optional<uint8_t>
-    GetPreableCodeIndex() const noexcept;
+    GetPreambleCodeIndex() const noexcept;
 
-    std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>
+    std::unordered_set<::uwb::protocol::fira::ResultReportConfiguration>
     GetResultReportConfigurations() const noexcept;
 
-    std::optional<uwb::UwbMacAddressType>
+    std::optional<::uwb::UwbMacAddressType>
     GetMacAddressMode() const noexcept;
 
-    std::optional<uwb::UwbMacAddress>
+    std::optional<::uwb::UwbMacAddress>
     GetControleeShortMacAddress() const noexcept;
 
-    std::optional<uwb::UwbMacAddress>
+    std::optional<::uwb::UwbMacAddress>
     GetControllerMacAddress() const noexcept;
 
     std::optional<uint8_t>
@@ -255,7 +255,7 @@ struct UwbConfiguration
     std::optional<uint8_t>
     GetKeyRotationRate() const noexcept;
 
-    std::optional<uwb::UwbMacAddressFcsType>
+    std::optional<::uwb::UwbMacAddressFcsType>
     GetMacAddressFcsType() const noexcept;
 
     std::optional<uint16_t>
@@ -290,10 +290,10 @@ private:
 namespace std
 {
 template <>
-struct hash<uwb::protocol::fira::UwbConfiguration>
+struct hash<::uwb::protocol::fira::UwbConfiguration>
 {
     std::size_t
-    operator()(const uwb::protocol::fira::UwbConfiguration& uwbConfiguration) const noexcept
+    operator()(const ::uwb::protocol::fira::UwbConfiguration& uwbConfiguration) const noexcept
     {
         std::size_t value = 0;
         auto resultReportConfigurations = uwbConfiguration.GetResultReportConfigurations();
@@ -316,7 +316,7 @@ struct hash<uwb::protocol::fira::UwbConfiguration>
             uwbConfiguration.GetSp0PhySetNumber(),
             uwbConfiguration.GetSp1PhySetNumber(),
             uwbConfiguration.GetSp3PhySetNumber(),
-            uwbConfiguration.GetPreableCodeIndex(),
+            uwbConfiguration.GetPreambleCodeIndex(),
             notstd::hash_range(std::cbegin(resultReportConfigurations), std::cend(resultReportConfigurations)),
             uwbConfiguration.GetMacAddressMode(),
             uwbConfiguration.GetControleeShortMacAddress(),

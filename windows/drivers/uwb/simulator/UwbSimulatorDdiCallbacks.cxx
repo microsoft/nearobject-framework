@@ -21,31 +21,23 @@ using namespace windows::devices::uwb::simulator;
  */
 namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
 
-UwbSimulatorDdiCallbacks::UwbSimulatorDdiCallbacks() :
-    m_simulatorCapabilities({ IUwbSimulator::Version })
+UwbSimulatorDdiCallbacks::UwbSimulatorDdiCallbacks(UwbSimulatorDeviceFile *deviceFile) :
+    m_simulatorCapabilities({ IUwbSimulator::Version }),
+    m_deviceFile(deviceFile)
 {}
 
 NTSTATUS
 UwbSimulatorDdiCallbacks::RaiseUwbNotification(UwbNotificationData uwbNotificationData)
 {
-    // Acquire the notification lock to ensure the notification proimise can be safely inspected and updated.
-    std::unique_lock notificationLock{ m_notificationGate };
-
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
         "UwbNotification",
         TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
         TraceLoggingString("EventRaised", "Action"),
-        TraceLoggingBool(m_notificationPromise.has_value(), "WaitPending"),
         TraceLoggingString(std::data(ToString(uwbNotificationData)), "Data"));
 
-    if (!m_notificationPromise.has_value()) {
-        // No outstanding client waiting for a result, so nothing to do.
-        return STATUS_INVALID_DEVICE_REQUEST;
-    }
-
-    m_notificationPromise->set_value(std::move(uwbNotificationData));
-    m_notificationPromise.reset();
+    auto ioEventQueue = m_deviceFile->GetIoEventQueue();
+    ioEventQueue->PushNotificationData(std::move(uwbNotificationData));
 
     return STATUS_SUCCESS;
 }
@@ -352,35 +344,16 @@ UwbSimulatorDdiCallbacks::SessionGetRangingCount(uint32_t sessionId, uint32_t &r
 }
 
 NTSTATUS
-UwbSimulatorDdiCallbacks::UwbNotification(UwbNotificationData &notificationData)
+UwbSimulatorDdiCallbacks::UwbNotification(UwbNotificationData & /*notificationData*/)
 {
-    // Acquire the notification lock to ensure the notification proimise can be safely inspected and updated.
-    std::unique_lock notificationLock{ m_notificationGate };
-    if (m_notificationPromise.has_value()) {
-        // pre-existing promise, this should not happen.
-        TraceLoggingWrite(
-            UwbSimulatorTraceloggingProvider,
-            "UwbNotification",
-            TraceLoggingLevel(TRACE_LEVEL_WARNING),
-            TraceLoggingString("Ignore", "Action"));
-        return STATUS_ALREADY_REGISTERED;
-    }
-
-    // Create a new promise whose shared state will be updated when a notification is raised.
-    auto notificationFuture = m_notificationPromise.emplace().get_future();
-
-    // Release the lock since the shared data (promise) has been created and future obtained.
-    notificationLock.unlock();
-
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
         "UwbNotification",
         TraceLoggingLevel(TRACE_LEVEL_VERBOSE),
         TraceLoggingString("Wait", "Action"));
 
-    // Lock is now released; synchronously wait indefinitely for the shared state to be updated.
-    notificationFuture.wait();
-    notificationData = notificationFuture.get();
+    // This callback should not be invoked directly.
+    NTSTATUS status = STATUS_NOT_IMPLEMENTED;
 
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
@@ -388,7 +361,7 @@ UwbSimulatorDdiCallbacks::UwbNotification(UwbNotificationData &notificationData)
         TraceLoggingLevel(TRACE_LEVEL_VERBOSE),
         TraceLoggingString("WaitComplete", "Action"));
 
-    return STATUS_SUCCESS;
+    return status;
 }
 
 UwbSimulatorCapabilities
