@@ -546,10 +546,21 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
     {
         // UWB_APP_CONFIG_PARAM_TYPE_STATIC_STS_IV
         constexpr std::array<uint8_t, StaticStsInitializationVectorLength> staticStsInitializationVector{ 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF };
-        constexpr UwbApplicationConfigurationParameter parameterstaticStsInitializationVector = {
+        constexpr UwbApplicationConfigurationParameter parameterStaticStsInitializationVector = {
             .Type = UwbApplicationConfigurationParameterType::StaticStsIv,
             .Value = staticStsInitializationVector,
         };
-        test::ValidateRoundtrip(parameterstaticStsInitializationVector);
+        test::ValidateRoundtrip(parameterStaticStsInitializationVector);
+    }
+
+    SECTION("UwbApplicationConfigurationParameter ::uwb::UwbMacAddress (short type)")
+    {
+        // UWB_APP_CONFIG_PARAM_TYPE_DEVICE_MAC_ADDRESS
+        constexpr ::uwb::UwbMacAddress uwbMacAddressShort(std::array<uint8_t, ::uwb::UwbMacAddressLength::Short>{ 0xAA, 0xBB });
+        constexpr UwbApplicationConfigurationParameter parameterUwbMacAddressShort = {
+            .Type = UwbApplicationConfigurationParameterType::DeviceMacAddress,
+            .Value = std::move(uwbMacAddressShort),
+        };
+        test::ValidateRoundtrip(parameterUwbMacAddressShort);
     }
 }
