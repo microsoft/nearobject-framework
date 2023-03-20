@@ -357,7 +357,7 @@ public:
      * @return std::optional<UwbMacAddress> The constructed optional UwbMacAddress.
      */
     static std::optional<UwbMacAddress>
-    FromString(const std::string addressString, UwbMacAddressType addressType);
+    FromString(const std::string& addressString, UwbMacAddressType addressType);
 
     /**
      * @brief Construct a default UwbMacAddress.
@@ -394,7 +394,7 @@ private:
      * @param addressString The semicolon-delimited address string.
      * @param addressType The type of mac address that addressString represents.
      */
-    UwbMacAddress(std::string addressString, UwbMacAddressType addressType);
+    UwbMacAddress(const std::string& addressString, UwbMacAddressType addressType);
 
     /**
      * @brief Swap the data members of this instance with another one.

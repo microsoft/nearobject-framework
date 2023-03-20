@@ -27,7 +27,7 @@ UwbMacAddress::UwbMacAddress(const UwbMacAddress& other) :
     InitializeView();
 }
 
-UwbMacAddress::UwbMacAddress(std::string addressString, UwbMacAddressType addressType)
+UwbMacAddress::UwbMacAddress(const std::string& addressString, UwbMacAddressType addressType)
 {
     // TODO: Make the delimiter configurable
 
@@ -134,7 +134,7 @@ UwbMacAddress::Random(UwbMacAddressType type)
 
 /* static */
 std::optional<UwbMacAddress>
-UwbMacAddress::FromString(const std::string addressString, UwbMacAddressType addressType)
+UwbMacAddress::FromString(const std::string& addressString, UwbMacAddressType addressType)
 {
     std::regex shortRegex("^([0-9A-Fa-f]{2}:){1}([0-9A-Fa-f]{2})$");
     std::regex extendedRegex("^(([0-9A-Fa-f]{2}:){7}[0-9A-Fa-f]{2})$");
