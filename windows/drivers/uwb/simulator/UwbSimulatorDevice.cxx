@@ -169,15 +169,16 @@ UwbSimulatorDevice::OnFileCreate(WDFDEVICE device, WDFREQUEST request, WDFFILEOB
         TraceLoggingPointer(file, "File"));
 
     auto uwbSimulatorFileBuffer = GetUwbSimulatorFile(file);
-    auto uwbSimulatorFile [[maybe_unused]] = new (uwbSimulatorFileBuffer) UwbSimulatorDeviceFile(file);
-    auto uwbSimulatorHandler = std::make_unique<UwbSimulatorDdiHandler>(file);
-    uwbSimulatorFile->RegisterHandler(std::move(uwbSimulatorHandler));
+    auto uwbSimulatorFile = new (uwbSimulatorFileBuffer) UwbSimulatorDeviceFile(file);
+    auto uwbSimulatorFileStatus = uwbSimulatorFile->Initialize();
+    if (uwbSimulatorFileStatus == STATUS_SUCCESS) {
+        auto uwbSimulatorHandler = std::make_unique<UwbSimulatorDdiHandler>(uwbSimulatorFile);
+        uwbSimulatorFile->RegisterHandler(std::move(uwbSimulatorHandler));
+    } else {
+        uwbSimulatorFile->~UwbSimulatorDeviceFile();
+    }
 
-    // TODO: Here, uwbSimulatorFile should be associated with the DDI it is responsible for handling.
-    // It could make sense for it to use the pimpl idiom since the storage for the class is pre-allocated
-    // by the driver framework, polymorphism can't be used.
-
-    WdfRequestComplete(request, STATUS_SUCCESS);
+    WdfRequestComplete(request, uwbSimulatorFileStatus);
 }
 
 void

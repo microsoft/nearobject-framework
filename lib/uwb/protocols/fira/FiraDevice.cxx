@@ -6,6 +6,7 @@
 #include <string_view>
 #include <typeindex>
 #include <typeinfo>
+#include <unordered_map>
 
 #include <magic_enum.hpp>
 #include <notstd/tostring.hxx>
