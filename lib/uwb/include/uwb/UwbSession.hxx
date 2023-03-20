@@ -54,6 +54,9 @@ public:
     void
     Configure(const protocol::fira::UwbSessionData& uwbSessionData);
 
+    void
+    Configure(const std::vector<protocol::fira::UwbApplicationConfigurationParameter> configParams);
+
     /**
      * @brief Set the type of mac address to be used for session participants.
      *
