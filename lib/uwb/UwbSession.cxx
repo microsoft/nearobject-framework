@@ -46,23 +46,21 @@ void
 UwbSession::StartRanging()
 {
     PLOG_VERBOSE << "start ranging";
-    bool rangingActiveUnexpected = true;
-    const bool wasRangingActive = m_rangingActive.compare_exchange_weak(rangingActiveUnexpected, true);
-    if (wasRangingActive) {
-        return;
+    bool rangingActiveExpected = false;
+    const bool wasNotRangingActive = m_rangingActive.compare_exchange_weak(rangingActiveExpected, true);
+    if (wasNotRangingActive) {
+        StartRangingImpl();
     }
-
-    StartRangingImpl();
 }
 
 void
 UwbSession::StopRanging()
 {
     PLOG_VERBOSE << "stop ranging";
-    bool rangingActiveUnexpected = false;
-    const bool wasRangingActive = m_rangingActive.compare_exchange_weak(rangingActiveUnexpected, false);
-    if (!wasRangingActive) {
-        return;
+    bool rangingActiveExpected = true;
+    const bool wasRangingActive = m_rangingActive.compare_exchange_weak(rangingActiveExpected, false);
+    if (wasRangingActive) {
+        //StopRangingImpl();
     }
 }
 
