@@ -47,8 +47,8 @@ UwbSession::StartRanging()
 {
     PLOG_VERBOSE << "start ranging";
     bool rangingActiveExpected = false;
-    const bool wasNotRangingActive = m_rangingActive.compare_exchange_weak(rangingActiveExpected, true);
-    if (wasNotRangingActive) {
+    const bool wasRangingInactive = m_rangingActive.compare_exchange_weak(rangingActiveExpected, true);
+    if (wasRangingInactive) {
         StartRangingImpl();
     }
 }
