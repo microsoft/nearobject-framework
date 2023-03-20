@@ -1343,8 +1343,23 @@ windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM &applicationConfi
         break;
     case UWB_APP_CONFIG_PARAM_TYPE_DEVICE_MAC_ADDRESS: {
         ::uwb::UwbMacAddress value{};
-        // TODO: convert
-        uwbApplicationConfigurationParameter.Value = std::move(value);
+        switch (applicationConfigurationParameter.paramLength) {
+        case ::uwb::UwbMacAddressLength::Short: {
+            ::uwb::UwbMacAddress::ShortType data{};
+            std::memcpy(std::data(data), &applicationConfigurationParameter.paramValue[0], std::size(data));
+            value = ::uwb::UwbMacAddress(std::move(data));
+            break;
+        }
+        case ::uwb::UwbMacAddressLength::Extended: {
+            ::uwb::UwbMacAddress::ExtendedType data{};
+            std::memcpy(std::data(data), &applicationConfigurationParameter.paramValue[0], std::size(data));
+            value = ::uwb::UwbMacAddress(std::move(data));
+            break;
+        }
+        default:
+            LOG_WARNING << "unsupported mac address length (" << applicationConfigurationParameter.paramLength << ") encountered";
+            break;
+        }
         break;
     }
     case UWB_APP_CONFIG_PARAM_TYPE_MAC_FCS_TYPE:
@@ -1360,8 +1375,13 @@ windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM &applicationConfi
         break;
     }
     case UWB_APP_CONFIG_PARAM_TYPE_DST_MAC_ADDRESS: {
+        // TODO: we can't infer the length as is done with
+        // UWB_APP_CONFIG_PARAM_TYPE_DEVICE_MAC_ADDRESS since the number of
+        // bytes is ambiguous (eg. paramLength == 8 could mean 4 short addresses
+        // or 1 extended address). The mac address type needs to be provided in
+        // in some way, but it's unclear how that information would be injected
+        // here. Re-visit.
         std::unordered_set<::uwb::UwbMacAddress> value{};
-        // TODO: convert
         uwbApplicationConfigurationParameter.Value = std::move(value);
         break;
     }
