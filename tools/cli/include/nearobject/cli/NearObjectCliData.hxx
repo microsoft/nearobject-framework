@@ -75,8 +75,8 @@ struct NearObjectCliData
     virtual ~NearObjectCliData() = default;
 
     bool HostIsController{ false };
-    std::string controllerMacAddress{};
-    std::string controleeMacAddress{};
+    std::string deviceMacAddress{};
+    std::string destinationMacAddress{}; // TODO: List of strings to support multiple controlees
     UwbConfigurationData uwbConfiguration{};
     uwb::protocol::fira::StaticRangingInfo StaticRanging{};
     uwb::protocol::fira::UwbSessionData SessionData{};

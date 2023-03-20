@@ -159,10 +159,10 @@ AddEnumOption(CLI::App* app, std::optional<EnumType>& assignTo, bool isMandatory
     enumUsage << " }";
 
     if (isMandatory) {
-        enumUsage << " This parameter is mandatory for a ranging session";
+        return app->add_option(std::move(optionName), assignTo, enumUsage.str())->capture_default_str()->required();
+    } else {
+        return app->add_option(std::move(optionName), assignTo, enumUsage.str())->capture_default_str();
     }
-
-    return app->add_option(std::move(optionName), assignTo, enumUsage.str())->capture_default_str();
 }
 
 } // namespace detail
@@ -235,14 +235,14 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     // List mandatory params first
     detail::AddEnumOption(rangeStartApp, uwbConfig.deviceRole, true);
     detail::AddEnumOption(rangeStartApp, uwbConfig.multiNodeMode, true);
-    rangeStartApp->add_option("--NumberOfControlees", uwbConfig.numberOfControlees, "1 <= N <= 8 This parameter is mandatory for a ranging session")->capture_default_str(); // TODO: Input validation
+    rangeStartApp->add_option("--NumberOfControlees", uwbConfig.numberOfControlees, "1 <= N <= 8")->capture_default_str()->required(); // TODO: Input validation
     // TODO: Accept multiple controlees
     if (uwbConfig.macAddressMode == uwb::UwbMacAddressType::Extended) {
-        rangeStartApp->add_option("--ControllerMacAddress", m_cliData->controllerMacAddress, "8-byte extended MAC address of controller: e.g. 12:34:56:78:87:65:43:21 This parameter is mandatory for a ranging session")->capture_default_str();
-        rangeStartApp->add_option("--ControleeMacAddress", m_cliData->controleeMacAddress, "8-byte extended MAC address of controlee: e.g. 12:34:56:78:87:65:43:21 This parameter is mandatory for a ranging session")->capture_default_str();
+        rangeStartApp->add_option("--DeviceMacAddress", m_cliData->deviceMacAddress, "8-byte extended MAC address of own device: e.g. 12:34:56:78:87:65:43:21")->capture_default_str()->required();
+        rangeStartApp->add_option("--DestinationMacAddress", m_cliData->destinationMacAddress, "8-byte extended MAC address of other device(s). If device is Controller, list NumberOfControlees mac addresses. If device is Controlee, list Controller mac address")->capture_default_str()->required();
     } else { // uwb::UwbMacAddressType::Short OR empty (default)
-        rangeStartApp->add_option("--ControllerMacAddress", m_cliData->controllerMacAddress, "2-byte short MAC address of controller: e.g. 12:34 This parameter is mandatory for a ranging session")->capture_default_str();
-        rangeStartApp->add_option("--ControleeMacAddress", m_cliData->controleeMacAddress, "2-byte short MAC address of controlee: e.g. 12:34 This parameter is mandatory for a ranging session")->capture_default_str();
+        rangeStartApp->add_option("--DeviceMacAddress", m_cliData->deviceMacAddress, "2-byte short MAC address of own device: e.g. 12:34")->capture_default_str()->required();
+        rangeStartApp->add_option("--DestinationMacAddress", m_cliData->destinationMacAddress, "2-byte short MAC address of controlee. If device is Controller, list NumberOfControlees mac addresses. If device is Controlee, list Controller mac address")->capture_default_str()->required();
     }
     detail::AddEnumOption(rangeStartApp, uwbConfig.deviceType, true);
 
@@ -285,64 +285,55 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     rangeStartApp->add_option("--ResultReportConfiguration", uwbConfig.resultReportConfigurationString)->capture_default_str();
 
     rangeStartApp->parse_complete_callback([this] {
-        // Ensure that mandatory params have a value
-        if (!m_cliData->uwbConfiguration.deviceRole.has_value() ||
-            !m_cliData->uwbConfiguration.multiNodeMode.has_value() ||
-            !m_cliData->uwbConfiguration.numberOfControlees.has_value() ||
-            m_cliData->controllerMacAddress.empty() ||
-            m_cliData->controleeMacAddress.empty() ||
-            !m_cliData->uwbConfiguration.deviceType.has_value()) {
+        // Set MAC addresses
+        std::optional<uwb::UwbMacAddress> controllerMacAddress;
+        std::optional<uwb::UwbMacAddress> controleeMacAddress;
 
-            std::cerr << "Not all mandatory params are set" << std::endl;
-        } else {
-            // Set MAC addresses
-            if (m_cliData->uwbConfiguration.macAddressMode == uwb::UwbMacAddressType::Extended) {
-                auto controllerMacAddress = uwb::UwbMacAddress::FromString(m_cliData->controllerMacAddress, uwb::UwbMacAddressType::Extended);
-                auto controleeMacAddress = uwb::UwbMacAddress::FromString(m_cliData->controleeMacAddress, uwb::UwbMacAddressType::Extended);
+        const auto macAddressType = m_cliData->uwbConfiguration.macAddressMode == uwb::UwbMacAddressType::Extended ? uwb::UwbMacAddressType::Extended : uwb::UwbMacAddressType::Short;
 
-                m_cliData->uwbConfiguration.controllerMacAddress = controllerMacAddress.value();
-                // TODO: Figure out where to store extended controlee mac address
-                // m_cliData->uwbConfiguration.??? = controleeMacAddress;
-            } else {
-                auto controllerMacAddress = uwb::UwbMacAddress::FromString(m_cliData->controllerMacAddress, uwb::UwbMacAddressType::Short);
-                auto controleeMacAddress = uwb::UwbMacAddress::FromString(m_cliData->controleeMacAddress, uwb::UwbMacAddressType::Short);
-
-                if (!controllerMacAddress.has_value()) {
-                    std::cerr << "Invalid ControllerMacAddress" << std::endl;
-                } else {
-                    m_cliData->uwbConfiguration.controllerMacAddress = controllerMacAddress.value();
-                    // TEST
-                    std::cout << "ControllerMacAddress: " << m_cliData->uwbConfiguration.controllerMacAddress << std::endl;
-                }
-
-                if (!controleeMacAddress.has_value()) {
-                    std::cerr << "Invalid ControleeMacAddress" << std::endl;
-                } else {
-                    m_cliData->uwbConfiguration.controleeShortMacAddress = controleeMacAddress.value();
-                    // TEST
-                    std::cout << "ControleeMacAddress: " << m_cliData->uwbConfiguration.controleeShortMacAddress << std::endl;
-                }
-            }
-
-            m_cliData->SessionData.uwbConfiguration = m_cliData->uwbConfiguration;
-            m_cliData->SessionData.staticRangingInfo = m_cliData->StaticRanging;
-
-            std::cout << "Selected parameters:" << std::endl;
-
-            for (const auto& [parameterTag, parameterValue] : m_cliData->SessionData.uwbConfiguration.GetValueMap()) {
-                std::visit([](auto&& arg) {
-                    using ParameterValueT = std::decay_t<decltype(arg)>;
-                    if constexpr (std::is_enum_v<ParameterValueT>) {
-                        std::cout << magic_enum::enum_type_name<ParameterValueT>() << "::" << magic_enum::enum_name(arg) << std::endl;
-                    } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>>) {
-                        std::cout << "ResultReportConfigurations: " << uwb::protocol::fira::ResultReportConfigurationToString(arg) << std::endl;
-                    }
-                },
-                    parameterValue);
-            }
-
-            std::cout << "StaticRangingInfo: { " << m_cliData->SessionData.staticRangingInfo << " }" << std::endl;
+        // TODO: Support multiple controlees
+        if (m_cliData->uwbConfiguration.deviceType == uwb::protocol::fira::DeviceType::Controller) {
+            controllerMacAddress = uwb::UwbMacAddress::FromString(m_cliData->deviceMacAddress, macAddressType);
+            controleeMacAddress = uwb::UwbMacAddress::FromString(m_cliData->destinationMacAddress, macAddressType);
+        } else { // uwb::protocol::fira::DeviceType::Controlee
+            controllerMacAddress = uwb::UwbMacAddress::FromString(m_cliData->destinationMacAddress, macAddressType);
+            controleeMacAddress = uwb::UwbMacAddress::FromString(m_cliData->deviceMacAddress, macAddressType);
         }
+
+        if (!controllerMacAddress.has_value()) {
+            std::cerr << "Invalid ControllerMacAddress" << std::endl;
+        } else {
+            m_cliData->uwbConfiguration.controllerMacAddress = controllerMacAddress.value();
+            // TEST
+            std::cout << "ControllerMacAddress: " << m_cliData->uwbConfiguration.controllerMacAddress << std::endl;
+        }
+
+        if (!controleeMacAddress.has_value()) {
+            std::cerr << "Invalid ControleeMacAddress" << std::endl;
+        } else {
+            m_cliData->uwbConfiguration.controleeShortMacAddress = controleeMacAddress.value();
+            // TEST
+            std::cout << "ControleeMacAddress: " << m_cliData->uwbConfiguration.controleeShortMacAddress << std::endl;
+        }
+
+        m_cliData->SessionData.uwbConfiguration = m_cliData->uwbConfiguration;
+        m_cliData->SessionData.staticRangingInfo = m_cliData->StaticRanging;
+
+        std::cout << "Selected parameters:" << std::endl;
+
+        for (const auto& [parameterTag, parameterValue] : m_cliData->SessionData.uwbConfiguration.GetValueMap()) {
+            std::visit([](auto&& arg) {
+                using ParameterValueT = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_enum_v<ParameterValueT>) {
+                    std::cout << magic_enum::enum_type_name<ParameterValueT>() << "::" << magic_enum::enum_name(arg) << std::endl;
+                } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>>) {
+                    std::cout << "ResultReportConfigurations: " << uwb::protocol::fira::ResultReportConfigurationToString(arg) << std::endl;
+                }
+            },
+                parameterValue);
+        }
+
+        std::cout << "StaticRangingInfo: { " << m_cliData->SessionData.staticRangingInfo << " }" << std::endl;
     });
 
     rangeStartApp->final_callback([this] {
