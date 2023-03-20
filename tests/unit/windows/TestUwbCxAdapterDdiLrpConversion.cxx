@@ -493,7 +493,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         constexpr bool hoppingMode = true;
         constexpr UwbApplicationConfigurationParameter parameterHoppingMode = {
             .Type = UwbApplicationConfigurationParameterType::HoppingMode,
-            .Value = hoppingMode,  
+            .Value = hoppingMode,
         };
         test::ValidateRoundtrip(parameterHoppingMode);
     }
@@ -504,7 +504,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         constexpr uint8_t numberOfControlees{ 100 };
         constexpr UwbApplicationConfigurationParameter parameterNumberOfControlees = {
             .Type = UwbApplicationConfigurationParameterType::NumberOfControlees,
-            .Value = numberOfControlees,  
+            .Value = numberOfControlees,
         };
         test::ValidateRoundtrip(parameterNumberOfControlees);
     }
@@ -515,7 +515,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         constexpr uint16_t slotDuration{ 0xAB };
         constexpr UwbApplicationConfigurationParameter parameterSlotDuration = {
             .Type = UwbApplicationConfigurationParameterType::SlotDuration,
-            .Value = slotDuration,  
+            .Value = slotDuration,
         };
         test::ValidateRoundtrip(parameterSlotDuration);
     }
@@ -526,7 +526,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         constexpr uint32_t rangingInterval{ 0xABCD };
         constexpr UwbApplicationConfigurationParameter parameterRangingInterval = {
             .Type = UwbApplicationConfigurationParameterType::RangingInterval,
-            .Value = rangingInterval,  
+            .Value = rangingInterval,
         };
         test::ValidateRoundtrip(parameterRangingInterval);
     }
@@ -537,7 +537,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         constexpr AoAResult aoaResult{ AoAResult::Enable };
         constexpr UwbApplicationConfigurationParameter parameterAoaResult = {
             .Type = UwbApplicationConfigurationParameterType::AoAResultRequest,
-            .Value = aoaResult,  
+            .Value = aoaResult,
         };
         test::ValidateRoundtrip(parameterAoaResult);
     }
@@ -548,7 +548,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         constexpr std::array<uint8_t, StaticStsInitializationVectorLength> staticStsInitializationVector{ 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF };
         constexpr UwbApplicationConfigurationParameter parameterstaticStsInitializationVector = {
             .Type = UwbApplicationConfigurationParameterType::StaticStsIv,
-            .Value = staticStsInitializationVector,  
+            .Value = staticStsInitializationVector,
         };
         test::ValidateRoundtrip(parameterstaticStsInitializationVector);
     }
