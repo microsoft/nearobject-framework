@@ -136,8 +136,8 @@ UwbMacAddress::Random(UwbMacAddressType type)
 std::optional<UwbMacAddress>
 UwbMacAddress::FromString(const std::string& addressString, UwbMacAddressType addressType)
 {
-    std::regex shortRegex("^([0-9A-Fa-f]{2}:){1}([0-9A-Fa-f]{2})$");
-    std::regex extendedRegex("^(([0-9A-Fa-f]{2}:){7}[0-9A-Fa-f]{2})$");
+    const std::regex shortRegex("^([0-9A-Fa-f]{2}:){1}([0-9A-Fa-f]{2})$");
+    const std::regex extendedRegex("^(([0-9A-Fa-f]{2}:){7}[0-9A-Fa-f]{2})$");
 
     if ((addressType == UwbMacAddressType::Short && !std::regex_match(addressString, shortRegex)) ||
         (addressType == UwbMacAddressType::Extended && !std::regex_match(addressString, extendedRegex))) {

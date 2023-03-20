@@ -141,7 +141,7 @@ template <typename EnumType>
 // clang-format off
 requires std::is_enum_v<EnumType>
 CLI::Option*
-AddEnumOption(CLI::App* app, std::optional<EnumType>& assignTo, bool isMandatory)
+AddEnumOption(CLI::App* app, std::optional<EnumType>& assignTo, bool isMandatory = false)
 // clang-format on
 {
     std::string optionName{ std::string("--").append(magic_enum::enum_type_name<EnumType>()) };
@@ -247,16 +247,16 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     detail::AddEnumOption(rangeStartApp, uwbConfig.deviceType, true);
 
     // enumerations
-    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingDirection, false);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingMeasurementReportMode, false);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.stsConfiguration, false);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingTimeStruct, false);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.schedulingMode, false);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.channel, false);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.rframeConfig, false);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.convolutionalCodeConstraintLength, false);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.prfMode, false);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.macAddressFcsType, false);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingDirection);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingMeasurementReportMode);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.stsConfiguration);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingTimeStruct);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.schedulingMode);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.channel);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.rframeConfig);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.convolutionalCodeConstraintLength);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.prfMode);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.macAddressFcsType);
 
     // booleans
     rangeStartApp->add_flag("--HoppingMode", uwbConfig.hoppingMode)->capture_default_str();

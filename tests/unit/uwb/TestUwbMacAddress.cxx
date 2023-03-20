@@ -334,6 +334,7 @@ TEST_CASE("uwb mac address can be constructed with a string input and address ty
     };
 
     static const auto ShortUwbMacAddressStringsInvalid = {
+        "",                       // empty string
         "GG:11",                  // out of bounds for hex characters
         "ABC:DEF",                // greater than two hex characters per group
         "1122",                   // no colon
@@ -350,6 +351,7 @@ TEST_CASE("uwb mac address can be constructed with a string input and address ty
     };
 
     static const auto ExtendedUwbMacAddressStringsInvalid = {
+        "",                        // empty string
         "1122334455667788",        // no colons
         "11:22:33:44:5566:77:88",  // missing colon
         "AA:BB:CC:DD:ee:ff:gg:hh", // out of bounds for hex characters
