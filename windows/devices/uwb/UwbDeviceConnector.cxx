@@ -287,7 +287,36 @@ UwbDeviceConnector::SessionRangingStart(uint32_t sessionId)
 {
     std::promise<UwbStatus> resultPromise;
     auto resultFuture = resultPromise.get_future();
-    // TODO: invoke IOCTL_UWB_START_RANGING_SESSION
+    
+    wil::shared_hfile handleDriver;
+    auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
+    if (FAILED(hr)) {
+        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
+        return resultFuture;
+    }
+
+    const UWB_START_RANGING_SESSION startRanging{
+        .size = sizeof(UWB_START_RANGING_SESSION),
+        .sessionId = sessionId,
+    };
+    UWB_STATUS status;
+
+    BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_START_RANGING_SESSION, const_cast<UWB_START_RANGING_SESSION*>(&startRanging), sizeof startRanging, &status, sizeof status, nullptr, nullptr);
+    if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
+        HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
+        PLOG_ERROR << "error when sending IOCTL_UWB_START_RANGING_SESSION for session id " << sessionId << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
+        return resultFuture;
+    } else {
+        PLOG_DEBUG << "IOCTL_UWB_START_RANGING_SESSION succeeded";
+        auto uwbStatus = UwbCxDdi::To(status);
+        if (!IsUwbStatusOk(uwbStatus)) {
+            resultPromise.set_exception(std::make_exception_ptr(UwbException(std::move(uwbStatus))));
+        } else {
+            resultPromise.set_value(std::move(uwbStatus));
+        }
+    }
 
     return resultFuture;
 }
