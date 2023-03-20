@@ -235,7 +235,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     // List mandatory params first
     detail::AddEnumOption(rangeStartApp, uwbConfig.deviceRole, true);
     detail::AddEnumOption(rangeStartApp, uwbConfig.multiNodeMode, true);
-    rangeStartApp->add_option("--NumberOfControlees", uwbConfig.numberOfControlees, "1 <= N <= 8")->capture_default_str()->required(); // TODO: Input validation
+    rangeStartApp->add_option("--NumberOfControlees", uwbConfig.numberOfControlees, "1 <= N <= 8")->capture_default_str()->required();
     // TODO: Accept multiple controlees
     if (uwbConfig.macAddressMode == uwb::UwbMacAddressType::Extended) {
         rangeStartApp->add_option("--DeviceMacAddress", m_cliData->deviceMacAddress, "8-byte extended MAC address of own device: e.g. 12:34:56:78:87:65:43:21")->capture_default_str()->required();
@@ -285,6 +285,16 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     rangeStartApp->add_option("--ResultReportConfiguration", uwbConfig.resultReportConfigurationString)->capture_default_str();
 
     rangeStartApp->parse_complete_callback([this] {
+        // Validate NumberOfControlees
+        if (m_cliData->uwbConfiguration.multiNodeMode == uwb::protocol::fira::MultiNodeMode::Unicast) {
+            if (m_cliData->uwbConfiguration.numberOfControlees != 1) {
+                std::cerr << "Only 1 controlee expected in Unicast mode" << std::endl;
+            }
+        } else {
+            if (m_cliData->uwbConfiguration.numberOfControlees < 1 || m_cliData->uwbConfiguration.numberOfControlees > 8) {
+                std::cerr << "Invalid number of controlees. Must be 1 <= N <= 8" << std::endl;
+            }
+        }
         // Set MAC addresses
         std::optional<uwb::UwbMacAddress> controllerMacAddress;
         std::optional<uwb::UwbMacAddress> controleeMacAddress;
