@@ -1253,7 +1253,7 @@ windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM &applicationConfi
         detail::ConvertUwbApplicatiuonConfigurationParameterIntegral<bool>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
         break;
     // uint8_t direct encodings
-    case UWB_APP_CONFIG_PARAM_TYPE_NUMBER_OF_CONTROLEES: // uint8_t
+    case UWB_APP_CONFIG_PARAM_TYPE_NUMBER_OF_CONTROLEES:
     case UWB_APP_CONFIG_PARAM_TYPE_PREAMBLE_CODE_INDEX:
     case UWB_APP_CONFIG_PARAM_TYPE_SFD_ID:
     case UWB_APP_CONFIG_PARAM_TYPE_SLOTS_PER_RR:
