@@ -1199,11 +1199,11 @@ namespace detail
 {
 /**
  * @brief Converts a UWB_APP_CONFIG_PARAM value containing data mapping to a enum-class neutral type.
- * 
+ *
  * @tparam T The enum class type to convert to.
  * @param applicationConfigurationParameter The parameter to convert from.
  * @param uwbApplicationConfigurationParameter The wrapper to convert to.
- * @return requires 
+ * @return requires
  */
 template <typename T>
 // clang-format off
@@ -1221,11 +1221,11 @@ ConvertUwbApplicatiuonConfigurationParameterEnumeration(const UWB_APP_CONFIG_PAR
 
 /**
  * @brief Converts a UWB_APP_CONFIG_PARAM value containing data mapping to an integral type.
- * 
+ *
  * @tparam T The integral type to convert to.
- * @param applicationConfigurationParameter 
- * @param uwbApplicationConfigurationParameter 
- * @return requires 
+ * @param applicationConfigurationParameter
+ * @param uwbApplicationConfigurationParameter
+ * @return requires
  */
 template <typename T>
 // clang-format off

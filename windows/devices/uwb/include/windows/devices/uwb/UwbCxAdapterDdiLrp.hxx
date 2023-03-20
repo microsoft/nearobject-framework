@@ -255,9 +255,9 @@ using UwbApplicationConfigurationParameterWrapper = notstd::flextype_wrapper<UWB
 
 /**
  * @brief Converts UwbApplicationConfigurationParameter to UWB_APP_CONFIG_PARAM.
- * 
- * @param uwbApplicationConfigurationParameterValue 
- * @return UwbApplicationConfigurationParameterWrapper 
+ *
+ * @param uwbApplicationConfigurationParameterValue
+ * @return UwbApplicationConfigurationParameterWrapper
  */
 UwbApplicationConfigurationParameterWrapper
 From(const ::uwb::protocol::fira::UwbApplicationConfigurationParameter &uwbApplicationConfigurationParameterValue);
@@ -265,10 +265,10 @@ From(const ::uwb::protocol::fira::UwbApplicationConfigurationParameter &uwbAppli
 using UwbApplicationConfigurationParametersWrapper = notstd::flextype_wrapper<UWB_APP_CONFIG_PARAMS>;
 
 /**
- * @brief 
- * 
- * @param uwbApplicationConfigurationParameters 
- * @return UwbApplicationConfigurationParametersWrapper 
+ * @brief
+ *
+ * @param uwbApplicationConfigurationParameters
+ * @return UwbApplicationConfigurationParametersWrapper
  */
 UwbApplicationConfigurationParametersWrapper
 From(const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterValue> &uwbApplicationConfigurationParameters);
@@ -490,18 +490,18 @@ To(const UWB_NOTIFICATION_DATA &notificationData);
 
 /**
  * @brief Converts UWB_APP_CONFIG_PARAM to UwbApplicationConfigurationParameter.
- * 
- * @param applicationConfigurationParameter 
- * @return ::uwb::protocol::fira::UwbApplicationConfigurationParameter 
+ *
+ * @param applicationConfigurationParameter
+ * @return ::uwb::protocol::fira::UwbApplicationConfigurationParameter
  */
 ::uwb::protocol::fira::UwbApplicationConfigurationParameter
 To(const UWB_APP_CONFIG_PARAM &applicationConfigurationParameter);
 
 /**
  * @brief Converts UWB_APP_CONFIG_PARAMS to a vector of UwbApplicationConfigurationParameter.
- * 
- * @param applicationConfigurationParameters 
- * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> 
+ *
+ * @param applicationConfigurationParameters
+ * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
  */
 std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
 To(const UWB_APP_CONFIG_PARAMS &applicationConfigurationParameters);
