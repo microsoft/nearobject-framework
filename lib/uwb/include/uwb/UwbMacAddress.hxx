@@ -275,8 +275,7 @@ private:
      * @return std::span<const uint8_t>
      */
     template <size_t Length>
-    std::span<const uint8_t>
-    constexpr UwbMacAddressView(UwbMacAddress& uwbMacAddress)
+    std::span<const uint8_t> constexpr UwbMacAddressView(UwbMacAddress& uwbMacAddress)
     {
         auto& value = UwbMacAddressValue<Length>(uwbMacAddress);
         return { std::begin(value), std::end(value) };
@@ -342,7 +341,7 @@ public:
     /**
      * @brief Construct a new, randomly generated UwbMacAddress object based on
      * runtime provided arguments.
-     * 
+     *
      * @param type The type of random address to generate.
      * @return UwbMacAddress The randomly generated address value.
      */
