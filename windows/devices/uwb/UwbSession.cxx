@@ -87,8 +87,8 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData& uwbSessio
     m_sessionId = sessionId;
 
     // Set the application configuration parameters for the session.
-    auto setParamsAdaptor = GenerateUwbSetAppConfigParameterDdi(uwbSessionData);
-    auto setAppConfigParamsFuture = m_uwbDeviceConnector->SetApplicationConfigurationParameters(sessionId, setParamsAdaptor);
+    std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters{};
+    auto setAppConfigParamsFuture = m_uwbDeviceConnector->SetApplicationConfigurationParameters(sessionId, applicationConfigurationParameters);
     if (!setAppConfigParamsFuture.valid()) {
         // TODO: need to signal to upper layer that this failed instead of just returning
         PLOG_ERROR << "failed to set the application configuration parameters";

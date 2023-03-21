@@ -138,9 +138,6 @@ public:
     virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>>>>
     SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> applicationConfigurationParameters) override;
 
-    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>>>>
-    SetApplicationConfigurationParameters(uint32_t sessionId, UwbSetAppConfigurationParameters applicationConfigurationParameters) override;
-
 private:
     /**
      * @brief Thread function for handling UWB notifications from the driver.
