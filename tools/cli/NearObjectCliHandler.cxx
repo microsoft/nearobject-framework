@@ -21,7 +21,7 @@ NearObjectCliHandler::HandleStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevi
 {
     auto callbacks = std::make_shared<nearobject::cli::NearObjectCliUwbSessionEventCallbacks>();
     auto session = uwbDevice->CreateSession(callbacks);
-    session->Configure(sessionData.sessionId, sessionData.uwbConfiguration.GetUciConfigParams());
+    session->Configure(sessionData.sessionId, uwb::protocol::fira::GetUciConfigParams(sessionData.uwbConfiguration));
     session->StartRanging();
 }
 

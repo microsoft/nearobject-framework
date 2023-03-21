@@ -147,14 +147,6 @@ struct UwbConfiguration
     operator==(const UwbConfiguration& other) const noexcept = default;
 
     /**
-     * @brief Converts the config params given by OOB to config params that UCI needs
-     *
-     * @return std::vector<UwbApplicationConfigurationParameter>
-     */
-    std::vector<UwbApplicationConfigurationParameter>
-    GetUciConfigParams();
-
-    /**
      * @brief Convert this object into a FiRa Data Object (DO).
      *
      * @return std::unique_ptr<encoding::TlvBer>
