@@ -321,4 +321,75 @@ TEST_CASE("uwb address can be used with stream operators", "[basic][io]")
     }
 }
 
+TEST_CASE("uwb mac address can be constructed with a string input and address type input")
+{
+    using namespace uwb;
+    using namespace uwb::test;
+
+    static const auto ShortUwbMacAddressStrings = {
+        "11:22",
+        "AA:BB",
+        "1A:1B",
+        "1a:2b"
+    };
+
+    static const auto ShortUwbMacAddressStringsInvalid = {
+        "",                       // empty string
+        "GG:11",                  // out of bounds for hex characters
+        "ABC:DEF",                // greater than two hex characters per group
+        "1122",                   // no colon
+        "12:34:",                 // extra colon
+        "1:2",                    // fewer than two hex characters per group
+        "11:22:33:44:55:66:77:88" // valid extended, but not short
+    };
+
+    static const auto ExtendedUwbMacAddressStrings = {
+        "11:22:33:44:55:66:77:88",
+        "AA:BB:CC:DD:DD:CC:BB:AA",
+        "aA:bB:cC:dD:Dd:Cc:Bb:Aa",
+        "A1:B2:C3:D4:1a:2b:3c:4d"
+    };
+
+    static const auto ExtendedUwbMacAddressStringsInvalid = {
+        "",                        // empty string
+        "1122334455667788",        // no colons
+        "11:22:33:44:5566:77:88",  // missing colon
+        "AA:BB:CC:DD:ee:ff:gg:hh", // out of bounds for hex characters
+        "12:34:56:78",             // not enough hex bytes
+        "12:34",                   // valid short, but not extended
+    };
+
+    SECTION("uwb mac address successfully created from valid short address strings")
+    {
+        for (const auto& shortUwbMacAddressString : ShortUwbMacAddressStrings) {
+            auto shortAddress = UwbMacAddress::FromString(std::string{ shortUwbMacAddressString }, UwbMacAddressType::Short);
+            ValidateUwbMacAddressParsing(shortUwbMacAddressString, shortAddress.value());
+        }
+    }
+
+    SECTION("uwb mac address successfully created from valid extended address strings")
+    {
+        for (const auto& extendedUwbMacAddressString : ExtendedUwbMacAddressStrings) {
+            auto extendedAddress = UwbMacAddress::FromString(extendedUwbMacAddressString, UwbMacAddressType::Extended);
+            ValidateUwbMacAddressParsing(extendedUwbMacAddressString, extendedAddress.value());
+        }
+    }
+
+    SECTION("uwb mac address not created from invalid short address strings")
+    {
+        for (const auto& shortUwbMacAddressString : ShortUwbMacAddressStringsInvalid) {
+            auto shortAddress = UwbMacAddress::FromString(shortUwbMacAddressString, UwbMacAddressType::Short);
+            REQUIRE(!shortAddress.has_value());
+        }
+    }
+
+    SECTION("uwb mac address not created from invalid extended address strings")
+    {
+        for (const auto& extendedUwbMacAddressString : ExtendedUwbMacAddressStringsInvalid) {
+            auto extendedAddress = UwbMacAddress::FromString(extendedUwbMacAddressString, UwbMacAddressType::Extended);
+            REQUIRE(!extendedAddress.has_value());
+        }
+    }
+}
+
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
