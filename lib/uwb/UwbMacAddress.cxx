@@ -41,6 +41,36 @@ UwbMacAddress::GetValueShort() const
     return (static_cast<uint16_t>(m_view[1]) << 8U) | m_view[0];
 }
 
+UwbMacAddress::UwbMacAddress(const std::string& addressString, UwbMacAddressType addressType)
+{
+    // TODO: Make the delimiter configurable
+
+    std::array<uint8_t, ShortLength> shortAddress{};
+    std::array<uint8_t, ExtendedLength> extendedAddress{};
+
+    std::stringstream ss(addressString);
+    for (auto i = 0; i < (addressType == UwbMacAddressType::Short ? ShortLength : ExtendedLength); i++) {
+        if (ss) {
+            std::string addressByte;
+            getline(ss, addressByte, ':');
+            const auto byteValue = static_cast<uint8_t>(std::stoi(addressByte, nullptr, 16));
+            if (addressType == UwbMacAddressType::Short) {
+                shortAddress[i] = byteValue;
+            } else {
+                extendedAddress[i] = byteValue;
+            }
+        } else {
+            throw std::invalid_argument("invalid mac address string");
+        }
+    }
+
+    if (addressType == UwbMacAddressType::Short) {
+        *this = UwbMacAddress(shortAddress);
+    } else {
+        *this = UwbMacAddress(extendedAddress);
+    }
+}
+
 /* static */
 UwbMacAddress
 UwbMacAddress::Random(UwbMacAddressType type)
