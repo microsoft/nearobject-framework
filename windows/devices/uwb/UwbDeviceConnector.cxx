@@ -322,10 +322,10 @@ UwbDeviceConnector::SessionUpdateControllerMulticastList(uint32_t sessionId, Uwb
     return resultFuture;
 }
 
-std::future<std::tuple<UwbStatus, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>>>>
+std::future<std::tuple<UwbStatus, std::vector<UwbApplicationConfigurationParameter>>>
 UwbDeviceConnector::GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes)
 {
-    std::promise<std::tuple<UwbStatus, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>>>> promiseResult;
+    std::promise<std::tuple<UwbStatus,  std::vector<UwbApplicationConfigurationParameter>>> promiseResult;
     auto resultFuture = promiseResult.get_future();
     // TODO: invoke IOCTL_UWB_GET_APP_CONFIG_PARAMS
 
@@ -333,7 +333,7 @@ UwbDeviceConnector::GetApplicationConfigurationParameters(uint32_t sessionId, st
 }
 
 std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>>>>
-UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> applicationConfigurationParameters)
+UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> applicationConfigurationParameters)
 {
     std::promise<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>>>> resultPromise;
     auto resultFuture = resultPromise.get_future();
