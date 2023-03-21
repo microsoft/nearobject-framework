@@ -214,7 +214,6 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
         UwbSessionData sessionData;
         sessionData.sessionId = 1;
         sessionData.uwbConfiguration = UwbConfiguration::Create().DeviceRole(roleExpected);
-        sessionData.uwbConfigurationAvailable = true;
 
         auto params = GenerateUwbSetAppConfigParameterDdi(sessionData);
         const auto& ddiParamsGenerated = params.DdiParameters();
@@ -243,7 +242,6 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
         UwbSessionData sessionData;
         sessionData.sessionId = 1;
         sessionData.uwbConfiguration = UwbConfiguration::Create().SetMacAddressControleeShort(dstMacAddressExpected);
-        sessionData.uwbConfigurationAvailable = true;
 
         auto params = GenerateUwbSetAppConfigParameterDdi(sessionData);
         const auto& ddiParamsGenerated = params.DdiParameters();
@@ -272,7 +270,6 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
         UwbSessionData sessionData;
         sessionData.sessionId = 1;
         sessionData.uwbConfiguration = UwbConfiguration::Create().SetMacAddressController(macAddressExpected);
-        sessionData.uwbConfigurationAvailable = true;
 
         auto params = GenerateUwbSetAppConfigParameterDdi(sessionData);
         const auto& ddiParamsGenerated = params.DdiParameters();
@@ -301,7 +298,6 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
         UwbSessionData sessionData;
         sessionData.sessionId = 1;
         sessionData.uwbConfiguration = UwbConfiguration::Create().SetSlotDuration(slotDurationExpected);
-        sessionData.uwbConfigurationAvailable = true;
 
         auto params = GenerateUwbSetAppConfigParameterDdi(sessionData);
         const auto& ddiParamsGenerated = params.DdiParameters();
@@ -330,7 +326,6 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
         UwbSessionData sessionData;
         sessionData.sessionId = 1;
         sessionData.uwbConfiguration = UwbConfiguration::Create().SetUwbInitiationTime(uwbInitiationTimeExpected);
-        sessionData.uwbConfigurationAvailable = true;
 
         auto params = GenerateUwbSetAppConfigParameterDdi(sessionData);
         const auto& ddiParamsGenerated = params.DdiParameters();
@@ -359,7 +354,6 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
         UwbSessionData sessionData;
         sessionData.sessionId = 1;
         sessionData.uwbConfiguration = UwbConfiguration::Create().SetRangingMethod(RangingMethodValue);
-        sessionData.uwbConfigurationAvailable = true;
 
         auto params = GenerateUwbSetAppConfigParameterDdi(sessionData);
         const auto& ddiParamsGenerated = params.DdiParameters();
@@ -392,7 +386,6 @@ TEST_CASE("GenerateUwbSetAppConfigParameterDdi works", "[basic]")
         UwbSessionData sessionData;
         sessionData.sessionId = 1;
         sessionData.uwbConfiguration = UwbConfiguration::Create().AddResultReportConfiguration(ResultReportConfigurationValue1).AddResultReportConfiguration(ResultReportConfigurationValue2).AddResultReportConfiguration(ResultReportConfigurationValue3).AddResultReportConfiguration(ResultReportConfigurationValue4);
-        sessionData.uwbConfigurationAvailable = true;
 
         auto params = GenerateUwbSetAppConfigParameterDdi(sessionData);
         const auto& ddiParamsGenerated = params.DdiParameters();
