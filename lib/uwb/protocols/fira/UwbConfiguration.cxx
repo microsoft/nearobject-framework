@@ -22,7 +22,7 @@ const std::unordered_set<ResultReportConfiguration> UwbConfiguration::ResultRepo
  * @brief map of uci tag to a function of how to generate that uci tag given UwbConfiguration
  *
  */
-const std::unordered_map<const uwb::protocol::fira::UwbApplicationConfigurationParameterType, std::function<std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue>(UwbConfiguration*)>> uciGenerators;
+const std::unordered_map<uwb::protocol::fira::UwbApplicationConfigurationParameterType, std::function<std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue>(UwbConfiguration*)>> uciGenerators;
 
 std::vector<UwbApplicationConfigurationParameter>
 UwbConfiguration::GetUciConfigParams()
