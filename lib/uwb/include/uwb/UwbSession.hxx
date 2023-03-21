@@ -44,18 +44,6 @@ public:
 
     /**
      * @brief Configure the session for use.
-     *
-     * TODO: This probably needs to return something to indicate whether it was
-     * successful or not.
-     *
-     * @param uwbSessionData The session configuration to use. This should have
-     * been obtained as a result of out-of-band negotiation.
-     */
-    void
-    Configure(const protocol::fira::UwbSessionData& uwbSessionData);
-
-    /**
-     * @brief Configure the session for use.
      * This function tells the UWBS to initialize the session for ranging with the particular sessionId and then
      * configures it with configParams
      *
@@ -114,11 +102,9 @@ private:
     /**
      * @brief Configures the session for use.
      *
+     * @param sessionId
      * @param uwbSessionData The session data to configure the session with.
      */
-    virtual void
-    ConfigureImpl(const protocol::fira::UwbSessionData& uwbSessionData) = 0;
-
     virtual void
     ConfigureImpl(uint32_t sessionId, const std::vector<protocol::fira::UwbApplicationConfigurationParameter> configParams) = 0;
 

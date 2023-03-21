@@ -18,6 +18,12 @@ const std::unordered_set<ResultReportConfiguration> UwbConfiguration::ResultRepo
     ResultReportConfiguration::AoAAzimuthReport
 };
 
+std::vector<UwbApplicationConfigurationParameter>
+UwbConfiguration::GetUCIConfigParams()
+{
+    return {};
+}
+
 std::unique_ptr<encoding::TlvBer>
 UwbConfiguration::ToDataObject() const
 {

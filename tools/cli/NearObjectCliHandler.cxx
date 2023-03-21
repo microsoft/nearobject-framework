@@ -4,6 +4,8 @@
 #include <uwb/UwbDevice.hxx>
 #include <uwb/UwbSession.hxx>
 
+#include <plog/Log.h>
+
 using namespace nearobject::cli;
 
 std::shared_ptr<uwb::UwbDevice>
@@ -19,8 +21,12 @@ NearObjectCliHandler::HandleStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevi
 {
     auto callbacks = std::make_shared<nearobject::cli::NearObjectCliUwbSessionEventCallbacks>();
     auto session = uwbDevice->CreateSession(callbacks);
-    session->Configure(sessionData);
-    session->StartRanging();
+    if (not sessionData.uwbConfigurationAvailable) {
+        PLOG_WARNING << "did not start ranging due to missing configuration";
+    } else {
+        session->Configure(sessionData.sessionId, sessionData.uwbConfiguration.GetUCIConfigParams());
+        session->StartRanging();
+    }
 }
 
 void
