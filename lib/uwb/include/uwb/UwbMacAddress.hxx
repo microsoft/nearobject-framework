@@ -406,7 +406,9 @@ private:
     {
         std::swap(this->m_type, other.m_type);
         std::swap(this->m_length, other.m_length);
-        std::swap(this->m_value, other.m_value);
+        auto tmpValue = std::move(other.m_value);
+        other.m_value = std::move(this->m_value);
+        this->m_value = std::move(tmpValue);
         InitializeView();
         other.InitializeView();
     }
