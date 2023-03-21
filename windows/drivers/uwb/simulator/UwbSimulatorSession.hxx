@@ -3,6 +3,7 @@
 #define UWB_SIMULATOR_SESSION_HXX
 
 #include <chrono>
+#include <functional>
 #include <thread>
 
 #include <uwb/protocols/fira/FiraDevice.hxx>

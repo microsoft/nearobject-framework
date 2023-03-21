@@ -8,7 +8,6 @@
 
 #include <uwb/UwbMacAddress.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
-#include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
 namespace windows::devices::uwb::simulator
 {
@@ -23,7 +22,7 @@ struct IUwbSimulatorSession
     uint32_t Sequence{ 0 };
     uint32_t RangingCount{ 0 };
     std::unordered_set<::uwb::UwbMacAddress> Controlees;
-    std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> ApplicationConfigurationParameters;
+    std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> ApplicationConfigurationParameters;
 };
 } // namespace windows::devices::uwb::simulator
 
