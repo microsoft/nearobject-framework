@@ -265,7 +265,7 @@ From(const ::uwb::protocol::fira::UwbApplicationConfigurationParameter &uwbAppli
 using UwbApplicationConfigurationParametersWrapper = notstd::flextype_wrapper<UWB_APP_CONFIG_PARAMS>;
 
 /**
- * @brief
+ * @brief Converts a vector of UwbApplicationConfigurationParameter to UWB_APP_CONFIG_PARAMS.
  *
  * @param uwbApplicationConfigurationParameters
  * @return UwbApplicationConfigurationParametersWrapper
