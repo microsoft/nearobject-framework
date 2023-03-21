@@ -201,7 +201,7 @@ UwbSimulatorDdiHandler::OnUwbGetApplicationConfigurationParameters(WDFREQUEST re
 
     // Convert DDI input type to neutral type.
     auto &applicationConfigurationParametersIn = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS *>(std::data(inputBuffer));
-    std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> applicationConfigurationParameters{};
+    std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters{};
     std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus>> applicationConfigurationParameterResults;
 
     // Invoke callback.
@@ -228,7 +228,7 @@ UwbSimulatorDdiHandler::OnUwbSetApplicationConfigurationParameters(WDFREQUEST re
 
     // Convert DDI input type to neutral type.
     auto &applicationConfigurationParametersIn = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS *>(std::data(inputBuffer));
-    std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> applicationConfigurationParameters{};
+    std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters{};
     std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus>> applicationConfigurationParameterResults{};
 
     // Invoke callback.
