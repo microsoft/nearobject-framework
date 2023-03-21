@@ -13,7 +13,7 @@ namespace uwb::protocol::fira
  * @return std::vector<UwbApplicationConfigurationParameter>
  */
 std::vector<UwbApplicationConfigurationParameter>
-GetUciConfigParams(const UwbConfiguration& uwbConfiguration);
+GetUciConfigParams(const UwbConfiguration& uwbConfiguration, DeviceType deviceType);
 
 } // namespace uwb::protocol::fira
 
