@@ -3,6 +3,7 @@
 #include <bit>
 #include <bitset>
 #include <functional>
+#include <ranges>
 #include <stdexcept>
 #include <type_traits>
 #include <typeindex>
@@ -1391,6 +1392,11 @@ windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM &applicationConfi
 std::vector<UwbApplicationConfigurationParameter>
 windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAMS &applicationConfigurationParameters)
 {
-    // TODO
-    return {};
+    std::vector<UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters{};
+    std::span applicationConfigurationParametersRange(applicationConfigurationParameters.appConfigParams, applicationConfigurationParameters.appConfigParamsCount);
+    std::ranges::transform(applicationConfigurationParametersRange, std::back_inserter(uwbApplicationConfigurationParameters), [](const auto &applicationConfigurationParameter) {
+        return To(applicationConfigurationParameter);
+    });
+
+    return std::move(uwbApplicationConfigurationParameters);
 }
