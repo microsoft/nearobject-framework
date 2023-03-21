@@ -11,6 +11,7 @@
 
 #include <uwb/UwbMacAddress.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
+#include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 
 namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
 
