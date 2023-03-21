@@ -24,7 +24,7 @@ class UwbSession
 public:
     /**
      * @brief Construct a new UwbSession object.
-     * 
+     *
      * @param callbacks The callbacks to invoke for session events.
      */
     UwbSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks);
@@ -55,12 +55,15 @@ public:
     Configure(const protocol::fira::UwbSessionData& uwbSessionData);
 
     /**
-     * @brief temporarily virtual function because UwbDeviceConnector is windows specific for now
-     * 
-     * @param configParams 
+     * @brief Configure the session for use.
+     * This function tells the UWBS to initialize the session for ranging with the particular sessionId and then
+     * configures it with configParams
+     *
+     * @param sessionId
+     * @param configParams
      */
     void
-    Configure(const std::vector<protocol::fira::UwbApplicationConfigurationParameter> configParams);
+    Configure(uint32_t sessionId, const std::vector<protocol::fira::UwbApplicationConfigurationParameter> configParams);
 
     /**
      * @brief Set the type of mac address to be used for session participants.
@@ -117,7 +120,7 @@ private:
     ConfigureImpl(const protocol::fira::UwbSessionData& uwbSessionData) = 0;
 
     virtual void
-    ConfigureImpl(const std::vector<protocol::fira::UwbApplicationConfigurationParameter> configParams) = 0;
+    ConfigureImpl(uint32_t sessionId, const std::vector<protocol::fira::UwbApplicationConfigurationParameter> configParams) = 0;
 
     /**
      * @brief Start ranging.

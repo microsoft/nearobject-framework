@@ -43,6 +43,13 @@ UwbSession::Configure(const uwb::protocol::fira::UwbSessionData& uwbSessionData)
 }
 
 void
+UwbSession::Configure(uint32_t sessionId, const std::vector<protocol::fira::UwbApplicationConfigurationParameter> configParams)
+{
+    PLOG_VERBOSE << "configure";
+    ConfigureImpl(sessionId, configParams);
+}
+
+void
 UwbSession::StartRanging()
 {
     PLOG_VERBOSE << "start ranging";

@@ -40,7 +40,7 @@ private:
     ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData& uwbSessionData) override;
 
     virtual void
-    ConfigureImpl(const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> configParams) override;
+    ConfigureImpl(uint32_t sessionId, const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> configParams) override;
 
     /**
      * @brief Start ranging.
