@@ -97,6 +97,32 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData &uwbSessio
 }
 
 void
+UwbSession::ConfigureImpl(uint32_t sessionId, const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> configParams)
+{
+    PLOG_VERBOSE << "ConfigureImpl";
+
+    UwbSessionType sessionType = UwbSessionType::RangingSession;
+
+    // Request a new session from the driver.
+    auto sessionInitResultFuture = m_uwbDeviceConnector->SessionInitialize(sessionId, sessionType);
+    if (!sessionInitResultFuture.valid()) {
+        // TODO: need to signal to upper layer that this failed instead of just returning
+        PLOG_ERROR << "failed to initialize session";
+        return;
+    }
+
+    m_sessionId = sessionId;
+
+    // Set the application configuration parameters for the session.
+    auto setAppConfigParamsFuture = m_uwbDeviceConnector->SetApplicationConfigurationParameters(sessionId, configParams);
+    if (!setAppConfigParamsFuture.valid()) {
+        // TODO: need to signal to upper layer that this failed instead of just returning
+        PLOG_ERROR << "failed to set the application configuration parameters";
+        return;
+    }
+}
+
+void
 UwbSession::StartRangingImpl()
 {
     // TODO: interface function should be modified to return a UwbStatus, and this value will be returned.
