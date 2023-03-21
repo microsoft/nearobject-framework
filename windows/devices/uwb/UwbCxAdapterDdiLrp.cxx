@@ -488,7 +488,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbNotificationData &uwbNotification
     };
 
     // The total size required must be calculated, which includes the size of
-    // all the non-discriminated strcuture members plus the size of the
+    // all the non-discriminated structure members plus the size of the
     // discriminated type within the union. Taking the sum of each individual
     // member is error-prone because 1) if the structure is ever updated, this
     // code will break, and 2) such a calculation would not include compiler
@@ -546,6 +546,57 @@ windows::devices::uwb::ddi::lrp::From(const UwbNotificationData &uwbNotification
 
     notificationDataWrapper->value().size = totalSize;
     return std::move(*notificationDataWrapper);
+}
+
+UwbApplicationConfigurationParameterWrapper
+windows::devices::uwb::ddi::lrp::From(const UwbApplicationConfigurationParameter &uwbApplicationConfigurationParameter)
+{
+    std::size_t totalSize = sizeof(UWB_APP_CONFIG_PARAM);
+    std::unique_ptr<UwbApplicationConfigurationParameterWrapper> applicationConfigurationParameterWrapper;
+
+    std::visit([&](auto &&arg) {
+        using T = std::decay_t<decltype(arg)>;
+        if constexpr (std::is_enum_v<T>) {
+            const auto uvalue = notstd::to_underlying(arg);
+            constexpr auto argSize = sizeof(uvalue);
+            totalSize += argSize - 1;
+            applicationConfigurationParameterWrapper = std::make_unique<UwbApplicationConfigurationParameterWrapper>(totalSize);
+            UWB_APP_CONFIG_PARAM &applicationConfigurationParameter = applicationConfigurationParameterWrapper->value();
+            applicationConfigurationParameter.paramLength = argSize;
+            std::memcpy(&applicationConfigurationParameter.paramValue[0], &uvalue, sizeof uvalue);
+        } else if constexpr (std::is_integral_v<T> || std::is_same_v<T, std::array<uint8_t, StaticStsInitializationVectorLength>>) {
+            constexpr auto argSize = sizeof(T);
+            totalSize += argSize - 1;
+            applicationConfigurationParameterWrapper = std::make_unique<UwbApplicationConfigurationParameterWrapper>(totalSize);
+            UWB_APP_CONFIG_PARAM &applicationConfigurationParameter = applicationConfigurationParameterWrapper->value();
+            applicationConfigurationParameter.paramLength = argSize;
+            std::memcpy(&applicationConfigurationParameter.paramValue[0], &arg, sizeof arg);
+        } else if constexpr (std::is_same_v<T, ::uwb::UwbMacAddress>) {
+            const auto value = arg.GetValue();
+            const auto argSize = std::size(value);
+            totalSize += argSize - 1;
+            applicationConfigurationParameterWrapper = std::make_unique<UwbApplicationConfigurationParameterWrapper>(totalSize);
+            UWB_APP_CONFIG_PARAM &applicationConfigurationParameter = applicationConfigurationParameterWrapper->value();
+            applicationConfigurationParameter.paramLength = argSize;
+            std::memcpy(&applicationConfigurationParameter.paramValue[0], std::data(value), std::size(value));
+        } else {
+            throw std::runtime_error("unknown UwbApplicationConfigurationParameter variant value encountered");
+        }
+    },
+        uwbApplicationConfigurationParameter.Value);
+
+    applicationConfigurationParameterWrapper->value().size = totalSize;
+    applicationConfigurationParameterWrapper->value().paramType = From(uwbApplicationConfigurationParameter.Type);
+
+    return std::move(*applicationConfigurationParameterWrapper);
+}
+
+UwbApplicationConfigurationParametersWrapper
+windows::devices::uwb::ddi::lrp::From([[maybe_unused]] const std::vector<UwbApplicationConfigurationParameterValue> &uwbApplicationConfigurationParameters)
+{
+    UwbApplicationConfigurationParametersWrapper applicationConfigurationParametersWrapper{ 1 /* FIXME */ };
+    // TODO
+    return applicationConfigurationParametersWrapper;
 }
 
 namespace detail
@@ -1150,4 +1201,211 @@ windows::devices::uwb::ddi::lrp::To(const UWB_NOTIFICATION_DATA &notificationDat
 
     PLOG_WARNING << "unknown UwbNotificationData type encountered; returning default constructed instance";
     return UwbNotificationData{};
+}
+
+namespace detail
+{
+/**
+ * @brief Converts a UWB_APP_CONFIG_PARAM value containing data mapping to a enum-class neutral type.
+ *
+ * @tparam T The enum class type to convert to.
+ * @param applicationConfigurationParameter The parameter to convert from.
+ * @param uwbApplicationConfigurationParameter The wrapper to convert to.
+ * @return requires
+ */
+template <typename T>
+// clang-format off
+requires std::is_enum_v<T>
+void
+// clang-format on
+ConvertUwbApplicationConfigurationParameterEnumeration(const UWB_APP_CONFIG_PARAM &applicationConfigurationParameter, UwbApplicationConfigurationParameter &uwbApplicationConfigurationParameter)
+{
+    T value{};
+    using U = std::underlying_type_t<decltype(value)>;
+    const U *valueUnderlying = reinterpret_cast<const U *>(&applicationConfigurationParameter.paramValue[0]);
+    value = static_cast<T>(*valueUnderlying);
+    uwbApplicationConfigurationParameter.Value = std::move(value);
+}
+
+/**
+ * @brief Converts a UWB_APP_CONFIG_PARAM value containing data mapping to an integral type.
+ *
+ * @tparam T The integral type to convert to.
+ * @param applicationConfigurationParameter
+ * @param uwbApplicationConfigurationParameter
+ * @return requires
+ */
+template <typename T>
+// clang-format off
+requires std::is_integral_v<T>
+void
+// clang-format on
+ConvertUwbApplicationConfigurationParameterIntegral(const UWB_APP_CONFIG_PARAM &applicationConfigurationParameter, UwbApplicationConfigurationParameter &uwbApplicationConfigurationParameter)
+{
+    T value;
+    const T *valuePointer = reinterpret_cast<const T *>(&applicationConfigurationParameter.paramValue[0]);
+    std::memcpy(&value, valuePointer, sizeof value);
+    uwbApplicationConfigurationParameter.Value = value;
+}
+} // namespace detail
+
+UwbApplicationConfigurationParameter
+windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM &applicationConfigurationParameter)
+{
+    UwbApplicationConfigurationParameter uwbApplicationConfigurationParameter{
+        .Type = To(applicationConfigurationParameter.paramType)
+    };
+
+    switch (applicationConfigurationParameter.paramType) {
+    case UWB_APP_CONFIG_PARAM_TYPE_HOPPING_MODE:
+        detail::ConvertUwbApplicationConfigurationParameterIntegral<bool>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    // uint8_t direct encodings
+    case UWB_APP_CONFIG_PARAM_TYPE_NUMBER_OF_CONTROLEES:
+    case UWB_APP_CONFIG_PARAM_TYPE_PREAMBLE_CODE_INDEX:
+    case UWB_APP_CONFIG_PARAM_TYPE_SFD_ID:
+    case UWB_APP_CONFIG_PARAM_TYPE_SLOTS_PER_RR:
+    case UWB_APP_CONFIG_PARAM_TYPE_RESPONDER_SLOT_INDEX:
+    case UWB_APP_CONFIG_PARAM_TYPE_KEY_ROTATION_RATE:
+    case UWB_APP_CONFIG_PARAM_TYPE_SESSION_PRIORITY:
+    case UWB_APP_CONFIG_PARAM_TYPE_NUMBER_OF_STS_SEGMENTS:
+    case UWB_APP_CONFIG_PARAM_TYPE_BLOCK_STRIDE_LENGTH:
+    case UWB_APP_CONFIG_PARAM_TYPE_IN_BAND_TERMINATION_ATTEMPT_COUNT:
+        detail::ConvertUwbApplicationConfigurationParameterIntegral<uint8_t>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    // uint16_t direct encodings
+    case UWB_APP_CONFIG_PARAM_TYPE_SLOT_DURATION:
+    case UWB_APP_CONFIG_PARAM_TYPE_RANGE_DATA_NTF_PROXIMITY_NEAR:
+    case UWB_APP_CONFIG_PARAM_TYPE_RANGE_DATA_NTF_PROXIMITY_FAR:
+    case UWB_APP_CONFIG_PARAM_TYPE_VENDOR_ID:
+    case UWB_APP_CONFIG_PARAM_TYPE_MAX_RR_RETRY:
+    case UWB_APP_CONFIG_PARAM_TYPE_MAX_NUMBER_OF_MEASUREMENTS:
+        detail::ConvertUwbApplicationConfigurationParameterIntegral<uint16_t>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    // uint32_t direct encodings
+    case UWB_APP_CONFIG_PARAM_TYPE_RANGING_INTERVAL:
+    case UWB_APP_CONFIG_PARAM_TYPE_STS_INDEX:
+    case UWB_APP_CONFIG_PARAM_TYPE_UWB_INITIATION_TIME:
+    case UWB_APP_CONFIG_PARAM_TYPE_SUB_SESSION_ID:
+        detail::ConvertUwbApplicationConfigurationParameterIntegral<uint32_t>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_AOA_RESULT_REQ:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<AoAResult>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_BPRF_PHR_DATA_RATE:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<BprfPhrDataRate>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_CHANNEL_NUMBER:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<Channel>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_DEVICE_ROLE:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<DeviceRole>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_DEVICE_TYPE:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<DeviceType>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_KEY_ROTATION:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<KeyRotation>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_MULTI_NODE_MODE:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<MultiNodeMode>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_PREAMBLE_DURATION:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<PreambleDuration>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_PRF_MODE:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<PrfMode>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_PSDU_DATA_RATE:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<PsduDataRate>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_RANGE_DATA_NTF_CONFIG:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<RangeDataNotificationConfiguration>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_RANGING_ROUND_USAGE:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<RangingRoundUsage>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_RANGING_TIME_STRUCT:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<RangingMode>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_RANGING_ROUND_CONTROL:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<RangingRoundControl>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_RESULT_REPORT_CONFIG:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<ResultReportConfiguration>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_SCHEDULED_MODE:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<SchedulingMode>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_STS_CONFIG:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<StsConfiguration>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_STS_LENGTH:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<StsLength>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_RFRAME_CONFIG:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<StsPacketConfiguration>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_TX_ADAPTIVE_PAYLOAD_POWER:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<TxAdaptivePayloadPower>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_DEVICE_MAC_ADDRESS: {
+        ::uwb::UwbMacAddress value{};
+        switch (applicationConfigurationParameter.paramLength) {
+        case ::uwb::UwbMacAddressLength::Short: {
+            ::uwb::UwbMacAddress::ShortType data{};
+            std::memcpy(std::data(data), &applicationConfigurationParameter.paramValue[0], std::size(data));
+            value = ::uwb::UwbMacAddress(std::move(data));
+            uwbApplicationConfigurationParameter.Value = std::move(value);
+            break;
+        }
+        case ::uwb::UwbMacAddressLength::Extended: {
+            ::uwb::UwbMacAddress::ExtendedType data{};
+            std::memcpy(std::data(data), &applicationConfigurationParameter.paramValue[0], std::size(data));
+            value = ::uwb::UwbMacAddress(std::move(data));
+            uwbApplicationConfigurationParameter.Value = std::move(value);
+            break;
+        }
+        default:
+            LOG_WARNING << "unsupported mac address length (" << applicationConfigurationParameter.paramLength << ") encountered";
+            break;
+        }
+        break;
+    }
+    case UWB_APP_CONFIG_PARAM_TYPE_MAC_FCS_TYPE:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<::uwb::UwbMacAddressFcsType>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_MAC_ADDRESS_MODE:
+        detail::ConvertUwbApplicationConfigurationParameterEnumeration<::uwb::UwbMacAddressType>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        break;
+    case UWB_APP_CONFIG_PARAM_TYPE_STATIC_STS_IV: {
+        std::array<uint8_t, StaticStsInitializationVectorLength> value{};
+        std::memcpy(std::data(value), &applicationConfigurationParameter.paramValue[0], sizeof value);
+        uwbApplicationConfigurationParameter.Value = std::move(value);
+        break;
+    }
+    case UWB_APP_CONFIG_PARAM_TYPE_DST_MAC_ADDRESS: {
+        // TODO: we can't infer the length as is done with
+        // UWB_APP_CONFIG_PARAM_TYPE_DEVICE_MAC_ADDRESS since the number of
+        // bytes is ambiguous (eg. paramLength == 8 could mean 4 short addresses
+        // or 1 extended address). The mac address type needs to be provided in
+        // in some way, but it's unclear how that information would be injected
+        // here. Re-visit.
+        std::unordered_set<::uwb::UwbMacAddress> value{};
+        uwbApplicationConfigurationParameter.Value = std::move(value);
+        break;
+    }
+    default:
+        PLOG_ERROR << "unknown uwb application configuration parameter type encountered, type=" << std::showbase << std::hex << notstd::to_underlying(applicationConfigurationParameter.paramType);
+        break;
+    }
+
+    return uwbApplicationConfigurationParameter;
+}
+
+std::vector<UwbApplicationConfigurationParameter>
+windows::devices::uwb::ddi::lrp::To([[maybe_unused]] const UWB_APP_CONFIG_PARAMS &applicationConfigurationParameters)
+{
+    // TODO
+    return {};
 }

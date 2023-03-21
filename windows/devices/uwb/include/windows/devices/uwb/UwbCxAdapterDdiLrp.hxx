@@ -2,6 +2,8 @@
 #ifndef UWB_CX_ADAPTER_DDI_LRP_HXX
 #define UWB_CX_ADAPTER_DDI_LRP_HXX
 
+#include <vector>
+
 #include <notstd/flextype_wrapper.hxx>
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
@@ -249,6 +251,28 @@ using UwbNotificationDataWrapper = notstd::flextype_wrapper<UWB_NOTIFICATION_DAT
 UwbNotificationDataWrapper
 From(const ::uwb::protocol::fira::UwbNotificationData &uwbNotificationData);
 
+using UwbApplicationConfigurationParameterWrapper = notstd::flextype_wrapper<UWB_APP_CONFIG_PARAM>;
+
+/**
+ * @brief Converts UwbApplicationConfigurationParameter to UWB_APP_CONFIG_PARAM.
+ *
+ * @param uwbApplicationConfigurationParameterValue
+ * @return UwbApplicationConfigurationParameterWrapper
+ */
+UwbApplicationConfigurationParameterWrapper
+From(const ::uwb::protocol::fira::UwbApplicationConfigurationParameter &uwbApplicationConfigurationParameterValue);
+
+using UwbApplicationConfigurationParametersWrapper = notstd::flextype_wrapper<UWB_APP_CONFIG_PARAMS>;
+
+/**
+ * @brief Converts a vector of UwbApplicationConfigurationParameter to UWB_APP_CONFIG_PARAMS.
+ *
+ * @param uwbApplicationConfigurationParameters
+ * @return UwbApplicationConfigurationParametersWrapper
+ */
+UwbApplicationConfigurationParametersWrapper
+From(const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterValue> &uwbApplicationConfigurationParameters);
+
 /**
  * @brief Converts UWB_DEVICE_CAPABILITIES to UwbCapability.
  *
@@ -463,6 +487,24 @@ To(const UWB_RANGING_DATA &rangingData);
  */
 ::uwb::protocol::fira::UwbNotificationData
 To(const UWB_NOTIFICATION_DATA &notificationData);
+
+/**
+ * @brief Converts UWB_APP_CONFIG_PARAM to UwbApplicationConfigurationParameter.
+ *
+ * @param applicationConfigurationParameter
+ * @return ::uwb::protocol::fira::UwbApplicationConfigurationParameter
+ */
+::uwb::protocol::fira::UwbApplicationConfigurationParameter
+To(const UWB_APP_CONFIG_PARAM &applicationConfigurationParameter);
+
+/**
+ * @brief Converts UWB_APP_CONFIG_PARAMS to a vector of UwbApplicationConfigurationParameter.
+ *
+ * @param applicationConfigurationParameters
+ * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
+ */
+std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
+To(const UWB_APP_CONFIG_PARAMS &applicationConfigurationParameters);
 
 } // namespace windows::devices::uwb::ddi::lrp
 
