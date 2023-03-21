@@ -54,6 +54,11 @@ public:
     void
     Configure(const protocol::fira::UwbSessionData& uwbSessionData);
 
+    /**
+     * @brief temporarily virtual function because UwbDeviceConnector is windows specific for now
+     * 
+     * @param configParams 
+     */
     void
     Configure(const std::vector<protocol::fira::UwbApplicationConfigurationParameter> configParams);
 
@@ -110,6 +115,9 @@ private:
      */
     virtual void
     ConfigureImpl(const protocol::fira::UwbSessionData& uwbSessionData) = 0;
+
+    virtual void
+    ConfigureImpl(const std::vector<protocol::fira::UwbApplicationConfigurationParameter> configParams) = 0;
 
     /**
      * @brief Start ranging.
