@@ -15,6 +15,12 @@ UwbSession::UwbSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks, uwb::p
     m_deviceType{ deviceType }
 {}
 
+uwb::protocol::fira::DeviceType
+UwbSession::GetDeviceType()
+{
+    return m_deviceType;
+}
+
 uint32_t
 UwbSession::GetId() const noexcept
 {

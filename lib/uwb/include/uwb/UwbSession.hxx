@@ -35,6 +35,14 @@ public:
     virtual ~UwbSession() = default;
 
     /**
+     * @brief Get the Device Type associated with the host of this UwbSession
+     * 
+     * @return uwb::protocol::fira::DeviceType 
+     */
+    uwb::protocol::fira::DeviceType
+    GetDeviceType();
+
+    /**
      * @brief Get the unique session id.
      *
      * @return uint32_t
