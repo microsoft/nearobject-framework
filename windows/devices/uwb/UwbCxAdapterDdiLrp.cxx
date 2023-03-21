@@ -3,6 +3,7 @@
 #include <bit>
 #include <bitset>
 #include <functional>
+#include <numeric>
 #include <ranges>
 #include <stdexcept>
 #include <type_traits>
@@ -593,11 +594,38 @@ windows::devices::uwb::ddi::lrp::From(const UwbApplicationConfigurationParameter
 }
 
 UwbApplicationConfigurationParametersWrapper
-windows::devices::uwb::ddi::lrp::From([[maybe_unused]] const std::vector<UwbApplicationConfigurationParameterValue> &uwbApplicationConfigurationParameters)
+windows::devices::uwb::ddi::lrp::From(const std::vector<UwbApplicationConfigurationParameter> &uwbApplicationConfigurationParameters)
 {
-    UwbApplicationConfigurationParametersWrapper applicationConfigurationParametersWrapper{ 1 /* FIXME */ };
-    // TODO
-    return applicationConfigurationParametersWrapper;
+    // Convert each individual parameter to its DDI wrapper.
+    std::vector<UwbApplicationConfigurationParameterWrapper> uwbApplicationConfigurationParameterWrappers{};
+    std::ranges::transform(uwbApplicationConfigurationParameters, std::back_inserter(uwbApplicationConfigurationParameterWrappers), [](const auto &uwbApplicationConfigurationParameter) {
+        return From(uwbApplicationConfigurationParameter);
+    });
+
+    // Calculate the total size required for the UWB_APP_CONFIG_PARAMS instance.
+    std::size_t totalSize = std::accumulate(
+        std::cbegin(uwbApplicationConfigurationParameterWrappers),
+        std::cend(uwbApplicationConfigurationParameterWrappers),
+        static_cast<std::size_t>(offsetof(UWB_APP_CONFIG_PARAMS, appConfigParams[0])),
+        [&](std::size_t totalSize, const auto &uwbApplicationConfigurationParameterWrapper) {
+            return totalSize + std::size(uwbApplicationConfigurationParameterWrapper);
+        });
+
+    // Insantiate a wrapper for UWB_APP_CONFIG_PARAMS and fill it in.
+    UwbApplicationConfigurationParametersWrapper applicationConfigurationParametersWrapper{ totalSize };
+    UWB_APP_CONFIG_PARAMS &appConfigParams = applicationConfigurationParametersWrapper.value();
+    appConfigParams.size = totalSize;
+    appConfigParams.status = UWB_STATUS_OK;
+    appConfigParams.appConfigParamsCount = std::size(uwbApplicationConfigurationParameterWrappers);
+
+    // Copy each of the converted UWB_APP_CONFIG_PARAM values into the UWB_APP_CONFIG_PARAMS flex-array.
+    for (auto i = 0; i < std::size(uwbApplicationConfigurationParameterWrappers); i++) {
+        auto &appConfigParam = appConfigParams.appConfigParams[i];
+        auto appConfigParamBuffer = std::data(uwbApplicationConfigurationParameterWrappers[i]);
+        std::memcpy(&appConfigParam, std::data(appConfigParamBuffer), std::size(appConfigParamBuffer));
+    }
+
+    return std::move(applicationConfigurationParametersWrapper);
 }
 
 namespace detail
