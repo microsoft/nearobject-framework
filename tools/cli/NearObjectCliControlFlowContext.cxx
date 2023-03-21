@@ -7,6 +7,12 @@ using namespace nearobject::cli;
     m_operationCompleteLatch(numOperations)
 {}
 
+std::stop_token
+NearObjectCliControlFlowContext::GetExecutionStopToken()
+{
+    return m_stopSource.get_token();
+}
+
 std::latch&
 NearObjectCliControlFlowContext::GetOperationCompleteLatch()
 {

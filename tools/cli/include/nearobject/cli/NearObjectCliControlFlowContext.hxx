@@ -3,6 +3,7 @@
 #define NEAR_OBJECT_CLI_CONTROL_FLOW_CONTEXT_HXX
 
 #include <latch>
+#include <stop_token>
 
 namespace nearobject::cli
 {
@@ -18,6 +19,19 @@ public:
      * @param numOperations 
      */
     explicit NearObjectCliControlFlowContext(std::ptrdiff_t numOperations);
+
+    /**
+     * @brief Get the whole-program exection stop token. 
+     * 
+     * A request to stop will be signaled on this token when the program should
+     * halt execution. This is a cooperative, best-effort based request so may
+     * not actually result in halting execution depending on the operation(s)
+     * being carried out.
+     * 
+     * @return std::stop_token 
+     */
+    std::stop_token
+    GetExecutionStopToken();
 
     /**
      * @brief Get the latch tracking operation completion.
@@ -38,6 +52,8 @@ public:
 
 private:
     std::latch m_operationCompleteLatch;
+    std::stop_source m_stopSource;
+    std::stop_token m_stopToken;
 };
 } // namespace nearobject::cli
 
