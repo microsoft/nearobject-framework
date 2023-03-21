@@ -9,9 +9,10 @@
 
 using namespace uwb;
 
-UwbSession::UwbSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks) :
+UwbSession::UwbSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks, uwb::protocol::fira::DeviceType deviceType) :
     m_uwbMacAddressSelf(UwbMacAddress::Random<UwbMacAddressType::Extended>()),
-    m_callbacks(std::move(callbacks))
+    m_callbacks(std::move(callbacks)),
+    m_deviceType{ deviceType }
 {}
 
 uint32_t

@@ -27,7 +27,7 @@ public:
      *
      * @param callbacks The callbacks to invoke for session events.
      */
-    UwbSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks);
+    UwbSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks, uwb::protocol::fira::DeviceType deviceType = uwb::protocol::fira::DeviceType::Controller);
 
     /**
      * @brief Destroy the UwbSession object.
@@ -129,6 +129,7 @@ private:
     AddPeerImpl(UwbMacAddress peerMacAddress) = 0;
 
 protected:
+    uwb::protocol::fira::DeviceType m_deviceType{ uwb::protocol::fira::DeviceType::Controller };
     uint32_t m_sessionId{ 0 };
     uwb::protocol::fira::UwbSessionStatus m_sessionStatus{};
     UwbMacAddressType m_uwbMacAddressType{ UwbMacAddressType::Extended };
