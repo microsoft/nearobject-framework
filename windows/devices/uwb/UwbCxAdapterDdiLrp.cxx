@@ -571,6 +571,14 @@ windows::devices::uwb::ddi::lrp::From(const UwbApplicationConfigurationParameter
             UWB_APP_CONFIG_PARAM &applicationConfigurationParameter = applicationConfigurationParameterWrapper->value();
             applicationConfigurationParameter.paramLength = argSize;
             std::memcpy(&applicationConfigurationParameter.paramValue[0], &arg, sizeof arg);
+        } else if constexpr (std::is_same_v<T, ::uwb::UwbMacAddress>) {
+            const auto value = arg.GetValue();
+            const auto argSize = std::size(value);
+            totalSize += argSize - 1;
+            applicationConfigurationParameterWrapper = std::make_unique<UwbApplicationConfigurationParameterWrapper>(totalSize);
+            UWB_APP_CONFIG_PARAM &applicationConfigurationParameter = applicationConfigurationParameterWrapper->value();
+            applicationConfigurationParameter.paramLength = argSize;
+            std::memcpy(&applicationConfigurationParameter.paramValue[0], std::data(value), std::size(value));
         } else {
             throw std::runtime_error("unknown UwbApplicationConfigurationParameter variant value encountered");
         }
@@ -1348,12 +1356,14 @@ windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM &applicationConfi
             ::uwb::UwbMacAddress::ShortType data{};
             std::memcpy(std::data(data), &applicationConfigurationParameter.paramValue[0], std::size(data));
             value = ::uwb::UwbMacAddress(std::move(data));
+            uwbApplicationConfigurationParameter.Value = std::move(value);
             break;
         }
         case ::uwb::UwbMacAddressLength::Extended: {
             ::uwb::UwbMacAddress::ExtendedType data{};
             std::memcpy(std::data(data), &applicationConfigurationParameter.paramValue[0], std::size(data));
             value = ::uwb::UwbMacAddress(std::move(data));
+            uwbApplicationConfigurationParameter.Value = std::move(value);
             break;
         }
         default:
