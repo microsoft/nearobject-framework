@@ -3,6 +3,7 @@
 #include <nearobject/cli/NearObjectCliUwbSessionEventCallbacks.hxx>
 #include <uwb/UwbDevice.hxx>
 #include <uwb/UwbSession.hxx>
+#include <uwb/protocols/fira/UwbOobConversions.hxx>
 
 #include <plog/Log.h>
 

@@ -16,18 +16,6 @@
 
 namespace uwb
 {
-
-namespace protocol::fira
-{
-/**
- * @brief Converts the config params given by OOB to config params that UCI needs
- *
- * @return std::vector<UwbApplicationConfigurationParameter>
- */
-std::vector<UwbApplicationConfigurationParameter>
-GetUciConfigParams(const UwbConfiguration& uwbConfiguration);
-} // namespace protocol::fira
-
 /**
  * @brief Represents a UWB session.
  */
