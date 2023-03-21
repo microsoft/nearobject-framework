@@ -11,7 +11,6 @@
 
 #include <uwb/UwbMacAddress.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
-#include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 
 namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
 
@@ -585,7 +584,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
 
     SECTION("std::vector<UwbApplicationConfigurationParameter>")
     {
-        const std::vector<UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters {
+        const std::vector<UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters{
             parameterHoppingMode,
             parameterNumberOfControlees,
             parameterSlotDuration,

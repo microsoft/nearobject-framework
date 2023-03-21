@@ -7,7 +7,6 @@
 #include <plog/Log.h>
 #include <wil/result.h>
 
-#include <windows/devices/uwb/UwbCxAdapter.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 #include <windows/devices/uwb/UwbSession.hxx>
 
