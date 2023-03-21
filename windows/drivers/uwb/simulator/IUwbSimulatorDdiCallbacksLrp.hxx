@@ -12,7 +12,6 @@
 #include <windows.h>
 
 #include <wdf.h>
-#include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
@@ -78,14 +77,14 @@ struct IUwbSimulatorDdiCallbacksLrp
 
     /**
      * @brief Get the Application Configuration Parameters object
-     *
-     * @param sessionId
-     * @param applicationConfigurationParameterTypes
-     * @param applicationConfigurationParameters
-     * @return UwbStatus
+     * 
+     * @param sessionId 
+     * @param applicationConfigurationParameterTypes 
+     * @param applicationConfigurationParameters 
+     * @return UwbStatus 
      */
     virtual UwbStatus
-    GetApplicationConfigurationParameters(uint32_t sessionId, const std::vector<UwbApplicationConfigurationParameterType> &applicationConfigurationParameterTypes, std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters) = 0;
+    GetApplicationConfigurationParameters(uint32_t sessionId, const std::vector<UwbApplicationConfigurationParameterType> &applicationConfigurationParameterTypes, std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters) = 0;
 
     /**
      * @brief Set the Application Configuration Parameters object
@@ -95,7 +94,7 @@ struct IUwbSimulatorDdiCallbacksLrp
      * @return UwbStatus
      */
     virtual UwbStatus
-    SetApplicationConfigurationParameters(uint32_t sessionId, const std::vector<std::shared_ptr<IUwbAppConfigurationParameter>> &applicationConfigurationParameters, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus>> &applicationConfigurationParameterResults) = 0;
+    SetApplicationConfigurationParameters(uint32_t sessionId, const std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus>> &applicationConfigurationParameterResults) = 0;
 
     /**
      * @brief Get the Session Count object
