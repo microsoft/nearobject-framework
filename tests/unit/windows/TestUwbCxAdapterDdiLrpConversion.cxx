@@ -523,7 +523,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
     };
 
     // UWB_APP_CONFIG_PARAM_TYPE_STATIC_STS_IV
-    constexpr std::array<uint8_t, StaticStsInitializationVectorLength> staticStsInitializationVector{ 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF };
+    constexpr std::array<uint8_t, StaticStsInitializationVectorLength> staticStsInitializationVector{ 'F', 'E', 'E', 'D', 'M', 'E' };
     constexpr UwbApplicationConfigurationParameter parameterStaticStsInitializationVector = {
         .Type = UwbApplicationConfigurationParameterType::StaticStsIv,
         .Value = staticStsInitializationVector,
@@ -592,8 +592,8 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
             parameterRangingInterval,
             parameterAoaResult,
             parameterStaticStsInitializationVector,
-            // parameterUwbMacAddressShort,
-            // parameterUwbMacAddressExtended,
+            parameterUwbMacAddressShort,
+            parameterUwbMacAddressExtended,
         };
         test::ValidateRoundtrip(uwbApplicationConfigurationParameters);
     }
