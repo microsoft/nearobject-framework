@@ -16,10 +16,9 @@ using namespace strings::ostream_operators;
 
 NearObjectCli::NearObjectCli(std::shared_ptr<NearObjectCliData> cliData, std::shared_ptr<NearObjectCliHandler> cliHandler) :
     m_cliData(cliData),
-    m_cliHandler(cliHandler)
+    m_cliHandler(cliHandler),
+    m_cliApp(CreateParser())
 {
-    m_cliApp = CreateParser();
-
     if (!m_cliApp) {
         throw std::runtime_error("failed to create command line parser");
     }
@@ -41,6 +40,19 @@ NearObjectCli::Parse(int argc, char* argv[]) noexcept
     }
 
     return 0;
+}
+
+void
+NearObjectCli::WaitForExecutionComplete()
+{
+    auto &operationCompleteLatch = m_cliControlFlowContext->GetOperationCompleteLatch();
+    operationCompleteLatch.wait();
+}
+
+void
+NearObjectCli::CancelExecution()
+{
+    // TODO
 }
 
 CLI::App&
@@ -79,6 +91,14 @@ NearObjectCli::GetRangeStopApp() noexcept
     return *m_rangeStopApp;
 }
 
+void
+NearObjectCli::RegisterCliAppWithOperation(CLI::App* app)
+{
+    app->parse_complete_callback([this] {
+        m_numberOfOperations++;
+    });
+}
+
 std::shared_ptr<uwb::UwbDevice>
 NearObjectCli::GetUwbDevice() noexcept
 {
@@ -92,6 +112,9 @@ NearObjectCli::CreateParser() noexcept
     // top-level command
     auto app = std::make_unique<CLI::App>("A command line tool to assist with all things nearobject", "nocli");
     app->require_subcommand();
+    app->final_callback([this] {
+        m_cliControlFlowContext = std::make_shared<NearObjectCliControlFlowContext>(m_numberOfOperations);
+    });
 
     // sub-commands
     m_uwbApp = AddSubcommandUwb(app.get());
@@ -189,6 +212,8 @@ NearObjectCli::AddSubcommandUwbMonitor(CLI::App* parent)
     monitorApp->final_callback([this] {
         m_cliHandler->HandleMonitorMode();
     });
+
+    RegisterCliAppWithOperation(monitorApp);
 
     return monitorApp;
 }

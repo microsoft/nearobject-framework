@@ -6,6 +6,7 @@
 #include <memory>
 
 #include <CLI/CLI.hpp>
+#include <nearobject/cli/NearObjectCliControlFlowContext.hxx>
 #include <nearobject/cli/NearObjectCliData.hxx>
 #include <nearobject/cli/NearObjectCliHandler.hxx>
 #include <uwb/UwbDevice.hxx>
@@ -58,6 +59,18 @@ public:
     Parse(int argc, char* argv[]) noexcept;
 
     /**
+     * @brief Wait for all queued operations to complete execution. 
+     */
+    void
+    WaitForExecutionComplete();
+
+    /**
+     * @brief Cancel all in-progress execution. 
+     */
+    void
+    CancelExecution();
+
+    /**
      * @brief Get the app object associated with the "uwb" sub-command.
      *
      * @return CLI::App&
@@ -98,6 +111,17 @@ public:
     GetRangeStopApp() noexcept;
 
 private:
+    /**
+     * @brief Register a CLI::App command that has an operation pending on it.
+     * 
+     * This function should be called once parsing is complete for the CLI::App
+     * instance.
+     * 
+     * @param app The CLI::App to register.
+     */
+    void
+    RegisterCliAppWithOperation(CLI::App *app);
+
     /**
      * @brief Obtain a reference to the resolved uwb device.
      *
@@ -197,6 +221,8 @@ private:
 private:
     std::shared_ptr<NearObjectCliData> m_cliData;
     std::shared_ptr<NearObjectCliHandler> m_cliHandler;
+    std::shared_ptr<NearObjectCliControlFlowContext> m_cliControlFlowContext;
+    std::size_t m_numberOfOperations{ 0 };
 
     std::unique_ptr<CLI::App> m_cliApp;
     // The following are helper references to the subcommands of m_cliApp, the memory is managed by CLI11.
