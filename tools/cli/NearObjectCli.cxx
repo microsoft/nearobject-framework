@@ -16,7 +16,6 @@ using namespace strings::ostream_operators;
 
 NearObjectCli::NearObjectCli(std::shared_ptr<NearObjectCliData> cliData, std::shared_ptr<NearObjectCliHandler> cliHandler) :
     m_cliData(cliData),
-    m_cliHandler(cliHandler),
     m_cliApp(CreateParser())
 {
     if (!m_cliApp) {
@@ -114,6 +113,7 @@ NearObjectCli::CreateParser() noexcept
     app->require_subcommand();
     app->final_callback([this] {
         m_cliControlFlowContext = std::make_shared<NearObjectCliControlFlowContext>(m_numberOfOperations);
+        m_cliHandler = std::make_shared<NearObjectCliHandler>(m_cliControlFlowContext);
     });
 
     // sub-commands

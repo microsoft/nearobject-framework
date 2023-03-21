@@ -13,6 +13,16 @@
 using namespace nearobject::cli;
 using namespace uwb::protocol::fira;
 
+NearObjectCliHandler::NearObjectCliHandler(std::shared_ptr<NearObjectCliControlFlowContext> controlFlowContext) :
+    m_controlFlowContext(std::move(controlFlowContext))
+{}
+
+NearObjectCliControlFlowContext&
+NearObjectCliHandler::GetControlFlowContext()
+{
+    return *(m_controlFlowContext.get());
+}
+
 std::shared_ptr<uwb::UwbDevice>
 NearObjectCliHandler::ResolveUwbDevice(const nearobject::cli::NearObjectCliData& /*cliData */) noexcept
 {

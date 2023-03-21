@@ -4,6 +4,7 @@
 
 #include <memory>
 
+#include <nearobject/cli/NearObjectCliControlFlowContext.hxx>
 #include <nearobject/cli/NearObjectCliData.hxx>
 #include <uwb/protocols/fira/UwbSessionData.hxx>
 #include <uwb/UwbDevice.hxx>
@@ -18,6 +19,13 @@ namespace nearobject::cli
 struct NearObjectCliHandler
 {
     NearObjectCliHandler() = default;
+
+    /**
+     * @brief Construct a new NearObjectCliHandler object
+     * 
+     * @param controlFlowContext 
+     */
+    NearObjectCliHandler(std::shared_ptr<NearObjectCliControlFlowContext> controlFlowContext);
 
     virtual ~NearObjectCliHandler() = default;
 
@@ -72,6 +80,18 @@ struct NearObjectCliHandler
     */
     virtual void
     HandleGetDeviceInfo(std::shared_ptr<uwb::UwbDevice> uwbDevice) noexcept;
+
+protected:
+    /**
+     * @brief Get a reference to the base class owned control flow context object.
+     * 
+     * @return NearObjectCliControlFlowContext& 
+     */
+    NearObjectCliControlFlowContext&
+    GetControlFlowContext();
+
+private:
+    std::shared_ptr<NearObjectCliControlFlowContext> m_controlFlowContext;
 };
 
 } // namespace nearobject::cli
