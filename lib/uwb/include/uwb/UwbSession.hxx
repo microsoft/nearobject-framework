@@ -51,7 +51,7 @@ public:
      * @param configParams
      */
     void
-    Configure(uint32_t sessionId, const std::vector<protocol::fira::UwbApplicationConfigurationParameter> configParams);
+    Configure(const uint32_t sessionId, const std::vector<protocol::fira::UwbApplicationConfigurationParameter> configParams);
 
     /**
      * @brief Set the type of mac address to be used for session participants.
@@ -106,7 +106,7 @@ private:
      * @param uwbSessionData The session data to configure the session with.
      */
     virtual void
-    ConfigureImpl(uint32_t sessionId, const std::vector<protocol::fira::UwbApplicationConfigurationParameter> configParams) = 0;
+    ConfigureImpl(const uint32_t sessionId, const std::vector<protocol::fira::UwbApplicationConfigurationParameter> configParams) = 0;
 
     /**
      * @brief Start ranging.

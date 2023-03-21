@@ -69,7 +69,7 @@ UwbSession::GetUwbDeviceConnector() noexcept
 }
 
 void
-UwbSession::ConfigureImpl(uint32_t sessionId, const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> configParams)
+UwbSession::ConfigureImpl(const uint32_t sessionId, const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> configParams)
 {
     PLOG_VERBOSE << "ConfigureImpl";
 

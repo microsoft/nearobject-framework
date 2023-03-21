@@ -21,12 +21,8 @@ NearObjectCliHandler::HandleStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevi
 {
     auto callbacks = std::make_shared<nearobject::cli::NearObjectCliUwbSessionEventCallbacks>();
     auto session = uwbDevice->CreateSession(callbacks);
-    if (not sessionData.uwbConfigurationAvailable) {
-        PLOG_WARNING << "did not start ranging due to missing configuration";
-    } else {
-        session->Configure(sessionData.sessionId, sessionData.uwbConfiguration.GetUciConfigParams());
-        session->StartRanging();
-    }
+    session->Configure(sessionData.sessionId, sessionData.uwbConfiguration.GetUciConfigParams());
+    session->StartRanging();
 }
 
 void

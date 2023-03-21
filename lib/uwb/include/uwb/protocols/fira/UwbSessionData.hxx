@@ -74,7 +74,7 @@ struct UwbSessionData
     UwbConfiguration uwbConfiguration{};
     std::optional<StaticRangingInfo> staticRangingInfo;
     std::optional<SecureRangingInfo> secureRangingInfo;
-    bool uwbConfigurationAvailable{ false };
+    bool uwbConfigurationAvailable{ false }; // TODO remove this unnecessary variable
 };
 
 } // namespace uwb::protocol::fira

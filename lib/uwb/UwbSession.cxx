@@ -36,7 +36,7 @@ UwbSession::AddPeer(UwbMacAddress peerMacAddress)
 }
 
 void
-UwbSession::Configure(uint32_t sessionId, const std::vector<protocol::fira::UwbApplicationConfigurationParameter> configParams)
+UwbSession::Configure(const uint32_t sessionId, const std::vector<protocol::fira::UwbApplicationConfigurationParameter> configParams)
 {
     PLOG_VERBOSE << "configure";
     ConfigureImpl(sessionId, configParams);

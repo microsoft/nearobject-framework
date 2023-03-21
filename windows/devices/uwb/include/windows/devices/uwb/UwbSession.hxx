@@ -38,7 +38,7 @@ private:
      * @param uwbSessionData The session data to configure the session with.
      */
     virtual void
-    ConfigureImpl(uint32_t sessionId, const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> configParams) override;
+    ConfigureImpl(const uint32_t sessionId, const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> configParams) override;
 
     /**
      * @brief Start ranging.
