@@ -174,7 +174,7 @@ struct UwbMacAddressTraits
 template <std::size_t Length>
 struct UwbMacAddressValueWrapper : public UwbMacAddressTraits<Length>
 {
-    explicit UwbMacAddressValueWrapper(typename UwbMacAddressTraits<Length>::value_type addressIn) :
+    explicit constexpr UwbMacAddressValueWrapper(typename UwbMacAddressTraits<Length>::value_type addressIn) :
         address(std::move(addressIn))
     {}
 
@@ -260,7 +260,7 @@ private:
      * @return std::array<uint8_t, Length>&
      */
     template <size_t Length>
-    std::array<uint8_t, Length>&
+    constexpr std::array<uint8_t, Length>&
     UwbMacAddressValue(UwbMacAddress& uwbMacAddress)
     {
         return std::get<std::array<uint8_t, Length>>(uwbMacAddress.m_value);
@@ -275,8 +275,7 @@ private:
      * @return std::span<const uint8_t>
      */
     template <size_t Length>
-    std::span<const uint8_t>
-    UwbMacAddressView(UwbMacAddress& uwbMacAddress)
+    std::span<const uint8_t> constexpr UwbMacAddressView(UwbMacAddress& uwbMacAddress)
     {
         auto& value = UwbMacAddressValue<Length>(uwbMacAddress);
         return { std::begin(value), std::end(value) };
@@ -290,7 +289,7 @@ private:
      * @param value The address value.
      */
     template <size_t Length>
-    UwbMacAddress(detail::UwbMacAddressValueWrapper<Length> value) :
+    constexpr UwbMacAddress(detail::UwbMacAddressValueWrapper<Length> value) :
         m_length{ value.length },
         m_type{ value.address_type },
         m_value{ value.address },
@@ -308,7 +307,7 @@ public:
      * @param address The address value.
      */
     template <size_t Length>
-    UwbMacAddress(std::array<uint8_t, Length> address) :
+    constexpr UwbMacAddress(std::array<uint8_t, Length> address) :
         UwbMacAddress(detail::UwbMacAddressValueWrapper<Length>{ address })
     {}
 
@@ -342,7 +341,7 @@ public:
     /**
      * @brief Construct a new, randomly generated UwbMacAddress object based on
      * runtime provided arguments.
-     * 
+     *
      * @param type The type of random address to generate.
      * @return UwbMacAddress The randomly generated address value.
      */
@@ -362,14 +361,25 @@ public:
     /**
      * @brief Construct a default UwbMacAddress.
      */
-    UwbMacAddress();
+    constexpr UwbMacAddress() :
+        UwbMacAddress(ShortType{ 0x00, 0x00 })
+    {}
 
     /**
      * @brief Copy constructor.
      *
      * @param other
      */
-    UwbMacAddress(const UwbMacAddress& other);
+    constexpr UwbMacAddress(const UwbMacAddress& other) :
+        m_length(other.m_length),
+        m_type(other.m_type),
+        m_value(other.m_value)
+    {
+        // Note that the view span (m_view) cannot be directly copied from the other
+        // instance because that view refers to its own address storage. Hence, the
+        // view is explicitly initialized here.
+        InitializeView();
+    }
 
     /**
      * @brief Copy assignment operator.
@@ -377,8 +387,17 @@ public:
      * @param other
      * @return UwbMacAddress&
      */
-    UwbMacAddress&
-    operator=(UwbMacAddress other);
+    constexpr UwbMacAddress&
+    operator=(UwbMacAddress other)
+    {
+        // Note that this implementation of operator= uses a copy of another
+        // instance, whereas the typical implementation takes a const reference.
+        // This value-based version is used to ensure copy-elision occurs, avoiding
+        // the need to create a temporary when using the standard copy-and-swap
+        // idiom.
+        Swap(other);
+        return *this;
+    }
 
     /**
      * @brief Three-way comparison operator.
@@ -401,8 +420,17 @@ private:
      *
      * @param other The other instance to swap with.
      */
-    void
-    Swap(UwbMacAddress& other) noexcept;
+    constexpr void
+    Swap(UwbMacAddress& other) noexcept
+    {
+        std::swap(this->m_type, other.m_type);
+        std::swap(this->m_length, other.m_length);
+        auto tmpValue = std::move(other.m_value);
+        other.m_value = std::move(this->m_value);
+        this->m_value = std::move(tmpValue);
+        InitializeView();
+        other.InitializeView();
+    }
 
     /**
      * @brief Initialize the address view.
@@ -416,8 +444,15 @@ private:
      * initialized prior to invoking this function for the view to be assigned
      * coherently.
      */
-    void
-    InitializeView();
+    constexpr void
+    InitializeView()
+    {
+        // clang-format off
+        std::visit([&](auto&& value) {
+            m_view = { std::begin(value), std::end(value) };
+        }, m_value);
+        // clang-format on
+    }
 
     /**
      * @brief Allow global equality function to access private members.

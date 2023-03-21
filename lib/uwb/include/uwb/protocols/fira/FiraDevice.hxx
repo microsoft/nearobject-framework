@@ -571,6 +571,9 @@ struct UwbApplicationConfigurationParameter
 {
     UwbApplicationConfigurationParameterType Type;
     UwbApplicationConfigurationParameterValue Value;
+
+    bool
+    operator==(const UwbApplicationConfigurationParameter&) const noexcept = default;
 };
 
 struct UwbMulticastListStatus
