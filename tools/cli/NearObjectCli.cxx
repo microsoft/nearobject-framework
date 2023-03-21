@@ -211,6 +211,7 @@ NearObjectCli::AddSubcommandUwbMonitor(CLI::App* parent)
 
     monitorApp->final_callback([this] {
         m_cliHandler->HandleMonitorMode();
+        m_cliControlFlowContext->SignalOperationComplete();
     });
 
     RegisterCliAppWithOperation(monitorApp);
@@ -382,6 +383,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
         }
 
         m_cliHandler->HandleStartRanging(uwbDevice, m_cliData->SessionData);
+        m_cliControlFlowContext->SignalOperationComplete();
     });
 
     return rangeStartApp;
@@ -396,6 +398,7 @@ NearObjectCli::AddSubcommandUwbRangeStop(CLI::App* parent)
     rangeStopApp->parse_complete_callback([this] {
         std::cout << "stop ranging" << std::endl;
         m_cliHandler->HandleStopRanging();
+        m_cliControlFlowContext->SignalOperationComplete();
     });
 
     return rangeStopApp;
@@ -422,6 +425,7 @@ NearObjectCli::AddSubcommandUwbRawDeviceReset(CLI::App* parent)
         }
 
         m_cliHandler->HandleDeviceReset(uwbDevice);
+        m_cliControlFlowContext->SignalOperationComplete();
     });
 
     return rawDeviceResetApp;
@@ -448,6 +452,7 @@ NearObjectCli::AddSubcommandUwbRawGetDeviceInfo(CLI::App* parent)
         }
 
         m_cliHandler->HandleGetDeviceInfo(uwbDevice);
+        m_cliControlFlowContext->SignalOperationComplete();
     });
 
     return rawGetDeviceInfoApp;
