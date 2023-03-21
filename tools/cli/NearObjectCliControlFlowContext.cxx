@@ -12,3 +12,14 @@ NearObjectCliControlFlowContext::GetOperationCompleteLatch()
 {
     return m_operationCompleteLatch;
 }
+
+bool
+NearObjectCliControlFlowContext::SignalOperationComplete()
+{
+    const bool allOperationsComplete = m_operationCompleteLatch.try_wait();
+    if (!allOperationsComplete) {
+        m_operationCompleteLatch.count_down(1);
+    }
+
+    return allOperationsComplete;
+}
