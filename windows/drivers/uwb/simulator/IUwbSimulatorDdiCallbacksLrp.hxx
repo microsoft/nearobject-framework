@@ -12,7 +12,6 @@
 #include <windows.h>
 
 #include <wdf.h>
-#include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>

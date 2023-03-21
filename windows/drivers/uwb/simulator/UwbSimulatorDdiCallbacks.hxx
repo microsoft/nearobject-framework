@@ -22,7 +22,6 @@
 #include "UwbSimulatorSession.hxx"
 
 #include <uwb/protocols/fira/UwbCapability.hxx>
-#include <windows/devices/uwb/UwbAppConfiguration.hxx>
 
 namespace windows::devices::uwb::simulator
 {
