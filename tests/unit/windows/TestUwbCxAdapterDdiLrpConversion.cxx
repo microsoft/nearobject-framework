@@ -1,5 +1,6 @@
 
 #include <concepts>
+#include <initializer_list>
 #include <iterator>
 #include <random>
 #include <ranges>
@@ -487,91 +488,113 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         test::ValidateRoundtrip(uwbNotificationDataRangingData);
     }
 
+    constexpr bool hoppingMode = true;
+    constexpr UwbApplicationConfigurationParameter parameterHoppingMode = {
+        .Type = UwbApplicationConfigurationParameterType::HoppingMode,
+        .Value = hoppingMode,
+    };
+
+    // UWB_APP_CONFIG_PARAM_TYPE_NUMBER_OF_CONTROLEES
+    constexpr uint8_t numberOfControlees{ 100 };
+    constexpr UwbApplicationConfigurationParameter parameterNumberOfControlees = {
+        .Type = UwbApplicationConfigurationParameterType::NumberOfControlees,
+        .Value = numberOfControlees,
+    };
+
+    // UWB_APP_CONFIG_PARAM_TYPE_SLOT_DURATION
+    constexpr uint16_t slotDuration{ 0xABCD };
+    constexpr UwbApplicationConfigurationParameter parameterSlotDuration = {
+        .Type = UwbApplicationConfigurationParameterType::SlotDuration,
+        .Value = slotDuration,
+    };
+
+    // UWB_APP_CONFIG_PARAM_TYPE_RANGING_INTERVAL
+    constexpr uint32_t rangingInterval{ 0xDEADBEEF };
+    constexpr UwbApplicationConfigurationParameter parameterRangingInterval = {
+        .Type = UwbApplicationConfigurationParameterType::RangingInterval,
+        .Value = rangingInterval,
+    };
+
+    // UWB_APP_CONFIG_PARAM_TYPE_AOA_RESULT_REQ
+    constexpr AoAResult aoaResult{ AoAResult::Enable };
+    constexpr UwbApplicationConfigurationParameter parameterAoaResult = {
+        .Type = UwbApplicationConfigurationParameterType::AoAResultRequest,
+        .Value = aoaResult,
+    };
+
+    // UWB_APP_CONFIG_PARAM_TYPE_STATIC_STS_IV
+    constexpr std::array<uint8_t, StaticStsInitializationVectorLength> staticStsInitializationVector{ 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF };
+    constexpr UwbApplicationConfigurationParameter parameterStaticStsInitializationVector = {
+        .Type = UwbApplicationConfigurationParameterType::StaticStsIv,
+        .Value = staticStsInitializationVector,
+    };
+
+    // UWB_APP_CONFIG_PARAM_TYPE_DEVICE_MAC_ADDRESS (short)
+    constexpr ::uwb::UwbMacAddress uwbMacAddressShort(std::array<uint8_t, ::uwb::UwbMacAddressLength::Short>{ 0xAA, 0xBB });
+    constexpr UwbApplicationConfigurationParameter parameterUwbMacAddressShort = {
+        .Type = UwbApplicationConfigurationParameterType::DeviceMacAddress,
+        .Value = std::move(uwbMacAddressShort),
+    };
+
+    // UWB_APP_CONFIG_PARAM_TYPE_DEVICE_MAC_ADDRESS (extended)
+    constexpr ::uwb::UwbMacAddress uwbMacAddressExtended(std::array<uint8_t, ::uwb::UwbMacAddressLength::Extended>{ 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF });
+    constexpr UwbApplicationConfigurationParameter parameterUwbMacAddressExtended = {
+        .Type = UwbApplicationConfigurationParameterType::DeviceMacAddress,
+        .Value = std::move(uwbMacAddressExtended),
+    };
+
     SECTION("UwbApplicationConfigurationParameter bool variant is stable")
     {
-        // UWB_APP_CONFIG_PARAM_TYPE_HOPPING_MODE
-        constexpr bool hoppingMode = true;
-        constexpr UwbApplicationConfigurationParameter parameterHoppingMode = {
-            .Type = UwbApplicationConfigurationParameterType::HoppingMode,
-            .Value = hoppingMode,
-        };
         test::ValidateRoundtrip(parameterHoppingMode);
     }
 
     SECTION("UwbApplicationConfigurationParameter uint8_t variant is stable")
     {
-        // UWB_APP_CONFIG_PARAM_TYPE_NUMBER_OF_CONTROLEES
-        constexpr uint8_t numberOfControlees{ 100 };
-        constexpr UwbApplicationConfigurationParameter parameterNumberOfControlees = {
-            .Type = UwbApplicationConfigurationParameterType::NumberOfControlees,
-            .Value = numberOfControlees,
-        };
         test::ValidateRoundtrip(parameterNumberOfControlees);
     }
 
     SECTION("UwbApplicationConfigurationParameter uint16_t variant is stable")
     {
-        // UWB_APP_CONFIG_PARAM_TYPE_SLOT_DURATION
-        constexpr uint16_t slotDuration{ 0xAB };
-        constexpr UwbApplicationConfigurationParameter parameterSlotDuration = {
-            .Type = UwbApplicationConfigurationParameterType::SlotDuration,
-            .Value = slotDuration,
-        };
         test::ValidateRoundtrip(parameterSlotDuration);
     }
 
     SECTION("UwbApplicationConfigurationParameter uint32_t variant is stable")
     {
-        // UWB_APP_CONFIG_PARAM_TYPE_RANGING_INTERVAL
-        constexpr uint32_t rangingInterval{ 0xABCD };
-        constexpr UwbApplicationConfigurationParameter parameterRangingInterval = {
-            .Type = UwbApplicationConfigurationParameterType::RangingInterval,
-            .Value = rangingInterval,
-        };
         test::ValidateRoundtrip(parameterRangingInterval);
     }
 
     SECTION("UwbApplicationConfigurationParameter enum class variant is stable")
     {
-        // UWB_APP_CONFIG_PARAM_TYPE_AOA_RESULT_REQ
-        constexpr AoAResult aoaResult{ AoAResult::Enable };
-        constexpr UwbApplicationConfigurationParameter parameterAoaResult = {
-            .Type = UwbApplicationConfigurationParameterType::AoAResultRequest,
-            .Value = aoaResult,
-        };
         test::ValidateRoundtrip(parameterAoaResult);
     }
 
     SECTION("UwbApplicationConfigurationParameter std::array<uint8_t, N> variant is stable")
     {
-        // UWB_APP_CONFIG_PARAM_TYPE_STATIC_STS_IV
-        constexpr std::array<uint8_t, StaticStsInitializationVectorLength> staticStsInitializationVector{ 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF };
-        constexpr UwbApplicationConfigurationParameter parameterStaticStsInitializationVector = {
-            .Type = UwbApplicationConfigurationParameterType::StaticStsIv,
-            .Value = staticStsInitializationVector,
-        };
         test::ValidateRoundtrip(parameterStaticStsInitializationVector);
     }
 
     SECTION("UwbApplicationConfigurationParameter ::uwb::UwbMacAddress (short type)")
     {
-        // UWB_APP_CONFIG_PARAM_TYPE_DEVICE_MAC_ADDRESS
-        constexpr ::uwb::UwbMacAddress uwbMacAddressShort(std::array<uint8_t, ::uwb::UwbMacAddressLength::Short>{ 0xAA, 0xBB });
-        constexpr UwbApplicationConfigurationParameter parameterUwbMacAddressShort = {
-            .Type = UwbApplicationConfigurationParameterType::DeviceMacAddress,
-            .Value = std::move(uwbMacAddressShort),
-        };
         test::ValidateRoundtrip(parameterUwbMacAddressShort);
     }
 
     SECTION("UwbApplicationConfigurationParameter ::uwb::UwbMacAddress (extended type)")
     {
-        // UWB_APP_CONFIG_PARAM_TYPE_DEVICE_MAC_ADDRESS
-        constexpr ::uwb::UwbMacAddress uwbMacAddressExtended(std::array<uint8_t, ::uwb::UwbMacAddressLength::Extended>{ 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF });
-        constexpr UwbApplicationConfigurationParameter parameterUwbMacAddressExtended = {
-            .Type = UwbApplicationConfigurationParameterType::DeviceMacAddress,
-            .Value = std::move(uwbMacAddressExtended),
-        };
         test::ValidateRoundtrip(parameterUwbMacAddressExtended);
+    }
+
+    SECTION("std::vector<UwbApplicationConfigurationParameter>")
+    {
+        const std::vector<UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters {
+            parameterHoppingMode,
+            parameterNumberOfControlees,
+            parameterSlotDuration,
+            parameterRangingInterval,
+            parameterAoaResult,
+            parameterStaticStsInitializationVector,
+            // parameterUwbMacAddressShort,
+            // parameterUwbMacAddressExtended,
+        };
+        test::ValidateRoundtrip(uwbApplicationConfigurationParameters);
     }
 }
