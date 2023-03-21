@@ -60,7 +60,7 @@ UwbSession::StopRanging()
     bool rangingActiveExpected = true;
     const bool wasRangingActive = m_rangingActive.compare_exchange_weak(rangingActiveExpected, false);
     if (wasRangingActive) {
-        //StopRangingImpl();
+        StopRangingImpl();
     }
 }
 
