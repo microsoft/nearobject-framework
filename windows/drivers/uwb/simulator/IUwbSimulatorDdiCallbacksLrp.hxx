@@ -77,11 +77,11 @@ struct IUwbSimulatorDdiCallbacksLrp
 
     /**
      * @brief Get the Application Configuration Parameters object
-     * 
-     * @param sessionId 
-     * @param applicationConfigurationParameterTypes 
-     * @param applicationConfigurationParameters 
-     * @return UwbStatus 
+     *
+     * @param sessionId
+     * @param applicationConfigurationParameterTypes
+     * @param applicationConfigurationParameters
+     * @return UwbStatus
      */
     virtual UwbStatus
     GetApplicationConfigurationParameters(uint32_t sessionId, const std::vector<UwbApplicationConfigurationParameterType> &applicationConfigurationParameterTypes, std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters) = 0;

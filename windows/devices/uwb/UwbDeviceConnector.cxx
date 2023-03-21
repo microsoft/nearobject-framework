@@ -325,7 +325,7 @@ UwbDeviceConnector::SessionUpdateControllerMulticastList(uint32_t sessionId, Uwb
 std::future<std::tuple<UwbStatus, std::vector<UwbApplicationConfigurationParameter>>>
 UwbDeviceConnector::GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes)
 {
-    std::promise<std::tuple<UwbStatus,  std::vector<UwbApplicationConfigurationParameter>>> promiseResult;
+    std::promise<std::tuple<UwbStatus, std::vector<UwbApplicationConfigurationParameter>>> promiseResult;
     auto resultFuture = promiseResult.get_future();
     // TODO: invoke IOCTL_UWB_GET_APP_CONFIG_PARAMS
 
@@ -339,8 +339,8 @@ UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, st
     auto resultFuture = resultPromise.get_future();
     // TODO: invoke IOCTL_UWB_SET_APP_CONFIG_PARAMS
 
-    // 
-    // Old code that used the original one-off UwbSetAppConfigurationParameters wrapper. 
+    //
+    // Old code that used the original one-off UwbSetAppConfigurationParameters wrapper.
     // TODO: Once this is implemented, delete the commented out code.
     //
 
