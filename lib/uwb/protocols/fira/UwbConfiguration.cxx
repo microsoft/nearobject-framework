@@ -22,7 +22,95 @@ const std::unordered_set<ResultReportConfiguration> UwbConfiguration::ResultRepo
  * @brief map of uci tag to a function of how to generate that uci tag given UwbConfiguration
  *
  */
-const std::unordered_map<uwb::protocol::fira::UwbApplicationConfigurationParameterType, std::function<std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue>(UwbConfiguration*)>> uciGenerators;
+const std::unordered_map<uwb::protocol::fira::UwbApplicationConfigurationParameterType, std::function<std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue>(UwbConfiguration*)>> uciGenerators{
+    // params that directly transfer
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::DeviceType, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         //  return config->GetDeviceType();
+         // TODO how do we know whether the device is controller or controlee?
+         return std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue>{};
+     } },
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::DeviceRole, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         return config->GetDeviceRole();
+     } },
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::StsConfiguration, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         return config->GetStsConfiguration();
+     } },
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::MultiNodeMode, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         return config->GetMultiNodeMode();
+     } },
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::ChannelNumber, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         return config->GetChannel();
+     } },
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::SlotDuration, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         return config->GetSlotDuration();
+     } },
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::RangingInterval, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         return config->GetRangingInterval();
+     } },
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::MacFcsType, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         return config->GetMacAddressFcsType();
+     } },
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::RFrameConfiguration, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         return config->GetRFrameConfig();
+     } },
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::PreambleCodeIndex, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         return config->GetPreambleCodeIndex();
+     } },
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::RangingTimeStruct, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         return config->GetRangingTimeStruct();
+     } },
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::SlotsPerRangingRound, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         return config->GetSlotsPerRangingRound();
+     } },
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::PrfMode, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         return config->GetPrfMode();
+     } },
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::ScheduledMode, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         return config->GetSchedulingMode();
+     } },
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::KeyRotationRate, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         return config->GetKeyRotationRate();
+     } },
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::MacAddressMode, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         return config->GetMacAddressMode();
+     } },
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::MaxRangingRoundRetry, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         return config->GetMaxRangingRoundRetry();
+     } },
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::UwbInitiationTime, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         return config->GetUwbInitiationTime();
+     } },
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::HoppingMode, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         return config->GetHoppingMode();
+     } },
+    // { uwb::protocol::fira::UwbApplicationConfigurationParameterType::ResultReportConfig, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+    //      return config->GetResultReportConfigurations();
+    //  } },
+
+    // params with different names
+    // { uwb::protocol::fira::UwbApplicationConfigurationParameterType::RangingRoundUsage, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+    //      return config->GetRangingMethod();
+    //  } },
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::DeviceMacAddress, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         auto mode = config->GetMacAddressMode();
+         auto role = config->GetDeviceRole();
+         if (not mode or not role) {
+             return std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue>{};
+         }
+         // TODO how do we know if we are controller or controlee?
+         return std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue>{};
+     } },
+    { uwb::protocol::fira::UwbApplicationConfigurationParameterType::DestinationMacAddresses, [](UwbConfiguration* config) -> std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue> {
+         auto mode = config->GetMacAddressMode();
+         auto role = config->GetDeviceRole();
+         if (not mode or not role) {
+             return std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue>{};
+         }
+         // TODO how do we know if we are controller or controlee?
+         return std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue>{};
+     } },
+    // TODO figure out the rest of the uci params
+};
 
 std::vector<UwbApplicationConfigurationParameter>
 UwbConfiguration::GetUciConfigParams()

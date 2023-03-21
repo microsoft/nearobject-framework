@@ -11,7 +11,7 @@
 namespace windows::devices::uwb
 {
 /**
- * @brief Generate neutral type UwbSetAppConfigParameters from UwbSessionData TODO should this function be located in UwbCxAdapterDdiLrp.hxx?
+ * @brief Generate neutral type UwbSetAppConfigParameters from UwbSessionData TODO this function needs to be updated to reflect the new differentiation between Uci and Oob app config params
  *
  * @param uwbSessionData
  * @return UwbSetAppConfigurationParameters
