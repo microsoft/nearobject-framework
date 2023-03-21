@@ -152,7 +152,7 @@ struct UwbConfiguration
      * @return std::vector<UwbApplicationConfigurationParameter>
      */
     std::vector<UwbApplicationConfigurationParameter>
-    GetUCIConfigParams();
+    GetUciConfigParams();
 
     /**
      * @brief Convert this object into a FiRa Data Object (DO).

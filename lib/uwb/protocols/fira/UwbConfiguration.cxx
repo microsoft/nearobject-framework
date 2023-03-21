@@ -18,10 +18,26 @@ const std::unordered_set<ResultReportConfiguration> UwbConfiguration::ResultRepo
     ResultReportConfiguration::AoAAzimuthReport
 };
 
+/**
+ * @brief map of uci tag to a function of how to generate that uci tag given UwbConfiguration
+ *
+ */
+const std::unordered_map<const uwb::protocol::fira::UwbApplicationConfigurationParameterType, std::function<std::optional<uwb::protocol::fira::UwbApplicationConfigurationParameterValue>(UwbConfiguration*)>> uciGenerators;
+
 std::vector<UwbApplicationConfigurationParameter>
-UwbConfiguration::GetUCIConfigParams()
+UwbConfiguration::GetUciConfigParams()
 {
-    return {};
+    std::vector<UwbApplicationConfigurationParameter> result;
+    for (const auto& [uciTag, generator] : uciGenerators) {
+        const auto uciValue = generator(this);
+        if (not uciValue) {
+            continue;
+        }
+        result.push_back(UwbApplicationConfigurationParameter{
+            .Type = uciTag,
+            .Value = uciValue.value() });
+    }
+    return result;
 }
 
 std::unique_ptr<encoding::TlvBer>
