@@ -2,6 +2,7 @@
 #ifndef NEAR_OBJECT_CLI_HANDLER_HXX
 #define NEAR_OBJECT_CLI_HANDLER_HXX
 
+#include <cstdint>
 #include <memory>
 
 #include <nearobject/cli/NearObjectCliData.hxx>
