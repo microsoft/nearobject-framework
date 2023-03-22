@@ -16,9 +16,10 @@ using namespace strings::ostream_operators;
 
 NearObjectCli::NearObjectCli(std::shared_ptr<NearObjectCliData> cliData, std::shared_ptr<NearObjectCliHandler> cliHandler) :
     m_cliData(cliData),
-    m_cliHandler(cliHandler)
+    m_cliHandler(std::move(cliHandler)),
+    m_cliApp(CreateParser())
 {
-    m_cliApp = CreateParser();
+    m_cliHandler->SetParent(this);
 
     if (!m_cliApp) {
         throw std::runtime_error("failed to create command line parser");
@@ -31,6 +32,12 @@ NearObjectCli::GetData() const noexcept
     return m_cliData;
 }
 
+std::shared_ptr<NearObjectCliControlFlowContext>
+NearObjectCli::GetControlFlowContext() const noexcept
+{
+    return m_cliControlFlowContext;
+}
+
 int
 NearObjectCli::Parse(int argc, char* argv[]) noexcept
 {
@@ -41,6 +48,36 @@ NearObjectCli::Parse(int argc, char* argv[]) noexcept
     }
 
     return 0;
+}
+
+void
+NearObjectCli::RegisterCliAppWithOperation(CLI::App* app)
+{
+    m_cliAppOperations.insert(app);
+}
+
+void
+NearObjectCli::SignalCliAppOperationCompleted(CLI::App* app)
+{
+    std::size_t numOperationsCompleted = m_cliAppOperations.erase(app);
+    if (numOperationsCompleted > 0) {
+        m_cliControlFlowContext->OperationSignalComplete(numOperationsCompleted);
+    }
+}
+
+void
+NearObjectCli::WaitForExecutionComplete()
+{
+    m_cliControlFlowContext->OperationsWaitForComplete();
+}
+
+void
+NearObjectCli::CancelExecution()
+{
+    bool stopRequested = m_cliControlFlowContext->RequestStopExecution();
+    if (!stopRequested) {
+        // TODO: log?
+    }
 }
 
 CLI::App&
@@ -92,6 +129,9 @@ NearObjectCli::CreateParser() noexcept
     // top-level command
     auto app = std::make_unique<CLI::App>("A command line tool to assist with all things nearobject", "nocli");
     app->require_subcommand();
+    app->parse_complete_callback([this] {
+        m_cliControlFlowContext = std::make_shared<NearObjectCliControlFlowContext>(std::size(m_cliAppOperations));
+    });
 
     // sub-commands
     m_uwbApp = AddSubcommandUwb(app.get());
@@ -186,8 +226,12 @@ NearObjectCli::AddSubcommandUwbMonitor(CLI::App* parent)
 {
     auto monitorApp = parent->add_subcommand("monitor", "commands relating to monitor mode")->fallthrough();
 
-    monitorApp->final_callback([this] {
+    monitorApp->parse_complete_callback([this, monitorApp] {
+        RegisterCliAppWithOperation(monitorApp);
+    });
+    monitorApp->final_callback([this, monitorApp] {
         m_cliHandler->HandleMonitorMode();
+        SignalCliAppOperationCompleted(monitorApp);
     });
 
     return monitorApp;
@@ -284,7 +328,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     rangeStartApp->add_option("--FiraMacVersion", uwbConfig.firaMacVersionString)->capture_default_str();
     rangeStartApp->add_option("--ResultReportConfiguration", uwbConfig.resultReportConfigurationString)->capture_default_str();
 
-    rangeStartApp->parse_complete_callback([this] {
+    rangeStartApp->parse_complete_callback([this, rangeStartApp] {
         // Validate NumberOfControlees
         if (m_cliData->uwbConfiguration.multiNodeMode == uwb::protocol::fira::MultiNodeMode::Unicast) {
             if (m_cliData->uwbConfiguration.numberOfControlees != 1) {
@@ -344,6 +388,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
         }
 
         std::cout << "StaticRangingInfo: { " << m_cliData->SessionData.staticRangingInfo << " }" << std::endl;
+        RegisterCliAppWithOperation(rangeStartApp);
     });
 
     rangeStartApp->final_callback([this] {
@@ -368,9 +413,14 @@ NearObjectCli::AddSubcommandUwbRangeStop(CLI::App* parent)
     // top-level command
     auto rangeStopApp = parent->add_subcommand("stop", "stop ranging")->fallthrough();
 
-    rangeStopApp->parse_complete_callback([this] {
+    rangeStopApp->parse_complete_callback([this, rangeStopApp] {
         std::cout << "stop ranging" << std::endl;
+        RegisterCliAppWithOperation(rangeStopApp);
+    });
+
+    rangeStopApp->final_callback([this, rangeStopApp] {
         m_cliHandler->HandleStopRanging();
+        SignalCliAppOperationCompleted(rangeStopApp);
     });
 
     return rangeStopApp;
@@ -382,11 +432,12 @@ NearObjectCli::AddSubcommandUwbRawDeviceReset(CLI::App* parent)
     // top-level command
     auto rawDeviceResetApp = parent->add_subcommand("devicereset", "DeviceReset")->fallthrough();
 
-    rawDeviceResetApp->parse_complete_callback([this] {
+    rawDeviceResetApp->parse_complete_callback([this, rawDeviceResetApp] {
         std::cout << "device reset" << std::endl;
+        RegisterCliAppWithOperation(rawDeviceResetApp);
     });
 
-    rawDeviceResetApp->final_callback([this] {
+    rawDeviceResetApp->final_callback([this, rawDeviceResetApp] {
         auto uwbDevice = GetUwbDevice();
         if (!uwbDevice) {
             std::cerr << "no device found" << std::endl;
@@ -397,6 +448,7 @@ NearObjectCli::AddSubcommandUwbRawDeviceReset(CLI::App* parent)
         }
 
         m_cliHandler->HandleDeviceReset(uwbDevice);
+        SignalCliAppOperationCompleted(rawDeviceResetApp);
     });
 
     return rawDeviceResetApp;
@@ -408,11 +460,12 @@ NearObjectCli::AddSubcommandUwbRawGetDeviceInfo(CLI::App* parent)
     // top-level command
     auto rawGetDeviceInfoApp = parent->add_subcommand("getdeviceinfo", "GetDeviceInfo")->fallthrough();
 
-    rawGetDeviceInfoApp->parse_complete_callback([this] {
+    rawGetDeviceInfoApp->parse_complete_callback([this, rawGetDeviceInfoApp] {
         std::cout << "get device info" << std::endl;
+        RegisterCliAppWithOperation(rawGetDeviceInfoApp);
     });
 
-    rawGetDeviceInfoApp->final_callback([this] {
+    rawGetDeviceInfoApp->final_callback([this, rawGetDeviceInfoApp] {
         auto uwbDevice = GetUwbDevice();
         if (!uwbDevice) {
             std::cerr << "no device found" << std::endl;
@@ -423,6 +476,8 @@ NearObjectCli::AddSubcommandUwbRawGetDeviceInfo(CLI::App* parent)
         }
 
         m_cliHandler->HandleGetDeviceInfo(uwbDevice);
+        m_cliControlFlowContext->OperationSignalComplete();
+        SignalCliAppOperationCompleted(rawGetDeviceInfoApp);
     });
 
     return rawGetDeviceInfoApp;
