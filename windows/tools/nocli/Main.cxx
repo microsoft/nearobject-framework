@@ -51,6 +51,9 @@ try {
         return result;
     }
 
+    // Wait for all requested operations to complete running.
+    cli.WaitForExecutionComplete();
+
     return 0;
 } catch (...) {
     // TODO

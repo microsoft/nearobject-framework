@@ -7,11 +7,13 @@ set(NO_CLI_DIR_PUBLIC_INCLUDE_PREFIX ${NO_CLI_DIR_PUBLIC_INCLUDE}/nearobject/cli
 target_sources(nocli-core
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectCli.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/NearObjectCliControlFlowContext.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectCliData.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectCliHandler.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectCliUwbSessionEventCallbacks.cxx
     PUBLIC
         ${NO_CLI_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectCli.hxx
+        ${NO_CLI_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectCliControlFlowContext.hxx
         ${NO_CLI_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectCliHandler.hxx
         ${NO_CLI_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectCliData.hxx
         ${NO_CLI_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectCliUwbSessionEventCallbacks.hxx
