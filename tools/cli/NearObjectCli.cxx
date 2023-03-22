@@ -51,7 +51,10 @@ NearObjectCli::WaitForExecutionComplete()
 void
 NearObjectCli::CancelExecution()
 {
-    // TODO
+    bool stopRequested = m_cliControlFlowContext->RequestStopExecution();
+    if (!stopRequested) {
+        // TODO: log?
+    }
 }
 
 CLI::App&

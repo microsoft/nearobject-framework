@@ -34,6 +34,15 @@ public:
     GetExecutionStopToken();
 
     /**
+     * @brief Request that execution is stopped. 
+     * 
+     * @return true If a request to stop execution was made.
+     * @return false If a request to stop execution could not be made.
+     */
+    bool
+    RequestStopExecution();
+
+    /**
      * @brief Get the latch tracking operation completion.
      * 
      * @return std::latch& 

@@ -13,6 +13,12 @@ NearObjectCliControlFlowContext::GetExecutionStopToken()
     return m_stopSource.get_token();
 }
 
+bool
+NearObjectCliControlFlowContext::RequestStopExecution()
+{
+    return m_stopSource.request_stop();
+}
+
 std::latch&
 NearObjectCliControlFlowContext::GetOperationCompleteLatch()
 {
