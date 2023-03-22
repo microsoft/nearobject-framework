@@ -2,6 +2,8 @@
 #ifndef NEAR_OBJECT_CLI_UWB_SESSION_EVENT_CALLBACKS_HXX
 #define NEAR_OBJECT_CLI_UWB_SESSION_EVENT_CALLBACKS_HXX
 
+#include <functional>
+
 #include <uwb/UwbSession.hxx>
 
 namespace nearobject::cli
@@ -12,6 +14,13 @@ namespace nearobject::cli
 struct NearObjectCliUwbSessionEventCallbacks :
     public ::uwb::UwbSessionEventCallbacks
 {
+    /**
+     * @brief Construct a new NearObjectCliUwbSessionEventCallbacks object.
+     * 
+     * @param onSessionEndedCallback The callback to invoke when the session ends.
+     */
+    NearObjectCliUwbSessionEventCallbacks(std::function<void()> onSessionEndedCallback);
+
     /**
      * @brief Invoked when the session is ended.
      *
@@ -58,6 +67,9 @@ struct NearObjectCliUwbSessionEventCallbacks :
      */
     void
     OnSessionMembershipChanged(::uwb::UwbSession *session, const std::vector<::uwb::UwbPeer> peersAdded, const std::vector<::uwb::UwbPeer> peersRemoved);
+
+private:
+    std::function<void()> m_onSessionEndedCallback;
 };
 
 } // namespace nearobject::cli

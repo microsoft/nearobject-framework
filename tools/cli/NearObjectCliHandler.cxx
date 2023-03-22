@@ -1,6 +1,7 @@
 
 #include <plog/Log.h>
 
+#include <nearobject/cli/NearObjectCli.hxx>
 #include <nearobject/cli/NearObjectCliHandler.hxx>
 #include <nearobject/cli/NearObjectCliUwbSessionEventCallbacks.hxx>
 #include <uwb/UwbDevice.hxx>
@@ -13,6 +14,12 @@
 using namespace nearobject::cli;
 using namespace uwb::protocol::fira;
 
+void
+NearObjectCliHandler::SetParent(NearObjectCli* parent)
+{
+    m_parent = parent;
+}
+
 std::shared_ptr<uwb::UwbDevice>
 NearObjectCliHandler::ResolveUwbDevice(const nearobject::cli::NearObjectCliData& /*cliData */) noexcept
 {
@@ -24,7 +31,12 @@ NearObjectCliHandler::ResolveUwbDevice(const nearobject::cli::NearObjectCliData&
 void
 NearObjectCliHandler::HandleStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevice, uwb::protocol::fira::UwbSessionData& sessionData) noexcept
 try {
-    auto callbacks = std::make_shared<nearobject::cli::NearObjectCliUwbSessionEventCallbacks>();
+    auto controlFlowContext = (m_parent != nullptr) ? m_parent->GetControlFlowContext() : nullptr;
+    auto callbacks = std::make_shared<nearobject::cli::NearObjectCliUwbSessionEventCallbacks>([controlFlowContext = std::move(controlFlowContext)]() {
+        if (controlFlowContext != nullptr) {
+            controlFlowContext->OperationSignalComplete();
+        }
+    });
     auto session = uwbDevice->CreateSession(callbacks);
     session->Configure(sessionData.sessionId, uwb::protocol::fira::GetUciConfigParams(sessionData.uwbConfiguration, session->GetDeviceType()));
     session->StartRanging();
