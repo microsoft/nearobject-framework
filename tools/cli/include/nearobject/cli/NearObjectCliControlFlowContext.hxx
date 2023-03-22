@@ -62,7 +62,6 @@ private:
     std::ptrdiff_t m_operationsCompleteLatchCount;
     std::latch m_operationCompleteLatch;
     std::stop_source m_stopSource;
-    std::stop_token m_stopToken;
 };
 } // namespace nearobject::cli
 
