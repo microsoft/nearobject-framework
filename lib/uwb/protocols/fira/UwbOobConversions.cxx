@@ -81,11 +81,11 @@ const std::unordered_map<UwbApplicationConfigurationParameterType, std::function
          if (deviceType == DeviceType::Controller) {
              return config.GetControllerMacAddress();
          } else {
-            if (mode == uwb::UwbMacAddressType::Short) {
+             if (mode == uwb::UwbMacAddressType::Short) {
                  return config.GetControleeShortMacAddress();
-             } else{
-                // TODO what do we do here
-                return std::nullopt;
+             } else {
+                 // TODO what do we do here
+                 return std::nullopt;
              }
          }
          return std::nullopt;
@@ -98,12 +98,12 @@ const std::unordered_map<UwbApplicationConfigurationParameterType, std::function
          if (deviceType == DeviceType::Controller) {
              if (mode == uwb::UwbMacAddressType::Short) {
                  return config.GetControleeShortMacAddress(); // TODO this should reflect the possibility for multiple peers
-             } else{
-                // TODO what do we do here
-                return std::nullopt;
+             } else {
+                 // TODO what do we do here
+                 return std::nullopt;
              }
          } else {
-            return config.GetControllerMacAddress();
+             return config.GetControllerMacAddress();
          }
      } },
     // TODO figure out the rest of the uci params
