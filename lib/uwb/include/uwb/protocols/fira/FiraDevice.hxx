@@ -13,9 +13,6 @@
 #include <variant>
 #include <vector>
 
-#include <notstd/hash.hxx>
-#include <notstd/utility.hxx>
-
 #include <uwb/UwbMacAddress.hxx>
 #include <uwb/UwbVersion.hxx>
 
@@ -279,28 +276,6 @@ ResultReportConfigurationToString(const std::unordered_set<ResultReportConfigura
  */
 std::optional<std::unordered_set<ResultReportConfiguration>>
 StringToResultReportConfiguration(const std::string& input);
-
-/**
- * @brief Effective ranging configuration.
- */
-struct RangingMethod
-{
-    constexpr RangingMethod() = default;
-
-    constexpr RangingMethod(RangingDirection method, MeasurementReportMode reportMode) :
-        Method(method),
-        ReportMode(reportMode)
-    {}
-
-    RangingDirection Method{ RangingDirection::OneWay };
-    MeasurementReportMode ReportMode{ MeasurementReportMode::None };
-
-    auto
-    operator<=>(const RangingMethod& other) const = default;
-
-    uint8_t
-    ToByte() const;
-};
 
 enum class UwbStatusSession {
     NotExist,
@@ -574,8 +549,7 @@ using UwbApplicationConfigurationParameterValue = std::variant<
     RangingRoundUsage, // RANGING_ROUND_USAGE, tag0x01, size 1
     RangingMode, // RANGING_TIME_STRUCT, tag 0x1A, size 1
     RangingRoundControl, // RANGING_ROUND_CONTROL, tag 0x0C, size 1,
-    std::unordered_set<ResultReportConfiguration>, // RESULT_REPORT_CONFIG, tag 0x2E, size 1
-    RangingMethod,
+    std::unordered_set<ResultReportConfiguration>, // RESULT_REPORT_CONFIG, tag 0x2E, size 1 // TODO this should really be a set
     SchedulingMode, // SCHEDULED_MODE, tag 0x22, size 1
     StsConfiguration, // STS_CONFIG, tag 0x02, size 1
     StsLength, // STS_LENGTH, tag 0x035, length 1,
@@ -761,20 +735,5 @@ std::string
 ToString(const UwbNotificationData& uwbNotificationData);
 
 } // namespace uwb::protocol::fira
-
-namespace std
-{
-template <>
-struct hash<::uwb::protocol::fira::RangingMethod>
-{
-    std::size_t
-    operator()(const ::uwb::protocol::fira::RangingMethod& rangingMethod) const noexcept
-    {
-        std::size_t value = 0;
-        notstd::hash_combine(value, notstd::to_underlying(rangingMethod.Method), notstd::to_underlying(rangingMethod.ReportMode));
-        return value;
-    }
-};
-} // namespace std
 
 #endif // FIRA_DEVICE_HXX

@@ -70,9 +70,9 @@ const std::unordered_map<UwbApplicationConfigurationParameterType, std::function
      } },
 
     // params with different names
-    {  UwbApplicationConfigurationParameterType::RangingRoundUsage, []( const UwbConfiguration & config, DeviceType deviceType) -> std::optional< UwbApplicationConfigurationParameterValue> {
-         return config.GetRangingMethod();
-     } },
+    // {  UwbApplicationConfigurationParameterType::RangingRoundUsage, []( const UwbConfiguration & config, DeviceType deviceType) -> std::optional< UwbApplicationConfigurationParameterValue> {
+    //      return config.GetRangingMethod();
+    //  } },
     { UwbApplicationConfigurationParameterType::DeviceMacAddress, [](const UwbConfiguration& config, DeviceType deviceType) -> std::optional<UwbApplicationConfigurationParameterValue> {
          auto mode = config.GetMacAddressMode();
          if (not mode) {

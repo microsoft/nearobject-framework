@@ -15,6 +15,7 @@
 
 #include <uwb/UwbMacAddress.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
+#include <uwb/protocols/fira/RangingMethod.hxx>
 
 namespace uwb::protocol::fira
 {

@@ -7,6 +7,7 @@ target_sources(uwb-proto-fira
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/ControleePreference.cxx
         ${CMAKE_CURRENT_LIST_DIR}/FiraDevice.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/RangingMethod.cxx
         ${CMAKE_CURRENT_LIST_DIR}/StaticRangingInfo.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbCapability.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbConfiguration.cxx
@@ -16,6 +17,7 @@ target_sources(uwb-proto-fira
     PUBLIC
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/ControleePreference.hxx
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/FiraDevice.hxx
+        ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/RangingMethod.hxx
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/SecureRangingInfo.hxx
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/StaticRangingInfo.hxx
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCapability.hxx
@@ -46,6 +48,7 @@ target_link_libraries(uwb-proto-fira
 list(APPEND UWBPROTOFIRA_PUBLIC_HEADERS
     ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/ControleePreference.hxx
     ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/FiraDevice.hxx
+    ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/RangingMethod.hxx
     ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/SecureRangingInfo.hxx
     ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/StaticRangingInfo.hxx
     ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCapability.hxx
