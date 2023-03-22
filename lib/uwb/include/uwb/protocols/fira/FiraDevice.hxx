@@ -549,7 +549,7 @@ using UwbApplicationConfigurationParameterValue = std::variant<
     RangingRoundUsage, // RANGING_ROUND_USAGE, tag0x01, size 1
     RangingMode, // RANGING_TIME_STRUCT, tag 0x1A, size 1
     RangingRoundControl, // RANGING_ROUND_CONTROL, tag 0x0C, size 1,
-    ResultReportConfiguration, // RESULT_REPORT_CONFIG, tag 0x2E, size 1 // TODO this should really be a set
+    std::unordered_set<ResultReportConfiguration>, // RESULT_REPORT_CONFIG, tag 0x2E, size 1 // TODO this should really be a set
     SchedulingMode, // SCHEDULED_MODE, tag 0x22, size 1
     StsConfiguration, // STS_CONFIG, tag 0x02, size 1
     StsLength, // STS_LENGTH, tag 0x035, length 1,
