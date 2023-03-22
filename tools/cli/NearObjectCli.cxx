@@ -114,7 +114,7 @@ NearObjectCli::CreateParser() noexcept
     // top-level command
     auto app = std::make_unique<CLI::App>("A command line tool to assist with all things nearobject", "nocli");
     app->require_subcommand();
-    app->final_callback([this] {
+    app->parse_complete_callback([this] {
         m_cliControlFlowContext = std::make_shared<NearObjectCliControlFlowContext>(m_numberOfOperations);
         m_cliHandler = std::make_shared<NearObjectCliHandler>(m_cliControlFlowContext);
     });
