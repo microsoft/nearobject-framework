@@ -110,7 +110,7 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData& uwbSessio
     // TODO: the caller probably wants to know about this, figure out the best way to signal the error.
     //       One option is to define a UwbSetApplicationConfigurationParameterException which has an
     //       accessor that just returns the vector entries with statusSetParameter != Ok
-    for (const auto &[applicationConfigurationParameterType, statusSetParameter] : resultSetParameters) {
+    for (const auto& [applicationConfigurationParameterType, statusSetParameter] : resultSetParameters) {
         if (!IsUwbStatusOk(statusSetParameter)) {
             LOG_ERROR << "failed to set application configuration parameter " << magic_enum::enum_name(applicationConfigurationParameterType) << ", status=" << ToString(statusSetParameter);
         }
