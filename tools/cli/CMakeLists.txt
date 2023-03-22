@@ -26,6 +26,7 @@ target_link_libraries(nocli-core
     PRIVATE
         CLI11::CLI11
         magic_enum::magic_enum
+        plog::plog
     PUBLIC
         uwb-proto-fira
         uwb
