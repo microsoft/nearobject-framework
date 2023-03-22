@@ -404,8 +404,9 @@ UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, st
         return resultFuture;
     }
 
-    auto paramsBuffer = UwbCxDdi::From(applicationConfigurationParameters).data();
-    auto statusSize = offsetof(UWB_SET_APP_CONFIG_PARAMS_STATUS, appConfigParamsStatus[applicationConfigurationParameters.size()]);
+    auto paramsDdi = UwbCxDdi::From(applicationConfigurationParameters);
+    auto paramsBuffer = std::data(paramsDdi);
+    auto statusSize = offsetof(UWB_SET_APP_CONFIG_PARAMS_STATUS, appConfigParamsStatus[std::size(applicationConfigurationParameters)]);
     std::vector<uint8_t> statusBuffer(statusSize);
     BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_SET_APP_CONFIG_PARAMS, std::data(paramsBuffer), std::size(paramsBuffer), std::data(statusBuffer), statusSize, nullptr, nullptr);
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
@@ -420,10 +421,9 @@ UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, st
         if (!IsUwbStatusOk(uwbStatus)) {
             resultPromise.set_exception(std::make_exception_ptr(UwbException(std::move(uwbStatus))));
         } else {
-            // TODO: Could move this logic into its own UwbCxDdi::To() function
+            // TODO: Should move this logic into its own UwbCxDdi::To() function
             std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>> appConfigParamsStatusList;
-            for (auto i = 0; i < uwbSetAppConfigParamsStatus.appConfigParamsCount; i++)
-            {
+            for (auto i = 0; i < uwbSetAppConfigParamsStatus.appConfigParamsCount; i++) {
                 auto paramType = UwbCxDdi::To(uwbSetAppConfigParamsStatus.appConfigParamsStatus[i].paramType);
                 auto paramStatus = UwbCxDdi::To(uwbSetAppConfigParamsStatus.appConfigParamsStatus[i].status);
 
