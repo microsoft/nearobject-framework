@@ -11,6 +11,8 @@
 
 namespace nearobject::cli
 {
+class NearObjectCli;
+
 /**
  * @brief Class which handles and executes resolved command-line requests. The
  * command line driver will invoke the function associated with the command line
@@ -23,12 +25,12 @@ struct NearObjectCliHandler
     virtual ~NearObjectCliHandler() = default;
 
     /**
-     * @brief Assign the control flow context for this handler.
+     * @brief Assign the parent CLI object for this handler.
      *
-     * @param controlFlowContext The control flow context to assign.
+     * @param parent The (owning) parent object.
      */
     void
-    SetControlFlowContext(std::shared_ptr<NearObjectCliControlFlowContext> controlFlowContext);
+    SetParent(NearObjectCli* parent);
 
     /**
      * @brief Invoked by the command line driver when a UWB device is required
@@ -82,17 +84,8 @@ struct NearObjectCliHandler
     virtual void
     HandleGetDeviceInfo(std::shared_ptr<uwb::UwbDevice> uwbDevice) noexcept;
 
-protected:
-    /**
-     * @brief Get a shared reference to the control flow context object.
-     *
-     * @return std::shared_ptr<NearObjectCliControlFlowContext>
-     */
-    std::shared_ptr<NearObjectCliControlFlowContext>
-    GetControlFlowContext() const noexcept;
-
 private:
-    std::shared_ptr<NearObjectCliControlFlowContext> m_controlFlowContext;
+    NearObjectCli* m_parent;
 };
 
 } // namespace nearobject::cli
