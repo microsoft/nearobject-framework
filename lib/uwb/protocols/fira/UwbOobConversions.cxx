@@ -65,12 +65,12 @@ const std::unordered_map<UwbApplicationConfigurationParameterType, std::function
     { UwbApplicationConfigurationParameterType::HoppingMode, [](const UwbConfiguration& config, DeviceType deviceType) -> std::optional<UwbApplicationConfigurationParameterValue> {
          return config.GetHoppingMode();
      } },
-    // {  UwbApplicationConfigurationParameterType::ResultReportConfig, []( const UwbConfiguration & config) -> std::optional< UwbApplicationConfigurationParameterValue> {
-    //      return config.GetResultReportConfigurations();
-    //  } },
+    { UwbApplicationConfigurationParameterType::ResultReportConfig, [](const UwbConfiguration& config, DeviceType deviceType) -> std::optional<UwbApplicationConfigurationParameterValue> {
+         return config.GetResultReportConfigurations();
+     } },
 
     // params with different names
-    // {  UwbApplicationConfigurationParameterType::RangingRoundUsage, []( const UwbConfiguration & config) -> std::optional< UwbApplicationConfigurationParameterValue> {
+    // {  UwbApplicationConfigurationParameterType::RangingRoundUsage, []( const UwbConfiguration & config, DeviceType deviceType) -> std::optional< UwbApplicationConfigurationParameterValue> {
     //      return config.GetRangingMethod();
     //  } },
     { UwbApplicationConfigurationParameterType::DeviceMacAddress, [](const UwbConfiguration& config, DeviceType deviceType) -> std::optional<UwbApplicationConfigurationParameterValue> {

@@ -1386,13 +1386,15 @@ windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM &applicationConfi
         detail::ConvertUwbApplicationConfigurationParameter<RangingRoundControl>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
         break;
     case UWB_APP_CONFIG_PARAM_TYPE_RESULT_REPORT_CONFIG: {
-        // TODO
         std::unordered_set<ResultReportConfiguration> configs;
-        for(const auto bitmap : magic_enum::enum_values<ResultReportConfiguration>()){
-            
+        uint8_t value = applicationConfigurationParameter.paramValue[0];
+        for (const auto bitmap : magic_enum::enum_values<ResultReportConfiguration>()) {
+            auto underlyingMap = notstd::to_underlying(bitmap);
+            if (value | underlyingMap) {
+                configs.insert(bitmap);
+            }
         }
         uwbApplicationConfigurationParameter.Value = std::move(configs);
-        // detail::ConvertUwbApplicationConfigurationParameter(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
         break;
     }
     case UWB_APP_CONFIG_PARAM_TYPE_SCHEDULED_MODE:
