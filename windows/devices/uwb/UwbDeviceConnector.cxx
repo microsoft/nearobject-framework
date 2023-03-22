@@ -578,12 +578,12 @@ bool
 Accessor(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks, std::function<std::function<void(ArgT)>(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>)> callbackAccessor, ArgT& arg)
 {
     if (not callbacks) {
-        PLOG_WARNING << "Ignoring" << ClassName(ArgT) << "event due to missing callback";
+        PLOG_WARNING << "Ignoring " << ClassName(ArgT) << " event due to missing callback";
         return false;
     }
     auto callback = callbackAccessor(callbacks);
     if (not callback) {
-        PLOG_WARNING << "Ignoring" << ClassName(ArgT) << "event due to missing callback";
+        PLOG_WARNING << "Ignoring " << ClassName(ArgT) << " event due to missing callback";
         return false;
     }
     callback(arg);

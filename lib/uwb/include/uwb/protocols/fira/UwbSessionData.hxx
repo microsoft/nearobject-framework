@@ -74,7 +74,6 @@ struct UwbSessionData
     UwbConfiguration uwbConfiguration{};
     std::optional<StaticRangingInfo> staticRangingInfo;
     std::optional<SecureRangingInfo> secureRangingInfo;
-    bool uwbConfigurationAvailable{ false };
 };
 
 } // namespace uwb::protocol::fira
@@ -94,8 +93,7 @@ struct hash<uwb::protocol::fira::UwbSessionData>
             uwbSessionData.subSessionId,
             uwbSessionData.uwbConfiguration,
             uwbSessionData.staticRangingInfo,
-            uwbSessionData.secureRangingInfo,
-            uwbSessionData.uwbConfigurationAvailable);
+            uwbSessionData.secureRangingInfo);
         return value;
     }
 };
