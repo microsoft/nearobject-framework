@@ -3,7 +3,7 @@
 
 using namespace uwb::protocol::fira;
 /**
- * @brief map of uci tag to a function of how to generate that uci tag given UwbConfiguration
+ * @brief map of uci parameter type to a function of how to generate that uci parameter value given UwbConfiguration
  *
  */
 const std::unordered_map<UwbApplicationConfigurationParameterType, std::function<std::optional<UwbApplicationConfigurationParameterValue>(const UwbConfiguration&, DeviceType)>> uciGenerators{
@@ -113,13 +113,13 @@ std::vector<UwbApplicationConfigurationParameter>
 uwb::protocol::fira::GetUciConfigParams(const UwbConfiguration& uwbConfiguration, DeviceType deviceType)
 {
     std::vector<UwbApplicationConfigurationParameter> result;
-    for (const auto& [uciTag, generator] : uciGenerators) {
+    for (const auto& [uciParameterType, generator] : uciGenerators) {
         const auto uciValue = generator(uwbConfiguration, deviceType);
         if (not uciValue) {
             continue;
         }
         result.push_back(UwbApplicationConfigurationParameter{
-            .Type = uciTag,
+            .Type = uciParameterType,
             .Value = uciValue.value() });
     }
     return result;

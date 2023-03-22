@@ -40,7 +40,7 @@ public:
      * @return uwb::protocol::fira::DeviceType 
      */
     uwb::protocol::fira::DeviceType
-    GetDeviceType();
+    GetDeviceType() const noexcept;
 
     /**
      * @brief Get the unique session id.
