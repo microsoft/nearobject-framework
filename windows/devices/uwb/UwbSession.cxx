@@ -15,8 +15,8 @@
 using namespace windows::devices::uwb;
 using namespace ::uwb::protocol::fira;
 
-UwbSession::UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, std::shared_ptr<UwbDeviceConnector> uwbDeviceConnector) :
-    ::uwb::UwbSession(std::move(callbacks)),
+UwbSession::UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, std::shared_ptr<UwbDeviceConnector> uwbDeviceConnector, ::uwb::protocol::fira::DeviceType deviceType) :
+    ::uwb::UwbSession(std::move(callbacks), deviceType),
     m_uwbDeviceConnector(std::move(uwbDeviceConnector))
 {
     m_registeredCallbacks = std::make_shared<::uwb::UwbRegisteredSessionEventCallbacks>(
@@ -55,10 +55,10 @@ UwbSession::UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks,
         [this](const std::vector<::uwb::UwbPeer> peersAdded, const std::vector<::uwb::UwbPeer> peersRemoved) {
             auto callbacks = m_callbacks.lock();
             if (not callbacks) {
-                PLOG_WARNING << "missing session event callback for ranging data, skipping";
+                PLOG_WARNING << "missing session event callback for peer list changes, skipping";
                 // TODO deregister
             }
-            return callbacks->OnPeerPropertiesChanged(this, peersAdded);
+            return callbacks->OnSessionMembershipChanged(this, peersAdded, peersRemoved);
         });
     m_registeredCallbacksToken = m_uwbDeviceConnector->RegisterSessionEventCallbacks(m_sessionId, m_registeredCallbacks);
 }
@@ -70,11 +70,10 @@ UwbSession::GetUwbDeviceConnector() noexcept
 }
 
 void
-UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData& uwbSessionData)
+UwbSession::ConfigureImpl(const uint32_t sessionId, const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> configParams)
 {
     PLOG_VERBOSE << "ConfigureImpl";
 
-    uint32_t sessionId = uwbSessionData.sessionId;
     UwbSessionType sessionType = UwbSessionType::RangingSession;
 
     // Request a new session from the driver.
@@ -93,8 +92,7 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData& uwbSessio
     m_sessionId = sessionId;
 
     // Set the application configuration parameters for the session.
-    std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters{};
-    auto setAppConfigParamsFuture = m_uwbDeviceConnector->SetApplicationConfigurationParameters(sessionId, applicationConfigurationParameters);
+    auto setAppConfigParamsFuture = m_uwbDeviceConnector->SetApplicationConfigurationParameters(sessionId, configParams);
     if (!setAppConfigParamsFuture.valid()) {
         PLOG_ERROR << "failed to set the application configuration parameters";
         throw UwbException(UwbStatusGeneric::Rejected);
@@ -132,7 +130,7 @@ UwbSession::StartRangingImpl()
 
     try {
         status = resultFuture.get();
-    } catch (std::exception& e) {
+    } catch (std::exception &e) {
         PLOG_ERROR << "caught exception attempting to start ranging for session id " << sessionId << "(" << e.what() << ")";
         status = UwbStatusGeneric::Failed;
     }
@@ -155,7 +153,7 @@ UwbSession::StopRangingImpl()
 
     try {
         status = resultFuture.get();
-    } catch (std::exception& e) {
+    } catch (std::exception &e) {
         PLOG_ERROR << "caught exception attempting to stop ranging for session id " << sessionId << "(" << e.what() << ")";
         status = UwbStatusGeneric::Failed;
     }
@@ -170,14 +168,15 @@ UwbSession::AddPeerImpl([[maybe_unused]] ::uwb::UwbMacAddress peerMacAddress)
 
     // TODO: convert code below to invoke IOCTL_UWB_SET_APP_CONFIG_PARAMS to use connector
 
-    // // TODO: two main options for updating the UWB-CLX peer list:
-    // //  1) Every time a peer is added (on-demand)
-    // //  2) Only when StartRanging() is called.
-    // // Below sample code exemplifies 1) for simplicity but this is not necessarily the way to go.
-    // //
-    // // TODO: request UWB-CLX to update controlee list per below pseudo-code,
-    // // which is *very* rough and some parts probably plain wrong:
-    // //
+    // TODO: two main options for updating the UWB-CLX peer list:
+    //  1) Every time a peer is added (on-demand)
+    //  2) Only when StartRanging() is called.
+    // Below sample code exemplifies 1) for simplicity but this is not necessarily the way to go.
+    //
+    // TODO: request UWB-CLX to update controlee list per below pseudo-code,
+    // which is *very* rough and some parts probably plain wrong:
+    //
+
     // const auto macAddressLength = m_uwbMacAddressSelf.GetLength();
     // const auto macAddressessLength = macAddressLength * m_peers.size();
 

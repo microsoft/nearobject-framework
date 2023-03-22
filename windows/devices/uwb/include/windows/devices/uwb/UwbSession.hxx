@@ -28,16 +28,17 @@ public:
      * @param callbacks The event callback instance.
      * @param uwbDeviceConnector The connector to the UWB-CX driver instance.
      */
-    UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, std::shared_ptr<UwbDeviceConnector> uwbDeviceConnector);
+    UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, std::shared_ptr<UwbDeviceConnector> uwbDeviceConnector, ::uwb::protocol::fira::DeviceType deviceType = ::uwb::protocol::fira::DeviceType::Controller);
 
 private:
     /**
      * @brief Configure the session for use.
      *
+     * @param sessionId
      * @param uwbSessionData The session data to configure the session with.
      */
     virtual void
-    ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData& uwbSessionData) override;
+    ConfigureImpl(const uint32_t sessionId, const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> configParams) override;
 
     /**
      * @brief Start ranging.

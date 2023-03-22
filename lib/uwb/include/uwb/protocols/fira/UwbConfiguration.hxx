@@ -20,7 +20,7 @@
 namespace uwb::protocol::fira
 {
 /**
- * @brief Describes UWB configuration parameters for a session.
+ * @brief Describes UWB configuration parameters for a session, as given by OOB.
  *
  * See FiRa Consortium Common Service Management Layer Technical Specification
  * v1.0.0, Section 6.4.3, 'UWB_CONFIGURATION', pages 50-54.

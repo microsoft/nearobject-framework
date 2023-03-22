@@ -24,15 +24,23 @@ class UwbSession
 public:
     /**
      * @brief Construct a new UwbSession object.
-     * 
+     *
      * @param callbacks The callbacks to invoke for session events.
      */
-    UwbSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks);
+    UwbSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks, uwb::protocol::fira::DeviceType deviceType = uwb::protocol::fira::DeviceType::Controller);
 
     /**
      * @brief Destroy the UwbSession object.
      */
     virtual ~UwbSession() = default;
+
+    /**
+     * @brief Get the Device Type associated with the host of this UwbSession
+     * 
+     * @return uwb::protocol::fira::DeviceType 
+     */
+    uwb::protocol::fira::DeviceType
+    GetDeviceType() const noexcept;
 
     /**
      * @brief Get the unique session id.
@@ -44,15 +52,14 @@ public:
 
     /**
      * @brief Configure the session for use.
+     * This function tells the UWBS to initialize the session for ranging with the particular sessionId and then
+     * configures it with configParams
      *
-     * TODO: This probably needs to return something to indicate whether it was
-     * successful or not.
-     *
-     * @param uwbSessionData The session configuration to use. This should have
-     * been obtained as a result of out-of-band negotiation.
+     * @param sessionId
+     * @param configParams
      */
     void
-    Configure(const protocol::fira::UwbSessionData& uwbSessionData);
+    Configure(const uint32_t sessionId, const std::vector<protocol::fira::UwbApplicationConfigurationParameter> configParams);
 
     /**
      * @brief Set the type of mac address to be used for session participants.
@@ -103,10 +110,11 @@ private:
     /**
      * @brief Configures the session for use.
      *
+     * @param sessionId
      * @param uwbSessionData The session data to configure the session with.
      */
     virtual void
-    ConfigureImpl(const protocol::fira::UwbSessionData& uwbSessionData) = 0;
+    ConfigureImpl(const uint32_t sessionId, const std::vector<protocol::fira::UwbApplicationConfigurationParameter> configParams) = 0;
 
     /**
      * @brief Start ranging.
@@ -129,6 +137,7 @@ private:
     AddPeerImpl(UwbMacAddress peerMacAddress) = 0;
 
 protected:
+    uwb::protocol::fira::DeviceType m_deviceType{ uwb::protocol::fira::DeviceType::Controller };
     uint32_t m_sessionId{ 0 };
     uwb::protocol::fira::UwbSessionStatus m_sessionStatus{};
     UwbMacAddressType m_uwbMacAddressType{ UwbMacAddressType::Extended };

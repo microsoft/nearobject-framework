@@ -5,6 +5,9 @@
 #include <nearobject/cli/NearObjectCliUwbSessionEventCallbacks.hxx>
 #include <uwb/UwbDevice.hxx>
 #include <uwb/UwbSession.hxx>
+#include <uwb/protocols/fira/UwbOobConversions.hxx>
+
+#include <plog/Log.h>
 #include <uwb/protocols/fira/UwbException.hxx>
 
 using namespace nearobject::cli;
@@ -23,7 +26,7 @@ NearObjectCliHandler::HandleStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevi
 try {
     auto callbacks = std::make_shared<nearobject::cli::NearObjectCliUwbSessionEventCallbacks>();
     auto session = uwbDevice->CreateSession(callbacks);
-    session->Configure(sessionData);
+    session->Configure(sessionData.sessionId, uwb::protocol::fira::GetUciConfigParams(sessionData.uwbConfiguration, session->GetDeviceType()));
     session->StartRanging();
 } catch (...) {
     PLOG_ERROR << "failed to start ranging";
