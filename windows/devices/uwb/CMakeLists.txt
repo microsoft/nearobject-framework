@@ -67,6 +67,7 @@ target_include_directories(windev-uwb
 
 target_link_libraries(windev-uwb
     PRIVATE
+        magic_enum::magic_enum
         windev-util
         windev-uwb-cx-adapter
     PUBLIC

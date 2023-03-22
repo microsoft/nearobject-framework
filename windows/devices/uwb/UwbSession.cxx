@@ -4,9 +4,11 @@
 #include <memory>
 #include <numeric>
 
+#include <magic_enum.hpp>
 #include <plog/Log.h>
 #include <wil/result.h>
 
+#include <uwb/protocols/fira/UwbException.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 #include <windows/devices/uwb/UwbSession.hxx>
 
@@ -78,9 +80,14 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData& uwbSessio
     // Request a new session from the driver.
     auto sessionInitResultFuture = m_uwbDeviceConnector->SessionInitialize(sessionId, sessionType);
     if (!sessionInitResultFuture.valid()) {
-        // TODO: need to signal to upper layer that this failed instead of just returning
         PLOG_ERROR << "failed to initialize session";
-        return;
+        throw UwbException(UwbStatusGeneric::Rejected);
+    }
+
+    UwbStatus statusSessionInit = sessionInitResultFuture.get();
+    if (!IsUwbStatusOk(statusSessionInit)) {
+        LOG_ERROR << "failed to initialize session, " << ToString(statusSessionInit);
+        throw UwbException(statusSessionInit);
     }
 
     m_sessionId = sessionId;
@@ -89,9 +96,24 @@ UwbSession::ConfigureImpl(const ::uwb::protocol::fira::UwbSessionData& uwbSessio
     std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters{};
     auto setAppConfigParamsFuture = m_uwbDeviceConnector->SetApplicationConfigurationParameters(sessionId, applicationConfigurationParameters);
     if (!setAppConfigParamsFuture.valid()) {
-        // TODO: need to signal to upper layer that this failed instead of just returning
         PLOG_ERROR << "failed to set the application configuration parameters";
-        return;
+        throw UwbException(UwbStatusGeneric::Rejected);
+    }
+
+    auto [statusSetParameters, resultSetParameters] = setAppConfigParamsFuture.get();
+    if (!IsUwbStatusOk(statusSetParameters)) {
+        LOG_ERROR << "failed to set application configuration parameters, " << ToString(statusSetParameters);
+        throw UwbException(statusSetParameters);
+    }
+
+    // Log an error for each of the parameters that were not successfuly set.
+    // TODO: the caller probably wants to know about this, figure out the best way to signal the error.
+    //       One option is to define a UwbSetApplicationConfigurationParameterException which has an
+    //       accessor that just returns the vector entries with statusSetParameter != Ok
+    for (const auto &[applicationConfigurationParameterType, statusSetParameter] : resultSetParameters) {
+        if (!IsUwbStatusOk(statusSetParameter)) {
+            LOG_ERROR << "failed to set application configuration parameter " << magic_enum::enum_name(applicationConfigurationParameterType) << ", status=" << ToString(statusSetParameter);
+        }
     }
 }
 
