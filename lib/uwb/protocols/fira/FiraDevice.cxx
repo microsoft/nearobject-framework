@@ -3,6 +3,7 @@
 
 #include <numeric>
 #include <sstream>
+#include <stdexcept>
 #include <string_view>
 #include <typeindex>
 #include <typeinfo>
@@ -13,6 +14,22 @@
 
 using namespace uwb::protocol::fira;
 using namespace strings::ostream_operators;
+
+uint8_t
+uwb::protocol::fira::RangingMethod::ToByte() const
+{
+    if (Method == RangingDirection::SingleSidedTwoWay and ReportMode == MeasurementReportMode::Deferred) {
+        return 1;
+    } else if (Method == RangingDirection::DoubleSidedTwoWay and ReportMode == MeasurementReportMode::Deferred) {
+        return 2;
+    } else if (Method == RangingDirection::SingleSidedTwoWay and ReportMode == MeasurementReportMode::NonDeferred) {
+        return 3;
+    } else if (Method == RangingDirection::DoubleSidedTwoWay and ReportMode == MeasurementReportMode::NonDeferred) {
+        return 4;
+    } else {
+        throw std::runtime_error("invalid ranging method");
+    }
+}
 
 std::string
 uwb::protocol::fira::VersionToString(uint32_t input) noexcept

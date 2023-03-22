@@ -1,10 +1,10 @@
 
 #include <initializer_list>
-#include <unordered_set>
+#include <unordered_map>
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <uwb/protocols/fira/RangingMethod.hxx>
+#include <uwb/protocols/fira/FiraDevice.hxx>
 
 using namespace uwb::protocol::fira;
 
