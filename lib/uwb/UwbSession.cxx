@@ -40,7 +40,7 @@ UwbSession::AddPeer(UwbMacAddress peerMacAddress)
 void
 UwbSession::Configure(const uwb::protocol::fira::UwbSessionData& uwbSessionData)
 {
-    PLOG_VERBOSE << "configure with with id " << m_sessionId;
+    PLOG_VERBOSE << "configure session with id " << m_sessionId;
     try {
         ConfigureImpl(uwbSessionData);
     } catch (UwbException &uwbException) {
