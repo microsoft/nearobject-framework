@@ -13,14 +13,16 @@
 using namespace nearobject::cli;
 using namespace uwb::protocol::fira;
 
-NearObjectCliHandler::NearObjectCliHandler(std::shared_ptr<NearObjectCliControlFlowContext> controlFlowContext) :
-    m_controlFlowContext(std::move(controlFlowContext))
-{}
-
-NearObjectCliControlFlowContext&
-NearObjectCliHandler::GetControlFlowContext()
+std::shared_ptr<NearObjectCliControlFlowContext>
+NearObjectCliHandler::GetControlFlowContext() const noexcept
 {
-    return *(m_controlFlowContext.get());
+    return m_controlFlowContext;
+}
+
+void
+NearObjectCliHandler::SetControlFlowContext(std::shared_ptr<NearObjectCliControlFlowContext> controlFlowContext)
+{
+    m_controlFlowContext = std::move(controlFlowContext);
 }
 
 std::shared_ptr<uwb::UwbDevice>
@@ -34,8 +36,11 @@ NearObjectCliHandler::ResolveUwbDevice(const nearobject::cli::NearObjectCliData&
 void
 NearObjectCliHandler::HandleStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevice, uwb::protocol::fira::UwbSessionData& sessionData) noexcept
 {
-    auto callbacks = std::make_shared<nearobject::cli::NearObjectCliUwbSessionEventCallbacks>([this]() {
-        GetControlFlowContext().SignalOperationComplete();
+    auto controlFlowContext = GetControlFlowContext();
+    auto callbacks = std::make_shared<nearobject::cli::NearObjectCliUwbSessionEventCallbacks>([controlFlowContext = std::move(controlFlowContext)]() {
+        if (controlFlowContext != nullptr) {
+            controlFlowContext->SignalOperationComplete();
+        }
     });
     auto session = uwbDevice->CreateSession(callbacks);
     session->Configure(sessionData.sessionId, uwb::protocol::fira::GetUciConfigParams(sessionData.uwbConfiguration, session->GetDeviceType()));

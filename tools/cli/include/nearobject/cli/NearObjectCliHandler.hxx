@@ -6,8 +6,8 @@
 
 #include <nearobject/cli/NearObjectCliControlFlowContext.hxx>
 #include <nearobject/cli/NearObjectCliData.hxx>
-#include <uwb/protocols/fira/UwbSessionData.hxx>
 #include <uwb/UwbDevice.hxx>
+#include <uwb/protocols/fira/UwbSessionData.hxx>
 
 namespace nearobject::cli
 {
@@ -20,22 +20,23 @@ struct NearObjectCliHandler
 {
     NearObjectCliHandler() = default;
 
-    /**
-     * @brief Construct a new NearObjectCliHandler object
-     * 
-     * @param controlFlowContext 
-     */
-    NearObjectCliHandler(std::shared_ptr<NearObjectCliControlFlowContext> controlFlowContext);
-
     virtual ~NearObjectCliHandler() = default;
+
+    /**
+     * @brief Assign the control flow context for this handler.
+     *
+     * @param controlFlowContext The control flow context to assign.
+     */
+    void
+    SetControlFlowContext(std::shared_ptr<NearObjectCliControlFlowContext> controlFlowContext);
 
     /**
      * @brief Invoked by the command line driver when a UWB device is required
      * for the selected nocli operation. This function must resolve and return
      * an instance of the appropriate UWB device to use for the operation.
-     * 
+     *
      * @param cliData The parsed command-line arguments.
-     * @return std::shared_ptr<uwb::UwbDevice> 
+     * @return std::shared_ptr<uwb::UwbDevice>
      */
     virtual std::shared_ptr<uwb::UwbDevice>
     ResolveUwbDevice(const nearobject::cli::NearObjectCliData& cliData) noexcept;
@@ -43,7 +44,7 @@ struct NearObjectCliHandler
     /**
      * @brief Invoked by command-line driver when the request is to start a
      * ranging session.
-     * 
+     *
      * @param uwbDevice The resolved uwb device to start the ranging session on.
      * @param sessionData The data to configure the ranging session.
      */
@@ -51,8 +52,8 @@ struct NearObjectCliHandler
     HandleStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevice, uwb::protocol::fira::UwbSessionData& sessionData) noexcept;
 
     /**
-     * @brief Invoked by the command-line driver when the request is to stop an ongoing ranging session. 
-     * 
+     * @brief Invoked by the command-line driver when the request is to stop an ongoing ranging session.
+     *
      * TODO: this will need to change to accept a session id. Or, prior state
      * saved may allow this to remain argumentless.
      */
@@ -74,21 +75,21 @@ struct NearObjectCliHandler
     HandleDeviceReset(std::shared_ptr<uwb::UwbDevice> uwbDevice) noexcept;
 
     /**
-    * @brief Invoked by the command-line driver when the request is to get device info.
-    * 
-    * @param uwbDevice The resolved uwb device to get device info from.
-    */
+     * @brief Invoked by the command-line driver when the request is to get device info.
+     *
+     * @param uwbDevice The resolved uwb device to get device info from.
+     */
     virtual void
     HandleGetDeviceInfo(std::shared_ptr<uwb::UwbDevice> uwbDevice) noexcept;
 
 protected:
     /**
-     * @brief Get a reference to the base class owned control flow context object.
-     * 
-     * @return NearObjectCliControlFlowContext& 
+     * @brief Get a shared reference to the control flow context object.
+     *
+     * @return std::shared_ptr<NearObjectCliControlFlowContext>
      */
-    NearObjectCliControlFlowContext&
-    GetControlFlowContext();
+    std::shared_ptr<NearObjectCliControlFlowContext>
+    GetControlFlowContext() const noexcept;
 
 private:
     std::shared_ptr<NearObjectCliControlFlowContext> m_controlFlowContext;
