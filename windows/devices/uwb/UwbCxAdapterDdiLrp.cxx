@@ -1390,7 +1390,7 @@ windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM &applicationConfi
         uint8_t value = applicationConfigurationParameter.paramValue[0];
         for (const auto bitmap : magic_enum::enum_values<ResultReportConfiguration>()) {
             auto underlyingMap = notstd::to_underlying(bitmap);
-            if (value | underlyingMap) {
+            if (value & underlyingMap) {
                 configs.insert(bitmap);
             }
         }
