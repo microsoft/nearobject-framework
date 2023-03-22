@@ -383,7 +383,6 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
         }
 
         m_cliHandler->HandleStartRanging(uwbDevice, m_cliData->SessionData);
-        m_cliControlFlowContext->SignalOperationComplete();
     });
 
     return rangeStartApp;
