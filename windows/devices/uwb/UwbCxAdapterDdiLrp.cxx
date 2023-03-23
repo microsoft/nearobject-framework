@@ -1398,10 +1398,10 @@ windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM &applicationConfi
         break;
     case UWB_APP_CONFIG_PARAM_TYPE_RESULT_REPORT_CONFIG: {
         std::unordered_set<ResultReportConfiguration> configs;
-        uint8_t value = applicationConfigurationParameter.paramValue[0];
+        const uint8_t value = applicationConfigurationParameter.paramValue[0];
         for (const auto bitmap : magic_enum::enum_values<ResultReportConfiguration>()) {
-            auto underlyingMap = notstd::to_underlying(bitmap);
-            if (value & underlyingMap) {
+            auto underlyingMap = std::bitset<sizeof value>(notstd::to_underlying(bitmap));
+            if (underlyingMap.test(value)) {
                 configs.insert(bitmap);
             }
         }
