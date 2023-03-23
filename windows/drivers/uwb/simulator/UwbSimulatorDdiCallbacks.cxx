@@ -195,8 +195,13 @@ UwbSimulatorDdiCallbacks::GetApplicationConfigurationParameters(uint32_t session
     }
 
     const auto &[_, session] = *sessionIt;
-    applicationConfigurationParameters = session.ApplicationConfigurationParameters;
-    // TODO: filter above with applicationConfigurationParameterTypes
+
+    std::ranges::copy_if(session.ApplicationConfigurationParameters, std::back_inserter(applicationConfigurationParameters), [&](const auto &entry) {
+        return std::ranges::any_of(applicationConfigurationParameterTypes, [&](const auto &type) {
+            return (entry.Type == type);
+        });
+    });
+
     return UwbStatusOk;
 }
 
