@@ -287,7 +287,7 @@ UwbDeviceConnector::SessionRangingStart(uint32_t sessionId)
 {
     std::promise<UwbStatus> resultPromise;
     auto resultFuture = resultPromise.get_future();
-    
+
     wil::shared_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
@@ -326,7 +326,7 @@ UwbDeviceConnector::SessionRangingStop(uint32_t sessionId)
 {
     std::promise<UwbStatus> resultPromise;
     auto resultFuture = resultPromise.get_future();
-    
+
     wil::shared_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
@@ -407,9 +407,7 @@ UwbDeviceConnector::GetApplicationConfigurationParameters(uint32_t sessionId, st
     for (const auto i : std::ranges::iota_view{ 1, 2 }) {
         getAppConfigParamsResultBuffer.resize(bytesRequired);
         PLOG_DEBUG << "IOCTL_UWB_GET_APP_CONFIG_PARAMS attempt #" << i << " with " << std::size(getAppConfigParamsResultBuffer) << "-byte buffer";
-        BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_APP_CONFIG_PARAMS, 
-            std::data(getAppConfigParamsBuffer), std::size(getAppConfigParamsBuffer), 
-            std::data(getAppConfigParamsResultBuffer), std::size(getAppConfigParamsResultBuffer), &bytesRequired, nullptr);
+        BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_APP_CONFIG_PARAMS, std::data(getAppConfigParamsBuffer), std::size(getAppConfigParamsBuffer), std::data(getAppConfigParamsResultBuffer), std::size(getAppConfigParamsResultBuffer), &bytesRequired, nullptr);
         if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
             DWORD lastError = GetLastError();
             // Treat all errors other than insufficient buffer size as fatal.
@@ -421,7 +419,7 @@ UwbDeviceConnector::GetApplicationConfigurationParameters(uint32_t sessionId, st
             }
             // Attempt to retry the ioctl with the appropriate buffer size, which is now held in bytesRequired.
             continue;
-        } 
+        }
 
         PLOG_DEBUG << "IOCTL_UWB_GET_APP_CONFIG_PARAMS succeeded";
         auto& appConfigParamsResult = *reinterpret_cast<UWB_APP_CONFIG_PARAMS*>(std::data(getAppConfigParamsResultBuffer));
