@@ -57,8 +57,13 @@ try {
             controlFlowContext->OperationSignalComplete();
         }
     });
-    auto session = uwbDevice->CreateSession(sessionData.sessionId, callbacks);
-    session->Configure(uwb::protocol::fira::GetUciConfigParams(sessionData.uwbConfiguration, session->GetDeviceType()));
+    auto session = uwbDevice->CreateSession(callbacks);
+    session->Configure(sessionData.sessionId, uwb::protocol::fira::GetUciConfigParams(sessionData.uwbConfiguration, session->GetDeviceType()));
+    auto applicationConfigurationParameters = session->GetApplicationConfigurationParameters();
+    PLOG_DEBUG << "Session Application Configuration Parameters: ";
+    for (const auto &applicationConfigurationParameter : applicationConfigurationParameters) {
+        PLOG_DEBUG << " > " << applicationConfigurationParameter.ToString();
+    }
     session->StartRanging();
 } catch (...) {
     PLOG_ERROR << "failed to start ranging";
