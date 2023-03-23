@@ -553,17 +553,17 @@ windows::devices::uwb::ddi::lrp::From(const UwbNotificationData &uwbNotification
 }
 
 UwbGetApplicationConfigurationParametersWrapper
-windows::devices::uwb::ddi::lrp::From(const std::vector<UwbApplicationConfigurationParameterType> &uwbApplicationConfigurationParameterTypes)
+windows::devices::uwb::ddi::lrp::From(const UwbGetApplicationConfigurationParameters &uwbGetApplicationConfigurationParameters)
 {
-    const std::size_t totalSize = offsetof(UWB_GET_APP_CONFIG_PARAMS, appConfigParams[std::size(uwbApplicationConfigurationParameterTypes)]);
+    const std::size_t totalSize = offsetof(UWB_GET_APP_CONFIG_PARAMS, appConfigParams[std::size(uwbGetApplicationConfigurationParameters.ParameterTypes)]);
     UwbGetApplicationConfigurationParametersWrapper getApplicationConfigurationParameterTypesWrapper(totalSize);
     auto &getApplicationConfigurationParameterTypes = getApplicationConfigurationParameterTypesWrapper.value();
     getApplicationConfigurationParameterTypes.size = totalSize;
-    getApplicationConfigurationParameterTypes.sessionId = 0; // TODO, need a wrapper struct to contain this
-    getApplicationConfigurationParameterTypes.appConfigParamsCount = std::size(uwbApplicationConfigurationParameterTypes);
+    getApplicationConfigurationParameterTypes.sessionId = uwbGetApplicationConfigurationParameters.SessionId;
+    getApplicationConfigurationParameterTypes.appConfigParamsCount = std::size(uwbGetApplicationConfigurationParameters.ParameterTypes);
 
     for (auto i = 0; i < getApplicationConfigurationParameterTypes.appConfigParamsCount; i++) {
-        getApplicationConfigurationParameterTypes.appConfigParams[i] = From(uwbApplicationConfigurationParameterTypes[i]);
+        getApplicationConfigurationParameterTypes.appConfigParams[i] = From(uwbGetApplicationConfigurationParameters.ParameterTypes[i]);
     }
 
     return std::move(getApplicationConfigurationParameterTypesWrapper);
@@ -1299,18 +1299,20 @@ windows::devices::uwb::ddi::lrp::To(const UWB_NOTIFICATION_DATA &notificationDat
     return UwbNotificationData{};
 }
 
-std::vector<UwbApplicationConfigurationParameterType>
+UwbGetApplicationConfigurationParameters
 windows::devices::uwb::ddi::lrp::To(const UWB_GET_APP_CONFIG_PARAMS &getApplicationConfigurationParameters)
 {
-    std::vector<UwbApplicationConfigurationParameterType> uwbApplicationConfigurationParameterTypes{};
-    uwbApplicationConfigurationParameterTypes.reserve(getApplicationConfigurationParameters.appConfigParamsCount);
+    UwbGetApplicationConfigurationParameters uwbGetApplicationConfigurationParameters{
+        .SessionId = getApplicationConfigurationParameters.sessionId
+    };
+    uwbGetApplicationConfigurationParameters.ParameterTypes.reserve(getApplicationConfigurationParameters.appConfigParamsCount);
 
     std::span applicationConfigurationParameterTypes(getApplicationConfigurationParameters.appConfigParams, getApplicationConfigurationParameters.appConfigParamsCount);
-    std::ranges::transform(applicationConfigurationParameterTypes, std::back_inserter(uwbApplicationConfigurationParameterTypes), [](const auto &applicationConfigurationParameterType) {
+    std::ranges::transform(applicationConfigurationParameterTypes, std::back_inserter(uwbGetApplicationConfigurationParameters.ParameterTypes), [](const auto &applicationConfigurationParameterType) {
         return To(applicationConfigurationParameterType);
     });
 
-    return uwbApplicationConfigurationParameterTypes;
+    return std::move(uwbGetApplicationConfigurationParameters);
 }
 
 namespace detail
