@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="UwbSimulatorDdiHandlerLrp.cxx" />
+    <ClCompile Include="UwbSimulatorDdiHandler.cxx" />
     <ClCompile Include="UwbSimulatorDriver.cxx" />
     <ClCompile Include="UwbSimulatorDdiCallbacks.cxx" />
     <ClCompile Include="UwbSimulatorIoEventQueue.cxx" />
