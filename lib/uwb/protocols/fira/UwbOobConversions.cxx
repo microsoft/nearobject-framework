@@ -65,14 +65,28 @@ const std::unordered_map<UwbApplicationConfigurationParameterType, std::function
     { UwbApplicationConfigurationParameterType::HoppingMode, [](const UwbConfiguration& config, DeviceType deviceType) -> std::optional<UwbApplicationConfigurationParameterValue> {
          return config.GetHoppingMode();
      } },
-    // {  UwbApplicationConfigurationParameterType::ResultReportConfig, []( const UwbConfiguration & config) -> std::optional< UwbApplicationConfigurationParameterValue> {
-    //      return config.GetResultReportConfigurations();
-    //  } },
+    { UwbApplicationConfigurationParameterType::ResultReportConfig, [](const UwbConfiguration& config, DeviceType deviceType) -> std::optional<UwbApplicationConfigurationParameterValue> {
+         return config.GetResultReportConfigurations();
+     } },
 
     // params with different names
-    // {  UwbApplicationConfigurationParameterType::RangingRoundUsage, []( const UwbConfiguration & config) -> std::optional< UwbApplicationConfigurationParameterValue> {
-    //      return config.GetRangingMethod();
-    //  } },
+    { UwbApplicationConfigurationParameterType::RangingRoundUsage, [](const UwbConfiguration& config, DeviceType deviceType) -> std::optional<UwbApplicationConfigurationParameterValue> {
+         auto rangingMethod = config.GetRangingMethod();
+         if (not rangingMethod) {
+             return std::nullopt;
+         }
+         if (rangingMethod->Method == RangingDirection::SingleSidedTwoWay and rangingMethod->ReportMode == MeasurementReportMode::Deferred) {
+             return RangingRoundUsage::SingleSidedTwoWayRangingWithDeferredMode;
+         } else if (rangingMethod->Method == RangingDirection::DoubleSidedTwoWay and rangingMethod->ReportMode == MeasurementReportMode::Deferred) {
+             return RangingRoundUsage::DoubleSidedTwoWayRangingWithDeferredMode;
+         } else if (rangingMethod->Method == RangingDirection::SingleSidedTwoWay and rangingMethod->ReportMode == MeasurementReportMode::NonDeferred) {
+             return RangingRoundUsage::SingleSidedTwoWayRangingNonDeferredMode;
+         } else if (rangingMethod->Method == RangingDirection::DoubleSidedTwoWay and rangingMethod->ReportMode == MeasurementReportMode::NonDeferred) {
+             return RangingRoundUsage::DoubleSidedTwoWayRangingNonDeferredMode;
+         } else {
+             return std::nullopt;
+         }
+     } },
     { UwbApplicationConfigurationParameterType::DeviceMacAddress, [](const UwbConfiguration& config, DeviceType deviceType) -> std::optional<UwbApplicationConfigurationParameterValue> {
          auto mode = config.GetMacAddressMode();
          if (not mode) {

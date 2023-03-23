@@ -21,6 +21,7 @@ target_include_directories(windev-uwb-cx-adapter
 target_link_libraries(windev-uwb-cx-adapter
     PRIVATE
         windev-util
+        magic_enum::magic_enum
     PUBLIC
         cfgmgr32.lib
         plog::plog

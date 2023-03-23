@@ -20,6 +20,8 @@
 #include <uwb/protocols/fira/UwbCapability.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 
+#include <magic_enum.hpp>
+
 using namespace ::uwb::protocol::fira;
 using namespace windows::devices::uwb::ddi::lrp;
 
@@ -1383,9 +1385,18 @@ windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM &applicationConfi
     case UWB_APP_CONFIG_PARAM_TYPE_RANGING_ROUND_CONTROL:
         detail::ConvertUwbApplicationConfigurationParameter<RangingRoundControl>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
         break;
-    case UWB_APP_CONFIG_PARAM_TYPE_RESULT_REPORT_CONFIG:
-        detail::ConvertUwbApplicationConfigurationParameter<ResultReportConfiguration>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+    case UWB_APP_CONFIG_PARAM_TYPE_RESULT_REPORT_CONFIG: {
+        std::unordered_set<ResultReportConfiguration> configs;
+        uint8_t value = applicationConfigurationParameter.paramValue[0];
+        for (const auto bitmap : magic_enum::enum_values<ResultReportConfiguration>()) {
+            auto underlyingMap = notstd::to_underlying(bitmap);
+            if (value & underlyingMap) {
+                configs.insert(bitmap);
+            }
+        }
+        uwbApplicationConfigurationParameter.Value = std::move(configs);
         break;
+    }
     case UWB_APP_CONFIG_PARAM_TYPE_SCHEDULED_MODE:
         detail::ConvertUwbApplicationConfigurationParameter<SchedulingMode>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
         break;
