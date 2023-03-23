@@ -31,7 +31,12 @@ NearObjectCliHandler::ResolveUwbDevice(const nearobject::cli::NearObjectCliData&
 void
 NearObjectCliHandler::HandleDriverStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevice, const UwbRangingParameters& rangingParameters) noexcept
 try {
-    auto callbacks = std::make_shared<nearobject::cli::NearObjectCliUwbSessionEventCallbacks>();
+    auto controlFlowContext = (m_parent != nullptr) ? m_parent->GetControlFlowContext() : nullptr;
+    auto callbacks = std::make_shared<nearobject::cli::NearObjectCliUwbSessionEventCallbacks>([controlFlowContext = std::move(controlFlowContext)]() {
+        if (controlFlowContext != nullptr) {
+            controlFlowContext->OperationSignalComplete();
+        }
+    });
     auto session = uwbDevice->CreateSession(callbacks);
     session->Configure(rangingParameters.sessionId, rangingParameters.appConfigParams);
     session->StartRanging();
