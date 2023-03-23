@@ -555,7 +555,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbNotificationData &uwbNotification
 UwbApplicationConfigurationParameterWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbApplicationConfigurationParameter &uwbApplicationConfigurationParameter)
 {
-    std::size_t totalSize = sizeof(UWB_APP_CONFIG_PARAM);
+    std::size_t totalSize = offsetof(UWB_APP_CONFIG_PARAM, paramValue[0]);
     std::unique_ptr<UwbApplicationConfigurationParameterWrapper> applicationConfigurationParameterWrapper;
 
     std::visit([&](auto &&arg) {
@@ -563,14 +563,14 @@ windows::devices::uwb::ddi::lrp::From(const UwbApplicationConfigurationParameter
         if constexpr (std::is_enum_v<T>) {
             const auto uvalue = notstd::to_underlying(arg);
             constexpr auto argSize = sizeof(uvalue);
-            totalSize += argSize - 1;
+            totalSize += argSize;
             applicationConfigurationParameterWrapper = std::make_unique<UwbApplicationConfigurationParameterWrapper>(totalSize);
             UWB_APP_CONFIG_PARAM &applicationConfigurationParameter = applicationConfigurationParameterWrapper->value();
             applicationConfigurationParameter.paramLength = argSize;
             std::memcpy(&applicationConfigurationParameter.paramValue[0], &uvalue, sizeof uvalue);
         } else if constexpr (std::is_integral_v<T> || std::is_same_v<T, std::array<uint8_t, StaticStsInitializationVectorLength>>) {
             constexpr auto argSize = sizeof(T);
-            totalSize += argSize - 1;
+            totalSize += argSize;
             applicationConfigurationParameterWrapper = std::make_unique<UwbApplicationConfigurationParameterWrapper>(totalSize);
             UWB_APP_CONFIG_PARAM &applicationConfigurationParameter = applicationConfigurationParameterWrapper->value();
             applicationConfigurationParameter.paramLength = argSize;
@@ -578,7 +578,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbApplicationConfigurationParameter
         } else if constexpr (std::is_same_v<T, ::uwb::UwbMacAddress>) {
             const auto value = arg.GetValue();
             const auto argSize = std::size(value);
-            totalSize += argSize - 1;
+            totalSize += argSize;
             applicationConfigurationParameterWrapper = std::make_unique<UwbApplicationConfigurationParameterWrapper>(totalSize);
             UWB_APP_CONFIG_PARAM &applicationConfigurationParameter = applicationConfigurationParameterWrapper->value();
             applicationConfigurationParameter.paramLength = argSize;
