@@ -1,15 +1,13 @@
 
-#include <plog/Log.h>
-
 #include <nearobject/cli/NearObjectCli.hxx>
 #include <nearobject/cli/NearObjectCliHandler.hxx>
 #include <nearobject/cli/NearObjectCliUwbSessionEventCallbacks.hxx>
 #include <uwb/UwbDevice.hxx>
 #include <uwb/UwbSession.hxx>
+#include <uwb/protocols/fira/UwbException.hxx>
 #include <uwb/protocols/fira/UwbOobConversions.hxx>
 
 #include <plog/Log.h>
-#include <uwb/protocols/fira/UwbException.hxx>
 
 using namespace nearobject::cli;
 using namespace uwb::protocol::fira;
