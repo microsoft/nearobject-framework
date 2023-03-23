@@ -8,6 +8,7 @@
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
+#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 #include <windows/devices/uwb/UwbSession.hxx>
 
 #include <plog/Log.h>
@@ -46,7 +47,7 @@ UwbDevice::DeviceName() const noexcept
 std::shared_ptr<uwb::UwbSession>
 UwbDevice::CreateSessionImpl(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
 {
-    return std::make_shared<UwbSession>(std::move(callbacks), m_uwbDeviceConnector);
+    return std::make_shared<UwbSession>(std::move(callbacks), std::dynamic_pointer_cast<UwbDeviceConnector>(m_uwbDeviceConnector));
 }
 
 UwbCapability

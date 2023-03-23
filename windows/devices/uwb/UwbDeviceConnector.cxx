@@ -18,13 +18,13 @@ using namespace windows::devices;
 using namespace windows::devices::uwb;
 using namespace ::uwb::protocol::fira;
 
-namespace windows::devices::uwb
+namespace uwb
 {
 class RegisteredCallbackToken
 {
     uint32_t callbackId;
 };
-} // namespace windows::devices::uwb
+} // namespace uwb
 
 /**
  * @brief Namespace alias to reduce typing but preserve clarity regarding DDI
@@ -287,7 +287,7 @@ UwbDeviceConnector::SessionRangingStart(uint32_t sessionId)
 {
     std::promise<UwbStatus> resultPromise;
     auto resultFuture = resultPromise.get_future();
-    
+
     wil::shared_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
@@ -326,7 +326,7 @@ UwbDeviceConnector::SessionRangingStop(uint32_t sessionId)
 {
     std::promise<UwbStatus> resultPromise;
     auto resultFuture = resultPromise.get_future();
-    
+
     wil::shared_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
@@ -650,14 +650,14 @@ UwbDeviceConnector::NotificationListenerStop()
     m_notificationThread.request_stop();
 }
 
-RegisteredCallbackToken*
+::uwb::RegisteredCallbackToken*
 UwbDeviceConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks)
 {
     m_deviceEventCallbacks = callbacks;
     return nullptr;
 }
 
-RegisteredCallbackToken*
+::uwb::RegisteredCallbackToken*
 UwbDeviceConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks)
 {
     m_sessionEventCallbacks.insert_or_assign(sessionId, callbacks);
@@ -665,7 +665,7 @@ UwbDeviceConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_
 }
 
 void
-UwbDeviceConnector::DeregisterEventCallback(RegisteredCallbackToken* token)
+UwbDeviceConnector::DeregisterEventCallback(::uwb::RegisteredCallbackToken* token)
 {
     // TODO implement
 }

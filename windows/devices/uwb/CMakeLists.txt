@@ -9,6 +9,7 @@ target_sources(windev-uwb-cx-adapter
         ${CMAKE_CURRENT_LIST_DIR}/UwbDeviceConnector.cxx
     PUBLIC
         ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/IUwbDeviceDdi.hxx
+        ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/IUwbSessionDdi.hxx
         ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCxAdapterDdiLrp.hxx
         ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceConnector.hxx
 )
@@ -33,6 +34,7 @@ target_link_libraries(windev-uwb-cx-adapter
 
 list(APPEND UWBCXADAPTER_PUBLIC_HEADERS
     ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/IUwbDeviceDdi.hxx
+    ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/IUwbSessionDdi.hxx
     ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCxAdapterDdiLrp.hxx
     ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceConnector.hxx
 )
