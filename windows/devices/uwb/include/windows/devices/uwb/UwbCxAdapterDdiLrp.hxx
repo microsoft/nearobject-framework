@@ -258,6 +258,9 @@ struct UwbGetApplicationConfigurationParameters
 {
     uint32_t SessionId;
     std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> ParameterTypes;
+
+    auto
+    operator<=>(const UwbGetApplicationConfigurationParameters &) const noexcept = default;
 };
 
 using UwbGetApplicationConfigurationParametersWrapper = notstd::flextype_wrapper<UWB_GET_APP_CONFIG_PARAMS>;
