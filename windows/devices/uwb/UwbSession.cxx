@@ -77,6 +77,8 @@ UwbSession::ConfigureImpl(const uint32_t sessionId, const std::vector<::uwb::pro
     UwbSessionType sessionType = UwbSessionType::RangingSession;
 
     // Request a new session from the driver.
+    m_sessionId = sessionId;
+
     auto sessionInitResultFuture = m_uwbDeviceConnector->SessionInitialize(sessionId, sessionType);
     if (!sessionInitResultFuture.valid()) {
         PLOG_ERROR << "failed to initialize session";
@@ -88,8 +90,6 @@ UwbSession::ConfigureImpl(const uint32_t sessionId, const std::vector<::uwb::pro
         LOG_ERROR << "failed to initialize session, " << ToString(statusSessionInit);
         throw UwbException(statusSessionInit);
     }
-
-    m_sessionId = sessionId;
 
     // Set the application configuration parameters for the session.
     auto setAppConfigParamsFuture = m_uwbDeviceConnector->SetApplicationConfigurationParameters(sessionId, configParams);
