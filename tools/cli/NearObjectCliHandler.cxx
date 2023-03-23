@@ -7,6 +7,7 @@
 #include <uwb/protocols/fira/UwbException.hxx>
 #include <uwb/protocols/fira/UwbOobConversions.hxx>
 
+#include <magic_enum.hpp>
 #include <plog/Log.h>
 
 using namespace nearobject::cli;
@@ -37,6 +38,11 @@ try {
     });
     auto session = uwbDevice->CreateSession(rangingParameters.sessionId, callbacks);
     session->Configure(rangingParameters.appConfigParams);
+    auto applicationConfigurationParameters = session->GetApplicationConfigurationParameters();
+    PLOG_DEBUG << "Session Application Configuration Parameters: ";
+    for (const auto &applicationConfigurationParameter : applicationConfigurationParameters) {
+        PLOG_DEBUG << " > " << applicationConfigurationParameter.ToString();
+    }
     session->StartRanging();
 } catch (...) {
     PLOG_ERROR << "failed to start ranging";
