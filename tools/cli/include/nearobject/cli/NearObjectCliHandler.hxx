@@ -2,6 +2,7 @@
 #ifndef NEAR_OBJECT_CLI_HANDLER_HXX
 #define NEAR_OBJECT_CLI_HANDLER_HXX
 
+#include <cstdint>
 #include <memory>
 
 #include <nearobject/cli/NearObjectCliControlFlowContext.hxx>
@@ -12,6 +13,15 @@
 namespace nearobject::cli
 {
 class NearObjectCli;
+
+/**
+ * @brief Structure to hold parameters for a ranging session.
+ */
+struct UwbRangingParameters
+{
+    uint32_t sessionId;
+    std::vector<uwb::protocol::fira::UwbApplicationConfigurationParameter> appConfigParams;
+};
 
 /**
  * @brief Class which handles and executes resolved command-line requests. The
@@ -47,6 +57,17 @@ struct NearObjectCliHandler
      * @brief Invoked by command-line driver when the request is to start a
      * ranging session.
      *
+     * @param uwbDevice The resolved uwb device to start the ranging session on.
+     * @param rangingParameters The parameters needed to configure and start a
+     * ranging session.
+     */
+    virtual void
+    HandleDriverStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevice, const UwbRangingParameters& rangingParameters) noexcept;
+
+    /**
+     * @brief Invoked by command-line driver when the request is to start a
+     * ranging session.
+     * 
      * @param uwbDevice The resolved uwb device to start the ranging session on.
      * @param sessionData The data to configure the ranging session.
      */
