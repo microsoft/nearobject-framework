@@ -529,6 +529,17 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         .Value = staticStsInitializationVector,
     };
 
+    // UWB_APP_CONFIG_PARAM_TYPE_RESULT_REPORT_CONFIG
+    const std::unordered_set<ResultReportConfiguration> resultReportConfig{
+        ResultReportConfiguration::TofReport,
+        ResultReportConfiguration::AoAElevationReport,
+        ResultReportConfiguration::AoAFoMReport,
+    };
+    const UwbApplicationConfigurationParameter parameterResultReportConfig = {
+        .Type = UwbApplicationConfigurationParameterType::ResultReportConfig,
+        .Value = resultReportConfig,
+    };
+
     // UWB_APP_CONFIG_PARAM_TYPE_DEVICE_MAC_ADDRESS (short)
     constexpr ::uwb::UwbMacAddress uwbMacAddressShort(std::array<uint8_t, ::uwb::UwbMacAddressLength::Short>{ 0xAA, 0xBB });
     constexpr UwbApplicationConfigurationParameter parameterUwbMacAddressShort = {
@@ -573,6 +584,11 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         test::ValidateRoundtrip(parameterStaticStsInitializationVector);
     }
 
+    SECTION("UwbApplicationConfigurationParameter std::unordered_set<ResultReportConfiguration> variant is stable")
+    {
+        test::ValidateRoundtrip(parameterResultReportConfig);
+    }
+
     SECTION("UwbApplicationConfigurationParameter ::uwb::UwbMacAddress (short type)")
     {
         test::ValidateRoundtrip(parameterUwbMacAddressShort);
@@ -592,6 +608,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
             parameterRangingInterval,
             parameterAoaResult,
             parameterStaticStsInitializationVector,
+            parameterResultReportConfig,
             parameterUwbMacAddressShort,
             parameterUwbMacAddressExtended,
         };
