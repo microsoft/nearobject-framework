@@ -283,7 +283,7 @@ using UwbSetApplicationConfigurationParametersWrapper = notstd::flextype_wrapper
  * @return UwbSetApplicationConfigurationParametersWrapper
  */
 UwbSetApplicationConfigurationParametersWrapper
-From(const std::vector <::uwb::protocol::fira::UwbApplicationConfigurationParameter> &uwbApplicationConfigurationParameters, const uint32_t sessionId);
+From(const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> &uwbApplicationConfigurationParameters, const uint32_t sessionId);
 
 /**
  * @brief Converts UWB_DEVICE_CAPABILITIES to UwbCapability.
