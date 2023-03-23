@@ -260,7 +260,7 @@ using UwbGetApplicationConfigurationParametersWrapper = notstd::flextype_wrapper
  * @return UwbGetApplicationConfigurationParametersWrapper 
  */
 UwbGetApplicationConfigurationParametersWrapper
-From( const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> &uwbApplicationConfigurationParameterTypes);
+From(const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> &uwbApplicationConfigurationParameterTypes);
 
 using UwbApplicationConfigurationParameterWrapper = notstd::flextype_wrapper<UWB_APP_CONFIG_PARAM>;
 
