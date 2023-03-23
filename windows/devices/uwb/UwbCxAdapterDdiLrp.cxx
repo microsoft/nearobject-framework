@@ -552,6 +552,14 @@ windows::devices::uwb::ddi::lrp::From(const UwbNotificationData &uwbNotification
     return std::move(*notificationDataWrapper);
 }
 
+UwbGetApplicationConfigurationParametersWrapper
+windows::devices::uwb::ddi::lrp::From([[maybe_unused]] const std::vector<UwbApplicationConfigurationParameterType> &uwbApplicationConfigurationParameterTypes)
+{
+    std::size_t totalSize = 0; // TODO
+    UwbGetApplicationConfigurationParametersWrapper applicationConfigurationParameterTypesWrapper(totalSize);
+    return std::move(applicationConfigurationParameterTypesWrapper);
+}
+
 UwbApplicationConfigurationParameterWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbApplicationConfigurationParameter &uwbApplicationConfigurationParameter)
 {
@@ -1280,6 +1288,14 @@ windows::devices::uwb::ddi::lrp::To(const UWB_NOTIFICATION_DATA &notificationDat
 
     PLOG_WARNING << "unknown UwbNotificationData type encountered; returning default constructed instance";
     return UwbNotificationData{};
+}
+
+std::vector<UwbApplicationConfigurationParameterType>
+windows::devices::uwb::ddi::lrp::To([[maybe_unused]] const UWB_GET_APP_CONFIG_PARAMS &getApplicationConfigurationParameters)
+{
+    std::vector<UwbApplicationConfigurationParameterType> uwbApplicationConfigurationParameterTypes{};
+    // TODO
+    return uwbApplicationConfigurationParameterTypes;
 }
 
 namespace detail

@@ -251,6 +251,17 @@ using UwbNotificationDataWrapper = notstd::flextype_wrapper<UWB_NOTIFICATION_DAT
 UwbNotificationDataWrapper
 From(const ::uwb::protocol::fira::UwbNotificationData &uwbNotificationData);
 
+using UwbGetApplicationConfigurationParametersWrapper = notstd::flextype_wrapper<UWB_GET_APP_CONFIG_PARAMS>;
+
+/**
+ * @brief Converts a list of UwbApplicationConfigurationParameterType to UWB_GET_APP_CONFIG_PARAMS.
+ * 
+ * @param uwbApplicationConfigurationParameterTypes 
+ * @return UwbGetApplicationConfigurationParametersWrapper 
+ */
+UwbGetApplicationConfigurationParametersWrapper
+From( const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> &uwbApplicationConfigurationParameterTypes);
+
 using UwbApplicationConfigurationParameterWrapper = notstd::flextype_wrapper<UWB_APP_CONFIG_PARAM>;
 
 /**
@@ -487,6 +498,15 @@ To(const UWB_RANGING_DATA &rangingData);
  */
 ::uwb::protocol::fira::UwbNotificationData
 To(const UWB_NOTIFICATION_DATA &notificationData);
+
+/**
+ * @brief Converts UWB_GET_APP_CONFIG_PARAMS to a vector of UwbApplicationConfigurationParameterType.
+ * 
+ * @param getApplicationConfigurationParameters 
+ * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> 
+ */
+std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType>
+To(const UWB_GET_APP_CONFIG_PARAMS &getApplicationConfigurationParameters);
 
 /**
  * @brief Converts UWB_APP_CONFIG_PARAM to UwbApplicationConfigurationParameter.
