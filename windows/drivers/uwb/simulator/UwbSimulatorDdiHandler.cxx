@@ -212,7 +212,7 @@ UwbSimulatorDdiHandler::OnUwbGetApplicationConfigurationParameters(WDFREQUEST re
     // Invoke callback.
     std::vector<UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters{};
     auto statusUwb = m_callbacks->GetApplicationConfigurationParameters(applicationConfigurationParametersIn.sessionId, uwbApplicationConfigurationParameterTypes, uwbApplicationConfigurationParameters);
-    
+
     // Convert neutral types to DDI types.
     auto &outputValue = *reinterpret_cast<UWB_APP_CONFIG_PARAMS *>(std::data(outputBuffer));
     if (IsUwbStatusOk(statusUwb)) {
@@ -224,10 +224,10 @@ UwbSimulatorDdiHandler::OnUwbGetApplicationConfigurationParameters(WDFREQUEST re
         outputValue.status = UwbCxDdi::From(statusUwb);
         outputValue.appConfigParamsCount = 0;
     }
- 
+
     // Complete the request.
     WdfRequestCompleteWithInformation(request, status, outputValue.size);
-    
+
     return status;
 }
 
