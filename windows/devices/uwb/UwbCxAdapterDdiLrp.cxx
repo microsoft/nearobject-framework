@@ -583,6 +583,17 @@ windows::devices::uwb::ddi::lrp::From(const UwbApplicationConfigurationParameter
             UWB_APP_CONFIG_PARAM &applicationConfigurationParameter = applicationConfigurationParameterWrapper->value();
             applicationConfigurationParameter.paramLength = argSize;
             std::memcpy(&applicationConfigurationParameter.paramValue[0], std::data(value), std::size(value));
+        } else if constexpr (std::is_same_v<T, std::unordered_set<ResultReportConfiguration>>) {
+            uint8_t value = 0;
+            const auto argSize = sizeof value;
+            totalSize += argSize;
+            for (const auto &resultReportConfiguration : arg) {
+                value |= notstd::to_underlying(resultReportConfiguration);
+            }
+            applicationConfigurationParameterWrapper = std::make_unique<UwbApplicationConfigurationParameterWrapper>(totalSize);
+            UWB_APP_CONFIG_PARAM &applicationConfigurationParameter = applicationConfigurationParameterWrapper->value();
+            applicationConfigurationParameter.paramLength = argSize;
+            applicationConfigurationParameter.paramValue[0] = value;
         } else {
             throw std::runtime_error("unknown UwbApplicationConfigurationParameter variant value encountered");
         }
