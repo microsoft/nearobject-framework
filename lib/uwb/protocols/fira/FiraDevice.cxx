@@ -258,3 +258,34 @@ uwb::protocol::fira::IsUwbStatusOk(const UwbStatus& uwbStatus) noexcept
     const auto* status = std::get_if<UwbStatusGeneric>(&uwbStatus);
     return (status != nullptr) && (*status == UwbStatusGeneric::Ok);
 }
+
+std::string
+UwbApplicationConfigurationParameter::ToString() const
+{
+    std::ostringstream ss{};
+    ss << magic_enum::enum_name(Type) << ": " << ::ToString(Value);
+    return ss.str();
+}
+
+/**
+ * @brief Returns a string representation of the object.
+ *
+ * @param uwbApplicationConfigurationParameterValue
+ * @return std::string
+ */
+std::string
+uwb::protocol::fira::ToString(const UwbApplicationConfigurationParameterValue& uwbApplicationConfigurationParameterValue)
+{
+    std::ostringstream ss{};
+    std::visit([&](auto&& arg) {
+        using T = std::decay_t<decltype(arg)>;
+        if constexpr (std::is_enum_v<T>) {
+            ss << magic_enum::enum_name(arg);
+        } else if constexpr (std::is_integral_v<T> || std::is_same_v<T, ::uwb::UwbMacAddress>) {
+            ss << arg;
+        }
+    },
+        uwbApplicationConfigurationParameterValue);
+
+    return ss.str();
+}

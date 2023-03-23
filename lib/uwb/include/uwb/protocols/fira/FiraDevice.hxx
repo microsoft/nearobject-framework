@@ -574,6 +574,14 @@ struct UwbApplicationConfigurationParameter
 
     bool
     operator==(const UwbApplicationConfigurationParameter&) const noexcept = default;
+
+    /**
+     * @brief Returns a string representation of the object.
+     * 
+     * @return std::string 
+     */
+    std::string
+    ToString() const;
 };
 
 struct UwbMulticastListStatus
@@ -733,6 +741,15 @@ ToString(const UwbStatus& uwbStatus);
  */
 std::string
 ToString(const UwbNotificationData& uwbNotificationData);
+
+/**
+ * @brief Returns a string representation of the object.
+ * 
+ * @param uwbApplicationConfigurationParameterValue 
+ * @return std::string 
+ */
+std::string
+ToString(const UwbApplicationConfigurationParameterValue &uwbApplicationConfigurationParameterValue);
 
 } // namespace uwb::protocol::fira
 
