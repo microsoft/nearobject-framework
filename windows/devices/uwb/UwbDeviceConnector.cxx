@@ -383,8 +383,22 @@ UwbDeviceConnector::SessionUpdateControllerMulticastList(uint32_t sessionId, Uwb
 std::future<std::tuple<UwbStatus, std::vector<UwbApplicationConfigurationParameter>>>
 UwbDeviceConnector::GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes)
 {
-    std::promise<std::tuple<UwbStatus, std::vector<UwbApplicationConfigurationParameter>>> promiseResult;
-    auto resultFuture = promiseResult.get_future();
+    std::promise<std::tuple<UwbStatus, std::vector<UwbApplicationConfigurationParameter>>> resultPromise;
+    auto resultFuture = resultPromise.get_future();
+
+    wil::unique_hfile handleDriver;
+    auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
+    if (FAILED(hr)) {
+        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
+        return resultFuture;
+    }
+
+    UwbCxDdi::UwbGetApplicationConfigurationParameters uwbGetApplicationConfigurationParameters{
+        .SessionId = sessionId,
+        .ParameterTypes = std::move(applicationConfigurationParameterTypes),
+    };
+    auto getAppConfigParams = UwbCxDdi::From(uwbGetApplicationConfigurationParameters);
     // TODO: invoke IOCTL_UWB_GET_APP_CONFIG_PARAMS
 
     return resultFuture;
