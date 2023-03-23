@@ -98,6 +98,14 @@ public:
     void
     SetSessionStatus(const uwb::protocol::fira::UwbSessionStatus& status);
 
+    /**
+     * @brief Get the application configuration parameters for this session.
+     * 
+     * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> 
+     */
+    std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
+    GetApplicationConfigurationParameters();
+
 private:
     /**
      * @brief Internal function to insert a peer address to this session
@@ -135,6 +143,14 @@ private:
      */
     virtual void
     AddPeerImpl(UwbMacAddress peerMacAddress) = 0;
+
+    /**
+     * @brief Get the application configuration parameters for this session.
+     * 
+     * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> 
+     */
+    virtual std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
+    GetApplicationConfigurationParametersImpl() = 0;
 
 protected:
     uwb::protocol::fira::DeviceType m_deviceType{ uwb::protocol::fira::DeviceType::Controller };

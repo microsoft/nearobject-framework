@@ -219,3 +219,10 @@ UwbSession::AddPeerImpl([[maybe_unused]] ::uwb::UwbMacAddress peerMacAddress)
     //     PLOG_ERROR << "could not send params to driver, hr=" << std::showbase << std::hex << hr;
     // }
 }
+
+std::vector<UwbApplicationConfigurationParameter>
+UwbSession::GetApplicationConfigurationParametersImpl()
+{
+    // TODO
+    return {};
+}
