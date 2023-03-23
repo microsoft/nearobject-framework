@@ -266,7 +266,7 @@ enum class ResultReportConfiguration : uint8_t {
  * @return std::string
  */
 std::string
-ResultReportConfigurationToString(const std::unordered_set<ResultReportConfiguration>& resultReportConfiguration);
+ToString(const std::unordered_set<ResultReportConfiguration>& resultReportConfiguration);
 
 /**
  * @brief Converts a string to vector of ResultReportConfiguration.

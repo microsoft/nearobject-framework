@@ -70,7 +70,7 @@ uwb::protocol::fira::StringToVersion(const std::string& input) noexcept
 }
 
 std::string
-uwb::protocol::fira::ResultReportConfigurationToString(const std::unordered_set<ResultReportConfiguration>& input)
+uwb::protocol::fira::ToString(const std::unordered_set<ResultReportConfiguration>& input)
 {
     return std::transform_reduce(
         std::cbegin(input),
