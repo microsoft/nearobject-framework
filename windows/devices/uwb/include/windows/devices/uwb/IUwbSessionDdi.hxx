@@ -21,18 +21,6 @@ namespace windows::devices::uwb
  */
 struct IUwbSessionDdi
 {
-    // // IOCTL_UWB_DEVICE_RESET
-    // virtual std::future<void>
-    // Reset() = 0;
-
-    // // IOCTL_UWB_GET_DEVICE_INFO
-    // virtual std::future<::uwb::protocol::fira::UwbDeviceInformation>
-    // GetDeviceInformation() = 0;
-
-    // // IOCTL_UWB_GET_DEVICE_CAPABILITIES
-    // virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbCapability>>
-    // GetCapabilities() = 0;
-
     // IOCTL_UWB_GET_SESSION_COUNT
     virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<uint32_t>>>
     GetSessionCount() = 0;
@@ -80,6 +68,13 @@ struct IUwbSessionDdi
 
 struct IUwbSessionDdiConnector : public IUwbSessionDdi
 {
+    /**
+     * @brief Registers the callbacks for a particular session
+     *
+     * @param sessionId
+     * @param callbacks
+     * @return RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback
+     */
     virtual ::uwb::RegisteredCallbackToken*
     RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks) = 0;
 };
