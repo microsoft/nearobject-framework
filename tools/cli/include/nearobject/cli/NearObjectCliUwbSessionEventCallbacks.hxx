@@ -19,7 +19,7 @@ struct NearObjectCliUwbSessionEventCallbacks :
      * 
      * @param onSessionEndedCallback The callback to invoke when the session ends.
      */
-    NearObjectCliUwbSessionEventCallbacks(std::function<void()> onSessionEndedCallback);
+    NearObjectCliUwbSessionEventCallbacks(std::function<void()> onSessionEndedCallback = {});
 
     /**
      * @brief Invoked when the session is ended.
