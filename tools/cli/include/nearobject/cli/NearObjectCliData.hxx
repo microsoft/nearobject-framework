@@ -14,6 +14,15 @@
 namespace nearobject::cli
 {
 /**
+ * @brief Helper structure to hold parameters for a ranging session.
+ */
+struct UwbRangingParameters
+{
+    uint32_t sessionId;
+    std::vector<uwb::protocol::fira::UwbApplicationConfigurationParameter> appConfigParams;
+};
+
+/**
  * @brief Helper sturcture for staging UwbConfiguration data fields from CLI
  * input. This is an intermediary structure that allows native use with the
  * CLI11 parsing library.
@@ -68,6 +77,25 @@ struct UwbConfigurationData
 };
 
 /**
+ * @brief Helper structure for staging UwbApplicationConfigurationParameter data fields from CLI
+ * input. This is an intermediary structure that allows native use with the
+ * CLI11 parsing library.
+ */
+struct UwbApplicationConfigurationParameterData
+{
+    // Mirrored properties from UwbApplicationConfigurationParameter data. Any newly added fields
+    // that should be supported from the command-line must also be added here,
+    // along with parsing support in a NearObjectCli instance.
+    std::optional<uwb::protocol::fira::DeviceRole> deviceRole;
+    std::optional<uwb::protocol::fira::MultiNodeMode> multiNodeMode;
+    std::optional<uint8_t> numberOfControlees;
+    std::optional<uwb::UwbMacAddress> deviceMacAddress;
+    std::optional<std::unordered_set<uwb::UwbMacAddress>> destinationMacAddresses;
+    std::optional<uwb::protocol::fira::DeviceType> deviceType;
+    std::optional<uwb::UwbMacAddressType> macAddressMode;
+};
+
+/**
  * @brief Base class for data parsed by NearObjectCli.
  */
 struct NearObjectCliData
@@ -75,11 +103,13 @@ struct NearObjectCliData
     virtual ~NearObjectCliData() = default;
 
     bool HostIsController{ false };
-    std::string deviceMacAddress{};
-    std::string destinationMacAddress{}; // TODO: List of strings to support multiple controlees
+    std::string deviceMacAddressString;
+    std::string destinationMacAddressString; // TODO: List of strings (or large string of mac address substrings) to support multiple controlees
     UwbConfigurationData uwbConfiguration{};
+    UwbApplicationConfigurationParameterData appConfigParamsData{};
     uwb::protocol::fira::StaticRangingInfo StaticRanging{};
     uwb::protocol::fira::UwbSessionData SessionData{};
+    UwbRangingParameters RangingParameters{};
 };
 
 } // namespace nearobject::cli

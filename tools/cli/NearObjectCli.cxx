@@ -93,27 +93,51 @@ NearObjectCli::GetUwbApp() noexcept
 }
 
 CLI::App&
-NearObjectCli::GetRangeApp() noexcept
+NearObjectCli::GetServiceApp() noexcept
 {
-    return *m_rangeApp;
+    return *m_serviceApp;
 }
 
 CLI::App&
-NearObjectCli::GetRawApp() noexcept
+NearObjectCli::GetUwbRawApp() noexcept
 {
-    return *m_rawApp;
+    return *m_uwbRawApp;
 }
 
 CLI::App&
-NearObjectCli::GetRangeStartApp() noexcept
+NearObjectCli::GetUwbRangeApp() noexcept
 {
-    return *m_rangeStartApp;
+    return *m_uwbRangeApp;
 }
 
 CLI::App&
-NearObjectCli::GetRangeStopApp() noexcept
+NearObjectCli::GetServiceRangeApp() noexcept
 {
-    return *m_rangeStopApp;
+    return *m_serviceRangeApp;
+}
+
+CLI::App&
+NearObjectCli::GetUwbRangeStartApp() noexcept
+{
+    return *m_uwbRangeStartApp;
+}
+
+CLI::App&
+NearObjectCli::GetUwbRangeStopApp() noexcept
+{
+    return *m_uwbRangeStopApp;
+}
+
+CLI::App&
+NearObjectCli::GetServiceRangeStartApp() noexcept
+{
+    return *m_serviceRangeStartApp;
+}
+
+CLI::App&
+NearObjectCli::GetServiceRangeStopApp() noexcept
+{
+    return *m_serviceRangeStopApp;
 }
 
 std::shared_ptr<uwb::UwbDevice>
@@ -135,6 +159,7 @@ NearObjectCli::CreateParser() noexcept
 
     // sub-commands
     m_uwbApp = AddSubcommandUwb(app.get());
+    m_serviceApp = AddSubcommandService(app.get());
 
     return app;
 }
@@ -211,14 +236,26 @@ CLI::App*
 NearObjectCli::AddSubcommandUwb(CLI::App* parent)
 {
     // top-level command
-    auto uwbApp = parent->add_subcommand("uwb", "commands related to uwb")->require_subcommand()->fallthrough();
+    auto uwbApp = parent->add_subcommand("uwb", "commands related to UWB driver testing")->require_subcommand()->fallthrough();
 
     // sub-commands
     m_monitorApp = AddSubcommandUwbMonitor(uwbApp);
-    m_rangeApp = AddSubcommandUwbRange(uwbApp);
-    m_rawApp = AddSubcommandUwbRaw(uwbApp);
+    m_uwbRawApp = AddSubcommandUwbRaw(uwbApp);
+    m_uwbRangeApp = AddSubcommandUwbRange(uwbApp);
 
     return uwbApp;
+}
+
+CLI::App*
+NearObjectCli::AddSubcommandService(CLI::App* parent)
+{
+    // top-level command
+    auto serviceApp = parent->add_subcommand("service", "commands related to NearObject service testing")->require_subcommand()->fallthrough();
+
+    // sub-commands
+    m_serviceRangeApp = AddSubcommandServiceRange(serviceApp);
+
+    return serviceApp;
 }
 
 CLI::App*
@@ -238,7 +275,36 @@ NearObjectCli::AddSubcommandUwbMonitor(CLI::App* parent)
 }
 
 CLI::App*
+NearObjectCli::AddSubcommandUwbRaw(CLI::App* parent)
+{
+    // top-level command
+    auto rawApp = parent->add_subcommand("raw", "individual commands for driver testing")->require_subcommand()->fallthrough();
+
+    // sub-commands
+    AddSubcommandUwbRawDeviceReset(rawApp);
+    AddSubcommandUwbRawGetDeviceInfo(rawApp);
+
+    return rawApp;
+}
+
+CLI::App*
 NearObjectCli::AddSubcommandUwbRange(CLI::App* parent)
+{
+    // top-level command
+    auto rangeApp = parent->add_subcommand("range", "commands related to ranging")->require_subcommand()->fallthrough();
+
+    // options
+    rangeApp->add_option("--SessionId", m_cliData->RangingParameters.sessionId)->capture_default_str()->required();
+
+    // sub-commands
+    m_uwbRangeStartApp = AddSubcommandUwbRangeStart(rangeApp);
+    m_uwbRangeStopApp = AddSubcommandUwbRangeStop(rangeApp);
+
+    return rangeApp;
+}
+
+CLI::App*
+NearObjectCli::AddSubcommandServiceRange(CLI::App* parent)
 {
     // top-level command
     auto rangeApp = parent->add_subcommand("range", "commands related to ranging")->require_subcommand()->fallthrough();
@@ -249,51 +315,178 @@ NearObjectCli::AddSubcommandUwbRange(CLI::App* parent)
     rangeApp->add_option("--SubSessionId", m_cliData->SessionData.subSessionId)->capture_default_str();
 
     // sub-commands
-    m_rangeStartApp = AddSubcommandUwbRangeStart(rangeApp);
-    m_rangeStopApp = AddSubcommandUwbRangeStop(rangeApp);
+    m_serviceRangeStartApp = AddSubcommandServiceRangeStart(rangeApp);
+    m_serviceRangeStopApp = AddSubcommandServiceRangeStop(rangeApp);
 
     return rangeApp;
 }
 
 CLI::App*
-NearObjectCli::AddSubcommandUwbRaw(CLI::App* parent)
+NearObjectCli::AddSubcommandUwbRawDeviceReset(CLI::App* parent)
 {
     // top-level command
-    auto rawApp = parent->add_subcommand("raw", "individual commands")->require_subcommand()->fallthrough();
+    auto rawDeviceResetApp = parent->add_subcommand("devicereset", "DeviceReset")->fallthrough();
 
-    // sub-commands
-    AddSubcommandUwbRawDeviceReset(rawApp);
-    AddSubcommandUwbRawGetDeviceInfo(rawApp);
+    rawDeviceResetApp->parse_complete_callback([this] {
+        std::cout << "device reset" << std::endl;
+    });
 
-    return rawApp;
+    rawDeviceResetApp->final_callback([this] {
+        auto uwbDevice = GetUwbDevice();
+        if (!uwbDevice) {
+            std::cerr << "no device found" << std::endl;
+            return;
+        }
+        if (!uwbDevice->Initialize()) {
+            std::cerr << "device not initialized" << std::endl;
+        }
+
+        m_cliHandler->HandleDeviceReset(uwbDevice);
+    });
+
+    return rawDeviceResetApp;
+}
+
+CLI::App*
+NearObjectCli::AddSubcommandUwbRawGetDeviceInfo(CLI::App* parent)
+{
+    // top-level command
+    auto rawGetDeviceInfoApp = parent->add_subcommand("getdeviceinfo", "GetDeviceInfo")->fallthrough();
+
+    rawGetDeviceInfoApp->parse_complete_callback([this] {
+        std::cout << "get device info" << std::endl;
+    });
+
+    rawGetDeviceInfoApp->final_callback([this] {
+        auto uwbDevice = GetUwbDevice();
+        if (!uwbDevice) {
+            std::cerr << "no device found" << std::endl;
+            return;
+        }
+        if (!uwbDevice->Initialize()) {
+            std::cerr << "device not initialized" << std::endl;
+        }
+
+        m_cliHandler->HandleGetDeviceInfo(uwbDevice);
+    });
+
+    return rawGetDeviceInfoApp;
 }
 
 CLI::App*
 NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
+{
+    auto& appConfigParamsData = m_cliData->appConfigParamsData;
+    auto rangeStartApp = parent->add_subcommand("start", "start ranging. Please refer to Table 29 of the FiRa UCI spec for more info on the options")->fallthrough();
+
+    // List mandatory params first
+    detail::AddEnumOption(rangeStartApp, appConfigParamsData.deviceRole, true);
+    detail::AddEnumOption(rangeStartApp, appConfigParamsData.multiNodeMode, true);
+    rangeStartApp->add_option("--NumberOfControlees", appConfigParamsData.numberOfControlees, "1 <= N <= 8")->capture_default_str()->required();
+
+    std::string deviceMacAddressDescription = "2-byte short MAC address of own device: e.g. 12:34";
+    std::string dstMacAddressDescription = "2-byte short MAC address(es) of other device(s). If device is Controller, list NumberOfControlees mac addresses. If device is Controlee, list Controller mac address";
+    if (appConfigParamsData.macAddressMode == uwb::UwbMacAddressType::Extended) { // TODO: Enable macAddressMode to be set before checking this value. Otherwise, the default empty value will always be used
+        deviceMacAddressDescription = "8-byte extended MAC address of own device: e.g. 12:34:56:78:87:65:43:21";
+        dstMacAddressDescription = "8-byte extended MAC address(es) of other device(s). If device is Controller, list NumberOfControlees mac addresses. If device is Controlee, list Controller mac address";
+    }
+    rangeStartApp->add_option("--DeviceMacAddress", m_cliData->deviceMacAddressString, deviceMacAddressDescription)->capture_default_str()->required();
+    rangeStartApp->add_option("--DestinationMacAddress", m_cliData->destinationMacAddressString, dstMacAddressDescription)->capture_default_str()->required();
+
+    detail::AddEnumOption(rangeStartApp, appConfigParamsData.deviceType, true);
+
+    rangeStartApp->parse_complete_callback([this] {
+        // TODO: Move validation logic into its own function
+
+        // Validate NumberOfControlees
+        if (m_cliData->appConfigParamsData.multiNodeMode == uwb::protocol::fira::MultiNodeMode::Unicast) {
+            if (m_cliData->appConfigParamsData.numberOfControlees != 1) {
+                std::cerr << "Only 1 controlee expected in Unicast mode" << std::endl;
+            }
+        } else {
+            if (m_cliData->appConfigParamsData.numberOfControlees < 1 || m_cliData->appConfigParamsData.numberOfControlees > 8) {
+                std::cerr << "Invalid number of controlees. Must be 1 <= N <= 8" << std::endl;
+            }
+        }
+        // Set MAC addresses
+        const auto macAddressType = m_cliData->appConfigParamsData.macAddressMode == uwb::UwbMacAddressType::Extended ? uwb::UwbMacAddressType::Extended : uwb::UwbMacAddressType::Short;
+
+        m_cliData->appConfigParamsData.deviceMacAddress = uwb::UwbMacAddress::FromString(m_cliData->deviceMacAddressString, macAddressType);
+        m_cliData->appConfigParamsData.destinationMacAddresses.emplace();
+        // TODO: Insert the correct Controlee mac address rather than simply inserting the entire destinationMacAddressString
+        for (auto i = 0; i < m_cliData->appConfigParamsData.numberOfControlees; i++) {
+            m_cliData->appConfigParamsData.destinationMacAddresses.value().insert(uwb::UwbMacAddress::FromString(m_cliData->destinationMacAddressString, macAddressType).value());
+        }
+
+        std::cout << "Selected parameters:" << std::endl;
+        // TODO: Display selected parameters
+        std::cout << "DeviceRole: " << static_cast<int>(m_cliData->appConfigParamsData.deviceRole.value()) << std::endl;
+        std::cout << "MultiNodeMode: " << static_cast<int>(m_cliData->appConfigParamsData.multiNodeMode.value()) << std::endl;
+        std::cout << "NumberOfControlees: " << static_cast<int>(m_cliData->appConfigParamsData.numberOfControlees.value()) << std::endl;
+        std::cout << "DeviceMacAddress: " << m_cliData->appConfigParamsData.deviceMacAddress.value() << std::endl;
+        for (const auto& dstMacAddress : m_cliData->appConfigParamsData.destinationMacAddresses.value()) {
+            std::cout << "DestinationMacAddresses: " << dstMacAddress << std::endl;
+        }
+        std::cout << "DeviceType: " << static_cast<int>(m_cliData->appConfigParamsData.deviceType.value()) << std::endl;
+
+        // TODO: Create std::vector<UwbApplicationConfigurationParameter> based on m_cliData->appConfigParamsData
+        m_cliData->RangingParameters.appConfigParams.push_back({ uwb::protocol::fira::UwbApplicationConfigurationParameterType::DeviceRole, m_cliData->appConfigParamsData.deviceRole.value() });
+        m_cliData->RangingParameters.appConfigParams.push_back({ uwb::protocol::fira::UwbApplicationConfigurationParameterType::MultiNodeMode, m_cliData->appConfigParamsData.multiNodeMode.value() });
+        m_cliData->RangingParameters.appConfigParams.push_back({ uwb::protocol::fira::UwbApplicationConfigurationParameterType::NumberOfControlees, m_cliData->appConfigParamsData.numberOfControlees.value() });
+        m_cliData->RangingParameters.appConfigParams.push_back({ uwb::protocol::fira::UwbApplicationConfigurationParameterType::DeviceMacAddress, m_cliData->appConfigParamsData.deviceMacAddress.value() });
+        m_cliData->RangingParameters.appConfigParams.push_back({ uwb::protocol::fira::UwbApplicationConfigurationParameterType::DestinationMacAddresses, m_cliData->appConfigParamsData.destinationMacAddresses.value() });
+        m_cliData->RangingParameters.appConfigParams.push_back({ uwb::protocol::fira::UwbApplicationConfigurationParameterType::DeviceType, m_cliData->appConfigParamsData.deviceType.value() });
+    });
+
+    rangeStartApp->final_callback([this] {
+        auto uwbDevice = GetUwbDevice();
+        if (!uwbDevice) {
+            std::cerr << "no device found" << std::endl;
+            return;
+        }
+        if (!uwbDevice->Initialize()) {
+            std::cerr << "device not initialized" << std::endl;
+        }
+
+        m_cliHandler->HandleDriverStartRanging(uwbDevice, m_cliData->RangingParameters);
+    });
+
+    return rangeStartApp;
+}
+
+CLI::App*
+NearObjectCli::AddSubcommandUwbRangeStop(CLI::App* parent)
+{
+    // top-level command
+    auto rangeStopApp = parent->add_subcommand("stop", "stop ranging")->fallthrough();
+
+    rangeStopApp->parse_complete_callback([this, rangeStopApp] {
+        std::cout << "stop ranging" << std::endl;
+        RegisterCliAppWithOperation(rangeStopApp);
+    });
+
+    rangeStopApp->final_callback([this, rangeStopApp] {
+        m_cliHandler->HandleStopRanging();
+        SignalCliAppOperationCompleted(rangeStopApp);
+    });
+
+    return rangeStopApp;
+}
+
+CLI::App*
+NearObjectCli::AddSubcommandServiceRangeStart(CLI::App* parent)
 {
     auto& uwbConfig = m_cliData->uwbConfiguration;
     auto rangeStartApp = parent->add_subcommand("start", "start ranging. Please refer to Table 53 of the FiRa CSML spec for more info on the options")->fallthrough();
 
     // TODO is there a way to put all the enums into a list of [optionName, optionDestination, optionMap] so we don't have to create the initializer list each time
 
-    // List mandatory params first
-    detail::AddEnumOption(rangeStartApp, uwbConfig.deviceRole, true);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.multiNodeMode, true);
-    rangeStartApp->add_option("--NumberOfControlees", uwbConfig.numberOfControlees, "1 <= N <= 8")->capture_default_str()->required();
-    // TODO: Accept multiple controlees
-    if (uwbConfig.macAddressMode == uwb::UwbMacAddressType::Extended) {
-        rangeStartApp->add_option("--DeviceMacAddress", m_cliData->deviceMacAddress, "8-byte extended MAC address of own device: e.g. 12:34:56:78:87:65:43:21")->capture_default_str()->required();
-        rangeStartApp->add_option("--DestinationMacAddress", m_cliData->destinationMacAddress, "8-byte extended MAC address of other device(s). If device is Controller, list NumberOfControlees mac addresses. If device is Controlee, list Controller mac address")->capture_default_str()->required();
-    } else { // uwb::UwbMacAddressType::Short OR empty (default)
-        rangeStartApp->add_option("--DeviceMacAddress", m_cliData->deviceMacAddress, "2-byte short MAC address of own device: e.g. 12:34")->capture_default_str()->required();
-        rangeStartApp->add_option("--DestinationMacAddress", m_cliData->destinationMacAddress, "2-byte short MAC address of controlee. If device is Controller, list NumberOfControlees mac addresses. If device is Controlee, list Controller mac address")->capture_default_str()->required();
-    }
-    detail::AddEnumOption(rangeStartApp, uwbConfig.deviceType, true);
-
     // enumerations
+    detail::AddEnumOption(rangeStartApp, uwbConfig.deviceRole);
     detail::AddEnumOption(rangeStartApp, uwbConfig.rangingDirection);
     detail::AddEnumOption(rangeStartApp, uwbConfig.rangingMeasurementReportMode);
     detail::AddEnumOption(rangeStartApp, uwbConfig.stsConfiguration);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.multiNodeMode);
     detail::AddEnumOption(rangeStartApp, uwbConfig.rangingTimeStruct);
     detail::AddEnumOption(rangeStartApp, uwbConfig.schedulingMode);
     detail::AddEnumOption(rangeStartApp, uwbConfig.channel);
@@ -303,6 +496,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     detail::AddEnumOption(rangeStartApp, uwbConfig.macAddressFcsType);
 
     // booleans
+    rangeStartApp->add_flag("--controller,!--controlee", m_cliData->HostIsController, "default is controlee")->capture_default_str();
     rangeStartApp->add_flag("--HoppingMode", uwbConfig.hoppingMode)->capture_default_str();
     rangeStartApp->add_flag("--BlockStriding", uwbConfig.blockStriding)->capture_default_str();
 
@@ -329,47 +523,6 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     rangeStartApp->add_option("--ResultReportConfiguration", uwbConfig.resultReportConfigurationString)->capture_default_str();
 
     rangeStartApp->parse_complete_callback([this, rangeStartApp] {
-        // Validate NumberOfControlees
-        if (m_cliData->uwbConfiguration.multiNodeMode == uwb::protocol::fira::MultiNodeMode::Unicast) {
-            if (m_cliData->uwbConfiguration.numberOfControlees != 1) {
-                std::cerr << "Only 1 controlee expected in Unicast mode" << std::endl;
-            }
-        } else {
-            if (m_cliData->uwbConfiguration.numberOfControlees < 1 || m_cliData->uwbConfiguration.numberOfControlees > 8) {
-                std::cerr << "Invalid number of controlees. Must be 1 <= N <= 8" << std::endl;
-            }
-        }
-        // Set MAC addresses
-        std::optional<uwb::UwbMacAddress> controllerMacAddress;
-        std::optional<uwb::UwbMacAddress> controleeMacAddress;
-
-        const auto macAddressType = m_cliData->uwbConfiguration.macAddressMode == uwb::UwbMacAddressType::Extended ? uwb::UwbMacAddressType::Extended : uwb::UwbMacAddressType::Short;
-
-        // TODO: Support multiple controlees
-        if (m_cliData->uwbConfiguration.deviceType == uwb::protocol::fira::DeviceType::Controller) {
-            controllerMacAddress = uwb::UwbMacAddress::FromString(m_cliData->deviceMacAddress, macAddressType);
-            controleeMacAddress = uwb::UwbMacAddress::FromString(m_cliData->destinationMacAddress, macAddressType);
-        } else { // uwb::protocol::fira::DeviceType::Controlee
-            controllerMacAddress = uwb::UwbMacAddress::FromString(m_cliData->destinationMacAddress, macAddressType);
-            controleeMacAddress = uwb::UwbMacAddress::FromString(m_cliData->deviceMacAddress, macAddressType);
-        }
-
-        if (!controllerMacAddress.has_value()) {
-            std::cerr << "Invalid ControllerMacAddress" << std::endl;
-        } else {
-            m_cliData->uwbConfiguration.controllerMacAddress = controllerMacAddress.value();
-            // TEST
-            std::cout << "ControllerMacAddress: " << m_cliData->uwbConfiguration.controllerMacAddress << std::endl;
-        }
-
-        if (!controleeMacAddress.has_value()) {
-            std::cerr << "Invalid ControleeMacAddress" << std::endl;
-        } else {
-            m_cliData->uwbConfiguration.controleeShortMacAddress = controleeMacAddress.value();
-            // TEST
-            std::cout << "ControleeMacAddress: " << m_cliData->uwbConfiguration.controleeShortMacAddress << std::endl;
-        }
-
         m_cliData->SessionData.uwbConfiguration = m_cliData->uwbConfiguration;
         m_cliData->SessionData.staticRangingInfo = m_cliData->StaticRanging;
 
@@ -408,7 +561,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
 }
 
 CLI::App*
-NearObjectCli::AddSubcommandUwbRangeStop(CLI::App* parent)
+NearObjectCli::AddSubcommandServiceRangeStop(CLI::App* parent)
 {
     // top-level command
     auto rangeStopApp = parent->add_subcommand("stop", "stop ranging")->fallthrough();
@@ -424,61 +577,4 @@ NearObjectCli::AddSubcommandUwbRangeStop(CLI::App* parent)
     });
 
     return rangeStopApp;
-}
-
-CLI::App*
-NearObjectCli::AddSubcommandUwbRawDeviceReset(CLI::App* parent)
-{
-    // top-level command
-    auto rawDeviceResetApp = parent->add_subcommand("devicereset", "DeviceReset")->fallthrough();
-
-    rawDeviceResetApp->parse_complete_callback([this, rawDeviceResetApp] {
-        std::cout << "device reset" << std::endl;
-        RegisterCliAppWithOperation(rawDeviceResetApp);
-    });
-
-    rawDeviceResetApp->final_callback([this, rawDeviceResetApp] {
-        auto uwbDevice = GetUwbDevice();
-        if (!uwbDevice) {
-            std::cerr << "no device found" << std::endl;
-            return;
-        }
-        if (!uwbDevice->Initialize()) {
-            std::cerr << "device not initialized" << std::endl;
-        }
-
-        m_cliHandler->HandleDeviceReset(uwbDevice);
-        SignalCliAppOperationCompleted(rawDeviceResetApp);
-    });
-
-    return rawDeviceResetApp;
-}
-
-CLI::App*
-NearObjectCli::AddSubcommandUwbRawGetDeviceInfo(CLI::App* parent)
-{
-    // top-level command
-    auto rawGetDeviceInfoApp = parent->add_subcommand("getdeviceinfo", "GetDeviceInfo")->fallthrough();
-
-    rawGetDeviceInfoApp->parse_complete_callback([this, rawGetDeviceInfoApp] {
-        std::cout << "get device info" << std::endl;
-        RegisterCliAppWithOperation(rawGetDeviceInfoApp);
-    });
-
-    rawGetDeviceInfoApp->final_callback([this, rawGetDeviceInfoApp] {
-        auto uwbDevice = GetUwbDevice();
-        if (!uwbDevice) {
-            std::cerr << "no device found" << std::endl;
-            return;
-        }
-        if (!uwbDevice->Initialize()) {
-            std::cerr << "device not initialized" << std::endl;
-        }
-
-        m_cliHandler->HandleGetDeviceInfo(uwbDevice);
-        m_cliControlFlowContext->OperationSignalComplete();
-        SignalCliAppOperationCompleted(rawGetDeviceInfoApp);
-    });
-
-    return rawGetDeviceInfoApp;
 }
