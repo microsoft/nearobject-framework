@@ -70,8 +70,6 @@ struct IUwbSimulatorDdiCallbacksLrp
      * @param deviceConfigurationParameters
      * @param deviceConfigurationParameterResults
      * @return UwbStatus
-     *
-     * TODO: possibly separate the results into a vector with ones that had UwbStatus::Ok, and a separate vector with the ones that weren't retrieved.
      */
     virtual UwbStatus
     DeviceSetConfigurationParameters(const std::vector<UwbDeviceConfigurationParameter> &deviceConfigurationParameters, std::vector<std::tuple<UwbDeviceConfigurationParameterType, UwbStatus>> &deviceConfigurationParameterResults) = 0;

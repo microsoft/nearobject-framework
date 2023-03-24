@@ -242,10 +242,9 @@ UwbSimulatorDdiHandler::OnUwbSetApplicationConfigurationParameters(WDFREQUEST re
 
     // Convert neutral type to DDI output type.
     auto &outputValue = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS_STATUS *>(std::data(outputBuffer));
-    outputValue.size = sizeof outputValue;
-    outputValue.status = UwbCxDdi::From(statusUwb);
-
-    // TODO: the output value needs to be filled in with applicationConfigurationParameterResults
+    auto setApplicationConfigurationParametersStatus = UwbCxDdi::From(uwbSetApplicationConfigurationParametersStatus);
+    auto setApplicationConfigurationParametersStatusBuffer = std::data(setApplicationConfigurationParametersStatus);
+    std::memcpy(std::data(outputBuffer), std::data(setApplicationConfigurationParametersStatusBuffer), std::size(setApplicationConfigurationParametersStatusBuffer));
 
     // Complete the request.
     WdfRequestCompleteWithInformation(request, status, outputValue.size);
