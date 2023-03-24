@@ -6,8 +6,6 @@
 #include <memory>
 #include <mutex>
 #include <optional>
-#include <shared_mutex>
-#include <unordered_map>
 #include <vector>
 
 #include <windows.h>
@@ -123,10 +121,6 @@ private:
     // Static device information.
     UwbDeviceInformation m_deviceInformation{};
     UwbCapability m_deviceCapabilities{};
-
-    // Session state and associated lock that protects it.
-    std::shared_mutex m_sessionsGate;
-    std::unordered_map<uint32_t, UwbSimulatorSession> m_sessions{};
 
 private:
     UwbSimulatorCapabilities m_simulatorCapabilities{};

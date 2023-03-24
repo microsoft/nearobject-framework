@@ -9,6 +9,7 @@
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 
 #include "IUwbSimulator.hxx"
+#include "UwbSimulatorDevice.hxx"
 #include "UwbSimulatorDdiCallbacks.hxx"
 #include "UwbSimulatorTracelogging.hxx"
 
@@ -128,14 +129,18 @@ UwbSimulatorDdiCallbacks::SessionInitialize(uint32_t sessionId, UwbSessionType s
         TraceLoggingUInt32(sessionId, "Session Id"),
         TraceLoggingString(std::data(magic_enum::enum_name(sessionType)), "Session Type"));
 
-    std::unique_lock sessionsWriteLock{ m_sessionsGate };
-    auto [sessionIt, inserted] = m_sessions.try_emplace(sessionId, sessionId, sessionType);
-    if (!inserted) {
-        return UwbStatusSession::Duplicate;
+    auto device = m_deviceFile->GetDevice();
+    if (!device) {
+        return UwbStatusGeneric::Rejected;
     }
 
-    auto &[_, session] = *sessionIt;
-    SessionUpdateState(session, UwbSessionState::Initialized);
+    // Create a new session.
+    auto [uwbStatus, session] = device->SessionCreate(sessionId, sessionType);
+    if (!IsUwbStatusOk(uwbStatus)) {
+        return uwbStatus;
+    }
+
+    SessionUpdateState(*session, UwbSessionState::Initialized);
 
     return UwbStatusOk;
 }
@@ -149,17 +154,17 @@ UwbSimulatorDdiCallbacks::SessionDeninitialize(uint32_t sessionId)
         TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
         TraceLoggingUInt32(sessionId, "Session Id"));
 
-    decltype(m_sessions)::node_type nodeHandle;
-    {
-        std::unique_lock sessionsWriteLock{ m_sessionsGate };
-        nodeHandle = m_sessions.extract(sessionId);
-    }
-    if (nodeHandle.empty()) {
-        return UwbStatusSession::NotExist;
+    auto device = m_deviceFile->GetDevice();
+    if (!device) {
+        return UwbStatusGeneric::Rejected;
     }
 
-    auto &session = nodeHandle.mapped();
-    SessionUpdateState(session, UwbSessionState::Deinitialized);
+    auto [uwbStatus, session] = device->SessionDestroy(sessionId);
+    if (!IsUwbStatusOk(uwbStatus)) {
+        return uwbStatus;
+    }
+
+    SessionUpdateState(*session, UwbSessionState::Deinitialized);
 
     return UwbStatusOk;
 }
@@ -173,15 +178,18 @@ UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t session
         TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
         TraceLoggingUInt32(sessionId, "Session Id"));
 
-    std::unique_lock sessionsWriteLock{ m_sessionsGate };
-    auto sessionIt = m_sessions.find(sessionId);
-    if (sessionIt == std::cend(m_sessions)) {
+    auto device = m_deviceFile->GetDevice();
+    if (!device) {
+        return UwbStatusGeneric::Rejected;
+    }
+
+    auto session = device->SessionGet(sessionId);
+    if (session == nullptr) {
         return UwbStatusSession::NotExist;
     }
 
-    auto &[_, session] = *sessionIt;
-
     std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus>> results{};
+    // TODO: update session with these
     applicationConfigurationParameterResults = std::move(results);
     return UwbStatusOk;
 }
@@ -195,16 +203,17 @@ UwbSimulatorDdiCallbacks::GetApplicationConfigurationParameters(uint32_t session
         TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
         TraceLoggingUInt32(sessionId, "Session Id"));
 
-    std::shared_lock sessionsReadLock{ m_sessionsGate };
-    auto sessionIt = m_sessions.find(sessionId);
-    if (sessionIt == std::cend(m_sessions)) {
-        applicationConfigurationParameters = {};
+    auto device = m_deviceFile->GetDevice();
+    if (!device) {
+        return UwbStatusGeneric::Rejected;
+    }
+
+    auto session = device->SessionGet(sessionId);
+    if (session == nullptr) {
         return UwbStatusSession::NotExist;
     }
 
-    const auto &[_, session] = *sessionIt;
-
-    std::ranges::copy_if(session.ApplicationConfigurationParameters, std::back_inserter(applicationConfigurationParameters), [&](const auto &entry) {
+    std::ranges::copy_if(session->ApplicationConfigurationParameters, std::back_inserter(applicationConfigurationParameters), [&](const auto &entry) {
         return std::ranges::any_of(applicationConfigurationParameterTypes, [&](const auto &type) {
             return (entry.Type == type);
         });
@@ -216,8 +225,12 @@ UwbSimulatorDdiCallbacks::GetApplicationConfigurationParameters(uint32_t session
 UwbStatus
 UwbSimulatorDdiCallbacks::GetSessionCount(uint32_t &sessionCount)
 {
-    std::shared_lock sessionsReadLock{ m_sessionsGate };
-    sessionCount = static_cast<uint32_t>(std::size(m_sessions));
+    auto device = m_deviceFile->GetDevice();
+    if (!device) {
+        return UwbStatusGeneric::Rejected;
+    }
+
+    sessionCount = static_cast<uint32_t>(device->GetSessionCount());
 
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
@@ -231,14 +244,17 @@ UwbSimulatorDdiCallbacks::GetSessionCount(uint32_t &sessionCount)
 UwbStatus
 UwbSimulatorDdiCallbacks::SessionGetState(uint32_t sessionId, UwbSessionState &sessionState)
 {
-    std::shared_lock sessionsReadLock{ m_sessionsGate };
-    auto sessionIt = m_sessions.find(sessionId);
-    if (sessionIt == std::cend(m_sessions)) {
+    auto device = m_deviceFile->GetDevice();
+    if (!device) {
+        return UwbStatusGeneric::Rejected;
+    }
+
+    auto session = device->SessionGet(sessionId);
+    if (session == nullptr) {
         return UwbStatusSession::NotExist;
     }
 
-    const auto &[_, session] = *sessionIt;
-    sessionState = session.State;
+    sessionState = session->State;
 
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
@@ -260,14 +276,17 @@ UwbSimulatorDdiCallbacks::SessionUpdateControllerMulticastList(uint32_t sessionI
         TraceLoggingUInt32(sessionId, "Session Id"),
         TraceLoggingString(std::data(magic_enum::enum_name(action)), "Multicast Action"));
 
-    std::unique_lock sessionsWriteLock{ m_sessionsGate };
-    auto sessionIt = m_sessions.find(sessionId);
-    if (sessionIt == std::cend(m_sessions)) {
+    auto device = m_deviceFile->GetDevice();
+    if (!device) {
+        return UwbStatusGeneric::Rejected;
+    }
+
+    auto session = device->SessionGet(sessionId);
+    if (session == nullptr) {
         return UwbStatusSession::NotExist;
     }
 
-    auto &[_, session] = *sessionIt;
-
+    // TODO: session exclusive mutex
     const auto getControlee = [](const UwbSessionUpdateMulticastListEntry &entry) {
         return entry.ControleeMacAddress;
     };
@@ -275,12 +294,12 @@ UwbSimulatorDdiCallbacks::SessionUpdateControllerMulticastList(uint32_t sessionI
     switch (action) {
     case UwbMulticastAction::AddShortAddress: {
         // TODO: updateMulticastListEntry.SubSessionId needs to be handled in future.
-        std::ranges::move(updateMulticastListEntries | std::views::transform(getControlee), std::inserter(session.Controlees, std::end(session.Controlees)));
+        std::ranges::move(updateMulticastListEntries | std::views::transform(getControlee), std::inserter(session->Controlees, std::end(session->Controlees)));
         break;
     }
     case UwbMulticastAction::DeleteShortAddress: {
         // TODO: updateMulticastListEntry.SubSessionId needs to be handled in future.
-        std::erase_if(session.Controlees, [&](const auto &controleeToRemove) {
+        std::erase_if(session->Controlees, [&](const auto &controleeToRemove) {
             return std::ranges::any_of(updateMulticastListEntries | std::views::transform(getControlee), [&](const auto &controlee) {
                 return controleeToRemove == controlee;
             });
@@ -303,14 +322,18 @@ UwbSimulatorDdiCallbacks::SessionStartRanging(uint32_t sessionId)
         TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
         TraceLoggingUInt32(sessionId, "Session Id"));
 
-    std::unique_lock sessionsWriteLock{ m_sessionsGate };
-    auto sessionIt = m_sessions.find(sessionId);
-    if (sessionIt == std::cend(m_sessions)) {
+    auto device = m_deviceFile->GetDevice();
+    if (!device) {
+        return UwbStatusGeneric::Rejected;
+    }
+
+    auto session = device->SessionGet(sessionId);
+    if (session == nullptr) {
         return UwbStatusSession::NotExist;
     }
 
-    auto &[_, session] = *sessionIt;
-    session.RangingCount++;
+    // TODO: session exclusive mutex
+    session->RangingCount++;
     return UwbStatusOk;
 }
 
@@ -323,13 +346,18 @@ UwbSimulatorDdiCallbacks::SessionStopRanging(uint32_t sessionId)
         TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
         TraceLoggingUInt32(sessionId, "Session Id"));
 
-    std::unique_lock sessionsWriteLock{ m_sessionsGate };
-    auto sessionIt = m_sessions.find(sessionId);
-    if (sessionIt == std::cend(m_sessions)) {
+    auto device = m_deviceFile->GetDevice();
+    if (!device) {
+        return UwbStatusGeneric::Rejected;
+    }
+
+    auto session = device->SessionGet(sessionId);
+    if (session == nullptr) {
         return UwbStatusSession::NotExist;
     }
 
-    auto &[_, session] = *sessionIt;
+    // TODO: session exclusive mutex
+    // TODO: how do we mark this as stopped ranging? update the state?
 
     return UwbStatusOk;
 }
@@ -337,14 +365,17 @@ UwbSimulatorDdiCallbacks::SessionStopRanging(uint32_t sessionId)
 UwbStatus
 UwbSimulatorDdiCallbacks::SessionGetRangingCount(uint32_t sessionId, uint32_t &rangingCount)
 {
-    std::unique_lock sessionsWriteLock{ m_sessionsGate };
-    auto sessionIt = m_sessions.find(sessionId);
-    if (sessionIt == std::cend(m_sessions)) {
+    auto device = m_deviceFile->GetDevice();
+    if (!device) {
+        return UwbStatusGeneric::Rejected;
+    }
+
+    auto session = device->SessionGet(sessionId);
+    if (session == nullptr) {
         return UwbStatusSession::NotExist;
     }
 
-    auto &[_, session] = *sessionIt;
-    rangingCount = session.RangingCount;
+    rangingCount = session->RangingCount;
 
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
@@ -419,20 +450,22 @@ UwbSimulatorDdiCallbacks::TriggerSessionEvent(const UwbSimulatorTriggerSessionEv
 void
 UwbSimulatorDdiCallbacks::SessionRandomMeasurementGenerationConfigure(uint32_t sessionId, RandomMeasurementGeneration action)
 {
-    std::unique_lock sessionsWriteLock{ m_sessionsGate };
-    auto sessionIt = m_sessions.find(sessionId);
-    if (sessionIt == std::cend(m_sessions)) {
+    auto device = m_deviceFile->GetDevice();
+    if (!device) {
         return;
     }
 
-    auto &[_, session] = *sessionIt;
+    auto session = device->SessionGet(sessionId);
+    if (session == nullptr) {
+        return;
+    }
 
     switch (action) {
     case RandomMeasurementGeneration::Disable:
-        session.RandomRangingMeasurementGenerationStop();
+        session->RandomRangingMeasurementGenerationStop();
         break;
     case RandomMeasurementGeneration::Enable:
-        session.RandomRangingMeasurementGenerationStart([&](UwbRangingData rangingData) {
+        session->RandomRangingMeasurementGenerationStart([&](UwbRangingData rangingData) {
             RaiseUwbNotification(std::move(rangingData));
         });
         break;

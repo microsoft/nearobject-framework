@@ -7,7 +7,15 @@
 #include <wdf.h>
 #include <wdfrequest.h>
 
+#include <memory>
+#include <shared_mutex>
+#include <tuple>
+#include <unordered_map>
+
 #include "UwbSimulatorIoQueue.hxx"
+#include "UwbSimulatorSession.hxx"
+
+#include <uwb/protocols/fira/FiraDevice.hxx>
 
 /**
  * @brief
@@ -37,6 +45,18 @@ public:
      */
     NTSTATUS
     Uninitialize();
+
+    std::tuple<UwbStatus, std::shared_ptr<windows::devices::uwb::simulator::UwbSimulatorSession>>
+    SessionCreate(uint32_t sessionId, UwbSessionType sessionType);
+
+    std::tuple<UwbStatus, std::shared_ptr<windows::devices::uwb::simulator::UwbSimulatorSession>>
+    SessionDestroy(uint32_t sessionId);
+
+    std::shared_ptr<windows::devices::uwb::simulator::UwbSimulatorSession>
+    SessionGet(uint32_t sessionId);
+
+    std::size_t
+    GetSessionCount();
 
 public:
     static EVT_WDF_DRIVER_DEVICE_ADD OnWdfDeviceAdd;
@@ -86,6 +106,10 @@ private:
 private:
     WDFDEVICE m_wdfDevice;
     UwbSimulatorIoQueue *m_ioQueue{ nullptr };
+
+    // Session state and associated lock that protects it.
+    std::shared_mutex m_sessionsGate;
+    std::unordered_map<uint32_t, std::shared_ptr<windows::devices::uwb::simulator::UwbSimulatorSession>> m_sessions{};
 };
 
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(UwbSimulatorDevice, GetUwbSimulatorDevice)
