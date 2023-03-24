@@ -644,6 +644,15 @@ windows::devices::uwb::ddi::lrp::From(const UwbApplicationConfigurationParameter
             applicationConfigurationParameterWrapper = std::make_unique<UwbApplicationConfigurationParameterWrapper>(totalSize);
             UWB_APP_CONFIG_PARAM &applicationConfigurationParameter = applicationConfigurationParameterWrapper->value();
             applicationConfigurationParameter.paramValue[0] = value;
+        } else if constexpr (std::is_same_v<T, std::unordered_set<::uwb::UwbMacAddress>>) {
+            // TODO: Get all values from set, not just first one
+            const auto val = *std::begin(arg);
+            const auto value = val.GetValue();
+            parameterLength = std::size(value);
+            totalSize += parameterLength;
+            applicationConfigurationParameterWrapper = std::make_unique<UwbApplicationConfigurationParameterWrapper>(totalSize);
+            UWB_APP_CONFIG_PARAM &applicationConfigurationParameter = applicationConfigurationParameterWrapper->value();
+            std::memcpy(&applicationConfigurationParameter.paramValue[0], std::data(value), parameterLength);
         } else {
             throw std::runtime_error("unknown UwbApplicationConfigurationParameter variant value encountered");
         }
