@@ -395,7 +395,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
 
     detail::AddEnumOption(rangeStartApp, appConfigParamsData.deviceType, true);
 
-    rangeStartApp->parse_complete_callback([this] {
+    rangeStartApp->parse_complete_callback([this, rangeStartApp] {
         // TODO: Move validation logic into its own function
 
         // Validate NumberOfControlees
@@ -436,6 +436,8 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
         m_cliData->RangingParameters.appConfigParams.push_back({ uwb::protocol::fira::UwbApplicationConfigurationParameterType::DeviceMacAddress, m_cliData->appConfigParamsData.deviceMacAddress.value() });
         m_cliData->RangingParameters.appConfigParams.push_back({ uwb::protocol::fira::UwbApplicationConfigurationParameterType::DestinationMacAddresses, m_cliData->appConfigParamsData.destinationMacAddresses.value() });
         m_cliData->RangingParameters.appConfigParams.push_back({ uwb::protocol::fira::UwbApplicationConfigurationParameterType::DeviceType, m_cliData->appConfigParamsData.deviceType.value() });
+
+        RegisterCliAppWithOperation(rangeStartApp);
     });
 
     rangeStartApp->final_callback([this] {
