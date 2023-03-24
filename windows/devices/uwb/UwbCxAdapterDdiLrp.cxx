@@ -1315,6 +1315,22 @@ windows::devices::uwb::ddi::lrp::To(const UWB_GET_APP_CONFIG_PARAMS &getApplicat
     return std::move(uwbGetApplicationConfigurationParameters);
 }
 
+UwbSetApplicationConfigurationParameters
+windows::devices::uwb::ddi::lrp::To(const UWB_SET_APP_CONFIG_PARAMS &setApplicationConfigurationParameters)
+{
+    UwbSetApplicationConfigurationParameters uwbSetApplicationConfigurationParameters{
+        .SessionId = setApplicationConfigurationParameters.sessionId
+    };
+    uwbSetApplicationConfigurationParameters.Parameters.reserve(setApplicationConfigurationParameters.appConfigParamsCount);
+
+    std::span applicationConfigurationParameters(setApplicationConfigurationParameters.appConfigParams, setApplicationConfigurationParameters.appConfigParamsCount);
+    std::ranges::transform(applicationConfigurationParameters, std::back_inserter(uwbSetApplicationConfigurationParameters.Parameters), [](const auto &applicationConfigurationParameter) {
+        return To(applicationConfigurationParameter);
+    });
+
+    return std::move(uwbSetApplicationConfigurationParameters);
+}
+
 namespace detail
 {
 /**
