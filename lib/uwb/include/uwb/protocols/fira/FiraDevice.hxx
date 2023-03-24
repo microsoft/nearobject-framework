@@ -42,12 +42,6 @@ std::optional<uint32_t>
 StringToVersion(const std::string& input) noexcept;
 
 /**
- * @brief See FiRa Consortium - UCI Generic Specification v1.1.0, Section 8.3,
- * Table 29, 'APP Configuration Parameter IDs'.
- */
-constexpr auto MaxNumberOfControlees = 8;
-
-/**
  * @brief See FiRa Consortium MAC Technical Requirements v1.3.0,
  * Section D.1.8 STS, Figure 19, page 70.
  */

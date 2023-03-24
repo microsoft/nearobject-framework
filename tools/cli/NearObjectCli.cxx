@@ -404,11 +404,8 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
             if (m_cliData->appConfigParamsData.numberOfControlees != 1) {
                 std::cerr << "Only 1 controlee expected in Unicast mode" << std::endl;
             }
-        } else {
-            if (m_cliData->appConfigParamsData.numberOfControlees < 1 || m_cliData->appConfigParamsData.numberOfControlees > MaxNumberOfControlees) {
-                std::cerr << "Invalid number of controlees. Must be 1 <= N <= 8" << std::endl;
-            }
         }
+
         // Set MAC addresses
         const auto macAddressType = m_cliData->appConfigParamsData.macAddressMode == uwb::UwbMacAddressType::Extended ? uwb::UwbMacAddressType::Extended : uwb::UwbMacAddressType::Short;
 
