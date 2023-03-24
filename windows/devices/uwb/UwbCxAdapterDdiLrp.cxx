@@ -569,6 +569,19 @@ windows::devices::uwb::ddi::lrp::From(const UwbGetApplicationConfigurationParame
     return std::move(getApplicationConfigurationParameterTypesWrapper);
 }
 
+UWB_APP_CONFIG_PARAM_STATUS
+windows::devices::uwb::ddi::lrp::From(const std::tuple<::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbApplicationConfigurationParameterType> &uwbApplicationConfigurationParameterStatus)
+{
+    const auto &[status, uwbApplicationConfigurationParameterType] = uwbApplicationConfigurationParameterStatus;
+    UWB_APP_CONFIG_PARAM_STATUS applicationConfigurationParameterStatus = {
+        .size = sizeof applicationConfigurationParameterStatus,
+        .paramType = From(uwbApplicationConfigurationParameterType),
+        .status = From(status),
+    };
+
+    return applicationConfigurationParameterStatus;
+}
+
 UwbSetApplicationConfigurationParametersWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbSetApplicationConfigurationParameters &uwbSetApplicationConfigurationParameters)
 {
@@ -1357,6 +1370,15 @@ windows::devices::uwb::ddi::lrp::To(const UWB_GET_APP_CONFIG_PARAMS &getApplicat
     });
 
     return std::move(uwbGetApplicationConfigurationParameters);
+}
+
+std::tuple<UwbStatus, UwbApplicationConfigurationParameterType>
+windows::devices::uwb::ddi::lrp::To([[maybe_unused]] const UWB_APP_CONFIG_PARAM_STATUS &applicationConfigurationParameterStatus)
+{
+    return {
+        To(applicationConfigurationParameterStatus.status),
+        To(applicationConfigurationParameterStatus.paramType)
+    };
 }
 
 UwbSetApplicationConfigurationParameters

@@ -286,6 +286,15 @@ struct UwbSetApplicationConfigurationParameters
     operator<=>(const UwbSetApplicationConfigurationParameters &) const noexcept = default;
 };
 
+/**
+ * @brief Converts a UwbStatus, UwbApplicationConfigurationParameterType pair to UWB_APP_CONFIG_PARAM_STATUS.
+ * 
+ * @param uwbApplicationConfigurationParameterStatus 
+ * @return UWB_APP_CONFIG_PARAM_STATUS 
+ */
+UWB_APP_CONFIG_PARAM_STATUS
+From(const std::tuple<::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbApplicationConfigurationParameterType> &uwbApplicationConfigurationParameterStatus);
+
 using UwbSetApplicationConfigurationParametersWrapper = notstd::flextype_wrapper<UWB_SET_APP_CONFIG_PARAMS>;
 
 /**
@@ -553,6 +562,15 @@ To(const UWB_NOTIFICATION_DATA &notificationData);
  */
 UwbGetApplicationConfigurationParameters
 To(const UWB_GET_APP_CONFIG_PARAMS &getApplicationConfigurationParameters);
+
+/**
+ * @brief Converts UWB_APP_CONFIG_PARAM_STATUS to a pair of UwbStatus and UwbApplicationConfigurationParameterType.
+ * 
+ * @param applicationConfigurationParameterStatus 
+ * @return std::tuple<::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbApplicationConfigurationParameterType> 
+ */
+std::tuple<::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbApplicationConfigurationParameterType>
+To(const UWB_APP_CONFIG_PARAM_STATUS &applicationConfigurationParameterStatus);
 
 /**
  * @brief Converts UWB_SET_APP_CONFIG_PARAMS to UwbSetApplicationConfigurationParameters.
