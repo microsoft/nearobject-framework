@@ -88,12 +88,20 @@ public:
     GetUwbApp() noexcept;
 
     /**
+     * @brief Get the app object associated with the "service" sub-command.
+     *
+     * @return CLI::App&
+     */
+    CLI::App&
+    GetServiceApp() noexcept;
+
+    /**
      * @brief Get the app object associated with the "uwb range" sub-command.
      *
      * @return CLI::App&
      */
     CLI::App&
-    GetRangeApp() noexcept;
+    GetUwbRangeApp() noexcept;
 
     /**
      * @brief Get the app object associated with the "uwb raw" sub-command.
@@ -101,7 +109,7 @@ public:
      * @return CLI::App&
      */
     CLI::App&
-    GetRawApp() noexcept;
+    GetUwbRawApp() noexcept;
 
     /**
      * @brief Get the app object associated with the "uwb range start" sub-command.
@@ -109,7 +117,7 @@ public:
      * @return CLI::App&
      */
     CLI::App&
-    GetRangeStartApp() noexcept;
+    GetUwbRangeStartApp() noexcept;
 
     /**
      * @brief Get the app object associated with the "uwb range stop" sub-command.
@@ -117,7 +125,31 @@ public:
      * @return CLI::App&
      */
     CLI::App&
-    GetRangeStopApp() noexcept;
+    GetUwbRangeStopApp() noexcept;
+
+    /**
+     * @brief Get the app object associated with the "service range" sub-command.
+     *
+     * @return CLI::App&
+     */
+    CLI::App&
+    GetServiceRangeApp() noexcept;
+
+    /**
+     * @brief Get the app object associated with the "service range start" sub-command.
+     *
+     * @return CLI::App&
+     */
+    CLI::App&
+    GetServiceRangeStartApp() noexcept;
+
+    /**
+     * @brief Get the app object associated with the "service range stop" sub-command.
+     *
+     * @return CLI::App&
+     */
+    CLI::App&
+    GetServiceRangeStopApp() noexcept;
 
 private:
     /**
@@ -173,6 +205,15 @@ private:
     AddSubcommandUwb(CLI::App* parent);
 
     /**
+     * @brief Add the 'service' sub-command.
+     *
+     * @param parent The parent app to add the command to.
+     * @return CLI::App*
+     */
+    CLI::App*
+    AddSubcommandService(CLI::App* parent);
+
+    /**
      * @brief Add the 'uwb monitor' sub-command.
      *
      * @param parent The parent app to add the command to.
@@ -180,6 +221,15 @@ private:
      */
     CLI::App*
     AddSubcommandUwbMonitor(CLI::App* parent);
+
+    /**
+     * @brief Add the 'uwb raw' sub-command.
+     *
+     * @param parent The parent app to add the command to.
+     * @return CLI::App*
+     */
+    CLI::App*
+    AddSubcommandUwbRaw(CLI::App* parent);
 
     /**
      * @brief Add the 'uwb range' sub-command.
@@ -191,13 +241,31 @@ private:
     AddSubcommandUwbRange(CLI::App* parent);
 
     /**
-     * @brief Add the 'uwb raw' sub-command.
+     * @brief Add the 'service range' sub-command.
      *
      * @param parent The parent app to add the command to.
      * @return CLI::App*
      */
     CLI::App*
-    AddSubcommandUwbRaw(CLI::App* parent);
+    AddSubcommandServiceRange(CLI::App* parent);
+
+    /**
+     * @brief Add the 'uwb raw devicereset' sub-command.
+     *
+     * @param parent The parent app to add the command to.
+     * @return CLI::App*
+     */
+    CLI::App*
+    AddSubcommandUwbRawDeviceReset(CLI::App* parent);
+
+    /**
+     * @brief Add the 'uwb raw getdeviceinfo' sub-command.
+     *
+     * @param parent The parent app to add the command to.
+     * @return CLI::App*
+     */
+    CLI::App*
+    AddSubcommandUwbRawGetDeviceInfo(CLI::App* parent);
 
     /**
      * @brief Add the 'uwb range start' sub-command.
@@ -218,22 +286,22 @@ private:
     AddSubcommandUwbRangeStop(CLI::App* parent);
 
     /**
-     * @brief Add the 'uwb raw devicereset' sub-command.
+     * @brief Add the 'service range start' sub-command.
      *
-     * @param parent The parent app to add the command to.
+     * @param parent
      * @return CLI::App*
      */
     CLI::App*
-    AddSubcommandUwbRawDeviceReset(CLI::App* parent);
+    AddSubcommandServiceRangeStart(CLI::App* parent);
 
     /**
-     * @brief Add the 'uwb raw getdeviceinfo' sub-command.
+     * @brief Add the 'service range stop' sub-command.
      *
      * @param parent The parent app to add the command to.
      * @return CLI::App*
      */
     CLI::App*
-    AddSubcommandUwbRawGetDeviceInfo(CLI::App* parent);
+    AddSubcommandServiceRangeStop(CLI::App* parent);
 
 private:
     std::shared_ptr<NearObjectCliData> m_cliData;
@@ -244,11 +312,15 @@ private:
     std::unique_ptr<CLI::App> m_cliApp;
     // The following are helper references to the subcommands of m_cliApp, the memory is managed by CLI11.
     CLI::App* m_uwbApp;
+    CLI::App* m_serviceApp;
     CLI::App* m_monitorApp;
-    CLI::App* m_rangeApp;
-    CLI::App* m_rawApp;
-    CLI::App* m_rangeStartApp;
-    CLI::App* m_rangeStopApp;
+    CLI::App* m_uwbRawApp;
+    CLI::App* m_uwbRangeApp;
+    CLI::App* m_serviceRangeApp;
+    CLI::App* m_uwbRangeStartApp;
+    CLI::App* m_uwbRangeStopApp;
+    CLI::App* m_serviceRangeStartApp;
+    CLI::App* m_serviceRangeStopApp;
 };
 } // namespace nearobject::cli
 

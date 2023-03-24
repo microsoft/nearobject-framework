@@ -13,16 +13,6 @@
 namespace nearobject::cli
 {
 class NearObjectCli;
-
-/**
- * @brief Structure to hold parameters for a ranging session.
- */
-struct UwbRangingParameters
-{
-    uint32_t sessionId;
-    std::vector<uwb::protocol::fira::UwbApplicationConfigurationParameter> appConfigParams;
-};
-
 /**
  * @brief Class which handles and executes resolved command-line requests. The
  * command line driver will invoke the function associated with the command line
