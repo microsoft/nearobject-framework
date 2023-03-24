@@ -340,8 +340,8 @@ UwbSimulatorDdiCallbacks::SessionStopRanging(uint32_t sessionId)
     }
 
     // TODO: session exclusive mutex
-    // TODO: how do we mark this as stopped ranging? update the state?
-
+    SessionUpdateState(*session, UwbSessionState::Idle, UwbSessionReasonCode::StateChangeWithSessionManagementCommands);
+    
     return UwbStatusOk;
 }
 
