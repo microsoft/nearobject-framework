@@ -7,6 +7,7 @@
 #include <iostream>
 #include <memory>
 #include <optional>
+#include <ranges>
 #include <span>
 #include <string>
 #include <unordered_set>
@@ -562,6 +563,14 @@ using UwbApplicationConfigurationParameterValue = std::variant<
     std::unordered_set<::uwb::UwbMacAddress>>; // DST_MAC_ADDRESS, tag 0x07, size 2/8*N
 // clang-format on
 
+constexpr std::array<UwbApplicationConfigurationParameterType, 5> UwbApplicationConfigurationParameterTypesUpdateableWhileActive{
+    UwbApplicationConfigurationParameterType::BlockStrideLength,
+    UwbApplicationConfigurationParameterType::RangingInterval,
+    UwbApplicationConfigurationParameterType::RangeDataNotificationConfig,
+    UwbApplicationConfigurationParameterType::RangeDataNotificationProximityNear,
+    UwbApplicationConfigurationParameterType::RangeDataNotificationProximityFar,
+};
+
 /**
  * @brief Determines whether the specified application configuration parameter
  * (type) is allowed to be updated while a session is in the 'Active' state. 
@@ -573,17 +582,19 @@ using UwbApplicationConfigurationParameterValue = std::variant<
 constexpr bool
 IsApplicationConfigurationParameterChangeableWhileActive(const UwbApplicationConfigurationParameterType& uwbApplicationConfigurationParameterType)
 {
-    // TODO: the UCI spec (section 7.3.1) indicates STATUS_ERROR_SESSION_ACTIVE
-    // will be returned for application configuration parameters 'which are not
-    // allowed to set during the SESSION_STATE_ACTIVE Session State'. However,
-    // it does not list which parameters fall into this case. So for now, the
-    // list here is empty.
-    switch (uwbApplicationConfigurationParameterType) {
-    default:
-        break;
-    }
-
-    return false;
+    return std::ranges::any_of(UwbApplicationConfigurationParameterTypesUpdateableWhileActive, [&](const auto &type){
+        return (type == uwbApplicationConfigurationParameterType);
+    });
+    // switch (uwbApplicationConfigurationParameterType) {
+    // case UwbApplicationConfigurationParameterType::BlockStrideLength:
+    // case UwbApplicationConfigurationParameterType::RangingInterval:
+    // case UwbApplicationConfigurationParameterType::RangeDataNotificationConfig:
+    // case UwbApplicationConfigurationParameterType::RangeDataNotificationProximityNear:
+    // case UwbApplicationConfigurationParameterType::RangeDataNotificationProximityFar:
+    //     return true;
+    // default:
+    //     return false;
+    // }
 }
 
 /**
