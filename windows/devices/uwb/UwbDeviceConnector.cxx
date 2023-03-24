@@ -3,6 +3,7 @@
 #include <ios>
 #include <ranges>
 #include <stdexcept>
+#include <typeinfo>
 
 #include <plog/Log.h>
 #include <wil/result.h>
@@ -608,8 +609,6 @@ UwbDeviceConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData r
     callbacks->OnPeerPropertiesChanged(peersData);
 }
 
-#define ClassName(x) #x
-
 /**
  * @brief Helper function to handle the deregistration of missing callbacks
  *
@@ -623,12 +622,12 @@ bool
 Accessor(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks, std::function<std::function<void(ArgT)>(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>)> callbackAccessor, ArgT& arg)
 {
     if (not callbacks) {
-        PLOG_WARNING << "Ignoring " << ClassName(ArgT) << " event due to missing callback";
+        PLOG_WARNING << "Ignoring " << typeinfo(ArgT).name() << " event due to missing callback";
         return false;
     }
     auto callback = callbackAccessor(callbacks);
     if (not callback) {
-        PLOG_WARNING << "Ignoring " << ClassName(ArgT) << " event due to missing callback";
+        PLOG_WARNING << "Ignoring " << typeinfo(ArgT).name() << " event due to missing callback";
         return false;
     }
     callback(arg);
