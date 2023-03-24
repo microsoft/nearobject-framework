@@ -173,13 +173,21 @@ UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t session
         TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
         TraceLoggingUInt32(sessionId, "Session Id"));
 
+    std::unique_lock sessionsWriteLock{ m_sessionsGate };
+    auto sessionIt = m_sessions.find(sessionId);
+    if (sessionIt == std::cend(m_sessions)) {
+        return UwbStatusSession::NotExist;
+    }
+
+    auto &[_, session] = *sessionIt;
+
     std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus>> results{};
     applicationConfigurationParameterResults = std::move(results);
     return UwbStatusOk;
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacks::GetApplicationConfigurationParameters(uint32_t sessionId, [[maybe_unused]] const std::vector<UwbApplicationConfigurationParameterType> &applicationConfigurationParameterTypes, std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters)
+UwbSimulatorDdiCallbacks::GetApplicationConfigurationParameters(uint32_t sessionId, const std::vector<UwbApplicationConfigurationParameterType> &applicationConfigurationParameterTypes, std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters)
 {
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
@@ -195,8 +203,13 @@ UwbSimulatorDdiCallbacks::GetApplicationConfigurationParameters(uint32_t session
     }
 
     const auto &[_, session] = *sessionIt;
-    applicationConfigurationParameters = session.ApplicationConfigurationParameters;
-    // TODO: filter above with applicationConfigurationParameterTypes
+
+    std::ranges::copy_if(session.ApplicationConfigurationParameters, std::back_inserter(applicationConfigurationParameters), [&](const auto &entry) {
+        return std::ranges::any_of(applicationConfigurationParameterTypes, [&](const auto &type) {
+            return (entry.Type == type);
+        });
+    });
+
     return UwbStatusOk;
 }
 

@@ -287,7 +287,7 @@ UwbDeviceConnector::SessionRangingStart(uint32_t sessionId)
 {
     std::promise<UwbStatus> resultPromise;
     auto resultFuture = resultPromise.get_future();
-    
+
     wil::shared_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
@@ -326,7 +326,7 @@ UwbDeviceConnector::SessionRangingStop(uint32_t sessionId)
 {
     std::promise<UwbStatus> resultPromise;
     auto resultFuture = resultPromise.get_future();
-    
+
     wil::shared_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
@@ -383,9 +383,55 @@ UwbDeviceConnector::SessionUpdateControllerMulticastList(uint32_t sessionId, Uwb
 std::future<std::tuple<UwbStatus, std::vector<UwbApplicationConfigurationParameter>>>
 UwbDeviceConnector::GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes)
 {
-    std::promise<std::tuple<UwbStatus, std::vector<UwbApplicationConfigurationParameter>>> promiseResult;
-    auto resultFuture = promiseResult.get_future();
-    // TODO: invoke IOCTL_UWB_GET_APP_CONFIG_PARAMS
+    std::promise<std::tuple<UwbStatus, std::vector<UwbApplicationConfigurationParameter>>> resultPromise;
+    auto resultFuture = resultPromise.get_future();
+
+    wil::unique_hfile handleDriver;
+    auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
+    if (FAILED(hr)) {
+        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
+        return resultFuture;
+    }
+
+    UwbCxDdi::UwbGetApplicationConfigurationParameters uwbGetApplicationConfigurationParameters{
+        .SessionId = sessionId,
+        .ParameterTypes = std::move(applicationConfigurationParameterTypes),
+    };
+    auto getAppConfigParams = UwbCxDdi::From(uwbGetApplicationConfigurationParameters);
+    auto getAppConfigParamsBuffer = std::data(getAppConfigParams);
+
+    DWORD bytesRequired = 0;
+    std::vector<uint8_t> getAppConfigParamsResultBuffer{};
+
+    for (const auto i : std::ranges::iota_view{ 1, 2 }) {
+        getAppConfigParamsResultBuffer.resize(bytesRequired);
+        PLOG_DEBUG << "IOCTL_UWB_GET_APP_CONFIG_PARAMS attempt #" << i << " with " << std::size(getAppConfigParamsResultBuffer) << "-byte buffer";
+        BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_APP_CONFIG_PARAMS, std::data(getAppConfigParamsBuffer), std::size(getAppConfigParamsBuffer), std::data(getAppConfigParamsResultBuffer), std::size(getAppConfigParamsResultBuffer), &bytesRequired, nullptr);
+        if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
+            DWORD lastError = GetLastError();
+            // Treat all errors other than insufficient buffer size as fatal.
+            if (lastError != ERROR_INSUFFICIENT_BUFFER) {
+                HRESULT hr = HRESULT_FROM_WIN32(lastError);
+                PLOG_ERROR << "error when sending IOCTL_UWB_GET_APP_CONFIG_PARAMS, hr=" << std::showbase << std::hex << hr;
+                resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Failed)));
+                break;
+            }
+            // Attempt to retry the ioctl with the appropriate buffer size, which is now held in bytesRequired.
+            continue;
+        }
+
+        PLOG_DEBUG << "IOCTL_UWB_GET_APP_CONFIG_PARAMS succeeded";
+        auto& appConfigParamsResult = *reinterpret_cast<UWB_APP_CONFIG_PARAMS*>(std::data(getAppConfigParamsResultBuffer));
+        auto uwbStatus = UwbCxDdi::To(appConfigParamsResult.status);
+        if (!IsUwbStatusOk(uwbStatus)) {
+            resultPromise.set_exception(std::make_exception_ptr(UwbException(std::move(uwbStatus))));
+        } else {
+            auto uwbAppConfigParams = UwbCxDdi::To(appConfigParamsResult);
+            resultPromise.set_value(std::make_tuple(std::move(uwbStatus), std::move(uwbAppConfigParams)));
+        }
+        break; // for{1,2}
+    }
 
     return resultFuture;
 }

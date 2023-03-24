@@ -3,6 +3,7 @@
 #define I_UWB_SIMULATOR_SESSION_HXX
 
 #include <memory>
+#include <set>
 #include <unordered_set>
 #include <vector>
 
@@ -22,7 +23,7 @@ struct IUwbSimulatorSession
     uint32_t Sequence{ 0 };
     uint32_t RangingCount{ 0 };
     std::unordered_set<::uwb::UwbMacAddress> Controlees;
-    std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> ApplicationConfigurationParameters;
+    std::set<::uwb::protocol::fira::UwbApplicationConfigurationParameter> ApplicationConfigurationParameters;
 };
 } // namespace windows::devices::uwb::simulator
 

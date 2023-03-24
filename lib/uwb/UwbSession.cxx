@@ -94,3 +94,10 @@ UwbSession::InsertPeerImpl(const uwb::UwbMacAddress& peerAddress)
     m_peers.insert(peerAddress);
     PLOG_VERBOSE << "Session with id " << m_sessionId << " added peer via DDI with mac address " << peerAddress.ToString();
 }
+
+std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
+UwbSession::GetApplicationConfigurationParameters()
+{
+    PLOG_VERBOSE << "get application configuration parameters";
+    return GetApplicationConfigurationParametersImpl();
+}

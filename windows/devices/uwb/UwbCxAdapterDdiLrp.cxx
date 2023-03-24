@@ -552,6 +552,23 @@ windows::devices::uwb::ddi::lrp::From(const UwbNotificationData &uwbNotification
     return std::move(*notificationDataWrapper);
 }
 
+UwbGetApplicationConfigurationParametersWrapper
+windows::devices::uwb::ddi::lrp::From(const UwbGetApplicationConfigurationParameters &uwbGetApplicationConfigurationParameters)
+{
+    const std::size_t totalSize = offsetof(UWB_GET_APP_CONFIG_PARAMS, appConfigParams[std::size(uwbGetApplicationConfigurationParameters.ParameterTypes)]);
+    UwbGetApplicationConfigurationParametersWrapper getApplicationConfigurationParameterTypesWrapper(totalSize);
+    auto &getApplicationConfigurationParameterTypes = getApplicationConfigurationParameterTypesWrapper.value();
+    getApplicationConfigurationParameterTypes.size = totalSize;
+    getApplicationConfigurationParameterTypes.sessionId = uwbGetApplicationConfigurationParameters.SessionId;
+    getApplicationConfigurationParameterTypes.appConfigParamsCount = std::size(uwbGetApplicationConfigurationParameters.ParameterTypes);
+
+    for (auto i = 0; i < getApplicationConfigurationParameterTypes.appConfigParamsCount; i++) {
+        getApplicationConfigurationParameterTypes.appConfigParams[i] = From(uwbGetApplicationConfigurationParameters.ParameterTypes[i]);
+    }
+
+    return std::move(getApplicationConfigurationParameterTypesWrapper);
+}
+
 UwbApplicationConfigurationParameterWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbApplicationConfigurationParameter &uwbApplicationConfigurationParameter)
 {
@@ -1280,6 +1297,22 @@ windows::devices::uwb::ddi::lrp::To(const UWB_NOTIFICATION_DATA &notificationDat
 
     PLOG_WARNING << "unknown UwbNotificationData type encountered; returning default constructed instance";
     return UwbNotificationData{};
+}
+
+UwbGetApplicationConfigurationParameters
+windows::devices::uwb::ddi::lrp::To(const UWB_GET_APP_CONFIG_PARAMS &getApplicationConfigurationParameters)
+{
+    UwbGetApplicationConfigurationParameters uwbGetApplicationConfigurationParameters{
+        .SessionId = getApplicationConfigurationParameters.sessionId
+    };
+    uwbGetApplicationConfigurationParameters.ParameterTypes.reserve(getApplicationConfigurationParameters.appConfigParamsCount);
+
+    std::span applicationConfigurationParameterTypes(getApplicationConfigurationParameters.appConfigParams, getApplicationConfigurationParameters.appConfigParamsCount);
+    std::ranges::transform(applicationConfigurationParameterTypes, std::back_inserter(uwbGetApplicationConfigurationParameters.ParameterTypes), [](const auto &applicationConfigurationParameterType) {
+        return To(applicationConfigurationParameterType);
+    });
+
+    return std::move(uwbGetApplicationConfigurationParameters);
 }
 
 namespace detail

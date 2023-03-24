@@ -554,6 +554,8 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         .Value = std::move(uwbMacAddressExtended),
     };
 
+    constexpr auto uwbApplicationConfigurationParameterTypesAll = magic_enum::enum_values<UwbApplicationConfigurationParameterType>();
+
     SECTION("UwbApplicationConfigurationParameter bool variant is stable")
     {
         test::ValidateRoundtrip(parameterHoppingMode);
@@ -589,17 +591,17 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         test::ValidateRoundtrip(parameterResultReportConfig);
     }
 
-    SECTION("UwbApplicationConfigurationParameter ::uwb::UwbMacAddress (short type)")
+    SECTION("UwbApplicationConfigurationParameter ::uwb::UwbMacAddress (short type) is stable")
     {
         test::ValidateRoundtrip(parameterUwbMacAddressShort);
     }
 
-    SECTION("UwbApplicationConfigurationParameter ::uwb::UwbMacAddress (extended type)")
+    SECTION("UwbApplicationConfigurationParameter ::uwb::UwbMacAddress (extended type) is stable")
     {
         test::ValidateRoundtrip(parameterUwbMacAddressExtended);
     }
 
-    SECTION("std::vector<UwbApplicationConfigurationParameter>")
+    SECTION("std::vector<UwbApplicationConfigurationParameter> is stable")
     {
         const std::vector<UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters{
             parameterHoppingMode,
@@ -613,5 +615,17 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
             parameterUwbMacAddressExtended,
         };
         test::ValidateRoundtrip(uwbApplicationConfigurationParameters);
+    }
+
+    SECTION("UwbGetApplicationConfigurationParameters is stable")
+    {
+        const UwbGetApplicationConfigurationParameters uwbGetApplicationConfigurationParameters{
+            .SessionId = test::GetRandom<uint32_t>(),
+            .ParameterTypes{
+                std::cbegin(uwbApplicationConfigurationParameterTypesAll),
+                std::cend(uwbApplicationConfigurationParameterTypesAll),
+            }
+        };
+        test::ValidateRoundtrip(uwbGetApplicationConfigurationParameters);
     }
 }

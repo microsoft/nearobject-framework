@@ -108,7 +108,7 @@ UwbSession::ConfigureImpl(const uint32_t sessionId, const std::vector<::uwb::pro
     // TODO: the caller probably wants to know about this, figure out the best way to signal the error.
     //       One option is to define a UwbSetApplicationConfigurationParameterException which has an
     //       accessor that just returns the vector entries with statusSetParameter != Ok
-    for (const auto& [applicationConfigurationParameterType, statusSetParameter] : resultSetParameters) {
+    for (const auto &[applicationConfigurationParameterType, statusSetParameter] : resultSetParameters) {
         if (!IsUwbStatusOk(statusSetParameter)) {
             LOG_ERROR << "failed to set application configuration parameter " << magic_enum::enum_name(applicationConfigurationParameterType) << ", status=" << ToString(statusSetParameter);
         }
@@ -218,4 +218,32 @@ UwbSession::AddPeerImpl([[maybe_unused]] ::uwb::UwbMacAddress peerMacAddress)
     //     HRESULT hr = GetLastError();
     //     PLOG_ERROR << "could not send params to driver, hr=" << std::showbase << std::hex << hr;
     // }
+}
+
+std::vector<UwbApplicationConfigurationParameter>
+UwbSession::GetApplicationConfigurationParametersImpl()
+{
+    uint32_t sessionId = GetId();
+    constexpr auto allParameterTypesArray = magic_enum::enum_values<UwbApplicationConfigurationParameterType>();
+    std::vector<UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes(std::cbegin(allParameterTypesArray), std::cend(allParameterTypesArray));
+
+    auto resultFuture = m_uwbDeviceConnector->GetApplicationConfigurationParameters(sessionId, applicationConfigurationParameterTypes);
+    if (!resultFuture.valid()) {
+        PLOG_ERROR << "failed to obtain application configuration parameters for session id " << sessionId;
+        throw UwbException(UwbStatusGeneric::Failed);
+    }
+
+    try {
+        auto [uwbStatus, applicationConfigurationParameters] = resultFuture.get();
+        if (!IsUwbStatusOk(uwbStatus)) {
+            // TODO: this value should be returned
+        }
+        return applicationConfigurationParameters;
+    } catch (UwbException &uwbException) {
+        PLOG_ERROR << "caught exception attempting to obtain application configuration parameters for session id " << sessionId << "(" << ToString(uwbException.Status) << ")";
+        throw uwbException;
+    } catch (std::exception &e) {
+        PLOG_ERROR << "caught unexpected exception attempting to obtain application configuration parameters for session id " << sessionId << "(" << e.what() << ")";
+        throw e;
+    }
 }

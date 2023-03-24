@@ -58,6 +58,14 @@ private:
     virtual void
     AddPeerImpl(::uwb::UwbMacAddress peerMacAddress) override;
 
+    /**
+     * @brief Get the application configuration parameters for this session.
+     * 
+     * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> 
+     */
+    virtual std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
+    GetApplicationConfigurationParametersImpl() override;
+
 protected:
     /**
      * @brief Obtain a shared instance of the device driver connector.
