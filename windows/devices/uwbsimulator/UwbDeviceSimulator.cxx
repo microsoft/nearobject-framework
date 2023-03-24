@@ -36,9 +36,9 @@ UwbDeviceSimulator::Initialize()
 }
 
 std::shared_ptr<::uwb::UwbSession>
-UwbDeviceSimulator::CreateSessionImpl(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
+UwbDeviceSimulator::CreateSessionImpl(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
 {
-    return std::make_shared<UwbSessionSimulator>(std::move(callbacks), m_uwbDeviceConnector, m_uwbDeviceSimulatorConnector);
+    return std::make_shared<UwbSessionSimulator>(sessionId, std::move(callbacks), m_uwbDeviceConnector, m_uwbDeviceSimulatorConnector);
 }
 
 UwbSimulatorCapabilities

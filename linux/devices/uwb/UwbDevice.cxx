@@ -5,7 +5,7 @@ using namespace linux::devices;
 using namespace uwb::protocol::fira;
 
 std::shared_ptr<uwb::UwbSession>
-UwbDevice::CreateSessionImpl(std::weak_ptr<uwb::UwbSessionEventCallbacks> /* callbacks */)
+UwbDevice::CreateSessionImpl(uint32_t sessionId, std::weak_ptr<uwb::UwbSessionEventCallbacks> /* callbacks */)
 {
     // TODO
     return nullptr;

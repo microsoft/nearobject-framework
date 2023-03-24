@@ -251,6 +251,52 @@ using UwbNotificationDataWrapper = notstd::flextype_wrapper<UWB_NOTIFICATION_DAT
 UwbNotificationDataWrapper
 From(const ::uwb::protocol::fira::UwbNotificationData &uwbNotificationData);
 
+/**
+ * @brief Neutral type for the UWB_GET_APP_CONFIG_PARAMS DDI structure.
+ */
+struct UwbGetApplicationConfigurationParameters
+{
+    uint32_t SessionId;
+    std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> ParameterTypes;
+
+    auto
+    operator<=>(const UwbGetApplicationConfigurationParameters &) const noexcept = default;
+};
+
+using UwbGetApplicationConfigurationParametersWrapper = notstd::flextype_wrapper<UWB_GET_APP_CONFIG_PARAMS>;
+
+/**
+ * @brief Converts UwbGetApplicationConfigurationParameters to UWB_GET_APP_CONFIG_PARAMS.
+ *
+ * @param uwbGetApplicationConfigurationParameters
+ * @return UwbGetApplicationConfigurationParametersWrapper
+ */
+UwbGetApplicationConfigurationParametersWrapper
+From(const UwbGetApplicationConfigurationParameters &uwbGetApplicationConfigurationParameters);
+
+/**
+ * @brief Neutral type for the UWB_SET_APP_CONFIG_PARAMS DDI structure.
+ */
+struct UwbSetApplicationConfigurationParameters
+{
+    uint32_t SessionId;
+    std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> Parameters;
+
+    auto
+    operator<=>(const UwbSetApplicationConfigurationParameters &) const noexcept = default;
+};
+
+using UwbSetApplicationConfigurationParametersWrapper = notstd::flextype_wrapper<UWB_SET_APP_CONFIG_PARAMS>;
+
+/**
+ * @brief
+ *
+ * @param uwbSetApplicationConfigurationParameters
+ * @return UwbSetApplicationConfigurationParametersWrapper
+ */
+UwbSetApplicationConfigurationParametersWrapper
+From(const UwbSetApplicationConfigurationParameters &uwbSetApplicationConfigurationParameters);
+
 using UwbApplicationConfigurationParameterWrapper = notstd::flextype_wrapper<UWB_APP_CONFIG_PARAM>;
 
 /**
@@ -487,6 +533,24 @@ To(const UWB_RANGING_DATA &rangingData);
  */
 ::uwb::protocol::fira::UwbNotificationData
 To(const UWB_NOTIFICATION_DATA &notificationData);
+
+/**
+ * @brief Converts UWB_GET_APP_CONFIG_PARAMS to UwbGetApplicationConfigurationParameters.
+ *
+ * @param getApplicationConfigurationParameters
+ * @return UwbGetApplicationConfigurationParameters
+ */
+UwbGetApplicationConfigurationParameters
+To(const UWB_GET_APP_CONFIG_PARAMS &getApplicationConfigurationParameters);
+
+/**
+ * @brief Converts UWB_SET_APP_CONFIG_PARAMS to UwbSetApplicationConfigurationParameters.
+ *
+ * @param setApplicationConfigurationParameters
+ * @return UwbSetApplicationConfigurationParameters
+ */
+UwbSetApplicationConfigurationParameters
+To(const UWB_SET_APP_CONFIG_PARAMS &setApplicationConfigurationParameters);
 
 /**
  * @brief Converts UWB_APP_CONFIG_PARAM to UwbApplicationConfigurationParameter.

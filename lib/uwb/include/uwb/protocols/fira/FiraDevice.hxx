@@ -266,7 +266,7 @@ enum class ResultReportConfiguration : uint8_t {
  * @return std::string
  */
 std::string
-ResultReportConfigurationToString(const std::unordered_set<ResultReportConfiguration>& resultReportConfiguration);
+ToString(const std::unordered_set<ResultReportConfiguration>& resultReportConfiguration);
 
 /**
  * @brief Converts a string to vector of ResultReportConfiguration.
@@ -574,6 +574,14 @@ struct UwbApplicationConfigurationParameter
 
     bool
     operator==(const UwbApplicationConfigurationParameter&) const noexcept = default;
+
+    /**
+     * @brief Returns a string representation of the object.
+     *
+     * @return std::string
+     */
+    std::string
+    ToString() const;
 };
 
 struct UwbMulticastListStatus
@@ -733,6 +741,15 @@ ToString(const UwbStatus& uwbStatus);
  */
 std::string
 ToString(const UwbNotificationData& uwbNotificationData);
+
+/**
+ * @brief Returns a string representation of the object.
+ *
+ * @param uwbApplicationConfigurationParameterValue
+ * @return std::string
+ */
+std::string
+ToString(const UwbApplicationConfigurationParameterValue& uwbApplicationConfigurationParameterValue);
 
 } // namespace uwb::protocol::fira
 

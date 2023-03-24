@@ -21,7 +21,7 @@ struct UwbDeviceTestBase : public uwb::UwbDevice
     uint16_t Id;
 
     std::shared_ptr<UwbSession>
-    CreateSessionImpl(std::weak_ptr<UwbSessionEventCallbacks> /* callbacks */) override
+    CreateSessionImpl(uint32_t /* sessionId */, std::weak_ptr<UwbSessionEventCallbacks> /* callbacks */) override
     {
         return nullptr;
     }

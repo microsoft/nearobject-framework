@@ -200,19 +200,30 @@ UwbSimulatorDdiHandler::OnUwbGetApplicationConfigurationParameters(WDFREQUEST re
     NTSTATUS status = STATUS_SUCCESS;
 
     // Convert DDI input type to neutral type.
-    auto &applicationConfigurationParametersIn = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS *>(std::data(inputBuffer));
-    std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters{};
-    std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus>> applicationConfigurationParameterResults;
+    auto &applicationConfigurationParametersIn = *reinterpret_cast<UWB_GET_APP_CONFIG_PARAMS *>(std::data(inputBuffer));
+
+    std::vector<UwbApplicationConfigurationParameterType> uwbApplicationConfigurationParameterTypes{};
+    uwbApplicationConfigurationParameterTypes.reserve(applicationConfigurationParametersIn.appConfigParamsCount);
+    std::span uwbApplicationConfigurationParameterTypesRange{ applicationConfigurationParametersIn.appConfigParams, applicationConfigurationParametersIn.appConfigParamsCount };
+    std::ranges::transform(uwbApplicationConfigurationParameterTypesRange, std::back_inserter(uwbApplicationConfigurationParameterTypes), [](const auto &applicationConfigurationParameterType) {
+        return UwbCxDdi::To(applicationConfigurationParameterType);
+    });
 
     // Invoke callback.
-    auto statusUwb = m_callbacks->SetApplicationConfigurationParameters(applicationConfigurationParametersIn.sessionId, applicationConfigurationParameters, applicationConfigurationParameterResults);
+    std::vector<UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters{};
+    auto statusUwb = m_callbacks->GetApplicationConfigurationParameters(applicationConfigurationParametersIn.sessionId, uwbApplicationConfigurationParameterTypes, uwbApplicationConfigurationParameters);
 
     // Convert neutral types to DDI types.
-    auto &outputValue = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS_STATUS *>(std::data(outputBuffer));
-    outputValue.size = sizeof outputValue;
-    outputValue.status = UwbCxDdi::From(statusUwb);
-
-    // TODO: the output value needs to be filled in with applicationConfigurationParameterResults
+    auto &outputValue = *reinterpret_cast<UWB_APP_CONFIG_PARAMS *>(std::data(outputBuffer));
+    if (IsUwbStatusOk(statusUwb)) {
+        auto applicationConfigurationParametersWrapper = UwbCxDdi::From(uwbApplicationConfigurationParameters);
+        auto applicationConfigurationParameterBuffer = std::data(applicationConfigurationParametersWrapper);
+        std::ranges::copy(applicationConfigurationParameterBuffer, std::begin(outputBuffer));
+    } else {
+        outputValue.size = sizeof outputValue;
+        outputValue.status = UwbCxDdi::From(statusUwb);
+        outputValue.appConfigParamsCount = 0;
+    }
 
     // Complete the request.
     WdfRequestCompleteWithInformation(request, status, outputValue.size);

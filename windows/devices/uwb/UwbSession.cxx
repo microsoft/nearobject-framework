@@ -15,8 +15,8 @@
 using namespace windows::devices::uwb;
 using namespace ::uwb::protocol::fira;
 
-UwbSession::UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, std::shared_ptr<IUwbSessionDdiConnector> uwbDeviceConnector, ::uwb::protocol::fira::DeviceType deviceType) :
-    ::uwb::UwbSession(std::move(callbacks), deviceType),
+UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, std::shared_ptr<IUwbSessionDdiConnector> uwbDeviceConnector, ::uwb::protocol::fira::DeviceType deviceType) :
+    ::uwb::UwbSession(sessionId, std::move(callbacks), deviceType),
     m_uwbDeviceConnector(std::move(uwbDeviceConnector))
 {
     m_registeredCallbacks = std::make_shared<::uwb::UwbRegisteredSessionEventCallbacks>(
@@ -70,14 +70,14 @@ UwbSession::GetUwbDeviceConnector() noexcept
 }
 
 void
-UwbSession::ConfigureImpl(const uint32_t sessionId, const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> configParams)
+UwbSession::ConfigureImpl(const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> configParams)
 {
     PLOG_VERBOSE << "ConfigureImpl";
 
     UwbSessionType sessionType = UwbSessionType::RangingSession;
 
     // Request a new session from the driver.
-    auto sessionInitResultFuture = m_uwbDeviceConnector->SessionInitialize(sessionId, sessionType);
+    auto sessionInitResultFuture = m_uwbDeviceConnector->SessionInitialize(m_sessionId, sessionType);
     if (!sessionInitResultFuture.valid()) {
         PLOG_ERROR << "failed to initialize session";
         throw UwbException(UwbStatusGeneric::Rejected);
@@ -89,10 +89,8 @@ UwbSession::ConfigureImpl(const uint32_t sessionId, const std::vector<::uwb::pro
         throw UwbException(statusSessionInit);
     }
 
-    m_sessionId = sessionId;
-
     // Set the application configuration parameters for the session.
-    auto setAppConfigParamsFuture = m_uwbDeviceConnector->SetApplicationConfigurationParameters(sessionId, configParams);
+    auto setAppConfigParamsFuture = m_uwbDeviceConnector->SetApplicationConfigurationParameters(m_sessionId, configParams);
     if (!setAppConfigParamsFuture.valid()) {
         PLOG_ERROR << "failed to set the application configuration parameters";
         throw UwbException(UwbStatusGeneric::Rejected);
@@ -218,4 +216,32 @@ UwbSession::AddPeerImpl([[maybe_unused]] ::uwb::UwbMacAddress peerMacAddress)
     //     HRESULT hr = GetLastError();
     //     PLOG_ERROR << "could not send params to driver, hr=" << std::showbase << std::hex << hr;
     // }
+}
+
+std::vector<UwbApplicationConfigurationParameter>
+UwbSession::GetApplicationConfigurationParametersImpl()
+{
+    uint32_t sessionId = GetId();
+    constexpr auto allParameterTypesArray = magic_enum::enum_values<UwbApplicationConfigurationParameterType>();
+    std::vector<UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes(std::cbegin(allParameterTypesArray), std::cend(allParameterTypesArray));
+
+    auto resultFuture = m_uwbDeviceConnector->GetApplicationConfigurationParameters(sessionId, applicationConfigurationParameterTypes);
+    if (!resultFuture.valid()) {
+        PLOG_ERROR << "failed to obtain application configuration parameters for session id " << sessionId;
+        throw UwbException(UwbStatusGeneric::Failed);
+    }
+
+    try {
+        auto [uwbStatus, applicationConfigurationParameters] = resultFuture.get();
+        if (!IsUwbStatusOk(uwbStatus)) {
+            // TODO: this value should be returned
+        }
+        return applicationConfigurationParameters;
+    } catch (UwbException &uwbException) {
+        PLOG_ERROR << "caught exception attempting to obtain application configuration parameters for session id " << sessionId << "(" << ToString(uwbException.Status) << ")";
+        throw uwbException;
+    } catch (std::exception &e) {
+        PLOG_ERROR << "caught unexpected exception attempting to obtain application configuration parameters for session id " << sessionId << "(" << e.what() << ")";
+        throw e;
+    }
 }
