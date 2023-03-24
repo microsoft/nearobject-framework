@@ -183,7 +183,7 @@ UwbSimulatorDdiCallbacks::SessionDeninitialize(uint32_t sessionId)
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus>> &applicationConfigurationParameterResults)
+UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters, std::vector<UwbSetApplicationConfigurationParameterStatus> &applicationConfigurationParameterResults)
 {
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
@@ -198,7 +198,7 @@ UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t session
         return UwbStatusSession::NotExist;
     }
 
-    std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus>> results{};
+    std::vector<UwbSetApplicationConfigurationParameterStatus> results{};
     // TODO: session exclusive mutex
 
     // Partition the parameters into those that are expressly disallowed and those that require further checking.
@@ -210,7 +210,7 @@ UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t session
 
     // Update result container with all disallowed parameters.
     std::ranges::transform(disallowed, std::back_inserter(results), [&](const auto &applicationConfigurationParameter) {
-        return std::make_tuple(applicationConfigurationParameter.Type, UwbStatusSession::Active);
+        return { UwbStatusSession::Active, applicationConfigurationParameter.Type };
     });
 
     // Process remaining entries.
@@ -244,7 +244,7 @@ UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t session
         session->ApplicationConfigurationParameters.insert(std::move(node));
 
         // Update result container indicating setting the parameter was successful.
-        return std::make_tuple(type, UwbStatusGeneric::Ok);
+        return { UwbStatusGeneric::Ok, type };
     });
 
     applicationConfigurationParameterResults = std::move(results);

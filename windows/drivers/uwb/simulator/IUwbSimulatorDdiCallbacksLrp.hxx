@@ -94,7 +94,7 @@ struct IUwbSimulatorDdiCallbacksLrp
      * @return UwbStatus
      */
     virtual UwbStatus
-    SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus>> &applicationConfigurationParameterResults) = 0;
+    SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters, std::vector<UwbSetApplicationConfigurationParameterStatus> &applicationConfigurationParameterResults) = 0;
 
     /**
      * @brief Get the Session Count object

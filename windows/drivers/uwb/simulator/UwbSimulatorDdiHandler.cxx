@@ -240,7 +240,7 @@ UwbSimulatorDdiHandler::OnUwbSetApplicationConfigurationParameters(WDFREQUEST re
     // Convert DDI input type to neutral type.
     auto &applicationConfigurationParametersIn = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS *>(std::data(inputBuffer));
     std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters{};
-    std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus>> applicationConfigurationParameterResults{};
+    std::vector<UwbSetApplicationConfigurationParameterStatus> applicationConfigurationParameterResults{};
 
     // Invoke callback.
     auto statusUwb = m_callbacks->SetApplicationConfigurationParameters(applicationConfigurationParametersIn.sessionId, applicationConfigurationParameters, applicationConfigurationParameterResults);
