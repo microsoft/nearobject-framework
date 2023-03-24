@@ -325,6 +325,9 @@ struct UwbSetApplicationConfigurationParametersStatus
 {
     ::uwb::protocol::fira::UwbStatus Status;
     std::vector<UwbSetApplicationConfigurationParameterStatus> ParameterStatuses;
+
+    auto
+    operator<=>(const UwbSetApplicationConfigurationParametersStatus &) const noexcept = default;
 };
 
 using UwbSetApplicationConfigurationParametersStatusWrapper = notstd::flextype_wrapper<UWB_SET_APP_CONFIG_PARAMS_STATUS>;
