@@ -51,19 +51,30 @@ try {
 void
 NearObjectCliHandler::HandleStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevice, uwb::protocol::fira::UwbSessionData& sessionData) noexcept
 try {
+    // Instantiate callbacks for session events.
     auto controlFlowContext = (m_parent != nullptr) ? m_parent->GetControlFlowContext() : nullptr;
     auto callbacks = std::make_shared<nearobject::cli::NearObjectCliUwbSessionEventCallbacks>([controlFlowContext = std::move(controlFlowContext)]() {
         if (controlFlowContext != nullptr) {
             controlFlowContext->OperationSignalComplete();
         }
     });
-    auto session = uwbDevice->CreateSession(callbacks);
-    session->Configure(sessionData.sessionId, uwb::protocol::fira::GetUciConfigParams(sessionData.uwbConfiguration, session->GetDeviceType()));
-    auto applicationConfigurationParameters = session->GetApplicationConfigurationParameters();
+
+    // Create a new session.
+    auto session = uwbDevice->CreateSession(sessionData.sessionId, callbacks);
+
+    // Convert configuration from OOB (UWB_SESSION_DATA) to UCI application
+    // configuration parameters and configure the session with them.
+    auto applicationConfigurationParameters = GetUciConfigParams(sessionData.uwbConfiguration, session->GetDeviceType());
+    session->Configure(applicationConfigurationParameters);
+
+    // Obtain the configured session application configuration parameters.
+    auto applicationConfigurationParametersSet = session->GetApplicationConfigurationParameters();
     PLOG_DEBUG << "Session Application Configuration Parameters: ";
-    for (const auto& applicationConfigurationParameter : applicationConfigurationParameters) {
+    for (const auto& applicationConfigurationParameter : applicationConfigurationParametersSet) {
         PLOG_DEBUG << " > " << applicationConfigurationParameter.ToString();
     }
+
+    // Start ranging.
     session->StartRanging();
 } catch (...) {
     PLOG_ERROR << "failed to start ranging";
