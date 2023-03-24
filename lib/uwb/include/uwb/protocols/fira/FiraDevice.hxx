@@ -563,6 +563,30 @@ using UwbApplicationConfigurationParameterValue = std::variant<
 // clang-format on
 
 /**
+ * @brief Determines whether the specified application configuration parameter
+ * (type) is allowed to be updated while a session is in the 'Active' state. 
+ * 
+ * @param uwbApplicationConfigurationParameterType 
+ * @return true The parameter may be updated while a session is active.
+ * @return false The parameter may not be updated while a session is active.
+ */
+constexpr bool
+IsApplicationConfigurationParameterChangeableWhileActive(const UwbApplicationConfigurationParameterType& uwbApplicationConfigurationParameterType)
+{
+    // TODO: the UCI spec (section 7.3.1) indicates STATUS_ERROR_SESSION_ACTIVE
+    // will be returned for application configuration parameters 'which are not
+    // allowed to set during the SESSION_STATE_ACTIVE Session State'. However,
+    // it does not list which parameters fall into this case. So for now, the
+    // list here is empty.
+    switch (uwbApplicationConfigurationParameterType) {
+    default:
+        break;
+    }
+
+    return false;
+}
+
+/**
  * @brief Represents a FiRa UWB Application Configuration Parameter as
  * described in the FiRa Consortium UWB Command Interface Generic Technical
  * Specification.
