@@ -23,10 +23,10 @@ public:
 
     /**
      * @brief Determine if this device is the same as another.
-     * 
-     * @param other 
-     * @return true 
-     * @return false 
+     *
+     * @param other
+     * @return true
+     * @return false
      */
     bool
     IsEqual(const uwb::UwbDevice& other) const noexcept override;
@@ -34,31 +34,32 @@ public:
 private:
     /**
      * @brief Create a Session object
-     * 
-     * @param callbacks 
-     * @return std::shared_ptr<uwb::UwbSession> 
+     *
+     * @param sessionId
+     * @param callbacks
+     * @return std::shared_ptr<uwb::UwbSession>
      */
     std::shared_ptr<uwb::UwbSession>
-    CreateSessionImpl(std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks) override;
+    CreateSessionImpl(uint32_t sessionId, std::weak_ptr<uwb::UwbSessionEventCallbacks> callbacks) override;
 
     /**
      * @brief Get the capabilities of the device.
-     * 
-     * @return uwb::protocol::fira::UwbCapability 
+     *
+     * @return uwb::protocol::fira::UwbCapability
      */
     uwb::protocol::fira::UwbCapability
     GetCapabilitiesImpl() override;
 
     /**
      * @brief Get the FiRa device information of the device.
-     * 
-     * @return uwb::protocol::fira::UwbDeviceInformation 
+     *
+     * @return uwb::protocol::fira::UwbDeviceInformation
      */
     uwb::protocol::fira::UwbDeviceInformation
     GetDeviceInformationImpl() override;
 
     /**
-     * @brief Reset the device to an initial clean state. 
+     * @brief Reset the device to an initial clean state.
      */
     void
     ResetImpl() override;

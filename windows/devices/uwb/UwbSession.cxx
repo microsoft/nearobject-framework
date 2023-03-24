@@ -15,8 +15,8 @@
 using namespace windows::devices::uwb;
 using namespace ::uwb::protocol::fira;
 
-UwbSession::UwbSession(std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, std::shared_ptr<UwbDeviceConnector> uwbDeviceConnector, ::uwb::protocol::fira::DeviceType deviceType) :
-    ::uwb::UwbSession(std::move(callbacks), deviceType),
+UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, std::shared_ptr<UwbDeviceConnector> uwbDeviceConnector, ::uwb::protocol::fira::DeviceType deviceType) :
+    ::uwb::UwbSession(sessionId, std::move(callbacks), deviceType),
     m_uwbDeviceConnector(std::move(uwbDeviceConnector))
 {
     m_registeredCallbacks = std::make_shared<::uwb::UwbRegisteredSessionEventCallbacks>(
@@ -70,16 +70,14 @@ UwbSession::GetUwbDeviceConnector() noexcept
 }
 
 void
-UwbSession::ConfigureImpl(const uint32_t sessionId, const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> configParams)
+UwbSession::ConfigureImpl(const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> configParams)
 {
     PLOG_VERBOSE << "ConfigureImpl";
 
     UwbSessionType sessionType = UwbSessionType::RangingSession;
 
     // Request a new session from the driver.
-    m_sessionId = sessionId;
-
-    auto sessionInitResultFuture = m_uwbDeviceConnector->SessionInitialize(sessionId, sessionType);
+    auto sessionInitResultFuture = m_uwbDeviceConnector->SessionInitialize(m_sessionId, sessionType);
     if (!sessionInitResultFuture.valid()) {
         PLOG_ERROR << "failed to initialize session";
         throw UwbException(UwbStatusGeneric::Rejected);
@@ -92,7 +90,7 @@ UwbSession::ConfigureImpl(const uint32_t sessionId, const std::vector<::uwb::pro
     }
 
     // Set the application configuration parameters for the session.
-    auto setAppConfigParamsFuture = m_uwbDeviceConnector->SetApplicationConfigurationParameters(sessionId, configParams);
+    auto setAppConfigParamsFuture = m_uwbDeviceConnector->SetApplicationConfigurationParameters(m_sessionId, configParams);
     if (!setAppConfigParamsFuture.valid()) {
         PLOG_ERROR << "failed to set the application configuration parameters";
         throw UwbException(UwbStatusGeneric::Rejected);
