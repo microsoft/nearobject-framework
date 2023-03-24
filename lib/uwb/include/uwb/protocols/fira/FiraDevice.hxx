@@ -573,16 +573,16 @@ constexpr std::array<UwbApplicationConfigurationParameterType, 5> UwbApplication
 
 /**
  * @brief Determines whether the specified application configuration parameter
- * (type) is allowed to be updated while a session is in the 'Active' state. 
- * 
- * @param uwbApplicationConfigurationParameterType 
+ * (type) is allowed to be updated while a session is in the 'Active' state.
+ *
+ * @param uwbApplicationConfigurationParameterType
  * @return true The parameter may be updated while a session is active.
  * @return false The parameter may not be updated while a session is active.
  */
 constexpr bool
 IsApplicationConfigurationParameterChangeableWhileActive(const UwbApplicationConfigurationParameterType& uwbApplicationConfigurationParameterType)
 {
-    return std::ranges::any_of(UwbApplicationConfigurationParameterTypesUpdateableWhileActive, [&](const auto &type){
+    return std::ranges::any_of(UwbApplicationConfigurationParameterTypesUpdateableWhileActive, [&](const auto& type) {
         return (type == uwbApplicationConfigurationParameterType);
     });
 }
@@ -611,14 +611,14 @@ struct UwbApplicationConfigurationParameter
 
 /**
  * @brief Determines whether the specified application configuration parameter
- * is allowed to be updated while a session is in the 'Active' state. 
- * 
- * @param uwbApplicationConfigurationParameter 
+ * is allowed to be updated while a session is in the 'Active' state.
+ *
+ * @param uwbApplicationConfigurationParameter
  * @return true The parameter may be updated while a session is active.
  * @return false The parameter may not be updated while a session is active.
  */
 constexpr bool
-IsApplicationConfigurationChangeableWhileActive(const UwbApplicationConfigurationParameter &uwbApplicationConfigurationParameter)
+IsApplicationConfigurationChangeableWhileActive(const UwbApplicationConfigurationParameter& uwbApplicationConfigurationParameter)
 {
     return IsApplicationConfigurationParameterChangeableWhileActive(uwbApplicationConfigurationParameter.Type);
 }
@@ -791,5 +791,21 @@ std::string
 ToString(const UwbApplicationConfigurationParameterValue& uwbApplicationConfigurationParameterValue);
 
 } // namespace uwb::protocol::fira
+
+namespace std
+{
+using ::uwb::protocol::fira::UwbApplicationConfigurationParameter;
+using ::uwb::protocol::fira::UwbApplicationConfigurationParameterType;
+
+template <>
+struct less<UwbApplicationConfigurationParameter>
+{
+    bool
+    operator()(const UwbApplicationConfigurationParameter& lhs, const UwbApplicationConfigurationParameter& rhs) const
+    {
+        return std::less<UwbApplicationConfigurationParameterType>{}(lhs.Type, rhs.Type);
+    }
+};
+} // namespace std
 
 #endif // FIRA_DEVICE_HXX
