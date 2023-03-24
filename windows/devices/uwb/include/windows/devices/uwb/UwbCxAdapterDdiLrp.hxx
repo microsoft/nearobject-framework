@@ -297,6 +297,17 @@ using UwbSetApplicationConfigurationParametersWrapper = notstd::flextype_wrapper
 UwbSetApplicationConfigurationParametersWrapper
 From(const UwbSetApplicationConfigurationParameters &uwbSetApplicationConfigurationParameters);
 
+using UwbSetApplicationConfigurationParametersStatusWrapper = notstd::flextype_wrapper<UWB_SET_APP_CONFIG_PARAMS_STATUS>;
+
+/**
+ * @brief 
+ * 
+ * @param uwbSetApplicationConfigurationParametersStatuses 
+ * @return UwbSetApplicationConfigurationParametersStatusWrapper 
+ */
+UwbSetApplicationConfigurationParametersStatusWrapper
+From(const std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>>& uwbSetApplicationConfigurationParametersStatuses);
+
 using UwbApplicationConfigurationParameterWrapper = notstd::flextype_wrapper<UWB_APP_CONFIG_PARAM>;
 
 /**
@@ -551,6 +562,15 @@ To(const UWB_GET_APP_CONFIG_PARAMS &getApplicationConfigurationParameters);
  */
 UwbSetApplicationConfigurationParameters
 To(const UWB_SET_APP_CONFIG_PARAMS &setApplicationConfigurationParameters);
+
+/**
+ * @brief Converts UWB_SET_APP_CONFIG_PARAMS_STATUS to a list of corresponding neutral types.
+ * 
+ * @param setApplicationConfigurationParametersStatus 
+ * @return std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>> 
+ */
+std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>>
+To(const UWB_SET_APP_CONFIG_PARAMS_STATUS& setApplicationConfigurationParametersStatus);
 
 /**
  * @brief Converts UWB_APP_CONFIG_PARAM to UwbApplicationConfigurationParameter.
