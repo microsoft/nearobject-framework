@@ -1359,10 +1359,12 @@ windows::devices::uwb::ddi::lrp::To(const UWB_SET_APP_CONFIG_PARAMS &setApplicat
     };
     uwbSetApplicationConfigurationParameters.Parameters.reserve(setApplicationConfigurationParameters.appConfigParamsCount);
 
-    std::span applicationConfigurationParameters(setApplicationConfigurationParameters.appConfigParams, setApplicationConfigurationParameters.appConfigParamsCount);
-    std::ranges::transform(applicationConfigurationParameters, std::back_inserter(uwbSetApplicationConfigurationParameters.Parameters), [](const auto &applicationConfigurationParameter) {
-        return To(applicationConfigurationParameter);
-    });
+    auto *appConfigParam = reinterpret_cast<const UWB_APP_CONFIG_PARAM *>(&setApplicationConfigurationParameters.appConfigParams[0]);
+    for (auto i = 0; i < setApplicationConfigurationParameters.appConfigParamsCount; i++) {
+        auto uwbAppConfigParam = To(*appConfigParam);
+        uwbSetApplicationConfigurationParameters.Parameters.push_back(std::move(uwbAppConfigParam));
+        appConfigParam = reinterpret_cast<const UWB_APP_CONFIG_PARAM *>(reinterpret_cast<uintptr_t>(appConfigParam) + appConfigParam->size);
+    }
 
     return std::move(uwbSetApplicationConfigurationParameters);
 }
