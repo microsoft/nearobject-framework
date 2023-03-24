@@ -450,7 +450,12 @@ UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, st
         return resultFuture;
     }
 
-    auto paramsDdi = UwbCxDdi::From(applicationConfigurationParameters);
+    UwbCxDdi::UwbSetApplicationConfigurationParameters uwbSetApplicationConfigurationParameters{
+        .SessionId = sessionId,
+        .Parameters = std::move(applicationConfigurationParameters),
+    };
+
+    auto paramsDdi = UwbCxDdi::From(uwbSetApplicationConfigurationParameters);
     auto paramsBuffer = std::data(paramsDdi);
     auto statusSize = offsetof(UWB_SET_APP_CONFIG_PARAMS_STATUS, appConfigParamsStatus[std::size(applicationConfigurationParameters)]);
     std::vector<uint8_t> statusBuffer(statusSize);
