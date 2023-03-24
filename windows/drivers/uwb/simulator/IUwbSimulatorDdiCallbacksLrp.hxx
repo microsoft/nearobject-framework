@@ -15,6 +15,7 @@
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
+#include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 
 using namespace uwb::protocol::fira;
 
@@ -80,7 +81,7 @@ struct IUwbSimulatorDdiCallbacksLrp
      *
      * @param sessionId
      * @param applicationConfigurationParameterTypes
-     * @param applicationConfigurationParameters
+     * @param uwbSetApplicationConfigurationParameters
      * @return UwbStatus
      */
     virtual UwbStatus
@@ -89,12 +90,12 @@ struct IUwbSimulatorDdiCallbacksLrp
     /**
      * @brief Set the Application Configuration Parameters object
      *
-     * @param applicationConfigurationParameters
+     * @param uwbSetApplicationConfigurationParameters
      * @param applicationConfigurationParameterResults
      * @return UwbStatus
      */
     virtual UwbStatus
-    SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters, std::vector<UwbSetApplicationConfigurationParameterStatus> &applicationConfigurationParameterResults) = 0;
+    SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> &uwbApplicationConfigurationParameters, std::vector<UwbCxDdi::UwbSetApplicationConfigurationParameterStatus> &uwbSetApplicationConfigurationParameterStatuses) = 0;
 
     /**
      * @brief Get the Session Count object

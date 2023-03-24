@@ -15,12 +15,6 @@
 using namespace windows::devices::uwb::simulator;
 
 /**
- * @brief Namespace alias to reduce typing but preserve clarity regarding DDI
- * conversion.
- */
-namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
-
-/**
  * @brief Template function alias which partially specializes the
  * UwbSimulatorDispatchEntry template with ClassT = UwbSimulatorDdiHandler.
  * This reduces some typing.
@@ -239,11 +233,12 @@ UwbSimulatorDdiHandler::OnUwbSetApplicationConfigurationParameters(WDFREQUEST re
 
     // Convert DDI input type to neutral type.
     auto &applicationConfigurationParametersIn = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS *>(std::data(inputBuffer));
-    std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters{};
-    std::vector<UwbSetApplicationConfigurationParameterStatus> applicationConfigurationParameterResults{};
+    auto applicationConfigurationParameters = UwbCxDdi::To(applicationConfigurationParametersIn);
+
+    UwbCxDdi::UwbSetApplicationConfigurationParametersStatus uwbSetApplicationConfigurationParametersStatus;
 
     // Invoke callback.
-    auto statusUwb = m_callbacks->SetApplicationConfigurationParameters(applicationConfigurationParametersIn.sessionId, applicationConfigurationParameters, applicationConfigurationParameterResults);
+    auto statusUwb = m_callbacks->SetApplicationConfigurationParameters(applicationConfigurationParameters.SessionId, applicationConfigurationParameters.Parameters, uwbSetApplicationConfigurationParametersStatus.ParameterStatuses);
 
     // Convert neutral type to DDI output type.
     auto &outputValue = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS_STATUS *>(std::data(outputBuffer));

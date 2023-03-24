@@ -330,7 +330,7 @@ struct UwbSetApplicationConfigurationParametersStatus
 using UwbSetApplicationConfigurationParametersStatusWrapper = notstd::flextype_wrapper<UWB_SET_APP_CONFIG_PARAMS_STATUS>;
 
 /**
- * @brief Converts UwbSetApplicationConfigurationParameterResult to UWB_SET_APP_CONFIG_PARAMS_STATUS.
+ * @brief Converts UwbSetApplicationConfigurationParametersStatus to UWB_SET_APP_CONFIG_PARAMS_STATUS.
  * 
  * @param uwbSetApplicationConfigurationParameterResult 
  * @return UwbSetApplicationConfigurationParametersStatusWrapper 
@@ -630,5 +630,11 @@ std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
 To(const UWB_APP_CONFIG_PARAMS &applicationConfigurationParameters);
 
 } // namespace windows::devices::uwb::ddi::lrp
+
+/**
+ * @brief Namespace alias to reduce typing but preserve clarity regarding DDI
+ * conversion.
+ */
+namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
 
 #endif // UWB_CX_ADAPTER_DDI_LRP_HXX

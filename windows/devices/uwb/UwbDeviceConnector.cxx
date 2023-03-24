@@ -26,12 +26,6 @@ class RegisteredCallbackToken
 };
 } // namespace windows::devices::uwb
 
-/**
- * @brief Namespace alias to reduce typing but preserve clarity regarding DDI
- * conversion.
- */
-namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
-
 UwbDeviceConnector::UwbDeviceConnector(std::string deviceName) :
     m_deviceName(std::move(deviceName))
 {}

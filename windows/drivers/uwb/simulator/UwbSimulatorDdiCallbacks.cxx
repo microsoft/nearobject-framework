@@ -16,12 +16,6 @@
 using namespace windows::devices::uwb;
 using namespace windows::devices::uwb::simulator;
 
-/**
- * @brief Namespace alias to reduce typing but preserve clarity regarding DDI
- * conversion.
- */
-namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
-
 UwbSimulatorDdiCallbacks::UwbSimulatorDdiCallbacks(UwbSimulatorDeviceFile *deviceFile) :
     m_simulatorCapabilities({ IUwbSimulator::Version }),
     m_deviceFile(deviceFile)
@@ -183,7 +177,7 @@ UwbSimulatorDdiCallbacks::SessionDeninitialize(uint32_t sessionId)
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters, std::vector<UwbSetApplicationConfigurationParameterStatus> &applicationConfigurationParameterResults)
+UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> &uwbApplicationConfigurationParameters, std::vector<UwbCxDdi::UwbSetApplicationConfigurationParameterStatus> &uwbSetApplicationConfigurationParameterStatuses)
 {
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
@@ -198,23 +192,23 @@ UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t session
         return UwbStatusSession::NotExist;
     }
 
-    std::vector<UwbSetApplicationConfigurationParameterStatus> results{};
+    std::vector<UwbCxDdi::UwbSetApplicationConfigurationParameterStatus> parameterStatuses{};
     // TODO: session exclusive mutex
 
     // Partition the parameters into those that are expressly disallowed and those that require further checking.
-    auto disallowed = std::ranges::partition(applicationConfigurationParameters, [&](const auto &applicationConfigurationParameter) {
+    auto disallowed = std::ranges::partition(uwbApplicationConfigurationParameters, [&](const auto &applicationConfigurationParameter) {
         return (session->State == UwbSessionState::Active)
             ? ::uwb::protocol::fira::IsApplicationConfigurationChangeableWhileActive(applicationConfigurationParameter)
             : false;
     });
 
     // Update result container with all disallowed parameters.
-    std::ranges::transform(disallowed, std::back_inserter(results), [&](const auto &applicationConfigurationParameter) {
-        return { UwbStatusSession::Active, applicationConfigurationParameter.Type };
+    std::ranges::transform(disallowed, std::back_inserter(parameterStatuses), [&](const auto &applicationConfigurationParameter) {
+        return UwbCxDdi::UwbSetApplicationConfigurationParameterStatus{ UwbStatusSession::Active, applicationConfigurationParameter.Type };
     });
 
     // Process remaining entries.
-    std::ranges::transform(std::ranges::begin(applicationConfigurationParameters), std::ranges::begin(disallowed), std::back_inserter(results), [&](auto &applicationConfigurationParameter) {
+    std::ranges::transform(std::ranges::begin(uwbApplicationConfigurationParameters), std::ranges::begin(disallowed), std::back_inserter(parameterStatuses), [&](auto &applicationConfigurationParameter) {
         // Copy the type for later use in the result tuple.
         auto type = applicationConfigurationParameter.Type;
         
@@ -244,10 +238,11 @@ UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t session
         session->ApplicationConfigurationParameters.insert(std::move(node));
 
         // Update result container indicating setting the parameter was successful.
-        return { UwbStatusGeneric::Ok, type };
+        return UwbCxDdi::UwbSetApplicationConfigurationParameterStatus{ UwbStatusGeneric::Ok, type };
     });
 
-    applicationConfigurationParameterResults = std::move(results);
+    uwbSetApplicationConfigurationParameterStatuses = std::move(parameterStatuses);
+
     return UwbStatusOk;
 }
 
