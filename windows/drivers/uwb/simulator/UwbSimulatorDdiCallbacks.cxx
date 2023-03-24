@@ -194,16 +194,65 @@ UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t session
     auto [uwbStatus, session] = SessionGet(sessionId);
     if (!IsUwbStatusOk(uwbStatus)) {
         return uwbStatus;
+    } else if (session->State == UwbSessionState::Deinitialized) {
+        return UwbStatusSession::NotExist;
     }
 
     std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus>> results{};
-    // TODO: update session with these
+    // TODO: session exclusive mutex
+
+    // Partition the parameters into those that are expressly disallowed and those that require further checking.
+    auto disallowed = std::ranges::partition(applicationConfigurationParameters, [&](const auto &applicationConfigurationParameter) {
+        return (session->State == UwbSessionState::Active)
+            ? ::uwb::protocol::fira::IsApplicationConfigurationChangeableWhileActive(applicationConfigurationParameter)
+            : false;
+    });
+
+    // Update result container with all disallowed parameters.
+    std::ranges::transform(disallowed, std::back_inserter(results), [&](const auto &applicationConfigurationParameter) {
+        return std::make_tuple(applicationConfigurationParameter.Type, UwbStatusSession::Active);
+    });
+
+    // Process remaining entries.
+    std::ranges::transform(std::ranges::begin(applicationConfigurationParameters), std::ranges::begin(disallowed), std::back_inserter(results), [&](auto &applicationConfigurationParameter) {
+        // Copy the type for later use in the result tuple.
+        auto type = applicationConfigurationParameter.Type;
+        
+        // Extract the existing entry. If there is no entry, the node will be empty.
+        auto node = session->ApplicationConfigurationParameters.extract(applicationConfigurationParameter);
+        if (!node.empty()) {
+            TraceLoggingWrite(
+                UwbSimulatorTraceloggingProvider,
+                "SetApplicationConfigurationParameters",
+                TraceLoggingLevel(TRACE_LEVEL_VERBOSE),
+                TraceLoggingUInt32(sessionId, "Session Id"),
+                TraceLoggingString("ParameterUpdate"),
+                TraceLoggingString(node.value().ToString().c_str(), "ValueOld"),
+                TraceLoggingString(applicationConfigurationParameter.ToString().c_str(), "Value"));
+        } else {
+            TraceLoggingWrite(
+                UwbSimulatorTraceloggingProvider,
+                "SetApplicationConfigurationParameters",
+                TraceLoggingLevel(TRACE_LEVEL_VERBOSE),
+                TraceLoggingUInt32(sessionId, "Session Id"),
+                TraceLoggingString("ParameterSet"),
+                TraceLoggingString(applicationConfigurationParameter.ToString().c_str(), "Value"));
+        }
+        
+        // Update the node with the current parameter value.
+        node.value() = std::move(applicationConfigurationParameter);
+        session->ApplicationConfigurationParameters.insert(std::move(node));
+
+        // Update result container indicating setting the parameter was successful.
+        return std::make_tuple(type, UwbStatusGeneric::Ok);
+    });
+
     applicationConfigurationParameterResults = std::move(results);
     return UwbStatusOk;
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacks::GetApplicationConfigurationParameters(uint32_t sessionId, const std::vector<UwbApplicationConfigurationParameterType> &applicationConfigurationParameterTypes, std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters)
+UwbSimulatorDdiCallbacks::GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes, std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters)
 {
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
@@ -215,7 +264,8 @@ UwbSimulatorDdiCallbacks::GetApplicationConfigurationParameters(uint32_t session
     if (!IsUwbStatusOk(uwbStatus)) {
         return uwbStatus;
     }
-
+    
+    // TODO: session shared mutex
     std::ranges::copy_if(session->ApplicationConfigurationParameters, std::back_inserter(applicationConfigurationParameters), [&](const auto &entry) {
         return std::ranges::any_of(applicationConfigurationParameterTypes, [&](const auto &type) {
             return (entry.Type == type);
