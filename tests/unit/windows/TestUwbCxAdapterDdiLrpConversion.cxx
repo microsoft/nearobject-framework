@@ -646,9 +646,17 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         test::ValidateRoundtrip(uwbSetApplicationConfigurationParameters);
     }
 
-    SECTION("UwbSetApplicationConfigurationParametersResult is stable")
+    SECTION("UwbSetApplicationConfigurationParameterStatus is stable")
     {
-        std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus>> uwbSetApplicationConfigurationParametersStatuses{};
-        test::ValidateRoundtrip(uwbSetApplicationConfigurationParametersStatuses);
+        const UwbSetApplicationConfigurationParameterStatus uwbSetApplicationConfigurationParameterStatus{};
+        // TODO: above should be filled in with non-trivial data
+        test::ValidateRoundtrip(uwbSetApplicationConfigurationParameterStatus);
+    }
+
+    SECTION("UwbSetApplicationConfigurationParametersStatus is stable")
+    {
+        const UwbSetApplicationConfigurationParametersStatus uwbSetApplicationConfigurationParametersStatus{};
+        // TODO: above should be filled in with non-trivial data
+        test::ValidateRoundtrip(uwbSetApplicationConfigurationParametersStatus);
     }
 }
