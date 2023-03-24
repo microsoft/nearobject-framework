@@ -18,8 +18,8 @@ namespace nearobject::cli
  */
 struct UwbRangingParameters
 {
-    uint32_t sessionId;
-    std::vector<uwb::protocol::fira::UwbApplicationConfigurationParameter> appConfigParams;
+    uint32_t SessionId;
+    std::vector<uwb::protocol::fira::UwbApplicationConfigurationParameter> ApplicationConfigurationParameters;
 };
 
 /**

@@ -13,6 +13,7 @@
 
 using namespace nearobject::cli;
 using namespace strings::ostream_operators;
+using namespace ::uwb::protocol::fira;
 
 NearObjectCli::NearObjectCli(std::shared_ptr<NearObjectCliData> cliData, std::shared_ptr<NearObjectCliHandler> cliHandler) :
     m_cliData(cliData),
@@ -294,7 +295,7 @@ NearObjectCli::AddSubcommandUwbRange(CLI::App* parent)
     auto rangeApp = parent->add_subcommand("range", "commands related to ranging")->require_subcommand()->fallthrough();
 
     // options
-    rangeApp->add_option("--SessionId", m_cliData->RangingParameters.sessionId)->capture_default_str()->required();
+    rangeApp->add_option("--SessionId", m_cliData->RangingParameters.SessionId)->capture_default_str()->required();
 
     // sub-commands
     m_uwbRangeStartApp = AddSubcommandUwbRangeStart(rangeApp);
@@ -399,12 +400,12 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
         // TODO: Move validation logic into its own function
 
         // Validate NumberOfControlees
-        if (m_cliData->appConfigParamsData.multiNodeMode == uwb::protocol::fira::MultiNodeMode::Unicast) {
+        if (m_cliData->appConfigParamsData.multiNodeMode == MultiNodeMode::Unicast) {
             if (m_cliData->appConfigParamsData.numberOfControlees != 1) {
                 std::cerr << "Only 1 controlee expected in Unicast mode" << std::endl;
             }
         } else {
-            if (m_cliData->appConfigParamsData.numberOfControlees < 1 || m_cliData->appConfigParamsData.numberOfControlees > 8) {
+            if (m_cliData->appConfigParamsData.numberOfControlees < 1 || m_cliData->appConfigParamsData.numberOfControlees > MaxNumberOfControlees) {
                 std::cerr << "Invalid number of controlees. Must be 1 <= N <= 8" << std::endl;
             }
         }
@@ -419,23 +420,23 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
         }
 
         std::cout << "Selected parameters:" << std::endl;
-        // TODO: Display selected parameters
-        std::cout << "DeviceRole: " << static_cast<int>(m_cliData->appConfigParamsData.deviceRole.value()) << std::endl;
-        std::cout << "MultiNodeMode: " << static_cast<int>(m_cliData->appConfigParamsData.multiNodeMode.value()) << std::endl;
+        // TODO: Display parameters more efficiently
+        std::cout << "DeviceRole: " << magic_enum::enum_name(m_cliData->appConfigParamsData.deviceRole.value()) << std::endl;
+        std::cout << "MultiNodeMode: " << magic_enum::enum_name(m_cliData->appConfigParamsData.multiNodeMode.value()) << std::endl;
         std::cout << "NumberOfControlees: " << static_cast<int>(m_cliData->appConfigParamsData.numberOfControlees.value()) << std::endl;
         std::cout << "DeviceMacAddress: " << m_cliData->appConfigParamsData.deviceMacAddress.value() << std::endl;
         for (const auto& dstMacAddress : m_cliData->appConfigParamsData.destinationMacAddresses.value()) {
             std::cout << "DestinationMacAddresses: " << dstMacAddress << std::endl;
         }
-        std::cout << "DeviceType: " << static_cast<int>(m_cliData->appConfigParamsData.deviceType.value()) << std::endl;
+        std::cout << "DeviceType: " << magic_enum::enum_name(m_cliData->appConfigParamsData.deviceType.value()) << std::endl;
 
-        // TODO: Create std::vector<UwbApplicationConfigurationParameter> based on m_cliData->appConfigParamsData
-        m_cliData->RangingParameters.appConfigParams.push_back({ uwb::protocol::fira::UwbApplicationConfigurationParameterType::DeviceRole, m_cliData->appConfigParamsData.deviceRole.value() });
-        m_cliData->RangingParameters.appConfigParams.push_back({ uwb::protocol::fira::UwbApplicationConfigurationParameterType::MultiNodeMode, m_cliData->appConfigParamsData.multiNodeMode.value() });
-        m_cliData->RangingParameters.appConfigParams.push_back({ uwb::protocol::fira::UwbApplicationConfigurationParameterType::NumberOfControlees, m_cliData->appConfigParamsData.numberOfControlees.value() });
-        m_cliData->RangingParameters.appConfigParams.push_back({ uwb::protocol::fira::UwbApplicationConfigurationParameterType::DeviceMacAddress, m_cliData->appConfigParamsData.deviceMacAddress.value() });
-        m_cliData->RangingParameters.appConfigParams.push_back({ uwb::protocol::fira::UwbApplicationConfigurationParameterType::DestinationMacAddresses, m_cliData->appConfigParamsData.destinationMacAddresses.value() });
-        m_cliData->RangingParameters.appConfigParams.push_back({ uwb::protocol::fira::UwbApplicationConfigurationParameterType::DeviceType, m_cliData->appConfigParamsData.deviceType.value() });
+        // TODO: Create std::vector<UwbApplicationConfigurationParameter> more efficiently
+        m_cliData->RangingParameters.ApplicationConfigurationParameters.push_back({ UwbApplicationConfigurationParameterType::DeviceRole, m_cliData->appConfigParamsData.deviceRole.value() });
+        m_cliData->RangingParameters.ApplicationConfigurationParameters.push_back({ UwbApplicationConfigurationParameterType::MultiNodeMode, m_cliData->appConfigParamsData.multiNodeMode.value() });
+        m_cliData->RangingParameters.ApplicationConfigurationParameters.push_back({ UwbApplicationConfigurationParameterType::NumberOfControlees, m_cliData->appConfigParamsData.numberOfControlees.value() });
+        m_cliData->RangingParameters.ApplicationConfigurationParameters.push_back({ UwbApplicationConfigurationParameterType::DeviceMacAddress, m_cliData->appConfigParamsData.deviceMacAddress.value() });
+        m_cliData->RangingParameters.ApplicationConfigurationParameters.push_back({ UwbApplicationConfigurationParameterType::DestinationMacAddresses, m_cliData->appConfigParamsData.destinationMacAddresses.value() });
+        m_cliData->RangingParameters.ApplicationConfigurationParameters.push_back({ UwbApplicationConfigurationParameterType::DeviceType, m_cliData->appConfigParamsData.deviceType.value() });
 
         RegisterCliAppWithOperation(rangeStartApp);
     });
@@ -535,8 +536,8 @@ NearObjectCli::AddSubcommandServiceRangeStart(CLI::App* parent)
                 using ParameterValueT = std::decay_t<decltype(arg)>;
                 if constexpr (std::is_enum_v<ParameterValueT>) {
                     std::cout << magic_enum::enum_type_name<ParameterValueT>() << "::" << magic_enum::enum_name(arg) << std::endl;
-                } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>>) {
-                    std::cout << "ResultReportConfigurations: " << uwb::protocol::fira::ToString(arg) << std::endl;
+                } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<ResultReportConfiguration>>) {
+                    std::cout << "ResultReportConfigurations: " << ToString(arg) << std::endl;
                 }
             },
                 parameterValue);
