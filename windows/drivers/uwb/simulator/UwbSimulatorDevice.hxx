@@ -46,15 +46,39 @@ public:
     NTSTATUS
     Uninitialize();
 
+    /**
+     * @brief Create a new uwb session.
+     *
+     * @param sessionId
+     * @param sessionType
+     * @return std::tuple<UwbStatus, std::shared_ptr<windows::devices::uwb::simulator::UwbSimulatorSession>>
+     */
     std::tuple<UwbStatus, std::shared_ptr<windows::devices::uwb::simulator::UwbSimulatorSession>>
     SessionCreate(uint32_t sessionId, UwbSessionType sessionType);
 
+    /**
+     * @brief Destroy an existing session.
+     *
+     * @param sessionId
+     * @return std::tuple<UwbStatus, std::shared_ptr<windows::devices::uwb::simulator::UwbSimulatorSession>>
+     */
     std::tuple<UwbStatus, std::shared_ptr<windows::devices::uwb::simulator::UwbSimulatorSession>>
     SessionDestroy(uint32_t sessionId);
 
+    /**
+     * @brief Get a shared reference to an existing session.
+     *
+     * @param sessionId
+     * @return std::shared_ptr<windows::devices::uwb::simulator::UwbSimulatorSession>
+     */
     std::shared_ptr<windows::devices::uwb::simulator::UwbSimulatorSession>
     SessionGet(uint32_t sessionId);
 
+    /**
+     * @brief Get the number of sessions.
+     *
+     * @return std::size_t
+     */
     std::size_t
     GetSessionCount();
 

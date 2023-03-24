@@ -89,6 +89,16 @@ struct UwbSimulatorDdiCallbacks :
 
 protected:
     /**
+     * @brief Obtain a reference to the session context for the specified
+     * session id.
+     *
+     * @param sessionId The session id to obtain session context for.
+     * @return std::tuple<UwbStatus, std::shared_ptr<UwbSimulatorSession>>
+     */
+    std::tuple<UwbStatus, std::shared_ptr<UwbSimulatorSession>>
+    SessionGet(uint32_t sessionId);
+
+    /**
      * @brief Update the state of the specified session.
      *
      * This function will also generate a UWB notification associated with the change.
