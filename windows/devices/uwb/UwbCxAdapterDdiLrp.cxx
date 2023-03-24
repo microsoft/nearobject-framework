@@ -569,6 +569,42 @@ windows::devices::uwb::ddi::lrp::From(const UwbGetApplicationConfigurationParame
     return std::move(getApplicationConfigurationParameterTypesWrapper);
 }
 
+UwbSetApplicationConfigurationParametersWrapper
+windows::devices::uwb::ddi::lrp::From(const UwbSetApplicationConfigurationParameters &uwbSetApplicationConfigurationParameters)
+{
+    // Convert each individual parameter to its DDI wrapper.
+    std::vector<UwbApplicationConfigurationParameterWrapper> uwbApplicationConfigurationParameterWrappers{};
+    std::ranges::transform(uwbSetApplicationConfigurationParameters.Parameters, std::back_inserter(uwbApplicationConfigurationParameterWrappers), [](const auto &uwbApplicationConfigurationParameter) {
+        return From(uwbApplicationConfigurationParameter);
+    });
+
+    // Calculate the total size required for the UWB_APP_CONFIG_PARAMS instance.
+    const std::size_t totalSize = std::accumulate(
+        std::cbegin(uwbApplicationConfigurationParameterWrappers),
+        std::cend(uwbApplicationConfigurationParameterWrappers),
+        static_cast<std::size_t>(offsetof(UWB_SET_APP_CONFIG_PARAMS, appConfigParams[0])),
+        [&](std::size_t totalSize, const auto &uwbApplicationConfigurationParameterWrapper) {
+            return totalSize + std::size(uwbApplicationConfigurationParameterWrapper);
+        });
+
+    // Instantiate a wrapper for UWB_SET_APP_CONFIG_PARAMS and fill it in.
+    UwbSetApplicationConfigurationParametersWrapper setApplicationConfigurationParametersWrapper{ totalSize };
+    UWB_SET_APP_CONFIG_PARAMS &setAppConfigParams = setApplicationConfigurationParametersWrapper.value();
+    setAppConfigParams.size = totalSize;
+    setAppConfigParams.sessionId = uwbSetApplicationConfigurationParameters.SessionId;
+    setAppConfigParams.appConfigParamsCount = std::size(uwbApplicationConfigurationParameterWrappers);
+
+    // Copy each of the converted UWB_APP_CONFIG_PARAM values into the UWB_SET_APP_CONFIG_PARAMS flex-array.
+    UWB_APP_CONFIG_PARAM *appConfigParam = reinterpret_cast<UWB_APP_CONFIG_PARAM *>(&setAppConfigParams.appConfigParams[0]);
+    for (auto &uwbApplicationConfigurationParameterWrapper : uwbApplicationConfigurationParameterWrappers) {
+        UWB_APP_CONFIG_PARAM &uwbAppConfigParam = uwbApplicationConfigurationParameterWrapper.value();
+        std::memcpy(appConfigParam, &uwbAppConfigParam, uwbAppConfigParam.size);
+        appConfigParam = reinterpret_cast<UWB_APP_CONFIG_PARAM *>(reinterpret_cast<uintptr_t>(appConfigParam) + appConfigParam->size);
+    }
+
+    return std::move(setApplicationConfigurationParametersWrapper);
+}
+
 UwbApplicationConfigurationParameterWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbApplicationConfigurationParameter &uwbApplicationConfigurationParameter)
 {
@@ -1313,6 +1349,24 @@ windows::devices::uwb::ddi::lrp::To(const UWB_GET_APP_CONFIG_PARAMS &getApplicat
     });
 
     return std::move(uwbGetApplicationConfigurationParameters);
+}
+
+UwbSetApplicationConfigurationParameters
+windows::devices::uwb::ddi::lrp::To(const UWB_SET_APP_CONFIG_PARAMS &setApplicationConfigurationParameters)
+{
+    UwbSetApplicationConfigurationParameters uwbSetApplicationConfigurationParameters{
+        .SessionId = setApplicationConfigurationParameters.sessionId
+    };
+    uwbSetApplicationConfigurationParameters.Parameters.reserve(setApplicationConfigurationParameters.appConfigParamsCount);
+
+    auto *appConfigParam = reinterpret_cast<const UWB_APP_CONFIG_PARAM *>(&setApplicationConfigurationParameters.appConfigParams[0]);
+    for (auto i = 0; i < setApplicationConfigurationParameters.appConfigParamsCount; i++) {
+        auto uwbAppConfigParam = To(*appConfigParam);
+        uwbSetApplicationConfigurationParameters.Parameters.push_back(std::move(uwbAppConfigParam));
+        appConfigParam = reinterpret_cast<const UWB_APP_CONFIG_PARAM *>(reinterpret_cast<uintptr_t>(appConfigParam) + appConfigParam->size);
+    }
+
+    return std::move(uwbSetApplicationConfigurationParameters);
 }
 
 namespace detail

@@ -628,4 +628,23 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         };
         test::ValidateRoundtrip(uwbGetApplicationConfigurationParameters);
     }
+
+    SECTION("UwbSetApplicationConfigurationParameters is stable")
+    {
+        const UwbSetApplicationConfigurationParameters uwbSetApplicationConfigurationParameters{
+            .SessionId = test::GetRandom<uint32_t>(),
+            .Parameters{
+                parameterHoppingMode,
+                parameterNumberOfControlees,
+                parameterSlotDuration,
+                parameterRangingInterval,
+                parameterAoaResult,
+                parameterStaticStsInitializationVector,
+                parameterResultReportConfig,
+                parameterUwbMacAddressShort,
+                parameterUwbMacAddressExtended,
+            }
+        };
+        test::ValidateRoundtrip(uwbSetApplicationConfigurationParameters);
+    }
 }

@@ -7,6 +7,7 @@
 #include <uwb/protocols/fira/UwbException.hxx>
 #include <uwb/protocols/fira/UwbOobConversions.hxx>
 
+#include <magic_enum.hpp>
 #include <plog/Log.h>
 
 using namespace nearobject::cli;
@@ -37,6 +38,11 @@ try {
     });
     auto session = uwbDevice->CreateSession(rangingParameters.sessionId, callbacks);
     session->Configure(rangingParameters.appConfigParams);
+    auto applicationConfigurationParameters = session->GetApplicationConfigurationParameters();
+    PLOG_DEBUG << "Session Application Configuration Parameters: ";
+    for (const auto& applicationConfigurationParameter : applicationConfigurationParameters) {
+        PLOG_DEBUG << " > " << applicationConfigurationParameter.ToString();
+    }
     session->StartRanging();
 } catch (...) {
     PLOG_ERROR << "failed to start ranging";
@@ -45,14 +51,30 @@ try {
 void
 NearObjectCliHandler::HandleStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevice, uwb::protocol::fira::UwbSessionData& sessionData) noexcept
 try {
+    // Instantiate callbacks for session events.
     auto controlFlowContext = (m_parent != nullptr) ? m_parent->GetControlFlowContext() : nullptr;
     auto callbacks = std::make_shared<nearobject::cli::NearObjectCliUwbSessionEventCallbacks>([controlFlowContext = std::move(controlFlowContext)]() {
         if (controlFlowContext != nullptr) {
             controlFlowContext->OperationSignalComplete();
         }
     });
+
+    // Create a new session.
     auto session = uwbDevice->CreateSession(sessionData.sessionId, callbacks);
-    session->Configure(uwb::protocol::fira::GetUciConfigParams(sessionData.uwbConfiguration, session->GetDeviceType()));
+
+    // Convert configuration from OOB (UWB_SESSION_DATA) to UCI application
+    // configuration parameters and configure the session with them.
+    auto applicationConfigurationParameters = GetUciConfigParams(sessionData.uwbConfiguration, session->GetDeviceType());
+    session->Configure(applicationConfigurationParameters);
+
+    // Obtain the configured session application configuration parameters.
+    auto applicationConfigurationParametersSet = session->GetApplicationConfigurationParameters();
+    PLOG_DEBUG << "Session Application Configuration Parameters: ";
+    for (const auto& applicationConfigurationParameter : applicationConfigurationParametersSet) {
+        PLOG_DEBUG << " > " << applicationConfigurationParameter.ToString();
+    }
+
+    // Start ranging.
     session->StartRanging();
 } catch (...) {
     PLOG_ERROR << "failed to start ranging";

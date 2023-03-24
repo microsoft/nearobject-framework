@@ -381,7 +381,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
                 if constexpr (std::is_enum_v<ParameterValueT>) {
                     std::cout << magic_enum::enum_type_name<ParameterValueT>() << "::" << magic_enum::enum_name(arg) << std::endl;
                 } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>>) {
-                    std::cout << "ResultReportConfigurations: " << uwb::protocol::fira::ResultReportConfigurationToString(arg) << std::endl;
+                    std::cout << "ResultReportConfigurations: " << uwb::protocol::fira::ToString(arg) << std::endl;
                 }
             },
                 parameterValue);
