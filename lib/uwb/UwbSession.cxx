@@ -11,11 +11,11 @@
 using namespace uwb;
 using namespace uwb::protocol::fira;
 
-UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks, uwb::protocol::fira::DeviceType deviceType) :
-    m_sessionId(sessionId),
+UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks, DeviceType deviceType) :
     m_uwbMacAddressSelf(UwbMacAddress::Random<UwbMacAddressType::Extended>()),
     m_callbacks(std::move(callbacks)),
-    m_deviceType{ deviceType }
+    m_deviceType{ deviceType },
+    m_sessionId(sessionId)
 {}
 
 uwb::protocol::fira::DeviceType
