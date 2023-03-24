@@ -620,7 +620,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbSetApplicationConfigurationParame
 UwbSetApplicationConfigurationParametersStatusWrapper
 windows::devices::uwb::ddi::lrp::From([[maybe_unused]] const UwbSetApplicationConfigurationParametersStatus &uwbSetApplicationConfigurationParameterResult)
 {
-    UwbSetApplicationConfigurationParametersStatusWrapper uwbSetApplicationConfigurationParametersStatusWrapper{1 /* FIXME */};
+    UwbSetApplicationConfigurationParametersStatusWrapper uwbSetApplicationConfigurationParametersStatusWrapper{1024  /* FIXME */};
     // TODO
     return std::move(uwbSetApplicationConfigurationParametersStatusWrapper);
 }
