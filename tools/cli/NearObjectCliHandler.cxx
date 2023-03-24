@@ -35,8 +35,8 @@ try {
             controlFlowContext->OperationSignalComplete();
         }
     });
-    auto session = uwbDevice->CreateSession(callbacks);
-    session->Configure(rangingParameters.sessionId, rangingParameters.appConfigParams);
+    auto session = uwbDevice->CreateSession(rangingParameters.sessionId, callbacks);
+    session->Configure(rangingParameters.appConfigParams);
     session->StartRanging();
 } catch (...) {
     PLOG_ERROR << "failed to start ranging";
@@ -51,8 +51,8 @@ try {
             controlFlowContext->OperationSignalComplete();
         }
     });
-    auto session = uwbDevice->CreateSession(callbacks);
-    session->Configure(sessionData.sessionId, uwb::protocol::fira::GetUciConfigParams(sessionData.uwbConfiguration, session->GetDeviceType()));
+    auto session = uwbDevice->CreateSession(sessionData.sessionId, callbacks);
+    session->Configure(uwb::protocol::fira::GetUciConfigParams(sessionData.uwbConfiguration, session->GetDeviceType()));
     session->StartRanging();
 } catch (...) {
     PLOG_ERROR << "failed to start ranging";

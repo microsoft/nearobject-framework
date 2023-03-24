@@ -11,10 +11,11 @@
 using namespace uwb;
 using namespace uwb::protocol::fira;
 
-UwbSession::UwbSession(std::weak_ptr<UwbSessionEventCallbacks> callbacks, uwb::protocol::fira::DeviceType deviceType) :
+UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks, DeviceType deviceType) :
     m_uwbMacAddressSelf(UwbMacAddress::Random<UwbMacAddressType::Extended>()),
     m_callbacks(std::move(callbacks)),
-    m_deviceType{ deviceType }
+    m_deviceType{ deviceType },
+    m_sessionId(sessionId)
 {}
 
 uwb::protocol::fira::DeviceType
@@ -45,11 +46,11 @@ UwbSession::AddPeer(UwbMacAddress peerMacAddress)
 }
 
 void
-UwbSession::Configure(const uint32_t sessionId, const std::vector<protocol::fira::UwbApplicationConfigurationParameter> configParams)
+UwbSession::Configure(const std::vector<protocol::fira::UwbApplicationConfigurationParameter> configParams)
 {
     PLOG_VERBOSE << "configure session with id " << m_sessionId;
     try {
-        ConfigureImpl(sessionId, configParams);
+        ConfigureImpl(configParams);
     } catch (UwbException& uwbException) {
         PLOG_ERROR << "error configuring session with id " << m_sessionId << ", status=" << ToString(uwbException.Status);
         throw uwbException;
