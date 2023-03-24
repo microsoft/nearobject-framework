@@ -585,16 +585,6 @@ IsApplicationConfigurationParameterChangeableWhileActive(const UwbApplicationCon
     return std::ranges::any_of(UwbApplicationConfigurationParameterTypesUpdateableWhileActive, [&](const auto &type){
         return (type == uwbApplicationConfigurationParameterType);
     });
-    // switch (uwbApplicationConfigurationParameterType) {
-    // case UwbApplicationConfigurationParameterType::BlockStrideLength:
-    // case UwbApplicationConfigurationParameterType::RangingInterval:
-    // case UwbApplicationConfigurationParameterType::RangeDataNotificationConfig:
-    // case UwbApplicationConfigurationParameterType::RangeDataNotificationProximityNear:
-    // case UwbApplicationConfigurationParameterType::RangeDataNotificationProximityFar:
-    //     return true;
-    // default:
-    //     return false;
-    // }
 }
 
 /**
@@ -618,6 +608,20 @@ struct UwbApplicationConfigurationParameter
     std::string
     ToString() const;
 };
+
+/**
+ * @brief Determines whether the specified application configuration parameter
+ * is allowed to be updated while a session is in the 'Active' state. 
+ * 
+ * @param uwbApplicationConfigurationParameter 
+ * @return true The parameter may be updated while a session is active.
+ * @return false The parameter may not be updated while a session is active.
+ */
+constexpr bool
+IsApplicationConfigurationChangeableWhileActive(const UwbApplicationConfigurationParameter &uwbApplicationConfigurationParameter)
+{
+    return IsApplicationConfigurationParameterChangeableWhileActive(uwbApplicationConfigurationParameter.Type);
+}
 
 struct UwbMulticastListStatus
 {
