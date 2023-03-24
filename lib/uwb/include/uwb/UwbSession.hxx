@@ -25,8 +25,9 @@ public:
     /**
      * @brief Construct a new UwbSession object.
      *
-     * @param sessionId The requested sessionId
-     * @param callbacks The callbacks to invoke for session events.
+     * @param sessionId
+     * @param callbacks
+     * @param deviceType
      */
     UwbSession(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks, uwb::protocol::fira::DeviceType deviceType = uwb::protocol::fira::DeviceType::Controller);
 
@@ -53,8 +54,9 @@ public:
 
     /**
      * @brief Configure the session for use.
-     * This function tells the UWBS to initialize the session for ranging with the particular sessionId and then
-     * configures it with configParams
+     *
+     * This function tells the UWBS to initialize the session for ranging with
+     * the particular sessionId and then configures it with configParams.
      *
      * @param configParams
      */
