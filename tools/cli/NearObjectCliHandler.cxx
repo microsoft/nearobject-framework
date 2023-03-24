@@ -40,7 +40,7 @@ try {
     session->Configure(rangingParameters.appConfigParams);
     auto applicationConfigurationParameters = session->GetApplicationConfigurationParameters();
     PLOG_DEBUG << "Session Application Configuration Parameters: ";
-    for (const auto &applicationConfigurationParameter : applicationConfigurationParameters) {
+    for (const auto& applicationConfigurationParameter : applicationConfigurationParameters) {
         PLOG_DEBUG << " > " << applicationConfigurationParameter.ToString();
     }
     session->StartRanging();
@@ -61,7 +61,7 @@ try {
     session->Configure(sessionData.sessionId, uwb::protocol::fira::GetUciConfigParams(sessionData.uwbConfiguration, session->GetDeviceType()));
     auto applicationConfigurationParameters = session->GetApplicationConfigurationParameters();
     PLOG_DEBUG << "Session Application Configuration Parameters: ";
-    for (const auto &applicationConfigurationParameter : applicationConfigurationParameters) {
+    for (const auto& applicationConfigurationParameter : applicationConfigurationParameters) {
         PLOG_DEBUG << " > " << applicationConfigurationParameter.ToString();
     }
     session->StartRanging();
