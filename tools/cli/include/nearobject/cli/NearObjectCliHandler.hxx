@@ -98,7 +98,7 @@ struct NearObjectCliHandler
 
 private:
     NearObjectCli* m_parent;
-    std::shared_ptr<::uwb::UwbSession> m_activeSession{ nullptr };
+    std::shared_ptr<::uwb::UwbSession> m_activeSession;
 };
 
 } // namespace nearobject::cli
