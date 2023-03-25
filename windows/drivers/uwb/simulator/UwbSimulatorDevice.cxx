@@ -1,12 +1,15 @@
 
 #include <memory>
 
+#include <magic_enum.hpp>
+
 #include "UwbSimulatorDdiHandler.hxx"
 #include "UwbSimulatorDevice.hxx"
 #include "UwbSimulatorDeviceFile.hxx"
 #include "UwbSimulatorTracelogging.hxx"
 
 using windows::devices::uwb::simulator::UwbSimulatorDdiHandler;
+using windows::devices::uwb::simulator::UwbSimulatorSession;
 
 UwbSimulatorDevice::UwbSimulatorDevice(WDFDEVICE wdfDevice) :
     m_wdfDevice(wdfDevice)
@@ -169,7 +172,7 @@ UwbSimulatorDevice::OnFileCreate(WDFDEVICE device, WDFREQUEST request, WDFFILEOB
         TraceLoggingPointer(file, "File"));
 
     auto uwbSimulatorFileBuffer = GetUwbSimulatorFile(file);
-    auto uwbSimulatorFile = new (uwbSimulatorFileBuffer) UwbSimulatorDeviceFile(file);
+    auto uwbSimulatorFile = new (uwbSimulatorFileBuffer) UwbSimulatorDeviceFile(file, this);
     auto uwbSimulatorFileStatus = uwbSimulatorFile->Initialize();
     if (uwbSimulatorFileStatus == STATUS_SUCCESS) {
         auto uwbSimulatorHandler = std::make_unique<UwbSimulatorDdiHandler>(uwbSimulatorFile);
@@ -213,4 +216,68 @@ UwbSimulatorDevice::OnD0Exit(WDF_POWER_DEVICE_STATE targetState)
         TraceLoggingHexUInt32(targetState, "targetState"));
 
     return STATUS_SUCCESS;
+}
+
+std::tuple<UwbStatus, std::shared_ptr<UwbSimulatorSession>>
+UwbSimulatorDevice::SessionCreate(uint32_t sessionId, UwbSessionType sessionType)
+{
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "SessionCreate",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingUInt32(sessionId, "Session Id"),
+        TraceLoggingString(std::data(magic_enum::enum_name(sessionType)), "Session Type"));
+
+    auto session = std::make_shared<UwbSimulatorSession>(sessionId, sessionType);
+
+    std::unique_lock sessionsWriteLock{ m_sessionsGate };
+    auto [sessionIt, inserted] = m_sessions.try_emplace(sessionId, session);
+    if (!inserted) {
+        return { UwbStatusSession::Duplicate, nullptr };
+    }
+
+    return { UwbStatusOk, session };
+}
+
+std::tuple<UwbStatus, std::shared_ptr<UwbSimulatorSession>>
+UwbSimulatorDevice::SessionDestroy(uint32_t sessionId)
+{
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "SessionDestroy",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingUInt32(sessionId, "Session Id"));
+
+    decltype(m_sessions)::node_type nodeHandle;
+    {
+        std::unique_lock sessionsWriteLock{ m_sessionsGate };
+        nodeHandle = m_sessions.extract(sessionId);
+    }
+    if (nodeHandle.empty()) {
+        return { UwbStatusSession::NotExist, nullptr };
+    }
+
+    auto &session = nodeHandle.mapped();
+
+    return { UwbStatusOk, session };
+}
+
+std::shared_ptr<windows::devices::uwb::simulator::UwbSimulatorSession>
+UwbSimulatorDevice::SessionGet(uint32_t sessionId)
+{
+    std::shared_lock sessionsReadLock{ m_sessionsGate };
+    auto sessionIt = m_sessions.find(sessionId);
+    if (sessionIt == std::cend(m_sessions)) {
+        return nullptr;
+    }
+
+    const auto &[_, session] = *sessionIt;
+    return session;
+}
+
+std::size_t
+UwbSimulatorDevice::GetSessionCount()
+{
+    std::shared_lock sessionsReadLock{ m_sessionsGate };
+    return std::size(m_sessions);
 }

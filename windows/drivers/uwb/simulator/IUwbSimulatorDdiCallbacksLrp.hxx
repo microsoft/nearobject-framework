@@ -15,6 +15,7 @@
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
+#include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 
 using namespace uwb::protocol::fira;
 
@@ -28,7 +29,7 @@ struct IUwbSimulatorDdiCallbacksLrp
     virtual ~IUwbSimulatorDdiCallbacksLrp() = default;
 
     /**
-     * @brief
+     * @brief Reset the UWB device.
      *
      * @return UwbStatus
      */
@@ -36,7 +37,7 @@ struct IUwbSimulatorDdiCallbacksLrp
     DeviceReset() = 0;
 
     /**
-     * @brief
+     * @brief Get uwb device information.
      *
      * @param deviceInfo
      * @return UwbStatus
@@ -45,7 +46,7 @@ struct IUwbSimulatorDdiCallbacksLrp
     DeviceGetInformation(UwbDeviceInformation &deviceInfo) = 0;
 
     /**
-     * @brief
+     * @brief Get uwb device capabilities.
      *
      * @param deviceCapabilities
      * @return UwbStatus
@@ -54,7 +55,7 @@ struct IUwbSimulatorDdiCallbacksLrp
     DeviceGetCapabilities(UwbCapability &deviceCapabilities) = 0;
 
     /**
-     * @brief
+     * @brief Get uwb device configuration parameters.
      *
      * @param deviceConfigurationParameterTypes
      * @param deviceConfigurationParameterResults
@@ -64,19 +65,17 @@ struct IUwbSimulatorDdiCallbacksLrp
     DeviceGetConfigurationParameters(std::vector<UwbDeviceConfigurationParameterType> &deviceConfigurationParameterTypes, std::vector<std::tuple<UwbDeviceConfigurationParameterType, UwbStatus, std::optional<UwbDeviceConfigurationParameter>>> &deviceConfigurationParameterResults) = 0;
 
     /**
-     * @brief
+     * @brief Set uwb device configuration parameters.
      *
      * @param deviceConfigurationParameters
      * @param deviceConfigurationParameterResults
      * @return UwbStatus
-     *
-     * TODO: possibly separate the results into a vector with ones that had UwbStatus::Ok, and a separate vector with the ones that weren't retrieved.
      */
     virtual UwbStatus
     DeviceSetConfigurationParameters(const std::vector<UwbDeviceConfigurationParameter> &deviceConfigurationParameters, std::vector<std::tuple<UwbDeviceConfigurationParameterType, UwbStatus>> &deviceConfigurationParameterResults) = 0;
 
     /**
-     * @brief Get the Application Configuration Parameters object
+     * @brief Get the session application configuration parameters.
      *
      * @param sessionId
      * @param applicationConfigurationParameterTypes
@@ -84,20 +83,21 @@ struct IUwbSimulatorDdiCallbacksLrp
      * @return UwbStatus
      */
     virtual UwbStatus
-    GetApplicationConfigurationParameters(uint32_t sessionId, const std::vector<UwbApplicationConfigurationParameterType> &applicationConfigurationParameterTypes, std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters) = 0;
+    GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes, std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters) = 0;
 
     /**
-     * @brief Set the Application Configuration Parameters object
+     * @brief Set the session application configuration parameters.
      *
-     * @param applicationConfigurationParameters
-     * @param applicationConfigurationParameterResults
+     * @param sessionId
+     * @param uwbApplicationConfigurationParameters
+     * @param uwbSetApplicationConfigurationParameterStatuses
      * @return UwbStatus
      */
     virtual UwbStatus
-    SetApplicationConfigurationParameters(uint32_t sessionId, const std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus>> &applicationConfigurationParameterResults) = 0;
+    SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> &uwbApplicationConfigurationParameters, std::vector<::uwb::protocol::fira::UwbSetApplicationConfigurationParameterStatus> &uwbSetApplicationConfigurationParameterStatuses) = 0;
 
     /**
-     * @brief Get the Session Count object
+     * @brief Get the count of active sessions.
      *
      * @param sessionCount
      * @return UwbStatus
@@ -106,7 +106,7 @@ struct IUwbSimulatorDdiCallbacksLrp
     GetSessionCount(uint32_t &sessionCount) = 0;
 
     /**
-     * @brief
+     * @brief Initialize a new session.
      *
      * @param sessionId
      * @param sessionType
@@ -116,7 +116,7 @@ struct IUwbSimulatorDdiCallbacksLrp
     SessionInitialize(uint32_t sessionId, UwbSessionType sessionType) = 0;
 
     /**
-     * @brief
+     * @brief Deinitialize an existing session.
      *
      * @param sessionId
      * @return UwbStatus
@@ -125,7 +125,7 @@ struct IUwbSimulatorDdiCallbacksLrp
     SessionDeninitialize(uint32_t sessionId) = 0;
 
     /**
-     * @brief
+     * @brief Obtain the state of a session.
      *
      * @param sessionId
      * @param sessionState
@@ -135,7 +135,7 @@ struct IUwbSimulatorDdiCallbacksLrp
     SessionGetState(uint32_t sessionId, UwbSessionState &sessionState) = 0;
 
     /**
-     * @brief
+     * @brief Update the multicast list for a session.
      *
      * @param sessionId
      * @param action
@@ -146,7 +146,7 @@ struct IUwbSimulatorDdiCallbacksLrp
     SessionUpdateControllerMulticastList(uint32_t sessionId, UwbMulticastAction action, std::vector<UwbSessionUpdateMulticastListEntry> updateMulticastListEntries) = 0;
 
     /**
-     * @brief
+     * @brief Start ranging in a session.
      *
      * @param sessionId
      * @return UwbStatus
@@ -155,7 +155,7 @@ struct IUwbSimulatorDdiCallbacksLrp
     SessionStartRanging(uint32_t sessionId) = 0;
 
     /**
-     * @brief
+     * @brief Stop ranging in a session.
      *
      * @param sessionId
      * @return UwbStatus
@@ -164,7 +164,7 @@ struct IUwbSimulatorDdiCallbacksLrp
     SessionStopRanging(uint32_t sessionId) = 0;
 
     /**
-     * @brief
+     * @brief Get the number of times ranging was performed in a session.
      *
      * @param sessionId
      * @param rangingCount
@@ -174,7 +174,7 @@ struct IUwbSimulatorDdiCallbacksLrp
     SessionGetRangingCount(uint32_t sessionId, uint32_t &rangingCount) = 0;
 
     /**
-     * @brief
+     * @brief Obtain uwb notification event data.
      *
      * @param notificationData
      * @return NTSTATUS

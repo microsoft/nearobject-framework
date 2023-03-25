@@ -110,7 +110,7 @@ jobs:
     - name: CMake Configure
       run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -G"${{ matrix.config.generator }}"
 
-    - name: CMake Build ${{ matrix.config.arch }}
+    - name: CMake Cross-Compile Build ${{ matrix.config.arch }}
       if: ${{ matrix.config.arch }}
       run: cmake --build --preset ${{ inputs.preset-name }} --config ${{ matrix.build-type }} -A ${{ matrix.config.arch }}
 
