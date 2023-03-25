@@ -451,6 +451,7 @@ UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, st
 
     auto paramsDdi = UwbCxDdi::From(uwbSetApplicationConfigurationParameters);
     auto paramsBuffer = std::data(paramsDdi);
+
     auto statusSize = offsetof(UWB_SET_APP_CONFIG_PARAMS_STATUS, appConfigParamsStatus[std::size(applicationConfigurationParameters)]);
     std::vector<uint8_t> statusBuffer(statusSize);
     BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_SET_APP_CONFIG_PARAMS, std::data(paramsBuffer), std::size(paramsBuffer), std::data(statusBuffer), statusSize, nullptr, nullptr);

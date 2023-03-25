@@ -664,6 +664,15 @@ windows::devices::uwb::ddi::lrp::From(const UwbApplicationConfigurationParameter
             applicationConfigurationParameterWrapper = std::make_unique<UwbApplicationConfigurationParameterWrapper>(totalSize);
             UWB_APP_CONFIG_PARAM &applicationConfigurationParameter = applicationConfigurationParameterWrapper->value();
             applicationConfigurationParameter.paramValue[0] = value;
+        } else if constexpr (std::is_same_v<T, std::unordered_set<::uwb::UwbMacAddress>>) {
+            // TODO: Get all values from set, not just first one
+            const auto val = *std::begin(arg);
+            const auto value = val.GetValue();
+            parameterLength = std::size(value);
+            totalSize += parameterLength;
+            applicationConfigurationParameterWrapper = std::make_unique<UwbApplicationConfigurationParameterWrapper>(totalSize);
+            UWB_APP_CONFIG_PARAM &applicationConfigurationParameter = applicationConfigurationParameterWrapper->value();
+            std::memcpy(&applicationConfigurationParameter.paramValue[0], std::data(value), parameterLength);
         } else {
             throw std::runtime_error("unknown UwbApplicationConfigurationParameter variant value encountered");
         }
@@ -1591,6 +1600,13 @@ windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM &applicationConfi
         // in some way, but it's unclear how that information would be injected
         // here. Re-visit.
         std::unordered_set<::uwb::UwbMacAddress> value{};
+
+        // TODO: Currently assuming that DST_MAC_ADDRESS is a single, short address.
+        // However, the addresses could be extended and there could be multiple.
+        // Re-visit.
+        ::uwb::UwbMacAddress::ShortType data{};
+        std::memcpy(std::data(data), &applicationConfigurationParameter.paramValue[0], std::size(data));
+        value.insert(::uwb::UwbMacAddress(std::move(data)));
         uwbApplicationConfigurationParameter.Value = std::move(value);
         break;
     }

@@ -552,6 +552,15 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         .Value = std::move(uwbMacAddressExtended),
     };
 
+    // UWB_APP_CONFIG_PARAM_TYPE_DST_MAC_ADDRESS (single address)
+    const std::unordered_set<::uwb::UwbMacAddress> uwbMacAddressSetSingleAddress{
+        std::array<uint8_t, ::uwb::UwbMacAddressLength::Short>{ 0xAA, 0xBB },
+    };
+    const UwbApplicationConfigurationParameter parameterUwbMacAddressSetSingleAddress = {
+        .Type = UwbApplicationConfigurationParameterType::DestinationMacAddresses,
+        .Value = std::move(uwbMacAddressSetSingleAddress),
+    };
+
     constexpr auto uwbApplicationConfigurationParameterTypesAll = magic_enum::enum_values<UwbApplicationConfigurationParameterType>();
 
     SECTION("UwbApplicationConfigurationParameter bool variant is stable")
@@ -597,6 +606,11 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
     SECTION("UwbApplicationConfigurationParameter ::uwb::UwbMacAddress (extended type) is stable")
     {
         test::ValidateRoundtrip(parameterUwbMacAddressExtended);
+    }
+
+    SECTION("UwbApplicationConfigurationParameter std::unordered_set<::uwb::UwbMacAddress> (single address) is stable")
+    {
+        test::ValidateRoundtrip(parameterUwbMacAddressSetSingleAddress);
     }
 
     SECTION("std::vector<UwbApplicationConfigurationParameter> is stable")

@@ -37,8 +37,8 @@ try {
         }
         m_activeSession.reset();
     });
-    auto session = uwbDevice->CreateSession(rangingParameters.sessionId, callbacks);
-    session->Configure(rangingParameters.appConfigParams);
+    auto session = uwbDevice->CreateSession(rangingParameters.SessionId, callbacks);
+    session->Configure(rangingParameters.ApplicationConfigurationParameters);
     auto applicationConfigurationParameters = session->GetApplicationConfigurationParameters();
     PLOG_DEBUG << "Session Application Configuration Parameters: ";
     for (const auto& applicationConfigurationParameter : applicationConfigurationParameters) {
