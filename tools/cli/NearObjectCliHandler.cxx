@@ -20,7 +20,7 @@ NearObjectCliHandler::SetParent(NearObjectCli* parent)
 }
 
 std::shared_ptr<uwb::UwbDevice>
-NearObjectCliHandler::ResolveUwbDevice(const nearobject::cli::NearObjectCliData& /*cliData */) noexcept
+NearObjectCliHandler::ResolveUwbDevice(const NearObjectCliData& /*cliData */) noexcept
 {
     // Default implementation does not know how to resolve a device. OS-specific
     // implementations are expected to sub-class and override this function.
@@ -31,7 +31,7 @@ void
 NearObjectCliHandler::HandleDriverStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevice, const UwbRangingParameters& rangingParameters) noexcept
 try {
     auto controlFlowContext = (m_parent != nullptr) ? m_parent->GetControlFlowContext() : nullptr;
-    auto callbacks = std::make_shared<nearobject::cli::NearObjectCliUwbSessionEventCallbacks>([this, controlFlowContext = std::move(controlFlowContext)]() {
+    auto callbacks = std::make_shared<NearObjectCliUwbSessionEventCallbacks>([this, controlFlowContext = std::move(controlFlowContext)]() {
         if (controlFlowContext != nullptr) {
             controlFlowContext->OperationSignalComplete();
         }
@@ -57,7 +57,7 @@ NearObjectCliHandler::HandleStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevi
 try {
     // Instantiate callbacks for session events.
     auto controlFlowContext = (m_parent != nullptr) ? m_parent->GetControlFlowContext() : nullptr;
-    auto callbacks = std::make_shared<nearobject::cli::NearObjectCliUwbSessionEventCallbacks>([this, controlFlowContext = std::move(controlFlowContext)]() {
+    auto callbacks = std::make_shared<NearObjectCliUwbSessionEventCallbacks>([this, controlFlowContext = std::move(controlFlowContext)]() {
         if (controlFlowContext != nullptr) {
             controlFlowContext->OperationSignalComplete();
         }
