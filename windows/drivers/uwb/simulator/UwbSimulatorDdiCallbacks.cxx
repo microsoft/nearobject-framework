@@ -192,7 +192,7 @@ UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t session
         return UwbStatusSession::NotExist;
     }
 
-    std::vector<UwbCxDdi::UwbSetApplicationConfigurationParameterStatus> parameterStatuses{};
+    std::vector<::uwb::protocol::fira::UwbSetApplicationConfigurationParameterStatus> parameterStatuses{};
     // TODO: session exclusive mutex
 
     // Partition the parameters into those that are expressly disallowed and those that require further checking.
@@ -204,14 +204,14 @@ UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t session
 
     // Update result container with all disallowed parameters.
     std::ranges::transform(disallowed, std::back_inserter(parameterStatuses), [&](const auto &applicationConfigurationParameter) {
-        return UwbCxDdi::UwbSetApplicationConfigurationParameterStatus{ UwbStatusSession::Active, applicationConfigurationParameter.Type };
+        return UwbSetApplicationConfigurationParameterStatus{ UwbStatusSession::Active, applicationConfigurationParameter.Type };
     });
 
     // Process remaining entries.
     std::ranges::transform(std::ranges::begin(uwbApplicationConfigurationParameters), std::ranges::begin(disallowed), std::back_inserter(parameterStatuses), [&](auto &applicationConfigurationParameter) {
-        // Copy the type for later use in the result tuple.
-        auto type = applicationConfigurationParameter.Type;
-        
+        // Copy the parameterType for later use in the result tuple.
+        auto parameterType = applicationConfigurationParameter.Type;
+
         // Extract the existing entry. If there is no entry, the node will be empty.
         auto node = session->ApplicationConfigurationParameters.extract(applicationConfigurationParameter);
         if (!node.empty()) {
@@ -232,13 +232,13 @@ UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t session
                 TraceLoggingString("ParameterSet"),
                 TraceLoggingString(applicationConfigurationParameter.ToString().c_str(), "Value"));
         }
-        
+
         // Update the node with the current parameter value.
         node.value() = std::move(applicationConfigurationParameter);
         session->ApplicationConfigurationParameters.insert(std::move(node));
 
         // Update result container indicating setting the parameter was successful.
-        return UwbCxDdi::UwbSetApplicationConfigurationParameterStatus{ UwbStatusGeneric::Ok, type };
+        return UwbSetApplicationConfigurationParameterStatus{ UwbStatusGeneric::Ok, parameterType };
     });
 
     uwbSetApplicationConfigurationParameterStatuses = std::move(parameterStatuses);
@@ -259,7 +259,7 @@ UwbSimulatorDdiCallbacks::GetApplicationConfigurationParameters(uint32_t session
     if (!IsUwbStatusOk(uwbStatus)) {
         return uwbStatus;
     }
-    
+
     // TODO: session shared mutex
     std::ranges::copy_if(session->ApplicationConfigurationParameters, std::back_inserter(applicationConfigurationParameters), [&](const auto &entry) {
         return std::ranges::any_of(applicationConfigurationParameterTypes, [&](const auto &type) {
@@ -386,7 +386,7 @@ UwbSimulatorDdiCallbacks::SessionStopRanging(uint32_t sessionId)
 
     // TODO: session exclusive mutex
     SessionUpdateState(*session, UwbSessionState::Idle, UwbSessionReasonCode::StateChangeWithSessionManagementCommands);
-    
+
     return UwbStatusOk;
 }
 
