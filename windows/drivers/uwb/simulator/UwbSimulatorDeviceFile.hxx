@@ -12,13 +12,15 @@
 #include "IUwbSimulatorDdiHandler.hxx"
 #include "UwbSimulatorIoEventQueue.hxx"
 
+class UwbSimulatorDevice;
+
 /**
  * @brief Device driver open file abstraction.
  */
 class UwbSimulatorDeviceFile
 {
 public:
-    explicit UwbSimulatorDeviceFile(WDFFILEOBJECT wdfFile);
+    explicit UwbSimulatorDeviceFile(WDFFILEOBJECT wdfFile, UwbSimulatorDevice *uwbSimulatorDevice);
 
     /**
      * @brief Initializes the file object for use.
@@ -53,14 +55,27 @@ public:
 
     /**
      * @brief Get the associated wdf file handle.
-     * 
-     * @return WDFFILEOBJECT 
+     *
+     * @return WDFFILEOBJECT
      */
     WDFFILEOBJECT
     GetWdfFile() const noexcept;
 
-    UwbSimulatorIoEventQueue*
+    /**
+     * @brief Get a pointer to the io event queue for this file object.
+     *
+     * @return UwbSimulatorIoEventQueue*
+     */
+    UwbSimulatorIoEventQueue *
     GetIoEventQueue() noexcept;
+
+    /**
+     * @brief Get a pointer to the simulator device that owns this file object.
+     *
+     * @return UwbSimulatorDevice*
+     */
+    UwbSimulatorDevice *
+    GetDevice() noexcept;
 
 public:
     static EVT_WDF_OBJECT_CONTEXT_DESTROY OnWdfDestroy;
@@ -83,6 +98,7 @@ private:
 
 private:
     WDFFILEOBJECT m_wdfFile;
+    UwbSimulatorDevice *m_uwbSimulatorDevice{ nullptr };
     UwbSimulatorIoEventQueue *m_ioEventQueue{ nullptr };
     std::vector<std::unique_ptr<windows::devices::uwb::simulator::IUwbSimulatorDdiHandler>> m_ddiHandlers{};
 };
