@@ -214,7 +214,7 @@ UwbSimulatorDdiHandler::OnUwbGetApplicationConfigurationParameters(WDFREQUEST re
         auto applicationConfigurationParameterBuffer = std::data(applicationConfigurationParametersWrapper);
         std::ranges::copy(applicationConfigurationParameterBuffer, std::begin(outputBuffer));
     } else {
-        outputValue.size = sizeof outputValue;
+        outputValue.size = offsetof(UWB_APP_CONFIG_PARAMS, appConfigParams[0]);
         outputValue.status = UwbCxDdi::From(statusUwb);
         outputValue.appConfigParamsCount = 0;
     }
