@@ -23,8 +23,8 @@ class UwbSimulatorDdiHandler :
 public:
     /**
      * @brief Construct a new UwbSimulatorDdiHandler object.
-     * 
-     * @param deviceFile The file object context for this handler. 
+     *
+     * @param deviceFile The file object context for this handler.
      */
     explicit UwbSimulatorDdiHandler(UwbSimulatorDeviceFile *deviceFile);
 

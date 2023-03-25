@@ -569,6 +569,18 @@ windows::devices::uwb::ddi::lrp::From(const UwbGetApplicationConfigurationParame
     return std::move(getApplicationConfigurationParameterTypesWrapper);
 }
 
+UWB_APP_CONFIG_PARAM_STATUS
+windows::devices::uwb::ddi::lrp::From(const UwbSetApplicationConfigurationParameterStatus &uwbSetApplicationConfigurationParameterStatus)
+{
+    UWB_APP_CONFIG_PARAM_STATUS applicationConfigurationParameterStatus = {
+        .size = sizeof applicationConfigurationParameterStatus,
+        .paramType = From(uwbSetApplicationConfigurationParameterStatus.ParameterType),
+        .status = From(uwbSetApplicationConfigurationParameterStatus.Status),
+    };
+
+    return applicationConfigurationParameterStatus;
+}
+
 UwbSetApplicationConfigurationParametersWrapper
 windows::devices::uwb::ddi::lrp::From(const UwbSetApplicationConfigurationParameters &uwbSetApplicationConfigurationParameters)
 {
@@ -603,6 +615,23 @@ windows::devices::uwb::ddi::lrp::From(const UwbSetApplicationConfigurationParame
     }
 
     return std::move(setApplicationConfigurationParametersWrapper);
+}
+
+UwbSetApplicationConfigurationParametersStatusWrapper
+windows::devices::uwb::ddi::lrp::From(const UwbSetApplicationConfigurationParametersStatus &uwbSetApplicationConfigurationParametersStatus)
+{
+    auto uwbSetApplicationConfigurationParametersStatusWrapper = UwbSetApplicationConfigurationParametersStatusWrapper::from_num_elements<UWB_APP_CONFIG_PARAM_STATUS>(std::size(uwbSetApplicationConfigurationParametersStatus.ParameterStatuses));
+    auto &setApplicationConfigurationParametersStatus = uwbSetApplicationConfigurationParametersStatusWrapper.value();
+    setApplicationConfigurationParametersStatus.size = std::size(uwbSetApplicationConfigurationParametersStatusWrapper);
+    setApplicationConfigurationParametersStatus.status = From(uwbSetApplicationConfigurationParametersStatus.Status);
+    setApplicationConfigurationParametersStatus.appConfigParamsCount = std::size(uwbSetApplicationConfigurationParametersStatus.ParameterStatuses);
+
+    auto parameterStatuses = std::span(setApplicationConfigurationParametersStatus.appConfigParamsStatus, setApplicationConfigurationParametersStatus.appConfigParamsCount);
+    std::ranges::transform(uwbSetApplicationConfigurationParametersStatus.ParameterStatuses, std::ranges::begin(parameterStatuses), [&](const auto &parameterStatus) {
+        return From(parameterStatus);
+    });
+
+    return std::move(uwbSetApplicationConfigurationParametersStatusWrapper);
 }
 
 UwbApplicationConfigurationParameterWrapper
@@ -1360,6 +1389,17 @@ windows::devices::uwb::ddi::lrp::To(const UWB_GET_APP_CONFIG_PARAMS &getApplicat
     return std::move(uwbGetApplicationConfigurationParameters);
 }
 
+UwbSetApplicationConfigurationParameterStatus
+windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM_STATUS &applicationConfigurationParameterStatus)
+{
+    UwbSetApplicationConfigurationParameterStatus uwbSetApplicationConfigurationParameterStatus{
+        .Status = To(applicationConfigurationParameterStatus.status),
+        .ParameterType = To(applicationConfigurationParameterStatus.paramType),
+    };
+
+    return uwbSetApplicationConfigurationParameterStatus;
+}
+
 UwbSetApplicationConfigurationParameters
 windows::devices::uwb::ddi::lrp::To(const UWB_SET_APP_CONFIG_PARAMS &setApplicationConfigurationParameters)
 {
@@ -1376,6 +1416,22 @@ windows::devices::uwb::ddi::lrp::To(const UWB_SET_APP_CONFIG_PARAMS &setApplicat
     }
 
     return std::move(uwbSetApplicationConfigurationParameters);
+}
+
+UwbSetApplicationConfigurationParametersStatus
+windows::devices::uwb::ddi::lrp::To(const UWB_SET_APP_CONFIG_PARAMS_STATUS &setApplicationConfigurationParametersStatus)
+{
+    UwbSetApplicationConfigurationParametersStatus uwbSetApplicationConfigurationParameterResult{
+        .Status = To(setApplicationConfigurationParametersStatus.status),
+    };
+
+    uwbSetApplicationConfigurationParameterResult.ParameterStatuses.reserve(setApplicationConfigurationParametersStatus.appConfigParamsCount);
+    auto parameterStatusesRange = std::span(setApplicationConfigurationParametersStatus.appConfigParamsStatus, setApplicationConfigurationParametersStatus.appConfigParamsCount);
+    std::ranges::transform(parameterStatusesRange, std::back_inserter(uwbSetApplicationConfigurationParameterResult.ParameterStatuses), [&](const auto &parameterStatus) {
+        return To(parameterStatus);
+    });
+
+    return std::move(uwbSetApplicationConfigurationParameterResult);
 }
 
 namespace detail

@@ -7,6 +7,7 @@
 #include <iostream>
 #include <memory>
 #include <optional>
+#include <ranges>
 #include <span>
 #include <string>
 #include <unordered_set>
@@ -562,6 +563,30 @@ using UwbApplicationConfigurationParameterValue = std::variant<
     std::unordered_set<::uwb::UwbMacAddress>>; // DST_MAC_ADDRESS, tag 0x07, size 2/8*N
 // clang-format on
 
+constexpr std::array<UwbApplicationConfigurationParameterType, 5> UwbApplicationConfigurationParameterTypesUpdateableWhileActive{
+    UwbApplicationConfigurationParameterType::BlockStrideLength,
+    UwbApplicationConfigurationParameterType::RangingInterval,
+    UwbApplicationConfigurationParameterType::RangeDataNotificationConfig,
+    UwbApplicationConfigurationParameterType::RangeDataNotificationProximityNear,
+    UwbApplicationConfigurationParameterType::RangeDataNotificationProximityFar,
+};
+
+/**
+ * @brief Determines whether the specified application configuration parameter
+ * (type) is allowed to be updated while a session is in the 'Active' state.
+ *
+ * @param uwbApplicationConfigurationParameterType
+ * @return true The parameter may be updated while a session is active.
+ * @return false The parameter may not be updated while a session is active.
+ */
+constexpr bool
+IsApplicationConfigurationParameterChangeableWhileActive(const UwbApplicationConfigurationParameterType& uwbApplicationConfigurationParameterType)
+{
+    return std::ranges::any_of(UwbApplicationConfigurationParameterTypesUpdateableWhileActive, [&](const auto& type) {
+        return (type == uwbApplicationConfigurationParameterType);
+    });
+}
+
 /**
  * @brief Represents a FiRa UWB Application Configuration Parameter as
  * described in the FiRa Consortium UWB Command Interface Generic Technical
@@ -582,6 +607,33 @@ struct UwbApplicationConfigurationParameter
      */
     std::string
     ToString() const;
+};
+
+/**
+ * @brief Determines whether the specified application configuration parameter
+ * is allowed to be updated while a session is in the 'Active' state.
+ *
+ * @param uwbApplicationConfigurationParameter
+ * @return true The parameter may be updated while a session is active.
+ * @return false The parameter may not be updated while a session is active.
+ */
+constexpr bool
+IsApplicationConfigurationChangeableWhileActive(const UwbApplicationConfigurationParameter& uwbApplicationConfigurationParameter)
+{
+    return IsApplicationConfigurationParameterChangeableWhileActive(uwbApplicationConfigurationParameter.Type);
+}
+
+/**
+ * @brief Represents the status of setting an application configuration
+ * parameter using FiRa UCI SESSION_SET_APP_CONFIG_CMD.
+ */
+struct UwbSetApplicationConfigurationParameterStatus
+{
+    UwbStatus Status;
+    UwbApplicationConfigurationParameterType ParameterType;
+
+    auto
+    operator<=>(const UwbSetApplicationConfigurationParameterStatus&) const noexcept = default;
 };
 
 struct UwbMulticastListStatus
@@ -752,5 +804,21 @@ std::string
 ToString(const UwbApplicationConfigurationParameterValue& uwbApplicationConfigurationParameterValue);
 
 } // namespace uwb::protocol::fira
+
+namespace std
+{
+using ::uwb::protocol::fira::UwbApplicationConfigurationParameter;
+using ::uwb::protocol::fira::UwbApplicationConfigurationParameterType;
+
+template <>
+struct less<UwbApplicationConfigurationParameter>
+{
+    bool
+    operator()(const UwbApplicationConfigurationParameter& lhs, const UwbApplicationConfigurationParameter& rhs) const
+    {
+        return std::less<UwbApplicationConfigurationParameterType>{}(lhs.Type, rhs.Type);
+    }
+};
+} // namespace std
 
 #endif // FIRA_DEVICE_HXX

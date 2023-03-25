@@ -286,6 +286,15 @@ struct UwbSetApplicationConfigurationParameters
     operator<=>(const UwbSetApplicationConfigurationParameters &) const noexcept = default;
 };
 
+/**
+ * @brief Converts a UwbSetApplicationConfigurationParameterStatus to UWB_APP_CONFIG_PARAM_STATUS.
+ *
+ * @param uwbSetApplicationConfigurationParameterStatus
+ * @return UWB_APP_CONFIG_PARAM_STATUS
+ */
+UWB_APP_CONFIG_PARAM_STATUS
+From(const ::uwb::protocol::fira::UwbSetApplicationConfigurationParameterStatus &uwbSetApplicationConfigurationParameterStatus);
+
 using UwbSetApplicationConfigurationParametersWrapper = notstd::flextype_wrapper<UWB_SET_APP_CONFIG_PARAMS>;
 
 /**
@@ -296,6 +305,29 @@ using UwbSetApplicationConfigurationParametersWrapper = notstd::flextype_wrapper
  */
 UwbSetApplicationConfigurationParametersWrapper
 From(const UwbSetApplicationConfigurationParameters &uwbSetApplicationConfigurationParameters);
+
+/**
+ * @brief Neutral type for the UWB_SET_APP_CONFIG_PARAMS_STATUS DDI structure.
+ */
+struct UwbSetApplicationConfigurationParametersStatus
+{
+    ::uwb::protocol::fira::UwbStatus Status;
+    std::vector<::uwb::protocol::fira::UwbSetApplicationConfigurationParameterStatus> ParameterStatuses;
+
+    auto
+    operator<=>(const UwbSetApplicationConfigurationParametersStatus &) const noexcept = default;
+};
+
+using UwbSetApplicationConfigurationParametersStatusWrapper = notstd::flextype_wrapper<UWB_SET_APP_CONFIG_PARAMS_STATUS>;
+
+/**
+ * @brief Converts UwbSetApplicationConfigurationParametersStatus to UWB_SET_APP_CONFIG_PARAMS_STATUS.
+ *
+ * @param uwbSetApplicationConfigurationParameterResult
+ * @return UwbSetApplicationConfigurationParametersStatusWrapper
+ */
+UwbSetApplicationConfigurationParametersStatusWrapper
+From(const UwbSetApplicationConfigurationParametersStatus &uwbSetApplicationConfigurationParameterResult);
 
 using UwbApplicationConfigurationParameterWrapper = notstd::flextype_wrapper<UWB_APP_CONFIG_PARAM>;
 
@@ -544,6 +576,15 @@ UwbGetApplicationConfigurationParameters
 To(const UWB_GET_APP_CONFIG_PARAMS &getApplicationConfigurationParameters);
 
 /**
+ * @brief Converts UWB_APP_CONFIG_PARAM_STATUS to UwbSetApplicationConfigurationParameterStatus.
+ *
+ * @param applicationConfigurationParameterStatus
+ * @return ::uwb::protocol::fira::UwbSetApplicationConfigurationParameterStatus
+ */
+::uwb::protocol::fira::UwbSetApplicationConfigurationParameterStatus
+To(const UWB_APP_CONFIG_PARAM_STATUS &applicationConfigurationParameterStatus);
+
+/**
  * @brief Converts UWB_SET_APP_CONFIG_PARAMS to UwbSetApplicationConfigurationParameters.
  *
  * @param setApplicationConfigurationParameters
@@ -551,6 +592,15 @@ To(const UWB_GET_APP_CONFIG_PARAMS &getApplicationConfigurationParameters);
  */
 UwbSetApplicationConfigurationParameters
 To(const UWB_SET_APP_CONFIG_PARAMS &setApplicationConfigurationParameters);
+
+/**
+ * @brief Converts UWB_SET_APP_CONFIG_PARAMS_STATUS to UwbSetApplicationConfigurationParametersStatus.
+ *
+ * @param applicationConfigurationParameterStatus
+ * @return UwbSetApplicationConfigurationParametersStatus
+ */
+UwbSetApplicationConfigurationParametersStatus
+To(const UWB_SET_APP_CONFIG_PARAMS_STATUS &applicationConfigurationParameterStatus);
 
 /**
  * @brief Converts UWB_APP_CONFIG_PARAM to UwbApplicationConfigurationParameter.
@@ -571,5 +621,11 @@ std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
 To(const UWB_APP_CONFIG_PARAMS &applicationConfigurationParameters);
 
 } // namespace windows::devices::uwb::ddi::lrp
+
+/**
+ * @brief Namespace alias to reduce typing but preserve clarity regarding DDI
+ * conversion.
+ */
+namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
 
 #endif // UWB_CX_ADAPTER_DDI_LRP_HXX
