@@ -561,6 +561,21 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         .Value = std::move(uwbMacAddressSetSingleAddress),
     };
 
+    constexpr UwbSetApplicationConfigurationParameterStatus uwbSetApplicationConfigurationParameterStatusAoaResulReq{
+        .Status = UwbStatusOk,
+        .ParameterType = UwbApplicationConfigurationParameterType::AoAResultRequest,
+    };
+
+    constexpr UwbSetApplicationConfigurationParameterStatus uwbSetApplicationConfigurationParameterStatusBlockStrideLength{
+        .Status = UwbStatusSession::Active,
+        .ParameterType = UwbApplicationConfigurationParameterType::BlockStrideLength,
+    };
+
+    constexpr UwbSetApplicationConfigurationParameterStatus uwbSetApplicationConfigurationParameterStatusBprfPhrDataRate{
+        .Status = UwbStatusRanging::RxTimeout,
+        .ParameterType = UwbApplicationConfigurationParameterType::BprfPhrDataRate,
+    };
+
     constexpr auto uwbApplicationConfigurationParameterTypesAll = magic_enum::enum_values<UwbApplicationConfigurationParameterType>();
 
     SECTION("UwbApplicationConfigurationParameter bool variant is stable")
@@ -662,15 +677,21 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
 
     SECTION("UwbSetApplicationConfigurationParameterStatus is stable")
     {
-        const UwbSetApplicationConfigurationParameterStatus uwbSetApplicationConfigurationParameterStatus{};
-        // TODO: above should be filled in with non-trivial data
-        test::ValidateRoundtrip(uwbSetApplicationConfigurationParameterStatus);
+        test::ValidateRoundtrip(uwbSetApplicationConfigurationParameterStatusAoaResulReq);
+        test::ValidateRoundtrip(uwbSetApplicationConfigurationParameterStatusBlockStrideLength);
+        test::ValidateRoundtrip(uwbSetApplicationConfigurationParameterStatusBprfPhrDataRate);
     }
 
     SECTION("UwbSetApplicationConfigurationParametersStatus is stable")
     {
-        const UwbSetApplicationConfigurationParametersStatus uwbSetApplicationConfigurationParametersStatus{};
-        // TODO: above should be filled in with non-trivial data
+        const UwbSetApplicationConfigurationParametersStatus uwbSetApplicationConfigurationParametersStatus{
+            .Status = UwbStatusOk,
+            .ParameterStatuses{
+                uwbSetApplicationConfigurationParameterStatusAoaResulReq,
+                uwbSetApplicationConfigurationParameterStatusBlockStrideLength,
+                uwbSetApplicationConfigurationParameterStatusBprfPhrDataRate,
+            },
+        };
         test::ValidateRoundtrip(uwbSetApplicationConfigurationParametersStatus);
     }
 }

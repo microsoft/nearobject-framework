@@ -430,10 +430,10 @@ UwbDeviceConnector::GetApplicationConfigurationParameters(uint32_t sessionId, st
     return resultFuture;
 }
 
-std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>>>>
-UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> applicationConfigurationParameters)
+std::future<std::tuple<UwbStatus, std::vector<UwbSetApplicationConfigurationParameterStatus>>>
+UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters)
 {
-    std::promise<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>>>> resultPromise;
+    std::promise<std::tuple<UwbStatus, std::vector<UwbSetApplicationConfigurationParameterStatus>>> resultPromise;
     auto resultFuture = resultPromise.get_future();
 
     wil::shared_hfile handleDriver;
@@ -462,21 +462,13 @@ UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, st
         return resultFuture;
     } else {
         PLOG_DEBUG << "IOCTL_UWB_SET_APP_CONFIG_PARAMS succeeded";
-        auto& uwbSetAppConfigParamsStatus = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS_STATUS*>(std::data(statusBuffer));
-        auto uwbStatus = UwbCxDdi::To(uwbSetAppConfigParamsStatus.status);
+        auto& setApplicationConfigurationParametersStatus = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS_STATUS*>(std::data(statusBuffer));
+        auto uwbStatus = UwbCxDdi::To(setApplicationConfigurationParametersStatus.status);
         if (!IsUwbStatusOk(uwbStatus)) {
             resultPromise.set_exception(std::make_exception_ptr(UwbException(std::move(uwbStatus))));
         } else {
-            // TODO: Should move this logic into its own UwbCxDdi::To() function
-            std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>> appConfigParamsStatusList;
-            for (auto i = 0; i < uwbSetAppConfigParamsStatus.appConfigParamsCount; i++) {
-                auto paramType = UwbCxDdi::To(uwbSetAppConfigParamsStatus.appConfigParamsStatus[i].paramType);
-                auto paramStatus = UwbCxDdi::To(uwbSetAppConfigParamsStatus.appConfigParamsStatus[i].status);
-
-                auto appConfigParamStatus = std::make_tuple(paramType, paramStatus);
-                appConfigParamsStatusList.push_back(appConfigParamStatus);
-            }
-            auto result = std::make_tuple(uwbStatus, std::move(appConfigParamsStatusList));
+            auto uwbSetApplicationConfigurationParametersStatus = UwbCxDdi::To(setApplicationConfigurationParametersStatus);
+            auto result = std::make_tuple(uwbSetApplicationConfigurationParametersStatus.Status, std::move(uwbSetApplicationConfigurationParametersStatus.ParameterStatuses));
             resultPromise.set_value(std::move(result));
         }
     }

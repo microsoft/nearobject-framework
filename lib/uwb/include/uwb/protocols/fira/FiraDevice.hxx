@@ -623,6 +623,19 @@ IsApplicationConfigurationChangeableWhileActive(const UwbApplicationConfiguratio
     return IsApplicationConfigurationParameterChangeableWhileActive(uwbApplicationConfigurationParameter.Type);
 }
 
+/**
+ * @brief Represents the status of setting an application configuration
+ * parameter using FiRa UCI SESSION_SET_APP_CONFIG_CMD.
+ */
+struct UwbSetApplicationConfigurationParameterStatus
+{
+    UwbStatus Status;
+    UwbApplicationConfigurationParameterType ParameterType;
+
+    auto
+    operator<=>(const UwbSetApplicationConfigurationParameterStatus &) const noexcept = default;
+};
+
 struct UwbMulticastListStatus
 {
     uwb::UwbMacAddress ControleeMacAddress;

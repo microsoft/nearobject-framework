@@ -287,25 +287,13 @@ struct UwbSetApplicationConfigurationParameters
 };
 
 /**
- * @brief Neutral type for the UWB_APP_CONFIG_PARAM_STATUS DDI structure.
- */
-struct UwbSetApplicationConfigurationParameterStatus
-{
-    ::uwb::protocol::fira::UwbStatus Status;
-    ::uwb::protocol::fira::UwbApplicationConfigurationParameterType ParameterType;
-
-    auto
-    operator<=>(const UwbSetApplicationConfigurationParameterStatus &) const noexcept = default;
-};
-
-/**
  * @brief Converts a UwbSetApplicationConfigurationParameterStatus to UWB_APP_CONFIG_PARAM_STATUS.
  * 
  * @param uwbApplicationConfigurationParameterStatus 
  * @return UWB_APP_CONFIG_PARAM_STATUS 
  */
 UWB_APP_CONFIG_PARAM_STATUS
-From(const UwbSetApplicationConfigurationParameterStatus &uwbSetApplicationConfigurationParameterStatus);
+From(const ::uwb::protocol::fira::UwbSetApplicationConfigurationParameterStatus &uwbSetApplicationConfigurationParameterStatus);
 
 using UwbSetApplicationConfigurationParametersWrapper = notstd::flextype_wrapper<UWB_SET_APP_CONFIG_PARAMS>;
 
@@ -324,7 +312,7 @@ From(const UwbSetApplicationConfigurationParameters &uwbSetApplicationConfigurat
 struct UwbSetApplicationConfigurationParametersStatus
 {
     ::uwb::protocol::fira::UwbStatus Status;
-    std::vector<UwbSetApplicationConfigurationParameterStatus> ParameterStatuses;
+    std::vector<::uwb::protocol::fira::UwbSetApplicationConfigurationParameterStatus> ParameterStatuses;
 
     auto
     operator<=>(const UwbSetApplicationConfigurationParametersStatus &) const noexcept = default;
@@ -591,9 +579,9 @@ To(const UWB_GET_APP_CONFIG_PARAMS &getApplicationConfigurationParameters);
  * @brief Converts UWB_APP_CONFIG_PARAM_STATUS to UwbSetApplicationConfigurationParameterStatus.
  * 
  * @param applicationConfigurationParameterStatus 
- * @return UwbSetApplicationConfigurationParameterStatus 
+ * @return ::uwb::protocol::fira::UwbSetApplicationConfigurationParameterStatus 
  */
-UwbSetApplicationConfigurationParameterStatus
+::uwb::protocol::fira::UwbSetApplicationConfigurationParameterStatus
 To(const UWB_APP_CONFIG_PARAM_STATUS &applicationConfigurationParameterStatus);
 
 /**
