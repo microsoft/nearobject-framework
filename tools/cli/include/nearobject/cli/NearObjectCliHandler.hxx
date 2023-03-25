@@ -58,7 +58,7 @@ struct NearObjectCliHandler
     /**
      * @brief Invoked by command-line driver when the request is to start a
      * ranging session.
-     * 
+     *
      * @param uwbDevice The resolved uwb device to start the ranging session on.
      * @param sessionData The data to configure the ranging session.
      */

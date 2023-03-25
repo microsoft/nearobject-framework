@@ -288,9 +288,9 @@ struct UwbSetApplicationConfigurationParameters
 
 /**
  * @brief Converts a UwbSetApplicationConfigurationParameterStatus to UWB_APP_CONFIG_PARAM_STATUS.
- * 
- * @param uwbApplicationConfigurationParameterStatus 
- * @return UWB_APP_CONFIG_PARAM_STATUS 
+ *
+ * @param uwbApplicationConfigurationParameterStatus
+ * @return UWB_APP_CONFIG_PARAM_STATUS
  */
 UWB_APP_CONFIG_PARAM_STATUS
 From(const ::uwb::protocol::fira::UwbSetApplicationConfigurationParameterStatus &uwbSetApplicationConfigurationParameterStatus);
@@ -322,9 +322,9 @@ using UwbSetApplicationConfigurationParametersStatusWrapper = notstd::flextype_w
 
 /**
  * @brief Converts UwbSetApplicationConfigurationParametersStatus to UWB_SET_APP_CONFIG_PARAMS_STATUS.
- * 
- * @param uwbSetApplicationConfigurationParameterResult 
- * @return UwbSetApplicationConfigurationParametersStatusWrapper 
+ *
+ * @param uwbSetApplicationConfigurationParameterResult
+ * @return UwbSetApplicationConfigurationParametersStatusWrapper
  */
 UwbSetApplicationConfigurationParametersStatusWrapper
 From(const UwbSetApplicationConfigurationParametersStatus &uwbSetApplicationConfigurationParameterResult);
@@ -577,9 +577,9 @@ To(const UWB_GET_APP_CONFIG_PARAMS &getApplicationConfigurationParameters);
 
 /**
  * @brief Converts UWB_APP_CONFIG_PARAM_STATUS to UwbSetApplicationConfigurationParameterStatus.
- * 
- * @param applicationConfigurationParameterStatus 
- * @return ::uwb::protocol::fira::UwbSetApplicationConfigurationParameterStatus 
+ *
+ * @param applicationConfigurationParameterStatus
+ * @return ::uwb::protocol::fira::UwbSetApplicationConfigurationParameterStatus
  */
 ::uwb::protocol::fira::UwbSetApplicationConfigurationParameterStatus
 To(const UWB_APP_CONFIG_PARAM_STATUS &applicationConfigurationParameterStatus);
@@ -595,9 +595,9 @@ To(const UWB_SET_APP_CONFIG_PARAMS &setApplicationConfigurationParameters);
 
 /**
  * @brief Converts UWB_SET_APP_CONFIG_PARAMS_STATUS to UwbSetApplicationConfigurationParametersStatus.
- * 
- * @param applicationConfigurationParameterStatus 
- * @return UwbSetApplicationConfigurationParametersStatus 
+ *
+ * @param applicationConfigurationParameterStatus
+ * @return UwbSetApplicationConfigurationParametersStatus
  */
 UwbSetApplicationConfigurationParametersStatus
 To(const UWB_SET_APP_CONFIG_PARAMS_STATUS &applicationConfigurationParameterStatus);

@@ -633,7 +633,7 @@ struct UwbSetApplicationConfigurationParameterStatus
     UwbApplicationConfigurationParameterType ParameterType;
 
     auto
-    operator<=>(const UwbSetApplicationConfigurationParameterStatus &) const noexcept = default;
+    operator<=>(const UwbSetApplicationConfigurationParameterStatus&) const noexcept = default;
 };
 
 struct UwbMulticastListStatus
