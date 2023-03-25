@@ -618,10 +618,20 @@ windows::devices::uwb::ddi::lrp::From(const UwbSetApplicationConfigurationParame
 }
 
 UwbSetApplicationConfigurationParametersStatusWrapper
-windows::devices::uwb::ddi::lrp::From([[maybe_unused]] const UwbSetApplicationConfigurationParametersStatus &uwbSetApplicationConfigurationParameterResult)
+windows::devices::uwb::ddi::lrp::From(const UwbSetApplicationConfigurationParametersStatus &uwbSetApplicationConfigurationParametersStatus)
 {
-    UwbSetApplicationConfigurationParametersStatusWrapper uwbSetApplicationConfigurationParametersStatusWrapper{1024  /* FIXME */};
-    // TODO
+    auto uwbSetApplicationConfigurationParametersStatusWrapper = UwbSetApplicationConfigurationParametersStatusWrapper::from_num_elements<UWB_APP_CONFIG_PARAM_STATUS>(std::size(uwbSetApplicationConfigurationParametersStatus.ParameterStatuses));
+    auto &setApplicationConfigurationParametersStatus = uwbSetApplicationConfigurationParametersStatusWrapper.value();
+    setApplicationConfigurationParametersStatus.size = std::size(uwbSetApplicationConfigurationParametersStatusWrapper);
+    setApplicationConfigurationParametersStatus.status = From(uwbSetApplicationConfigurationParametersStatus.Status);
+    setApplicationConfigurationParametersStatus.appConfigParamsCount = std::size(uwbSetApplicationConfigurationParametersStatus.ParameterStatuses);
+
+    auto parameterStatuses = std::span(setApplicationConfigurationParametersStatus.appConfigParamsStatus, setApplicationConfigurationParametersStatus.appConfigParamsCount);
+    std::ranges::transform(uwbSetApplicationConfigurationParametersStatus.ParameterStatuses, std::ranges::begin(parameterStatuses), [&](const auto &parameterStatus)
+    {
+        return From(parameterStatus);
+    });
+
     return std::move(uwbSetApplicationConfigurationParametersStatusWrapper);
 }
 
@@ -1410,11 +1420,19 @@ windows::devices::uwb::ddi::lrp::To(const UWB_SET_APP_CONFIG_PARAMS &setApplicat
 }
 
 UwbSetApplicationConfigurationParametersStatus
-windows::devices::uwb::ddi::lrp::To([[maybe_unused]] const UWB_SET_APP_CONFIG_PARAMS_STATUS& setApplicationConfigurationParametersStatus)
+windows::devices::uwb::ddi::lrp::To(const UWB_SET_APP_CONFIG_PARAMS_STATUS& setApplicationConfigurationParametersStatus)
 {
-    UwbSetApplicationConfigurationParametersStatus uwbSetApplicationConfigurationParameterResult{};
-    // TODO
-    return uwbSetApplicationConfigurationParameterResult; 
+    UwbSetApplicationConfigurationParametersStatus uwbSetApplicationConfigurationParameterResult{
+        .Status = To(setApplicationConfigurationParametersStatus.status),
+    };
+
+    uwbSetApplicationConfigurationParameterResult.ParameterStatuses.reserve(setApplicationConfigurationParametersStatus.appConfigParamsCount);
+    auto parameterStatusesRange = std::span(setApplicationConfigurationParametersStatus.appConfigParamsStatus, setApplicationConfigurationParametersStatus.appConfigParamsCount);
+    std::ranges::transform(parameterStatusesRange, std::back_inserter(uwbSetApplicationConfigurationParameterResult.ParameterStatuses), [&](const auto &parameterStatus){
+        return To(parameterStatus);
+    });
+
+    return std::move(uwbSetApplicationConfigurationParameterResult); 
 }
 
 namespace detail
