@@ -289,7 +289,7 @@ struct UwbSetApplicationConfigurationParameters
 /**
  * @brief Converts a UwbSetApplicationConfigurationParameterStatus to UWB_APP_CONFIG_PARAM_STATUS.
  *
- * @param uwbApplicationConfigurationParameterStatus
+ * @param uwbSetApplicationConfigurationParameterStatus
  * @return UWB_APP_CONFIG_PARAM_STATUS
  */
 UWB_APP_CONFIG_PARAM_STATUS
