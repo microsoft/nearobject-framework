@@ -22,7 +22,7 @@ class NearObjectCli;
  */
 struct NearObjectCliHandler
 {
-    NearObjectCliHandler();
+    NearObjectCliHandler() = default;
 
     virtual ~NearObjectCliHandler() = default;
 

@@ -12,14 +12,18 @@
 using namespace nearobject::cli;
 using namespace uwb::protocol::fira;
 
-NearObjectCliHandler::NearObjectCliHandler() :
-    m_sessionEventCallbacks(std::make_shared<NearObjectCliUwbSessionEventCallbacks>())
-{}
-
 void
 NearObjectCliHandler::SetParent(NearObjectCli* parent)
 {
     m_parent = parent;
+
+    auto controlFlowContext = (m_parent != nullptr) ? m_parent->GetControlFlowContext() : nullptr;
+    m_sessionEventCallbacks = std::make_shared<NearObjectCliUwbSessionEventCallbacks>([this, controlFlowContext = std::move(controlFlowContext)]() {
+        if (controlFlowContext != nullptr) {
+            controlFlowContext->OperationSignalComplete();
+        }
+        m_activeSession.reset();
+    });
 }
 
 std::shared_ptr<uwb::UwbDevice>
@@ -33,12 +37,6 @@ NearObjectCliHandler::ResolveUwbDevice(const NearObjectCliData& /*cliData */) no
 void
 NearObjectCliHandler::HandleDriverStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevice, const UwbRangingParameters& rangingParameters) noexcept
 try {
-    auto controlFlowContext = (m_parent != nullptr) ? m_parent->GetControlFlowContext() : nullptr;
-    if (controlFlowContext == nullptr) {
-        controlFlowContext->OperationSignalComplete();
-    }
-    m_activeSession.reset();
-
     auto session = uwbDevice->CreateSession(rangingParameters.SessionId, m_sessionEventCallbacks);
     session->Configure(rangingParameters.ApplicationConfigurationParameters);
     auto applicationConfigurationParameters = session->GetApplicationConfigurationParameters();
@@ -57,12 +55,6 @@ try {
 void
 NearObjectCliHandler::HandleStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevice, uwb::protocol::fira::UwbSessionData& sessionData) noexcept
 try {
-    auto controlFlowContext = (m_parent != nullptr) ? m_parent->GetControlFlowContext() : nullptr;
-    if (controlFlowContext == nullptr) {
-        controlFlowContext->OperationSignalComplete();
-    }
-    m_activeSession.reset();
-
     // Create a new session.
     auto session = uwbDevice->CreateSession(sessionData.sessionId, m_sessionEventCallbacks);
 
