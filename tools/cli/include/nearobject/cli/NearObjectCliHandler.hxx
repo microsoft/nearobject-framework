@@ -7,6 +7,7 @@
 
 #include <nearobject/cli/NearObjectCliControlFlowContext.hxx>
 #include <nearobject/cli/NearObjectCliData.hxx>
+#include <nearobject/cli/NearObjectCliUwbSessionEventCallbacks.hxx>
 #include <uwb/UwbDevice.hxx>
 #include <uwb/UwbSession.hxx>
 #include <uwb/protocols/fira/UwbSessionData.hxx>
@@ -21,7 +22,7 @@ class NearObjectCli;
  */
 struct NearObjectCliHandler
 {
-    NearObjectCliHandler() = default;
+    NearObjectCliHandler();
 
     virtual ~NearObjectCliHandler() = default;
 
@@ -99,6 +100,7 @@ struct NearObjectCliHandler
 private:
     NearObjectCli* m_parent;
     std::shared_ptr<::uwb::UwbSession> m_activeSession;
+    std::shared_ptr<NearObjectCliUwbSessionEventCallbacks> m_sessionEventCallbacks;
 };
 
 } // namespace nearobject::cli
