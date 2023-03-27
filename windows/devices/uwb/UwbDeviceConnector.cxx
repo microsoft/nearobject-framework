@@ -110,7 +110,7 @@ UwbDeviceConnector::GetDeviceInformation()
         if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
             DWORD lastError = GetLastError();
             // Treat all errors other than insufficient buffer size as fatal.
-            if (lastError != ERROR_INSUFFICIENT_BUFFER) {
+            if (lastError != ERROR_MORE_DATA) {
                 HRESULT hr = HRESULT_FROM_WIN32(lastError);
                 PLOG_ERROR << "error when sending IOCTL_UWB_GET_DEVICE_INFO, hr=" << std::showbase << std::hex << hr;
                 resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Failed)));
@@ -501,7 +501,7 @@ UwbDeviceConnector::HandleNotifications(std::stop_token stopToken)
                             << "error waiting for IOCTL_UWB_NOTIFICATION completion, hr=" << std::showbase << std::hex << hr;
                         break; // for({1,2})
                     }
-                } else if (lastError == ERROR_INSUFFICIENT_BUFFER) {
+                } else if (lastError == ERROR_MORE_DATA) {
                     // Attempt to retry the ioctl with the appropriate buffer size, which is now held in bytesRequired.
                     continue;
                 } else {
