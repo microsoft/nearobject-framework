@@ -18,7 +18,7 @@ class UwbSessionSimulator :
     public windows::devices::uwb::UwbSession
 {
 public:
-    UwbSessionSimulator(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, std::shared_ptr<IUwbSessionDdiConnector> uwbDeviceConnector, std::shared_ptr<UwbDeviceSimulatorConnector> uwbDeviceSimulatorConnector);
+    UwbSessionSimulator(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, UwbDevice* uwbDevice, std::shared_ptr<UwbDeviceSimulatorConnector> uwbDeviceSimulatorConnector);
 
     virtual ~UwbSessionSimulator() = default;
 
