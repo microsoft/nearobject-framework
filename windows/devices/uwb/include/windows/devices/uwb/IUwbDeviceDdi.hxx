@@ -45,14 +45,6 @@ struct IUwbDeviceDdi
 struct IUwbDeviceDdiConnector : public IUwbDeviceDdi
 {
     /**
-     * @brief Get the name of this device.
-     *
-     * @return const std::string&
-     */
-    virtual const std::string&
-    DeviceName() const noexcept = 0;
-
-    /**
      * @brief Sets the callbacks for the UwbDevice that owns this UwbConnector
      *
      * @param callbacks

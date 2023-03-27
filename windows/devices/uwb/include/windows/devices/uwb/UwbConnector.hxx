@@ -37,16 +37,16 @@ public:
      */
     ~UwbConnector();
 
-public:
-    // IUwbDeviceDdiConnector
     /**
      * @brief Get the name of this device.
      *
      * @return const std::string&
      */
-    virtual const std::string&
-    DeviceName() const noexcept override;
+    const std::string&
+    DeviceName() const noexcept;
 
+public:
+    // IUwbDeviceDdiConnector
     /**
      * @brief Start listening for notifications.
      *
