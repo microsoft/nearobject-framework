@@ -59,6 +59,7 @@ try {
     }
 
     // Save the session reference so it stays alive while the session is active.
+    m_activeDevice = uwbDevice;
     m_activeSession = std::move(session);
 } catch (...) {
     PLOG_ERROR << "failed to start ranging";

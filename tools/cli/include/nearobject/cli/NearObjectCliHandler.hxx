@@ -100,6 +100,7 @@ struct NearObjectCliHandler
 
 private:
     NearObjectCli* m_parent;
+    std::shared_ptr<::uwb::UwbDevice> m_activeDevice;
     std::shared_ptr<::uwb::UwbSession> m_activeSession;
     std::shared_ptr<::uwb::UwbSessionEventCallbacks> m_sessionEventCallbacks;
 };
