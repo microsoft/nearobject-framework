@@ -103,7 +103,7 @@ UwbDeviceConnector::GetDeviceInformation()
     // the case, the first attempt will succeed. Otherwise, the buffer is grown
     // to account for the vendor specific information, and the IOCTL attempted a
     // second time.
-    for (const auto i : std::ranges::iota_view{ 1, 2 }) {
+    for (const auto i : std::ranges::iota_view{ 0, 2 }) {
         deviceInformationBuffer.resize(bytesRequired);
         PLOG_DEBUG << "IOCTL_UWB_GET_DEVICE_INFO attempt #" << i << " with " << std::size(deviceInformationBuffer) << "-byte buffer";
         BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_DEVICE_INFO, nullptr, 0, std::data(deviceInformationBuffer), std::size(deviceInformationBuffer), &bytesRequired, nullptr);
@@ -399,7 +399,7 @@ UwbDeviceConnector::GetApplicationConfigurationParameters(uint32_t sessionId, st
     DWORD bytesRequired = 0;
     std::vector<uint8_t> getAppConfigParamsResultBuffer{};
 
-    for (const auto i : std::ranges::iota_view{ 1, 2 }) {
+    for (const auto i : std::ranges::iota_view{ 0, 2 }) {
         getAppConfigParamsResultBuffer.resize(bytesRequired);
         PLOG_DEBUG << "IOCTL_UWB_GET_APP_CONFIG_PARAMS attempt #" << i << " with " << std::size(getAppConfigParamsResultBuffer) << "-byte buffer";
         BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_APP_CONFIG_PARAMS, std::data(getAppConfigParamsBuffer), std::size(getAppConfigParamsBuffer), std::data(getAppConfigParamsResultBuffer), std::size(getAppConfigParamsResultBuffer), &bytesRequired, nullptr);
@@ -486,7 +486,7 @@ UwbDeviceConnector::HandleNotifications(std::stop_token stopToken)
 
     while (!stopToken.stop_requested()) {
         m_notificationOverlapped = {};
-        for (const auto i : std::ranges::iota_view{ 1, 2 }) {
+        for (const auto i : std::ranges::iota_view{ 0, 2 }) {
             uwbNotificationDataBuffer.resize(bytesRequired);
             PLOG_DEBUG << "IOCTL_UWB_NOTIFICATION attempt #" << i << " with " << std::size(uwbNotificationDataBuffer) << "-byte buffer";
             BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, std::data(uwbNotificationDataBuffer), std::size(uwbNotificationDataBuffer), &bytesRequired, &m_notificationOverlapped);
