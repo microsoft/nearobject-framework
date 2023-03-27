@@ -191,6 +191,7 @@ UwbSimulatorDdiHandler::OnUwbSetDeviceConfigurationParameters(WDFREQUEST /*reque
 NTSTATUS
 UwbSimulatorDdiHandler::OnUwbGetApplicationConfigurationParameters(WDFREQUEST request, std::span<uint8_t> inputBuffer, std::span<uint8_t> outputBuffer)
 {
+    std::size_t outputSize = 0;
     NTSTATUS status = STATUS_SUCCESS;
 
     // Convert DDI input type to neutral type.
@@ -212,15 +213,25 @@ UwbSimulatorDdiHandler::OnUwbGetApplicationConfigurationParameters(WDFREQUEST re
     if (IsUwbStatusOk(statusUwb)) {
         auto applicationConfigurationParametersWrapper = UwbCxDdi::From(uwbApplicationConfigurationParameters);
         auto applicationConfigurationParameterBuffer = std::data(applicationConfigurationParametersWrapper);
-        std::ranges::copy(applicationConfigurationParameterBuffer, std::begin(outputBuffer));
+        outputSize = std::size(applicationConfigurationParameterBuffer);
+        if (std::size(outputBuffer) >= outputSize) {
+            std::ranges::copy(applicationConfigurationParameterBuffer, std::begin(outputBuffer));
+        } else {
+            status = STATUS_BUFFER_TOO_SMALL;
+        }
     } else {
-        outputValue.size = offsetof(UWB_APP_CONFIG_PARAMS, appConfigParams[0]);
-        outputValue.status = UwbCxDdi::From(statusUwb);
-        outputValue.appConfigParamsCount = 0;
+        outputSize = offsetof(UWB_APP_CONFIG_PARAMS, appConfigParams[0]);
+        if (std::size(outputBuffer) >= outputSize) {
+            outputValue.size = offsetof(UWB_APP_CONFIG_PARAMS, appConfigParams[0]);
+            outputValue.status = UwbCxDdi::From(statusUwb);
+            outputValue.appConfigParamsCount = 0;
+        } else {
+            status = STATUS_BUFFER_TOO_SMALL;
+        }
     }
 
     // Complete the request.
-    WdfRequestCompleteWithInformation(request, status, outputValue.size);
+    WdfRequestCompleteWithInformation(request, status, outputSize);
 
     return status;
 }
