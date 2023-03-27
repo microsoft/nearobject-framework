@@ -8,7 +8,7 @@
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
-#include <windows/devices/uwb/UwbDeviceConnector.hxx>
+#include <windows/devices/uwb/UwbConnector.hxx>
 #include <windows/devices/uwb/UwbSession.hxx>
 
 #include <plog/Log.h>
@@ -41,7 +41,7 @@ UwbDevice::DeviceName() const noexcept
 std::shared_ptr<uwb::UwbSession>
 UwbDevice::CreateSessionImpl(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
 {
-    return std::make_shared<UwbSession>(sessionId, std::move(callbacks), std::dynamic_pointer_cast<UwbDeviceConnector>(m_uwbDeviceConnector));
+    return std::make_shared<UwbSession>(sessionId, std::move(callbacks), std::dynamic_pointer_cast<UwbConnector>(m_uwbDeviceConnector));
 }
 
 UwbCapability
@@ -106,7 +106,7 @@ UwbDevice::ResetImpl()
 bool
 UwbDevice::InitializeImpl()
 {
-    m_uwbDeviceConnector = std::make_shared<UwbDeviceConnector>(m_deviceName);
+    m_uwbDeviceConnector = std::make_shared<UwbConnector>(m_deviceName);
     m_callbacksToken = m_uwbDeviceConnector->RegisterDeviceEventCallbacks(m_callbacks);
     m_uwbDeviceConnector->NotificationListenerStart();
     return true;

@@ -23,7 +23,7 @@ class UwbSession :
 public:
     /**
      * @brief Construct a new UwbSession object.
-     * This also registers the callbacks with the UwbDeviceConnector
+     * This also registers the callbacks with the UwbConnector
      *
      * @param sessionId
      * @param callbacks The event callback instance.

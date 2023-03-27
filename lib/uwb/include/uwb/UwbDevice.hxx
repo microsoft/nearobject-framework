@@ -127,7 +127,7 @@ protected:
     GetSession(uint32_t sessionId);
 
     /**
-     * @brief Invoked when a generic error occurs. TODO this callback needs to be invoked by a UwbDeviceConnector for the linux portion too
+     * @brief Invoked when a generic error occurs. TODO this callback needs to be invoked by a UwbConnector for the linux portion too
      *
      * @param status The generic error that occurred.
      */

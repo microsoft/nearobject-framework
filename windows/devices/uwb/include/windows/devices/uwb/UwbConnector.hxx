@@ -20,22 +20,22 @@
 
 namespace windows::devices::uwb
 {
-class UwbDeviceConnector :
+class UwbConnector :
     public IUwbDeviceDdiConnector,
     public IUwbSessionDdiConnector
 {
 public:
     /**
-     * @brief Construct a new UwbDeviceConnector object.
+     * @brief Construct a new UwbConnector object.
      *
      * @param deviceName The interface path name.
      */
-    explicit UwbDeviceConnector(std::string deviceName);
+    explicit UwbConnector(std::string deviceName);
 
     /**
      * @brief Destroy the Uwb Device Connector object
      */
-    ~UwbDeviceConnector();
+    ~UwbConnector();
 
 public:
     // IUwbDeviceDdiConnector
@@ -68,7 +68,7 @@ public:
     NotificationListenerStop() override;
 
     /**
-     * @brief Sets the callbacks for the UwbDevice that owns this UwbDeviceConnector
+     * @brief Sets the callbacks for the UwbDevice that owns this UwbConnector
      *
      * @param callbacks
      * @return RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback

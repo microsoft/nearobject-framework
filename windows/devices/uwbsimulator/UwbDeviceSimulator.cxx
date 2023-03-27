@@ -4,6 +4,7 @@
 #include <plog/Log.h>
 
 #include <uwb/protocols/fira/UwbException.hxx>
+#include <windows/devices/uwb/UwbConnector.hxx>
 #include <windows/devices/uwb/simulator/UwbDeviceSimulator.hxx>
 #include <windows/devices/uwb/simulator/UwbSessionSimulator.hxx>
 
@@ -30,7 +31,7 @@ UwbDeviceSimulator::DeviceName() const noexcept
 bool
 UwbDeviceSimulator::Initialize()
 {
-    m_uwbDeviceConnector = std::make_shared<UwbDeviceConnector>(m_deviceName);
+    m_uwbDeviceConnector = std::make_shared<UwbConnector>(m_deviceName);
     m_uwbDeviceSimulatorConnector = std::make_shared<UwbDeviceSimulatorConnector>(m_deviceName);
     return true;
 }
@@ -38,7 +39,7 @@ UwbDeviceSimulator::Initialize()
 std::shared_ptr<::uwb::UwbSession>
 UwbDeviceSimulator::CreateSessionImpl(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
 {
-    return std::make_shared<UwbSessionSimulator>(sessionId, std::move(callbacks), m_uwbDeviceConnector, m_uwbDeviceSimulatorConnector);
+    return std::make_shared<UwbSessionSimulator>(sessionId, std::move(callbacks), std::dynamic_pointer_cast<UwbConnector>(m_uwbDeviceConnector), m_uwbDeviceSimulatorConnector);
 }
 
 UwbSimulatorCapabilities

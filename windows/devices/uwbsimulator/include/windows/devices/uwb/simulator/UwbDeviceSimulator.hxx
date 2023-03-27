@@ -14,8 +14,8 @@
 #include <cfgmgr32.h>
 #include <wil/resource.h>
 #include <windows/devices/DeviceResource.hxx>
+#include <windows/devices/uwb/IUwbDeviceDdi.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
-#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 #include <windows/devices/uwb/simulator/UwbDeviceSimulatorConnector.hxx>
 
 namespace windows::devices::uwb::simulator
@@ -65,7 +65,7 @@ private:
 
 private:
     const std::string m_deviceName;
-    std::shared_ptr<UwbDeviceConnector> m_uwbDeviceConnector;
+    std::shared_ptr<IUwbDeviceDdiConnector> m_uwbDeviceConnector; // TODO why do we need this if the base class windows::device::uwb::UwbDevice already has this member?
     std::shared_ptr<UwbDeviceSimulatorConnector> m_uwbDeviceSimulatorConnector;
 };
 

@@ -53,7 +53,7 @@ struct IUwbDeviceDdiConnector : public IUwbDeviceDdi
     DeviceName() const noexcept = 0;
 
     /**
-     * @brief Sets the callbacks for the UwbDevice that owns this UwbDeviceConnector
+     * @brief Sets the callbacks for the UwbDevice that owns this UwbConnector
      *
      * @param callbacks
      * @return RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback
