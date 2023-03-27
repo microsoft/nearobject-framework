@@ -406,7 +406,7 @@ UwbDeviceConnector::GetApplicationConfigurationParameters(uint32_t sessionId, st
         if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
             DWORD lastError = GetLastError();
             // Treat all errors other than insufficient buffer size as fatal.
-            if (lastError != ERROR_INSUFFICIENT_BUFFER) {
+            if (lastError != ERROR_MORE_DATA) {
                 HRESULT hr = HRESULT_FROM_WIN32(lastError);
                 PLOG_ERROR << "error when sending IOCTL_UWB_GET_APP_CONFIG_PARAMS, hr=" << std::showbase << std::hex << hr;
                 resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Failed)));

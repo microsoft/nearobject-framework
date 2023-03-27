@@ -217,7 +217,7 @@ UwbSimulatorDdiHandler::OnUwbGetApplicationConfigurationParameters(WDFREQUEST re
         if (std::size(outputBuffer) >= outputSize) {
             std::ranges::copy(applicationConfigurationParameterBuffer, std::begin(outputBuffer));
         } else {
-            status = STATUS_BUFFER_TOO_SMALL;
+            status = STATUS_BUFFER_OVERFLOW;
         }
     } else {
         outputSize = offsetof(UWB_APP_CONFIG_PARAMS, appConfigParams[0]);
@@ -226,7 +226,7 @@ UwbSimulatorDdiHandler::OnUwbGetApplicationConfigurationParameters(WDFREQUEST re
             outputValue.status = UwbCxDdi::From(statusUwb);
             outputValue.appConfigParamsCount = 0;
         } else {
-            status = STATUS_BUFFER_TOO_SMALL;
+            status = STATUS_BUFFER_OVERFLOW;
         }
     }
 
