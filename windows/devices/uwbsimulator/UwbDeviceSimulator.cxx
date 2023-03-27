@@ -4,7 +4,7 @@
 #include <plog/Log.h>
 
 #include <uwb/protocols/fira/UwbException.hxx>
-#include <windows/devices/uwb/UwbConnector.hxx>
+#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 #include <windows/devices/uwb/simulator/UwbDeviceSimulator.hxx>
 #include <windows/devices/uwb/simulator/UwbSessionSimulator.hxx>
 

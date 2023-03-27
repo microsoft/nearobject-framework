@@ -11,7 +11,7 @@
 #include <uwb/UwbPeer.hxx>
 #include <uwb/protocols/fira/UwbException.hxx>
 #include <windows/devices/DeviceHandle.hxx>
-#include <windows/devices/uwb/UwbConnector.hxx>
+#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 
