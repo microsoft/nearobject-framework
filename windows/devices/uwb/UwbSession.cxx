@@ -245,3 +245,24 @@ UwbSession::GetApplicationConfigurationParametersImpl()
         throw e;
     }
 }
+
+void
+UwbSession::DestroyImpl()
+{
+    uint32_t sessionId = GetId();
+    auto resultFuture = m_uwbDeviceConnector->SessionDeinitialize(sessionId);
+    if (!resultFuture.valid()) {
+        PLOG_ERROR << "failed to issue device deinitialization request for session id " << sessionId;
+        throw UwbException(UwbStatusGeneric::Rejected);
+    }
+
+    try {
+        resultFuture.get();
+    } catch (UwbException &uwbException) {
+        PLOG_ERROR << "caught exception attempting to to deinitialize for session id " << sessionId << " (" << ToString(uwbException.Status) << ")";
+        throw uwbException;
+    } catch (std::exception &e) {
+        PLOG_ERROR << "caught unexpected exception attempting to deinitialize for session id " << sessionId << " (" << e.what() << ")";
+        throw e;
+    }
+}

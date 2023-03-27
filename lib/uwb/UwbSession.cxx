@@ -102,3 +102,10 @@ UwbSession::GetApplicationConfigurationParameters()
     PLOG_VERBOSE << "get application configuration parameters";
     return GetApplicationConfigurationParametersImpl();
 }
+
+void
+UwbSession::Destroy()
+{
+    PLOG_VERBOSE << "destroy session with id " << m_sessionId;
+    DestroyImpl();
+}

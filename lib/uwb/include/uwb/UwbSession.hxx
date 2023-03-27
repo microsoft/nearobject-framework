@@ -108,6 +108,12 @@ public:
     std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
     GetApplicationConfigurationParameters();
 
+    /**
+     * @brief Destroy the session, making it unusable.
+     */
+    void
+    Destroy();
+
 private:
     /**
      * @brief Internal function to insert a peer address to this session
@@ -152,6 +158,12 @@ private:
      */
     virtual std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
     GetApplicationConfigurationParametersImpl() = 0;
+
+    /**
+     * @brief Destroy the session, making it unusable.
+     */
+    virtual void 
+    DestroyImpl() = 0;
 
 protected:
     uwb::protocol::fira::DeviceType m_deviceType{ uwb::protocol::fira::DeviceType::Controller };
