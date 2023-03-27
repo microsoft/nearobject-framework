@@ -6,8 +6,6 @@
 #include <memory>
 #include <mutex>
 #include <optional>
-#include <shared_mutex>
-#include <unordered_map>
 #include <vector>
 
 #include <windows.h>
@@ -55,10 +53,10 @@ struct UwbSimulatorDdiCallbacks :
     SessionDeninitialize(uint32_t sessionId) override;
 
     virtual UwbStatus
-    SetApplicationConfigurationParameters(uint32_t sessionId, const std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus>> &applicationConfigurationParameterResults) override;
+    SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> &uwbApplicationConfigurationParameters, std::vector<::uwb::protocol::fira::UwbSetApplicationConfigurationParameterStatus> &uwbSetApplicationConfigurationParameterStatuses) override;
 
     virtual UwbStatus
-    GetApplicationConfigurationParameters(uint32_t sessionId, const std::vector<UwbApplicationConfigurationParameterType> &applicationConfigurationParameterTypes, std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters) override;
+    GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes, std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters) override;
 
     virtual UwbStatus
     GetSessionCount(uint32_t &sessionCount) override;
@@ -90,6 +88,16 @@ struct UwbSimulatorDdiCallbacks :
     TriggerSessionEvent(const UwbSimulatorTriggerSessionEventArgs &triggerSessionEventArgs) override;
 
 protected:
+    /**
+     * @brief Obtain a reference to the session context for the specified
+     * session id.
+     *
+     * @param sessionId The session id to obtain session context for.
+     * @return std::tuple<UwbStatus, std::shared_ptr<UwbSimulatorSession>>
+     */
+    std::tuple<UwbStatus, std::shared_ptr<UwbSimulatorSession>>
+    SessionGet(uint32_t sessionId);
+
     /**
      * @brief Update the state of the specified session.
      *
@@ -123,10 +131,6 @@ private:
     // Static device information.
     UwbDeviceInformation m_deviceInformation{};
     UwbCapability m_deviceCapabilities{};
-
-    // Session state and associated lock that protects it.
-    std::shared_mutex m_sessionsGate;
-    std::unordered_map<uint32_t, UwbSimulatorSession> m_sessions{};
 
 private:
     UwbSimulatorCapabilities m_simulatorCapabilities{};

@@ -16,12 +16,6 @@
 
 using ::uwb::protocol::fira::UwbNotificationData;
 
-/**
- * @brief Namespace alias to reduce typing but preserve clarity regarding DDI
- * conversion.
- */
-namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
-
 UwbSimulatorIoEventQueue::UwbSimulatorIoEventQueue(WDFQUEUE wdfQueue, std::size_t maximumQueueSize) :
     m_wdfQueue(wdfQueue),
     m_maximumQueueSize(maximumQueueSize)

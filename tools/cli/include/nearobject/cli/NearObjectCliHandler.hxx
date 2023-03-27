@@ -8,6 +8,7 @@
 #include <nearobject/cli/NearObjectCliControlFlowContext.hxx>
 #include <nearobject/cli/NearObjectCliData.hxx>
 #include <uwb/UwbDevice.hxx>
+#include <uwb/UwbSession.hxx>
 #include <uwb/protocols/fira/UwbSessionData.hxx>
 
 namespace nearobject::cli
@@ -57,7 +58,7 @@ struct NearObjectCliHandler
     /**
      * @brief Invoked by command-line driver when the request is to start a
      * ranging session.
-     * 
+     *
      * @param uwbDevice The resolved uwb device to start the ranging session on.
      * @param sessionData The data to configure the ranging session.
      */
@@ -97,6 +98,7 @@ struct NearObjectCliHandler
 
 private:
     NearObjectCli* m_parent;
+    std::shared_ptr<::uwb::UwbSession> m_activeSession;
 };
 
 } // namespace nearobject::cli

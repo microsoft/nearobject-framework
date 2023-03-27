@@ -3,6 +3,7 @@
 #include <ios>
 #include <ranges>
 #include <stdexcept>
+#include <typeinfo>
 
 #include <plog/Log.h>
 #include <wil/result.h>
@@ -25,12 +26,6 @@ class RegisteredCallbackToken
     uint32_t callbackId;
 };
 } // namespace uwb
-
-/**
- * @brief Namespace alias to reduce typing but preserve clarity regarding DDI
- * conversion.
- */
-namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
 
 UwbDeviceConnector::UwbDeviceConnector(std::string deviceName) :
     m_deviceName(std::move(deviceName))
@@ -436,10 +431,10 @@ UwbDeviceConnector::GetApplicationConfigurationParameters(uint32_t sessionId, st
     return resultFuture;
 }
 
-std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>>>>
-UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> applicationConfigurationParameters)
+std::future<std::tuple<UwbStatus, std::vector<UwbSetApplicationConfigurationParameterStatus>>>
+UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters)
 {
-    std::promise<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>>>> resultPromise;
+    std::promise<std::tuple<UwbStatus, std::vector<UwbSetApplicationConfigurationParameterStatus>>> resultPromise;
     auto resultFuture = resultPromise.get_future();
 
     wil::shared_hfile handleDriver;
@@ -450,8 +445,12 @@ UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, st
         return resultFuture;
     }
 
-    UwbCxDdi::UwbSetApplicationConfigurationParameters setAppConfigParams{ sessionId, applicationConfigurationParameters };
-    auto paramsDdi = UwbCxDdi::From(setAppConfigParams);
+    UwbCxDdi::UwbSetApplicationConfigurationParameters uwbSetApplicationConfigurationParameters{
+        .SessionId = sessionId,
+        .Parameters = std::move(applicationConfigurationParameters),
+    };
+
+    auto paramsDdi = UwbCxDdi::From(uwbSetApplicationConfigurationParameters);
     auto paramsBuffer = std::data(paramsDdi);
 
     auto statusSize = offsetof(UWB_SET_APP_CONFIG_PARAMS_STATUS, appConfigParamsStatus[std::size(applicationConfigurationParameters)]);
@@ -464,21 +463,13 @@ UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, st
         return resultFuture;
     } else {
         PLOG_DEBUG << "IOCTL_UWB_SET_APP_CONFIG_PARAMS succeeded";
-        auto& uwbSetAppConfigParamsStatus = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS_STATUS*>(std::data(statusBuffer));
-        auto uwbStatus = UwbCxDdi::To(uwbSetAppConfigParamsStatus.status);
+        auto& setApplicationConfigurationParametersStatus = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS_STATUS*>(std::data(statusBuffer));
+        auto uwbStatus = UwbCxDdi::To(setApplicationConfigurationParametersStatus.status);
         if (!IsUwbStatusOk(uwbStatus)) {
             resultPromise.set_exception(std::make_exception_ptr(UwbException(std::move(uwbStatus))));
         } else {
-            // TODO: Should move this logic into its own UwbCxDdi::To() function
-            std::vector<std::tuple<::uwb::protocol::fira::UwbApplicationConfigurationParameterType, ::uwb::protocol::fira::UwbStatus>> appConfigParamsStatusList;
-            for (auto i = 0; i < uwbSetAppConfigParamsStatus.appConfigParamsCount; i++) {
-                auto paramType = UwbCxDdi::To(uwbSetAppConfigParamsStatus.appConfigParamsStatus[i].paramType);
-                auto paramStatus = UwbCxDdi::To(uwbSetAppConfigParamsStatus.appConfigParamsStatus[i].status);
-
-                auto appConfigParamStatus = std::make_tuple(paramType, paramStatus);
-                appConfigParamsStatusList.push_back(appConfigParamStatus);
-            }
-            auto result = std::make_tuple(uwbStatus, std::move(appConfigParamsStatusList));
+            auto uwbSetApplicationConfigurationParametersStatus = UwbCxDdi::To(setApplicationConfigurationParametersStatus);
+            auto result = std::make_tuple(uwbSetApplicationConfigurationParametersStatus.Status, std::move(uwbSetApplicationConfigurationParametersStatus.ParameterStatuses));
             resultPromise.set_value(std::move(result));
         }
     }
@@ -610,8 +601,6 @@ UwbDeviceConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData r
     callbacks->OnPeerPropertiesChanged(peersData);
 }
 
-#define ClassName(x) #x
-
 /**
  * @brief Helper function to handle the deregistration of missing callbacks
  *
@@ -625,12 +614,12 @@ bool
 Accessor(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks, std::function<std::function<void(ArgT)>(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>)> callbackAccessor, ArgT& arg)
 {
     if (not callbacks) {
-        PLOG_WARNING << "Ignoring " << ClassName(ArgT) << " event due to missing callback";
+        PLOG_WARNING << "Ignoring " << typeid(ArgT).name() << " event due to missing callback";
         return false;
     }
     auto callback = callbackAccessor(callbacks);
     if (not callback) {
-        PLOG_WARNING << "Ignoring " << ClassName(ArgT) << " event due to missing callback";
+        PLOG_WARNING << "Ignoring " << typeid(ArgT).name() << " event due to missing callback";
         return false;
     }
     callback(arg);

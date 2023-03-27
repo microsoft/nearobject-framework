@@ -8,8 +8,9 @@
 
 using windows::devices::uwb::simulator::IUwbSimulatorDdiHandler;
 
-UwbSimulatorDeviceFile::UwbSimulatorDeviceFile(WDFFILEOBJECT wdfFile) :
-    m_wdfFile(wdfFile)
+UwbSimulatorDeviceFile::UwbSimulatorDeviceFile(WDFFILEOBJECT wdfFile, UwbSimulatorDevice *uwbSimulatorDevice) :
+    m_wdfFile(wdfFile),
+    m_uwbSimulatorDevice(uwbSimulatorDevice)
 {}
 
 WDFFILEOBJECT
@@ -22,6 +23,12 @@ UwbSimulatorIoEventQueue *
 UwbSimulatorDeviceFile::GetIoEventQueue() noexcept
 {
     return m_ioEventQueue;
+}
+
+UwbSimulatorDevice *
+UwbSimulatorDeviceFile::GetDevice() noexcept
+{
+    return m_uwbSimulatorDevice;
 }
 
 NTSTATUS

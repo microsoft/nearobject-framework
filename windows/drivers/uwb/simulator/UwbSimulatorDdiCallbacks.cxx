@@ -10,16 +10,11 @@
 
 #include "IUwbSimulator.hxx"
 #include "UwbSimulatorDdiCallbacks.hxx"
+#include "UwbSimulatorDevice.hxx"
 #include "UwbSimulatorTracelogging.hxx"
 
 using namespace windows::devices::uwb;
 using namespace windows::devices::uwb::simulator;
-
-/**
- * @brief Namespace alias to reduce typing but preserve clarity regarding DDI
- * conversion.
- */
-namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
 
 UwbSimulatorDdiCallbacks::UwbSimulatorDdiCallbacks(UwbSimulatorDeviceFile *deviceFile) :
     m_simulatorCapabilities({ IUwbSimulator::Version }),
@@ -40,6 +35,24 @@ UwbSimulatorDdiCallbacks::RaiseUwbNotification(UwbNotificationData uwbNotificati
     ioEventQueue->PushNotificationData(std::move(uwbNotificationData));
 
     return STATUS_SUCCESS;
+}
+
+std::tuple<UwbStatus, std::shared_ptr<UwbSimulatorSession>>
+UwbSimulatorDdiCallbacks::SessionGet(uint32_t sessionId)
+{
+    auto device = m_deviceFile->GetDevice();
+    if (!device) {
+        return { UwbStatusGeneric::Rejected, nullptr };
+    }
+
+    auto session = device->SessionGet(sessionId);
+    if (session == nullptr) {
+        return { UwbStatusSession::NotExist, nullptr };
+    }
+
+    return {
+        UwbStatusGeneric::Ok, session
+    };
 }
 
 void
@@ -128,14 +141,18 @@ UwbSimulatorDdiCallbacks::SessionInitialize(uint32_t sessionId, UwbSessionType s
         TraceLoggingUInt32(sessionId, "Session Id"),
         TraceLoggingString(std::data(magic_enum::enum_name(sessionType)), "Session Type"));
 
-    std::unique_lock sessionsWriteLock{ m_sessionsGate };
-    auto [sessionIt, inserted] = m_sessions.try_emplace(sessionId, sessionId, sessionType);
-    if (!inserted) {
-        return UwbStatusSession::Duplicate;
+    auto device = m_deviceFile->GetDevice();
+    if (!device) {
+        return UwbStatusGeneric::Rejected;
     }
 
-    auto &[_, session] = *sessionIt;
-    SessionUpdateState(session, UwbSessionState::Initialized);
+    // Create a new session.
+    auto [uwbStatus, session] = device->SessionCreate(sessionId, sessionType);
+    if (!IsUwbStatusOk(uwbStatus)) {
+        return uwbStatus;
+    }
+
+    SessionUpdateState(*session, UwbSessionState::Initialized);
 
     return UwbStatusOk;
 }
@@ -149,23 +166,18 @@ UwbSimulatorDdiCallbacks::SessionDeninitialize(uint32_t sessionId)
         TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
         TraceLoggingUInt32(sessionId, "Session Id"));
 
-    decltype(m_sessions)::node_type nodeHandle;
-    {
-        std::unique_lock sessionsWriteLock{ m_sessionsGate };
-        nodeHandle = m_sessions.extract(sessionId);
-    }
-    if (nodeHandle.empty()) {
-        return UwbStatusSession::NotExist;
+    auto [uwbStatus, session] = SessionGet(sessionId);
+    if (!IsUwbStatusOk(uwbStatus)) {
+        return uwbStatus;
     }
 
-    auto &session = nodeHandle.mapped();
-    SessionUpdateState(session, UwbSessionState::Deinitialized);
+    SessionUpdateState(*session, UwbSessionState::Deinitialized);
 
     return UwbStatusOk;
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t sessionId, const std::vector<UwbApplicationConfigurationParameter> & /* applicationConfigurationParameters */, std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus>> &applicationConfigurationParameterResults)
+UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> &uwbApplicationConfigurationParameters, std::vector<::uwb::protocol::fira::UwbSetApplicationConfigurationParameterStatus> &uwbSetApplicationConfigurationParameterStatuses)
 {
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
@@ -173,21 +185,69 @@ UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t session
         TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
         TraceLoggingUInt32(sessionId, "Session Id"));
 
-    std::unique_lock sessionsWriteLock{ m_sessionsGate };
-    auto sessionIt = m_sessions.find(sessionId);
-    if (sessionIt == std::cend(m_sessions)) {
+    auto [uwbStatus, session] = SessionGet(sessionId);
+    if (!IsUwbStatusOk(uwbStatus)) {
+        return uwbStatus;
+    } else if (session->State == UwbSessionState::Deinitialized) {
         return UwbStatusSession::NotExist;
     }
 
-    auto &[_, session] = *sessionIt;
+    std::vector<::uwb::protocol::fira::UwbSetApplicationConfigurationParameterStatus> parameterStatuses{};
+    // TODO: session exclusive mutex
 
-    std::vector<std::tuple<UwbApplicationConfigurationParameterType, UwbStatus>> results{};
-    applicationConfigurationParameterResults = std::move(results);
+    // Partition the parameters into those that are expressly disallowed and those that require further checking.
+    auto disallowed = std::ranges::partition(uwbApplicationConfigurationParameters, [&](const auto &applicationConfigurationParameter) {
+        return (session->State == UwbSessionState::Active)
+            ? ::uwb::protocol::fira::IsApplicationConfigurationChangeableWhileActive(applicationConfigurationParameter)
+            : false;
+    });
+
+    // Update result container with all disallowed parameters.
+    std::ranges::transform(disallowed, std::back_inserter(parameterStatuses), [&](const auto &applicationConfigurationParameter) {
+        return UwbSetApplicationConfigurationParameterStatus{ UwbStatusSession::Active, applicationConfigurationParameter.Type };
+    });
+
+    // Process remaining entries.
+    std::ranges::transform(std::ranges::begin(uwbApplicationConfigurationParameters), std::ranges::begin(disallowed), std::back_inserter(parameterStatuses), [&](auto &applicationConfigurationParameter) {
+        // Copy the parameterType for later use in the result tuple.
+        auto parameterType = applicationConfigurationParameter.Type;
+
+        // Extract the existing entry. If there is no entry, the node will be empty.
+        auto node = session->ApplicationConfigurationParameters.extract(applicationConfigurationParameter);
+        if (!node.empty()) {
+            TraceLoggingWrite(
+                UwbSimulatorTraceloggingProvider,
+                "SetApplicationConfigurationParameters",
+                TraceLoggingLevel(TRACE_LEVEL_VERBOSE),
+                TraceLoggingUInt32(sessionId, "Session Id"),
+                TraceLoggingString("ParameterUpdate"),
+                TraceLoggingString(node.value().ToString().c_str(), "ValueOld"),
+                TraceLoggingString(applicationConfigurationParameter.ToString().c_str(), "Value"));
+        } else {
+            TraceLoggingWrite(
+                UwbSimulatorTraceloggingProvider,
+                "SetApplicationConfigurationParameters",
+                TraceLoggingLevel(TRACE_LEVEL_VERBOSE),
+                TraceLoggingUInt32(sessionId, "Session Id"),
+                TraceLoggingString("ParameterSet"),
+                TraceLoggingString(applicationConfigurationParameter.ToString().c_str(), "Value"));
+        }
+
+        // Update the node with the current parameter value.
+        node.value() = std::move(applicationConfigurationParameter);
+        session->ApplicationConfigurationParameters.insert(std::move(node));
+
+        // Update result container indicating setting the parameter was successful.
+        return UwbSetApplicationConfigurationParameterStatus{ UwbStatusGeneric::Ok, parameterType };
+    });
+
+    uwbSetApplicationConfigurationParameterStatuses = std::move(parameterStatuses);
+
     return UwbStatusOk;
 }
 
 UwbStatus
-UwbSimulatorDdiCallbacks::GetApplicationConfigurationParameters(uint32_t sessionId, const std::vector<UwbApplicationConfigurationParameterType> &applicationConfigurationParameterTypes, std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters)
+UwbSimulatorDdiCallbacks::GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes, std::vector<UwbApplicationConfigurationParameter> &applicationConfigurationParameters)
 {
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
@@ -195,16 +255,13 @@ UwbSimulatorDdiCallbacks::GetApplicationConfigurationParameters(uint32_t session
         TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
         TraceLoggingUInt32(sessionId, "Session Id"));
 
-    std::shared_lock sessionsReadLock{ m_sessionsGate };
-    auto sessionIt = m_sessions.find(sessionId);
-    if (sessionIt == std::cend(m_sessions)) {
-        applicationConfigurationParameters = {};
-        return UwbStatusSession::NotExist;
+    auto [uwbStatus, session] = SessionGet(sessionId);
+    if (!IsUwbStatusOk(uwbStatus)) {
+        return uwbStatus;
     }
 
-    const auto &[_, session] = *sessionIt;
-
-    std::ranges::copy_if(session.ApplicationConfigurationParameters, std::back_inserter(applicationConfigurationParameters), [&](const auto &entry) {
+    // TODO: session shared mutex
+    std::ranges::copy_if(session->ApplicationConfigurationParameters, std::back_inserter(applicationConfigurationParameters), [&](const auto &entry) {
         return std::ranges::any_of(applicationConfigurationParameterTypes, [&](const auto &type) {
             return (entry.Type == type);
         });
@@ -216,8 +273,12 @@ UwbSimulatorDdiCallbacks::GetApplicationConfigurationParameters(uint32_t session
 UwbStatus
 UwbSimulatorDdiCallbacks::GetSessionCount(uint32_t &sessionCount)
 {
-    std::shared_lock sessionsReadLock{ m_sessionsGate };
-    sessionCount = static_cast<uint32_t>(std::size(m_sessions));
+    auto device = m_deviceFile->GetDevice();
+    if (!device) {
+        return UwbStatusGeneric::Rejected;
+    }
+
+    sessionCount = static_cast<uint32_t>(device->GetSessionCount());
 
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
@@ -231,14 +292,12 @@ UwbSimulatorDdiCallbacks::GetSessionCount(uint32_t &sessionCount)
 UwbStatus
 UwbSimulatorDdiCallbacks::SessionGetState(uint32_t sessionId, UwbSessionState &sessionState)
 {
-    std::shared_lock sessionsReadLock{ m_sessionsGate };
-    auto sessionIt = m_sessions.find(sessionId);
-    if (sessionIt == std::cend(m_sessions)) {
-        return UwbStatusSession::NotExist;
+    auto [uwbStatus, session] = SessionGet(sessionId);
+    if (!IsUwbStatusOk(uwbStatus)) {
+        return uwbStatus;
     }
 
-    const auto &[_, session] = *sessionIt;
-    sessionState = session.State;
+    sessionState = session->State;
 
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
@@ -260,14 +319,12 @@ UwbSimulatorDdiCallbacks::SessionUpdateControllerMulticastList(uint32_t sessionI
         TraceLoggingUInt32(sessionId, "Session Id"),
         TraceLoggingString(std::data(magic_enum::enum_name(action)), "Multicast Action"));
 
-    std::unique_lock sessionsWriteLock{ m_sessionsGate };
-    auto sessionIt = m_sessions.find(sessionId);
-    if (sessionIt == std::cend(m_sessions)) {
-        return UwbStatusSession::NotExist;
+    auto [uwbStatus, session] = SessionGet(sessionId);
+    if (!IsUwbStatusOk(uwbStatus)) {
+        return uwbStatus;
     }
 
-    auto &[_, session] = *sessionIt;
-
+    // TODO: session exclusive mutex
     const auto getControlee = [](const UwbSessionUpdateMulticastListEntry &entry) {
         return entry.ControleeMacAddress;
     };
@@ -275,12 +332,12 @@ UwbSimulatorDdiCallbacks::SessionUpdateControllerMulticastList(uint32_t sessionI
     switch (action) {
     case UwbMulticastAction::AddShortAddress: {
         // TODO: updateMulticastListEntry.SubSessionId needs to be handled in future.
-        std::ranges::move(updateMulticastListEntries | std::views::transform(getControlee), std::inserter(session.Controlees, std::end(session.Controlees)));
+        std::ranges::move(updateMulticastListEntries | std::views::transform(getControlee), std::inserter(session->Controlees, std::end(session->Controlees)));
         break;
     }
     case UwbMulticastAction::DeleteShortAddress: {
         // TODO: updateMulticastListEntry.SubSessionId needs to be handled in future.
-        std::erase_if(session.Controlees, [&](const auto &controleeToRemove) {
+        std::erase_if(session->Controlees, [&](const auto &controleeToRemove) {
             return std::ranges::any_of(updateMulticastListEntries | std::views::transform(getControlee), [&](const auto &controlee) {
                 return controleeToRemove == controlee;
             });
@@ -303,14 +360,13 @@ UwbSimulatorDdiCallbacks::SessionStartRanging(uint32_t sessionId)
         TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
         TraceLoggingUInt32(sessionId, "Session Id"));
 
-    std::unique_lock sessionsWriteLock{ m_sessionsGate };
-    auto sessionIt = m_sessions.find(sessionId);
-    if (sessionIt == std::cend(m_sessions)) {
-        return UwbStatusSession::NotExist;
+    auto [uwbStatus, session] = SessionGet(sessionId);
+    if (!IsUwbStatusOk(uwbStatus)) {
+        return uwbStatus;
     }
 
-    auto &[_, session] = *sessionIt;
-    session.RangingCount++;
+    // TODO: session exclusive mutex
+    session->RangingCount++;
     return UwbStatusOk;
 }
 
@@ -323,13 +379,13 @@ UwbSimulatorDdiCallbacks::SessionStopRanging(uint32_t sessionId)
         TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
         TraceLoggingUInt32(sessionId, "Session Id"));
 
-    std::unique_lock sessionsWriteLock{ m_sessionsGate };
-    auto sessionIt = m_sessions.find(sessionId);
-    if (sessionIt == std::cend(m_sessions)) {
-        return UwbStatusSession::NotExist;
+    auto [uwbStatus, session] = SessionGet(sessionId);
+    if (!IsUwbStatusOk(uwbStatus)) {
+        return uwbStatus;
     }
 
-    auto &[_, session] = *sessionIt;
+    // TODO: session exclusive mutex
+    SessionUpdateState(*session, UwbSessionState::Idle, UwbSessionReasonCode::StateChangeWithSessionManagementCommands);
 
     return UwbStatusOk;
 }
@@ -337,14 +393,12 @@ UwbSimulatorDdiCallbacks::SessionStopRanging(uint32_t sessionId)
 UwbStatus
 UwbSimulatorDdiCallbacks::SessionGetRangingCount(uint32_t sessionId, uint32_t &rangingCount)
 {
-    std::unique_lock sessionsWriteLock{ m_sessionsGate };
-    auto sessionIt = m_sessions.find(sessionId);
-    if (sessionIt == std::cend(m_sessions)) {
-        return UwbStatusSession::NotExist;
+    auto [uwbStatus, session] = SessionGet(sessionId);
+    if (!IsUwbStatusOk(uwbStatus)) {
+        return uwbStatus;
     }
 
-    auto &[_, session] = *sessionIt;
-    rangingCount = session.RangingCount;
+    rangingCount = session->RangingCount;
 
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
@@ -419,20 +473,17 @@ UwbSimulatorDdiCallbacks::TriggerSessionEvent(const UwbSimulatorTriggerSessionEv
 void
 UwbSimulatorDdiCallbacks::SessionRandomMeasurementGenerationConfigure(uint32_t sessionId, RandomMeasurementGeneration action)
 {
-    std::unique_lock sessionsWriteLock{ m_sessionsGate };
-    auto sessionIt = m_sessions.find(sessionId);
-    if (sessionIt == std::cend(m_sessions)) {
+    auto [uwbStatus, session] = SessionGet(sessionId);
+    if (!IsUwbStatusOk(uwbStatus)) {
         return;
     }
 
-    auto &[_, session] = *sessionIt;
-
     switch (action) {
     case RandomMeasurementGeneration::Disable:
-        session.RandomRangingMeasurementGenerationStop();
+        session->RandomRangingMeasurementGenerationStop();
         break;
     case RandomMeasurementGeneration::Enable:
-        session.RandomRangingMeasurementGenerationStart([&](UwbRangingData rangingData) {
+        session->RandomRangingMeasurementGenerationStart([&](UwbRangingData rangingData) {
             RaiseUwbNotification(std::move(rangingData));
         });
         break;

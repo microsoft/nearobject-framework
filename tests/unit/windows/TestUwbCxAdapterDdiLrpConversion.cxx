@@ -13,8 +13,6 @@
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 
-namespace UwbCxDdi = windows::devices::uwb::ddi::lrp;
-
 namespace windows::devices::uwb::ddi::lrp::test
 {
 /**
@@ -563,6 +561,21 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         .Value = std::move(uwbMacAddressSetSingleAddress),
     };
 
+    constexpr UwbSetApplicationConfigurationParameterStatus uwbSetApplicationConfigurationParameterStatusAoaResulReq{
+        .Status = UwbStatusOk,
+        .ParameterType = UwbApplicationConfigurationParameterType::AoAResultRequest,
+    };
+
+    constexpr UwbSetApplicationConfigurationParameterStatus uwbSetApplicationConfigurationParameterStatusBlockStrideLength{
+        .Status = UwbStatusSession::Active,
+        .ParameterType = UwbApplicationConfigurationParameterType::BlockStrideLength,
+    };
+
+    constexpr UwbSetApplicationConfigurationParameterStatus uwbSetApplicationConfigurationParameterStatusBprfPhrDataRate{
+        .Status = UwbStatusRanging::RxTimeout,
+        .ParameterType = UwbApplicationConfigurationParameterType::BprfPhrDataRate,
+    };
+
     constexpr auto uwbApplicationConfigurationParameterTypesAll = magic_enum::enum_values<UwbApplicationConfigurationParameterType>();
 
     SECTION("UwbApplicationConfigurationParameter bool variant is stable")
@@ -660,5 +673,25 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
             }
         };
         test::ValidateRoundtrip(uwbSetApplicationConfigurationParameters);
+    }
+
+    SECTION("UwbSetApplicationConfigurationParameterStatus is stable")
+    {
+        test::ValidateRoundtrip(uwbSetApplicationConfigurationParameterStatusAoaResulReq);
+        test::ValidateRoundtrip(uwbSetApplicationConfigurationParameterStatusBlockStrideLength);
+        test::ValidateRoundtrip(uwbSetApplicationConfigurationParameterStatusBprfPhrDataRate);
+    }
+
+    SECTION("UwbSetApplicationConfigurationParametersStatus is stable")
+    {
+        const UwbSetApplicationConfigurationParametersStatus uwbSetApplicationConfigurationParametersStatus{
+            .Status = UwbStatusOk,
+            .ParameterStatuses{
+                uwbSetApplicationConfigurationParameterStatusAoaResulReq,
+                uwbSetApplicationConfigurationParameterStatusBlockStrideLength,
+                uwbSetApplicationConfigurationParameterStatusBprfPhrDataRate,
+            },
+        };
+        test::ValidateRoundtrip(uwbSetApplicationConfigurationParametersStatus);
     }
 }

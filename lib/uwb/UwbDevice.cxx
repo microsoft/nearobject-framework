@@ -80,7 +80,7 @@ UwbDevice::OnSessionStatusChanged(UwbSessionStatus statusSession)
 std::shared_ptr<UwbSession>
 UwbDevice::CreateSession(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks)
 {
-    auto session = CreateSessionImpl(sessionId, callbacks);
+    auto session = CreateSessionImpl(sessionId, std::move(callbacks));
     {
         std::unique_lock sessionExclusiveLock{ m_sessionsGate };
         m_sessions[session->GetId()] = std::weak_ptr<UwbSession>(session);
