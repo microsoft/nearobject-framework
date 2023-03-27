@@ -15,9 +15,8 @@
 using namespace windows::devices::uwb;
 using namespace ::uwb::protocol::fira;
 
-UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, std::shared_ptr<UwbDeviceConnector> uwbDeviceConnector, ::uwb::protocol::fira::DeviceType deviceType) :
-    ::uwb::UwbSession(sessionId, std::move(callbacks), deviceType),
-    m_uwbDeviceConnector(std::move(uwbDeviceConnector))
+UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, UwbDevice* uwbDevice, ::uwb::protocol::fira::DeviceType deviceType) :
+    ::uwb::UwbSession(sessionId, std::move(callbacks), deviceType)
 {
     m_registeredCallbacks = std::make_shared<::uwb::UwbRegisteredSessionEventCallbacks>(
         [this](::uwb::UwbSessionEndReason reason) {
@@ -60,6 +59,9 @@ UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventC
             }
             return callbacks->OnSessionMembershipChanged(this, peersAdded, peersRemoved);
         });
+
+    m_uwbDeviceConnector = std::make_shared<UwbDeviceConnector>(uwbDevice->DeviceName());
+    m_uwbDeviceConnector->NotificationListenerStart();
     m_registeredCallbacksToken = m_uwbDeviceConnector->RegisterSessionEventCallbacks(m_sessionId, m_registeredCallbacks);
 }
 

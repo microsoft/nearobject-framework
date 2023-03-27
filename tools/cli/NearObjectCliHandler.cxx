@@ -1,7 +1,6 @@
 
 #include <nearobject/cli/NearObjectCli.hxx>
 #include <nearobject/cli/NearObjectCliHandler.hxx>
-#include <nearobject/cli/NearObjectCliUwbSessionEventCallbacks.hxx>
 #include <uwb/UwbDevice.hxx>
 #include <uwb/UwbSession.hxx>
 #include <uwb/protocols/fira/UwbException.hxx>
@@ -12,6 +11,10 @@
 
 using namespace nearobject::cli;
 using namespace uwb::protocol::fira;
+
+NearObjectCliHandler::NearObjectCliHandler() :
+    m_sessionEventCallbacks(std::make_shared<NearObjectCliUwbSessionEventCallbacks>())
+{}
 
 void
 NearObjectCliHandler::SetParent(NearObjectCli* parent)
@@ -31,13 +34,12 @@ void
 NearObjectCliHandler::HandleDriverStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevice, const UwbRangingParameters& rangingParameters) noexcept
 try {
     auto controlFlowContext = (m_parent != nullptr) ? m_parent->GetControlFlowContext() : nullptr;
-    auto callbacks = std::make_shared<NearObjectCliUwbSessionEventCallbacks>([this, controlFlowContext = std::move(controlFlowContext)]() {
-        if (controlFlowContext != nullptr) {
-            controlFlowContext->OperationSignalComplete();
-        }
-        m_activeSession.reset();
-    });
-    auto session = uwbDevice->CreateSession(rangingParameters.SessionId, callbacks);
+    if (controlFlowContext == nullptr) {
+        controlFlowContext->OperationSignalComplete();
+    }
+    m_activeSession.reset();
+
+    auto session = uwbDevice->CreateSession(rangingParameters.SessionId, m_sessionEventCallbacks);
     session->Configure(rangingParameters.ApplicationConfigurationParameters);
     auto applicationConfigurationParameters = session->GetApplicationConfigurationParameters();
     PLOG_DEBUG << "Session Application Configuration Parameters: ";
@@ -55,17 +57,14 @@ try {
 void
 NearObjectCliHandler::HandleStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevice, uwb::protocol::fira::UwbSessionData& sessionData) noexcept
 try {
-    // Instantiate callbacks for session events.
     auto controlFlowContext = (m_parent != nullptr) ? m_parent->GetControlFlowContext() : nullptr;
-    auto callbacks = std::make_shared<NearObjectCliUwbSessionEventCallbacks>([this, controlFlowContext = std::move(controlFlowContext)]() {
-        if (controlFlowContext != nullptr) {
-            controlFlowContext->OperationSignalComplete();
-        }
-        m_activeSession.reset();
-    });
+    if (controlFlowContext == nullptr) {
+        controlFlowContext->OperationSignalComplete();
+    }
+    m_activeSession.reset();
 
     // Create a new session.
-    auto session = uwbDevice->CreateSession(sessionData.sessionId, callbacks);
+    auto session = uwbDevice->CreateSession(sessionData.sessionId, m_sessionEventCallbacks);
 
     // Convert configuration from OOB (UWB_SESSION_DATA) to UCI application
     // configuration parameters and configure the session with them.

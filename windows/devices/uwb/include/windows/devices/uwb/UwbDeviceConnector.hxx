@@ -52,11 +52,6 @@ public:
     /**
      * @brief Start listening for notifications.
      *
-     * Note: this is a rudimentary implementation and is only present to
-     * preserve existing behavior. It will eventually be replaced by a
-     * fine-grained publication/subscription model.
-     *
-     * @param onNotification The handler to invoke for each notification.
      * @return true If listening for notifications started successfully.
      * @return false If listening for notifications could not be started.
      */

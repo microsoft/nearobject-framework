@@ -11,6 +11,7 @@
 #include <uwb/UwbSessionEventCallbacks.hxx>
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
 #include <windows/devices/uwb/UwbDeviceConnector.hxx>
+#include <windows/devices/uwb/UwbDevice.hxx>
 
 namespace windows::devices::uwb
 {
@@ -27,9 +28,9 @@ public:
      *
      * @param sessionId
      * @param callbacks The event callback instance.
-     * @param uwbDeviceConnector The connector to the UWB-CX driver instance.
+     * @param uwbDevice The uwb device tied to the session.
      */
-    UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, std::shared_ptr<UwbDeviceConnector> uwbDeviceConnector, ::uwb::protocol::fira::DeviceType deviceType = ::uwb::protocol::fira::DeviceType::Controller);
+    UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, UwbDevice* uwbDevice, ::uwb::protocol::fira::DeviceType deviceType = ::uwb::protocol::fira::DeviceType::Controller);
 
 private:
     /**
