@@ -17,6 +17,14 @@ void
 NearObjectCliHandler::SetParent(NearObjectCli* parent)
 {
     m_parent = parent;
+
+    auto controlFlowContext = (m_parent != nullptr) ? m_parent->GetControlFlowContext() : nullptr;
+    m_sessionEventCallbacks = std::make_shared<NearObjectCliUwbSessionEventCallbacks>([this, controlFlowContext = std::move(controlFlowContext)]() {
+        if (controlFlowContext != nullptr) {
+            controlFlowContext->OperationSignalComplete();
+        }
+        m_activeSession.reset();
+    });
 }
 
 std::shared_ptr<uwb::UwbDevice>
@@ -31,14 +39,7 @@ void
 NearObjectCliHandler::HandleDriverStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevice, const UwbRangingParameters& rangingParameters) noexcept
 try {
     auto controlFlowContext = (m_parent != nullptr) ? m_parent->GetControlFlowContext() : nullptr;
-    auto callbacks = std::make_shared<NearObjectCliUwbSessionEventCallbacks>([this, controlFlowContext = std::move(controlFlowContext)]() {
-        if (controlFlowContext != nullptr) {
-            controlFlowContext->OperationSignalComplete();
-        }
-        m_activeSession.reset();
-    });
-
-    auto session = uwbDevice->CreateSession(rangingParameters.SessionId, callbacks);
+    auto session = uwbDevice->CreateSession(rangingParameters.SessionId, m_sessionEventCallbacks);
     session->Configure(rangingParameters.ApplicationConfigurationParameters);
     auto applicationConfigurationParameters = session->GetApplicationConfigurationParameters();
     PLOG_DEBUG << "Session Application Configuration Parameters: ";
