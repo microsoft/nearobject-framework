@@ -286,7 +286,7 @@ uwb::protocol::fira::ToString(const UwbApplicationConfigurationParameterValue& u
         } else if constexpr (std::is_same_v<T, ::uwb::UwbMacAddress>) {
             ss << arg;
         } else if constexpr (std::is_same_v<T, std::unordered_set<::uwb::UwbMacAddress>>) {
-            for (const auto &uwbMacAddress : arg) {
+            for (const auto& uwbMacAddress : arg) {
                 ss << uwbMacAddress << ' ';
             }
         } else if constexpr (std::is_same_v<T, std::unordered_set<ResultReportConfiguration>>) {

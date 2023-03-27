@@ -9,7 +9,9 @@ using namespace nearobject::cli;
 NearObjectCliControlFlowContext::NearObjectCliControlFlowContext(std::ptrdiff_t numOperations) :
     m_operationsCompleteLatchCount(numOperations),
     m_operationCompleteLatch(numOperations),
-    m_stopCallback(m_stopSource.get_token(), [&]{ OnStop(); })
+    m_stopCallback(m_stopSource.get_token(), [&] {
+        OnStop();
+    })
 {}
 
 std::stop_token

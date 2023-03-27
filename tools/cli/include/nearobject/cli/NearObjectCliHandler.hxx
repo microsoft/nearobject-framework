@@ -7,9 +7,9 @@
 
 #include <nearobject/cli/NearObjectCliControlFlowContext.hxx>
 #include <nearobject/cli/NearObjectCliData.hxx>
-#include <uwb/UwbSessionEventCallbacks.hxx>
 #include <uwb/UwbDevice.hxx>
 #include <uwb/UwbSession.hxx>
+#include <uwb/UwbSessionEventCallbacks.hxx>
 #include <uwb/protocols/fira/UwbSessionData.hxx>
 
 namespace nearobject::cli

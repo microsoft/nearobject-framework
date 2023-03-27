@@ -25,8 +25,8 @@ namespace windows::devices::uwb
 class RegisteredCallbackToken;
 
 /**
- * @brief Class representing a logical communication channel with a UWB driver. 
- * 
+ * @brief Class representing a logical communication channel with a UWB driver.
+ *
  * This class exposes functions which map 1-1 to the UWB LRP DDI as defined in
  * UwbCxLrpDevice.h, using neutral C++ types instead of the the raw C ABI
  * types.

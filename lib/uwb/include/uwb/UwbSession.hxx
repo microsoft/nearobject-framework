@@ -102,8 +102,8 @@ public:
 
     /**
      * @brief Get the application configuration parameters for this session.
-     * 
-     * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> 
+     *
+     * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
      */
     std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
     GetApplicationConfigurationParameters();
@@ -153,8 +153,8 @@ private:
 
     /**
      * @brief Get the application configuration parameters for this session.
-     * 
-     * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> 
+     *
+     * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
      */
     virtual std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
     GetApplicationConfigurationParametersImpl() = 0;
@@ -162,7 +162,7 @@ private:
     /**
      * @brief Destroy the session, making it unusable.
      */
-    virtual void 
+    virtual void
     DestroyImpl() = 0;
 
 protected:

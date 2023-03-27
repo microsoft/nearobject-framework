@@ -49,9 +49,9 @@ try {
     session->StartRanging();
     bool destroySessionOnClose = true; // TODO: allow overriding this
 
-    // Register a stop callback such that 
+    // Register a stop callback such that
     if (controlFlowContext != nullptr) {
-        controlFlowContext->RegisterStopCallback([=](){
+        controlFlowContext->RegisterStopCallback([=]() {
             session->StopRanging();
             if (destroySessionOnClose) {
                 session->Destroy();
