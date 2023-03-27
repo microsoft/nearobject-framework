@@ -17,7 +17,7 @@
 using namespace windows::devices::uwb;
 using namespace ::uwb::protocol::fira;
 
-UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, UwbDevice* uwbDevice, ::uwb::protocol::fira::DeviceType deviceType) :
+UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, UwbDevice *uwbDevice, ::uwb::protocol::fira::DeviceType deviceType) :
     ::uwb::UwbSession(sessionId, std::move(callbacks), deviceType)
 {
     m_registeredCallbacks = std::make_shared<::uwb::UwbRegisteredSessionEventCallbacks>(
