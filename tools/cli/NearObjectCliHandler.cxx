@@ -37,6 +37,7 @@ try {
         }
         m_activeSession.reset();
     });
+
     auto session = uwbDevice->CreateSession(rangingParameters.SessionId, callbacks);
     session->Configure(rangingParameters.ApplicationConfigurationParameters);
     auto applicationConfigurationParameters = session->GetApplicationConfigurationParameters();
@@ -45,6 +46,13 @@ try {
         PLOG_DEBUG << " > " << applicationConfigurationParameter.ToString();
     }
     session->StartRanging();
+
+    // Register a stop callback such that 
+    if (controlFlowContext != nullptr) {
+        controlFlowContext->RegisterStopCallback([=](){
+            session->Destroy();
+        });
+    }
 
     // Save the session reference so it stays alive while the session is active.
     m_activeSession = std::move(session);

@@ -2,8 +2,10 @@
 #ifndef NEAR_OBJECT_CLI_CONTROL_FLOW_CONTEXT_HXX
 #define NEAR_OBJECT_CLI_CONTROL_FLOW_CONTEXT_HXX
 
+#include <functional>
 #include <latch>
 #include <stop_token>
+#include <vector>
 
 namespace nearobject::cli
 {
@@ -58,10 +60,28 @@ public:
     void
     OperationsWaitForComplete();
 
+    /**
+     * @brief Register a callback to be invoked when a stop is requested. 
+     * 
+     * @param stopCallback 
+     */
+    void
+    RegisterStopCallback(std::function<void()> stopCallback);
+
+private:
+    /**
+     * @brief Function which runs when `stop_requested()` is called on the stop
+     * source.
+     */
+    void
+    OnStop();
+
 private:
     std::ptrdiff_t m_operationsCompleteLatchCount;
     std::latch m_operationCompleteLatch;
     std::stop_source m_stopSource;
+    std::stop_callback<std::function<void()>> m_stopCallback;
+    std::vector<std::function<void()>> m_stopCallbacks;
 };
 } // namespace nearobject::cli
 
