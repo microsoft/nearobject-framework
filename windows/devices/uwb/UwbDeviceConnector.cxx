@@ -11,39 +11,39 @@
 #include <uwb/UwbPeer.hxx>
 #include <uwb/protocols/fira/UwbException.hxx>
 #include <windows/devices/DeviceHandle.hxx>
+#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
-#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 
 using namespace windows::devices;
 using namespace windows::devices::uwb;
 using namespace ::uwb::protocol::fira;
 
-namespace windows::devices::uwb
+namespace uwb
 {
 class RegisteredCallbackToken
 {
     uint32_t callbackId;
 };
-} // namespace windows::devices::uwb
+} // namespace uwb
 
-UwbDeviceConnector::UwbDeviceConnector(std::string deviceName) :
+UwbConnector::UwbConnector(std::string deviceName) :
     m_deviceName(std::move(deviceName))
 {}
 
-UwbDeviceConnector::~UwbDeviceConnector()
+UwbConnector::~UwbConnector()
 {
     NotificationListenerStop();
 }
 
 const std::string&
-UwbDeviceConnector::DeviceName() const noexcept
+UwbConnector::DeviceName() const noexcept
 {
     return m_deviceName;
 }
 
 std::future<void>
-UwbDeviceConnector::Reset()
+UwbConnector::Reset()
 {
     std::promise<void> resultPromise{};
     auto resultFuture = resultPromise.get_future();
@@ -82,7 +82,7 @@ UwbDeviceConnector::Reset()
 }
 
 std::future<UwbDeviceInformation>
-UwbDeviceConnector::GetDeviceInformation()
+UwbConnector::GetDeviceInformation()
 {
     std::promise<UwbDeviceInformation> resultPromise;
     auto resultFuture = resultPromise.get_future();
@@ -136,7 +136,7 @@ UwbDeviceConnector::GetDeviceInformation()
 }
 
 std::future<std::tuple<::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbCapability>>
-UwbDeviceConnector::GetCapabilities()
+UwbConnector::GetCapabilities()
 {
     std::promise<std::tuple<::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbCapability>> resultPromise{};
     auto resultFuture = resultPromise.get_future();
@@ -179,7 +179,7 @@ UwbDeviceConnector::GetCapabilities()
 }
 
 std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<uint32_t>>>
-UwbDeviceConnector::GetSessionCount()
+UwbConnector::GetSessionCount()
 {
     std::promise<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<uint32_t>>> resultPromise;
     auto resultFuture = resultPromise.get_future();
@@ -189,7 +189,7 @@ UwbDeviceConnector::GetSessionCount()
 }
 
 std::future<UwbStatus>
-UwbDeviceConnector::SessionInitialize(uint32_t sessionId, UwbSessionType sessionType)
+UwbConnector::SessionInitialize(uint32_t sessionId, UwbSessionType sessionType)
 {
     std::promise<UwbStatus> resultPromise;
     auto resultFuture = resultPromise.get_future();
@@ -229,7 +229,7 @@ UwbDeviceConnector::SessionInitialize(uint32_t sessionId, UwbSessionType session
 }
 
 std::future<UwbStatus>
-UwbDeviceConnector::SessionDeinitialize(uint32_t sessionId)
+UwbConnector::SessionDeinitialize(uint32_t sessionId)
 {
     std::promise<UwbStatus> resultPromise;
     auto resultFuture = resultPromise.get_future();
@@ -268,7 +268,7 @@ UwbDeviceConnector::SessionDeinitialize(uint32_t sessionId)
 }
 
 std::future<std::tuple<UwbStatus, std::optional<UwbSessionState>>>
-UwbDeviceConnector::SessionGetState(uint32_t sessionId)
+UwbConnector::SessionGetState(uint32_t sessionId)
 {
     std::promise<std::tuple<UwbStatus, std::optional<UwbSessionState>>> resultPromise;
     auto resultFuture = resultPromise.get_future();
@@ -278,7 +278,7 @@ UwbDeviceConnector::SessionGetState(uint32_t sessionId)
 }
 
 std::future<UwbStatus>
-UwbDeviceConnector::SessionRangingStart(uint32_t sessionId)
+UwbConnector::SessionRangingStart(uint32_t sessionId)
 {
     std::promise<UwbStatus> resultPromise;
     auto resultFuture = resultPromise.get_future();
@@ -317,7 +317,7 @@ UwbDeviceConnector::SessionRangingStart(uint32_t sessionId)
 }
 
 std::future<UwbStatus>
-UwbDeviceConnector::SessionRangingStop(uint32_t sessionId)
+UwbConnector::SessionRangingStop(uint32_t sessionId)
 {
     std::promise<UwbStatus> resultPromise;
     auto resultFuture = resultPromise.get_future();
@@ -356,7 +356,7 @@ UwbDeviceConnector::SessionRangingStop(uint32_t sessionId)
 }
 
 std::future<std::tuple<UwbStatus, std::optional<uint32_t>>>
-UwbDeviceConnector::SessionGetRangingCount(uint32_t sessionId)
+UwbConnector::SessionGetRangingCount(uint32_t sessionId)
 {
     std::promise<std::tuple<UwbStatus, std::optional<uint32_t>>> resultPromise;
     auto resultFuture = resultPromise.get_future();
@@ -366,7 +366,7 @@ UwbDeviceConnector::SessionGetRangingCount(uint32_t sessionId)
 }
 
 std::future<UwbSessionUpdateMulicastListStatus>
-UwbDeviceConnector::SessionUpdateControllerMulticastList(uint32_t sessionId, UwbMulticastAction multicastAction, std::vector<::uwb::UwbMacAddress> controlees)
+UwbConnector::SessionUpdateControllerMulticastList(uint32_t sessionId, UwbMulticastAction multicastAction, std::vector<::uwb::UwbMacAddress> controlees)
 {
     std::promise<UwbSessionUpdateMulicastListStatus> resultPromise;
     auto resultFuture = resultPromise.get_future();
@@ -376,7 +376,7 @@ UwbDeviceConnector::SessionUpdateControllerMulticastList(uint32_t sessionId, Uwb
 }
 
 std::future<std::tuple<UwbStatus, std::vector<UwbApplicationConfigurationParameter>>>
-UwbDeviceConnector::GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes)
+UwbConnector::GetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes)
 {
     std::promise<std::tuple<UwbStatus, std::vector<UwbApplicationConfigurationParameter>>> resultPromise;
     auto resultFuture = resultPromise.get_future();
@@ -432,7 +432,7 @@ UwbDeviceConnector::GetApplicationConfigurationParameters(uint32_t sessionId, st
 }
 
 std::future<std::tuple<UwbStatus, std::vector<UwbSetApplicationConfigurationParameterStatus>>>
-UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters)
+UwbConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters)
 {
     std::promise<std::tuple<UwbStatus, std::vector<UwbSetApplicationConfigurationParameterStatus>>> resultPromise;
     auto resultFuture = resultPromise.get_future();
@@ -478,7 +478,7 @@ UwbDeviceConnector::SetApplicationConfigurationParameters(uint32_t sessionId, st
 }
 
 void
-UwbDeviceConnector::HandleNotifications(std::stop_token stopToken)
+UwbConnector::HandleNotifications(std::stop_token stopToken)
 {
     DWORD bytesRequired = 0;
     std::vector<uint8_t> uwbNotificationDataBuffer{};
@@ -533,7 +533,7 @@ UwbDeviceConnector::HandleNotifications(std::stop_token stopToken)
 }
 
 void
-UwbDeviceConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList)
+UwbConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList)
 {
     uint32_t sessionId = statusMulticastList.SessionId;
     auto it = m_sessionEventCallbacks.find(sessionId);
@@ -572,7 +572,7 @@ UwbDeviceConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessi
 }
 
 void
-UwbDeviceConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData)
+UwbConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData)
 {
     uint32_t sessionId = rangingData.SessionId;
     auto it = m_sessionEventCallbacks.find(sessionId);
@@ -627,7 +627,7 @@ Accessor(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks, st
 }
 
 void
-UwbDeviceConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNotificationData)
+UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNotificationData)
 {
     std::visit([this](auto&& arg) {
         using ValueType = std::decay_t<decltype(arg)>;
@@ -663,7 +663,7 @@ UwbDeviceConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData
 }
 
 bool
-UwbDeviceConnector::NotificationListenerStart()
+UwbConnector::NotificationListenerStart()
 {
     wil::shared_hfile notificationHandleDriver;
     auto hr = OpenDriverHandle(notificationHandleDriver, m_deviceName.c_str(), true);
@@ -681,28 +681,28 @@ UwbDeviceConnector::NotificationListenerStart()
 }
 
 void
-UwbDeviceConnector::NotificationListenerStop()
+UwbConnector::NotificationListenerStop()
 {
     LOG_IF_WIN32_BOOL_FALSE(CancelIoEx(m_notificationHandleDriver.get(), &m_notificationOverlapped));
     m_notificationThread.request_stop();
 }
 
-RegisteredCallbackToken*
-UwbDeviceConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks)
+::uwb::RegisteredCallbackToken*
+UwbConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks)
 {
     m_deviceEventCallbacks = callbacks;
     return nullptr;
 }
 
-RegisteredCallbackToken*
-UwbDeviceConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks)
+::uwb::RegisteredCallbackToken*
+UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks)
 {
     m_sessionEventCallbacks.insert_or_assign(sessionId, callbacks);
     return nullptr;
 }
 
 void
-UwbDeviceConnector::DeregisterEventCallback(RegisteredCallbackToken* token)
+UwbConnector::DeregisterEventCallback(::uwb::RegisteredCallbackToken* token)
 {
     // TODO implement
 }

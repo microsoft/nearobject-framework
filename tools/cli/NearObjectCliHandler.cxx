@@ -1,7 +1,6 @@
 
 #include <nearobject/cli/NearObjectCli.hxx>
 #include <nearobject/cli/NearObjectCliHandler.hxx>
-#include <nearobject/cli/NearObjectCliUwbSessionEventCallbacks.hxx>
 #include <uwb/UwbDevice.hxx>
 #include <uwb/UwbSession.hxx>
 #include <uwb/protocols/fira/UwbException.hxx>
@@ -68,17 +67,8 @@ try {
 void
 NearObjectCliHandler::HandleStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevice, uwb::protocol::fira::UwbSessionData& sessionData) noexcept
 try {
-    // Instantiate callbacks for session events.
-    auto controlFlowContext = (m_parent != nullptr) ? m_parent->GetControlFlowContext() : nullptr;
-    auto callbacks = std::make_shared<NearObjectCliUwbSessionEventCallbacks>([this, controlFlowContext = std::move(controlFlowContext)]() {
-        if (controlFlowContext != nullptr) {
-            controlFlowContext->OperationSignalComplete();
-        }
-        m_activeSession.reset();
-    });
-
     // Create a new session.
-    auto session = uwbDevice->CreateSession(sessionData.sessionId, callbacks);
+    auto session = uwbDevice->CreateSession(sessionData.sessionId, m_sessionEventCallbacks);
 
     // Convert configuration from OOB (UWB_SESSION_DATA) to UCI application
     // configuration parameters and configure the session with them.
