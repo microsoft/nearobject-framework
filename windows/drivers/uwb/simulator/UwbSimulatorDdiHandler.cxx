@@ -105,7 +105,7 @@ UwbSimulatorDdiHandler::OnUwbGetDeviceInformation(WDFREQUEST request, std::span<
     if (std::size(outputBuffer) >= outputSize) {
         std::memcpy(std::data(outputBuffer), std::data(std::data(uwbDeviceInformation)), outputSize);
     } else {
-        status = STATUS_BUFFER_TOO_SMALL;
+        status = STATUS_BUFFER_OVERFLOW;
     }
 
     // Complete the request.
@@ -133,7 +133,7 @@ UwbSimulatorDdiHandler::OnUwbGetDeviceCapabilities(WDFREQUEST request, std::span
     if (std::size(outputBuffer) >= outputSize) {
         std::memcpy(std::data(outputBuffer), std::data(std::data(uwbCapabilities)), outputSize);
     } else {
-        status = STATUS_BUFFER_TOO_SMALL;
+        status = STATUS_BUFFER_OVERFLOW;
     }
 
     // Complete the request.
@@ -171,7 +171,7 @@ UwbSimulatorDdiHandler::OnUwbGetDeviceConfigurationParameters(WDFREQUEST request
     if (std::size(outputBuffer) >= outputSize) {
         // TODO: std::memcpy(std::data(outputBuffer), std::data(std::data(<neutal wrapper>)), outputBufferSize);
     } else {
-        status = STATUS_BUFFER_TOO_SMALL;
+        status = STATUS_BUFFER_OVERFLOW;
     }
 
     // Complete the request.

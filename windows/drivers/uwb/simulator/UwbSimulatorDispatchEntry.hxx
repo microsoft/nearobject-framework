@@ -68,7 +68,7 @@ struct UwbSimulatorDispatchEntry
         if (inputBufferSize < (InputSizeMinimum + inputBufferVariableSize)) {
             return STATUS_INVALID_PARAMETER;
         } else if (outputBufferSize < (OutputSizeMinimum + outputBufferVariableSize)) {
-            return STATUS_BUFFER_TOO_SMALL;
+            return STATUS_BUFFER_OVERFLOW;
         } else {
             return STATUS_SUCCESS;
         }
