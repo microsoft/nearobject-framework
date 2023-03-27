@@ -46,11 +46,15 @@ try {
         PLOG_DEBUG << " > " << applicationConfigurationParameter.ToString();
     }
     session->StartRanging();
+    bool destroySessionOnClose = true; // TODO: allow overriding this
 
     // Register a stop callback such that 
     if (controlFlowContext != nullptr) {
         controlFlowContext->RegisterStopCallback([=](){
-            session->Destroy();
+            session->StopRanging();
+            if (destroySessionOnClose) {
+                session->Destroy();
+            }
         });
     }
 
