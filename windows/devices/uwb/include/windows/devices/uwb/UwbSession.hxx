@@ -10,7 +10,7 @@
 #include <uwb/UwbSession.hxx>
 #include <uwb/UwbSessionEventCallbacks.hxx>
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
-#include <windows/devices/uwb/UwbDeviceConnector.hxx>
+#include <windows/devices/uwb/IUwbSessionDdi.hxx>
 
 namespace windows::devices::uwb
 {
@@ -23,13 +23,13 @@ class UwbSession :
 public:
     /**
      * @brief Construct a new UwbSession object.
-     * This also registers the callbacks with the UwbDeviceConnector
+     * This also registers the callbacks with the UwbConnector
      *
      * @param sessionId
      * @param callbacks The event callback instance.
      * @param uwbDeviceConnector The connector to the UWB-CX driver instance.
      */
-    UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, std::shared_ptr<UwbDeviceConnector> uwbDeviceConnector, ::uwb::protocol::fira::DeviceType deviceType = ::uwb::protocol::fira::DeviceType::Controller);
+    UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, std::shared_ptr<IUwbSessionDdiConnector> uwbDeviceConnector, ::uwb::protocol::fira::DeviceType deviceType = ::uwb::protocol::fira::DeviceType::Controller);
 
 private:
     /**
@@ -70,15 +70,15 @@ protected:
     /**
      * @brief Obtain a shared instance of the device driver connector.
      *
-     * @return std::shared_ptr<UwbDeviceConnector>
+     * @return std::shared_ptr<IUwbSessionDdiConnector>
      */
-    std::shared_ptr<UwbDeviceConnector>
+    std::shared_ptr<IUwbSessionDdiConnector>
     GetUwbDeviceConnector() noexcept;
 
 private:
-    std::shared_ptr<UwbDeviceConnector> m_uwbDeviceConnector;
+    std::shared_ptr<IUwbSessionDdiConnector> m_uwbDeviceConnector;
     std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks> m_registeredCallbacks;
-    RegisteredCallbackToken* m_registeredCallbacksToken;
+    ::uwb::RegisteredCallbackToken* m_registeredCallbacksToken;
 };
 
 } // namespace windows::devices::uwb

@@ -16,30 +16,26 @@
 #include <uwb/protocols/fira/UwbCapability.hxx>
 #include <wil/resource.h>
 #include <windows/devices/uwb/IUwbDeviceDdi.hxx>
+#include <windows/devices/uwb/IUwbSessionDdi.hxx>
 
 namespace windows::devices::uwb
 {
-/**
- * @brief Opaque class forward declaration to help with the deregistration
- *
- */
-class RegisteredCallbackToken;
-
-class UwbDeviceConnector :
-    public IUwbDeviceDdi
+class UwbConnector :
+    public IUwbDeviceDdiConnector,
+    public IUwbSessionDdiConnector
 {
 public:
     /**
-     * @brief Construct a new UwbDeviceConnector object.
+     * @brief Construct a new UwbConnector object.
      *
      * @param deviceName The interface path name.
      */
-    explicit UwbDeviceConnector(std::string deviceName);
+    explicit UwbConnector(std::string deviceName);
 
     /**
      * @brief Destroy the Uwb Device Connector object
      */
-    ~UwbDeviceConnector();
+    ~UwbConnector();
 
     /**
      * @brief Get the name of this device.
@@ -49,6 +45,8 @@ public:
     const std::string&
     DeviceName() const noexcept;
 
+public:
+    // IUwbDeviceDdiConnector
     /**
      * @brief Start listening for notifications.
      *
@@ -60,15 +58,26 @@ public:
      * @return true If listening for notifications started successfully.
      * @return false If listening for notifications could not be started.
      */
-    bool
-    NotificationListenerStart();
+    virtual bool
+    NotificationListenerStart() override;
 
     /**
      * @brief Stop listening for notifications.
      */
-    void
-    NotificationListenerStop();
+    virtual void
+    NotificationListenerStop() override;
 
+    /**
+     * @brief Sets the callbacks for the UwbDevice that owns this UwbConnector
+     *
+     * @param callbacks
+     * @return RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback
+     */
+    virtual ::uwb::RegisteredCallbackToken*
+    RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks) override;
+
+public:
+    // IUwbSessionDdiConnector
     /**
      * @brief Registers the callbacks for a particular session
      *
@@ -76,18 +85,10 @@ public:
      * @param callbacks
      * @return RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback
      */
-    RegisteredCallbackToken*
-    RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks);
+    virtual ::uwb::RegisteredCallbackToken*
+    RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks) override;
 
-    /**
-     * @brief Sets the callbacks for the UwbDevice that owns this UwbDeviceConnector
-     *
-     * @param callbacks
-     * @return RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback
-     */
-    RegisteredCallbackToken*
-    RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks);
-
+public:
     /**
      * @brief De-registers the callback associated with the token
      * If you pass in a token that is no longer valid, this function does nothing
@@ -95,7 +96,7 @@ public:
      * @param token
      */
     void
-    DeregisterEventCallback(RegisteredCallbackToken* token);
+    DeregisterEventCallback(::uwb::RegisteredCallbackToken* token);
 
 public:
     // IUwbDeviceDdi
@@ -111,6 +112,8 @@ public:
     virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<uint32_t>>>
     GetSessionCount() override;
 
+public:
+    // IUwbSessionDdi
     virtual std::future<::uwb::protocol::fira::UwbStatus>
     SessionInitialize(uint32_t sessionId, ::uwb::protocol::fira::UwbSessionType sessionType) override;
 

@@ -19,7 +19,7 @@
 #include <uwb/UwbSession.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <windows/devices/DeviceResource.hxx>
-#include <windows/devices/uwb/UwbDeviceConnector.hxx>
+#include <windows/devices/uwb/IUwbDeviceDdi.hxx>
 
 namespace uwb
 {
@@ -104,9 +104,9 @@ private:
 
 private:
     const std::string m_deviceName;
-    std::shared_ptr<UwbDeviceConnector> m_uwbDeviceConnector;
+    std::shared_ptr<IUwbDeviceDdiConnector> m_uwbDeviceConnector;
     std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> m_callbacks;
-    RegisteredCallbackToken* m_callbacksToken;
+    ::uwb::RegisteredCallbackToken* m_callbacksToken;
 };
 } // namespace windows::devices::uwb
 

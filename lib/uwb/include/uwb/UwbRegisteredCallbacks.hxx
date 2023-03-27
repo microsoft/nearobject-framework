@@ -12,6 +12,12 @@
 namespace uwb
 {
 /**
+ * @brief Opaque class forward declaration to help with the deregistration
+ *
+ */
+class RegisteredCallbackToken;
+
+/**
  * @brief Interface for receiving events from a UwbSession. This is the primary
  * method to receive information from near peers.
  *
