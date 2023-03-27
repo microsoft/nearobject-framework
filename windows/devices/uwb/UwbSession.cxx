@@ -238,10 +238,10 @@ UwbSession::GetApplicationConfigurationParametersImpl()
         }
         return applicationConfigurationParameters;
     } catch (UwbException &uwbException) {
-        PLOG_ERROR << "caught exception attempting to obtain application configuration parameters for session id " << sessionId << "(" << ToString(uwbException.Status) << ")";
+        PLOG_ERROR << "caught exception attempting to obtain application configuration parameters for session id " << sessionId << " (" << ToString(uwbException.Status) << ")";
         throw uwbException;
     } catch (std::exception &e) {
-        PLOG_ERROR << "caught unexpected exception attempting to obtain application configuration parameters for session id " << sessionId << "(" << e.what() << ")";
+        PLOG_ERROR << "caught unexpected exception attempting to obtain application configuration parameters for session id " << sessionId << " (" << e.what() << ")";
         throw e;
     }
 }
