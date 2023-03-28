@@ -11,9 +11,9 @@
 #include <uwb/UwbPeer.hxx>
 #include <uwb/protocols/fira/UwbException.hxx>
 #include <windows/devices/DeviceHandle.hxx>
-#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
+#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 
 using namespace windows::devices;
 using namespace windows::devices::uwb;
@@ -105,7 +105,7 @@ UwbConnector::GetDeviceInformation()
     // second time.
     for (const auto i : std::ranges::iota_view{ 0, 2 }) {
         deviceInformationBuffer.resize(bytesRequired);
-        PLOG_DEBUG << "IOCTL_UWB_GET_DEVICE_INFO attempt #" << i << " with " << std::size(deviceInformationBuffer) << "-byte buffer";
+        PLOG_DEBUG << "IOCTL_UWB_GET_DEVICE_INFO attempt #" << (i + 1) << " with " << std::size(deviceInformationBuffer) << "-byte buffer";
         BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_DEVICE_INFO, nullptr, 0, std::data(deviceInformationBuffer), std::size(deviceInformationBuffer), &bytesRequired, nullptr);
         if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
             DWORD lastError = GetLastError();
@@ -401,7 +401,7 @@ UwbConnector::GetApplicationConfigurationParameters(uint32_t sessionId, std::vec
 
     for (const auto i : std::ranges::iota_view{ 0, 2 }) {
         getAppConfigParamsResultBuffer.resize(bytesRequired);
-        PLOG_DEBUG << "IOCTL_UWB_GET_APP_CONFIG_PARAMS attempt #" << i << " with " << std::size(getAppConfigParamsResultBuffer) << "-byte buffer";
+        PLOG_DEBUG << "IOCTL_UWB_GET_APP_CONFIG_PARAMS attempt #" << (i + 1) << " with " << std::size(getAppConfigParamsResultBuffer) << "-byte buffer";
         BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_APP_CONFIG_PARAMS, std::data(getAppConfigParamsBuffer), std::size(getAppConfigParamsBuffer), std::data(getAppConfigParamsResultBuffer), std::size(getAppConfigParamsResultBuffer), &bytesRequired, nullptr);
         if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
             DWORD lastError = GetLastError();

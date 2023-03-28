@@ -12,6 +12,7 @@
 
 #include "IUwbSimulatorDdiHandler.hxx"
 #include "UwbSimulatorDdiCallbacks.hxx"
+#include "UwbSimulatorDevice.hxx"
 #include "UwbSimulatorDeviceFile.hxx"
 #include "UwbSimulatorDispatchEntry.hxx"
 
@@ -21,12 +22,8 @@ class UwbSimulatorDdiHandler :
     public IUwbSimulatorDdiHandler
 {
 public:
-    /**
-     * @brief Construct a new UwbSimulatorDdiHandler object.
-     *
-     * @param deviceFile The file object context for this handler.
-     */
-    explicit UwbSimulatorDdiHandler(UwbSimulatorDeviceFile *deviceFile);
+    // TODO: docs
+    explicit UwbSimulatorDdiHandler(UwbSimulatorDevice *device);
 
     /**
      * @brief Indicates whether the specified i/o control code is handled by
@@ -129,7 +126,7 @@ private:
     static const std::initializer_list<windows::devices::uwb::simulator::UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>> Dispatch;
 
 private:
-    UwbSimulatorDeviceFile *m_deviceFile;
+    UwbSimulatorDevice *m_device;
     std::unique_ptr<windows::devices::uwb::simulator::UwbSimulatorDdiCallbacks> m_callbacks;
 };
 } // namespace windows::devices::uwb::simulator
