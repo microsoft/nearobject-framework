@@ -10,7 +10,6 @@
 #include <wdf.h>
 
 #include "IUwbSimulatorDdiHandler.hxx"
-#include "UwbSimulatorIoEventQueue.hxx"
 
 class UwbSimulatorDevice;
 
@@ -61,19 +60,6 @@ public:
     WDFFILEOBJECT
     GetWdfFile() const noexcept;
 
-    /**
-     * @brief Get a pointer to the io event queue for this file object.
-     *
-     * @return UwbSimulatorIoEventQueue*
-     */
-    UwbSimulatorIoEventQueue *
-    GetIoEventQueue() noexcept;
-
-    /**
-     * @brief Get a pointer to the simulator device that owns this file object.
-     *
-     * @return UwbSimulatorDevice*
-     */
     UwbSimulatorDevice *
     GetDevice() noexcept;
 
@@ -99,7 +85,6 @@ private:
 private:
     WDFFILEOBJECT m_wdfFile;
     UwbSimulatorDevice *m_uwbSimulatorDevice{ nullptr };
-    UwbSimulatorIoEventQueue *m_ioEventQueue{ nullptr };
     std::vector<std::shared_ptr<windows::devices::uwb::simulator::IUwbSimulatorDdiHandler>> m_ddiHandlers{};
 };
 

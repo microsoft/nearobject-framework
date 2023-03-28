@@ -16,7 +16,7 @@
 
 #include "IUwbSimulatorDdiCallbacksLrp.hxx"
 #include "IUwbSimulatorDdiCallbacksSimulator.hxx"
-#include "UwbSimulatorDeviceFile.hxx"
+#include "UwbSimulatorDevice.hxx"
 #include "UwbSimulatorSession.hxx"
 
 #include <uwb/protocols/fira/UwbCapability.hxx>
@@ -27,7 +27,7 @@ struct UwbSimulatorDdiCallbacks :
     public IUwbSimulatorDdiCallbacksLrp,
     public IUwbSimulatorDdiCallbacksSimulator
 {
-    UwbSimulatorDdiCallbacks(UwbSimulatorDeviceFile *deviceFile);
+    UwbSimulatorDdiCallbacks(UwbSimulatorDevice *device);
 
     // IUwbSimulatorDdiCallbacksLrp
 
@@ -134,7 +134,7 @@ private:
 
 private:
     UwbSimulatorCapabilities m_simulatorCapabilities{};
-    UwbSimulatorDeviceFile *m_deviceFile;
+    UwbSimulatorDevice *m_device{ nullptr };
 };
 } // namespace windows::devices::uwb::simulator
 
