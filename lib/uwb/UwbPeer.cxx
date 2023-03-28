@@ -13,20 +13,24 @@ using namespace strings::ostream_operators;
 std::string
 UwbPeerSpatialProperties::ToString() const
 {
-    std::initializer_list<std::tuple<std::string, std::optional<double>>> name2value{ { "Distance", Distance },
+    static const std::initializer_list<std::tuple<std::string, std::optional<double>>> name2value{
+        { "Distance", Distance },
         { "AngleAzimuth", AngleAzimuth },
         { "AngleElevation", AngleElevation },
-        { "Elevation", Elevation } };
+        { "Elevation", Elevation }
+    };
 
     std::ostringstream ss;
 
     for (const auto& [name, value] : name2value) {
-        if (value.has_value()) {
-            ss << name << ": " << std::to_string(*value) << std::endl;
-        }
+        ss << name << ": " << std::to_string(value.value_or(0)) << ", ";
     }
 
-    return ss.str();
+    // Remove the trailing ", "
+    auto str = ss.str();
+    str.resize(std::size(str) - 2);
+
+    return str;
 }
 
 UwbPeer::UwbPeer(UwbMacAddress address) :
@@ -48,7 +52,7 @@ double
 ConvertQ97FormatToIEEE(uint16_t q97)
 {
     static const double pow2 = std::pow(2, -7);
-    static const uint16_t signMask =            0b1000'0000'0000'0000U;
+    static const uint16_t signMask = 0b1000'0000'0000'0000U;
     static const uint16_t unsignedIntegerMask = 0b0111'1111'1000'0000U;
     static const uint16_t fractionMask = ~(signMask | unsignedIntegerMask);
 
