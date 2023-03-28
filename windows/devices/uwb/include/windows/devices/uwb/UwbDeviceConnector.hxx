@@ -75,7 +75,7 @@ public:
     NotificationListenerStop() override;
 
     /**
-     * @brief Sets the callbacks for the UwbDevice that owns this UwbConnector
+     * @brief Sets the callbacks for the UwbDevice that owns this UwbConnector. This function MUST be called before the NotificationListenerStart() is called
      *
      * @param callbacks
      * @return RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback
@@ -86,7 +86,7 @@ public:
 public:
     // IUwbSessionDdiConnector
     /**
-     * @brief Registers the callbacks for a particular session
+     * @brief Registers the callbacks for a particular session. This function MUST be called before the NotificationListenerStart() is called
      *
      * @param sessionId
      * @param callbacks
