@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <iomanip>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <string>
 #include <tuple>
@@ -61,10 +62,22 @@ main(int argc, char* argv[])
     app.name("uwbsim");
     app.description("control and interact with uwb simulator devices");
 
+    uint32_t sessionId;
     bool getCapabilities{ false };
     std::string deviceName{};
-    app.add_option("--deviceName, -d", deviceName, "The uwb simulator device name (path)");
+    auto deviceNameOpt = app.add_option("--deviceName, -d", deviceName, "The uwb simulator device name (path)");
+    auto sessionIdOpt = app.add_option("--sessionId", sessionId, "session id for operations that require one");
     app.add_flag("--getCapabilities", getCapabilities, "enumerate the capabilities of the simulator");
+
+    const std::map<std::string, UwbSimulatorSessionEventAction> eventActionMap{
+        { "startrandomgeneration", UwbSimulatorSessionEventAction::RandomRangingMeasurementGenerationStart },
+        { "stoprandomgeneration", UwbSimulatorSessionEventAction::RandomRangingMeasurementGenerationStop }
+    };
+
+    UwbSimulatorTriggerSessionEventArgs uwbSimulatorTriggerSessionEventArgs{};
+    auto appTrigger = app.add_subcommand("trigger", "commands to trigger events on a session")->fallthrough();
+    appTrigger->add_option("--eventAction, -e", uwbSimulatorTriggerSessionEventArgs.Action, "event action name")->required()->transform(CLI::CheckedTransformer(eventActionMap, CLI::ignore_case));
+    appTrigger->needs(sessionIdOpt);
 
     try {
         app.parse(argc, argv);
@@ -98,6 +111,8 @@ main(int argc, char* argv[])
         return -2;
     }
 
+    std::cout << "initialization succeeded" << std::endl;
+
     if (getCapabilities) {
         try {
             auto capabilities = uwbDeviceSimulator->GetSimulatorCapabilities();
@@ -109,7 +124,13 @@ main(int argc, char* argv[])
         }
     }
 
-    std::cout << "initialization succeeded" << std::endl;
+    if (appTrigger->parsed()) {
+        try {
+            auto result = uwbDeviceSimulator->TriggerSessionEvent(uwbSimulatorTriggerSessionEventArgs);
+        } catch (UwbException& e) {
+            std::cerr << "failed to trigger session event (error=" << ::ToString(e.Status) << ")";
+        }
+    }
 
     return 0;
 }
