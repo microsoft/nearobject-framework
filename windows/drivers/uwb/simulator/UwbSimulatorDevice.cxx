@@ -12,7 +12,8 @@ using windows::devices::uwb::simulator::UwbSimulatorDdiHandler;
 using windows::devices::uwb::simulator::UwbSimulatorSession;
 
 UwbSimulatorDevice::UwbSimulatorDevice(WDFDEVICE wdfDevice) :
-    m_wdfDevice(wdfDevice)
+    m_wdfDevice(wdfDevice),
+    m_ddiHandler(std::make_shared<UwbSimulatorDdiHandler>(nullptr /* FIXME */))
 {}
 
 /* static */
@@ -175,8 +176,7 @@ UwbSimulatorDevice::OnFileCreate(WDFDEVICE device, WDFREQUEST request, WDFFILEOB
     auto uwbSimulatorFile = new (uwbSimulatorFileBuffer) UwbSimulatorDeviceFile(file, this);
     auto uwbSimulatorFileStatus = uwbSimulatorFile->Initialize();
     if (uwbSimulatorFileStatus == STATUS_SUCCESS) {
-        auto uwbSimulatorHandler = std::make_unique<UwbSimulatorDdiHandler>(uwbSimulatorFile);
-        uwbSimulatorFile->RegisterHandler(std::move(uwbSimulatorHandler));
+        uwbSimulatorFile->RegisterHandler(m_ddiHandler);
     } else {
         uwbSimulatorFile->~UwbSimulatorDeviceFile();
     }

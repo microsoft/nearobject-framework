@@ -14,6 +14,7 @@
 
 #include "UwbSimulatorIoQueue.hxx"
 #include "UwbSimulatorSession.hxx"
+#include "IUwbSimulatorDdiHandler.hxx"
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
 
@@ -130,6 +131,7 @@ private:
 private:
     WDFDEVICE m_wdfDevice;
     UwbSimulatorIoQueue *m_ioQueue{ nullptr };
+    std::shared_ptr<windows::devices::uwb::simulator::IUwbSimulatorDdiHandler> m_ddiHandler;
 
     // Session state and associated lock that protects it.
     std::shared_mutex m_sessionsGate;

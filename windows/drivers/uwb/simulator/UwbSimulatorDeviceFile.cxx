@@ -75,7 +75,7 @@ UwbSimulatorDeviceFile::Initialize()
 }
 
 void
-UwbSimulatorDeviceFile::RegisterHandler(std::unique_ptr<IUwbSimulatorDdiHandler> handler)
+UwbSimulatorDeviceFile::RegisterHandler(std::shared_ptr<IUwbSimulatorDdiHandler> handler)
 {
     m_ddiHandlers.push_back(std::move(handler));
 }

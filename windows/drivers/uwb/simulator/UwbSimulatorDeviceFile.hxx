@@ -36,7 +36,7 @@ public:
      * @param handler The handler to register.
      */
     void
-    RegisterHandler(std::unique_ptr<windows::devices::uwb::simulator::IUwbSimulatorDdiHandler> handler);
+    RegisterHandler(std::shared_ptr<windows::devices::uwb::simulator::IUwbSimulatorDdiHandler> handler);
 
     /**
      * @brief Device i/o control handler function.
@@ -100,7 +100,7 @@ private:
     WDFFILEOBJECT m_wdfFile;
     UwbSimulatorDevice *m_uwbSimulatorDevice{ nullptr };
     UwbSimulatorIoEventQueue *m_ioEventQueue{ nullptr };
-    std::vector<std::unique_ptr<windows::devices::uwb::simulator::IUwbSimulatorDdiHandler>> m_ddiHandlers{};
+    std::vector<std::shared_ptr<windows::devices::uwb::simulator::IUwbSimulatorDdiHandler>> m_ddiHandlers{};
 };
 
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(UwbSimulatorDeviceFile, GetUwbSimulatorFile);
