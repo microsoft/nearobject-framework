@@ -126,6 +126,7 @@ main(int argc, char* argv[])
 
     if (appTrigger->parsed()) {
         try {
+            uwbSimulatorTriggerSessionEventArgs.SessionId = sessionId;
             auto result = uwbDeviceSimulator->TriggerSessionEvent(uwbSimulatorTriggerSessionEventArgs);
         } catch (UwbException& e) {
             std::cerr << "failed to trigger session event (error=" << ::ToString(e.Status) << ")";
