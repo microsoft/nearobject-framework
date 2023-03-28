@@ -42,7 +42,7 @@ NearObjectCliUwbSessionEventCallbacks::OnPeerPropertiesChanged(::uwb::UwbSession
               << std::hex << std::setw(8) << std::setfill('0') << std::showbase << std::internal << session->GetId() << ": Peer Properties Changed" << std::endl;
 
     for (const auto& peer : peersChanged) {
-        std::cout << peer << std::endl;
+        std::cout << " > " << peer << std::endl;
     }
 }
 
