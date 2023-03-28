@@ -52,7 +52,7 @@ UwbSimulatorIoEventQueue::HandleNotificationRequest(WDFREQUEST request, std::opt
         auto outputBufferSizeRequired = converted.size();
         if (outputBufferSize < outputBufferSizeRequired) {
             outputBufferSize = outputBufferSizeRequired;
-            status = STATUS_BUFFER_OVERFLOW;
+            status = STATUS_BUFFER_TOO_SMALL;
         } else {
             notificationDataOpt = std::move(notificationData);
             m_notificationQueue.pop();

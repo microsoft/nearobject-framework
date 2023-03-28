@@ -480,7 +480,7 @@ UwbConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vec
 void
 UwbConnector::HandleNotifications(std::stop_token stopToken)
 {
-    DWORD bytesRequired = 0;
+        DWORD bytesRequired = 0;
     std::vector<uint8_t> uwbNotificationDataBuffer{};
     auto handleDriver = m_notificationHandleDriver;
 
@@ -488,7 +488,7 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
         m_notificationOverlapped = {};
         for (const auto i : std::ranges::iota_view{ 0, 2 }) {
             uwbNotificationDataBuffer.resize(bytesRequired);
-            PLOG_DEBUG << "IOCTL_UWB_NOTIFICATION attempt #" << i << " with " << std::size(uwbNotificationDataBuffer) << "-byte buffer";
+            PLOG_DEBUG << "IOCTL_UWB_NOTIFICATION attempt #" << (i + 1) << " with " << std::size(uwbNotificationDataBuffer) << "-byte buffer";
             BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, std::data(uwbNotificationDataBuffer), std::size(uwbNotificationDataBuffer), &bytesRequired, &m_notificationOverlapped);
             if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
                 DWORD lastError = GetLastError();
@@ -497,11 +497,21 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
                     if (!LOG_IF_WIN32_BOOL_FALSE(GetOverlappedResult(handleDriver.get(), &m_notificationOverlapped, &bytesRequired, TRUE /* wait */))) {
                         lastError = GetLastError();
                         HRESULT hr = HRESULT_FROM_WIN32(lastError);
-                        PLOG(lastError == ERROR_OPERATION_ABORTED ? plog::debug : plog::error)
-                            << "error waiting for IOCTL_UWB_NOTIFICATION completion, hr=" << std::showbase << std::hex << hr;
-                        break; // for({1,2})
+                        switch (lastError) {
+                        case ERROR_INSUFFICIENT_BUFFER: // occurs for overlapped i/o
+                        case ERROR_MORE_DATA:           // occurs for synchronous i/o
+                            LOG_DEBUG << "IOCTL_UWB_NOTIFICATION completed, hr=" << std::showbase << std::hex << hr;
+                            // driver indicated buffer was too small and put required size in 'bytesRequired'. Retry with new size.
+                            continue;
+                        case ERROR_OPERATION_ABORTED:
+                            LOG_WARNING << "IOCTL_UWB_NOTIFICATION aborted";
+                            break;
+                        default:
+                            PLOG_ERROR << "error when sending IOCTL_UWB_NOTIFICATION, hr=" << std::showbase << std::hex << hr;
+                            break; // for({0,2})
+                        }
                     }
-                } else if (lastError == ERROR_MORE_DATA) {
+                } else if (lastError == ERROR_MORE_DATA || lastError == ERROR_INSUFFICIENT_BUFFER) {
                     // Attempt to retry the ioctl with the appropriate buffer size, which is now held in bytesRequired.
                     continue;
                 } else {
