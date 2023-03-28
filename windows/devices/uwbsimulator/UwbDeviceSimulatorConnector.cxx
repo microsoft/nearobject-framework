@@ -45,11 +45,27 @@ UwbDeviceSimulatorConnector::GetCapabilites()
 }
 
 std::future<UwbSimulatorTriggerSessionEventResult>
-UwbDeviceSimulatorConnector::TriggerSessionEvent([[maybe_unused]] const UwbSimulatorTriggerSessionEventArgs& triggerSessionEventArgs)
+UwbDeviceSimulatorConnector::TriggerSessionEvent(const UwbSimulatorTriggerSessionEventArgs& triggerSessionEventArgs)
 {
     std::promise<UwbSimulatorTriggerSessionEventResult> resultPromise;
     auto resultFuture = resultPromise.get_future();
-    // TODO: invoke IOCTL_UWB_DEVICE_SIM_TRIGGER_SESSION_EVENT
+
+    wil::unique_hfile handleDriver;
+    auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
+    if (FAILED(hr)) {
+        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        return resultFuture;
+    }
+
+    UwbSimulatorTriggerSessionEventResult uwbSimulatorTriggerSessionEventResult{};
+    DWORD bytesRequired = sizeof uwbSimulatorTriggerSessionEventResult;
+    BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_DEVICE_SIM_TRIGGER_SESSION_EVENT, const_cast<UwbSimulatorTriggerSessionEventArgs*>(&triggerSessionEventArgs), sizeof triggerSessionEventArgs, &uwbSimulatorTriggerSessionEventResult, sizeof uwbSimulatorTriggerSessionEventResult, &bytesRequired, nullptr);
+    if (!ioResult) {
+        HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
+        PLOG_ERROR << "error when sending IOCTL_UWB_DEVICE_SIM_TRIGGER_SESSION_EVENT, hr=" << std::showbase << std::hex << hr;
+    }
+
+    resultPromise.set_value(std::move(uwbSimulatorTriggerSessionEventResult));
 
     return resultFuture;
 }
