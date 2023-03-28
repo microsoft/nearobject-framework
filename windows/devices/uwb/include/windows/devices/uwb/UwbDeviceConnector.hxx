@@ -20,6 +20,18 @@
 
 namespace windows::devices::uwb
 {
+/**
+ * @brief Opaque class forward declaration to help with the deregistration
+ */
+class RegisteredCallbackToken;
+
+/**
+ * @brief Class representing a logical communication channel with a UWB driver.
+ *
+ * This class exposes functions which map 1-1 to the UWB LRP DDI as defined in
+ * UwbCxLrpDevice.h, using neutral C++ types instead of the the raw C ABI
+ * types.
+ */
 class UwbConnector :
     public IUwbDeviceDdiConnector,
     public IUwbSessionDdiConnector

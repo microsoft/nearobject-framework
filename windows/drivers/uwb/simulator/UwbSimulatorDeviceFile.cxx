@@ -148,7 +148,7 @@ UwbSimulatorDeviceFile::OnRequest(WDFREQUEST request, ULONG ioControlCode, size_
     switch (status) {
     case STATUS_SUCCESS:
         break;
-    case STATUS_BUFFER_TOO_SMALL:
+    case STATUS_BUFFER_OVERFLOW:
         WdfRequestCompleteWithInformation(request, status, outputBufferLength);
         return status;
     default:

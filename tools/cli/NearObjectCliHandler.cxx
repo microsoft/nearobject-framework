@@ -37,6 +37,7 @@ NearObjectCliHandler::ResolveUwbDevice(const NearObjectCliData& /*cliData */) no
 void
 NearObjectCliHandler::HandleDriverStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevice, const UwbRangingParameters& rangingParameters) noexcept
 try {
+    auto controlFlowContext = (m_parent != nullptr) ? m_parent->GetControlFlowContext() : nullptr;
     auto session = uwbDevice->CreateSession(rangingParameters.SessionId, m_sessionEventCallbacks);
     session->Configure(rangingParameters.ApplicationConfigurationParameters);
     auto applicationConfigurationParameters = session->GetApplicationConfigurationParameters();
@@ -45,8 +46,20 @@ try {
         PLOG_DEBUG << " > " << applicationConfigurationParameter.ToString();
     }
     session->StartRanging();
+    bool destroySessionOnClose = true; // TODO: allow overriding this
+
+    // Register a stop callback such that
+    if (controlFlowContext != nullptr) {
+        controlFlowContext->RegisterStopCallback([=]() {
+            session->StopRanging();
+            if (destroySessionOnClose) {
+                session->Destroy();
+            }
+        });
+    }
 
     // Save the session reference so it stays alive while the session is active.
+    m_activeDevice = uwbDevice;
     m_activeSession = std::move(session);
 } catch (...) {
     PLOG_ERROR << "failed to start ranging";

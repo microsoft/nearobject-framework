@@ -102,11 +102,17 @@ public:
 
     /**
      * @brief Get the application configuration parameters for this session.
-     * 
-     * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> 
+     *
+     * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
      */
     std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
     GetApplicationConfigurationParameters();
+
+    /**
+     * @brief Destroy the session, making it unusable.
+     */
+    void
+    Destroy();
 
 private:
     /**
@@ -147,11 +153,17 @@ private:
 
     /**
      * @brief Get the application configuration parameters for this session.
-     * 
-     * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> 
+     *
+     * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
      */
     virtual std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
     GetApplicationConfigurationParametersImpl() = 0;
+
+    /**
+     * @brief Destroy the session, making it unusable.
+     */
+    virtual void
+    DestroyImpl() = 0;
 
 protected:
     uwb::protocol::fira::DeviceType m_deviceType{ uwb::protocol::fira::DeviceType::Controller };

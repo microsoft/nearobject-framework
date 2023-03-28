@@ -8,7 +8,10 @@ using namespace nearobject::cli;
 
 NearObjectCliControlFlowContext::NearObjectCliControlFlowContext(std::ptrdiff_t numOperations) :
     m_operationsCompleteLatchCount(numOperations),
-    m_operationCompleteLatch(numOperations)
+    m_operationCompleteLatch(numOperations),
+    m_stopCallback(m_stopSource.get_token(), [&] {
+        OnStop();
+    })
 {}
 
 std::stop_token
@@ -43,4 +46,19 @@ void
 NearObjectCliControlFlowContext::OperationsWaitForComplete()
 {
     m_operationCompleteLatch.wait();
+    OnStop();
+}
+
+void
+NearObjectCliControlFlowContext::RegisterStopCallback(std::function<void()> stopCallback)
+{
+    m_stopCallbacks.push_back(std::move(stopCallback));
+}
+
+void
+NearObjectCliControlFlowContext::OnStop()
+{
+    for (auto &stopCallback : m_stopCallbacks) {
+        stopCallback();
+    }
 }

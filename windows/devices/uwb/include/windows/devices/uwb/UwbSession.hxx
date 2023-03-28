@@ -68,6 +68,12 @@ private:
     virtual std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
     GetApplicationConfigurationParametersImpl() override;
 
+    /**
+     * @brief Destroy the session, making it unusable.
+     */
+    void
+    DestroyImpl() override;
+
 protected:
     /**
      * @brief Obtain a shared instance of the device driver connector.

@@ -281,7 +281,19 @@ uwb::protocol::fira::ToString(const UwbApplicationConfigurationParameterValue& u
         using T = std::decay_t<decltype(arg)>;
         if constexpr (std::is_enum_v<T>) {
             ss << magic_enum::enum_name(arg);
-        } else if constexpr (std::is_integral_v<T> || std::is_same_v<T, ::uwb::UwbMacAddress>) {
+        } else if constexpr (std::is_integral_v<T>) {
+            ss << +arg;
+        } else if constexpr (std::is_same_v<T, ::uwb::UwbMacAddress>) {
+            ss << arg;
+        } else if constexpr (std::is_same_v<T, std::unordered_set<::uwb::UwbMacAddress>>) {
+            for (const auto& uwbMacAddress : arg) {
+                ss << uwbMacAddress << ' ';
+            }
+        } else if constexpr (std::is_same_v<T, std::unordered_set<ResultReportConfiguration>>) {
+            ss << ToString(arg);
+        } else if constexpr (std::is_same_v<T, std::array<uint8_t, StaticStsInitializationVectorLength>>) {
+            ss << std::showbase << std::hex << +arg[0] << +arg[1] << +arg[2] << +arg[3] << +arg[4] << +arg[5];
+        } else {
             ss << arg;
         }
     },

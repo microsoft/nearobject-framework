@@ -199,11 +199,11 @@ UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t session
     auto disallowed = std::ranges::partition(uwbApplicationConfigurationParameters, [&](const auto &applicationConfigurationParameter) {
         return (session->State == UwbSessionState::Active)
             ? ::uwb::protocol::fira::IsApplicationConfigurationChangeableWhileActive(applicationConfigurationParameter)
-            : false;
+            : true;
     });
 
     // Update result container with all disallowed parameters.
-    std::ranges::transform(disallowed, std::back_inserter(parameterStatuses), [&](const auto &applicationConfigurationParameter) {
+    std::ranges::transform(disallowed, std::back_inserter(parameterStatuses), [&](auto &applicationConfigurationParameter) {
         return UwbSetApplicationConfigurationParameterStatus{ UwbStatusSession::Active, applicationConfigurationParameter.Type };
     });
 
@@ -223,6 +223,10 @@ UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t session
                 TraceLoggingString("ParameterUpdate"),
                 TraceLoggingString(node.value().ToString().c_str(), "ValueOld"),
                 TraceLoggingString(applicationConfigurationParameter.ToString().c_str(), "Value"));
+
+            // Update the node with the current parameter value.
+            node.value() = applicationConfigurationParameter;
+            session->ApplicationConfigurationParameters.insert(std::move(node));
         } else {
             TraceLoggingWrite(
                 UwbSimulatorTraceloggingProvider,
@@ -231,11 +235,9 @@ UwbSimulatorDdiCallbacks::SetApplicationConfigurationParameters(uint32_t session
                 TraceLoggingUInt32(sessionId, "Session Id"),
                 TraceLoggingString("ParameterSet"),
                 TraceLoggingString(applicationConfigurationParameter.ToString().c_str(), "Value"));
-        }
 
-        // Update the node with the current parameter value.
-        node.value() = std::move(applicationConfigurationParameter);
-        session->ApplicationConfigurationParameters.insert(std::move(node));
+            session->ApplicationConfigurationParameters.insert(applicationConfigurationParameter);
+        }
 
         // Update result container indicating setting the parameter was successful.
         return UwbSetApplicationConfigurationParameterStatus{ UwbStatusGeneric::Ok, parameterType };
