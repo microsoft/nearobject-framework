@@ -587,14 +587,14 @@ UwbConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData ranging
     uint32_t sessionId = rangingData.SessionId;
     auto it = m_sessionEventCallbacks.find(sessionId);
     if (it == std::end(m_sessionEventCallbacks)) {
-        PLOG_WARNING << "Ignoring RangingData event due to missing session callback";
+        PLOG_VERBOSE << "Ignoring RangingData event due to missing session callback";
         return;
     }
 
     auto& [_, callbacksWeak] = *it;
     auto callbacks = callbacksWeak.lock();
     if (not(callbacks->OnPeerPropertiesChanged)) {
-        PLOG_WARNING << "Ignoring RangingData event due to missing session callback";
+        PLOG_WARNING << "Ignoring RangingData event due to expired session callback";
         m_sessionEventCallbacks.erase(it);
         return;
     }
