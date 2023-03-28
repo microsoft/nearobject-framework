@@ -109,12 +109,15 @@ UwbMacAddress::ToString() const
 {
     std::ostringstream macString{};
 
-    for (const auto& b : m_view.first(m_view.size() - 1)) {
-        macString << std::hex << +b << ':';
+    for (const auto& b : m_view) {
+        macString << std::hex << std::setw(2) << std::setfill('0') << +b << ':';
     }
-    macString << std::hex << +m_view[m_view.size() - 1];
 
-    return macString.str();
+    // Remove the trailing ':'.
+    auto str = macString.str();
+    str.pop_back();
+
+    return str;
 }
 
 bool
