@@ -27,7 +27,7 @@ struct NearObjectCliUwbSessionEventCallbacks :
      * @param session The session for which the event occurred.
      * @param reason The reason the session ended.
      */
-    virtual void
+    void
     OnSessionEnded(::uwb::UwbSession *session, ::uwb::UwbSessionEndReason reason) override;
 
     /**
@@ -35,7 +35,7 @@ struct NearObjectCliUwbSessionEventCallbacks :
      *
      * @param session The session for which the event occurred.
      */
-    virtual void
+    void
     OnRangingStarted(::uwb::UwbSession *session) override;
 
     /**
@@ -43,7 +43,7 @@ struct NearObjectCliUwbSessionEventCallbacks :
      *
      * @param session The session for which the event occurred.
      */
-    virtual void
+    void
     OnRangingStopped(::uwb::UwbSession *session) override;
 
     /**
@@ -53,7 +53,7 @@ struct NearObjectCliUwbSessionEventCallbacks :
      * @param session The session for which the event occurred.
      * @param peersChanged A list of peers whose properties changed.
      */
-    virtual void
+    void
     OnPeerPropertiesChanged(::uwb::UwbSession *session, const std::vector<::uwb::UwbPeer> peersChanged) override;
 
     /**
@@ -65,7 +65,7 @@ struct NearObjectCliUwbSessionEventCallbacks :
      * @param peersAdded A list of peers that were added to the session.
      * @param peersRemoved A list of peers that were removed from the session.
      */
-    virtual void
+    void
     OnSessionMembershipChanged(::uwb::UwbSession *session, const std::vector<::uwb::UwbPeer> peersAdded, const std::vector<::uwb::UwbPeer> peersRemoved) override;
 
 private:

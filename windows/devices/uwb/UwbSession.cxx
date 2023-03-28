@@ -10,8 +10,8 @@
 
 #include <uwb/protocols/fira/UwbException.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
-#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
+#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 #include <windows/devices/uwb/UwbSession.hxx>
 
 using namespace windows::devices::uwb;
@@ -62,10 +62,9 @@ UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventC
             return callbacks->OnSessionMembershipChanged(this, peersAdded, peersRemoved);
         });
 
-    auto uwbConnector = std::make_shared<UwbConnector>(uwbDevice->DeviceName());
-    uwbConnector->NotificationListenerStart();
-    m_uwbDeviceConnector = uwbConnector;
+    auto m_uwbDeviceConnector = std::make_shared<UwbConnector>(uwbDevice->DeviceName());
     m_registeredCallbacksToken = m_uwbDeviceConnector->RegisterSessionEventCallbacks(m_sessionId, m_registeredCallbacks);
+    m_uwbDeviceConnector->NotificationListenerStart();
 }
 
 std::shared_ptr<IUwbSessionDdiConnector>
