@@ -107,10 +107,7 @@ std::string
 UwbPeer::ToString() const
 {
     std::ostringstream ss;
-    ss << "{" << std::endl;
-    ss << "mac: " << m_address << std::endl;
-    ss << m_spatialProperties << std::endl;
-    ss << "}" << std::endl;
+    ss << "Mac: " << m_address << ", Spatial Properties: " << m_spatialProperties;
     return ss.str();
 }
 
