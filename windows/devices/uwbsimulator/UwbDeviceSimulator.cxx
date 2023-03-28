@@ -3,6 +3,7 @@
 
 #include <plog/Log.h>
 
+#include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/UwbException.hxx>
 #include <windows/devices/uwb/UwbDeviceConnector.hxx>
 #include <windows/devices/uwb/simulator/UwbDeviceSimulator.hxx>
@@ -56,6 +57,24 @@ UwbDeviceSimulator::GetSimulatorCapabilities()
         return std::move(simulatorCapabilities);
     } catch (const UwbException& e) {
         PLOG_ERROR << "caught exception obtaining simulator capabilities";
+        throw e;
+    }
+}
+
+UwbSimulatorTriggerSessionEventResult
+UwbDeviceSimulator::TriggerSessionEvent(const UwbSimulatorTriggerSessionEventArgs& triggerSessionEventArgs)
+{
+    auto resultFuture = m_uwbDeviceSimulatorConnector->TriggerSessionEvent(triggerSessionEventArgs);
+    if (!resultFuture.valid()) {
+        PLOG_ERROR << "failed to trigger session event";
+        throw UwbException(UwbStatusGeneric::Failed);
+    }
+
+    try {
+        auto uwbSimulatorTriggerSessionEventResult = resultFuture.get();
+        return std::move(uwbSimulatorTriggerSessionEventResult);
+    } catch (const UwbException& e) {
+        PLOG_ERROR << "caught exception triggering session event (" << ToString(e.Status) << ")";
         throw e;
     }
 }

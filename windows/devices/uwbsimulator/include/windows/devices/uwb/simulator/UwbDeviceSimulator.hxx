@@ -59,6 +59,15 @@ public:
     UwbSimulatorCapabilities
     GetSimulatorCapabilities();
 
+    /**
+     * @brief Trigger an event for a session. 
+     * 
+     * @param triggerSessionEventArgs 
+     * @return UwbSimulatorTriggerSessionEventResult 
+     */
+    UwbSimulatorTriggerSessionEventResult
+    TriggerSessionEvent(const UwbSimulatorTriggerSessionEventArgs& triggerSessionEventArgs);
+
 private:
     virtual std::shared_ptr<::uwb::UwbSession>
     CreateSessionImpl(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks) override;
