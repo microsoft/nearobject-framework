@@ -27,24 +27,24 @@ struct NearObjectCliUwbSessionEventCallbacks :
      * @param session The session for which the event occurred.
      * @param reason The reason the session ended.
      */
-    void
-    OnSessionEnded(::uwb::UwbSession *session, ::uwb::UwbSessionEndReason reason);
+    virtual void
+    OnSessionEnded(::uwb::UwbSession *session, ::uwb::UwbSessionEndReason reason) override;
 
     /**
      * @brief Invoked when active ranging starts.
      *
      * @param session The session for which the event occurred.
      */
-    void
-    OnRangingStarted(::uwb::UwbSession *session);
+    virtual void
+    OnRangingStarted(::uwb::UwbSession *session) override;
 
     /**
      * @brief Invoked when active ranging stops.
      *
      * @param session The session for which the event occurred.
      */
-    void
-    OnRangingStopped(::uwb::UwbSession *session);
+    virtual void
+    OnRangingStopped(::uwb::UwbSession *session) override;
 
     /**
      * @brief Invoked when the properties of a peer involved in the session
@@ -53,8 +53,8 @@ struct NearObjectCliUwbSessionEventCallbacks :
      * @param session The session for which the event occurred.
      * @param peersChanged A list of peers whose properties changed.
      */
-    void
-    OnPeerPropertiesChanged(::uwb::UwbSession *session, const std::vector<::uwb::UwbPeer> peersChanged);
+    virtual void
+    OnPeerPropertiesChanged(::uwb::UwbSession *session, const std::vector<::uwb::UwbPeer> peersChanged) override;
 
     /**
      * @brief Invoked when membership of one or more near peers involved in
@@ -65,8 +65,8 @@ struct NearObjectCliUwbSessionEventCallbacks :
      * @param peersAdded A list of peers that were added to the session.
      * @param peersRemoved A list of peers that were removed from the session.
      */
-    void
-    OnSessionMembershipChanged(::uwb::UwbSession *session, const std::vector<::uwb::UwbPeer> peersAdded, const std::vector<::uwb::UwbPeer> peersRemoved);
+    virtual void
+    OnSessionMembershipChanged(::uwb::UwbSession *session, const std::vector<::uwb::UwbPeer> peersAdded, const std::vector<::uwb::UwbPeer> peersRemoved) override;
 
 private:
     std::function<void()> m_onSessionEndedCallback;
