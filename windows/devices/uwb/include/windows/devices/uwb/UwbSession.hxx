@@ -24,10 +24,18 @@ class UwbSession :
 {
 public:
     /**
+     * @brief Construct a new UwbSession object without callbacks.
+     *
+     * @param sessionId The session identifier.
+     * @param uwbDevice The uwb device tied to the session.
+     */
+    UwbSession(uint32_t sessionId, UwbDevice* uwbDevice, ::uwb::protocol::fira::DeviceType deviceType = ::uwb::protocol::fira::DeviceType::Controller);
+
+    /**
      * @brief Construct a new UwbSession object.
      * This also registers the callbacks with the UwbConnector
      *
-     * @param sessionId
+     * @param sessionId The session identifier.
      * @param callbacks The event callback instance.
      * @param uwbDevice The uwb device tied to the session.
      */
@@ -62,8 +70,8 @@ private:
 
     /**
      * @brief Get the application configuration parameters for this session.
-     * 
-     * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> 
+     *
+     * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
      */
     virtual std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
     GetApplicationConfigurationParametersImpl() override;
