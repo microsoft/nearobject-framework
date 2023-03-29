@@ -38,8 +38,7 @@ UwbDevice::GetSession(uint32_t sessionId)
     // function concurrently, resolved the session, and added it to the cache.
     std::unique_lock sessionExclusiveLock{ m_sessionsGate };
 
-    // Check if a concurrent call resolved this device concurrently and won the
-    // race to cache it.
+    // Check if a concurrent call resolved this device and won the race to cache it.
     auto sessionCached = FindSessionLocked(sessionId);
     if (sessionCached != nullptr) {
         return sessionCached;
