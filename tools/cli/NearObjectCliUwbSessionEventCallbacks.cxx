@@ -75,7 +75,7 @@ NearObjectCliUwbSessionEventCallbacks::OnPeerPropertiesChanged(::uwb::UwbSession
     std::cout << LogPrefix(session->GetId()) << "Peer Properties Changed" << std::endl;
 
     for (const auto& peer : peersChanged) {
-        std::cout << " > " << peer << std::endl;
+        std::cout << ' ' << peer << std::endl;
     }
 }
 
