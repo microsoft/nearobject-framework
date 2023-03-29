@@ -8,7 +8,6 @@
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
-#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 #include <windows/devices/uwb/UwbSession.hxx>
 
 #include <plog/Log.h>
@@ -45,7 +44,7 @@ UwbDevice::CreateSessionImpl(uint32_t sessionId, std::weak_ptr<::uwb::UwbSession
 }
 
 std::shared_ptr<::uwb::UwbSession>
-UwbDevice::ResolveSessionImpl([[maybe_unused]] uint32_t sessionId)
+UwbDevice::ResolveSessionImpl(uint32_t sessionId)
 {
     // TODO: implement this
     // One problem is that m_uwbDeviceConnector is of type
@@ -61,7 +60,7 @@ UwbDevice::ResolveSessionImpl([[maybe_unused]] uint32_t sessionId)
 UwbCapability
 UwbDevice::GetCapabilitiesImpl()
 {
-    auto resultFuture = m_uwbDeviceConnector->GetCapabilities();
+    auto resultFuture = m_uwbConnector->GetCapabilities();
     if (!resultFuture.valid()) {
         // TODO: need to do something different than just return a default-constructed object here
         PLOG_ERROR << "failed to obtain capabilities from driver";
@@ -84,7 +83,7 @@ UwbDevice::GetCapabilitiesImpl()
 UwbDeviceInformation
 UwbDevice::GetDeviceInformationImpl()
 {
-    auto resultFuture = m_uwbDeviceConnector->GetDeviceInformation();
+    auto resultFuture = m_uwbConnector->GetDeviceInformation();
     if (!resultFuture.valid()) {
         PLOG_ERROR << "failed to obtain capabilities from driver";
         throw std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected));
@@ -102,7 +101,7 @@ UwbDevice::GetDeviceInformationImpl()
 void
 UwbDevice::ResetImpl()
 {
-    auto resultFuture = m_uwbDeviceConnector->Reset();
+    auto resultFuture = m_uwbConnector->Reset();
     if (!resultFuture.valid()) {
         // TODO: need to do something different than just return a default-constructed object here
         PLOG_ERROR << "failed to reset the uwb device";
@@ -120,9 +119,9 @@ UwbDevice::ResetImpl()
 bool
 UwbDevice::InitializeImpl()
 {
-    m_uwbDeviceConnector = std::make_shared<UwbConnector>(m_deviceName);
-    m_callbacksToken = m_uwbDeviceConnector->RegisterDeviceEventCallbacks(m_callbacks);
-    m_uwbDeviceConnector->NotificationListenerStart();
+    m_uwbConnector = std::make_shared<UwbConnector>(m_deviceName);
+    m_callbacksToken = m_uwbConnector->RegisterDeviceEventCallbacks(m_callbacks);
+    m_uwbConnector->NotificationListenerStart();
     return true;
 }
 
