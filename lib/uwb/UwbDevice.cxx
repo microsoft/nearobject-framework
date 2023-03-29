@@ -15,7 +15,7 @@ std::shared_ptr<UwbSession>
 UwbDevice::GetSession(uint32_t sessionId)
 {
     // First determine if the session is already in the cache.
-    auto session = FindSessionLocked(sessionId);
+    auto session = FindSession(sessionId);
     if (session != nullptr) {
         return session;
     }
