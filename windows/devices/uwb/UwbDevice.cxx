@@ -38,10 +38,24 @@ UwbDevice::DeviceName() const noexcept
     return m_deviceName;
 }
 
-std::shared_ptr<uwb::UwbSession>
+std::shared_ptr<::uwb::UwbSession>
 UwbDevice::CreateSessionImpl(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
 {
     return std::make_shared<UwbSession>(sessionId, std::move(callbacks), this);
+}
+
+std::shared_ptr<::uwb::UwbSession>
+UwbDevice::ResolveSessionImpl([[maybe_unused]] uint32_t sessionId)
+{
+    // TODO: implement this
+    // One problem is that m_uwbDeviceConnector is of type
+    // IUwbDeviceDdiConnector, which prevents use of the session-based connector
+    // functionality. That is needed here to obtain information about the
+    // session in question. For example, we need to call
+    // IUwbSessionDdi::[SessionGetState, GetApplicationConfigurationParameters,
+    // SessionGetRangingCount]. So, we may need to change the type of
+    // m_uwbDeviceConnector to UwbConnector instead.
+    return nullptr;
 }
 
 UwbCapability

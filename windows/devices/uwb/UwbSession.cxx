@@ -10,8 +10,8 @@
 
 #include <uwb/protocols/fira/UwbException.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
-#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
+#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 #include <windows/devices/uwb/UwbSession.hxx>
 
 using namespace windows::devices::uwb;
@@ -22,40 +22,40 @@ UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventC
 {
     m_registeredCallbacks = std::make_shared<::uwb::UwbRegisteredSessionEventCallbacks>(
         [this](::uwb::UwbSessionEndReason reason) {
-            auto callbacks = m_callbacks.lock();
-            if (not callbacks) {
+            auto callbacks = ResolveEventCallbacks();
+            if (callbacks == nullptr) {
                 PLOG_WARNING << "missing session event callback for UwbSessionEndReason, skipping";
                 // TODO deregister
             }
             return callbacks->OnSessionEnded(this, reason);
         },
         [this]() {
-            auto callbacks = m_callbacks.lock();
-            if (not callbacks) {
+            auto callbacks = ResolveEventCallbacks();
+            if (callbacks == nullptr) {
                 PLOG_WARNING << "missing session event callback for ranging started, skipping";
                 // TODO deregister
             }
             return callbacks->OnRangingStarted(this);
         },
         [this]() {
-            auto callbacks = m_callbacks.lock();
-            if (not callbacks) {
+            auto callbacks = ResolveEventCallbacks();
+            if (callbacks == nullptr) {
                 PLOG_WARNING << "missing session event callback for ranging stopped, skipping";
                 // TODO deregister
             }
             return callbacks->OnRangingStopped(this);
         },
         [this](const std::vector<::uwb::UwbPeer> peersChanged) {
-            auto callbacks = m_callbacks.lock();
-            if (not callbacks) {
+            auto callbacks = ResolveEventCallbacks();
+            if (callbacks == nullptr) {
                 PLOG_WARNING << "missing session event callback for ranging data, skipping";
                 // TODO deregister
             }
             return callbacks->OnPeerPropertiesChanged(this, peersChanged);
         },
         [this](const std::vector<::uwb::UwbPeer> peersAdded, const std::vector<::uwb::UwbPeer> peersRemoved) {
-            auto callbacks = m_callbacks.lock();
-            if (not callbacks) {
+            auto callbacks = ResolveEventCallbacks();
+            if (callbacks == nullptr) {
                 PLOG_WARNING << "missing session event callback for peer list changes, skipping";
                 // TODO deregister
             }

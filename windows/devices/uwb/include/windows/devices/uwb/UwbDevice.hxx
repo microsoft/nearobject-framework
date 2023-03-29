@@ -73,6 +73,18 @@ private:
     CreateSessionImpl(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks) override;
 
     /**
+     * @brief Attempt to resolve a session from the underlying UWB device. 
+     * 
+     * This is used when a session may be pre-existing within the driver but
+     * this instance is not yet aware of.
+     * 
+     * @param sessionId The identifier of the session to resolve.
+     * @return std::shared_ptr<UwbSession> 
+     */
+    virtual std::shared_ptr<::uwb::UwbSession>
+    ResolveSessionImpl(uint32_t sessionId) override;
+
+    /**
      * @brief Get the capabilities of the device.
      *
      * @return uwb::protocol::fira::UwbCapability
