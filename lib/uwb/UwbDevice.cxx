@@ -20,24 +20,26 @@ UwbDevice::GetSession(uint32_t sessionId)
         return session;
     }
 
-    // Attempt to resolve the session from the underlying device driver.
+    // Session not in cache. Attempt to resolve the session from the driver.
     session = ResolveSessionImpl(sessionId);
     if (session == nullptr) {
-        // No such session exists.
         // TODO: the ResolveSessionImpl function should probably return or throw
-        // UwbException such that this code doesn't can differentiate between a
-        // completed call where no session exists, and, and failed call where
+        // UwbException such that this code can differentiate between a
+        // completed call where no session exists, and a failed call where
         // the resolution failed and so could not produce a UwbSession object
         // whether the session existed or not.
+
+        // No such session exists.
         return session;
     }
 
-    // Attempt to resolve a session from the underlying device driver. The lock
-    // is taken here to check for a race where another caller could have
-    // re-entered this function and resolved the session concurrently.
+    // Re-check if the session is in the cache. An exclusive lock is taken here
+    // early to check for a race where another caller could have invoked this
+    // function concurrently, resolved the session, and added it to the cache.
     std::unique_lock sessionExclusiveLock{ m_sessionsGate };
 
-    // Check if a re-entrant call resolved this device concurrently and won the race to cache it.
+    // Check if a concurrent call resolved this device concurrently and won the
+    // race to cache it.
     auto sessionCached = FindSessionLocked(sessionId);
     if (sessionCached != nullptr) {
         return sessionCached;
@@ -47,8 +49,8 @@ UwbDevice::GetSession(uint32_t sessionId)
     // have any session callbacks attached to it since it was constructed by the
     // lower layer and no callbacks are taken as input to this function. This is
     // fine since the callbacks aren't used by this class; instead, clients that
-    // obtain an instance to this session via GetSession() must set their own
-    // desired callbacks on it.
+    // obtain an instance to this session via GetSession() must set callbacks on
+    // it themselves, if desired.
     m_sessions[session->GetId()] = std::weak_ptr<UwbSession>(session);
     return session;
 }
