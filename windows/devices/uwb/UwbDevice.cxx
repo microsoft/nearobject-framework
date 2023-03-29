@@ -9,6 +9,7 @@
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
+#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 #include <windows/devices/uwb/UwbSession.hxx>
 
 #include <plog/Log.h>
@@ -49,7 +50,7 @@ UwbDevice::ResolveSessionImpl(uint32_t sessionId)
 {
     std::vector<UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes({ UwbApplicationConfigurationParameterType::DeviceType });
 
-    auto resultFuture = m_uwbConnector->GetApplicationConfigurationParameters(sessionId, applicationConfigurationParameterTypes);
+    auto resultFuture = m_uwbSessionConnector->GetApplicationConfigurationParameters(sessionId, applicationConfigurationParameterTypes);
     if (!resultFuture.valid()) {
         PLOG_ERROR << "failed to obtain application configuration parameters for session id " << sessionId;
         throw UwbException(UwbStatusGeneric::Failed);
@@ -87,7 +88,7 @@ UwbDevice::ResolveSessionImpl(uint32_t sessionId)
 UwbCapability
 UwbDevice::GetCapabilitiesImpl()
 {
-    auto resultFuture = m_uwbConnector->GetCapabilities();
+    auto resultFuture = m_uwbDeviceConnector->GetCapabilities();
     if (!resultFuture.valid()) {
         // TODO: need to do something different than just return a default-constructed object here
         PLOG_ERROR << "failed to obtain capabilities from driver";
@@ -110,7 +111,7 @@ UwbDevice::GetCapabilitiesImpl()
 UwbDeviceInformation
 UwbDevice::GetDeviceInformationImpl()
 {
-    auto resultFuture = m_uwbConnector->GetDeviceInformation();
+    auto resultFuture = m_uwbDeviceConnector->GetDeviceInformation();
     if (!resultFuture.valid()) {
         PLOG_ERROR << "failed to obtain capabilities from driver";
         throw std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected));
@@ -128,7 +129,7 @@ UwbDevice::GetDeviceInformationImpl()
 void
 UwbDevice::ResetImpl()
 {
-    auto resultFuture = m_uwbConnector->Reset();
+    auto resultFuture = m_uwbDeviceConnector->Reset();
     if (!resultFuture.valid()) {
         // TODO: need to do something different than just return a default-constructed object here
         PLOG_ERROR << "failed to reset the uwb device";
@@ -146,9 +147,11 @@ UwbDevice::ResetImpl()
 bool
 UwbDevice::InitializeImpl()
 {
-    m_uwbConnector = std::make_shared<UwbConnector>(m_deviceName);
-    m_callbacksToken = m_uwbConnector->RegisterDeviceEventCallbacks(m_callbacks);
-    m_uwbConnector->NotificationListenerStart();
+    auto uwbConnector = std::make_shared<UwbConnector>(m_deviceName);
+    m_uwbDeviceConnector = uwbConnector;
+    m_uwbSessionConnector = uwbConnector;
+    m_callbacksToken = m_uwbDeviceConnector->RegisterDeviceEventCallbacks(m_callbacks);
+    m_uwbDeviceConnector->NotificationListenerStart();
     return true;
 }
 
