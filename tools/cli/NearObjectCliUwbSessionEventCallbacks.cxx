@@ -25,7 +25,7 @@ public:
     std::ostream&
     operator()(std::ostream& out) const
     {
-        return out << "[Session " << std::showbase << std::hex << std::setw(sizeof(m_sessionId)) << std::internal << m_sessionId << "]: ";
+        return out << "[Session " << std::showbase << std::hex << std::setw(sizeof(m_sessionId)) << std::setfill('0') << std::internal << m_sessionId << "]: ";
     }
 
 private:
