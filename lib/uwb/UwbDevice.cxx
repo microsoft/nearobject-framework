@@ -14,21 +14,66 @@ using namespace uwb::protocol::fira;
 std::shared_ptr<UwbSession>
 UwbDevice::GetSession(uint32_t sessionId)
 {
-    std::weak_ptr<UwbSession> sessionWeak;
-    {
-        std::shared_lock sessionSharedLock{ m_sessionsGate };
-        auto sessionIt = m_sessions.find(sessionId);
-        if (sessionIt == std::cend(m_sessions)) {
-            PLOG_VERBOSE << "Session with id=" << sessionId << " not found";
-            return nullptr;
-        }
-
-        sessionWeak = sessionIt->second;
+    // First determine if the session is already in the cache.
+    auto session = FindSessionLocked(sessionId);
+    if (session != nullptr) {
+        return session;
     }
 
+    // Attempt to resolve the session from the underlying device driver.
+    session = ResolveSessionImpl(sessionId);
+    if (session == nullptr) {
+        // No such session exists.
+        // TODO: the ResolveSessionImpl function should probably return or throw
+        // UwbException such that this code doesn't can differentiate between a
+        // completed call where no session exists, and, and failed call where
+        // the resolution failed and so could not produce a UwbSession object
+        // whether the session existed or not.
+        return session;
+    }
+
+    // Attempt to resolve a session from the underlying device driver. The lock
+    // is taken here to check for a race where another caller could have
+    // re-entered this function and resolved the session concurrently.
+    std::unique_lock sessionExclusiveLock{ m_sessionsGate };
+
+    // Check if a re-entrant call resolved this device concurrently and won the race to cache it.
+    auto sessionCached = FindSessionLocked(sessionId);
+    if (sessionCached != nullptr) {
+        return sessionCached;
+    }
+
+    // Add the resolved session to the cache. Note that this instance will not
+    // have any session callbacks attached to it since it was constructed by the
+    // lower layer and no callbacks are taken as input to this function. This is
+    // fine since the callbacks aren't used by this class; instead, clients that
+    // obtain an instance to this session via GetSession() must set their own
+    // desired callbacks on it.
+    m_sessions[session->GetId()] = std::weak_ptr<UwbSession>(session);
+    return session;
+}
+
+std::shared_ptr<UwbSession>
+UwbDevice::FindSession(uint32_t sessionId)
+{
+    std::shared_lock sessionSharedLock{ m_sessionsGate };
+    auto session = FindSessionLocked(sessionId);
+    return session;
+}
+
+std::shared_ptr<UwbSession>
+UwbDevice::FindSessionLocked(uint32_t sessionId)
+{
+    auto sessionIt = m_sessions.find(sessionId);
+    if (sessionIt == std::cend(m_sessions)) {
+        PLOG_VERBOSE << "Session with id=" << sessionId << " not found in cache";
+        return nullptr;
+    }
+
+    auto sessionWeak = sessionIt->second;
     auto session = sessionWeak.lock();
     if (!session) {
-        PLOG_VERBOSE << "Session with id=" << sessionId << " expired";
+        PLOG_VERBOSE << "Session with id=" << sessionId << " expired from cache";
         return nullptr;
     }
 
@@ -68,7 +113,7 @@ void
 UwbDevice::OnSessionStatusChanged(UwbSessionStatus statusSession)
 {
     // TODO should this be something that the session handles itself?
-    auto session = GetSession(statusSession.SessionId);
+    auto session = FindSession(statusSession.SessionId);
     if (!session) {
         PLOG_WARNING << "Ignoring StatusChanged event due to missing session";
         return;
