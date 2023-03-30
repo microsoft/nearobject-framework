@@ -16,9 +16,8 @@ void
 NearObjectCliHandler::SetParent(NearObjectCli* parent)
 {
     m_parent = parent;
-
-    auto controlFlowContext = (m_parent != nullptr) ? m_parent->GetControlFlowContext() : nullptr;
-    m_sessionEventCallbacks = std::make_shared<NearObjectCliUwbSessionEventCallbacks>([this, controlFlowContext = std::move(controlFlowContext)]() {
+    m_sessionEventCallbacks = std::make_shared<NearObjectCliUwbSessionEventCallbacks>([this]() {
+        auto controlFlowContext = (m_parent != nullptr) ? m_parent->GetControlFlowContext() : nullptr;
         if (controlFlowContext != nullptr) {
             controlFlowContext->OperationSignalComplete();
         }
