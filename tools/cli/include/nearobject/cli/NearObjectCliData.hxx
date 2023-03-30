@@ -110,6 +110,7 @@ struct NearObjectCliData
     uwb::protocol::fira::StaticRangingInfo StaticRanging{};
     uwb::protocol::fira::UwbSessionData SessionData{};
     UwbRangingParameters RangingParameters{};
+    uint32_t SessionId{0};
 };
 
 } // namespace nearobject::cli

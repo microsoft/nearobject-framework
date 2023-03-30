@@ -128,7 +128,13 @@ try {
 void
 NearObjectCliHandler::HandleSessionDeinitialize(std::shared_ptr<::uwb::UwbDevice> uwbDevice, uint32_t sessionId) noexcept
 try {
-    // TODO
+    auto session = uwbDevice->GetSession(sessionId);
+    if (session == nullptr) {
+        PLOG_WARNING << "no session found with id " << sessionId;
+        return;
+    }
+
+    session->Destroy();
 } catch (...) {
     PLOG_ERROR << "failed to deinitialize session";
 }
