@@ -19,5 +19,6 @@ target_link_libraries(notstd-test
         notstd
 )
 
-catch_discover_tests(notstd-test)
+set_target_properties(notstd-test PROPERTIES FOLDER test/unit)
 
+catch_discover_tests(notstd-test)

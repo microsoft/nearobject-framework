@@ -1,6 +1,5 @@
 add_subdirectory(devices)
 add_subdirectory(drivers)
 add_subdirectory(nearobject)
-add_subdirectory(nearobjectsvc)
 add_subdirectory(shared)
 add_subdirectory(tools)

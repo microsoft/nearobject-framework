@@ -1,7 +1,7 @@
 
-add_executable(nocli-win "")
+add_executable(nearobject-cli-windows "")
 
-target_sources(nocli-win
+target_sources(nearobject-cli-windows
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/Main.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectCliDataWindows.hxx
@@ -10,23 +10,23 @@ target_sources(nocli-win
 
 )
 
-target_link_libraries(nocli-win
+target_link_libraries(nearobject-cli-windows
     PRIVATE
         CLI11::CLI11
         logging-utils
         magic_enum::magic_enum
-        nocli-core
+        nearobject-cli
         notstd-windows
         plog::plog
-        windev-util
-        windev-uwb
+        windows-devices-util
+        windows-devices-uwb
 )
 
-set_target_properties(nocli-win PROPERTIES OUTPUT_NAME nocli)
-set_target_properties(nocli-win PROPERTIES FOLDER windows/tools)
+set_target_properties(nearobject-cli-windows PROPERTIES OUTPUT_NAME nocli)
+set_target_properties(nearobject-cli-windows PROPERTIES FOLDER windows/tools)
 
 install(
-    TARGETS nocli-win
-    EXPORT nocli-win
+    TARGETS nearobject-cli-windows
+    EXPORT nearobject-cli-windows
     RUNTIME
 )

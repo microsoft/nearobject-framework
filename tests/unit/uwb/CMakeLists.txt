@@ -25,4 +25,6 @@ target_link_libraries(uwb-test
         uwb-proto-fira
 )
 
+set_target_properties(uwb-test PROPERTIES FOLDER test/unit)
+
 catch_discover_tests(uwb-test)

@@ -1,10 +1,10 @@
 
-add_library(windev-uwb-simulator STATIC "")
+add_library(windows-devices-uwb-simulator STATIC "")
 
 set(WINDEVUWBSIM_DIR_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
 set(WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE}/windows/devices/uwb/simulator)
 
-target_sources(windev-uwb-simulator
+target_sources(windows-devices-uwb-simulator
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/UwbDeviceSimulator.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbDeviceSimulatorConnector.cxx
@@ -16,20 +16,20 @@ target_sources(windev-uwb-simulator
         ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionSimulator.hxx
 )
 
-target_include_directories(windev-uwb-simulator
+target_include_directories(windows-devices-uwb-simulator
     PUBLIC
         ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE}
 )
 
-target_link_libraries(windev-uwb-simulator
+target_link_libraries(windows-devices-uwb-simulator
     PRIVATE
         plog::plog
-        windev-util
+        windows-devices-util
     PUBLIC
         uwb-proto-fira
         uwbsim-driver
         WIL::WIL
-        windev-uwb
+        windows-devices-uwb
 )
 
 list(APPEND WINDEVUWBSIM_PUBLIC_HEADERS
@@ -39,11 +39,11 @@ list(APPEND WINDEVUWBSIM_PUBLIC_HEADERS
     ${WINDEVUWBSIM_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionSimulator.hxx
 )
 
-set_target_properties(windev-uwb-simulator PROPERTIES FOLDER windows/devices/uwb)
-set_target_properties(windev-uwb-simulator PROPERTIES PUBLIC_HEADER "${WINDEVUWBSIM_PUBLIC_HEADERS}")
+set_target_properties(windows-devices-uwb-simulator PROPERTIES FOLDER windows/devices/uwb)
+set_target_properties(windows-devices-uwb-simulator PROPERTIES PUBLIC_HEADER "${WINDEVUWBSIM_PUBLIC_HEADERS}")
 
 install(
-    TARGETS windev-uwb-simulator 
+    TARGETS windows-devices-uwb-simulator 
     EXPORT uwbsimulator
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/windows/devices/uwb/simulator
 )
