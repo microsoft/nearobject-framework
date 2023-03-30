@@ -20,6 +20,7 @@
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <windows/devices/DeviceResource.hxx>
 #include <windows/devices/uwb/IUwbDeviceDdi.hxx>
+#include <windows/devices/uwb/IUwbSessionDdi.hxx>
 
 namespace uwb
 {
@@ -73,13 +74,13 @@ private:
     CreateSessionImpl(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks) override;
 
     /**
-     * @brief Attempt to resolve a session from the underlying UWB device. 
-     * 
+     * @brief Attempt to resolve a session from the underlying UWB device.
+     *
      * This is used when a session may be pre-existing within the driver but
      * this instance is not yet aware of.
-     * 
+     *
      * @param sessionId The identifier of the session to resolve.
-     * @return std::shared_ptr<UwbSession> 
+     * @return std::shared_ptr<UwbSession>
      */
     virtual std::shared_ptr<::uwb::UwbSession>
     ResolveSessionImpl(uint32_t sessionId) override;
@@ -117,6 +118,7 @@ private:
 private:
     const std::string m_deviceName;
     std::shared_ptr<IUwbDeviceDdiConnector> m_uwbDeviceConnector;
+    std::shared_ptr<IUwbSessionDdiConnector> m_uwbSessionConnector;
     std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> m_callbacks;
     ::uwb::RegisteredCallbackToken* m_callbacksToken;
 };

@@ -68,6 +68,10 @@ UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventC
     m_registeredCallbacksToken = m_uwbDeviceConnector->RegisterSessionEventCallbacks(m_sessionId, m_registeredCallbacks);
 }
 
+UwbSession::UwbSession(uint32_t sessionId, UwbDevice *uwbDevice, ::uwb::protocol::fira::DeviceType deviceType) :
+    UwbSession(sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks>{}, uwbDevice, deviceType)
+{}
+
 std::shared_ptr<IUwbSessionDdiConnector>
 UwbSession::GetUwbDeviceConnector() noexcept
 {

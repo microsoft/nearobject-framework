@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <memory>
 #include <mutex>
-#include <ranges>
+#include <shared_mutex>
 #include <unordered_set>
 
 #include <uwb/UwbMacAddress.hxx>
@@ -53,7 +53,7 @@ public:
      * @return std::weak_ptr<UwbSessionEventCallbacks>
      */
     std::weak_ptr<UwbSessionEventCallbacks>
-    GetEventCallbacks() const noexcept;
+    GetEventCallbacks() noexcept;
 
     /**
      * @brief Set the callbacks to be used for events.
@@ -211,7 +211,8 @@ protected:
     std::atomic<bool> m_rangingActive{ false };
     std::mutex m_peerGate;
     std::unordered_set<UwbMacAddress> m_peers{};
-    std::atomic<std::weak_ptr<UwbSessionEventCallbacks>> m_callbacks;
+    std::shared_mutex m_callbacksGate;
+    std::weak_ptr<UwbSessionEventCallbacks> m_callbacks;
 };
 
 } // namespace uwb
