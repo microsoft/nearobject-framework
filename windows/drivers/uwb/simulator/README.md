@@ -40,7 +40,7 @@ The main project defines a vcpkg called [`nearobject-framework`](../../../../pac
 
 ### Quickstart: How to push library updates into the driver project
 
-Any time new changes are made to dependent libraries in the main project (eg. `uwb`, `windev-uwb-cx-adapter`, `uwbcx-driver`, etc.), Visual Studio must be instructed to rebuild the `nearobject-framework` vcpkg. The easiest way to do this is to delete the timestamp file associated with the package. This can be found under `${MSBuildProjectDirectory}/vcpkg_installed/x64-windows/.msbuildstamp-x64-windows.stamp`, for example `D:\src\nearobject-framework\windows\drivers\uwb\simulator\vcpkg_installed\x64-windows\.msbuildstamp-x64-windows.stamp`. So, the process to ingest the changes is:
+Any time new changes are made to dependent libraries in the main project (eg. `uwb`, `windows-devices-uwb-cx-adapter`, `uwbcx-driver`, etc.), Visual Studio must be instructed to rebuild the `nearobject-framework` vcpkg. The easiest way to do this is to delete the timestamp file associated with the package. This can be found under `${MSBuildProjectDirectory}/vcpkg_installed/x64-windows/.msbuildstamp-x64-windows.stamp`, for example `D:\src\nearobject-framework\windows\drivers\uwb\simulator\vcpkg_installed\x64-windows\.msbuildstamp-x64-windows.stamp`. So, the process to ingest the changes is:
 
 1. Make the changes to the main project library or libraries and ensure the `install` (or `ALL_BUILD`) target builds successfully.
 2. Commit the changes. The changes __do not__ have to be pushed to a remote; committing to the local repository is fine.

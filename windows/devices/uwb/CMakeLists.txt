@@ -1,9 +1,9 @@
-add_library(windev-uwb-cx-adapter STATIC "")
+add_library(windows-devices-uwb-cx-adapter STATIC "")
 
 set(UWBCXADAPTER_DIR_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
 set(UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE}/windows/devices/uwb)
 
-target_sources(windev-uwb-cx-adapter
+target_sources(windows-devices-uwb-cx-adapter
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/UwbCxAdapterDdiLrp.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbDeviceConnector.cxx
@@ -14,14 +14,14 @@ target_sources(windev-uwb-cx-adapter
         ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceConnector.hxx
 )
 
-target_include_directories(windev-uwb-cx-adapter
+target_include_directories(windows-devices-uwb-cx-adapter
     PUBLIC
         ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE}
 )
 
-target_link_libraries(windev-uwb-cx-adapter
+target_link_libraries(windows-devices-uwb-cx-adapter
     PRIVATE
-        windev-util
+        windows-devices-util
         magic_enum::magic_enum
     PUBLIC
         cfgmgr32.lib
@@ -39,21 +39,21 @@ list(APPEND UWBCXADAPTER_PUBLIC_HEADERS
     ${UWBCXADAPTER_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceConnector.hxx
 )
 
-set_target_properties(windev-uwb-cx-adapter PROPERTIES FOLDER windows/devices/uwb)
-set_target_properties(windev-uwb-cx-adapter PROPERTIES PUBLIC_HEADER "${UWBCXADAPTER_PUBLIC_HEADERS}")
+set_target_properties(windows-devices-uwb-cx-adapter PROPERTIES FOLDER windows/devices/uwb)
+set_target_properties(windows-devices-uwb-cx-adapter PROPERTIES PUBLIC_HEADER "${UWBCXADAPTER_PUBLIC_HEADERS}")
 
 install(
-    TARGETS windev-uwb-cx-adapter 
-    EXPORT windev-uwb-cx-adapter
+    TARGETS windows-devices-uwb-cx-adapter 
+    EXPORT windows-devices-uwb-cx-adapter
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/windows/devices/uwb
 )
 
-add_library(windev-uwb STATIC "")
+add_library(windows-devices-uwb STATIC "")
 
 set(WINDEVUWB_DIR_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
 set(WINDEVUWB_DIR_PUBLIC_INCLUDE_PREFIX ${WINDEVUWB_DIR_PUBLIC_INCLUDE}/windows/devices/uwb)
 
-target_sources(windev-uwb
+target_sources(windows-devices-uwb
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/UwbDevice.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbSession.cxx
@@ -63,16 +63,16 @@ target_sources(windev-uwb
         ${WINDEVUWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSession.hxx
 )
 
-target_include_directories(windev-uwb
+target_include_directories(windows-devices-uwb
     PUBLIC
         ${WINDEVUWB_DIR_PUBLIC_INCLUDE}
 )
 
-target_link_libraries(windev-uwb
+target_link_libraries(windows-devices-uwb
     PRIVATE
         magic_enum::magic_enum
-        windev-util
-        windev-uwb-cx-adapter
+        windows-devices-util
+        windows-devices-uwb-cx-adapter
     PUBLIC
         uwb
         uwb-proto-fira
@@ -86,11 +86,11 @@ list(APPEND WINDEVUWB_PUBLIC_HEADERS
     ${WINDEVUWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSession.hxx
 )
 
-set_target_properties(windev-uwb PROPERTIES FOLDER windows/devices)
-set_target_properties(windev-uwb PROPERTIES PUBLIC_HEADER "${WINDEVUWB_PUBLIC_HEADERS}")
+set_target_properties(windows-devices-uwb PROPERTIES FOLDER windows/devices)
+set_target_properties(windows-devices-uwb PROPERTIES PUBLIC_HEADER "${WINDEVUWB_PUBLIC_HEADERS}")
 
 install(
-    TARGETS windev-uwb 
+    TARGETS windows-devices-uwb 
     EXPORT uwb
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/windows/devices/uwb
 )

@@ -18,11 +18,11 @@ target_include_directories(nearobject-service-windows
 
 target_link_libraries(nearobject-service-windows
     PRIVATE
-        windev-uwb
+        windows-devices-uwb
     PUBLIC
         nearobject-service
         WIL::WIL
-        windev-util
+        windows-devices-util
 )
 
 list(APPEND NO_SERVICE_WINDOWS_PUBLIC_HEADERS
@@ -37,3 +37,5 @@ install(
     EXPORT nearobject
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/windows/nearobject/service
 )
+
+add_subdirectory(host)

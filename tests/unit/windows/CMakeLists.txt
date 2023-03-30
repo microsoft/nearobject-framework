@@ -16,8 +16,10 @@ target_link_libraries(nearobject-test-windows
         nearobject-service-windows
         notstd-windows
         uwb
-        windev-uwb
-        windev-uwb-cx-adapter
+        windows-devices-uwb
+        windows-devices-uwb-cx-adapter
 )
+
+set_target_properties(nearobject-test-windows PROPERTIES FOLDER test/unit)
 
 catch_discover_tests(nearobject-test-windows)

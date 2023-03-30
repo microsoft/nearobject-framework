@@ -46,7 +46,11 @@ target_link_libraries(nearobject-test
         uwb
 )
 
+set_target_properties(nearobject-test PROPERTIES FOLDER test/unit)
+
 catch_discover_tests(nearobject-test)
+
+set_target_properties(Catch2 Catch2WithMain PROPERTIES FOLDER test/unit)
 
 add_subdirectory(notstd)
 add_subdirectory(uwb)

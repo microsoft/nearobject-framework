@@ -25,7 +25,7 @@ list(APPEND PLOGTRACELOGGING_PUBLIC_HEADERS
     ${PLOGTRACELOGGING_DIR_PUBLIC_INCLUDE_PREFIX}/PlogTraceLogging.hxx
 )
 
-set_target_properties(logging-plog-windows PROPERTIES FOLDER shared/PlogTraceLogging)
+set_target_properties(logging-plog-windows PROPERTIES FOLDER shared/logging)
 set_target_properties(logging-plog-windows PROPERTIES PUBLIC_HEADER "${PLOGTRACELOGGING_PUBLIC_HEADERS}")
 
 install(

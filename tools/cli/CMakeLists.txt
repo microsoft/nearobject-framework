@@ -1,10 +1,10 @@
 
-add_library(nocli-core STATIC "")
+add_library(nearobject-cli STATIC "")
 
 set(NO_CLI_DIR_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
 set(NO_CLI_DIR_PUBLIC_INCLUDE_PREFIX ${NO_CLI_DIR_PUBLIC_INCLUDE}/nearobject/cli)
 
-target_sources(nocli-core
+target_sources(nearobject-cli
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectCli.cxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectCliControlFlowContext.cxx
@@ -19,12 +19,12 @@ target_sources(nocli-core
         ${NO_CLI_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectCliUwbSessionEventCallbacks.hxx
 )
 
-target_include_directories(nocli-core
+target_include_directories(nearobject-cli
     PUBLIC
         ${NO_CLI_DIR_PUBLIC_INCLUDE}
 )
 
-target_link_libraries(nocli-core
+target_link_libraries(nearobject-cli
     PRIVATE
         CLI11::CLI11
         magic_enum::magic_enum
@@ -34,4 +34,5 @@ target_link_libraries(nocli-core
         uwb
 )
 
-set_target_properties(nocli-core PROPERTIES FOLDER lib/nearobject)
+set_target_properties(nearobject-cli PROPERTIES OUTPUT_NAME nearobject-cli)
+set_target_properties(nearobject-cli PROPERTIES FOLDER lib/nearobject)
