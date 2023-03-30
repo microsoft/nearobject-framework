@@ -453,7 +453,7 @@ UwbConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vec
     auto paramsDdi = UwbCxDdi::From(uwbSetApplicationConfigurationParameters);
     auto paramsBuffer = std::data(paramsDdi);
 
-    auto statusSize = offsetof(UWB_SET_APP_CONFIG_PARAMS_STATUS, appConfigParamsStatus[std::size(applicationConfigurationParameters)]);
+    auto statusSize = offsetof(UWB_SET_APP_CONFIG_PARAMS_STATUS, appConfigParamsStatus[std::size(uwbSetApplicationConfigurationParameters.Parameters)]);
     std::vector<uint8_t> statusBuffer(statusSize);
     BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_SET_APP_CONFIG_PARAMS, std::data(paramsBuffer), std::size(paramsBuffer), std::data(statusBuffer), statusSize, nullptr, nullptr);
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
@@ -520,6 +520,11 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
                     PLOG_ERROR << "error when sending IOCTL_UWB_NOTIFICATION, hr=" << std::showbase << std::hex << hr;
                     break; // for({1,2})
                 }
+            }
+
+            // Ensure some data was provided by the driver.
+            if (uwbNotificationDataBuffer.empty()) {
+                continue;
             }
 
             // Convert to neutral type and process the notification.
