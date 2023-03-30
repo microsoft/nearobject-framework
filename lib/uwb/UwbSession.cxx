@@ -45,6 +45,7 @@ UwbSession::SetEventCallbacks(std::weak_ptr<UwbSessionEventCallbacks> callbacks)
 std::shared_ptr<UwbSessionEventCallbacks>
 UwbSession::ResolveEventCallbacks() noexcept
 {
+    std::shared_lock callbacksLockShared{ m_callbacksGate };
     return m_callbacks.lock();
 }
 
