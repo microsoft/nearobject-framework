@@ -70,8 +70,8 @@ struct UwbConfigurationData
 
     /**
      * @brief Convert the staging data to a complete UwbConfiguration object.
-     * 
-     * @return uwb::protocol::fira::UwbConfiguration 
+     *
+     * @return uwb::protocol::fira::UwbConfiguration
      */
     operator uwb::protocol::fira::UwbConfiguration() const noexcept;
 };
@@ -110,6 +110,7 @@ struct NearObjectCliData
     uwb::protocol::fira::StaticRangingInfo StaticRanging{};
     uwb::protocol::fira::UwbSessionData SessionData{};
     UwbRangingParameters RangingParameters{};
+    uint32_t SessionId{ 0 };
 };
 
 } // namespace nearobject::cli

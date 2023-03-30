@@ -19,12 +19,6 @@ UwbSimulatorDeviceFile::GetWdfFile() const noexcept
     return m_wdfFile;
 }
 
-UwbSimulatorIoEventQueue *
-UwbSimulatorDeviceFile::GetIoEventQueue() noexcept
-{
-    return m_ioEventQueue;
-}
-
 UwbSimulatorDevice *
 UwbSimulatorDeviceFile::GetDevice() noexcept
 {
@@ -34,48 +28,11 @@ UwbSimulatorDeviceFile::GetDevice() noexcept
 NTSTATUS
 UwbSimulatorDeviceFile::Initialize()
 {
-    // Create a manual dispatch queue for event handling.
-    WDF_IO_QUEUE_CONFIG queueConfig;
-    WDF_IO_QUEUE_CONFIG_INIT(&queueConfig, WdfIoQueueDispatchManual);
-    queueConfig.PowerManaged = WdfFalse;
-
-    // Set the parent to this file such that the queue's lifetime is tied to it.
-    WDF_OBJECT_ATTRIBUTES queueAttributes;
-    queueAttributes.ParentObject = m_wdfFile;
-    WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&queueAttributes, UwbSimulatorIoEventQueue);
-
-    WDFQUEUE wdfQueue;
-    WDFDEVICE wdfDevice = WdfFileObjectGetDevice(m_wdfFile);
-    NTSTATUS status = WdfIoQueueCreate(wdfDevice, &queueConfig, &queueAttributes, &wdfQueue);
-    if (!NT_SUCCESS(status)) {
-        TraceLoggingWrite(
-            UwbSimulatorTraceloggingProvider,
-            "WdfIoQueueCreate failed",
-            TraceLoggingLevel(TRACE_LEVEL_FATAL),
-            TraceLoggingNTStatus(status));
-        return status;
-    }
-
-    // Construct a new UwbSimulatorIoEventQueue instance using the WDF pre-allocated buffer.
-    auto ioEventQueueBuffer = GetUwbSimulatorIoEventQueue(wdfQueue);
-    auto ioEventQueue = new (ioEventQueueBuffer) UwbSimulatorIoEventQueue(wdfQueue);
-    if (ioEventQueue == nullptr) {
-        return STATUS_INSUFFICIENT_RESOURCES;
-    }
-
-    status = ioEventQueue->Initialize();
-    if (!NT_SUCCESS(status)) {
-        ioEventQueue->~UwbSimulatorIoEventQueue();
-        return status;
-    }
-
-    m_ioEventQueue = ioEventQueue;
-
-    return status;
+    return STATUS_SUCCESS;
 }
 
 void
-UwbSimulatorDeviceFile::RegisterHandler(std::unique_ptr<IUwbSimulatorDdiHandler> handler)
+UwbSimulatorDeviceFile::RegisterHandler(std::shared_ptr<IUwbSimulatorDdiHandler> handler)
 {
     m_ddiHandlers.push_back(std::move(handler));
 }
@@ -110,11 +67,6 @@ UwbSimulatorDeviceFile::OnWdfRequestCancel(WDFREQUEST request)
 void
 UwbSimulatorDeviceFile::OnDestroy()
 {
-    if (m_ioEventQueue != nullptr) {
-        m_ioEventQueue->Uninitialize();
-        m_ioEventQueue->~UwbSimulatorIoEventQueue();
-        m_ioEventQueue = nullptr;
-    }
 }
 
 void

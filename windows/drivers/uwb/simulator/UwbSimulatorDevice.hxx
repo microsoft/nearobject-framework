@@ -12,6 +12,8 @@
 #include <tuple>
 #include <unordered_map>
 
+#include "IUwbSimulatorDdiHandler.hxx"
+#include "UwbSimulatorIoEventQueue.hxx"
 #include "UwbSimulatorIoQueue.hxx"
 #include "UwbSimulatorSession.hxx"
 
@@ -45,6 +47,10 @@ public:
      */
     NTSTATUS
     Uninitialize();
+
+    // TODO: docs
+    std::weak_ptr<UwbSimulatorIoEventQueue>
+    GetIoEventQueue() noexcept;
 
     /**
      * @brief Create a new uwb session.
@@ -130,6 +136,8 @@ private:
 private:
     WDFDEVICE m_wdfDevice;
     UwbSimulatorIoQueue *m_ioQueue{ nullptr };
+    std::shared_ptr<UwbSimulatorIoEventQueue> m_ioEventQueue{ nullptr };
+    std::shared_ptr<windows::devices::uwb::simulator::IUwbSimulatorDdiHandler> m_ddiHandler;
 
     // Session state and associated lock that protects it.
     std::shared_mutex m_sessionsGate;

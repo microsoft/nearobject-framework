@@ -11,9 +11,9 @@
 #include <uwb/UwbPeer.hxx>
 #include <uwb/protocols/fira/UwbException.hxx>
 #include <windows/devices/DeviceHandle.hxx>
-#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
+#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 
 using namespace windows::devices;
 using namespace windows::devices::uwb;
@@ -105,7 +105,7 @@ UwbConnector::GetDeviceInformation()
     // second time.
     for (const auto i : std::ranges::iota_view{ 0, 2 }) {
         deviceInformationBuffer.resize(bytesRequired);
-        PLOG_DEBUG << "IOCTL_UWB_GET_DEVICE_INFO attempt #" << i << " with " << std::size(deviceInformationBuffer) << "-byte buffer";
+        PLOG_DEBUG << "IOCTL_UWB_GET_DEVICE_INFO attempt #" << (i + 1) << " with " << std::size(deviceInformationBuffer) << "-byte buffer";
         BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_DEVICE_INFO, nullptr, 0, std::data(deviceInformationBuffer), std::size(deviceInformationBuffer), &bytesRequired, nullptr);
         if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
             DWORD lastError = GetLastError();
@@ -401,7 +401,7 @@ UwbConnector::GetApplicationConfigurationParameters(uint32_t sessionId, std::vec
 
     for (const auto i : std::ranges::iota_view{ 0, 2 }) {
         getAppConfigParamsResultBuffer.resize(bytesRequired);
-        PLOG_DEBUG << "IOCTL_UWB_GET_APP_CONFIG_PARAMS attempt #" << i << " with " << std::size(getAppConfigParamsResultBuffer) << "-byte buffer";
+        PLOG_DEBUG << "IOCTL_UWB_GET_APP_CONFIG_PARAMS attempt #" << (i + 1) << " with " << std::size(getAppConfigParamsResultBuffer) << "-byte buffer";
         BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_APP_CONFIG_PARAMS, std::data(getAppConfigParamsBuffer), std::size(getAppConfigParamsBuffer), std::data(getAppConfigParamsResultBuffer), std::size(getAppConfigParamsResultBuffer), &bytesRequired, nullptr);
         if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
             DWORD lastError = GetLastError();
@@ -480,7 +480,7 @@ UwbConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vec
 void
 UwbConnector::HandleNotifications(std::stop_token stopToken)
 {
-        DWORD bytesRequired = 0;
+    DWORD bytesRequired = 0;
     std::vector<uint8_t> uwbNotificationDataBuffer{};
     auto handleDriver = m_notificationHandleDriver;
 
@@ -543,6 +543,27 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
 }
 
 void
+UwbConnector::OnSessionEnded(uint32_t sessionId, ::uwb::UwbSessionEndReason sessionEndReason)
+{
+    auto it = m_sessionEventCallbacks.find(sessionId);
+    if (it == std::end(m_sessionEventCallbacks)) {
+        PLOG_WARNING << "Ignoring SessionEnded event due to missing session callback";
+        return;
+    }
+
+    auto& [_, callbacksWeak] = *it;
+    auto callbacks = callbacksWeak.lock();
+    if (callbacks->OnSessionEnded == nullptr) {
+        PLOG_WARNING << "Ignoring SessionEnded event due to missing session callback";
+        m_sessionEventCallbacks.erase(it);
+        return;
+    }
+
+    PLOG_VERBOSE << "Session with id " << sessionId << " executing callback for session ended";
+    callbacks->OnSessionEnded(sessionEndReason);
+}
+
+void
 UwbConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList)
 {
     uint32_t sessionId = statusMulticastList.SessionId;
@@ -587,14 +608,14 @@ UwbConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData ranging
     uint32_t sessionId = rangingData.SessionId;
     auto it = m_sessionEventCallbacks.find(sessionId);
     if (it == std::end(m_sessionEventCallbacks)) {
-        PLOG_WARNING << "Ignoring RangingData event due to missing session callback";
+        PLOG_VERBOSE << "Ignoring RangingData event due to missing session callback";
         return;
     }
 
     auto& [_, callbacksWeak] = *it;
     auto callbacks = callbacksWeak.lock();
     if (not(callbacks->OnPeerPropertiesChanged)) {
-        PLOG_WARNING << "Ignoring RangingData event due to missing session callback";
+        PLOG_WARNING << "Ignoring RangingData event due to expired session callback";
         m_sessionEventCallbacks.erase(it);
         return;
     }
@@ -663,6 +684,9 @@ UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNo
                     return callbacks->OnSessionStatusChanged;
                 },
                 arg);
+            if (arg.State == UwbSessionState::Deinitialized) {
+                OnSessionEnded(arg.SessionId, ::uwb::UwbSessionEndReason::Stopped);
+            }
         } else if constexpr (std::is_same_v<ValueType, UwbSessionUpdateMulicastListStatus>) {
             OnSessionMulticastListStatus(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbRangingData>) {

@@ -26,6 +26,12 @@ struct UwbDeviceTestBase : public uwb::UwbDevice
         return nullptr;
     }
 
+    std::shared_ptr<UwbSession>
+    ResolveSessionImpl(uint32_t /* sessionId */) override
+    {
+        return nullptr;
+    }
+
     uwb::protocol::fira::UwbCapability
     GetCapabilitiesImpl() override
     {

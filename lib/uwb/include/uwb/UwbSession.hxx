@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <memory>
 #include <mutex>
-#include <ranges>
+#include <shared_mutex>
 #include <unordered_set>
 
 #include <uwb/UwbMacAddress.hxx>
@@ -22,19 +22,46 @@ namespace uwb
 class UwbSession
 {
 public:
+    static constexpr uwb::protocol::fira::DeviceType DeviceTypeDefault = uwb::protocol::fira::DeviceType::Controller;
+
+    /**
+     * @brief Construct a new UwbSession object without callbacks.
+     *
+     * @param sessionId The session identifier.
+     * @param deviceType The host device type in the session (controller, controlee).
+     */
+    UwbSession(uint32_t sessionId, uwb::protocol::fira::DeviceType deviceType = DeviceTypeDefault);
+
     /**
      * @brief Construct a new UwbSession object.
      *
-     * @param sessionId
-     * @param callbacks
-     * @param deviceType
+     *
+     * @param sessionId The session identifier.
+     * @param callbacks The event callbacks to use.
+     * @param deviceType The host device type in the session (controller, controlee).
      */
-    UwbSession(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks, uwb::protocol::fira::DeviceType deviceType = uwb::protocol::fira::DeviceType::Controller);
+    UwbSession(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks, uwb::protocol::fira::DeviceType deviceType = DeviceTypeDefault);
 
     /**
      * @brief Destroy the UwbSession object.
      */
     virtual ~UwbSession() = default;
+
+    /**
+     * @brief Get a weak reference to the event callbacks instance.
+     *
+     * @return std::weak_ptr<UwbSessionEventCallbacks>
+     */
+    std::weak_ptr<UwbSessionEventCallbacks>
+    GetEventCallbacks() noexcept;
+
+    /**
+     * @brief Set the callbacks to be used for events.
+     *
+     * @param callbacks The event callbacks instance.
+     */
+    void
+    SetEventCallbacks(std::weak_ptr<UwbSessionEventCallbacks> callbacks) noexcept;
 
     /**
      * @brief Get the Device Type associated with the host of this UwbSession
@@ -114,6 +141,16 @@ public:
     void
     Destroy();
 
+protected:
+    /**
+     * @brief Attempt to resolve the event callbacks from a weak to a shared
+     * reference.
+     *
+     * @return std::shared_ptr<UwbSessionEventCallbacks>
+     */
+    std::shared_ptr<UwbSessionEventCallbacks>
+    ResolveEventCallbacks() noexcept;
+
 private:
     /**
      * @brief Internal function to insert a peer address to this session
@@ -174,6 +211,7 @@ protected:
     std::atomic<bool> m_rangingActive{ false };
     std::mutex m_peerGate;
     std::unordered_set<UwbMacAddress> m_peers{};
+    std::shared_mutex m_callbacksGate;
     std::weak_ptr<UwbSessionEventCallbacks> m_callbacks;
 };
 

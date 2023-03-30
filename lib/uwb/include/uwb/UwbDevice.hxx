@@ -31,6 +31,15 @@ public:
     CreateSession(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks);
 
     /**
+     * @brief Obtains a shared reference to a pre-existing session.
+     * 
+     * @param sessionId The session identifier.
+     * @return std::shared_ptr<UwbSession> 
+     */
+    std::shared_ptr<UwbSession>
+    GetSession(uint32_t sessionId);
+
+    /**
      * @brief Get the FiRa capabilities of the device.
      *
      * @return uwb::protocol::fira::UwbCapability
@@ -87,6 +96,18 @@ private:
     CreateSessionImpl(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks) = 0;
 
     /**
+     * @brief Attempt to resolve a session from the underlying UWB device. 
+     * 
+     * This is used when a session may be pre-existing within the driver but
+     * this instance is not yet aware of.
+     * 
+     * @param sessionId The identifier of the session to resolve.
+     * @return std::shared_ptr<UwbSession> 
+     */
+    virtual std::shared_ptr<UwbSession>
+    ResolveSessionImpl(uint32_t sessionId) = 0;
+
+    /**
      * @brief Get the FiRa capabilities of the device.
      *
      * @return uwb::protocol::fira::UwbCapability
@@ -118,13 +139,25 @@ private:
 
 protected:
     /**
-     * @brief Get a reference to the specified session.
+     * @brief Find the specified session in the session cache.
      *
-     * @param sessionId
+     * @param sessionId The identifier of the session to find.
      * @return std::shared_ptr<UwbSession>
      */
     std::shared_ptr<UwbSession>
-    GetSession(uint32_t sessionId);
+    FindSession(uint32_t sessionId);
+
+    /**
+     * @brief Internal function which finds the specified session but does not
+     * enforce any mutual exclusion. The caller must hold the m_sessionsGate
+     * mutex either in shared or exclusive mode in order to safely call this
+     * function. 
+     * 
+     * @param sessionId The identifier of the session to find.
+     * @return std::shared_ptr<UwbSession> 
+     */
+    std::shared_ptr<UwbSession>
+    FindSessionLocked(uint32_t sessionId);
 
     /**
      * @brief Invoked when a generic error occurs. TODO this callback needs to be invoked by a UwbConnector for the linux portion too

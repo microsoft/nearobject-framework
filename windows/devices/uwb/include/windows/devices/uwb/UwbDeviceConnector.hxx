@@ -13,6 +13,7 @@
 #include <vector>
 
 #include <uwb/UwbRegisteredCallbacks.hxx>
+#include <uwb/UwbSessionEventCallbacks.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
 #include <wil/resource.h>
 #include <windows/devices/uwb/IUwbDeviceDdi.hxx>
@@ -165,6 +166,15 @@ private:
      */
     void
     DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNotificationData);
+
+    /**
+     * @brief Response for calling the relevant registered callbacks for the session ended event.
+     *
+     * @param sessionId The session identifier of the session that ended.
+     * @param sessionEndReason The reason the session ended.
+     */
+    void
+    OnSessionEnded(uint32_t sessionId, ::uwb::UwbSessionEndReason sessionEndReason);
 
     /**
      * @brief Internal function that prepares the notification for processing by the m_sessionEventCallbacks

@@ -2,6 +2,7 @@
 #include <future>
 #include <ios>
 #include <stdexcept>
+#include <tuple>
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/UwbException.hxx>
@@ -38,10 +39,50 @@ UwbDevice::DeviceName() const noexcept
     return m_deviceName;
 }
 
-std::shared_ptr<uwb::UwbSession>
+std::shared_ptr<::uwb::UwbSession>
 UwbDevice::CreateSessionImpl(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
 {
     return std::make_shared<UwbSession>(sessionId, std::move(callbacks), this);
+}
+
+std::shared_ptr<::uwb::UwbSession>
+UwbDevice::ResolveSessionImpl(uint32_t sessionId)
+{
+    std::vector<UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes({ UwbApplicationConfigurationParameterType::DeviceType });
+
+    auto resultFuture = m_uwbSessionConnector->GetApplicationConfigurationParameters(sessionId, applicationConfigurationParameterTypes);
+    if (!resultFuture.valid()) {
+        PLOG_ERROR << "failed to obtain application configuration parameters for session id " << sessionId;
+        throw UwbException(UwbStatusGeneric::Failed);
+    }
+
+    UwbStatus uwbStatus;
+    std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters;
+    try {
+        std::tie(uwbStatus, applicationConfigurationParameters) = resultFuture.get();
+        if (!IsUwbStatusOk(uwbStatus)) {
+            PLOG_ERROR << "failed to obtain device type for session id " << sessionId << " (" << ToString(uwbStatus) << ")";
+            throw UwbException(uwbStatus);
+        }
+    } catch (UwbException& uwbException) {
+        PLOG_ERROR << "caught exception attempting to obtain application configuration parameters for session id " << sessionId << " (" << ToString(uwbException.Status) << ")";
+        throw uwbException;
+    } catch (std::exception& e) {
+        PLOG_ERROR << "caught unexpected exception attempting to obtain application configuration parameters for session id " << sessionId << " (" << e.what() << ")";
+        throw e;
+    }
+
+    // Validate the call provided the expected DeviceType parameter.
+    if (std::size(applicationConfigurationParameters) < 1 || !std::holds_alternative<DeviceType>(applicationConfigurationParameters.front().Value)) {
+        PLOG_FATAL << "invalid application configuration parameters returned";
+        throw std::runtime_error("GetApplicationConfigurationParameters() returned bad data; this is a bug!");
+    }
+
+    // Create an instance of the session.
+    auto deviceType = std::get<DeviceType>(applicationConfigurationParameters.front().Value);
+    auto session = std::make_shared<UwbSession>(sessionId, this, deviceType);
+
+    return session;
 }
 
 UwbCapability
@@ -106,7 +147,9 @@ UwbDevice::ResetImpl()
 bool
 UwbDevice::InitializeImpl()
 {
-    m_uwbDeviceConnector = std::make_shared<UwbConnector>(m_deviceName);
+    auto uwbConnector = std::make_shared<UwbConnector>(m_deviceName);
+    m_uwbDeviceConnector = uwbConnector;
+    m_uwbSessionConnector = uwbConnector;
     m_callbacksToken = m_uwbDeviceConnector->RegisterDeviceEventCallbacks(m_callbacks);
     m_uwbDeviceConnector->NotificationListenerStart();
     return true;

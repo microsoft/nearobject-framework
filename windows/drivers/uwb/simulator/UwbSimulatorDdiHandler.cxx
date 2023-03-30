@@ -61,9 +61,9 @@ const std::initializer_list<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>> U
     MakeLrpDispatchEntry<UwbSimulatorTriggerSessionEventArgs, Unrestricted>(IOCTL_UWB_DEVICE_SIM_TRIGGER_SESSION_EVENT, &UwbSimulatorDdiHandler::OnUwbSimulatorTriggerSessionEvent),
 };
 
-UwbSimulatorDdiHandler::UwbSimulatorDdiHandler(UwbSimulatorDeviceFile *deviceFile) :
-    m_deviceFile(deviceFile),
-    m_callbacks(std::make_unique<UwbSimulatorDdiCallbacks>(deviceFile))
+UwbSimulatorDdiHandler::UwbSimulatorDdiHandler(UwbSimulatorDevice *device) :
+    m_device(device),
+    m_callbacks(std::make_unique<UwbSimulatorDdiCallbacks>(device))
 {
 }
 
@@ -459,11 +459,22 @@ UwbSimulatorDdiHandler::OnUwbSessionGetRangingCount(WDFREQUEST request, std::spa
 NTSTATUS
 UwbSimulatorDdiHandler::OnUwbNotification(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
 {
-    std::size_t outputBufferSize = std::size(outputBuffer);
+    NTSTATUS status = STATUS_SUCCESS;
 
+    // Obtain a reference to the io event queue.
+    auto ioEventQueueWeak = m_device->GetIoEventQueue();
+    auto ioEventQueue = ioEventQueueWeak.lock();
+    if (ioEventQueue == nullptr) {
+        // TODO: log
+        status = STATUS_INVALID_DEVICE_STATE;
+        WdfRequestComplete(request, status);
+        return status;
+    }
+
+    // Process the notification request.
+    std::size_t outputBufferSize = std::size(outputBuffer);
     std::optional<UwbNotificationData> uwbNotificationData;
-    auto *ioEventQueue = m_deviceFile->GetIoEventQueue();
-    NTSTATUS status = ioEventQueue->HandleNotificationRequest(request, uwbNotificationData, outputBufferSize);
+    status = ioEventQueue->HandleNotificationRequest(request, uwbNotificationData, outputBufferSize);
     if (status == STATUS_SUCCESS) {
         // Convert neutral type to DDI output type, and copy to output buffer.
         auto notificationData = UwbCxDdi::From(uwbNotificationData.value());

@@ -115,5 +115,7 @@ UwbSimulatorIoEventQueue::PushNotificationData(UwbNotificationData notificationD
         status = STATUS_SUCCESS;
     }
 
+    WdfWaitLockRelease(m_wdfQueueLock);
+
     return status;
 }
