@@ -522,6 +522,11 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
                 }
             }
 
+            // Ensure some data was provided by the driver.
+            if (uwbNotificationDataBuffer.empty()) {
+                continue;
+            }
+
             // Convert to neutral type and process the notification.
             const UWB_NOTIFICATION_DATA& notificationData = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
             auto uwbNotificationData = UwbCxDdi::To(notificationData);
