@@ -32,13 +32,13 @@ UwbSession::GetEventCallbacks() noexcept
 void
 UwbSession::SetEventCallbacks(std::weak_ptr<UwbSessionEventCallbacks> callbacks) noexcept
 {
-    std::unique_lock<std::shared_mutex> callbacksLockExclusive;
-    decltype(m_callbacks) callbacksOld = m_callbacks;
-    m_callbacks = std::move(callbacks);
+    {
+        std::unique_lock<std::shared_mutex> callbacksLockExclusive;
+        m_callbacks.swap(callbacks);
+    }
 
-    std::swap(callbacksOld, callbacks);
-    if (callbacksOld.lock() != nullptr) {
-        LOG_WARNING << "SetEventCallbacks existing callbacks were replaced";
+    if (callbacks.lock() != nullptr) {
+        LOG_WARNING << "Session with id " << m_sessionId << " callbacks were replaced"; 
     }
 }
 
