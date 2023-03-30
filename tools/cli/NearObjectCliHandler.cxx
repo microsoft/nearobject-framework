@@ -124,3 +124,11 @@ try {
 } catch (...) {
     PLOG_ERROR << "failed to obtain device information";
 }
+
+void
+NearObjectCliHandler::HandleSessionDeinitialize(std::shared_ptr<::uwb::UwbDevice> uwbDevice, uint32_t sessionId) noexcept
+try {
+    // TODO
+} catch (...) {
+    PLOG_ERROR << "failed to deinitialize session";
+}
