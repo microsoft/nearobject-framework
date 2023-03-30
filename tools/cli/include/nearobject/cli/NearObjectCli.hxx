@@ -268,6 +268,15 @@ private:
     AddSubcommandUwbRawGetDeviceInfo(CLI::App* parent);
 
     /**
+     * @brief Add the 'uwb raw sessiondeinit' sub-command. 
+     * 
+     * @param parent The parent app to add the command.
+     * @return CLI::App* 
+     */
+    CLI::App*
+    AddSubcommandUwbRawSessionDeinitialize(CLI::App* parent);
+
+    /**
      * @brief Add the 'uwb range start' sub-command.
      *
      * @param parent

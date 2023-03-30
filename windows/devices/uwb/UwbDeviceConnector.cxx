@@ -480,7 +480,7 @@ UwbConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vec
 void
 UwbConnector::HandleNotifications(std::stop_token stopToken)
 {
-        DWORD bytesRequired = 0;
+    DWORD bytesRequired = 0;
     std::vector<uint8_t> uwbNotificationDataBuffer{};
     auto handleDriver = m_notificationHandleDriver;
 
@@ -540,6 +540,27 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
             });
         }
     }
+}
+
+void
+UwbConnector::OnSessionEnded(uint32_t sessionId, ::uwb::UwbSessionEndReason sessionEndReason)
+{
+    auto it = m_sessionEventCallbacks.find(sessionId);
+    if (it == std::end(m_sessionEventCallbacks)) {
+        PLOG_WARNING << "Ignoring SessionEnded event due to missing session callback";
+        return;
+    }
+
+    auto& [_, callbacksWeak] = *it;
+    auto callbacks = callbacksWeak.lock();
+    if (callbacks->OnSessionEnded == nullptr) {
+        PLOG_WARNING << "Ignoring SessionEnded event due to missing session callback";
+        m_sessionEventCallbacks.erase(it);
+        return;
+    }
+
+    PLOG_VERBOSE << "Session with id " << sessionId << " executing callback for session ended";
+    callbacks->OnSessionEnded(sessionEndReason);
 }
 
 void
@@ -663,6 +684,9 @@ UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNo
                     return callbacks->OnSessionStatusChanged;
                 },
                 arg);
+            if (arg.State == UwbSessionState::Deinitialized) {
+                OnSessionEnded(arg.SessionId, ::uwb::UwbSessionEndReason::Stopped);
+            }
         } else if constexpr (std::is_same_v<ValueType, UwbSessionUpdateMulicastListStatus>) {
             OnSessionMulticastListStatus(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbRangingData>) {

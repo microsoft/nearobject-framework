@@ -284,6 +284,7 @@ NearObjectCli::AddSubcommandUwbRaw(CLI::App* parent)
     // sub-commands
     AddSubcommandUwbRawDeviceReset(rawApp);
     AddSubcommandUwbRawGetDeviceInfo(rawApp);
+    AddSubcommandUwbRawSessionDeinitialize(rawApp);
 
     return rawApp;
 }
@@ -372,6 +373,36 @@ NearObjectCli::AddSubcommandUwbRawGetDeviceInfo(CLI::App* parent)
     });
 
     return rawGetDeviceInfoApp;
+}
+
+CLI::App*
+NearObjectCli::AddSubcommandUwbRawSessionDeinitialize(CLI::App* parent)
+{
+    // top-level command
+    auto rawSessionDeinitializeApp = parent->add_subcommand("sessiondeinit", "Deinitialize a pre-existing session")->fallthrough();
+    rawSessionDeinitializeApp->add_option("Session Id, --SessionId", m_cliData->SessionId)->required();
+
+    rawSessionDeinitializeApp->parse_complete_callback([this, rawSessionDeinitializeApp] {
+        RegisterCliAppWithOperation(rawSessionDeinitializeApp);
+        std::cout << "deinitialize session " << m_cliData->SessionId << std::endl;
+    });
+
+    rawSessionDeinitializeApp->final_callback([this, rawSessionDeinitializeApp] {
+        auto uwbDevice = GetUwbDevice();
+        if (!uwbDevice) {
+            std::cerr << "no device found" << std::endl;
+            return;
+        }
+        if (!uwbDevice->Initialize()) {
+            std::cerr << "device not initialized" << std::endl;
+        }
+
+        m_cliHandler->HandleSessionDeinitialize(uwbDevice, m_cliData->SessionId);
+
+        SignalCliAppOperationCompleted(rawSessionDeinitializeApp);
+    });
+
+    return rawSessionDeinitializeApp;
 }
 
 CLI::App*
