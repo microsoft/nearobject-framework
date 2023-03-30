@@ -4,6 +4,8 @@
 #include <nearobject/cli/NearObjectCliUwbSessionEventCallbacks.hxx>
 #include <notstd/tostring.hxx>
 
+#include <magic_enum.hpp>
+
 using namespace nearobject::cli;
 using namespace strings::ostream_operators;
 
@@ -48,9 +50,9 @@ operator<<(std::ostream& out, LogPrefix logPrefix)
 } // namespace
 
 void
-NearObjectCliUwbSessionEventCallbacks::OnSessionEnded(::uwb::UwbSession* session, ::uwb::UwbSessionEndReason /* reason */)
+NearObjectCliUwbSessionEventCallbacks::OnSessionEnded(::uwb::UwbSession* session, ::uwb::UwbSessionEndReason reason)
 {
-    std::cout << LogPrefix(session->GetId()) << "Session Ended" << std::endl;
+    std::cout << LogPrefix(session->GetId()) << "Session Ended (" << magic_enum::enum_name(reason) << ")" << std::endl;
 
     if (m_onSessionEndedCallback) {
         m_onSessionEndedCallback();
