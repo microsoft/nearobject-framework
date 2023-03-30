@@ -38,7 +38,7 @@ UwbSession::SetEventCallbacks(std::weak_ptr<UwbSessionEventCallbacks> callbacks)
     }
 
     if (callbacks.lock() != nullptr) {
-        LOG_WARNING << "Session with id " << m_sessionId << " callbacks were replaced"; 
+        LOG_WARNING << "Session with id " << m_sessionId << " callbacks were replaced";
     }
 }
 
