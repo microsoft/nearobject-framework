@@ -23,15 +23,20 @@ UwbSession::UwbSession(uint32_t sessionId, DeviceType deviceType) :
 {}
 
 std::weak_ptr<UwbSessionEventCallbacks>
-UwbSession::GetEventCallbacks() const noexcept
+UwbSession::GetEventCallbacks() noexcept
 {
-    return m_callbacks.load();
+    std::shared_lock callbacksLockShared{ m_callbacksGate };
+    return m_callbacks;
 }
 
 void
 UwbSession::SetEventCallbacks(std::weak_ptr<UwbSessionEventCallbacks> callbacks) noexcept
 {
-    auto callbacksOld = m_callbacks.exchange(callbacks);
+    std::unique_lock<std::shared_mutex> callbacksLockExclusive;
+    decltype(m_callbacks) callbacksOld = m_callbacks;
+    m_callbacks = std::move(callbacks);
+
+    std::swap(callbacksOld, callbacks);
     if (callbacksOld.lock() != nullptr) {
         LOG_WARNING << "SetEventCallbacks existing callbacks were replaced";
     }
@@ -40,7 +45,7 @@ UwbSession::SetEventCallbacks(std::weak_ptr<UwbSessionEventCallbacks> callbacks)
 std::shared_ptr<UwbSessionEventCallbacks>
 UwbSession::ResolveEventCallbacks() noexcept
 {
-    return m_callbacks.load().lock();
+    return m_callbacks.lock();
 }
 
 uwb::protocol::fira::DeviceType
