@@ -95,21 +95,9 @@ struct UwbApplicationConfigurationParameterData
     std::optional<uwb::UwbMacAddressType> macAddressMode;
 
     /**
-     * @brief Variant for all possible property types.
-     */
-    using ParameterTypesVariant = std::variant<
-        uint8_t,
-        ::uwb::protocol::fira::DeviceRole,
-        ::uwb::protocol::fira::DeviceType,
-        ::uwb::protocol::fira::MultiNodeMode,
-        ::uwb::UwbMacAddress,
-        ::uwb::UwbMacAddressType,
-        std::unordered_set<::uwb::UwbMacAddress>>;
-
-    /**
      * @brief Map of application configuration parameter type to the parameter's value.
      */
-    std::unordered_map<uwb::protocol::fira::UwbApplicationConfigurationParameterType, ParameterTypesVariant>
+    std::unordered_map<uwb::protocol::fira::UwbApplicationConfigurationParameterType, uwb::protocol::fira::UwbApplicationConfigurationParameterValue>
     GetValueMap() const;
 };
 

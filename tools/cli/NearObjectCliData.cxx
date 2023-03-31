@@ -4,6 +4,7 @@
 
 using namespace nearobject::cli;
 using uwb::protocol::fira::UwbApplicationConfigurationParameterType;
+using uwb::protocol::fira::UwbApplicationConfigurationParameterValue;
 using uwb::protocol::fira::UwbConfiguration;
 
 UwbConfigurationData::operator UwbConfiguration() const noexcept
@@ -116,10 +117,10 @@ UwbConfigurationData::operator UwbConfiguration() const noexcept
     return builder;
 }
 
-std::unordered_map<UwbApplicationConfigurationParameterType, UwbApplicationConfigurationParameterData::ParameterTypesVariant>
+std::unordered_map<UwbApplicationConfigurationParameterType, UwbApplicationConfigurationParameterValue>
 UwbApplicationConfigurationParameterData::GetValueMap() const
 {
-    std::unordered_map<UwbApplicationConfigurationParameterType, ParameterTypesVariant> valuesMap;
+    std::unordered_map<UwbApplicationConfigurationParameterType, UwbApplicationConfigurationParameterValue> valuesMap;
     if (deviceRole.has_value()) {
         valuesMap[UwbApplicationConfigurationParameterType::DeviceRole] = deviceRole.value();
     }
