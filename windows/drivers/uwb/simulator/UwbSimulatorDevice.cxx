@@ -172,7 +172,7 @@ UwbSimulatorDevice::OnFileCreate(WDFDEVICE device, WDFREQUEST request, WDFFILEOB
         TraceLoggingPointer(request, "Request"),
         TraceLoggingPointer(file, "File"));
 
-    auto uwbSimulatorFileBuffer = GetUwbSimulatorFile(file);
+    auto uwbSimulatorFileBuffer = GetUwbSimulatorDeviceFile(file);
     auto uwbSimulatorFile = new (uwbSimulatorFileBuffer) UwbSimulatorDeviceFile(file, this);
     auto uwbSimulatorFileStatus = uwbSimulatorFile->Initialize();
     if (uwbSimulatorFileStatus == STATUS_SUCCESS) {
@@ -198,7 +198,7 @@ UwbSimulatorDevice::OnFileClose(WDFFILEOBJECT file)
         TraceLoggingPointer(file, "File"));
 
     std::unique_lock deviceFilesLockExclusive{ m_deviceFilesGate };
-    const auto uwbSimulatorFileClosed = GetUwbSimulatorFile(file);
+    const auto uwbSimulatorFileClosed = GetUwbSimulatorDeviceFile(file);
     const auto removed = std::erase_if(m_deviceFiles, [&](const auto &uwbSimulatorFile) {
         return (uwbSimulatorFile == uwbSimulatorFileClosed);
     });

@@ -83,7 +83,7 @@ UwbSimulatorIoQueue::OnIoDeviceControl(WDFREQUEST request, size_t outputBufferLe
     NTSTATUS status = STATUS_INVALID_DEVICE_STATE;
 
     // Get the file object this request came in on, and dispatch the request to it.
-    UwbSimulatorDeviceFile *uwbSimulatorDeviceFile = GetUwbSimulatorFile(WdfRequestGetFileObject(request));
+    UwbSimulatorDeviceFile *uwbSimulatorDeviceFile = GetUwbSimulatorDeviceFile(WdfRequestGetFileObject(request));
     if (uwbSimulatorDeviceFile != nullptr) {
         status = uwbSimulatorDeviceFile->OnRequest(request, ioControlCode, inputBufferLength, outputBufferLength);
     } else {
