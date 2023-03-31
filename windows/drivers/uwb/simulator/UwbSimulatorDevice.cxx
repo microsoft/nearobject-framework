@@ -111,36 +111,6 @@ UwbSimulatorDevice::OnWdfFileClose(WDFFILEOBJECT file)
 NTSTATUS
 UwbSimulatorDevice::Initialize()
 {
-    std::shared_ptr<UwbSimulatorIoEventQueue> ioEventQueue;
-    {
-        // Create a manual dispatch queue for event handling.
-        WDF_IO_QUEUE_CONFIG queueConfig;
-        WDF_IO_QUEUE_CONFIG_INIT(&queueConfig, WdfIoQueueDispatchManual);
-        queueConfig.PowerManaged = WdfFalse;
-
-        WDFQUEUE wdfQueue;
-        NTSTATUS status = WdfIoQueueCreate(m_wdfDevice, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &wdfQueue);
-        if (!NT_SUCCESS(status)) {
-            TraceLoggingWrite(
-                UwbSimulatorTraceloggingProvider,
-                "WdfIoQueueCreate failed",
-                TraceLoggingLevel(TRACE_LEVEL_FATAL),
-                TraceLoggingNTStatus(status));
-            return status;
-        }
-
-        // Construct a new UwbSimulatorIoEventQueue instance using the WDF pre-allocated buffer.
-        ioEventQueue = std::make_shared<UwbSimulatorIoEventQueue>(wdfQueue);
-        if (ioEventQueue == nullptr) {
-            return STATUS_INSUFFICIENT_RESOURCES;
-        }
-
-        status = ioEventQueue->Initialize();
-        if (!NT_SUCCESS(status)) {
-            return status;
-        }
-    }
-
     // Create a default queue for all requests that are not explicitly configured to go elsewhere.
     WDF_IO_QUEUE_CONFIG queueConfig;
     WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
@@ -175,7 +145,6 @@ UwbSimulatorDevice::Initialize()
     }
 
     m_ioQueue = ioQueue;
-    m_ioEventQueue = ioEventQueue;
 
     return STATUS_SUCCESS;
 }
@@ -190,12 +159,6 @@ UwbSimulatorDevice::Uninitialize()
     }
 
     return STATUS_SUCCESS;
-}
-
-std::weak_ptr<UwbSimulatorIoEventQueue>
-UwbSimulatorDevice::GetIoEventQueue() noexcept
-{
-    return m_ioEventQueue;
 }
 
 void
@@ -214,6 +177,8 @@ UwbSimulatorDevice::OnFileCreate(WDFDEVICE device, WDFREQUEST request, WDFFILEOB
     auto uwbSimulatorFileStatus = uwbSimulatorFile->Initialize();
     if (uwbSimulatorFileStatus == STATUS_SUCCESS) {
         uwbSimulatorFile->RegisterHandler(m_ddiHandler);
+        m_deviceFiles.push_back(uwbSimulatorFile);
+        DbgPrint("%p added file object %p\n", m_wdfDevice, file);
     } else {
         uwbSimulatorFile->~UwbSimulatorDeviceFile();
     }
@@ -229,6 +194,13 @@ UwbSimulatorDevice::OnFileClose(WDFFILEOBJECT file)
         "OnFileClose",
         TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
         TraceLoggingPointer(file, "File"));
+
+    const auto uwbSimulatorFileClosed = GetUwbSimulatorFile(file);
+    const auto removed = std::erase_if(m_deviceFiles, [&](const auto &uwbSimulatorFile) {
+        return (uwbSimulatorFile == uwbSimulatorFileClosed);
+    });
+
+    DbgPrint("%p %s file object %p", m_wdfDevice, (removed ? "removed" : "failed to remove"), file);
 }
 
 NTSTATUS
@@ -317,4 +289,17 @@ UwbSimulatorDevice::GetSessionCount()
 {
     std::shared_lock sessionsReadLock{ m_sessionsGate };
     return std::size(m_sessions);
+}
+
+void
+UwbSimulatorDevice::PushUwbNotification(UwbNotificationData uwbNotificationData)
+{
+    // TODO: log
+    // TODO: lock
+    // TODO: avoid copies by using std::shared_ptr<> instead
+
+    // Distribute a copy of the notification data to each open file handle.
+    for (auto &deviceFile : m_deviceFiles) {
+        deviceFile->GetIoEventQueue()->PushNotification(uwbNotificationData);
+    }
 }
