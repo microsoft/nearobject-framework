@@ -189,11 +189,12 @@ UwbSimulatorDevice::OnFileCreate(WDFDEVICE device, WDFREQUEST request, WDFFILEOB
     if (uwbSimulatorFileStatus == STATUS_SUCCESS) {
         uwbSimulatorFile->RegisterHandler(m_ddiHandler);
 
-        std::unique_lock deviceFilesLockExclusive{ m_deviceFilesGate };
+        std::scoped_lock deviceFilesLockExclusive{ m_deviceFilesGate };
         m_deviceFiles.push_back(uwbSimulatorFile);
         DbgPrint("%p added file object %p\n", m_wdfDevice, file);
     } else {
         uwbSimulatorFileContext->~UwbSimulatorDeviceFileWdfContext();
+        DbgPrint("%p failed to initialize file context object with status 0x%08x\n", uwbSimulatorFileStatus);
     }
 
     WdfRequestComplete(request, uwbSimulatorFileStatus);
