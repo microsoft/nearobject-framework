@@ -108,6 +108,9 @@ struct UwbApplicationConfigurationParameterData
         ::uwb::UwbMacAddressType,
         std::unordered_set<::uwb::UwbMacAddress>>;
 
+    /**
+     * @brief Map of application configuration parameter type to the parameter's value.
+     */
     std::unordered_map<UwbApplicationConfigurationParameterType, ParameterTypesVariant>
     GetValueMap() const
     {
