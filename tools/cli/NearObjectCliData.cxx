@@ -116,7 +116,7 @@ UwbConfigurationData::operator UwbConfiguration() const noexcept
     return builder;
 }
 
-std::unordered_map<uwb::protocol::fira::UwbApplicationConfigurationParameterType, UwbApplicationConfigurationParameterData::ParameterTypesVariant>
+std::unordered_map<UwbApplicationConfigurationParameterType, UwbApplicationConfigurationParameterData::ParameterTypesVariant>
 UwbApplicationConfigurationParameterData::GetValueMap() const
 {
     std::unordered_map<UwbApplicationConfigurationParameterType, ParameterTypesVariant> valuesMap;
