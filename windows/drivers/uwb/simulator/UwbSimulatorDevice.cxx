@@ -322,9 +322,6 @@ UwbSimulatorDevice::PushUwbNotification(UwbNotificationData uwbNotificationData)
     constexpr auto resolveWeak = [](auto deviceFileWeak) {
         return deviceFileWeak.lock();
     };
-    constexpr auto nonNull = [](auto deviceFileStrong) {
-        return deviceFileStrong != nullptr;
-    };
 
     DbgPrint("%p received push notification payload %s\n", m_wdfDevice, std::data(ToString(uwbNotificationData)));
 
