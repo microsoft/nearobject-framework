@@ -200,7 +200,7 @@ UwbSimulatorDevice::OnFileClose(WDFFILEOBJECT file)
         return (uwbSimulatorFile == uwbSimulatorFileClosed);
     });
 
-    DbgPrint("%p %s file object %p", m_wdfDevice, (removed ? "removed" : "failed to remove"), file);
+    DbgPrint("%p %s file object %p\n", m_wdfDevice, (removed ? "removed" : "failed to remove"), file);
 }
 
 NTSTATUS
