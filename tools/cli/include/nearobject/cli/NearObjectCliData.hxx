@@ -11,8 +11,6 @@
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
 #include <uwb/protocols/fira/UwbSessionData.hxx>
 
-using namespace uwb::protocol::fira;
-
 namespace nearobject::cli
 {
 /**
@@ -111,30 +109,8 @@ struct UwbApplicationConfigurationParameterData
     /**
      * @brief Map of application configuration parameter type to the parameter's value.
      */
-    std::unordered_map<UwbApplicationConfigurationParameterType, ParameterTypesVariant>
-    GetValueMap() const
-    {
-        std::unordered_map<UwbApplicationConfigurationParameterType, ParameterTypesVariant> valuesMap;
-        if (deviceRole.has_value()) {
-            valuesMap[UwbApplicationConfigurationParameterType::DeviceRole] = deviceRole.value();
-        }
-        if (multiNodeMode.has_value()) {
-            valuesMap[UwbApplicationConfigurationParameterType::MultiNodeMode] = multiNodeMode.value();
-        }
-        if (numberOfControlees.has_value()) {
-            valuesMap[UwbApplicationConfigurationParameterType::NumberOfControlees] = numberOfControlees.value();
-        }
-        if (deviceMacAddress.has_value()) {
-            valuesMap[UwbApplicationConfigurationParameterType::DeviceMacAddress] = deviceMacAddress.value();
-        }
-        if (destinationMacAddresses.has_value()) {
-            valuesMap[UwbApplicationConfigurationParameterType::DestinationMacAddresses] = destinationMacAddresses.value();
-        }
-        if (deviceType.has_value()) {
-            valuesMap[UwbApplicationConfigurationParameterType::DeviceType] = deviceType.value();
-        }
-        return valuesMap;
-    }
+    std::unordered_map<uwb::protocol::fira::UwbApplicationConfigurationParameterType, ParameterTypesVariant>
+    GetValueMap() const;
 };
 
 /**

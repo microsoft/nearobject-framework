@@ -243,23 +243,23 @@ ProcessApplicationConfigurationParameters(UwbApplicationConfigurationParameterDa
     std::vector<uwb::protocol::fira::UwbApplicationConfigurationParameter> applicationConfigurationParameters;
 
     std::cout << "Selected parameters:" << std::endl;
-    for (const auto& [applicationConfigurationParameter, applicationConfigurationParameterValue] : applicationConfigurationParameterData.GetValueMap()) {
-        std::visit([&applicationConfigurationParameter, &applicationConfigurationParameters](auto&& arg)
-        {
+    const auto applicationConfigurationParameterValues = applicationConfigurationParameterData.GetValueMap();
+    for (const auto& [applicationConfigurationParameter, applicationConfigurationParameterValue] : applicationConfigurationParameterValues) {
+        std::visit([&applicationConfigurationParameter, &applicationConfigurationParameters](auto&& arg) {
             applicationConfigurationParameters.push_back({ applicationConfigurationParameter, arg });
 
             using ParameterValueT = std::decay_t<decltype(arg)>;
             if constexpr (std::is_enum_v<ParameterValueT>) {
                 std::cout << magic_enum::enum_name(applicationConfigurationParameter) << "::" << magic_enum::enum_name(arg) << std::endl;
             } else if constexpr (std::is_same_v<ParameterValueT, uint8_t>) {
-                std::cout << magic_enum::enum_name(applicationConfigurationParameter) << "::" << static_cast<int>(arg) << std::endl;
+                std::cout << magic_enum::enum_name(applicationConfigurationParameter) << "::" << +arg << std::endl;
             } else if constexpr (std::is_same_v<ParameterValueT, ::uwb::UwbMacAddress>) {
                 std::cout << magic_enum::enum_name(applicationConfigurationParameter) << "::" << ToString(arg) << std::endl;
             } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<::uwb::UwbMacAddress>>) {
                 for (const auto& address : arg) {
                     std::cout << magic_enum::enum_name(applicationConfigurationParameter) << "::" << ToString(arg) << std::endl;
                 }
-            } 
+            }
         },
             applicationConfigurationParameterValue);
     }
