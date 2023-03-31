@@ -83,9 +83,7 @@ UwbSimulatorDeviceFile::OnWdfDestroy(WDFOBJECT wdfFile)
         return;
     }
 
-    // Explicitly invoke the destructor since the object was created with placement new.
     instance->OnDestroy();
-    instance->~UwbSimulatorDeviceFile();
 }
 
 /* static */
@@ -104,6 +102,7 @@ UwbSimulatorDeviceFile::OnWdfRequestCancel(WDFREQUEST request)
 void
 UwbSimulatorDeviceFile::OnDestroy()
 {
+    DbgPrint("%p destroyed\n", m_wdfFile);
 }
 
 void
