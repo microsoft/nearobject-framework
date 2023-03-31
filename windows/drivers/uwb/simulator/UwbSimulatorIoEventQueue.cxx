@@ -84,7 +84,7 @@ UwbSimulatorIoEventQueue::PushNotification(UwbNotificationData notificationData)
     // Push the notification data into the queue.
     {
         std::unique_lock notificationLockExclusive{ m_notificationGate };
-        DbgPrint("%p pushing notification data with payload %s", ToString(notificationData).c_str());
+        DbgPrint("%p pushing notification data with payload %s\n", m_wdfQueue, std::data(ToString(notificationData)));
         m_notificationQueue.push(std::move(notificationData));
     }
     
@@ -107,7 +107,7 @@ UwbSimulatorIoEventQueue::ProcessNotificationQueue(std::stop_token stopToken)
         // If predicate returned false, wait() unblocked due to stop request.
         if (!isNotificationRequestPending) {
             assert(stopToken.stop_requested());
-            DbgPrint("%p exiting notification processing thread due to stop request", m_wdfQueue);
+            DbgPrint("%p exiting notification processing thread due to stop request\n", m_wdfQueue);
             break;
         }
 
@@ -118,7 +118,7 @@ UwbSimulatorIoEventQueue::ProcessNotificationQueue(std::stop_token stopToken)
 
         if (!isNotificationDataAvailable) {
             assert(stopToken.stop_requested());
-            DbgPrint("%p exiting notification processing thread due to stop request", m_wdfQueue);
+            DbgPrint("%p exiting notification processing thread due to stop request\n", m_wdfQueue);
         }
 
         // Obtain the pended request from the queue.
@@ -146,7 +146,7 @@ UwbSimulatorIoEventQueue::ProcessNotificationQueue(std::stop_token stopToken)
         std::size_t outputBufferSize = 0;
         status = WdfRequestRetrieveOutputBuffer(request, notificationDdiSize, &outputBuffer, &outputBufferSize);
         if (NT_SUCCESS(status)) {
-            DbgPrint("%p updating request %p with %llu byte payload %s\n", m_wdfQueue, request, notificationDdiSize, ToString(notification).c_str());
+            DbgPrint("%p completing request %p with %llu byte payload %s\n", m_wdfQueue, request, notificationDdiSize, ToString(notification).c_str());
             std::memcpy(outputBuffer, std::data(notificationDdiBuffer), notificationDdiSize);
         }
 
