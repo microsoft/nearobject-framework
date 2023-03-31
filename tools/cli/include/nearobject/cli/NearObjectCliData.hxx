@@ -3,7 +3,6 @@
 #define NEAR_OBJECT_CLI_DATA_HXX
 
 #include <cstdint>
-#include <any>
 #include <optional>
 #include <string>
 
