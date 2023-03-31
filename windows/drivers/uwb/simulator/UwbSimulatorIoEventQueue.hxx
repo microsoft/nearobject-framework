@@ -61,6 +61,15 @@ public:
     NTSTATUS
     Uninitialize();
 
+    /**
+     * @brief Enqueue a WDFREQUEST for uwb notifications.
+     *
+     * This adds the specified wdf request to the request queue and notifies the
+     * notification processing thread that a request is now pending.
+     *
+     * @param request The request to enqueue.
+     * @return NTSTATUS
+     */
     NTSTATUS
     EnqueueRequest(WDFREQUEST request);
 
@@ -73,6 +82,13 @@ public:
     PushNotification(::uwb::protocol::fira::UwbNotificationData notificationData);
 
 private:
+    /**
+     * @brief Notification event queue processing thread handler function.
+     * 
+     * This thread processes event notifications and completes pended requests.
+     * 
+     * @param stopToken The stop token to be signaled to stop operation.
+     */
     void
     ProcessNotificationQueue(std::stop_token stopToken);
 
