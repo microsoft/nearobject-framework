@@ -19,6 +19,8 @@
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
 
+class UwbSimulatorDeviceFile;
+
 /**
  * @brief
  */
@@ -47,10 +49,6 @@ public:
      */
     NTSTATUS
     Uninitialize();
-
-    // TODO: docs
-    std::weak_ptr<UwbSimulatorIoEventQueue>
-    GetIoEventQueue() noexcept;
 
     /**
      * @brief Create a new uwb session.
@@ -87,6 +85,9 @@ public:
      */
     std::size_t
     GetSessionCount();
+
+    void
+    PushUwbNotification(::uwb::protocol::fira::UwbNotificationData notificationData);
 
 public:
     static EVT_WDF_DRIVER_DEVICE_ADD OnWdfDeviceAdd;
@@ -136,12 +137,14 @@ private:
 private:
     WDFDEVICE m_wdfDevice;
     UwbSimulatorIoQueue *m_ioQueue{ nullptr };
-    std::shared_ptr<UwbSimulatorIoEventQueue> m_ioEventQueue{ nullptr };
     std::shared_ptr<windows::devices::uwb::simulator::IUwbSimulatorDdiHandler> m_ddiHandler;
 
     // Session state and associated lock that protects it.
     std::shared_mutex m_sessionsGate;
     std::unordered_map<uint32_t, std::shared_ptr<windows::devices::uwb::simulator::UwbSimulatorSession>> m_sessions{};
+
+    // Open file handles
+    std::vector<UwbSimulatorDeviceFile *> m_deviceFiles{};
 };
 
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(UwbSimulatorDevice, GetUwbSimulatorDevice)

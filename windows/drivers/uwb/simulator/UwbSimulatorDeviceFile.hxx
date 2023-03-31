@@ -10,6 +10,7 @@
 #include <wdf.h>
 
 #include "IUwbSimulatorDdiHandler.hxx"
+#include "UwbSimulatorIoEventQueue.hxx"
 
 class UwbSimulatorDevice;
 
@@ -63,6 +64,9 @@ public:
     UwbSimulatorDevice *
     GetDevice() noexcept;
 
+    std::shared_ptr<UwbSimulatorIoEventQueue>
+    GetIoEventQueue();
+
 public:
     static EVT_WDF_OBJECT_CONTEXT_DESTROY OnWdfDestroy;
     static EVT_WDF_REQUEST_CANCEL OnWdfRequestCancel;
@@ -86,6 +90,9 @@ private:
     WDFFILEOBJECT m_wdfFile;
     UwbSimulatorDevice *m_uwbSimulatorDevice{ nullptr };
     std::vector<std::shared_ptr<windows::devices::uwb::simulator::IUwbSimulatorDdiHandler>> m_ddiHandlers{};
+    std::shared_ptr<UwbSimulatorIoEventQueue> m_ioEventQueue;
+
+    static constexpr std::size_t MaximumQueueSizeDefault = 16;
 };
 
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(UwbSimulatorDeviceFile, GetUwbSimulatorFile);
