@@ -53,7 +53,7 @@ UwbSimulatorIoEventQueue::EnqueueRequest(WDFREQUEST request)
 {
     WDFREQUEST requestExisting = nullptr;
     auto wdfFile = WdfRequestGetFileObject(request);
-    std::unique_lock notificationLockExclusive{ m_notificationGate };
+    std::scoped_lock notificationLockExclusive{ m_notificationGate };
 
     // Check if a request is already pending.
     NTSTATUS status = WdfIoQueueFindRequest(m_wdfQueue, nullptr, wdfFile, nullptr, &requestExisting);
@@ -83,7 +83,7 @@ UwbSimulatorIoEventQueue::PushNotification(UwbNotificationData notificationData)
 {
     // Push the notification data into the queue.
     {
-        std::unique_lock notificationLockExclusive{ m_notificationGate };
+        std::scoped_lock notificationLockExclusive{ m_notificationGate };
         DbgPrint("%p pushing notification data with payload %s\n", m_wdfQueue, std::data(ToString(notificationData)));
         m_notificationQueue.push(std::move(notificationData));
     }
