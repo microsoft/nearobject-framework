@@ -3,6 +3,7 @@
 #include <uwb/protocols/fira/UwbConfigurationBuilder.hxx>
 
 using namespace nearobject::cli;
+using uwb::protocol::fira::UwbApplicationConfigurationParameterType;
 using uwb::protocol::fira::UwbConfiguration;
 
 UwbConfigurationData::operator UwbConfiguration() const noexcept
@@ -113,4 +114,29 @@ UwbConfigurationData::operator UwbConfiguration() const noexcept
     }
 
     return builder;
+}
+
+std::unordered_map<UwbApplicationConfigurationParameterType, UwbApplicationConfigurationParameterData::ParameterTypesVariant>
+UwbApplicationConfigurationParameterData::GetValueMap() const
+{
+    std::unordered_map<UwbApplicationConfigurationParameterType, ParameterTypesVariant> valuesMap;
+    if (deviceRole.has_value()) {
+        valuesMap[UwbApplicationConfigurationParameterType::DeviceRole] = deviceRole.value();
+    }
+    if (multiNodeMode.has_value()) {
+        valuesMap[UwbApplicationConfigurationParameterType::MultiNodeMode] = multiNodeMode.value();
+    }
+    if (numberOfControlees.has_value()) {
+        valuesMap[UwbApplicationConfigurationParameterType::NumberOfControlees] = numberOfControlees.value();
+    }
+    if (deviceMacAddress.has_value()) {
+        valuesMap[UwbApplicationConfigurationParameterType::DeviceMacAddress] = deviceMacAddress.value();
+    }
+    if (destinationMacAddresses.has_value()) {
+        valuesMap[UwbApplicationConfigurationParameterType::DestinationMacAddresses] = destinationMacAddresses.value();
+    }
+    if (deviceType.has_value()) {
+        valuesMap[UwbApplicationConfigurationParameterType::DeviceType] = deviceType.value();
+    }
+    return valuesMap;
 }
