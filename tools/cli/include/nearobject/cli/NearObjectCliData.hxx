@@ -150,6 +150,7 @@ struct NearObjectCliData
     bool HostIsController{ false };
     std::string deviceMacAddressString;
     std::string destinationMacAddressString; // TODO: List of strings (or large string of mac address substrings) to support multiple controlees
+    std::string resultReportConfigurationString;
     UwbConfigurationData uwbConfiguration{};
     UwbApplicationConfigurationParameterData appConfigParamsData{};
     uwb::protocol::fira::StaticRangingInfo StaticRanging{};
