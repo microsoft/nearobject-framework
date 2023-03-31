@@ -506,7 +506,7 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
                             continue;
                         } else if (lastError == ERROR_OPERATION_ABORTED) {
                             LOG_WARNING << "IOCTL_UWB_NOTIFICATION aborted";
-                            break; // for({0,2})                        
+                            break; // for({0,2})
                         } else {
                             PLOG_ERROR << "error when sending IOCTL_UWB_NOTIFICATION, hr=" << std::showbase << std::hex << hr;
                             break; // for({0,2})
