@@ -24,9 +24,10 @@ class UwbSimulatorDeviceFile;
 /**
  * @brief
  */
-class UwbSimulatorDevice
+class UwbSimulatorDevice :
+    public std::enable_shared_from_this<UwbSimulatorDevice>
 {
-public:
+protected:
     /**
      * @brief Construct a new UwbSimulatorDevice object.
      *
@@ -34,6 +35,7 @@ public:
      */
     explicit UwbSimulatorDevice(WDFDEVICE wdfDevice);
 
+public:
     /**
      * @brief
      *
@@ -155,6 +157,11 @@ private:
     std::vector<UwbSimulatorDeviceFile *> m_deviceFiles{};
 };
 
-WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(UwbSimulatorDevice, GetUwbSimulatorDevice)
+struct UwbSimulatorDeviceWdfContext
+{
+    std::shared_ptr<UwbSimulatorDevice> Device;
+};
+
+WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(UwbSimulatorDeviceWdfContext, GetUwbSimulatorDeviceWdfContext)
 
 #endif // UWB_SIMULATOR_DEVICE_HXX

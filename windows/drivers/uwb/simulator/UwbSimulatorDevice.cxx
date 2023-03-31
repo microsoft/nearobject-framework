@@ -2,6 +2,7 @@
 #include <memory>
 
 #include <magic_enum.hpp>
+#include <notstd/memory.hxx>
 
 #include "UwbSimulatorDdiHandler.hxx"
 #include "UwbSimulatorDevice.hxx"
@@ -37,7 +38,7 @@ UwbSimulatorDevice::OnWdfDeviceAdd(WDFDRIVER /* driver */, PWDFDEVICE_INIT devic
 
     // Configure device object attributes.
     WDF_OBJECT_ATTRIBUTES deviceAttributes;
-    WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&deviceAttributes, UwbSimulatorDevice);
+    WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&deviceAttributes, UwbSimulatorDeviceWdfContext);
     deviceAttributes.EvtCleanupCallback = &UwbSimulatorDevice::OnWdfObjectContextCleanup;
     deviceAttributes.SynchronizationScope = WdfSynchronizationScopeNone;
     deviceAttributes.ExecutionLevel = WdfExecutionLevelPassive;
@@ -55,9 +56,12 @@ UwbSimulatorDevice::OnWdfDeviceAdd(WDFDRIVER /* driver */, PWDFDEVICE_INIT devic
     }
 
     // Initialize the device context from the WDF pre-allocated WDF buffer.
-    auto uwbSimulatorDeviceBuffer = GetUwbSimulatorDevice(device);
-    auto uwbSimulatorDevice = new (uwbSimulatorDeviceBuffer) UwbSimulatorDevice(device);
-
+    auto uwbSimulatorDeviceContextBuffer = GetUwbSimulatorDeviceWdfContext(device);
+    auto uwbSimulatorDeviceContext = new (uwbSimulatorDeviceContextBuffer) UwbSimulatorDeviceWdfContext{
+        .Device = std::make_shared<notstd::enable_make_protected<UwbSimulatorDevice>>(device)
+    };
+    
+    auto uwbSimulatorDevice = uwbSimulatorDeviceContext->Device;
     status = uwbSimulatorDevice->Initialize();
     return status;
 }
@@ -66,21 +70,22 @@ UwbSimulatorDevice::OnWdfDeviceAdd(WDFDRIVER /* driver */, PWDFDEVICE_INIT devic
 VOID
 UwbSimulatorDevice::OnWdfObjectContextCleanup(WDFOBJECT wdfDevice)
 {
-    auto instance = GetUwbSimulatorDevice(wdfDevice);
+    auto instanceContext = GetUwbSimulatorDeviceWdfContext(wdfDevice);
+    auto instance = instanceContext->Device;
     if (instance->m_wdfDevice != wdfDevice) {
         return;
     }
 
     // Explicitly invoke the destructor since the object was created with placement new.
     instance->Uninitialize();
-    instance->~UwbSimulatorDevice();
+    instanceContext->~UwbSimulatorDeviceWdfContext();
 }
 
 /* static */
 NTSTATUS
 UwbSimulatorDevice::OnWdfD0Entry(WDFDEVICE device, WDF_POWER_DEVICE_STATE previousState)
 {
-    auto instance = GetUwbSimulatorDevice(device);
+    auto instance = GetUwbSimulatorDeviceWdfContext(device)->Device;
     return instance->OnD0Entry(previousState);
 }
 
@@ -88,7 +93,7 @@ UwbSimulatorDevice::OnWdfD0Entry(WDFDEVICE device, WDF_POWER_DEVICE_STATE previo
 NTSTATUS
 UwbSimulatorDevice::OnWdfD0Exit(WDFDEVICE device, WDF_POWER_DEVICE_STATE targetState)
 {
-    auto instance = GetUwbSimulatorDevice(device);
+    auto instance = GetUwbSimulatorDeviceWdfContext(device)->Device;
     return instance->OnD0Exit(targetState);
 }
 
@@ -96,7 +101,7 @@ UwbSimulatorDevice::OnWdfD0Exit(WDFDEVICE device, WDF_POWER_DEVICE_STATE targetS
 void
 UwbSimulatorDevice::OnWdfFileCreate(WDFDEVICE device, WDFREQUEST request, WDFFILEOBJECT file)
 {
-    auto instance = GetUwbSimulatorDevice(device);
+    auto instance = GetUwbSimulatorDeviceWdfContext(device)->Device;
     instance->OnFileCreate(device, request, file);
 }
 
@@ -104,7 +109,7 @@ UwbSimulatorDevice::OnWdfFileCreate(WDFDEVICE device, WDFREQUEST request, WDFFIL
 void
 UwbSimulatorDevice::OnWdfFileClose(WDFFILEOBJECT file)
 {
-    auto instance = GetUwbSimulatorDevice(WdfFileObjectGetDevice(file));
+    auto instance = GetUwbSimulatorDeviceWdfContext(WdfFileObjectGetDevice(file))->Device;
     instance->OnFileClose(file);
 }
 
