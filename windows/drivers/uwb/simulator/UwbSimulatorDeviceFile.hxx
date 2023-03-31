@@ -106,6 +106,13 @@ private:
     std::vector<std::shared_ptr<windows::devices::uwb::simulator::IUwbSimulatorDdiHandler>> m_ddiHandlers{};
     std::shared_ptr<UwbSimulatorIoEventQueue> m_ioEventQueue;
 
+    /**
+     * @brief Default size for the data queue. This should be large enough to
+     * contain the expected number of entries that could be generated in the
+     * time it takes a client to process a single notification. The current
+     * value (16) was selected to hopefully satisfy this, however, will be tuned
+     * later once real-world empirical data is collected and analzyed.
+     */
     static constexpr std::size_t MaximumQueueSizeDefault = 16;
 };
 
