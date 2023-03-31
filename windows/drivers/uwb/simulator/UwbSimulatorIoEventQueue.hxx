@@ -81,11 +81,13 @@ private:
     WDFWAITLOCK m_wdfQueueLock{ nullptr };
     std::queue<::uwb::protocol::fira::UwbNotificationData> m_notificationQueue;
 
-    // Stuff for processing notifications.
+    // Notification processing. Note the jthread must come last to ensure it is
+    // joined first upon destruction, which will signal stop and release any waits
+    // on the condition variables.
     std::mutex m_notificationGate;
-    std::jthread m_notificationThread;
     std::condition_variable_any m_notificationRequestPending;
     std::condition_variable_any m_notificationDataAvailable;
+    std::jthread m_notificationThread;
 
     const std::size_t m_maximumQueueSize{ MaximumQueueSizeDefault };
 };
