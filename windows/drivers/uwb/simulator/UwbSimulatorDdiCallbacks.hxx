@@ -124,7 +124,7 @@ protected:
      *
      * @param uwbNotificationData The notification data to provide with the event.
      */
-    NTSTATUS
+    void
     RaiseUwbNotification(UwbNotificationData uwbNotificationData);
 
 private:

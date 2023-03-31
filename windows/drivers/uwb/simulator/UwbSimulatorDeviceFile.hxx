@@ -10,6 +10,7 @@
 #include <wdf.h>
 
 #include "IUwbSimulatorDdiHandler.hxx"
+#include "UwbSimulatorIoEventQueue.hxx"
 
 class UwbSimulatorDevice;
 
@@ -60,8 +61,21 @@ public:
     WDFFILEOBJECT
     GetWdfFile() const noexcept;
 
+    /**
+     * @brief Get a pointer to the owning device instance.
+     *
+     * @return UwbSimulatorDevice*
+     */
     UwbSimulatorDevice *
     GetDevice() noexcept;
+
+    /**
+     * @brief Get a reference to the i/o event queue for this open file handle.
+     *
+     * @return std::shared_ptr<UwbSimulatorIoEventQueue>
+     */
+    std::shared_ptr<UwbSimulatorIoEventQueue>
+    GetIoEventQueue();
 
 public:
     static EVT_WDF_OBJECT_CONTEXT_DESTROY OnWdfDestroy;
@@ -69,15 +83,19 @@ public:
 
 private:
     /**
-     * @brief
+     * @brief Destroy member function which is called in response to the
+     * EvtDestroyCallback WDF event (OnWdfDestroy) for the corresponding file
+     * object.
      */
     void
     OnDestroy();
 
     /**
-     * @brief
+     * @brief Request cancelation member function which is called in response to
+     * the EvtRequestCancel WDF event (OnWdfRequestCancel) for the corresponding
+     * file object.
      *
-     * @param request
+     * @param request The request that is being canceled.
      */
     void
     OnRequestCancel(WDFREQUEST request);
@@ -86,8 +104,18 @@ private:
     WDFFILEOBJECT m_wdfFile;
     UwbSimulatorDevice *m_uwbSimulatorDevice{ nullptr };
     std::vector<std::shared_ptr<windows::devices::uwb::simulator::IUwbSimulatorDdiHandler>> m_ddiHandlers{};
+    std::shared_ptr<UwbSimulatorIoEventQueue> m_ioEventQueue;
+
+    /**
+     * @brief Default size for the data queue. This should be large enough to
+     * contain the expected number of entries that could be generated in the
+     * time it takes a client to process a single notification. The current
+     * value (16) was selected to hopefully satisfy this, however, will be tuned
+     * later once real-world empirical data is collected and analzyed.
+     */
+    static constexpr std::size_t MaximumQueueSizeDefault = 16;
 };
 
-WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(UwbSimulatorDeviceFile, GetUwbSimulatorFile);
+WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(UwbSimulatorDeviceFile, GetUwbSimulatorDeviceFile);
 
 #endif // UWB_SIMULATOR_DEVICE_FILE_OBJECT

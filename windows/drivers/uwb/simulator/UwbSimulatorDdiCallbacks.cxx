@@ -21,7 +21,7 @@ UwbSimulatorDdiCallbacks::UwbSimulatorDdiCallbacks(UwbSimulatorDevice *device) :
     m_device(device)
 {}
 
-NTSTATUS
+void
 UwbSimulatorDdiCallbacks::RaiseUwbNotification(UwbNotificationData uwbNotificationData)
 {
     TraceLoggingWrite(
@@ -31,16 +31,8 @@ UwbSimulatorDdiCallbacks::RaiseUwbNotification(UwbNotificationData uwbNotificati
         TraceLoggingString("EventRaised", "Action"),
         TraceLoggingString(std::data(ToString(uwbNotificationData)), "Data"));
 
-    auto ioEventQueueWeak = m_device->GetIoEventQueue();
-    auto ioEventQueue = ioEventQueueWeak.lock();
-    if (ioEventQueue == nullptr) {
-        // TODO: log
-        return STATUS_INVALID_DEVICE_STATE;
-    }
-
-    ioEventQueue->PushNotificationData(std::move(uwbNotificationData));
-
-    return STATUS_SUCCESS;
+    // Dispatch the notification to the device.
+    m_device->PushUwbNotification(std::move(uwbNotificationData));
 }
 
 std::tuple<UwbStatus, std::shared_ptr<UwbSimulatorSession>>

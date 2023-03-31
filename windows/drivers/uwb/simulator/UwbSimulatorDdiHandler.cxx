@@ -457,33 +457,23 @@ UwbSimulatorDdiHandler::OnUwbSessionGetRangingCount(WDFREQUEST request, std::spa
 
 // IOCTL_UWB_NOTIFICATION
 NTSTATUS
-UwbSimulatorDdiHandler::OnUwbNotification(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> outputBuffer)
+UwbSimulatorDdiHandler::OnUwbNotification(WDFREQUEST request, std::span<uint8_t> /*inputBuffer*/, std::span<uint8_t> /*outputBuffer*/)
 {
     NTSTATUS status = STATUS_SUCCESS;
 
-    // Obtain a reference to the io event queue.
-    auto ioEventQueueWeak = m_device->GetIoEventQueue();
-    auto ioEventQueue = ioEventQueueWeak.lock();
+    auto file = WdfRequestGetFileObject(request);
+    auto uwbDeviceFile = GetUwbSimulatorDeviceFile(file);
+    auto ioEventQueue = uwbDeviceFile->GetIoEventQueue();
     if (ioEventQueue == nullptr) {
-        // TODO: log
+        DbgPrint("failed to obtain io event queue for request %p", request);
         status = STATUS_INVALID_DEVICE_STATE;
         WdfRequestComplete(request, status);
         return status;
     }
 
-    // Process the notification request.
-    std::size_t outputBufferSize = std::size(outputBuffer);
-    std::optional<UwbNotificationData> uwbNotificationData;
-    status = ioEventQueue->HandleNotificationRequest(request, uwbNotificationData, outputBufferSize);
-    if (status == STATUS_SUCCESS) {
-        // Convert neutral type to DDI output type, and copy to output buffer.
-        auto notificationData = UwbCxDdi::From(uwbNotificationData.value());
-        std::memcpy(std::data(outputBuffer), std::data(std::data(notificationData)), outputBufferSize);
-    }
-
-    // Complete the request only if it has not been pended by the driver.
+    status = ioEventQueue->EnqueueRequest(request);
     if (status != STATUS_PENDING) {
-        WdfRequestCompleteWithInformation(request, status, outputBufferSize);
+        WdfRequestComplete(request, status);
     }
 
     return status;
