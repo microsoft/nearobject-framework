@@ -144,6 +144,7 @@ private:
     std::unordered_map<uint32_t, std::shared_ptr<windows::devices::uwb::simulator::UwbSimulatorSession>> m_sessions{};
 
     // Open file handles
+    std::shared_mutex m_deviceFilesGate;
     std::vector<UwbSimulatorDeviceFile *> m_deviceFiles{};
 };
 
