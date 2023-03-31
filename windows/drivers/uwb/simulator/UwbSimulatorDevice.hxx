@@ -154,7 +154,7 @@ private:
 
     // Open file handles
     std::shared_mutex m_deviceFilesGate;
-    std::vector<UwbSimulatorDeviceFile *> m_deviceFiles{};
+    std::vector<std::weak_ptr<UwbSimulatorDeviceFile>> m_deviceFiles;
 };
 
 struct UwbSimulatorDeviceWdfContext

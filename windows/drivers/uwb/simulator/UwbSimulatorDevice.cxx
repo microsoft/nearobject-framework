@@ -32,7 +32,7 @@ UwbSimulatorDevice::OnWdfDeviceAdd(WDFDRIVER /* driver */, PWDFDEVICE_INIT devic
     WDF_FILEOBJECT_CONFIG fileConfiguration;
     WDF_FILEOBJECT_CONFIG_INIT(&fileConfiguration, &UwbSimulatorDevice::OnWdfFileCreate, &UwbSimulatorDevice::OnWdfFileClose, WDF_NO_EVENT_CALLBACK);
     WDF_OBJECT_ATTRIBUTES fileAttributes;
-    WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&fileAttributes, UwbSimulatorDeviceFile);
+    WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&fileAttributes, UwbSimulatorDeviceFileWdfContext);
     fileAttributes.EvtDestroyCallback = &UwbSimulatorDeviceFile::OnWdfDestroy;
     WdfDeviceInitSetFileObjectConfig(deviceInit, &fileConfiguration, &fileAttributes);
 
@@ -177,8 +177,12 @@ UwbSimulatorDevice::OnFileCreate(WDFDEVICE device, WDFREQUEST request, WDFFILEOB
         TraceLoggingPointer(request, "Request"),
         TraceLoggingPointer(file, "File"));
 
-    auto uwbSimulatorFileBuffer = GetUwbSimulatorDeviceFile(file);
-    auto uwbSimulatorFile = new (uwbSimulatorFileBuffer) UwbSimulatorDeviceFile(file, this);
+    auto uwbSimulatorFileContextBuffer = GetUwbSimulatorDeviceFileWdfContext(file);
+    auto uwbSimulatorFileContext = new (uwbSimulatorFileContextBuffer) UwbSimulatorDeviceFileWdfContext{
+        .File = std::make_shared<notstd::enable_make_protected<UwbSimulatorDeviceFile>>(file, weak_from_this())
+    };
+
+    auto uwbSimulatorFile = uwbSimulatorFileContext->File;
     auto uwbSimulatorFileStatus = uwbSimulatorFile->Initialize();
     if (uwbSimulatorFileStatus == STATUS_SUCCESS) {
         uwbSimulatorFile->RegisterHandler(m_ddiHandler);
@@ -187,7 +191,7 @@ UwbSimulatorDevice::OnFileCreate(WDFDEVICE device, WDFREQUEST request, WDFFILEOB
         m_deviceFiles.push_back(uwbSimulatorFile);
         DbgPrint("%p added file object %p\n", m_wdfDevice, file);
     } else {
-        uwbSimulatorFile->~UwbSimulatorDeviceFile();
+        uwbSimulatorFileContext->~UwbSimulatorDeviceFileWdfContext();
     }
 
     WdfRequestComplete(request, uwbSimulatorFileStatus);
@@ -203,9 +207,11 @@ UwbSimulatorDevice::OnFileClose(WDFFILEOBJECT file)
         TraceLoggingPointer(file, "File"));
 
     std::unique_lock deviceFilesLockExclusive{ m_deviceFilesGate };
-    const auto uwbSimulatorFileClosed = GetUwbSimulatorDeviceFile(file);
-    const auto removed = std::erase_if(m_deviceFiles, [&](const auto &uwbSimulatorFile) {
-        return (uwbSimulatorFile == uwbSimulatorFileClosed);
+    auto uwbSimulatorFileContextClosed = GetUwbSimulatorDeviceFileWdfContext(file);
+    auto uwbSimulatorFileClosed = uwbSimulatorFileContextClosed->File;
+
+    const auto removed = std::erase_if(m_deviceFiles, [&](auto &uwbSimulatorFile) {
+        return (uwbSimulatorFile.lock() == uwbSimulatorFileClosed);
     });
 
     DbgPrint("%p %s file object %p\n", m_wdfDevice, (removed ? "removed" : "failed to remove"), file);
@@ -307,7 +313,10 @@ UwbSimulatorDevice::PushUwbNotification(UwbNotificationData uwbNotificationData)
     std::shared_lock deviceFilesLockShared{ m_deviceFilesGate };
 
     // Distribute a copy of the notification data to each open file handle.
-    for (auto &deviceFile : m_deviceFiles) {
-        deviceFile->GetIoEventQueue()->PushNotification(uwbNotificationData);
+    for (auto &deviceFileWeak : m_deviceFiles) {
+        auto deviceFile = deviceFileWeak.lock();
+        if (deviceFile != nullptr) {
+            deviceFile->GetIoEventQueue()->PushNotification(uwbNotificationData);
+        }
     }
 }

@@ -462,7 +462,7 @@ UwbSimulatorDdiHandler::OnUwbNotification(WDFREQUEST request, std::span<uint8_t>
     NTSTATUS status = STATUS_SUCCESS;
 
     auto file = WdfRequestGetFileObject(request);
-    auto uwbDeviceFile = GetUwbSimulatorDeviceFile(file);
+    auto uwbDeviceFile = GetUwbSimulatorDeviceFileWdfContext(file)->File;
     auto ioEventQueue = uwbDeviceFile->GetIoEventQueue();
     if (ioEventQueue == nullptr) {
         DbgPrint("failed to obtain io event queue for request %p", request);

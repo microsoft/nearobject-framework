@@ -20,7 +20,7 @@ class UwbSimulatorDevice;
 class UwbSimulatorDeviceFile
 {
 public:
-    explicit UwbSimulatorDeviceFile(WDFFILEOBJECT wdfFile, UwbSimulatorDevice *uwbSimulatorDevice);
+    explicit UwbSimulatorDeviceFile(WDFFILEOBJECT wdfFile, std::weak_ptr<UwbSimulatorDevice> uwbSimulatorDevice);
 
     /**
      * @brief Initializes the file object for use.
@@ -66,7 +66,7 @@ public:
      *
      * @return UwbSimulatorDevice*
      */
-    UwbSimulatorDevice *
+    std::weak_ptr<UwbSimulatorDevice>
     GetDevice() noexcept;
 
     /**
@@ -102,13 +102,18 @@ private:
 
 private:
     WDFFILEOBJECT m_wdfFile;
-    UwbSimulatorDevice *m_uwbSimulatorDevice{ nullptr };
+    std::weak_ptr<UwbSimulatorDevice> m_uwbSimulatorDevice;
     std::vector<std::shared_ptr<windows::devices::uwb::simulator::IUwbSimulatorDdiHandler>> m_ddiHandlers{};
     std::shared_ptr<UwbSimulatorIoEventQueue> m_ioEventQueue;
 
     static constexpr std::size_t MaximumQueueSizeDefault = 16;
 };
 
-WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(UwbSimulatorDeviceFile, GetUwbSimulatorDeviceFile);
+struct UwbSimulatorDeviceFileWdfContext
+{
+    std::shared_ptr<UwbSimulatorDeviceFile> File;
+};
+
+WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(UwbSimulatorDeviceFileWdfContext, GetUwbSimulatorDeviceFileWdfContext);
 
 #endif // UWB_SIMULATOR_DEVICE_FILE_OBJECT

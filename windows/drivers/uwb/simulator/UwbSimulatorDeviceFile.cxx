@@ -8,7 +8,7 @@
 
 using windows::devices::uwb::simulator::IUwbSimulatorDdiHandler;
 
-UwbSimulatorDeviceFile::UwbSimulatorDeviceFile(WDFFILEOBJECT wdfFile, UwbSimulatorDevice *uwbSimulatorDevice) :
+UwbSimulatorDeviceFile::UwbSimulatorDeviceFile(WDFFILEOBJECT wdfFile, std::weak_ptr<UwbSimulatorDevice> uwbSimulatorDevice) :
     m_wdfFile(wdfFile),
     m_uwbSimulatorDevice(uwbSimulatorDevice)
 {}
@@ -19,7 +19,7 @@ UwbSimulatorDeviceFile::GetWdfFile() const noexcept
     return m_wdfFile;
 }
 
-UwbSimulatorDevice *
+std::weak_ptr<UwbSimulatorDevice>
 UwbSimulatorDeviceFile::GetDevice() noexcept
 {
     return m_uwbSimulatorDevice;
@@ -78,7 +78,7 @@ UwbSimulatorDeviceFile::RegisterHandler(std::shared_ptr<IUwbSimulatorDdiHandler>
 VOID
 UwbSimulatorDeviceFile::OnWdfDestroy(WDFOBJECT wdfFile)
 {
-    auto instance = GetUwbSimulatorDeviceFile(wdfFile);
+    auto instance = GetUwbSimulatorDeviceFileWdfContext(wdfFile)->File;
     if (instance->m_wdfFile != wdfFile) {
         return;
     }
@@ -93,7 +93,7 @@ VOID
 UwbSimulatorDeviceFile::OnWdfRequestCancel(WDFREQUEST request)
 {
     auto wdfFile = WdfRequestGetFileObject(request);
-    auto instance = GetUwbSimulatorDeviceFile(wdfFile);
+    auto instance = GetUwbSimulatorDeviceFileWdfContext(wdfFile)->File;
     if (instance->m_wdfFile != wdfFile) {
         return;
     }
