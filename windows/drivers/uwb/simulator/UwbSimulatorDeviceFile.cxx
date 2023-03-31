@@ -78,7 +78,7 @@ UwbSimulatorDeviceFile::RegisterHandler(std::shared_ptr<IUwbSimulatorDdiHandler>
 VOID
 UwbSimulatorDeviceFile::OnWdfDestroy(WDFOBJECT wdfFile)
 {
-    auto instance = GetUwbSimulatorFile(wdfFile);
+    auto instance = GetUwbSimulatorDeviceFile(wdfFile);
     if (instance->m_wdfFile != wdfFile) {
         return;
     }
@@ -93,7 +93,7 @@ VOID
 UwbSimulatorDeviceFile::OnWdfRequestCancel(WDFREQUEST request)
 {
     auto wdfFile = WdfRequestGetFileObject(request);
-    auto instance = GetUwbSimulatorFile(wdfFile);
+    auto instance = GetUwbSimulatorDeviceFile(wdfFile);
     if (instance->m_wdfFile != wdfFile) {
         return;
     }

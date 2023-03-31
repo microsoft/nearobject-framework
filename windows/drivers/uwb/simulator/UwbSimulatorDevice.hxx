@@ -86,6 +86,13 @@ public:
     std::size_t
     GetSessionCount();
 
+    /**
+     * @brief Push a simulated uwb notification.
+     *
+     * This distributes the event to all open-file handle i/o event queues.
+     *
+     * @param notificationData The notification data to distribute.
+     */
     void
     PushUwbNotification(::uwb::protocol::fira::UwbNotificationData notificationData);
 

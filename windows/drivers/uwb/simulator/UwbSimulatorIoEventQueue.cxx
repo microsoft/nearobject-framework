@@ -141,7 +141,9 @@ UwbSimulatorIoEventQueue::ProcessNotificationQueue(std::stop_token stopToken)
         auto notificationDdiBuffer = std::data(notificationDdi);
         auto notificationDdiSize = std::size(notificationDdiBuffer);
 
-        // Attempt to copy the notification data to the output buffer.
+        // Attempt to copy the notification data to the output buffer. Note that
+        // WdfRequestRetrieveOutBuffer() will return STATUS_BUFFER_TOO_SMALL if
+        // the request buffer is not large enough to contain available data.
         void *outputBuffer = nullptr;
         std::size_t outputBufferSize = 0;
         status = WdfRequestRetrieveOutputBuffer(request, notificationDdiSize, &outputBuffer, &outputBufferSize);
