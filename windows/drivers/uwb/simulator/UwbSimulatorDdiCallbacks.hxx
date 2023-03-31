@@ -99,6 +99,15 @@ protected:
     SessionGet(uint32_t sessionId);
 
     /**
+     * @brief Destroy session context for the specified sesion id.
+     * 
+     * @param sessionId The session id to destroy session context for. 
+     * @return std::tuple<UwbStatus, std::shared_ptr<UwbSimulatorSession>> 
+     */
+    std::tuple<UwbStatus, std::shared_ptr<UwbSimulatorSession>>
+    SessionDestroy(uint32_t sessionId);
+
+    /**
      * @brief Update the state of the specified session.
      *
      * This function will also generate a UWB notification associated with the change.

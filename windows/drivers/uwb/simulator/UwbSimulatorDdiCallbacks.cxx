@@ -61,6 +61,19 @@ UwbSimulatorDdiCallbacks::SessionGet(uint32_t sessionId)
     };
 }
 
+std::tuple<UwbStatus, std::shared_ptr<UwbSimulatorSession>>
+UwbSimulatorDdiCallbacks::SessionDestroy(uint32_t sessionId)
+{
+    auto device = m_device.lock();
+    if (device == nullptr) {
+        return {
+            UwbStatusGeneric::Rejected, nullptr
+        };
+    }
+
+    return device->SessionDestroy(sessionId);
+}
+
 void
 UwbSimulatorDdiCallbacks::SessionUpdateState(UwbSimulatorSession &session, UwbSessionState sessionState, std::optional<UwbSessionReasonCode> reasonCode = std::nullopt)
 {
@@ -179,7 +192,9 @@ UwbSimulatorDdiCallbacks::SessionDeninitialize(uint32_t sessionId)
 
     SessionUpdateState(*session, UwbSessionState::Deinitialized);
 
-    return UwbStatusOk;
+    std::tie(uwbStatus, session) = SessionDestroy(sessionId);
+
+    return uwbStatus;
 }
 
 UwbStatus
