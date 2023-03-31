@@ -3,6 +3,7 @@
 #define NEAR_OBJECT_CLI_DATA_HXX
 
 #include <cstdint>
+#include <any>
 #include <optional>
 #include <string>
 
@@ -10,6 +11,8 @@
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
 #include <uwb/protocols/fira/UwbSessionData.hxx>
+
+using namespace uwb::protocol::fira;
 
 namespace nearobject::cli
 {
@@ -93,6 +96,43 @@ struct UwbApplicationConfigurationParameterData
     std::optional<std::unordered_set<uwb::UwbMacAddress>> destinationMacAddresses;
     std::optional<uwb::protocol::fira::DeviceType> deviceType;
     std::optional<uwb::UwbMacAddressType> macAddressMode;
+
+    /**
+     * @brief Variant for all possible property types.
+     */
+    using ParameterTypesVariant = std::variant<
+        uint8_t,
+        ::uwb::protocol::fira::DeviceRole,
+        ::uwb::protocol::fira::DeviceType,
+        ::uwb::protocol::fira::MultiNodeMode,
+        ::uwb::UwbMacAddress,
+        ::uwb::UwbMacAddressType,
+        std::unordered_set<::uwb::UwbMacAddress>>;
+
+    std::unordered_map<UwbApplicationConfigurationParameterType, ParameterTypesVariant>
+    GetValueMap() const
+    {
+        std::unordered_map<UwbApplicationConfigurationParameterType, ParameterTypesVariant> valuesMap;
+        if (deviceRole.has_value()) {
+            valuesMap[UwbApplicationConfigurationParameterType::DeviceRole] = deviceRole.value();
+        }
+        if (multiNodeMode.has_value()) {
+            valuesMap[UwbApplicationConfigurationParameterType::MultiNodeMode] = multiNodeMode.value();
+        }
+        if (numberOfControlees.has_value()) {
+            valuesMap[UwbApplicationConfigurationParameterType::NumberOfControlees] = numberOfControlees.value();
+        }
+        if (deviceMacAddress.has_value()) {
+            valuesMap[UwbApplicationConfigurationParameterType::DeviceMacAddress] = deviceMacAddress.value();
+        }
+        if (destinationMacAddresses.has_value()) {
+            valuesMap[UwbApplicationConfigurationParameterType::DestinationMacAddresses] = destinationMacAddresses.value();
+        }
+        if (deviceType.has_value()) {
+            valuesMap[UwbApplicationConfigurationParameterType::DeviceType] = deviceType.value();
+        }
+        return valuesMap;
+    }
 };
 
 /**

@@ -231,6 +231,42 @@ AddEnumOption(CLI::App* app, std::optional<EnumType>& assignTo, bool isMandatory
     }
 }
 
+/**
+ * @brief Displays and returns application configuration parameters.
+ *
+ * @param applicationConfigurationParameterData The possible application configuration parameters that may be set.
+ * @return std::vector<uwb::protocol::fira::UwbApplicationConfigurationParameter>.
+ */
+std::vector<uwb::protocol::fira::UwbApplicationConfigurationParameter>
+ProcessApplicationConfigurationParameters(UwbApplicationConfigurationParameterData applicationConfigurationParameterData)
+{
+    std::vector<uwb::protocol::fira::UwbApplicationConfigurationParameter> applicationConfigurationParameters;
+
+    std::cout << "Selected parameters:" << std::endl;
+    for (const auto& [applicationConfigurationParameter, applicationConfigurationParameterValue] : applicationConfigurationParameterData.GetValueMap()) {
+        std::visit([&applicationConfigurationParameter, &applicationConfigurationParameters](auto&& arg)
+        {
+            applicationConfigurationParameters.push_back({ applicationConfigurationParameter, arg });
+
+            using ParameterValueT = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_enum_v<ParameterValueT>) {
+                std::cout << magic_enum::enum_name(applicationConfigurationParameter) << "::" << magic_enum::enum_name(arg) << std::endl;
+            } else if constexpr (std::is_same_v<ParameterValueT, uint8_t>) {
+                std::cout << magic_enum::enum_name(applicationConfigurationParameter) << "::" << static_cast<int>(arg) << std::endl;
+            } else if constexpr (std::is_same_v<ParameterValueT, ::uwb::UwbMacAddress>) {
+                std::cout << magic_enum::enum_name(applicationConfigurationParameter) << "::" << ToString(arg) << std::endl;
+            } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<::uwb::UwbMacAddress>>) {
+                for (const auto& address : arg) {
+                    std::cout << magic_enum::enum_name(applicationConfigurationParameter) << "::" << ToString(arg) << std::endl;
+                }
+            } 
+        },
+            applicationConfigurationParameterValue);
+    }
+
+    return applicationConfigurationParameters;
+}
+
 } // namespace detail
 
 CLI::App*
@@ -447,25 +483,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
             m_cliData->appConfigParamsData.destinationMacAddresses.value().insert(uwb::UwbMacAddress::FromString(m_cliData->destinationMacAddressString, macAddressType).value());
         }
 
-        std::cout << "Selected parameters:" << std::endl;
-        // TODO: Display parameters more efficiently
-        std::cout << "DeviceRole: " << magic_enum::enum_name(m_cliData->appConfigParamsData.deviceRole.value()) << std::endl;
-        std::cout << "MultiNodeMode: " << magic_enum::enum_name(m_cliData->appConfigParamsData.multiNodeMode.value()) << std::endl;
-        std::cout << "NumberOfControlees: " << static_cast<int>(m_cliData->appConfigParamsData.numberOfControlees.value()) << std::endl;
-        std::cout << "DeviceMacAddress: " << m_cliData->appConfigParamsData.deviceMacAddress.value() << std::endl;
-        for (const auto& dstMacAddress : m_cliData->appConfigParamsData.destinationMacAddresses.value()) {
-            std::cout << "DestinationMacAddresses: " << dstMacAddress << std::endl;
-        }
-        std::cout << "DeviceType: " << magic_enum::enum_name(m_cliData->appConfigParamsData.deviceType.value()) << std::endl;
-
-        // TODO: Create std::vector<UwbApplicationConfigurationParameter> more efficiently
-        m_cliData->RangingParameters.ApplicationConfigurationParameters.push_back({ UwbApplicationConfigurationParameterType::DeviceRole, m_cliData->appConfigParamsData.deviceRole.value() });
-        m_cliData->RangingParameters.ApplicationConfigurationParameters.push_back({ UwbApplicationConfigurationParameterType::MultiNodeMode, m_cliData->appConfigParamsData.multiNodeMode.value() });
-        m_cliData->RangingParameters.ApplicationConfigurationParameters.push_back({ UwbApplicationConfigurationParameterType::NumberOfControlees, m_cliData->appConfigParamsData.numberOfControlees.value() });
-        m_cliData->RangingParameters.ApplicationConfigurationParameters.push_back({ UwbApplicationConfigurationParameterType::DeviceMacAddress, m_cliData->appConfigParamsData.deviceMacAddress.value() });
-        m_cliData->RangingParameters.ApplicationConfigurationParameters.push_back({ UwbApplicationConfigurationParameterType::DestinationMacAddresses, m_cliData->appConfigParamsData.destinationMacAddresses.value() });
-        m_cliData->RangingParameters.ApplicationConfigurationParameters.push_back({ UwbApplicationConfigurationParameterType::DeviceType, m_cliData->appConfigParamsData.deviceType.value() });
-
+        m_cliData->RangingParameters.ApplicationConfigurationParameters = detail::ProcessApplicationConfigurationParameters(m_cliData->appConfigParamsData);
         RegisterCliAppWithOperation(rangeStartApp);
     });
 
