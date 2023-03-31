@@ -1,5 +1,7 @@
 
+#include <iterator>
 #include <memory>
+#include <ranges>
 
 #include <magic_enum.hpp>
 #include <notstd/memory.hxx>
@@ -308,15 +310,22 @@ UwbSimulatorDevice::GetSessionCount()
 void
 UwbSimulatorDevice::PushUwbNotification(UwbNotificationData uwbNotificationData)
 {
-    // TODO: log
-    // TODO: avoid copies by using std::shared_ptr<> instead
+    constexpr auto resolveWeak = [](auto deviceFileWeak) {
+        return deviceFileWeak.lock();
+    };
+    constexpr auto nonNull = [](auto deviceFileStrong) {
+        return deviceFileStrong != nullptr;
+    };
+
+    DbgPrint("%p received push notification payload %s\n", m_wdfDevice, std::data(ToString(uwbNotificationData)));
+
+    // Make a copy of the non-null resolved device file references.
     std::shared_lock deviceFilesLockShared{ m_deviceFilesGate };
+    auto deviceFiles = m_deviceFiles | std::views::transform(resolveWeak) | std::views::filter(nonNull);
+    deviceFilesLockShared.unlock();
 
     // Distribute a copy of the notification data to each open file handle.
-    for (auto &deviceFileWeak : m_deviceFiles) {
-        auto deviceFile = deviceFileWeak.lock();
-        if (deviceFile != nullptr) {
-            deviceFile->GetIoEventQueue()->PushNotification(uwbNotificationData);
-        }
+    for (auto deviceFile : deviceFiles) {
+        deviceFile->GetIoEventQueue()->PushNotification(uwbNotificationData);
     }
 }
