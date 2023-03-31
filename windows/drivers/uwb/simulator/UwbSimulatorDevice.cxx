@@ -14,7 +14,7 @@ using windows::devices::uwb::simulator::UwbSimulatorSession;
 
 UwbSimulatorDevice::UwbSimulatorDevice(WDFDEVICE wdfDevice) :
     m_wdfDevice(wdfDevice),
-    m_ddiHandler(std::make_shared<UwbSimulatorDdiHandler>(this))
+    m_ddiHandler(std::make_shared<UwbSimulatorDdiHandler>(weak_from_this()))
 {}
 
 /* static */
@@ -60,7 +60,7 @@ UwbSimulatorDevice::OnWdfDeviceAdd(WDFDRIVER /* driver */, PWDFDEVICE_INIT devic
     auto uwbSimulatorDeviceContext = new (uwbSimulatorDeviceContextBuffer) UwbSimulatorDeviceWdfContext{
         .Device = std::make_shared<notstd::enable_make_protected<UwbSimulatorDevice>>(device)
     };
-    
+
     auto uwbSimulatorDevice = uwbSimulatorDeviceContext->Device;
     status = uwbSimulatorDevice->Initialize();
     return status;

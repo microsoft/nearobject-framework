@@ -61,7 +61,7 @@ const std::initializer_list<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>> U
     MakeLrpDispatchEntry<UwbSimulatorTriggerSessionEventArgs, Unrestricted>(IOCTL_UWB_DEVICE_SIM_TRIGGER_SESSION_EVENT, &UwbSimulatorDdiHandler::OnUwbSimulatorTriggerSessionEvent),
 };
 
-UwbSimulatorDdiHandler::UwbSimulatorDdiHandler(UwbSimulatorDevice *device) :
+UwbSimulatorDdiHandler::UwbSimulatorDdiHandler(std::weak_ptr<UwbSimulatorDevice> device) :
     m_device(device),
     m_callbacks(std::make_unique<UwbSimulatorDdiCallbacks>(device))
 {

@@ -27,7 +27,7 @@ struct UwbSimulatorDdiCallbacks :
     public IUwbSimulatorDdiCallbacksLrp,
     public IUwbSimulatorDdiCallbacksSimulator
 {
-    UwbSimulatorDdiCallbacks(UwbSimulatorDevice *device);
+    UwbSimulatorDdiCallbacks(std::weak_ptr<UwbSimulatorDevice> device);
 
     // IUwbSimulatorDdiCallbacksLrp
 
@@ -134,7 +134,7 @@ private:
 
 private:
     UwbSimulatorCapabilities m_simulatorCapabilities{};
-    UwbSimulatorDevice *m_device{ nullptr };
+    std::weak_ptr<UwbSimulatorDevice> m_device;
 };
 } // namespace windows::devices::uwb::simulator
 
