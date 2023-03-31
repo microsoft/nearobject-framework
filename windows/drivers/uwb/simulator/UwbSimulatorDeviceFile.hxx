@@ -17,11 +17,19 @@ class UwbSimulatorDevice;
 /**
  * @brief Device driver open file abstraction.
  */
-class UwbSimulatorDeviceFile
+class UwbSimulatorDeviceFile :
+    public std::enable_shared_from_this<UwbSimulatorDeviceFile>
 {
-public:
+protected:
+    /**
+     * @brief Construct a new UwbSimulatorDeviceFile object.
+     *
+     * @param wdfFile The WDF file object this context is associated with.
+     * @param uwbSimulatorDevice The parent device of the open file handle.
+     */
     explicit UwbSimulatorDeviceFile(WDFFILEOBJECT wdfFile, std::weak_ptr<UwbSimulatorDevice> uwbSimulatorDevice);
 
+public:
     /**
      * @brief Initializes the file object for use.
      *
