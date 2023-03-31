@@ -329,12 +329,16 @@ UwbSimulatorDevice::PushUwbNotification(UwbNotificationData uwbNotificationData)
     DbgPrint("%p received push notification payload %s\n", m_wdfDevice, std::data(ToString(uwbNotificationData)));
 
     // Make a copy of the non-null resolved device file references.
-    std::shared_lock deviceFilesLockShared{ m_deviceFilesGate };
-    auto deviceFiles = m_deviceFiles | std::views::transform(resolveWeak) | std::views::filter(nonNull);
-    deviceFilesLockShared.unlock();
+    std::vector<std::shared_ptr<UwbSimulatorDeviceFile>> deviceFiles{};
+    {
+        std::shared_lock deviceFilesLockShared{ m_deviceFilesGate };
+        std::ranges::transform(m_deviceFiles, std::back_inserter(deviceFiles), resolveWeak);
+    }
 
     // Distribute a copy of the notification data to each open file handle.
     for (auto deviceFile : deviceFiles) {
-        deviceFile->GetIoEventQueue()->PushNotification(uwbNotificationData);
+        if (deviceFile != nullptr) {
+            deviceFile->GetIoEventQueue()->PushNotification(uwbNotificationData);
+        }
     }
 }
