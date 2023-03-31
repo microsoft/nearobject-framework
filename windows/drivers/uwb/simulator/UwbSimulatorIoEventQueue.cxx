@@ -69,7 +69,7 @@ UwbSimulatorIoEventQueue::EnqueueRequest(WDFREQUEST request)
     if (!NT_SUCCESS(status)) {
         DbgPrint("%p failed to pend request %p with status 0x%08x\n", m_wdfQueue, status);
         return status;
-    } 
+    }
 
     // Notify the processing thread that a new request is pending.
     m_notificationRequestPending.notify_one();
@@ -87,7 +87,7 @@ UwbSimulatorIoEventQueue::PushNotification(UwbNotificationData notificationData)
         DbgPrint("%p pushing notification data with payload %s\n", m_wdfQueue, std::data(ToString(notificationData)));
         m_notificationQueue.push(std::move(notificationData));
     }
-    
+
     // Signal the processing thread that notification data is available.
     m_notificationDataAvailable.notify_one();
 }

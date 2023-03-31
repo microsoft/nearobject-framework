@@ -74,7 +74,7 @@ public:
 
 private:
     void
-    ProcessNotificationQueue(std::stop_token stopToken);  
+    ProcessNotificationQueue(std::stop_token stopToken);
 
 private:
     WDFQUEUE m_wdfQueue;
