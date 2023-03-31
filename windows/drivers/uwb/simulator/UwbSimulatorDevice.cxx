@@ -15,8 +15,7 @@ using windows::devices::uwb::simulator::UwbSimulatorDdiHandler;
 using windows::devices::uwb::simulator::UwbSimulatorSession;
 
 UwbSimulatorDevice::UwbSimulatorDevice(WDFDEVICE wdfDevice) :
-    m_wdfDevice(wdfDevice),
-    m_ddiHandler(std::make_shared<UwbSimulatorDdiHandler>(weak_from_this()))
+    m_wdfDevice(wdfDevice)
 {}
 
 /* static */
@@ -125,6 +124,8 @@ UwbSimulatorDevice::OnWdfFileClose(WDFFILEOBJECT file)
 NTSTATUS
 UwbSimulatorDevice::Initialize()
 {
+    m_ddiHandler = std::make_shared<UwbSimulatorDdiHandler>(weak_from_this());
+
     // Create a default queue for all requests that are not explicitly configured to go elsewhere.
     WDF_IO_QUEUE_CONFIG queueConfig;
     WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
