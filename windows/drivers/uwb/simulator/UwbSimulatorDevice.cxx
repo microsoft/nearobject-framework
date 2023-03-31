@@ -183,6 +183,7 @@ UwbSimulatorDevice::OnFileCreate(WDFDEVICE device, WDFREQUEST request, WDFFILEOB
         DbgPrint("%p added file object %p\n", m_wdfDevice, file);
     } else {
         uwbSimulatorFile->~UwbSimulatorDeviceFile();
+        DbgPrint("%p failed to intialize file object context with status 0x%08x\n", status);
     }
 
     WdfRequestComplete(request, uwbSimulatorFileStatus);
