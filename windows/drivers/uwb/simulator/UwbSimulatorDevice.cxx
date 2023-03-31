@@ -177,6 +177,8 @@ UwbSimulatorDevice::OnFileCreate(WDFDEVICE device, WDFREQUEST request, WDFFILEOB
     auto uwbSimulatorFileStatus = uwbSimulatorFile->Initialize();
     if (uwbSimulatorFileStatus == STATUS_SUCCESS) {
         uwbSimulatorFile->RegisterHandler(m_ddiHandler);
+
+        std::unique_lock deviceFilesLockExclusive{ m_deviceFilesGate };
         m_deviceFiles.push_back(uwbSimulatorFile);
         DbgPrint("%p added file object %p\n", m_wdfDevice, file);
     } else {
@@ -195,6 +197,7 @@ UwbSimulatorDevice::OnFileClose(WDFFILEOBJECT file)
         TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
         TraceLoggingPointer(file, "File"));
 
+    std::unique_lock deviceFilesLockExclusive{ m_deviceFilesGate };
     const auto uwbSimulatorFileClosed = GetUwbSimulatorFile(file);
     const auto removed = std::erase_if(m_deviceFiles, [&](const auto &uwbSimulatorFile) {
         return (uwbSimulatorFile == uwbSimulatorFileClosed);
@@ -295,8 +298,8 @@ void
 UwbSimulatorDevice::PushUwbNotification(UwbNotificationData uwbNotificationData)
 {
     // TODO: log
-    // TODO: lock
     // TODO: avoid copies by using std::shared_ptr<> instead
+    std::shared_lock deviceFilesLockShared{ m_deviceFilesGate };
 
     // Distribute a copy of the notification data to each open file handle.
     for (auto &deviceFile : m_deviceFiles) {
