@@ -65,6 +65,13 @@ UwbSimulatorDevice::OnWdfDeviceAdd(WDFDRIVER /* driver */, PWDFDEVICE_INIT devic
 
     auto uwbSimulatorDevice = uwbSimulatorDeviceContext->Device;
     status = uwbSimulatorDevice->Initialize();
+    if (!NT_STATUS(status)) {
+        uwbSimulatorDeviceContext->~UwbSimulatorDeviceWdfContext();
+        DbgPrint("failed to initialize device context with status 0x%08x\n", status);
+    } else {
+        DbgPrint("successfully initialize simulator device context\n");
+    }
+
     return status;
 }
 
