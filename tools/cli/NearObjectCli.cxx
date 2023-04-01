@@ -1,4 +1,5 @@
 
+#include <bitset>
 #include <optional>
 #include <stdexcept>
 #include <string>
@@ -264,9 +265,7 @@ ProcessApplicationConfigurationParameters(UwbApplicationConfigurationParameterDa
             } else if constexpr (std::is_same_v<ParameterValueT, bool>) {
                 oss << std::boolalpha << arg;
             } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<ResultReportConfiguration>>) {
-                for (const auto& resultReportConfiguration : arg) {
-                    oss << ToString(arg);
-                }
+                oss << ToString(arg);
             } else if constexpr (std::is_same_v<ParameterValueT, std::array<uint8_t, StaticStsInitializationVectorLength>>) {
                 for (const auto& value : arg) {
                     oss << "0x" << std::setw(2) << std::internal << std::setfill('0') << std::hex << +value << " ";
@@ -523,7 +522,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     detail::AddEnumOption(rangeStartApp, appConfigParamsData.txAdaptivePayloadPower);
 
     // other
-    rangeStartApp->add_option("--ResultReportConfig", m_cliData->resultReportConfigurationString, "4-bit report config, e.g. 0101. b3=AOA FOM, b2=AOA Elevation, b1=AOA Azimuth, b0=TOF")->capture_default_str(); // TODO: Parse values into unordered_set
+    rangeStartApp->add_option("--ResultReportConfig", m_cliData->resultReportConfigurationString, "4-bit report config, e.g. 0101. b3=AOA FOM, b2=AOA Elevation, b1=AOA Azimuth, b0=TOF")->capture_default_str();
     rangeStartApp->add_option("--StaticStsInitializationVector", appConfigParamsData.staticStsIv, "6-octet array for vendor-defined static STS configuration, e.g. 11:22:33:44:55:66")->delimiter(':');
 
     rangeStartApp->parse_complete_callback([this, rangeStartApp] {
@@ -544,6 +543,40 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
         // TODO: Insert the correct Controlee mac address rather than simply inserting the entire destinationMacAddressString
         for (auto i = 0; i < m_cliData->appConfigParamsData.numberOfControlees; i++) {
             m_cliData->appConfigParamsData.destinationMacAddresses.value().insert(uwb::UwbMacAddress::FromString(m_cliData->destinationMacAddressString, macAddressType).value());
+        }
+
+        // Parse and validate ResultReportConfig
+        constexpr int resultReportConfigurationSize = 4; // TODO: Find a way to calculate this number
+        auto IsValidResultReportConfigurationString = [resultReportConfigurationSize](const std::string& resultReportConfigurationString) {
+            if (resultReportConfigurationString.length() != resultReportConfigurationSize) {
+                std::cerr << "Invalid ResultReportConfiguration length" << std::endl;
+                return false;
+            }
+            for (char c : resultReportConfigurationString) {
+                if (c != '0' && c != '1') {
+                    std::cerr << "Invalid ResultReportConfiguration value" << std::endl;
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        if (IsValidResultReportConfigurationString(m_cliData->resultReportConfigurationString)) {
+            m_cliData->appConfigParamsData.resultReportConfig.emplace();
+
+            const std::bitset<4> resultReportConfigurationBits(m_cliData->resultReportConfigurationString);
+            if (resultReportConfigurationBits[0]) {
+                m_cliData->appConfigParamsData.resultReportConfig.value().insert(ResultReportConfiguration::TofReport);
+            }
+            if (resultReportConfigurationBits[1]) {
+                m_cliData->appConfigParamsData.resultReportConfig.value().insert(ResultReportConfiguration::AoAAzimuthReport);
+            }
+            if (resultReportConfigurationBits[2]) {
+                m_cliData->appConfigParamsData.resultReportConfig.value().insert(ResultReportConfiguration::AoAElevationReport);
+            }
+            if (resultReportConfigurationBits[3]) {
+                m_cliData->appConfigParamsData.resultReportConfig.value().insert(ResultReportConfiguration::AoAFoMReport);
+            }
         }
 
         m_cliData->RangingParameters.ApplicationConfigurationParameters = detail::ProcessApplicationConfigurationParameters(m_cliData->appConfigParamsData);
