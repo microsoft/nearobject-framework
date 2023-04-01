@@ -13,7 +13,7 @@ NearObjectManager::FindAllConnectionProfiles() const
 }
 
 NearObjectManager::NearObjectCreateSessionResult
-NearObjectManager::CreateSession(const NearObjectProfile& connectionProfile)
+NearObjectManager::CreateSession(const NearObjectProfile& /* connectionProfile */)
 {
     // TODO: proxy to valid NearObjectDeviceControllerManager
     return {};

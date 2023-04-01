@@ -18,12 +18,24 @@ target_include_directories(nearobject-service-windows
 
 target_link_libraries(nearobject-service-windows
     PRIVATE
-        windevuwb
+        windows-devices-uwb
     PUBLIC
-        cfgmgr32.lib
         nearobject-service
-        WIL
-        windevutil
+        WIL::WIL
+        windows-devices-util
+)
+
+list(APPEND NO_SERVICE_WINDOWS_PUBLIC_HEADERS
+    ${NO_SERVICE_WINDOWS_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectDeviceDiscoveryAgentUwb.hxx
 )
 
 set_target_properties(nearobject-service-windows PROPERTIES FOLDER windows/service)
+set_target_properties(nearobject-service-windows PROPERTIES PUBLIC_HEADER "${NO_SERVICE_WINDOWS_PUBLIC_HEADERS}")
+
+install(
+    TARGETS nearobject-service-windows
+    EXPORT nearobject
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/windows/nearobject/service
+)
+
+add_subdirectory(host)

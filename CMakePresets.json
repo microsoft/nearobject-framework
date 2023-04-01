@@ -1,0 +1,284 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 25
+    },
+    "configurePresets": [
+        {
+            "name": "os-windows",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "os-linux",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+        {
+            "name": "resolve-deps-fetchcontent",
+            "hidden": true,
+            "displayName": "Resolve dependencies with FetchContent",
+            "description": "configures project to resolve dependencies with FetchContent",
+            "cacheVariables": {
+                "NOF_DEPENDENCY_RESOLUTION_METHOD": "FetchContent"
+            }
+        },
+        {
+            "name": "resolve-deps-vcpkg",
+            "hidden": true,
+            "displayName": "Resolve dependencies with vcpkg",
+            "description": "configures project to resolve dependencies with vcpkg",
+            "cacheVariables": {
+                "NOF_DEPENDENCY_RESOLUTION_METHOD": "vcpkg"
+            }
+        },
+        {
+            "name": "out-of-source-build",
+            "hidden": true,
+            "displayName": "Out of source build",
+            "description": "Configure to build outside of the source tree",
+            "binaryDir": "${sourceParentDir}/${sourceDirName}-cmake/out/build/${presetName}",
+            "installDir": "${sourceParentDir}/${sourceDirName}-cmake/out/install/${presetName}"
+        },
+        {
+            "name": "in-source-build",
+            "hidden": true,
+            "displayName": "In source build",
+            "description": "Configure to build inside the source tree",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "installDir": "${sourceDir}/out/install/${presetName}"
+        },
+        {
+            "name": "dev-base",
+            "hidden": true,
+            "displayName": "Development (base)",
+            "description": "Base options for all development presets",
+            "cacheVariables": {
+                "NOF_BUILD_ENVIRONMENT": "development",
+                "NOF_VCPKG_TARGET": "development"
+            },
+            "inherits": [
+                "in-source-build"
+            ]
+        },
+        {
+            "name": "vcpkg-base",
+            "hidden": true,
+            "displayName": "vcpkg (base)",
+            "description": "Base options for all vcpkg presets",
+            "inherits":[
+                "resolve-deps-vcpkg",
+                "in-source-build"
+            ],
+            "cacheVariables": {
+                "NOF_BUILD_ENVIRONMENT": "vcpkg"
+            }
+        },
+        {
+            "name": "dev",
+            "displayName": "Development (with FetchContent)",
+            "description": "Development build for inner-loop with FetchContent",
+            "inherits": [
+                "dev-base",
+                "resolve-deps-fetchcontent"
+            ]
+        },
+        {
+            "name": "dev-vcpkg",
+            "displayName": "Development (with vcpkg)",
+            "description": "Development build for inner-loop with vcpkg",
+            "inherits": [
+                "dev-base",
+                "resolve-deps-vcpkg"
+            ]
+        },
+        {
+            "name": "dev-driver",
+            "displayName": "Development (simulator driver)",
+            "description": "Development for the simulator driver",
+            "inherits": [
+                "os-windows",
+                "dev"
+            ],
+            "generator": "Visual Studio 17 2022",
+            "architecture":{
+                "strategy": "set",
+                "value": "x64"
+            },
+            "toolset":{
+                "strategy": "set",
+                "value": "host=x64"
+            },
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.34.31933/bin/Hostx64/x64/cl.exe",
+                "NOF_BUILD_WINDOWS_UWB_SIMULATOR_DRIVER": true
+            }
+        },
+        {
+            "name": "vcpkg-dev",
+            "displayName": "vcpkg (development)",
+            "description": "vcpkg-based build with development (latest) sources",
+            "inherits": [
+                "vcpkg-base"
+            ],
+            "cacheVariables": {
+                "NOF_VCPKG_TARGET": "development"
+            }
+        },
+        {
+            "name": "vcpkg-release",
+            "displayName": "vcpkg (release)",
+            "description": "vcpkg-based build with release (stable) sources",
+            "inherits": [
+                "vcpkg-base"
+            ],
+            "cacheVariables": {
+                "NOF_VCPKG_TARGET": "release"
+            }
+        },
+        {
+            "name": "cicd",
+            "displayName": "CI/CD",
+            "description": "Continuous integration and continuous delivery (CI/CD) based build",
+            "inherits": [
+                "dev-vcpkg"
+            ]
+        },
+        {
+            "name": "official-release",
+            "displayName": "Offcial Release",
+            "description": "Official release build",
+            "inherits": [
+                "cicd"
+            ],
+            "cacheVariables": {
+                "NOF_OFFICIAL_RELEASE": true
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "dev",
+            "configurePreset": "dev",
+            "configuration": "Debug"
+        },
+        {
+            "name": "vcpkg",
+            "configurePreset": "vcpkg-dev",
+            "configuration": "Debug"
+        },
+        {
+            "name": "release",
+            "configurePreset": "vcpkg-release",
+            "configuration": "Release"
+        },
+        {
+            "name": "driver",
+            "configurePreset": "dev-driver"
+        },
+        {
+            "name": "cicd",
+            "configurePreset": "cicd"
+        },
+        {
+            "name": "official-release",
+            "configurePreset": "official-release"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "test-common",
+            "hidden": true,
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "dev",
+            "configurePreset": "dev",
+            "inherits": [
+                "test-common"
+            ]
+        },
+        {
+            "name": "cicd",
+            "configurePreset": "cicd",
+            "inherits": [
+                "test-common"
+            ]
+        },
+        {
+            "name": "official-release",
+            "configurePreset": "official-release",
+            "inherits": [
+                "test-common"
+            ]
+        }
+    ],
+    "packagePresets": [
+        {
+            "name": "package-metadata",
+            "hidden": true,
+            "packageName": "nearobjectframework",
+            "vendorName": "microsoft"
+        },
+        {
+            "name": "package-generators",
+            "hidden": true,
+            "generators": [
+                "TXZ",
+                "ZIP"
+            ]
+        },
+        {
+            "name": "package-common",
+            "hidden": true,
+            "description": "Settings common to all packaging presets",
+            "inherits": [
+                "package-metadata",
+                "package-generators"
+            ]
+        },
+        {
+            "name": "package-out-of-source",
+            "hidden": true,
+            "variables": {
+                "CPACK_PACKAGE_DIRECTORY": "${sourceParentDir}/${sourceDirName}-cmake/out/package/${presetName}"
+            }
+        },
+        {
+            "name": "package-in-source",
+            "hidden": true,
+            "variables": {
+                "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/out/package/${presetName}"
+            }
+        },
+        {
+            "name": "cicd",
+            "displayName": "CI/CD",
+            "configurePreset": "cicd",
+            "inherits": [
+                "package-common",
+                "package-in-source"
+            ]
+        },
+        {
+            "name": "official-release",
+            "displayName": "Official Release",
+            "configurePreset": "official-release",
+            "inherits": [
+                "package-common",
+                "package-in-source"
+            ]
+        }
+    ]
+}

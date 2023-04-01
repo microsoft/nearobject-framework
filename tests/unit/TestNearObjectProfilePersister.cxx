@@ -8,11 +8,13 @@
 #include <system_error>
 #include <vector>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <nearobject/NearObjectProfile.hxx>
 #include <nearobject/persist/NearObjectProfilePersister.hxx>
 #include <nearobject/persist/NearObjectProfilePersisterFilesystem.hxx>
 #include <notstd/tostring.hxx>
+
+// NOLINTBEGIN(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
 
 using namespace strings::ostream_operators;
 
@@ -118,7 +120,7 @@ GetIso8601Timestamp()
 {
     const auto nowUtc = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
     const auto timestampAsTimeT = std::chrono::system_clock::to_time_t(nowUtc);
-    const auto timestampAsTm = *(std::gmtime(&timestampAsTimeT));
+    const auto timestampAsTm = *(std::gmtime(&timestampAsTimeT)); // NOLINT(concurrency-mt-unsafe)
 
     std::ostringstream timestampBuilder{};
     timestampBuilder << std::put_time(&timestampAsTm, "%Y%m%dT%H%M%S%zZ");
@@ -296,3 +298,5 @@ TEST_CASE("near object filesystem persister persists profiles", "[basic][persist
         // TODO
     }
 }
+
+// NOLINTEND(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)

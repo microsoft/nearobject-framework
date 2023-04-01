@@ -3,8 +3,10 @@
 #include <type_traits>
 #include <vector>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <notstd/range.hxx>
+
+// NOLINTBEGIN(*-avoid-c-arrays, cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
 /**
  * @brief Helper to validate a created range.
@@ -42,33 +44,34 @@ ValidateRange(const notstd::iterator_range<IteratorT>& range, const IteratorT& b
  * multiple tests. This is needed because std::to_array<> isn't available until
  * C++ 20.
  */
-#define VALUE_SEQUENCE 1,2,3,4,5,6,7,8,9,10,11,12
+#define VALUE_SEQUENCE 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 
 namespace notstd
 {
 namespace test
 {
-    // Raw array
-    constexpr int ValuesRawArray[] = { VALUE_SEQUENCE };
-    constexpr auto *ValuesRawArrayPtr = &ValuesRawArray[0];
-    constexpr auto ValuesRawCount = std::extent<decltype(ValuesRawArray)>::value;
-    constexpr auto ValuesRawPBegin = &ValuesRawArray[0];
-    constexpr auto ValuesRawBegin = std::begin(ValuesRawArray);
-    constexpr auto ValuesRawCBegin = std::cbegin(ValuesRawArray);
-    constexpr auto ValuesRawEnd = std::end(ValuesRawArray);
-    constexpr auto ValuesRawCEnd = std::cend(ValuesRawArray);
+// Raw array
+constexpr int ValuesRawArray[] = { VALUE_SEQUENCE };
+constexpr auto* ValuesRawArrayPtr = &ValuesRawArray[0];
+constexpr auto ValuesRawCount = std::extent<decltype(ValuesRawArray)>::value;
+constexpr auto ValuesRawPBegin = &ValuesRawArray[0];
+constexpr auto ValuesRawBegin = std::begin(ValuesRawArray);
+constexpr auto ValuesRawCBegin = std::cbegin(ValuesRawArray);
+constexpr auto ValuesRawEnd = std::end(ValuesRawArray);
+constexpr auto ValuesRawCEnd = std::cend(ValuesRawArray);
 
-    // std::array
-    constexpr std::array ValuesStdArray = { VALUE_SEQUENCE };
-    constexpr auto ValuesStdArrayCount = std::size(ValuesStdArray);
-    constexpr auto ValuesStdArrayBegin = std::begin(ValuesStdArray);
-    constexpr auto ValuesStdArrayCBegin = std::cbegin(ValuesStdArray);
-    constexpr auto ValuesStdArrayEnd = std::end(ValuesStdArray);
-    constexpr auto ValuesStdArrayCEnd = std::cend(ValuesStdArray);
+// std::array
+constexpr std::array ValuesStdArray = { VALUE_SEQUENCE };
+constexpr auto ValuesStdArrayCount = std::size(ValuesStdArray);
+constexpr auto ValuesStdArrayBegin = std::begin(ValuesStdArray);
+constexpr auto ValuesStdArrayCBegin = std::cbegin(ValuesStdArray);
+constexpr auto ValuesStdArrayEnd = std::end(ValuesStdArray);
+constexpr auto ValuesStdArrayCEnd = std::cend(ValuesStdArray);
 
 } // namespace test
 } // namespace notstd
 
+// This test specifically tests iterators which use arithmetic, so disable lint for that.
 TEST_CASE("range can be created from range bounds", "[notstd][range][utility]")
 {
     using namespace notstd::test;
@@ -122,13 +125,13 @@ TEST_CASE("range can be used in range-based for loops")
 
     SECTION("range created by c'tor can be used range-base for loop")
     {
-        REQUIRE_NOTHROW([&]{
-            for (const auto& value : notstd::iterator_range(ValuesStdArrayBegin, ValuesStdArrayEnd)) {
+        REQUIRE_NOTHROW([&] {
+            for ([[maybe_unused]] const auto& value : notstd::iterator_range(ValuesStdArrayBegin, ValuesStdArrayEnd)) {
                 ;
             }
         }());
-        REQUIRE_NOTHROW([&]{
-            for (const auto& value : notstd::iterator_range(ValuesStdArrayCBegin, ValuesStdArrayCEnd)) {
+        REQUIRE_NOTHROW([&] {
+            for ([[maybe_unused]] const auto& value : notstd::iterator_range(ValuesStdArrayCBegin, ValuesStdArrayCEnd)) {
                 ;
             }
         }());
@@ -136,15 +139,17 @@ TEST_CASE("range can be used in range-based for loops")
 
     SECTION("range created by make_range can be used in range-based for loop")
     {
-        REQUIRE_NOTHROW([&]{
-            for (const auto& value : notstd::make_range(ValuesStdArrayBegin, ValuesStdArrayCount)) {
+        REQUIRE_NOTHROW([&] {
+            for ([[maybe_unused]] const auto& value : notstd::make_range(ValuesStdArrayBegin, ValuesStdArrayCount)) {
                 ;
             }
         }());
-        REQUIRE_NOTHROW([&]{
-            for (const auto& value : notstd::make_range(ValuesStdArrayCBegin, ValuesStdArrayCount)) {
+        REQUIRE_NOTHROW([&] {
+            for ([[maybe_unused]] const auto& value : notstd::make_range(ValuesStdArrayCBegin, ValuesStdArrayCount)) {
                 ;
             }
-        }()); 
+        }());
     }
 }
+
+// NOLINTEND(*-avoid-c-arrays, cppcoreguidelines-pro-bounds-pointer-arithmetic)

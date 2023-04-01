@@ -18,4 +18,18 @@ target_include_directories(tlv
         ${TLV_DIR_PUBLIC_INCLUDE}
 )
 
+list(APPEND TLV_PUBLIC_HEADERS
+    ${TLV_DIR_PUBLIC_INCLUDE}/Tlv.hxx
+    ${TLV_DIR_PUBLIC_INCLUDE}/TlvBer.hxx
+    ${TLV_DIR_PUBLIC_INCLUDE}/TlvSimple.hxx
+)
+
 set_target_properties(tlv PROPERTIES FOLDER lib/shared/tlv)
+set_target_properties(tlv PROPERTIES PUBLIC_HEADER "${TLV_PUBLIC_HEADERS}")
+
+install(
+    TARGETS tlv
+    EXPORT tlv
+    ARCHIVE
+    PUBLIC_HEADER
+)

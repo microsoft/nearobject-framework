@@ -1,6 +1,7 @@
 
 #include <cassert>
-#include <ciso646>
+#include <version>
+
 #include <notstd/task_queue.hxx>
 
 using namespace notstd;
@@ -45,12 +46,12 @@ task_queue::get_dispatcher() const noexcept
 }
 
 void
-task_queue::stop(pending_task_action pending_task_action) noexcept
+task_queue::stop(pending_task_action pending_action) noexcept
 {
     {
         std::scoped_lock runnables_changed_lock{ m_runnables_changed_gate };
 
-        switch (pending_task_action) {
+        switch (pending_action) {
         case pending_task_action::cancel:
             m_state = state::canceling;
             break;
@@ -137,6 +138,7 @@ task_queue::process_queue()
         // the lock to run them later.
         assert(m_runnables.size() > 0);
         auto tasks = std::move(m_runnables);
+        m_runnables = {};
 
         // Now that all pending tasks have been popped from the queue, release
         // the lock. This allows clients to continue pushing onto the queue

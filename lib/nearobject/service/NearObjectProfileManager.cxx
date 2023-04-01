@@ -2,11 +2,11 @@
 #include <algorithm>
 #include <fstream>
 #include <mutex>
-#include <stdexcept>
 #include <sstream>
+#include <stdexcept>
 
-#include <nearobject/service/NearObjectProfileManager.hxx>
 #include <nearobject/persist/NearObjectProfilePersisterFilesystem.hxx>
+#include <nearobject/service/NearObjectProfileManager.hxx>
 
 using namespace nearobject;
 using namespace nearobject::persistence;

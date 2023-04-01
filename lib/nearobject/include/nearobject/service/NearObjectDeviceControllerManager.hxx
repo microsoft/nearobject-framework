@@ -79,8 +79,10 @@ public:
     ~NearObjectDeviceControllerManager() = default;
     NearObjectDeviceControllerManager(const NearObjectDeviceControllerManager&) = delete;
     NearObjectDeviceControllerManager(NearObjectDeviceControllerManager&&) = delete;
-    NearObjectDeviceControllerManager& operator=(NearObjectDeviceControllerManager&) = delete;
-    NearObjectDeviceControllerManager& operator=(NearObjectDeviceControllerManager&&) = delete;
+    NearObjectDeviceControllerManager&
+    operator=(NearObjectDeviceControllerManager&) = delete;
+    NearObjectDeviceControllerManager&
+    operator=(NearObjectDeviceControllerManager&&) = delete;
 
 protected:
     /**
@@ -108,7 +110,7 @@ private:
      * @param deviceChanged
      */
     void
-    OnDevicePresenceChanged(NearObjectDeviceControllerDiscoveryAgent *discoveryAgent, NearObjectDevicePresence presence, std::shared_ptr<NearObjectDeviceController> deviceChanged);
+    OnDevicePresenceChanged(NearObjectDeviceControllerDiscoveryAgent* discoveryAgent, NearObjectDevicePresence presence, std::shared_ptr<NearObjectDeviceController> deviceChanged);
 
     /**
      * @brief Adds a new device for use by the framework to implement Near

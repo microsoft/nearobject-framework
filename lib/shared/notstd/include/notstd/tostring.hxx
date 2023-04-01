@@ -13,7 +13,7 @@ namespace strings
 {
 namespace ostream_operators
 {
-namespace detail
+namespace value_providers 
 {
 struct empty_value_provider
 {
@@ -29,18 +29,20 @@ struct empty_value_provider
  * @brief Helper implementing global operator << which passes the result of
  * ToString() to the output stream.
  * 
- * @tparam HasToStringT The type which implements a ToString() function returning std::string
+ * @tparam CharT 
+ * @tparam Traits 
+ * @tparam ElementT The type which implements a ToString() function returning std::string
  * @param stream 
  * @param ref 
  * @return std::ostream& 
  */
-template<
+template <
     typename CharT,
     typename Traits,
-    typename HasToStringT,
-    typename = typename std::enable_if<std::is_member_function_pointer<decltype(&HasToStringT::ToString)>::value>::type>
+    typename ElementT>
+requires std::is_member_function_pointer_v<decltype(&ElementT::ToString)>
 std::ostream&
-operator<<(std::basic_ostream<CharT, Traits>& stream, const HasToStringT& ref)
+operator<<(std::basic_ostream<CharT, Traits>& stream, const ElementT& ref)
 {
     stream << ref.ToString();
     return stream;
@@ -50,7 +52,9 @@ operator<<(std::basic_ostream<CharT, Traits>& stream, const HasToStringT& ref)
  * @brief Helper implementing global operator <<, wrapping optional types whose
  * value type defines a ToString() function.
  * 
- * @tparam HasToStringT The type which implements a ToString() function returning std::string
+ * @tparam CharT 
+ * @tparam Traits 
+ * @tparam ElementT The type which implements a ToString() function returning std::string
  * @tparam EmptyValueProviderT The type providing the value to pass to the
  * output stream if the specified object does not contain a value. Defaults to
  * empty_value_provider
@@ -58,14 +62,14 @@ operator<<(std::basic_ostream<CharT, Traits>& stream, const HasToStringT& ref)
  * @param ref 
  * @return std::ostream& 
  */
-template<
+template <
     typename CharT,
     typename Traits,
-    typename HasToStringT,
-    typename = typename std::enable_if<std::is_member_function_pointer<decltype(&HasToStringT::ToString)>::value>::type,
-    typename EmptyValueProviderT = detail::empty_value_provider>
+    typename ElementT,
+    typename EmptyValueProviderT = value_providers::empty_value_provider>
+requires std::is_member_function_pointer_v<decltype(&ElementT::ToString)>
 std::ostream&
-operator<<(std::basic_ostream<CharT, Traits>& stream, const std::optional<HasToStringT>& ref)
+operator<<(std::basic_ostream<CharT, Traits>& stream, const std::optional<ElementT>& ref)
 {
     ref.has_value()
         ? stream << ref.value()
@@ -85,7 +89,7 @@ namespace containers
  * @param empty_name The name to output if the container is empty.
  * @return auto 
  */
-template<
+template <
     typename ContainerT,
     typename ItemT = typename ContainerT::value_type>
 auto

@@ -3,9 +3,11 @@
 #include <chrono>
 #include <memory>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <nearobject/service/NearObjectDeviceController.hxx>
 #include <nearobject/service/NearObjectDeviceControllerDiscoveryAgent.hxx>
+
+// NOLINTBEGIN(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
 
 namespace nearobject
 {
@@ -45,15 +47,24 @@ protected:
 struct NearObjectDeviceTest :
     public NearObjectDeviceController
 {
-    explicit NearObjectDeviceTest(uint64_t deviceId) :
-        NearObjectDeviceController(deviceId)
+    explicit NearObjectDeviceTest(uint8_t deviceId) :
+        DeviceId(deviceId)
     {}
 
     StartSessionResult
-    StartSessionImpl(const NearObjectProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) override
+    StartSessionImpl(const NearObjectProfile& /* profile */, std::weak_ptr<NearObjectSessionEventCallbacks> /* eventCallbacks */) override
     {
         return { std::nullopt };
     }
+
+    bool
+    IsEqual(const NearObjectDeviceController& other) const noexcept override
+    {
+        const auto& rhs = static_cast<const NearObjectDeviceTest&>(other);
+        return (this->DeviceId == rhs.DeviceId);
+    }
+
+    uint8_t DeviceId;
 };
 } // namespace test
 } // namespace service
@@ -114,6 +125,8 @@ TEST_CASE("near object device discovery agent can be created", "[basic][service]
 
     SECTION("discovery event callback provides correct presence and device for added device")
     {
+        using nearobject::service::NearObjectDevicePresence;
+
         const auto deviceToAdd = std::make_shared<test::NearObjectDeviceTest>(0x1);
         discoveryAgentTest.RegisterDiscoveryEventCallback([&](auto&& presence, auto&& deviceAdded) {
             REQUIRE(*deviceToAdd == *deviceAdded);
@@ -124,6 +137,8 @@ TEST_CASE("near object device discovery agent can be created", "[basic][service]
 
     SECTION("discovery event callback provides correct presence and device for removed device")
     {
+        using nearobject::service::NearObjectDevicePresence;
+
         const auto deviceToRemove = std::make_shared<test::NearObjectDeviceTest>(0x1);
         discoveryAgentTest.RegisterDiscoveryEventCallback([&](auto&& presence, auto&& deviceRemoved) {
             REQUIRE(*deviceToRemove == *deviceRemoved);
@@ -161,3 +176,5 @@ TEST_CASE("near object device discovery agent can be created", "[basic][service]
         REQUIRE(probeResults.size() == probeDevices.size());
     }
 }
+
+// NOLINTEND(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)

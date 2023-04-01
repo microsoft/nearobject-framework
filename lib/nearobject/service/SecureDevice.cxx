@@ -10,7 +10,7 @@ SecureDevice::CreateChannel(SecureDeviceChannelParameters params)
 }
 
 SecureDeviceChannel*
-SecureDevice::CreateChannelImpl(SecureDeviceChannelParameters /* params */)
+SecureDevice::CreateChannelImpl(SecureDeviceChannelParameters)
 {
     return nullptr;
 }

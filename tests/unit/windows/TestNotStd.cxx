@@ -1,15 +1,19 @@
 
 #include <algorithm>
 #include <array>
+#include <cctype>
+#include <cwctype>
 #include <functional>
 #include <map>
+#include <optional>
 #include <queue>
 #include <set>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <notstd/guid.hxx>
 
@@ -22,9 +26,79 @@ namespace test
 DEFINE_GUID(Guid1, 0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01);
 DEFINE_GUID(Guid2, 0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02);
 DEFINE_GUID(Guid3, 0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03);
+DEFINE_GUID(Guid4, 0xd9e92566, 0xdc22, 0x413c, 0x9f, 0x9d, 0xf1, 0x3e, 0x61, 0x3b, 0x60, 0x82);
+
+#define WSTR(s) WSTR2(s)
+#define WSTR2(s) L##s
+
+#define GUID1STR "00000000-0000-0000-0000-000000000001"
+#define GUID2STR "00000000-0000-0000-0000-000000000002"
+#define GUID3STR "00000000-0000-0000-0000-000000000003"
+#define GUID4STR "d9e92566-dc22-413c-9f9d-f13e613b6082"
 
 // Declare built-in array.
-const std::array<GUID, 3> Guids = { Guid1, Guid2, Guid3 };
+const std::array<GUID, 4> Guids = { Guid1, Guid2, Guid3, Guid4 };
+
+struct GuidStringHelper {
+    std::string Narrow;
+    std::wstring Wide;
+};
+
+const std::unordered_map<GUID, GuidStringHelper> StringMap = {
+    { Guid1, { GUID1STR, WSTR(GUID1STR) } },
+    { Guid2, { GUID2STR, WSTR(GUID2STR) } },
+    { Guid3, { GUID3STR, WSTR(GUID3STR) } },
+    { Guid4, { GUID4STR, WSTR(GUID4STR) } },
+};
+
+/**
+ * @brief Check if two strings are equal in a case-insensitive manner. 
+ * 
+ * @tparam TString The type of the string to compare.
+ * @param s1 The first string to compare.
+ * @param s2 The second string to compare.
+ * @return true If the strings have the same letters in the same sequence, ignoring case.
+ * @return false Otherwise.
+ */
+template <typename TString>
+bool
+string_iequals(const TString& s1, const TString& s2);
+
+/**
+ * @brief Specialization for checking if two std::strings are equal in a case-insensitive manner.
+ * 
+ * @tparam  
+ * @param s1 
+ * @param s2 
+ * @return true 
+ * @return false 
+ */
+template <>
+bool
+string_iequals(const std::string& s1, const std::string& s2)
+{
+    return std::equal(std::cbegin(s1), std::cend(s1), std::cbegin(s2), std::cend(s2), [](auto&& c1, auto&& c2) {
+        return std::tolower(c1) == std::tolower(c2);
+    });
+}
+
+/**
+ * @brief Specialization for checking if two std::wstrings are equal in a case-insensitive manner.
+ * 
+ * @tparam  
+ * @param s1 
+ * @param s2 
+ * @return true 
+ * @return false 
+ */
+template <>
+bool
+string_iequals(const std::wstring& s1, const std::wstring& s2)
+{
+    return std::equal(std::cbegin(s1), std::cend(s1), std::cbegin(s2), std::cend(s2), [](auto&& c1, auto&& c2) {
+        return std::towlower(c1) == std::towlower(c2);
+    });
+}
 
 } // namespace test
 } // namespace notstd
@@ -205,9 +279,6 @@ TEST_CASE("GUID type can be used with STL containers", "[basic][shared][windows]
             REQUIRE(guidNodeOne.mapped() == test::Guids[2]);
             REQUIRE(umapsOfGuids[0] == umapsOfGuids[1]);
         }
-
-        {   // unordered_multiset
-        }
     }
 
     SECTION("GUID can be used in container adaptors")
@@ -267,5 +338,67 @@ TEST_CASE("GUID type can be used with STL containers", "[basic][shared][windows]
             REQUIRE(vectorOfGuids.size() == size - 1);
         }
         REQUIRE(vectorOfGuids.empty());
+    }
+}
+
+TEST_CASE("GUID type can be converted to and from string types", "[basic][conversion]")
+{
+    using namespace notstd;
+    using notstd::test::string_iequals;
+
+    SECTION("can be converted to std::string")
+    {
+        for (const auto& [guid, value]: test::StringMap) {
+            const auto& [narrow, _] = value;
+            const auto guidString = GuidToString<std::string>(guid);
+            REQUIRE(string_iequals(guidString, narrow));
+        }
+    }
+
+    SECTION("can be converted to std::wstring")
+    {
+        for (const auto& [guid, value]: test::StringMap) {
+            const auto& [_, wide] = value;
+            const auto guidString = GuidToString<std::wstring>(guid);
+            REQUIRE(string_iequals(guidString, wide));
+        }
+    }
+
+    SECTION("can be parsed from std::string")
+    {
+        for (const auto& [guidExpected, value]: test::StringMap) {
+            const auto& [narrow, _] = value;
+            const auto guidResult = GuidFromString(narrow);
+            REQUIRE(guidResult.has_value());
+            REQUIRE(guidResult.value() == guidExpected);
+        }
+    }
+
+    SECTION("can be parsed from std::wstring")
+    {
+        for (const auto& [guidExpected, value]: test::StringMap) {
+            const auto& [_, wide] = value;
+            const auto guidResult = GuidFromString(wide);
+            REQUIRE(guidResult.has_value());
+            REQUIRE(guidResult.value() == guidExpected);
+        }
+    }
+
+    SECTION("conversion with std::string is stable")
+    {
+        for (const auto& [guid, value]: test::StringMap) {
+            const auto& [narrow, _] = value;
+            REQUIRE(GuidFromString(GuidToString<std::string>(guid)) == guid);
+            REQUIRE(string_iequals(GuidToString<std::string>(GuidFromString(narrow).value()), narrow));
+        }
+    }
+
+    SECTION("conversion with std::wstring is stable")
+    {
+        for (const auto& [guid, value]: test::StringMap) {
+            const auto& [_, wide] = value;
+            REQUIRE(GuidFromString(GuidToString<std::wstring>(guid)) == guid);
+            REQUIRE(string_iequals(GuidToString<std::wstring>(GuidFromString(wide).value()), wide));
+        }
     }
 }

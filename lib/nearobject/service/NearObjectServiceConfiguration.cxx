@@ -28,8 +28,9 @@ ConfigureCliAppOptions(CLI::App& app, NearObjectServiceConfiguration& configurat
     return app;
 }
 
-template<typename ...Args>
-NearObjectServiceConfiguration ParseCliAppOptions(bool throwOnParseError, Args&& ...args)
+template <typename... Args>
+NearObjectServiceConfiguration
+ParseCliAppOptions(bool throwOnParseError, Args&&... args)
 {
     CLI::App app{};
     NearObjectServiceConfiguration configuration{};
@@ -38,9 +39,9 @@ NearObjectServiceConfiguration ParseCliAppOptions(bool throwOnParseError, Args&&
 
     try {
         app.parse(std::forward<Args>(args)...);
-    } catch (const CLI::ParseError &parseError) {
+    } catch (const CLI::ParseError& parseError) {
         if (throwOnParseError) {
-            throw parseError;
+            throw parseError; // NOLINT(cert-err60-cpp)
         }
     }
 
@@ -48,12 +49,14 @@ NearObjectServiceConfiguration ParseCliAppOptions(bool throwOnParseError, Args&&
 }
 } // namespace details
 
+// NOLINTBEGIN(*-avoid-c-arrays)
 /* static */
 NearObjectServiceConfiguration
-NearObjectServiceConfiguration::FromCommandLineArguments(int argc, char *argv[], bool throwOnParseError)
+NearObjectServiceConfiguration::FromCommandLineArguments(int argc, char* argv[], bool throwOnParseError)
 {
     return details::ParseCliAppOptions(throwOnParseError, argc, argv);
 }
+// NOLINTEND(*-avoid-c-arrays)
 
 /* static */
 NearObjectServiceConfiguration

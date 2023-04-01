@@ -1,24 +1,31 @@
 
 #include <algorithm>
+#include <chrono>
 #include <iterator>
 
 #include <nearobject/NearObjectSession.hxx>
 #include <nearobject/NearObjectSessionEventCallbacks.hxx>
-#include <chrono>
 
 using namespace std::chrono_literals;
 using namespace nearobject;
 
-NearObjectSession::NearObjectSession(NearObjectCapabilities capabilities, const std::vector<std::shared_ptr<NearObject>>& nearObjects, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) :
+NearObjectSession::NearObjectSession(uint32_t sessionId, NearObjectCapabilities capabilities, const std::vector<std::shared_ptr<NearObject>>& nearObjects, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) :
+    m_sessionId(sessionId),
     m_capabilities(capabilities),
-    m_nearObjects(nearObjects),
-    m_eventCallbacks(std::move(eventCallbacks))
+    m_eventCallbacks(std::move(eventCallbacks)),
+    m_nearObjects(nearObjects)
 {
 }
 
 NearObjectSession::~NearObjectSession()
 {
     EndSession();
+}
+
+uint32_t
+NearObjectSession::GetId() const noexcept
+{
+    return m_sessionId;
 }
 
 NearObjectCapabilities
@@ -28,11 +35,11 @@ NearObjectSession::GetCapabilities() const noexcept
 }
 
 void
-NearObjectSession::InvokeEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor)
+NearObjectSession::InvokeEventCallback(std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor)
 {
     auto dispatcher = m_taskQueue.get_dispatcher();
 
-    auto const task = [this, executor]() {
+    auto const task = [this, executor = std::move(executor)]() {
         const auto eventCallbacks = m_eventCallbacks.lock();
         if (!eventCallbacks) {
             return;
@@ -69,7 +76,7 @@ NearObjectSession::AddNearObjects(std::vector<std::shared_ptr<NearObject>> nearO
 
     // Signal the membership changed event with the added near objects.
     InvokeEventCallback([this, nearObjectsToAdd = std::move(nearObjectsToAdd)](auto& eventCallbacks) {
-        eventCallbacks.OnSessionMembershipChanged(this, std::move(nearObjectsToAdd), {});
+        eventCallbacks.OnSessionMembershipChanged(this, nearObjectsToAdd, {});
     });
 }
 
@@ -88,8 +95,8 @@ NearObjectSession::RemoveNearObjects(std::vector<std::shared_ptr<NearObject>> ne
     // partition) and ones that should be removed (second partition), keeping
     // their relative order (stable). std::stable_partition returns an iterator
     // to the beginning of the second partition.
-    const auto nearObjectsRemoved = std::stable_partition(std::begin(m_nearObjects), std::end(m_nearObjects), [&](const auto nearObjectToCheck) { 
-        return std::none_of(std::cbegin(nearObjectsToRemove), std::cend(nearObjectsToRemove), [&](const auto& nearObjectToRemove){
+    auto nearObjectsRemoved = std::stable_partition(std::begin(m_nearObjects), std::end(m_nearObjects), [&](const auto nearObjectToCheck) {
+        return std::none_of(std::cbegin(nearObjectsToRemove), std::cend(nearObjectsToRemove), [&](const auto& nearObjectToRemove) {
             return (nearObjectToCheck == nearObjectToRemove);
         });
     });
@@ -105,7 +112,7 @@ NearObjectSession::RemoveNearObjects(std::vector<std::shared_ptr<NearObject>> ne
 
     // Signal the membership changed event with the removed near objects.
     InvokeEventCallback([this, nearObjectsToRemove = std::move(nearObjectsToRemove)](auto& eventCallbacks) {
-        eventCallbacks.OnSessionMembershipChanged(this, {}, std::move(nearObjectsToRemove));
+        eventCallbacks.OnSessionMembershipChanged(this, {}, nearObjectsToRemove);
     });
 }
 
@@ -135,19 +142,19 @@ NearObjectSession::GetNearObjects() const noexcept
     return m_nearObjects;
 }
 
-NearObjectSession::StartRangingSessionResult
+NearObjectSession::RangingSessionStatus
 NearObjectSession::StartRanging()
 {
-    StartRangingSessionResult result{};
+    RangingSessionStatus status = RangingSessionStatus::Error;
 
     const auto lock = std::scoped_lock{ m_rangingStateGate };
-    if (m_rangingSession.has_value()) {
-        result.Status = RangingSessionStatus::MaximumSessionsReached;
+    if (m_isRangingActive) {
+        status = RangingSessionStatus::MaximumSessionsReached;
     } else {
-        result.Status = CreateNewRangingSession();
+        status = CreateNewRangingSession();
     }
 
-    return result;
+    return status;
 }
 
 NearObjectSession::RangingSessionStatus
@@ -157,12 +164,8 @@ NearObjectSession::CreateNewRangingSession()
         return RangingSessionStatus::NotSupported;
     }
 
-    RangingSession rangingSession{ [&]() {
-        // TODO
-    } };
-
-    // TODO: actually create new ranging session
-    m_rangingSession.emplace(std::move(rangingSession));
+    // TODO: actually create and configure new ranging session
+    m_isRangingActive = true;
 
     InvokeEventCallback([&](auto& eventCallbacks) {
         eventCallbacks.OnRangingStarted(this);
@@ -175,12 +178,12 @@ void
 NearObjectSession::StopRanging()
 {
     const auto lock = std::scoped_lock{ m_rangingStateGate };
-    if (!m_rangingSession.has_value()) {
+    if (!m_isRangingActive) {
         return;
     }
 
     // TODO: signal to device to stop ranging
-    m_rangingSession.reset();
+    m_isRangingActive = false;
 
     InvokeEventCallback([&](auto& eventCallbacks) {
         eventCallbacks.OnRangingStopped(this);
@@ -191,5 +194,5 @@ bool
 NearObjectSession::IsRangingActive() const noexcept
 {
     const auto lock = std::scoped_lock{ m_rangingStateGate };
-    return m_rangingSession.has_value();
+    return m_isRangingActive;
 }
