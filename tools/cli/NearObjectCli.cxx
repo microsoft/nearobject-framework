@@ -249,17 +249,31 @@ ProcessApplicationConfigurationParameters(UwbApplicationConfigurationParameterDa
             applicationConfigurationParameters.push_back({ applicationConfigurationParameter, arg });
 
             using ParameterValueT = std::decay_t<decltype(arg)>;
+            std::ostringstream oss;
+            oss << magic_enum::enum_name(applicationConfigurationParameter) << "::";
             if constexpr (std::is_enum_v<ParameterValueT>) {
-                std::cout << magic_enum::enum_name(applicationConfigurationParameter) << "::" << magic_enum::enum_name(arg) << std::endl;
+                oss << magic_enum::enum_name(arg);
             } else if constexpr (std::is_same_v<ParameterValueT, uint8_t>) {
-                std::cout << magic_enum::enum_name(applicationConfigurationParameter) << "::" << +arg << std::endl;
+                oss << +arg;
             } else if constexpr (std::is_same_v<ParameterValueT, ::uwb::UwbMacAddress>) {
-                std::cout << magic_enum::enum_name(applicationConfigurationParameter) << "::" << ToString(arg) << std::endl;
+                oss << ToString(arg);
             } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<::uwb::UwbMacAddress>>) {
                 for (const auto& address : arg) {
-                    std::cout << magic_enum::enum_name(applicationConfigurationParameter) << "::" << ToString(arg) << std::endl;
+                    oss << ToString(arg);
+                }
+            } else if constexpr (std::is_same_v<ParameterValueT, bool>) {
+                oss << std::boolalpha << arg;
+            } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<ResultReportConfiguration>>) {
+                for (const auto& resultReportConfiguration : arg) {
+                    oss << ToString(arg);
+                }
+            } else if constexpr (std::is_same_v<ParameterValueT, std::array<uint8_t, StaticStsInitializationVectorLength>>) {
+                for (const auto& value : arg) {
+                    oss << "0x" << std::setw(2) << std::internal << std::setfill('0') << std::hex << +value << " ";
                 }
             }
+
+            std::cout << oss.str() << std::endl;
         },
             applicationConfigurationParameterValue);
     }
@@ -473,7 +487,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     rangeStartApp->add_option("--SessionPriority", appConfigParamsData.sessionPriority, "Value range: 1-100")->capture_default_str();
     rangeStartApp->add_option("--SfdId", appConfigParamsData.sfdId, "{0,2} for BPRF Mode; {1,2,3,4} for HPRF Mode")->capture_default_str();
     rangeStartApp->add_option("--SlotsPerRangingRound", appConfigParamsData.slotsPerRangingRound, "Number of slots per ranging round")->capture_default_str();
-    
+
     // uint16_t
     rangeStartApp->add_option("--MaxNumberOfMeasurements", appConfigParamsData.maxNumberOfMeasurements, "0 = Unlimited; 1+ = Max number of ranging measurements in a session")->capture_default_str();
     rangeStartApp->add_option("--MaxRangingRoundRetry", appConfigParamsData.maxRangingRoundRetry, "Number of failed RR attempts before stopping the session. Value range: 0-65535")->capture_default_str();
@@ -488,8 +502,8 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     rangeStartApp->add_option("--SubSessionId", appConfigParamsData.subSessionId, "Sub-session ID for the controlee device. Required for Dynamic STS with responder specific sub-session key")->capture_default_str();
     rangeStartApp->add_option("--UwbInitiationTime", appConfigParamsData.uwbInitiationTime, "Value range: 0-10000")->capture_default_str();
 
-    // bool - TODO: Try add_flag instead
-    rangeStartApp->add_option("--HoppingMode", appConfigParamsData.hoppingMode, "true = FiRa hopping enabled; false = hopping disabled")->capture_default_str();
+    // bool
+    rangeStartApp->add_flag("--HoppingMode", appConfigParamsData.hoppingMode, "Enables FiRa hopping");
 
     // enums
     detail::AddEnumOption(rangeStartApp, appConfigParamsData.aoaResultRequest);
@@ -510,7 +524,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
 
     // other
     rangeStartApp->add_option("--ResultReportConfig", m_cliData->resultReportConfigurationString, "4-bit report config, e.g. 0101. b3=AOA FOM, b2=AOA Elevation, b1=AOA Azimuth, b0=TOF")->capture_default_str(); // TODO: Parse values into unordered_set
-    rangeStartApp->add_option("--StaticStsInitializationVector", appConfigParamsData.staticStsIv, "6-octet array for vendor-defined static STS configuration, e.g. 11:22:33:44:55:66")->delimiter(':'); // TODO: Test to make sure this works properly
+    rangeStartApp->add_option("--StaticStsInitializationVector", appConfigParamsData.staticStsIv, "6-octet array for vendor-defined static STS configuration, e.g. 11:22:33:44:55:66")->delimiter(':');
 
     rangeStartApp->parse_complete_callback([this, rangeStartApp] {
         // TODO: Move validation logic into its own function
