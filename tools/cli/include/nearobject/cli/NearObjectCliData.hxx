@@ -86,30 +86,57 @@ struct UwbApplicationConfigurationParameterData
     // Mirrored properties from UwbApplicationConfigurationParameter data. Any newly added fields
     // that should be supported from the command-line must also be added here,
     // along with parsing support in a NearObjectCli instance.
-    std::optional<uwb::protocol::fira::DeviceRole> deviceRole;
+    std::optional<uwb::protocol::fira::DeviceType> deviceType;
+    std::optional<uwb::protocol::fira::RangingRoundUsage> rangingRoundUsage;
+    std::optional<uwb::protocol::fira::StsConfiguration> stsConfiguration;
     std::optional<uwb::protocol::fira::MultiNodeMode> multiNodeMode;
+    std::optional<uwb::protocol::fira::Channel> channelNumber;
     std::optional<uint8_t> numberOfControlees;
     std::optional<uwb::UwbMacAddress> deviceMacAddress;
     std::optional<std::unordered_set<uwb::UwbMacAddress>> destinationMacAddresses;
-    std::optional<uwb::protocol::fira::DeviceType> deviceType;
+    std::optional<uint16_t> slotDuration;
+    std::optional<uint32_t> rangingInterval;
+    std::optional<uint32_t> stsIndex;
+    std::optional<uwb::UwbMacAddressFcsType> macFcsType;
+    std::optional<uwb::protocol::fira::RangingRoundControl> rangingRoundControl;
+    std::optional<uwb::protocol::fira::AoAResult> aoaResultRequest;
+    std::optional<uwb::protocol::fira::RangeDataNotificationConfiguration> rangeDataNotificationConfig;
+    std::optional<uint16_t> rangeDataNotificationProximityNear;
+    std::optional<uint16_t> rangeDataNotificationProximityFar;
+    std::optional<uwb::protocol::fira::DeviceRole> deviceRole;
+    std::optional<uwb::protocol::fira::StsPacketConfiguration> rFrameConfiguration;
+    std::optional<uint8_t> preambleCodeIndex;
+    std::optional<uint8_t> sfdId;
+    std::optional<uwb::protocol::fira::PsduDataRate> psduDataRate;
+    std::optional<uwb::protocol::fira::PreambleDuration> preambleDuration;
+    std::optional<uwb::protocol::fira::RangingMode> rangingTimeStruct;
+    std::optional<uint8_t> slotsPerRangingRound;
+    std::optional<uwb::protocol::fira::TxAdaptivePayloadPower> txAdaptivePayloadPower;
+    std::optional<uint8_t> responderSlotIndex;
+    std::optional<uwb::protocol::fira::PrfMode> prfMode;
+    std::optional<uwb::protocol::fira::SchedulingMode> scheduledMode;
+    std::optional<uwb::protocol::fira::KeyRotation> keyRotation;
+    std::optional<uint8_t> keyRotationRate;
+    std::optional<uint8_t> sessionPriority;
     std::optional<uwb::UwbMacAddressType> macAddressMode;
-
-    /**
-     * @brief Variant for all possible property types.
-     */
-    using ParameterTypesVariant = std::variant<
-        uint8_t,
-        ::uwb::protocol::fira::DeviceRole,
-        ::uwb::protocol::fira::DeviceType,
-        ::uwb::protocol::fira::MultiNodeMode,
-        ::uwb::UwbMacAddress,
-        ::uwb::UwbMacAddressType,
-        std::unordered_set<::uwb::UwbMacAddress>>;
+    std::optional<uint16_t> vendorId;
+    std::optional<std::array<uint8_t, uwb::protocol::fira::StaticStsInitializationVectorLength>> staticStsIv;
+    std::optional<uint8_t> numberOfStsSegments;
+    std::optional<uint16_t> maxRangingRoundRetry;
+    std::optional<uint32_t> uwbInitiationTime;
+    std::optional<bool> hoppingMode;
+    std::optional<uint8_t> blockStrideLength;
+    std::optional<std::unordered_set<uwb::protocol::fira::ResultReportConfiguration>> resultReportConfig;
+    std::optional<uint8_t> inBandTerminationAttemptCount;
+    std::optional<uint32_t> subSessionId;
+    std::optional<uwb::protocol::fira::BprfPhrDataRate> bprfPhrDataRate;
+    std::optional<uint16_t> maxNumberOfMeasurements;
+    std::optional<uwb::protocol::fira::StsLength> stsLength;
 
     /**
      * @brief Map of application configuration parameter type to the parameter's value.
      */
-    std::unordered_map<uwb::protocol::fira::UwbApplicationConfigurationParameterType, ParameterTypesVariant>
+    std::unordered_map<uwb::protocol::fira::UwbApplicationConfigurationParameterType, uwb::protocol::fira::UwbApplicationConfigurationParameterValue>
     GetValueMap() const;
 };
 
@@ -123,6 +150,7 @@ struct NearObjectCliData
     bool HostIsController{ false };
     std::string deviceMacAddressString;
     std::string destinationMacAddressString; // TODO: List of strings (or large string of mac address substrings) to support multiple controlees
+    std::string resultReportConfigurationString;
     UwbConfigurationData uwbConfiguration{};
     UwbApplicationConfigurationParameterData appConfigParamsData{};
     uwb::protocol::fira::StaticRangingInfo StaticRanging{};

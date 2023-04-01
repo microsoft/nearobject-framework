@@ -4,6 +4,7 @@
 
 using namespace nearobject::cli;
 using uwb::protocol::fira::UwbApplicationConfigurationParameterType;
+using uwb::protocol::fira::UwbApplicationConfigurationParameterValue;
 using uwb::protocol::fira::UwbConfiguration;
 
 UwbConfigurationData::operator UwbConfiguration() const noexcept
@@ -116,27 +117,64 @@ UwbConfigurationData::operator UwbConfiguration() const noexcept
     return builder;
 }
 
-std::unordered_map<UwbApplicationConfigurationParameterType, UwbApplicationConfigurationParameterData::ParameterTypesVariant>
+std::unordered_map<UwbApplicationConfigurationParameterType, UwbApplicationConfigurationParameterValue>
 UwbApplicationConfigurationParameterData::GetValueMap() const
 {
-    std::unordered_map<UwbApplicationConfigurationParameterType, ParameterTypesVariant> valuesMap;
-    if (deviceRole.has_value()) {
-        valuesMap[UwbApplicationConfigurationParameterType::DeviceRole] = deviceRole.value();
+    std::unordered_map<UwbApplicationConfigurationParameterType, UwbApplicationConfigurationParameterValue> valuesMap;
+
+    std::initializer_list<std::pair<UwbApplicationConfigurationParameterType, std::optional<UwbApplicationConfigurationParameterValue>>> applicationConfigurationParameterList = {
+        { UwbApplicationConfigurationParameterType::DeviceRole, deviceRole },
+        { UwbApplicationConfigurationParameterType::MultiNodeMode, multiNodeMode },
+        { UwbApplicationConfigurationParameterType::NumberOfControlees, numberOfControlees },
+        { UwbApplicationConfigurationParameterType::DeviceMacAddress, deviceMacAddress },
+        { UwbApplicationConfigurationParameterType::DestinationMacAddresses, destinationMacAddresses },
+        { UwbApplicationConfigurationParameterType::DeviceType, deviceType },
+        { UwbApplicationConfigurationParameterType::RangingRoundUsage, rangingRoundUsage },
+        { UwbApplicationConfigurationParameterType::StsConfiguration, stsConfiguration },
+        { UwbApplicationConfigurationParameterType::ChannelNumber, channelNumber },
+        { UwbApplicationConfigurationParameterType::SlotDuration, slotDuration },
+        { UwbApplicationConfigurationParameterType::RangingInterval, rangingInterval },
+        { UwbApplicationConfigurationParameterType::StsIndex, stsIndex },
+        { UwbApplicationConfigurationParameterType::MacFcsType, macFcsType },
+        { UwbApplicationConfigurationParameterType::RangingRoundControl, rangingRoundControl },
+        { UwbApplicationConfigurationParameterType::AoAResultRequest, aoaResultRequest },
+        { UwbApplicationConfigurationParameterType::RangeDataNotificationConfig, rangeDataNotificationConfig },
+        { UwbApplicationConfigurationParameterType::RangeDataNotificationProximityNear, rangeDataNotificationProximityNear },
+        { UwbApplicationConfigurationParameterType::RangeDataNotificationProximityFar, rangeDataNotificationProximityFar },
+        { UwbApplicationConfigurationParameterType::RFrameConfiguration, rFrameConfiguration },
+        { UwbApplicationConfigurationParameterType::PreambleCodeIndex, preambleCodeIndex },
+        { UwbApplicationConfigurationParameterType::SfdId, sfdId },
+        { UwbApplicationConfigurationParameterType::PsduDataRate, psduDataRate },
+        { UwbApplicationConfigurationParameterType::PreambleDuration, preambleDuration },
+        { UwbApplicationConfigurationParameterType::RangingTimeStruct, rangingTimeStruct },
+        { UwbApplicationConfigurationParameterType::SlotsPerRangingRound, slotsPerRangingRound },
+        { UwbApplicationConfigurationParameterType::TxAdaptivePayloadPower, txAdaptivePayloadPower },
+        { UwbApplicationConfigurationParameterType::ResponderSlotIndex, responderSlotIndex },
+        { UwbApplicationConfigurationParameterType::PrfMode, prfMode },
+        { UwbApplicationConfigurationParameterType::ScheduledMode, scheduledMode },
+        { UwbApplicationConfigurationParameterType::KeyRotation, keyRotation },
+        { UwbApplicationConfigurationParameterType::KeyRotationRate, keyRotationRate },
+        { UwbApplicationConfigurationParameterType::SessionPriority, sessionPriority },
+        { UwbApplicationConfigurationParameterType::MacAddressMode, macAddressMode },
+        { UwbApplicationConfigurationParameterType::VendorId, vendorId },
+        { UwbApplicationConfigurationParameterType::StaticStsIv, staticStsIv },
+        { UwbApplicationConfigurationParameterType::NumberOfStsSegments, numberOfStsSegments },
+        { UwbApplicationConfigurationParameterType::MaxRangingRoundRetry, maxRangingRoundRetry },
+        { UwbApplicationConfigurationParameterType::UwbInitiationTime, uwbInitiationTime },
+        { UwbApplicationConfigurationParameterType::HoppingMode, hoppingMode },
+        { UwbApplicationConfigurationParameterType::BlockStrideLength, blockStrideLength },
+        { UwbApplicationConfigurationParameterType::ResultReportConfig, resultReportConfig },
+        { UwbApplicationConfigurationParameterType::InBandTerminationAttemptCount, inBandTerminationAttemptCount },
+        { UwbApplicationConfigurationParameterType::SubSessionId, subSessionId },
+        { UwbApplicationConfigurationParameterType::BprfPhrDataRate, bprfPhrDataRate },
+        { UwbApplicationConfigurationParameterType::MaxNumberOfMeasurements, maxNumberOfMeasurements },
+        { UwbApplicationConfigurationParameterType::StsLength, stsLength }
+    };
+    for (const auto& [parameterType, parameterValue] : applicationConfigurationParameterList) {
+        if (parameterValue.has_value()) {
+            valuesMap[parameterType] = parameterValue.value();
+        }
     }
-    if (multiNodeMode.has_value()) {
-        valuesMap[UwbApplicationConfigurationParameterType::MultiNodeMode] = multiNodeMode.value();
-    }
-    if (numberOfControlees.has_value()) {
-        valuesMap[UwbApplicationConfigurationParameterType::NumberOfControlees] = numberOfControlees.value();
-    }
-    if (deviceMacAddress.has_value()) {
-        valuesMap[UwbApplicationConfigurationParameterType::DeviceMacAddress] = deviceMacAddress.value();
-    }
-    if (destinationMacAddresses.has_value()) {
-        valuesMap[UwbApplicationConfigurationParameterType::DestinationMacAddresses] = destinationMacAddresses.value();
-    }
-    if (deviceType.has_value()) {
-        valuesMap[UwbApplicationConfigurationParameterType::DeviceType] = deviceType.value();
-    }
+
     return valuesMap;
 }

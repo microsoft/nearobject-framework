@@ -1,4 +1,5 @@
 
+#include <bitset>
 #include <optional>
 #include <stdexcept>
 #include <string>
@@ -249,17 +250,29 @@ ProcessApplicationConfigurationParameters(UwbApplicationConfigurationParameterDa
             applicationConfigurationParameters.push_back({ applicationConfigurationParameter, arg });
 
             using ParameterValueT = std::decay_t<decltype(arg)>;
+            std::ostringstream oss;
+            oss << magic_enum::enum_name(applicationConfigurationParameter) << "::";
             if constexpr (std::is_enum_v<ParameterValueT>) {
-                std::cout << magic_enum::enum_name(applicationConfigurationParameter) << "::" << magic_enum::enum_name(arg) << std::endl;
+                oss << magic_enum::enum_name(arg);
             } else if constexpr (std::is_same_v<ParameterValueT, uint8_t>) {
-                std::cout << magic_enum::enum_name(applicationConfigurationParameter) << "::" << +arg << std::endl;
+                oss << +arg;
             } else if constexpr (std::is_same_v<ParameterValueT, ::uwb::UwbMacAddress>) {
-                std::cout << magic_enum::enum_name(applicationConfigurationParameter) << "::" << ToString(arg) << std::endl;
+                oss << ToString(arg);
             } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<::uwb::UwbMacAddress>>) {
                 for (const auto& address : arg) {
-                    std::cout << magic_enum::enum_name(applicationConfigurationParameter) << "::" << ToString(arg) << std::endl;
+                    oss << ToString(arg);
+                }
+            } else if constexpr (std::is_same_v<ParameterValueT, bool>) {
+                oss << std::boolalpha << arg;
+            } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<ResultReportConfiguration>>) {
+                oss << ToString(arg);
+            } else if constexpr (std::is_same_v<ParameterValueT, std::array<uint8_t, StaticStsInitializationVectorLength>>) {
+                for (const auto& value : arg) {
+                    oss << "0x" << std::setw(2) << std::internal << std::setfill('0') << std::hex << +value << " ";
                 }
             }
+
+            std::cout << oss.str() << std::endl;
         },
             applicationConfigurationParameterValue);
     }
@@ -460,8 +473,57 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     }
     rangeStartApp->add_option("--DeviceMacAddress", m_cliData->deviceMacAddressString, deviceMacAddressDescription)->capture_default_str()->required();
     rangeStartApp->add_option("--DestinationMacAddress", m_cliData->destinationMacAddressString, dstMacAddressDescription)->capture_default_str()->required();
-
     detail::AddEnumOption(rangeStartApp, appConfigParamsData.deviceType, true);
+
+    // List remaining params
+    // uint8_t
+    rangeStartApp->add_option("--BlockStrideLength", appConfigParamsData.blockStrideLength, "0 = No block striding; 1-255 = Number of ranging blocks to be skipped")->capture_default_str();
+    rangeStartApp->add_option("--InBandTerminationAttemptCount", appConfigParamsData.inBandTerminationAttemptCount, "0 = Disable in-band termination attempt; 1-10 = In-band termination attempt count")->capture_default_str();
+    rangeStartApp->add_option("--KeyRotationRate", appConfigParamsData.keyRotationRate, "Exponent n where 2^n is the key rotation rate. Value range: 0-15")->capture_default_str();
+    rangeStartApp->add_option("--NumberOfStsSegments", appConfigParamsData.numberOfStsSegments, "Value range: 0-4. Note: 2-4 for HPRF Mode only")->capture_default_str();
+    rangeStartApp->add_option("--PreambleCodeIndex", appConfigParamsData.preambleCodeIndex, "Value range: 9-12 for BPRF Mode; 25-32 for HPRF Mode")->capture_default_str();
+    rangeStartApp->add_option("--ResponderSlotIndex", appConfigParamsData.responderSlotIndex, "Responder index in TWR. 1=Responder 1 ... N=Responder N. Not applicable to Initiator")->capture_default_str();
+    rangeStartApp->add_option("--SessionPriority", appConfigParamsData.sessionPriority, "Value range: 1-100")->capture_default_str();
+    rangeStartApp->add_option("--SfdId", appConfigParamsData.sfdId, "{0,2} for BPRF Mode; {1,2,3,4} for HPRF Mode")->capture_default_str();
+    rangeStartApp->add_option("--SlotsPerRangingRound", appConfigParamsData.slotsPerRangingRound, "Number of slots per ranging round")->capture_default_str();
+
+    // uint16_t
+    rangeStartApp->add_option("--MaxNumberOfMeasurements", appConfigParamsData.maxNumberOfMeasurements, "0 = Unlimited; 1+ = Max number of ranging measurements in a session")->capture_default_str();
+    rangeStartApp->add_option("--MaxRangingRoundRetry", appConfigParamsData.maxRangingRoundRetry, "Number of failed RR attempts before stopping the session. Value range: 0-65535")->capture_default_str();
+    rangeStartApp->add_option("--RangeDataNotificationProximityFar", appConfigParamsData.rangeDataNotificationProximityFar, "Upper bound in cm for ranging proximity mode. N >= RangeDataNotificationProximityNear")->capture_default_str();
+    rangeStartApp->add_option("--RangeDataNotificationProximityNear", appConfigParamsData.rangeDataNotificationProximityNear, "Lower bound in cm for ranging proximity mode. N <= RangeDataNotificationProximityFar")->capture_default_str();
+    rangeStartApp->add_option("--SlotDuration", appConfigParamsData.slotDuration, "Duration of a ranging slot in the unit of RSTU")->capture_default_str();
+    rangeStartApp->add_option("--VendorId", appConfigParamsData.vendorId, "Unique ID for vendor. Used for static STS")->capture_default_str();
+
+    // uint32_t
+    rangeStartApp->add_option("--RangingInterval", appConfigParamsData.rangingInterval, "Ranging interval in the unit of 1200 RSTU (1ms) between ranging rounds. Minimum should be duration of one ranging round")->capture_default_str();
+    rangeStartApp->add_option("--StsIndex", appConfigParamsData.stsIndex, "Test Mode only. See FiRa Consortium PHY Conformance Test Specification")->capture_default_str();
+    rangeStartApp->add_option("--SubSessionId", appConfigParamsData.subSessionId, "Sub-session ID for the controlee device. Required for Dynamic STS with responder specific sub-session key")->capture_default_str();
+    rangeStartApp->add_option("--UwbInitiationTime", appConfigParamsData.uwbInitiationTime, "Value range: 0-10000")->capture_default_str();
+
+    // bool
+    rangeStartApp->add_flag("--HoppingMode", appConfigParamsData.hoppingMode, "Enables FiRa hopping");
+
+    // enums
+    detail::AddEnumOption(rangeStartApp, appConfigParamsData.aoaResultRequest);
+    detail::AddEnumOption(rangeStartApp, appConfigParamsData.bprfPhrDataRate);
+    detail::AddEnumOption(rangeStartApp, appConfigParamsData.channelNumber);
+    detail::AddEnumOption(rangeStartApp, appConfigParamsData.keyRotation);
+    detail::AddEnumOption(rangeStartApp, appConfigParamsData.macAddressMode);
+    detail::AddEnumOption(rangeStartApp, appConfigParamsData.macFcsType);
+    detail::AddEnumOption(rangeStartApp, appConfigParamsData.preambleDuration);
+    detail::AddEnumOption(rangeStartApp, appConfigParamsData.prfMode);
+    detail::AddEnumOption(rangeStartApp, appConfigParamsData.rangeDataNotificationConfig);
+    detail::AddEnumOption(rangeStartApp, appConfigParamsData.rangingRoundControl);
+    detail::AddEnumOption(rangeStartApp, appConfigParamsData.rFrameConfiguration);
+    detail::AddEnumOption(rangeStartApp, appConfigParamsData.scheduledMode);
+    detail::AddEnumOption(rangeStartApp, appConfigParamsData.stsConfiguration);
+    detail::AddEnumOption(rangeStartApp, appConfigParamsData.stsLength);
+    detail::AddEnumOption(rangeStartApp, appConfigParamsData.txAdaptivePayloadPower);
+
+    // other
+    rangeStartApp->add_option("--ResultReportConfig", m_cliData->resultReportConfigurationString, "4-bit report config, e.g. 0101. b3=AOA FOM, b2=AOA Elevation, b1=AOA Azimuth, b0=TOF")->capture_default_str();
+    rangeStartApp->add_option("--StaticStsInitializationVector", appConfigParamsData.staticStsIv, "6-octet array for vendor-defined static STS configuration, e.g. 11:22:33:44:55:66")->delimiter(':');
 
     rangeStartApp->parse_complete_callback([this, rangeStartApp] {
         // TODO: Move validation logic into its own function
@@ -481,6 +543,40 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
         // TODO: Insert the correct Controlee mac address rather than simply inserting the entire destinationMacAddressString
         for (auto i = 0; i < m_cliData->appConfigParamsData.numberOfControlees; i++) {
             m_cliData->appConfigParamsData.destinationMacAddresses.value().insert(uwb::UwbMacAddress::FromString(m_cliData->destinationMacAddressString, macAddressType).value());
+        }
+
+        // Parse and validate ResultReportConfig
+        constexpr int resultReportConfigurationSize = 4; // TODO: Find a way to calculate this number
+        auto IsValidResultReportConfigurationString = [resultReportConfigurationSize](const std::string& resultReportConfigurationString) {
+            if (resultReportConfigurationString.length() != resultReportConfigurationSize) {
+                std::cerr << "Invalid ResultReportConfiguration length" << std::endl;
+                return false;
+            }
+            for (char c : resultReportConfigurationString) {
+                if (c != '0' && c != '1') {
+                    std::cerr << "Invalid ResultReportConfiguration value" << std::endl;
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        if (IsValidResultReportConfigurationString(m_cliData->resultReportConfigurationString)) {
+            m_cliData->appConfigParamsData.resultReportConfig.emplace();
+
+            const std::bitset<4> resultReportConfigurationBits(m_cliData->resultReportConfigurationString);
+            if (resultReportConfigurationBits[0]) {
+                m_cliData->appConfigParamsData.resultReportConfig.value().insert(ResultReportConfiguration::TofReport);
+            }
+            if (resultReportConfigurationBits[1]) {
+                m_cliData->appConfigParamsData.resultReportConfig.value().insert(ResultReportConfiguration::AoAAzimuthReport);
+            }
+            if (resultReportConfigurationBits[2]) {
+                m_cliData->appConfigParamsData.resultReportConfig.value().insert(ResultReportConfiguration::AoAElevationReport);
+            }
+            if (resultReportConfigurationBits[3]) {
+                m_cliData->appConfigParamsData.resultReportConfig.value().insert(ResultReportConfiguration::AoAFoMReport);
+            }
         }
 
         m_cliData->RangingParameters.ApplicationConfigurationParameters = detail::ProcessApplicationConfigurationParameters(m_cliData->appConfigParamsData);
