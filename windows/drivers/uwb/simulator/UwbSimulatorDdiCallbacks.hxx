@@ -27,7 +27,7 @@ struct UwbSimulatorDdiCallbacks :
     public IUwbSimulatorDdiCallbacksLrp,
     public IUwbSimulatorDdiCallbacksSimulator
 {
-    UwbSimulatorDdiCallbacks(UwbSimulatorDevice *device);
+    UwbSimulatorDdiCallbacks(std::weak_ptr<UwbSimulatorDevice> device);
 
     // IUwbSimulatorDdiCallbacksLrp
 
@@ -99,6 +99,15 @@ protected:
     SessionGet(uint32_t sessionId);
 
     /**
+     * @brief Destroy session context for the specified sesion id.
+     * 
+     * @param sessionId The session id to destroy session context for. 
+     * @return std::tuple<UwbStatus, std::shared_ptr<UwbSimulatorSession>> 
+     */
+    std::tuple<UwbStatus, std::shared_ptr<UwbSimulatorSession>>
+    SessionDestroy(uint32_t sessionId);
+
+    /**
      * @brief Update the state of the specified session.
      *
      * This function will also generate a UWB notification associated with the change.
@@ -134,7 +143,7 @@ private:
 
 private:
     UwbSimulatorCapabilities m_simulatorCapabilities{};
-    UwbSimulatorDevice *m_device{ nullptr };
+    std::weak_ptr<UwbSimulatorDevice> m_device;
 };
 } // namespace windows::devices::uwb::simulator
 

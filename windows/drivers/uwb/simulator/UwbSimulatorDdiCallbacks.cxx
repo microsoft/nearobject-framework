@@ -16,7 +16,7 @@
 using namespace windows::devices::uwb;
 using namespace windows::devices::uwb::simulator;
 
-UwbSimulatorDdiCallbacks::UwbSimulatorDdiCallbacks(UwbSimulatorDevice *device) :
+UwbSimulatorDdiCallbacks::UwbSimulatorDdiCallbacks(std::weak_ptr<UwbSimulatorDevice> device) :
     m_simulatorCapabilities({ IUwbSimulator::Version }),
     m_device(device)
 {}
@@ -31,14 +31,27 @@ UwbSimulatorDdiCallbacks::RaiseUwbNotification(UwbNotificationData uwbNotificati
         TraceLoggingString("EventRaised", "Action"),
         TraceLoggingString(std::data(ToString(uwbNotificationData)), "Data"));
 
+    auto device = m_device.lock();
+    if (device == nullptr) {
+        DbgPrint("device instance expired; dropping uwb notification\n");
+        return;
+    }
+
     // Dispatch the notification to the device.
-    m_device->PushUwbNotification(std::move(uwbNotificationData));
+    device->PushUwbNotification(std::move(uwbNotificationData));
 }
 
 std::tuple<UwbStatus, std::shared_ptr<UwbSimulatorSession>>
 UwbSimulatorDdiCallbacks::SessionGet(uint32_t sessionId)
 {
-    auto session = m_device->SessionGet(sessionId);
+    auto device = m_device.lock();
+    if (device == nullptr) {
+        return {
+            UwbStatusGeneric::Rejected, nullptr
+        };
+    }
+
+    auto session = device->SessionGet(sessionId);
     if (session == nullptr) {
         return { UwbStatusSession::NotExist, nullptr };
     }
@@ -46,6 +59,19 @@ UwbSimulatorDdiCallbacks::SessionGet(uint32_t sessionId)
     return {
         UwbStatusGeneric::Ok, session
     };
+}
+
+std::tuple<UwbStatus, std::shared_ptr<UwbSimulatorSession>>
+UwbSimulatorDdiCallbacks::SessionDestroy(uint32_t sessionId)
+{
+    auto device = m_device.lock();
+    if (device == nullptr) {
+        return {
+            UwbStatusGeneric::Rejected, nullptr
+        };
+    }
+
+    return device->SessionDestroy(sessionId);
 }
 
 void
@@ -134,8 +160,13 @@ UwbSimulatorDdiCallbacks::SessionInitialize(uint32_t sessionId, UwbSessionType s
         TraceLoggingUInt32(sessionId, "Session Id"),
         TraceLoggingString(std::data(magic_enum::enum_name(sessionType)), "Session Type"));
 
+    auto device = m_device.lock();
+    if (device == nullptr) {
+        return UwbStatusGeneric::Rejected;
+    }
+
     // Create a new session.
-    auto [uwbStatus, session] = m_device->SessionCreate(sessionId, sessionType);
+    auto [uwbStatus, session] = device->SessionCreate(sessionId, sessionType);
     if (!IsUwbStatusOk(uwbStatus)) {
         return uwbStatus;
     }
@@ -161,7 +192,9 @@ UwbSimulatorDdiCallbacks::SessionDeninitialize(uint32_t sessionId)
 
     SessionUpdateState(*session, UwbSessionState::Deinitialized);
 
-    return UwbStatusOk;
+    std::tie(uwbStatus, session) = SessionDestroy(sessionId);
+
+    return uwbStatus;
 }
 
 UwbStatus
@@ -263,7 +296,12 @@ UwbSimulatorDdiCallbacks::GetApplicationConfigurationParameters(uint32_t session
 UwbStatus
 UwbSimulatorDdiCallbacks::GetSessionCount(uint32_t &sessionCount)
 {
-    sessionCount = static_cast<uint32_t>(m_device->GetSessionCount());
+    auto device = m_device.lock();
+    if (device == nullptr) {
+        return UwbStatusGeneric::Rejected;
+    }
+
+    sessionCount = static_cast<uint32_t>(device->GetSessionCount());
 
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,

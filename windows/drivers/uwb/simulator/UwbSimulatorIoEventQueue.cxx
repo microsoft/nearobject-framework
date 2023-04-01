@@ -119,6 +119,7 @@ UwbSimulatorIoEventQueue::ProcessNotificationQueue(std::stop_token stopToken)
         if (!isNotificationDataAvailable) {
             assert(stopToken.stop_requested());
             DbgPrint("%p exiting notification processing thread due to stop request\n", m_wdfQueue);
+            break;
         }
 
         // Obtain the pended request from the queue.
