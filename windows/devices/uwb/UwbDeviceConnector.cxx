@@ -482,6 +482,11 @@ UwbConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vec
 void
 UwbConnector::HandleNotifications(std::stop_token stopToken)
 {
+    std::unique_lock lock{ m_callbacksPresentConditionVariableGate };
+    m_callbacksPresentConditionVariable.wait(lock, [this]() {
+        return CallbacksPresent();
+    });
+    
     DWORD bytesRequired = 0;
     std::vector<uint8_t> uwbNotificationDataBuffer{};
     auto handleDriver = m_notificationHandleDriver;
@@ -709,11 +714,6 @@ UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNo
 bool
 UwbConnector::NotificationListenerStart()
 {
-    std::unique_lock lock{ m_callbacksPresentConditionVariableGate };
-    m_callbacksPresentConditionVariable.wait(lock, [this]() {
-        return CallbacksPresent();
-    });
-
     wil::shared_hfile notificationHandleDriver;
     auto hr = OpenDriverHandle(notificationHandleDriver, m_deviceName.c_str(), true);
     if (FAILED(hr)) {
