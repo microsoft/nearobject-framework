@@ -234,12 +234,15 @@ AddEnumOption(CLI::App* app, std::optional<EnumType>& assignTo, bool isMandatory
 
 /**
  * @brief Validates input for nocli uwb range start.
- * 
+ *
  * @param cliData The nocli input data containing the application configuration parameters
  */
 void
 ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
 {
+    // Note: No restrictions other than type bounds checking given in FiRa UCI Generic Technical Specification v1.1.0 for the following parameters:
+    // SlotDuration, SlotsPerRangingRound, VendorId, MaxRangingRoundRetry, BlockStrideLength, MaxNumberOfMeasurements, RangingInterval, StsIndex, HoppingMode
+
     auto& parametersData = cliData->applicationConfigurationParametersData;
 
     // DeviceType (mandatory)
@@ -248,23 +251,23 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
     }
 
     // RangingRoundUsage
-    
+
     // StsConfiguration
-    
+
     // MultiNodeMode (mandatory)
     if (!magic_enum::enum_contains<MultiNodeMode>(parametersData.multiNodeMode.value())) {
         std::cerr << "Invalid MultiNodeMode" << std::endl;
     }
-    
+
     // Channel
-    
+
     // NumberOfControlees (mandatory)
     if (parametersData.multiNodeMode == MultiNodeMode::Unicast) {
         if (parametersData.numberOfControlees != 1) {
             std::cerr << "Invalid NumberOfControlees. Only 1 controlee expected in Unicast mode" << std::endl;
         }
     }
-    
+
     // DeviceMacAddress (mandatory) and DestinationMacAddresses (mandatory)
     const auto macAddressType = parametersData.macAddressMode == uwb::UwbMacAddressType::Extended ? uwb::UwbMacAddressType::Extended : uwb::UwbMacAddressType::Short;
     parametersData.deviceMacAddress = uwb::UwbMacAddress::FromString(cliData->deviceMacAddressString, macAddressType);
@@ -273,32 +276,41 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
     for (auto i = 0; i < parametersData.numberOfControlees; i++) {
         parametersData.destinationMacAddresses.value().insert(uwb::UwbMacAddress::FromString(cliData->destinationMacAddressString, macAddressType).value());
     }
-    
-    // SlotDuration
-    
-    // RangingInterval
-    
-    // StsIndex
-    
+
     // MacFcsType
-    
+
     // RangingRoundControl
-    
+
     // AoaResultRequest
-    
+
     // RangeDataNotificationConfig
-    
+
     // RangeDataNotificationProximityNear
-    
+    if (parametersData.rangeDataNotificationProximityNear.has_value()) {
+        if (parametersData.rangeDataNotificationConfig.has_value() && parametersData.rangeDataNotificationConfig.value() == RangeDataNotificationConfiguration::EnableInProximityRange) {
+            if ((!parametersData.rangeDataNotificationProximityFar.has_value() && parametersData.rangeDataNotificationProximityNear.value() > 20000) ||
+                (parametersData.rangeDataNotificationProximityFar.has_value() && parametersData.rangeDataNotificationProximityNear.value() > parametersData.rangeDataNotificationProximityFar.value())) {
+                std::cerr << "Invalid RangeDataNotificationProximityNear" << std::endl;
+            }
+        }
+    }
+
     // RangeDataNotificationProximityFar
-    
+    if (parametersData.rangeDataNotificationProximityFar.has_value()) {
+        if (parametersData.rangeDataNotificationConfig.has_value() && parametersData.rangeDataNotificationConfig.value() == RangeDataNotificationConfiguration::EnableInProximityRange) {
+            if (parametersData.rangeDataNotificationProximityNear.has_value() && parametersData.rangeDataNotificationProximityFar.value() < parametersData.rangeDataNotificationProximityNear.value()) {
+                std::cerr << "Invalid RangeDataNotificationProximityFar" << std::endl;
+            }
+        }
+    }
+
     // DeviceRole (mandatory)
     if (!magic_enum::enum_contains<DeviceRole>(parametersData.deviceRole.value())) {
         std::cerr << "Invalid DeviceRole" << std::endl;
     }
-    
+
     // RFrameConfiguration
-    
+
     // PreambleCodeIndex
     if (parametersData.preambleCodeIndex.has_value()) {
         if (!parametersData.prfMode.has_value() || (parametersData.prfMode.has_value() && parametersData.prfMode.value() == PrfMode::Bprf)) { // Either BPRF is set or PRF_MODE is left at default (BPRF)
@@ -311,7 +323,7 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
             }
         }
     }
-    
+
     // SfdId
     if (parametersData.sfdId.has_value()) {
         if (!parametersData.prfMode.has_value() || (parametersData.prfMode.has_value() && parametersData.prfMode.value() == PrfMode::Bprf)) { // Either BPRF is set or PRF_MODE is left at default (BPRF)
@@ -324,44 +336,40 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
             }
         }
     }
-    
+
     // PsduDataRate
-    
+
     // PreambleDuration
-    
+
     // RangingTimeStruct
-    
-    // SlotsPerRangingRound (No restrictions given in FiRa UCI Generic Technical Specification v1.1.0)
-    
+
     // TxAdaptivePayloadPower
-    
+
     // ResponderSlotIndex
     if (parametersData.responderSlotIndex.has_value() && parametersData.responderSlotIndex.value() < 1) { // TODO: > N, where N is number of Responders
         std::cerr << "Invalid ResponderSlotIndex. Out of range." << std::endl;
     }
-    
+
     // PrfMode
-    
+
     // ScheduledMode
-    
+
     // KeyRotation
-    
+
     // KeyRotationRate
     if (parametersData.keyRotationRate.has_value() && parametersData.keyRotationRate.value() > 15) {
         std::cerr << "Invalid KeyRotationRate. Out of range." << std::endl;
     }
-    
+
     // SessionPriority
     if (parametersData.sessionPriority.has_value() && (parametersData.sessionPriority.value() < 1 || parametersData.sessionPriority.value() > 100)) {
         std::cerr << "Invalid SessionPriority. Out of range." << std::endl;
     }
-    
+
     // MacAddressMode
-    
-    // VendorId
-    
+
     // StaticStsIv
-    
+
     // NumberOfStsSegments
     if (parametersData.numberOfStsSegments.has_value()) {
         if (parametersData.numberOfStsSegments.value() > 4) {
@@ -376,15 +384,12 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
             std::cerr << "Invalid NumberOfStsSegments. No STS segments expected with non-STS frames" << std::endl;
         }
     }
-    
-    // MaxRangingRoundRetry
-    
+
     // UwbInitiationTime
-    
-    // HoppingMode
-    
-    // BlockStrideLength (No restrictions given in FiRa UCI Generic Technical Specification v1.1.0)
-    
+    if (parametersData.uwbInitiationTime.has_value() && parametersData.uwbInitiationTime.value() > 10000) {
+        std::cerr << "Invalid UwbInitiationTime. Out of range" << std::endl;
+    }
+
     // ResultReportConfig
     constexpr int resultReportConfigurationSize = magic_enum::enum_count<ResultReportConfiguration>();
     auto IsValidResultReportConfigurationString = [resultReportConfigurationSize](const std::string& resultReportConfigurationString) {
@@ -410,20 +415,22 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
             }
         }
     }
-    
+
     // InBandTerminationAttemptCount
     if (parametersData.inBandTerminationAttemptCount.has_value() && parametersData.inBandTerminationAttemptCount.value() > 10) {
         std::cerr << "Invalid InBandTerminationAttemptCount. Out of range." << std::endl;
     }
-    
-    // SubSessionId
-    
-    // BprfPhrDataRate
-    
-    // MaxNumberOfMeasurements (No restrictions given in FiRa UCI Generic Technical Specification v1.1.0)
-    
-    // StsLength
 
+    // SubSessionId
+    if (parametersData.stsConfiguration.has_value() && parametersData.stsConfiguration.value() == StsConfiguration::DynamicWithResponderSubSessionKey) {
+        if (!parametersData.subSessionId.has_value()) {
+            std::cerr << "SubSessionId is required for Dynamic STS with Responder Sub-Session Key" << std::endl;
+        }
+    }
+
+    // BprfPhrDataRate
+
+    // StsLength
 }
 
 /**
