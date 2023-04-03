@@ -241,7 +241,8 @@ void
 ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
 {
     // Note: No restrictions other than type bounds checking given in FiRa UCI Generic Technical Specification v1.1.0 for the following parameters:
-    // SlotDuration, SlotsPerRangingRound, VendorId, MaxRangingRoundRetry, BlockStrideLength, MaxNumberOfMeasurements, RangingInterval, StsIndex, HoppingMode
+    // SlotDuration, SlotsPerRangingRound, VendorId, MaxRangingRoundRetry, BlockStrideLength, MaxNumberOfMeasurements, RangingInterval, StsIndex,
+    // HoppingMode, StaticStsIv
 
     auto& parametersData = cliData->applicationConfigurationParametersData;
 
@@ -251,8 +252,14 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
     }
 
     // RangingRoundUsage
+    if (parametersData.rangingRoundUsage.has_value() && !magic_enum::enum_contains<RangingRoundUsage>(parametersData.rangingRoundUsage.value())) {
+        std::cerr << "Invalid RangingRoundUsage" << std::endl;
+    }
 
     // StsConfiguration
+    if (parametersData.stsConfiguration.has_value() && !magic_enum::enum_contains<StsConfiguration>(parametersData.stsConfiguration.value())) {
+        std::cerr << "Invalid StsConfiguration" << std::endl;
+    }
 
     // MultiNodeMode (mandatory)
     if (!magic_enum::enum_contains<MultiNodeMode>(parametersData.multiNodeMode.value())) {
@@ -260,6 +267,9 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
     }
 
     // Channel
+    if (parametersData.channelNumber.has_value() && !magic_enum::enum_contains<Channel>(parametersData.channelNumber.value())) {
+        std::cerr << "Invalid Channel" << std::endl;
+    }
 
     // NumberOfControlees (mandatory)
     if (parametersData.multiNodeMode == MultiNodeMode::Unicast) {
@@ -278,12 +288,24 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
     }
 
     // MacFcsType
+    if (parametersData.macFcsType.has_value() && !magic_enum::enum_contains<uwb::UwbMacAddressFcsType>(parametersData.macFcsType.value())) {
+        std::cerr << "Invalid MacFcsType" << std::endl;
+    }
 
     // RangingRoundControl
+    if (parametersData.rangingRoundControl.has_value() && !magic_enum::enum_contains<RangingRoundControl>(parametersData.rangingRoundControl.value())) {
+        std::cerr << "Invalid RangingRoundControl" << std::endl;
+    }
 
     // AoaResultRequest
+    if (parametersData.aoaResultRequest.has_value() && !magic_enum::enum_contains<AoAResult>(parametersData.aoaResultRequest.value())) {
+        std::cerr << "Invalid AoAResultRequest" << std::endl;
+    }
 
     // RangeDataNotificationConfig
+    if (parametersData.rangeDataNotificationConfig.has_value() && !magic_enum::enum_contains<RangeDataNotificationConfiguration>(parametersData.rangeDataNotificationConfig.value())) {
+        std::cerr << "Invalid RangeDataNotificationConfig" << std::endl;
+    }
 
     // RangeDataNotificationProximityNear
     if (parametersData.rangeDataNotificationProximityNear.has_value()) {
@@ -310,6 +332,9 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
     }
 
     // RFrameConfiguration
+    if (parametersData.rFrameConfiguration.has_value() && !magic_enum::enum_contains<StsPacketConfiguration>(parametersData.rFrameConfiguration.value())) {
+        std::cerr << "Invalid RFrameConfiguration" << std::endl;
+    }
 
     // PreambleCodeIndex
     if (parametersData.preambleCodeIndex.has_value()) {
@@ -338,12 +363,24 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
     }
 
     // PsduDataRate
+    if (parametersData.psduDataRate.has_value() && !magic_enum::enum_contains<PsduDataRate>(parametersData.psduDataRate.value())) {
+        std::cerr << "Invalid PsduDataRate" << std::endl;
+    }
 
     // PreambleDuration
+    if (parametersData.preambleDuration.has_value() && !magic_enum::enum_contains<PreambleDuration>(parametersData.preambleDuration.value())) {
+        std::cerr << "Invalid PreambleDuration" << std::endl;
+    }
 
     // RangingTimeStruct
+    if (parametersData.rangingTimeStruct.has_value() && !magic_enum::enum_contains<RangingMode>(parametersData.rangingTimeStruct.value())) {
+        std::cerr << "Invalid RangingTimeStruct" << std::endl;
+    }
 
     // TxAdaptivePayloadPower
+    if (parametersData.txAdaptivePayloadPower.has_value() && !magic_enum::enum_contains<TxAdaptivePayloadPower>(parametersData.txAdaptivePayloadPower.value())) {
+        std::cerr << "Invalid TxAdaptivePayloadPower" << std::endl;
+    }
 
     // ResponderSlotIndex
     if (parametersData.responderSlotIndex.has_value() && parametersData.responderSlotIndex.value() < 1) { // TODO: > N, where N is number of Responders
@@ -351,10 +388,19 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
     }
 
     // PrfMode
+    if (parametersData.prfMode.has_value() && !magic_enum::enum_contains<PrfMode>(parametersData.prfMode.value())) {
+        std::cerr << "Invalid PrfMode" << std::endl;
+    }
 
     // ScheduledMode
+    if (parametersData.scheduledMode.has_value() && !magic_enum::enum_contains<SchedulingMode>(parametersData.scheduledMode.value())) {
+        std::cerr << "Invalid ScheduledMode" << std::endl;
+    }
 
     // KeyRotation
+    if (parametersData.keyRotation.has_value() && !magic_enum::enum_contains<KeyRotation>(parametersData.keyRotation.value())) {
+        std::cerr << "Invalid KeyRotation" << std::endl;
+    }
 
     // KeyRotationRate
     if (parametersData.keyRotationRate.has_value() && parametersData.keyRotationRate.value() > 15) {
@@ -367,8 +413,9 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
     }
 
     // MacAddressMode
-
-    // StaticStsIv
+    if (parametersData.macAddressMode.has_value() && !magic_enum::enum_contains<uwb::UwbMacAddressType>(parametersData.macAddressMode.value())) {
+        std::cerr << "Invalid MacAddressMode" << std::endl;
+    }
 
     // NumberOfStsSegments
     if (parametersData.numberOfStsSegments.has_value()) {
@@ -429,8 +476,20 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
     }
 
     // BprfPhrDataRate
+    if (parametersData.prfMode.has_value() && parametersData.prfMode.value() != PrfMode::Bprf) {
+        if (parametersData.bprfPhrDataRate.has_value()) {
+            std::cerr << "Invalid BprfPhrDataRate. Value expected only in BPRF mode" << std::endl;
+        }
+    } else {
+        if (parametersData.bprfPhrDataRate.has_value() && !magic_enum::enum_contains<BprfPhrDataRate>(parametersData.bprfPhrDataRate.value())) {
+            std::cerr << "Invalid BprfPhrDataRate" << std::endl;
+        }
+    }
 
     // StsLength
+    if (parametersData.stsLength.has_value() && !magic_enum::enum_contains<StsLength>(parametersData.stsLength.value())) {
+        std::cerr << "Invalid StsLength" << std::endl;
+    }
 }
 
 /**
