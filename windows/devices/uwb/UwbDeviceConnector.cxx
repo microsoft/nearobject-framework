@@ -589,7 +589,7 @@ UwbConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpda
 
     auto& [_, callbacksWeak] = *it;
     auto callbacks = callbacksWeak.lock();
-    if (not(callbacks->OnSessionMembershipChanged)) {
+    if (not(callbacks) or not(callbacks->OnSessionMembershipChanged)) {
         PLOG_WARNING << "Ignoring MulticastListStatus event due to missing session callback";
         m_sessionEventCallbacks.erase(it);
         return;
@@ -628,7 +628,7 @@ UwbConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData ranging
 
     auto& [_, callbacksWeak] = *it;
     auto callbacks = callbacksWeak.lock();
-    if (not(callbacks->OnPeerPropertiesChanged)) {
+    if (not(callbacks) or not(callbacks->OnPeerPropertiesChanged)) {
         PLOG_WARNING << "Ignoring RangingData event due to expired session callback";
         m_sessionEventCallbacks.erase(it);
         return;
