@@ -435,6 +435,7 @@ enum class AoAResult : uint8_t {
 enum class RangeDataNotificationConfiguration : uint8_t {
     Disable = 0U,
     Enable = 1U,
+    EnableInProximityRange = 2U,
 };
 
 enum class PreambleDuration : uint8_t {
