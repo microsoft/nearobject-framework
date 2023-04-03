@@ -480,11 +480,11 @@ UwbConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vec
 void
 UwbConnector::HandleNotifications(std::stop_token stopToken)
 {
-    DWORD bytesRequired = 0;
-    std::vector<uint8_t> uwbNotificationDataBuffer{};
     auto handleDriver = m_notificationHandleDriver;
 
     while (!stopToken.stop_requested()) {
+        DWORD bytesRequired = sizeof(UWB_NOTIFICATION_DATA);
+        std::vector<uint8_t> uwbNotificationDataBuffer{};
         m_notificationOverlapped = {};
         for (const auto i : std::ranges::iota_view{ 0, 2 }) {
             uwbNotificationDataBuffer.resize(bytesRequired);
