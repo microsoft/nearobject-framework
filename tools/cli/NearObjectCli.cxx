@@ -546,7 +546,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
         }
 
         // Parse and validate ResultReportConfig
-        constexpr int resultReportConfigurationSize = 4; // TODO: Find a way to calculate this number
+        constexpr int resultReportConfigurationSize = magic_enum::enum_count<ResultReportConfiguration>();
         auto IsValidResultReportConfigurationString = [resultReportConfigurationSize](const std::string& resultReportConfigurationString) {
             if (resultReportConfigurationString.length() != resultReportConfigurationSize) {
                 std::cerr << "Invalid ResultReportConfiguration length" << std::endl;
@@ -564,18 +564,11 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
         if (IsValidResultReportConfigurationString(m_cliData->resultReportConfigurationString)) {
             m_cliData->appConfigParamsData.resultReportConfig.emplace();
 
-            const std::bitset<4> resultReportConfigurationBits(m_cliData->resultReportConfigurationString);
-            if (resultReportConfigurationBits[0]) {
-                m_cliData->appConfigParamsData.resultReportConfig.value().insert(ResultReportConfiguration::TofReport);
-            }
-            if (resultReportConfigurationBits[1]) {
-                m_cliData->appConfigParamsData.resultReportConfig.value().insert(ResultReportConfiguration::AoAAzimuthReport);
-            }
-            if (resultReportConfigurationBits[2]) {
-                m_cliData->appConfigParamsData.resultReportConfig.value().insert(ResultReportConfiguration::AoAElevationReport);
-            }
-            if (resultReportConfigurationBits[3]) {
-                m_cliData->appConfigParamsData.resultReportConfig.value().insert(ResultReportConfiguration::AoAFoMReport);
+            const std::bitset<resultReportConfigurationSize> resultReportConfigurationBits(m_cliData->resultReportConfigurationString);
+            for (auto i = 0; i < resultReportConfigurationSize; i++) {
+                if (resultReportConfigurationBits.test(i)) {
+                    m_cliData->appConfigParamsData.resultReportConfig.value().insert(magic_enum::enum_value<ResultReportConfiguration>(i));
+                }
             }
         }
 
