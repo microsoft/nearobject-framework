@@ -147,13 +147,20 @@ UwbSimulatorIoEventQueue::ProcessNotificationQueue(std::stop_token stopToken)
         // the request buffer is not large enough to contain available data.
         void *outputBuffer = nullptr;
         std::size_t outputBufferSize = 0;
-        status = WdfRequestRetrieveOutputBuffer(request, notificationDdiSize, &outputBuffer, &outputBufferSize);
+        std::size_t outputSize = 0;
+        status = WdfRequestRetrieveOutputBuffer(request, sizeof notificationDdi.value(), &outputBuffer, &outputBufferSize);
         if (NT_SUCCESS(status)) {
-            DbgPrint("%p completing request %p with %llu byte payload %s\n", m_wdfQueue, request, notificationDdiSize, ToString(notification).c_str());
-            std::memcpy(outputBuffer, std::data(notificationDdiBuffer), notificationDdiSize);
-        }
+            outputSize = std::clamp(outputBufferSize, std::size_t(0), notificationDdiSize);
+            std::memcpy(outputBuffer, std::data(notificationDdiBuffer), outputSize);
 
+            // If the output buffer was too small, indicate a buffer overflow would have occurred.
+            if (outputSize < notificationDdiSize) {
+                status = STATUS_BUFFER_OVERFLOW;
+            }
+        }
+        
         // Complete the request.
-        WdfRequestCompleteWithInformation(request, status, notificationDdiSize);
+        DbgPrint("%p completing request %p with %llu byte payload %s\n", m_wdfQueue, request, outputSize, ToString(notification).c_str());
+        WdfRequestCompleteWithInformation(request, status, outputSize);
     } // for (;;)
 }
