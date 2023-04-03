@@ -565,17 +565,11 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
             m_cliData->appConfigParamsData.resultReportConfig.emplace();
 
             const std::bitset<resultReportConfigurationSize> resultReportConfigurationBits(m_cliData->resultReportConfigurationString);
-            if (resultReportConfigurationBits.test(0)) {
-                m_cliData->appConfigParamsData.resultReportConfig.value().insert(ResultReportConfiguration::TofReport);
-            }
-            if (resultReportConfigurationBits.test(1)) {
-                m_cliData->appConfigParamsData.resultReportConfig.value().insert(ResultReportConfiguration::AoAAzimuthReport);
-            }
-            if (resultReportConfigurationBits.test(2)) {
-                m_cliData->appConfigParamsData.resultReportConfig.value().insert(ResultReportConfiguration::AoAElevationReport);
-            }
-            if (resultReportConfigurationBits.test(3)) {
-                m_cliData->appConfigParamsData.resultReportConfig.value().insert(ResultReportConfiguration::AoAFoMReport);
+
+            for (auto i = 0; i < resultReportConfigurationSize; i++) {
+                if (resultReportConfigurationBits.test(i)) {
+                    m_cliData->appConfigParamsData.resultReportConfig.value().insert(magic_enum::enum_value<ResultReportConfiguration>(i));
+                }
             }
         }
 
