@@ -763,7 +763,7 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::
 bool
 UwbConnector::CallbacksPresent()
 {
-    return m_deviceEventCallbacks.lock() and (not m_sessionEventCallbacks.empty());
+    return m_deviceEventCallbacks.lock() or (not m_sessionEventCallbacks.empty());
 }
 
 void
