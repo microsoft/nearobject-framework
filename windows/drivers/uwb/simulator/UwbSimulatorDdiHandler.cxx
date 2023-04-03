@@ -14,6 +14,10 @@
 
 using namespace windows::devices::uwb::simulator;
 
+using UwbSimulatorDispatchEntryLrp = UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>;
+
+UwbSimulatorDispatchEntryLrp (*MakeLrpDispatchEntryWithSize)(ULONG, typename UwbSimulatorDispatchEntryLrp::HandlerFuncT, std:: size_t, std::size_t) = &MakeDispatchEntry<UwbSimulatorDdiHandler>;
+
 /**
  * @brief Template function alias which partially specializes the
  * UwbSimulatorDispatchEntry template with ClassT = UwbSimulatorDdiHandler.
@@ -30,7 +34,7 @@ using namespace windows::devices::uwb::simulator;
 template <
     typename InputT = Unrestricted,
     typename OutputT = Unrestricted>
-UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler> (*MakeLrpDispatchEntry)(ULONG, typename UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>::HandlerFuncT) = &MakeDispatchEntry<UwbSimulatorDdiHandler, InputT, OutputT>;
+UwbSimulatorDispatchEntryLrp (*MakeLrpDispatchEntry)(ULONG, typename UwbSimulatorDispatchEntryLrp::HandlerFuncT) = &MakeDispatchEntry<UwbSimulatorDdiHandler, InputT, OutputT>;
 
 /**
  * @brief Dispatch table for the LRP DDI driver IOCTLs.
@@ -55,7 +59,7 @@ const std::initializer_list<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>> U
     MakeLrpDispatchEntry<UWB_START_RANGING_SESSION, UWB_STATUS>(IOCTL_UWB_START_RANGING_SESSION, &UwbSimulatorDdiHandler::OnUwbSessionStartRanging),
     MakeLrpDispatchEntry<UWB_STOP_RANGING_SESSION, UWB_STATUS>(IOCTL_UWB_STOP_RANGING_SESSION, &UwbSimulatorDdiHandler::OnUwbSessionStopRanging),
     MakeLrpDispatchEntry<UWB_GET_RANGING_COUNT, UWB_RANGING_COUNT>(IOCTL_UWB_GET_RANGING_COUNT, &UwbSimulatorDdiHandler::OnUwbSessionGetRangingCount),
-    MakeLrpDispatchEntry<Unrestricted, Unrestricted>(IOCTL_UWB_NOTIFICATION, &UwbSimulatorDdiHandler::OnUwbNotification),
+    MakeLrpDispatchEntry<Unrestricted, UWB_NOTIFICATION_DATA>(IOCTL_UWB_NOTIFICATION, &UwbSimulatorDdiHandler::OnUwbNotification),
     // GUID_DEVINTERFACE_UWB_SIMULATOR Handlers
     MakeLrpDispatchEntry<Unrestricted, UwbSimulatorCapabilities>(IOCTL_UWB_DEVICE_SIM_GET_CAPABILITIES, &UwbSimulatorDdiHandler::OnUwbSimulatorCapabilities),
     MakeLrpDispatchEntry<UwbSimulatorTriggerSessionEventArgs, Unrestricted>(IOCTL_UWB_DEVICE_SIM_TRIGGER_SESSION_EVENT, &UwbSimulatorDdiHandler::OnUwbSimulatorTriggerSessionEvent),
