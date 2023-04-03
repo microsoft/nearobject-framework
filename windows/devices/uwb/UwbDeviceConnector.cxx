@@ -486,7 +486,7 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
     m_callbacksPresentConditionVariable.wait(lock, [this]() {
         return CallbacksPresent();
     });
-    
+
     DWORD bytesRequired = 0;
     std::vector<uint8_t> uwbNotificationDataBuffer{};
     auto handleDriver = m_notificationHandleDriver;
