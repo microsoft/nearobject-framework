@@ -8,7 +8,7 @@
 
 using windows::devices::uwb::simulator::IUwbSimulatorDdiHandler;
 
-UwbSimulatorDeviceFile::UwbSimulatorDeviceFile(WDFFILEOBJECT wdfFile, UwbSimulatorDevice *uwbSimulatorDevice) :
+UwbSimulatorDeviceFile::UwbSimulatorDeviceFile(WDFFILEOBJECT wdfFile, std::weak_ptr<UwbSimulatorDevice> uwbSimulatorDevice) :
     m_wdfFile(wdfFile),
     m_uwbSimulatorDevice(uwbSimulatorDevice)
 {}
@@ -19,15 +19,52 @@ UwbSimulatorDeviceFile::GetWdfFile() const noexcept
     return m_wdfFile;
 }
 
-UwbSimulatorDevice *
+std::weak_ptr<UwbSimulatorDevice>
 UwbSimulatorDeviceFile::GetDevice() noexcept
 {
     return m_uwbSimulatorDevice;
 }
 
+std::shared_ptr<UwbSimulatorIoEventQueue>
+UwbSimulatorDeviceFile::GetIoEventQueue()
+{
+    return m_ioEventQueue;
+}
+
 NTSTATUS
 UwbSimulatorDeviceFile::Initialize()
 {
+    std::shared_ptr<UwbSimulatorIoEventQueue> ioEventQueue;
+
+    // Create a manual dispatch queue for event handling.
+    WDF_IO_QUEUE_CONFIG queueConfig;
+    WDF_IO_QUEUE_CONFIG_INIT(&queueConfig, WdfIoQueueDispatchManual);
+    queueConfig.PowerManaged = WdfFalse;
+
+    WDFQUEUE wdfQueue;
+    WDFDEVICE wdfDevice = WdfFileObjectGetDevice(m_wdfFile);
+    NTSTATUS status = WdfIoQueueCreate(wdfDevice, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &wdfQueue);
+    if (!NT_SUCCESS(status)) {
+        TraceLoggingWrite(
+            UwbSimulatorTraceloggingProvider,
+            "WdfIoQueueCreate failed",
+            TraceLoggingLevel(TRACE_LEVEL_FATAL),
+            TraceLoggingNTStatus(status));
+        return status;
+    }
+
+    ioEventQueue = std::make_shared<UwbSimulatorIoEventQueue>(wdfQueue, MaximumQueueSizeDefault);
+    if (ioEventQueue == nullptr) {
+        return STATUS_INSUFFICIENT_RESOURCES;
+    }
+
+    status = ioEventQueue->Initialize();
+    if (!NT_SUCCESS(status)) {
+        return status;
+    }
+
+    m_ioEventQueue = std::move(ioEventQueue);
+
     return STATUS_SUCCESS;
 }
 
@@ -41,14 +78,12 @@ UwbSimulatorDeviceFile::RegisterHandler(std::shared_ptr<IUwbSimulatorDdiHandler>
 VOID
 UwbSimulatorDeviceFile::OnWdfDestroy(WDFOBJECT wdfFile)
 {
-    auto instance = GetUwbSimulatorFile(wdfFile);
+    auto instance = GetUwbSimulatorDeviceFileWdfContext(wdfFile)->File;
     if (instance->m_wdfFile != wdfFile) {
         return;
     }
 
-    // Explicitly invoke the destructor since the object was created with placement new.
     instance->OnDestroy();
-    instance->~UwbSimulatorDeviceFile();
 }
 
 /* static */
@@ -56,7 +91,7 @@ VOID
 UwbSimulatorDeviceFile::OnWdfRequestCancel(WDFREQUEST request)
 {
     auto wdfFile = WdfRequestGetFileObject(request);
-    auto instance = GetUwbSimulatorFile(wdfFile);
+    auto instance = GetUwbSimulatorDeviceFileWdfContext(wdfFile)->File;
     if (instance->m_wdfFile != wdfFile) {
         return;
     }
@@ -67,6 +102,7 @@ UwbSimulatorDeviceFile::OnWdfRequestCancel(WDFREQUEST request)
 void
 UwbSimulatorDeviceFile::OnDestroy()
 {
+    DbgPrint("%p destroyed\n", m_wdfFile);
 }
 
 void

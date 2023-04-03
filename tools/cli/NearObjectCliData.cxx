@@ -3,6 +3,8 @@
 #include <uwb/protocols/fira/UwbConfigurationBuilder.hxx>
 
 using namespace nearobject::cli;
+using uwb::protocol::fira::UwbApplicationConfigurationParameterType;
+using uwb::protocol::fira::UwbApplicationConfigurationParameterValue;
 using uwb::protocol::fira::UwbConfiguration;
 
 UwbConfigurationData::operator UwbConfiguration() const noexcept
@@ -113,4 +115,66 @@ UwbConfigurationData::operator UwbConfiguration() const noexcept
     }
 
     return builder;
+}
+
+std::unordered_map<UwbApplicationConfigurationParameterType, UwbApplicationConfigurationParameterValue>
+UwbApplicationConfigurationParameterData::GetValueMap() const
+{
+    std::unordered_map<UwbApplicationConfigurationParameterType, UwbApplicationConfigurationParameterValue> valuesMap;
+
+    std::initializer_list<std::pair<UwbApplicationConfigurationParameterType, std::optional<UwbApplicationConfigurationParameterValue>>> applicationConfigurationParameterList = {
+        { UwbApplicationConfigurationParameterType::DeviceRole, deviceRole },
+        { UwbApplicationConfigurationParameterType::MultiNodeMode, multiNodeMode },
+        { UwbApplicationConfigurationParameterType::NumberOfControlees, numberOfControlees },
+        { UwbApplicationConfigurationParameterType::DeviceMacAddress, deviceMacAddress },
+        { UwbApplicationConfigurationParameterType::DestinationMacAddresses, destinationMacAddresses },
+        { UwbApplicationConfigurationParameterType::DeviceType, deviceType },
+        { UwbApplicationConfigurationParameterType::RangingRoundUsage, rangingRoundUsage },
+        { UwbApplicationConfigurationParameterType::StsConfiguration, stsConfiguration },
+        { UwbApplicationConfigurationParameterType::ChannelNumber, channelNumber },
+        { UwbApplicationConfigurationParameterType::SlotDuration, slotDuration },
+        { UwbApplicationConfigurationParameterType::RangingInterval, rangingInterval },
+        { UwbApplicationConfigurationParameterType::StsIndex, stsIndex },
+        { UwbApplicationConfigurationParameterType::MacFcsType, macFcsType },
+        { UwbApplicationConfigurationParameterType::RangingRoundControl, rangingRoundControl },
+        { UwbApplicationConfigurationParameterType::AoAResultRequest, aoaResultRequest },
+        { UwbApplicationConfigurationParameterType::RangeDataNotificationConfig, rangeDataNotificationConfig },
+        { UwbApplicationConfigurationParameterType::RangeDataNotificationProximityNear, rangeDataNotificationProximityNear },
+        { UwbApplicationConfigurationParameterType::RangeDataNotificationProximityFar, rangeDataNotificationProximityFar },
+        { UwbApplicationConfigurationParameterType::RFrameConfiguration, rFrameConfiguration },
+        { UwbApplicationConfigurationParameterType::PreambleCodeIndex, preambleCodeIndex },
+        { UwbApplicationConfigurationParameterType::SfdId, sfdId },
+        { UwbApplicationConfigurationParameterType::PsduDataRate, psduDataRate },
+        { UwbApplicationConfigurationParameterType::PreambleDuration, preambleDuration },
+        { UwbApplicationConfigurationParameterType::RangingTimeStruct, rangingTimeStruct },
+        { UwbApplicationConfigurationParameterType::SlotsPerRangingRound, slotsPerRangingRound },
+        { UwbApplicationConfigurationParameterType::TxAdaptivePayloadPower, txAdaptivePayloadPower },
+        { UwbApplicationConfigurationParameterType::ResponderSlotIndex, responderSlotIndex },
+        { UwbApplicationConfigurationParameterType::PrfMode, prfMode },
+        { UwbApplicationConfigurationParameterType::ScheduledMode, scheduledMode },
+        { UwbApplicationConfigurationParameterType::KeyRotation, keyRotation },
+        { UwbApplicationConfigurationParameterType::KeyRotationRate, keyRotationRate },
+        { UwbApplicationConfigurationParameterType::SessionPriority, sessionPriority },
+        { UwbApplicationConfigurationParameterType::MacAddressMode, macAddressMode },
+        { UwbApplicationConfigurationParameterType::VendorId, vendorId },
+        { UwbApplicationConfigurationParameterType::StaticStsIv, staticStsIv },
+        { UwbApplicationConfigurationParameterType::NumberOfStsSegments, numberOfStsSegments },
+        { UwbApplicationConfigurationParameterType::MaxRangingRoundRetry, maxRangingRoundRetry },
+        { UwbApplicationConfigurationParameterType::UwbInitiationTime, uwbInitiationTime },
+        { UwbApplicationConfigurationParameterType::HoppingMode, hoppingMode },
+        { UwbApplicationConfigurationParameterType::BlockStrideLength, blockStrideLength },
+        { UwbApplicationConfigurationParameterType::ResultReportConfig, resultReportConfig },
+        { UwbApplicationConfigurationParameterType::InBandTerminationAttemptCount, inBandTerminationAttemptCount },
+        { UwbApplicationConfigurationParameterType::SubSessionId, subSessionId },
+        { UwbApplicationConfigurationParameterType::BprfPhrDataRate, bprfPhrDataRate },
+        { UwbApplicationConfigurationParameterType::MaxNumberOfMeasurements, maxNumberOfMeasurements },
+        { UwbApplicationConfigurationParameterType::StsLength, stsLength }
+    };
+    for (const auto& [parameterType, parameterValue] : applicationConfigurationParameterList) {
+        if (parameterValue.has_value()) {
+            valuesMap[parameterType] = parameterValue.value();
+        }
+    }
+
+    return valuesMap;
 }

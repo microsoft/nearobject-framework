@@ -8,10 +8,13 @@
 #ifndef UWB_SIMULATOR_IO_EVENT_QUEUE_HXX
 #define UWB_SIMULATOR_IO_EVENT_QUEUE_HXX
 
+#include <condition_variable>
 #include <cstddef>
 #include <memory>
 #include <optional>
 #include <queue>
+#include <stop_token>
+#include <thread>
 
 #include <windows.h>
 
@@ -59,30 +62,49 @@ public:
     Uninitialize();
 
     /**
-     * @brief Handle a WDF request for notification data.
+     * @brief Enqueue a WDFREQUEST for uwb notifications.
      *
-     * @param request The WDF request handle.
-     * @param notificationData The output argument to hold notification request data, if available.
-     * @param outputBufferSize The size of the DDI output buffer that will eventually be populated.
+     * This adds the specified wdf request to the request queue and notifies the
+     * notification processing thread that a request is now pending.
+     *
+     * @param request The request to enqueue.
      * @return NTSTATUS
      */
     NTSTATUS
-    HandleNotificationRequest(WDFREQUEST request, std::optional<::uwb::protocol::fira::UwbNotificationData> &notificationData, std::size_t &outputBufferSize);
+    EnqueueRequest(WDFREQUEST request);
 
     /**
-     * @brief Push new notification request data onto the queue.
+     * @brief Push new notification data onto the queue.
      *
      * @param notificationData The notification data.
-     * @return NTSTATUS
      */
-    NTSTATUS
-    PushNotificationData(::uwb::protocol::fira::UwbNotificationData notificationData);
+    void
+    PushNotification(::uwb::protocol::fira::UwbNotificationData notificationData);
+
+private:
+    /**
+     * @brief Notification event queue processing thread handler function.
+     * 
+     * This thread processes event notifications and completes pended requests.
+     * 
+     * @param stopToken The stop token to be signaled to stop operation.
+     */
+    void
+    ProcessNotificationQueue(std::stop_token stopToken);
 
 private:
     WDFQUEUE m_wdfQueue;
     WDFWAITLOCK m_wdfQueueLock{ nullptr };
-    std::optional<std::size_t> m_pendingRequestOutputBufferSize;
     std::queue<::uwb::protocol::fira::UwbNotificationData> m_notificationQueue;
+
+    // Notification processing. Note the jthread must come last to ensure it is
+    // joined first upon destruction, which will signal stop and release any waits
+    // on the condition variables.
+    std::mutex m_notificationGate;
+    std::condition_variable_any m_notificationRequestPending;
+    std::condition_variable_any m_notificationDataAvailable;
+    std::jthread m_notificationThread;
+
     const std::size_t m_maximumQueueSize{ MaximumQueueSizeDefault };
 };
 

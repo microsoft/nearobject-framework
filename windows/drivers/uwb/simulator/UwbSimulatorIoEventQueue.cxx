@@ -10,6 +10,7 @@
 
 #include <windows.h>
 
+#include "UwbSimulatorDeviceFile.hxx"
 #include "UwbSimulatorIoEventQueue.hxx"
 #include "UwbSimulatorTracelogging.hxx"
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
@@ -29,6 +30,15 @@ UwbSimulatorIoEventQueue::Initialize()
     lockAttributes.ParentObject = m_wdfQueue;
 
     NTSTATUS status = WdfWaitLockCreate(&lockAttributes, &m_wdfQueueLock);
+    if (!NT_SUCCESS(status)) {
+        return status;
+    }
+
+    // Start the notification processing thread.
+    m_notificationThread = std::jthread([this](std::stop_token stopToken) {
+        ProcessNotificationQueue(std::move(stopToken));
+    });
+
     return status;
 }
 
@@ -39,83 +49,111 @@ UwbSimulatorIoEventQueue::Uninitialize()
 }
 
 NTSTATUS
-UwbSimulatorIoEventQueue::HandleNotificationRequest(WDFREQUEST request, std::optional<UwbNotificationData> &notificationDataOpt, std::size_t &outputBufferSize)
+UwbSimulatorIoEventQueue::EnqueueRequest(WDFREQUEST request)
 {
-    NTSTATUS status = WdfWaitLockAcquire(m_wdfQueueLock, nullptr);
+    WDFREQUEST requestExisting = nullptr;
+    auto wdfFile = WdfRequestGetFileObject(request);
+    std::scoped_lock notificationLockExclusive{ m_notificationGate };
+
+    // Check if a request is already pending.
+    NTSTATUS status = WdfIoQueueFindRequest(m_wdfQueue, nullptr, wdfFile, nullptr, &requestExisting);
+    if (requestExisting != nullptr) {
+        DbgPrint("%p an existing request already pending", m_wdfQueue);
+        WdfObjectDereference(requestExisting);
+        return STATUS_INVALID_DEVICE_STATE;
+    }
+
+    // Forward the request to the queue and indicate the i/o is pending.
+    DbgPrint("%p pending request %p\n", m_wdfQueue, request);
+    status = WdfRequestForwardToIoQueue(request, m_wdfQueue);
     if (!NT_SUCCESS(status)) {
+        DbgPrint("%p failed to pend request %p with status 0x%08x\n", m_wdfQueue, status);
         return status;
     }
 
-    if (!m_notificationQueue.empty()) {
-        auto &notificationData = m_notificationQueue.front();
-        auto converted = UwbCxDdi::From(notificationData);
-        auto outputBufferSizeRequired = converted.size();
-        if (outputBufferSize < outputBufferSizeRequired) {
-            outputBufferSize = outputBufferSizeRequired;
-            status = STATUS_BUFFER_TOO_SMALL;
-        } else {
-            notificationDataOpt = std::move(notificationData);
-            m_notificationQueue.pop();
-            status = STATUS_SUCCESS;
-        }
-    } else {
-        status = WdfRequestForwardToIoQueue(request, m_wdfQueue);
-        if (!NT_SUCCESS(status)) {
-            // TODO: log
-        }
-        status = STATUS_PENDING;
-    }
+    // Notify the processing thread that a new request is pending.
+    m_notificationRequestPending.notify_one();
 
-    WdfWaitLockRelease(m_wdfQueueLock);
-
-    return status;
+    // Return pending status so dispatch code won't complete the request.
+    return STATUS_PENDING;
 }
 
-NTSTATUS
-UwbSimulatorIoEventQueue::PushNotificationData(UwbNotificationData notificationData)
+void
+UwbSimulatorIoEventQueue::PushNotification(UwbNotificationData notificationData)
 {
-    // Convert the neutral notification type to the DDI type. This needed, at
-    // minimum, to determine the required buffer size since it will eventually
-    // contain the DDI type.
-    auto notificationDataDdi = UwbCxDdi::From(notificationData);
-    auto notificationDataDdiBuffer = std::data(notificationDataDdi);
-    auto notificationDataDdiBufferSize = std::size(notificationDataDdi);
-
-    NTSTATUS status = WdfWaitLockAcquire(m_wdfQueueLock, nullptr);
-    if (!NT_SUCCESS(status)) {
-        return status;
+    // Push the notification data into the queue.
+    {
+        std::scoped_lock notificationLockExclusive{ m_notificationGate };
+        DbgPrint("%p pushing notification data with payload %s\n", m_wdfQueue, std::data(ToString(notificationData)));
+        m_notificationQueue.push(std::move(notificationData));
     }
 
-    // TODO: could we easily support > 1 pending requests by draining the queue
-    // here in a loop instead of taking the top queue entry only?
+    // Signal the processing thread that notification data is available.
+    m_notificationDataAvailable.notify_one();
+}
 
-    // Attempt to retrieve the most recent pended request.
-    WDFREQUEST request = nullptr;
-    status = WdfIoQueueRetrieveNextRequest(m_wdfQueue, &request);
+void
+UwbSimulatorIoEventQueue::ProcessNotificationQueue(std::stop_token stopToken)
+{
+    for (;;) {
+        // Wait for a notification request to be pended.
+        std::unique_lock notificationLock{ m_notificationGate };
+        DbgPrint("%p waiting for notification queue items\n", m_wdfQueue);
+        const auto isNotificationRequestPending = m_notificationRequestPending.wait(notificationLock, stopToken, [&] {
+            auto ioRequestQueueState = WdfIoQueueGetState(m_wdfQueue, nullptr, nullptr);
+            return !WDF_IO_QUEUE_IDLE(ioRequestQueueState);
+        });
 
-    // A request was pended, complete it with this notification data.
-    if (NT_SUCCESS(status)) {
+        // If predicate returned false, wait() unblocked due to stop request.
+        if (!isNotificationRequestPending) {
+            assert(stopToken.stop_requested());
+            DbgPrint("%p exiting notification processing thread due to stop request\n", m_wdfQueue);
+            break;
+        }
+
+        // Wait for notification data to become available.
+        const auto isNotificationDataAvailable = m_notificationDataAvailable.wait(notificationLock, stopToken, [&] {
+            return !m_notificationQueue.empty();
+        });
+
+        if (!isNotificationDataAvailable) {
+            assert(stopToken.stop_requested());
+            DbgPrint("%p exiting notification processing thread due to stop request\n", m_wdfQueue);
+            break;
+        }
+
+        // Obtain the pended request from the queue.
+        WDFREQUEST request = nullptr;
+        NTSTATUS status = WdfIoQueueRetrieveNextRequest(m_wdfQueue, &request);
+        if (!NT_SUCCESS(status)) {
+            DbgPrint("%p unable to retrieve pending i/o request from queue, status=0x%08x\n", m_wdfQueue, status);
+            continue;
+        }
+
+        // Remove the notification data from the top of the queue.
+        UwbNotificationData notification = std::move(m_notificationQueue.front());
+        m_notificationQueue.pop();
+
+        // Release the lock now that we've removed the queue item.
+        notificationLock.unlock();
+
+        // Convert the neutral type notification data to the DDI type.
+        auto notificationDdi = UwbCxDdi::From(notification);
+        auto notificationDdiBuffer = std::data(notificationDdi);
+        auto notificationDdiSize = std::size(notificationDdiBuffer);
+
+        // Attempt to copy the notification data to the output buffer. Note that
+        // WdfRequestRetrieveOutBuffer() will return STATUS_BUFFER_TOO_SMALL if
+        // the request buffer is not large enough to contain available data.
         void *outputBuffer = nullptr;
-        status = WdfRequestRetrieveOutputBuffer(request, notificationDataDdiBufferSize, &outputBuffer, nullptr);
+        std::size_t outputBufferSize = 0;
+        status = WdfRequestRetrieveOutputBuffer(request, notificationDdiSize, &outputBuffer, &outputBufferSize);
         if (NT_SUCCESS(status)) {
-            std::memcpy(outputBuffer, std::data(notificationDataDdiBuffer), notificationDataDdiBufferSize);
+            DbgPrint("%p completing request %p with %llu byte payload %s\n", m_wdfQueue, request, notificationDdiSize, ToString(notification).c_str());
+            std::memcpy(outputBuffer, std::data(notificationDdiBuffer), notificationDdiSize);
         }
 
         // Complete the request.
-        WdfRequestCompleteWithInformation(request, status, notificationDataDdiBufferSize);
-    } else {
-        // No request is pended, so queue this notification data for future requests.
-        // If the queue is full, drop requests until there is space for this entry.
-        while (std::size(m_notificationQueue) >= m_maximumQueueSize) {
-            m_notificationQueue.pop();
-        }
-
-        // Add this notification data to the queue.
-        m_notificationQueue.push(std::move(notificationData));
-        status = STATUS_SUCCESS;
-    }
-
-    WdfWaitLockRelease(m_wdfQueueLock);
-
-    return status;
+        WdfRequestCompleteWithInformation(request, status, notificationDdiSize);
+    } // for (;;)
 }
