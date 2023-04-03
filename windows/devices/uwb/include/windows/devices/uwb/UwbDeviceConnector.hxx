@@ -2,10 +2,13 @@
 #ifndef UWB_DEVICE_CONNECTOR_HXX
 #define UWB_DEVICE_CONNECTOR_HXX
 
+#include <condition_variable>
 #include <cstdint>
 #include <future>
 #include <memory>
+#include <mutex>
 #include <optional>
+#include <shared_mutex>
 #include <string>
 #include <thread>
 #include <tuple>
@@ -60,21 +63,6 @@ public:
 
 public:
     // IUwbDeviceDdiConnector
-    /**
-     * @brief Start listening for notifications.
-     *
-     * @return true If listening for notifications started successfully.
-     * @return false If listening for notifications could not be started.
-     */
-    virtual bool
-    NotificationListenerStart() override;
-
-    /**
-     * @brief Stop listening for notifications.
-     */
-    virtual void
-    NotificationListenerStop() override;
-
     /**
      * @brief Sets the callbacks for the UwbDevice that owns this UwbConnector
      *
@@ -151,6 +139,21 @@ public:
 
 private:
     /**
+     * @brief Start listening for notifications.
+     *
+     * @return true If listening for notifications started successfully.
+     * @return false If listening for notifications could not be started.
+     */
+    bool
+    NotificationListenerStart();
+
+    /**
+     * @brief Stop listening for notifications.
+     */
+    void
+    NotificationListenerStop();
+
+    /**
      * @brief Thread function for handling UWB notifications from the driver.
      *
      * @param stopToken The token used to request the notification loop to stop.
@@ -192,8 +195,23 @@ private:
     void
     OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData);
 
+    /**
+     * @brief Internal function to check if there are callbacks present
+     *
+     * @return true
+     * @return false
+     */
+    bool
+    CallbacksPresent();
+
 private:
+    mutable std::shared_mutex m_eventCallbacksGate;
+
+    mutable std::mutex m_callbacksPresentConditionVariableGate;
+    mutable std::condition_variable m_callbacksPresentConditionVariable;
+
     std::unordered_map<uint32_t, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks>> m_sessionEventCallbacks;
+
     std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> m_deviceEventCallbacks;
     std::string m_deviceName{};
     std::jthread m_notificationThread;

@@ -151,7 +151,6 @@ UwbDevice::InitializeImpl()
     m_uwbDeviceConnector = uwbConnector;
     m_uwbSessionConnector = uwbConnector;
     m_callbacksToken = m_uwbDeviceConnector->RegisterDeviceEventCallbacks(m_callbacks);
-    m_uwbDeviceConnector->NotificationListenerStart();
     return true;
 }
 

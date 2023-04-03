@@ -29,7 +29,9 @@ class RegisteredCallbackToken
 
 UwbConnector::UwbConnector(std::string deviceName) :
     m_deviceName(std::move(deviceName))
-{}
+{
+    NotificationListenerStart();
+}
 
 UwbConnector::~UwbConnector()
 {
@@ -665,6 +667,7 @@ Accessor(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks, st
 void
 UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNotificationData)
 {
+    std::shared_lock readerLock{ m_eventCallbacksGate };
     std::visit([this](auto&& arg) {
         using ValueType = std::decay_t<decltype(arg)>;
 
@@ -704,6 +707,11 @@ UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNo
 bool
 UwbConnector::NotificationListenerStart()
 {
+    std::unique_lock lock{ m_callbacksPresentConditionVariableGate };
+    m_callbacksPresentConditionVariable.wait(lock, [this]() {
+        return CallbacksPresent();
+    });
+
     wil::shared_hfile notificationHandleDriver;
     auto hr = OpenDriverHandle(notificationHandleDriver, m_deviceName.c_str(), true);
     if (FAILED(hr)) {
@@ -729,19 +737,36 @@ UwbConnector::NotificationListenerStop()
 ::uwb::RegisteredCallbackToken*
 UwbConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks)
 {
-    m_deviceEventCallbacks = callbacks;
+    {
+        std::lock_guard presenceLock{ m_callbacksPresentConditionVariableGate };
+        std::lock_guard writerLock{ m_eventCallbacksGate };
+        m_deviceEventCallbacks = callbacks;
+    }
+    m_callbacksPresentConditionVariable.notify_one();
     return nullptr;
 }
 
 ::uwb::RegisteredCallbackToken*
 UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks)
 {
-    m_sessionEventCallbacks.insert_or_assign(sessionId, callbacks);
+    {
+        std::lock_guard presenceLock{ m_callbacksPresentConditionVariableGate };
+        std::lock_guard writerLock{ m_eventCallbacksGate };
+        m_sessionEventCallbacks.insert_or_assign(sessionId, callbacks);
+    }
+    m_callbacksPresentConditionVariable.notify_one();
     return nullptr;
+}
+
+bool
+UwbConnector::CallbacksPresent()
+{
+    return m_deviceEventCallbacks.lock() and (not m_sessionEventCallbacks.empty());
 }
 
 void
 UwbConnector::DeregisterEventCallback(::uwb::RegisteredCallbackToken* token)
 {
     // TODO implement
+    std::lock_guard writerLock{ m_eventCallbacksGate };
 }

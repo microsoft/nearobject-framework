@@ -51,26 +51,6 @@ struct IUwbDeviceDdiConnector : public IUwbDeviceDdi
      * @return RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback
      */
     virtual ::uwb::RegisteredCallbackToken* RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>) = 0;
-
-    /**
-     * @brief Start listening for notifications.
-     *
-     * Note: this is a rudimentary implementation and is only present to
-     * preserve existing behavior. It will eventually be replaced by a
-     * fine-grained publication/subscription model.
-     *
-     * @param onNotification The handler to invoke for each notification.
-     * @return true If listening for notifications started successfully.
-     * @return false If listening for notifications could not be started.
-     */
-    virtual bool
-    NotificationListenerStart() = 0;
-
-    /**
-     * @brief Stop listening for notifications.
-     */
-    virtual void
-    NotificationListenerStop() = 0;
 };
 
 } // namespace windows::devices::uwb

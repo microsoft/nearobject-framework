@@ -63,7 +63,6 @@ UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventC
         });
 
     auto uwbConnector = std::make_shared<UwbConnector>(uwbDevice->DeviceName());
-    uwbConnector->NotificationListenerStart();
     m_uwbDeviceConnector = uwbConnector;
     m_registeredCallbacksToken = m_uwbDeviceConnector->RegisterSessionEventCallbacks(m_sessionId, m_registeredCallbacks);
 }
