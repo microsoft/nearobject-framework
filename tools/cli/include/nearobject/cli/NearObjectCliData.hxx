@@ -152,7 +152,7 @@ struct NearObjectCliData
     std::string destinationMacAddressString; // TODO: List of strings (or large string of mac address substrings) to support multiple controlees
     std::string resultReportConfigurationString;
     UwbConfigurationData uwbConfiguration{};
-    UwbApplicationConfigurationParameterData appConfigParamsData{};
+    UwbApplicationConfigurationParameterData applicationConfigurationParametersData{};
     uwb::protocol::fira::StaticRangingInfo StaticRanging{};
     uwb::protocol::fira::UwbSessionData SessionData{};
     UwbRangingParameters RangingParameters{};
