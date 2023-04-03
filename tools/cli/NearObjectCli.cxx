@@ -565,7 +565,6 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
             m_cliData->appConfigParamsData.resultReportConfig.emplace();
 
             const std::bitset<resultReportConfigurationSize> resultReportConfigurationBits(m_cliData->resultReportConfigurationString);
-
             for (auto i = 0; i < resultReportConfigurationSize; i++) {
                 if (resultReportConfigurationBits.test(i)) {
                     m_cliData->appConfigParamsData.resultReportConfig.value().insert(magic_enum::enum_value<ResultReportConfiguration>(i));
