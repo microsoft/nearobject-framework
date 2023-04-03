@@ -190,11 +190,13 @@ enum class Channel {
 
 /**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
- * 7.5.3.3, Table 53.
+ * 7.5.3.3, Table 53; and FiRa Consortium UWB Command Interface Generic Technical
+ * Specification v1.1.0, Section 8.3, Table 29
  */
 enum class PrfMode {
     Bprf = 0,
     Hprf = 1,
+    HprfSpecialDataRate = 2,
 };
 
 /**
