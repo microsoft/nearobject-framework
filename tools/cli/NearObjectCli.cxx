@@ -300,8 +300,30 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
     // RFrameConfiguration
     
     // PreambleCodeIndex
+    if (parametersData.preambleCodeIndex.has_value()) {
+        if (!parametersData.prfMode.has_value() || (parametersData.prfMode.has_value() && parametersData.prfMode.value() == PrfMode::Bprf)) { // Either BPRF is set or PRF_MODE is left at default (BPRF)
+            if (parametersData.preambleCodeIndex.value() < 9 || parametersData.preambleCodeIndex.value() > 12) {
+                std::cerr << "Invalid PreambleCodeIndex. Expected value range of 9-12 in BPRF mode" << std::endl;
+            }
+        } else { // HPRF mode
+            if (parametersData.preambleCodeIndex.value() < 25 || parametersData.preambleCodeIndex.value() > 32) {
+                std::cerr << "Invalid PreambleCodeIndex. Expected value range of 25-32 in HPRF mode" << std::endl;
+            }
+        }
+    }
     
     // SfdId
+    if (parametersData.sfdId.has_value()) {
+        if (!parametersData.prfMode.has_value() || (parametersData.prfMode.has_value() && parametersData.prfMode.value() == PrfMode::Bprf)) { // Either BPRF is set or PRF_MODE is left at default (BPRF)
+            if (parametersData.sfdId.value() != 0 && parametersData.sfdId.value() != 2) {
+                std::cerr << "Invalid SfdId. Expected values of 0 or 2 in BPRF mode" << std::endl;
+            }
+        } else { // HPRF mode
+            if (parametersData.sfdId.value() < 1 || parametersData.sfdId.value() > 4) {
+                std::cerr << "Invalid SfdId. Expected value range of 1-4 in HPRF mode" << std::endl;
+            }
+        }
+    }
     
     // PsduDataRate
     
@@ -309,11 +331,14 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
     
     // RangingTimeStruct
     
-    // SlotsPerRangingRound
+    // SlotsPerRangingRound (No restrictions given in FiRa UCI Generic Technical Specification v1.1.0)
     
     // TxAdaptivePayloadPower
     
     // ResponderSlotIndex
+    if (parametersData.responderSlotIndex.has_value() && parametersData.responderSlotIndex.value() < 1) { // TODO: > N, where N is number of Responders
+        std::cerr << "Invalid ResponderSlotIndex. Out of range." << std::endl;
+    }
     
     // PrfMode
     
@@ -322,8 +347,14 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
     // KeyRotation
     
     // KeyRotationRate
+    if (parametersData.keyRotationRate.has_value() && (parametersData.keyRotationRate.value() < 0 || parametersData.keyRotationRate.value() > 15)) {
+        std::cerr << "Invalid KeyRotationRate. Out of range." << std::endl;
+    }
     
     // SessionPriority
+    if (parametersData.sessionPriority.has_value() && (parametersData.sessionPriority.value() < 1 || parametersData.sessionPriority.value() > 100)) {
+        std::cerr << "Invalid SessionPriority. Out of range." << std::endl;
+    }
     
     // MacAddressMode
     
@@ -332,6 +363,19 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
     // StaticStsIv
     
     // NumberOfStsSegments
+    if (parametersData.numberOfStsSegments.has_value()) {
+        if (parametersData.numberOfStsSegments.value() < 0 || parametersData.numberOfStsSegments.value() > 4) {
+            std::cerr << "Invalid NumberOfStsSegments. Out of range." << std::endl;
+        }
+        if (!parametersData.prfMode.has_value() || (parametersData.prfMode.has_value() && parametersData.prfMode.value() == PrfMode::Bprf)) { // Either BPRF is set or PRF_MODE is left at default (BPRF)
+            if (parametersData.numberOfStsSegments.value() >= 2) {
+                std::cerr << "Invalid NumberOfStsSegments. Only 0 or 1 STS segments expected in BPRF mode" << std::endl;
+            }
+        }
+        if (parametersData.rFrameConfiguration.value() == StsPacketConfiguration::SP0 && parametersData.numberOfStsSegments != 0) {
+            std::cerr << "Invalid NumberOfStsSegments. No STS segments expected with non-STS frames" << std::endl;
+        }
+    }
     
     // MaxRangingRoundRetry
     
@@ -340,6 +384,9 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
     // HoppingMode
     
     // BlockStrideLength
+    if (parametersData.blockStrideLength.has_value() && (parametersData.blockStrideLength.value() < 0 || parametersData.blockStrideLength.value() > 255)) {
+        std::cerr << "Invalid BlockStrideLength. Out of range." << std::endl;
+    }
     
     // ResultReportConfig
     constexpr int resultReportConfigurationSize = magic_enum::enum_count<ResultReportConfiguration>();
@@ -368,6 +415,9 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
     }
     
     // InBandTerminationAttemptCount
+    if (parametersData.inBandTerminationAttemptCount.has_value() && (parametersData.inBandTerminationAttemptCount.value() < 0 || parametersData.inBandTerminationAttemptCount.value() > 10)) {
+        std::cerr << "Invalid InBandTerminationAttemptCount. Out of range." << std::endl;
+    }
     
     // SubSessionId
     
@@ -405,6 +455,10 @@ ProcessApplicationConfigurationParameters(std::shared_ptr<NearObjectCliData> cli
             if constexpr (std::is_enum_v<ParameterValueT>) {
                 oss << magic_enum::enum_name(arg);
             } else if constexpr (std::is_same_v<ParameterValueT, uint8_t>) {
+                oss << +arg;
+            } else if constexpr (std::is_same_v<ParameterValueT, uint16_t>) {
+                oss << +arg;
+            } else if constexpr (std::is_same_v<ParameterValueT, uint32_t>) {
                 oss << +arg;
             } else if constexpr (std::is_same_v<ParameterValueT, ::uwb::UwbMacAddress>) {
                 oss << ToString(arg);
