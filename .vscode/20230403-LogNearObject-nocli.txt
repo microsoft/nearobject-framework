@@ -1,0 +1,101 @@
+﻿2023-04-03 16:02:25.382 INFO  [4888] [uwb::UwbDevice::Initialize@167] Initialize
+2023-04-03 16:02:25.386 VERB  [4888] [uwb::UwbSession::Configure@82] configure session with id 10
+2023-04-03 16:02:25.400 VERB  [4888] [windows::devices::uwb::UwbSession::ConfigureImpl@84] ConfigureImpl
+2023-04-03 16:02:25.407 DEBUG [7780] [windows::devices::uwb::UwbConnector::HandleNotifications@491] IOCTL_UWB_NOTIFICATION attempt #1 with 0-byte buffer
+2023-04-03 16:02:25.407 DEBUG [5460] [windows::devices::uwb::UwbConnector::HandleNotifications@491] IOCTL_UWB_NOTIFICATION attempt #1 with 0-byte buffer
+2023-04-03 16:02:25.409 DEBUG [4888] [windows::devices::uwb::UwbConnector::SessionInitialize@219] IOCTL_UWB_SESSION_INIT succeeded
+2023-04-03 16:02:32.556 DEBUG [7780] [windows::devices::uwb::UwbConnector::HandleNotifications@495] IOCTL_UWB_NOTIFICATION attempt #1 with 0-byte buffer completed 0 bytes required hr=0x800703e5 lastError 0x3e5
+2023-04-03 16:02:37.296 DEBUG [5460] [windows::devices::uwb::UwbConnector::HandleNotifications@495] IOCTL_UWB_NOTIFICATION attempt #1 with 0-byte buffer completed 0 bytes required hr=0x800703e5 lastError 0x3e5
+2023-04-03 16:02:37.297 VERB  [7780] [windows::devices::uwb::UwbConnector::HandleNotifications@505] IOCTL_UWB_NOTIFICATION insufficient buffer (hr=0x8007007a), 92 bytes required, current size 0 bytes
+2023-04-03 16:02:37.298 VERB  [5460] [windows::devices::uwb::UwbConnector::HandleNotifications@505] IOCTL_UWB_NOTIFICATION insufficient buffer (hr=0x8007007a), 92 bytes required, current size 0 bytes
+2023-04-03 16:02:37.298 DEBUG [7780] [windows::devices::uwb::UwbConnector::HandleNotifications@491] IOCTL_UWB_NOTIFICATION attempt #2 with 92-byte buffer
+2023-04-03 16:02:37.298 DEBUG [5460] [windows::devices::uwb::UwbConnector::HandleNotifications@491] IOCTL_UWB_NOTIFICATION attempt #2 with 92-byte buffer
+2023-04-03 16:02:37.299 DEBUG [4888] [windows::devices::uwb::UwbConnector::SetApplicationConfigurationParameters@465] IOCTL_UWB_SET_APP_CONFIG_PARAMS succeeded
+2023-04-03 16:03:33.045 DEBUG [7780] [windows::devices::uwb::UwbConnector::HandleNotifications@495] IOCTL_UWB_NOTIFICATION attempt #2 with 92-byte buffer completed 92 bytes required hr=0x800703e5 lastError 0x3e5
+2023-04-03 16:04:18.014 VERB  [4888] [uwb::UwbSession::GetApplicationConfigurationParameters@133] get application configuration parameters
+2023-04-03 16:04:41.632 DEBUG [4888] [windows::devices::uwb::UwbConnector::GetApplicationConfigurationParameters@404] IOCTL_UWB_GET_APP_CONFIG_PARAMS attempt #1 with 0-byte buffer
+2023-04-03 16:04:43.877 DEBUG [4888] [windows::devices::uwb::UwbConnector::GetApplicationConfigurationParameters@404] IOCTL_UWB_GET_APP_CONFIG_PARAMS attempt #2 with 92-byte buffer
+2023-04-03 16:04:45.486 DEBUG [4888] [windows::devices::uwb::UwbConnector::GetApplicationConfigurationParameters@419] IOCTL_UWB_GET_APP_CONFIG_PARAMS succeeded
+2023-04-03 16:04:18.013 DEBUG [5460] [windows::devices::uwb::UwbConnector::HandleNotifications@495] IOCTL_UWB_NOTIFICATION attempt #2 with 92-byte buffer completed 92 bytes required hr=0x800703e5 lastError 0x3e5
+2023-04-03 16:04:48.270 VERB  [7780] [windows::devices::uwb::UwbConnector::HandleNotifications@505] IOCTL_UWB_NOTIFICATION insufficient buffer (hr=0x8007007a), 232 bytes required, current size 92 bytes
+2023-04-03 16:04:48.295 DEBUG [4888] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@43] Session Application Configuration Parameters: 
+2023-04-03 16:04:49.317 DEBUG [7780] [windows::devices::uwb::UwbConnector::HandleNotifications@491] IOCTL_UWB_NOTIFICATION attempt #1 with 232-byte buffer
+2023-04-03 16:04:49.317 VERB  [5460] [windows::devices::uwb::UwbConnector::HandleNotifications@505] IOCTL_UWB_NOTIFICATION insufficient buffer (hr=0x8007007a), 232 bytes required, current size 92 bytes
+2023-04-03 16:04:49.318 DEBUG [4888] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@45]  > DeviceType: Controlee
+2023-04-03 16:04:50.234 DEBUG [7780] [windows::devices::uwb::UwbConnector::HandleNotifications@495] IOCTL_UWB_NOTIFICATION attempt #1 with 232-byte buffer completed 0 bytes required hr=0x800703e5 lastError 0x3e5
+2023-04-03 16:04:50.236 DEBUG [5460] [windows::devices::uwb::UwbConnector::HandleNotifications@491] IOCTL_UWB_NOTIFICATION attempt #1 with 232-byte buffer
+2023-04-03 16:04:50.236 DEBUG [4888] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@45]  > MultiNodeMode: Unicast
+2023-04-03 16:04:50.238 DEBUG [7780] [windows::devices::uwb::UwbConnector::HandleNotifications@491] IOCTL_UWB_NOTIFICATION attempt #2 with 232-byte buffer
+2023-04-03 16:04:51.299 DEBUG [5460] [windows::devices::uwb::UwbConnector::HandleNotifications@495] IOCTL_UWB_NOTIFICATION attempt #1 with 232-byte buffer completed 0 bytes required hr=0x800703e5 lastError 0x3e5
+2023-04-03 16:04:51.299 VERB  [3616] [windows::devices::uwb::UwbConnector::OnSessionRangingData@618] Ignoring RangingData event due to missing session callback
+2023-04-03 16:04:51.301 DEBUG [4888] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@45]  > NumberOfControlees: 1
+2023-04-03 16:04:52.225 DEBUG [7780] [windows::devices::uwb::UwbConnector::HandleNotifications@495] IOCTL_UWB_NOTIFICATION attempt #2 with 232-byte buffer completed 232 bytes required hr=0x800703e5 lastError 0x3e5
+2023-04-03 16:04:52.228 DEBUG [5460] [windows::devices::uwb::UwbConnector::HandleNotifications@491] IOCTL_UWB_NOTIFICATION attempt #2 with 232-byte buffer
+2023-04-03 16:04:52.228 VERB  [3616] [windows::devices::uwb::UwbConnector::OnSessionRangingData@618] Ignoring RangingData event due to missing session callback
+2023-04-03 16:04:52.228 DEBUG [4888] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@45]  > DeviceMacAddress: 12:34
+2023-04-03 16:04:52.229 DEBUG [7780] [windows::devices::uwb::UwbConnector::HandleNotifications@491] IOCTL_UWB_NOTIFICATION attempt #1 with 232-byte buffer
+2023-04-03 16:04:52.229 DEBUG [4888] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@45]  > DestinationMacAddresses: 23:45 
+2023-04-03 16:04:52.229 VERB  [5636] [windows::devices::uwb::UwbConnector::OnSessionRangingData@618] Ignoring RangingData event due to missing session callback
+2023-04-03 16:04:53.292 DEBUG [5460] [windows::devices::uwb::UwbConnector::HandleNotifications@495] IOCTL_UWB_NOTIFICATION attempt #2 with 232-byte buffer completed 232 bytes required hr=0x800703e5 lastError 0x3e5
+2023-04-03 16:04:54.624 DEBUG [7780] [windows::devices::uwb::UwbConnector::HandleNotifications@495] IOCTL_UWB_NOTIFICATION attempt #1 with 232-byte buffer completed 0 bytes required hr=0x800703e5 lastError 0x3e5
+2023-04-03 16:04:54.626 DEBUG [4888] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@45]  > DeviceRole: Responder
+2023-04-03 16:04:54.627 DEBUG [5460] [windows::devices::uwb::UwbConnector::HandleNotifications@491] IOCTL_UWB_NOTIFICATION attempt #1 with 232-byte buffer
+2023-04-03 16:04:54.627 VERB  [3616] [windows::devices::uwb::UwbConnector::OnSessionRangingData@618] Ignoring RangingData event due to missing session callback
+2023-04-03 16:04:54.628 DEBUG [7780] [windows::devices::uwb::UwbConnector::HandleNotifications@491] IOCTL_UWB_NOTIFICATION attempt #2 with 232-byte buffer
+2023-04-03 16:04:54.628 VERB  [5636] [windows::devices::uwb::UwbConnector::OnSessionRangingData@618] Ignoring RangingData event due to missing session callback
+2023-04-03 16:04:54.628 VERB  [4888] [uwb::UwbSession::StartRanging@97] start ranging
+2023-04-03 16:04:55.743 DEBUG [5460] [windows::devices::uwb::UwbConnector::HandleNotifications@495] IOCTL_UWB_NOTIFICATION attempt #1 with 232-byte buffer completed 0 bytes required hr=0x800703e5 lastError 0x3e5
+2023-04-03 16:04:56.436 DEBUG [7780] [windows::devices::uwb::UwbConnector::HandleNotifications@495] IOCTL_UWB_NOTIFICATION attempt #2 with 232-byte buffer completed 232 bytes required hr=0x800703e5 lastError 0x3e5
+2023-04-03 16:04:56.438 DEBUG [4888] [windows::devices::uwb::UwbConnector::SessionRangingStart@307] IOCTL_UWB_START_RANGING_SESSION succeeded
+2023-04-03 16:04:56.440 DEBUG [7780] [windows::devices::uwb::UwbConnector::HandleNotifications@491] IOCTL_UWB_NOTIFICATION attempt #1 with 232-byte buffer
+2023-04-03 16:04:56.440 DEBUG [5460] [windows::devices::uwb::UwbConnector::HandleNotifications@491] IOCTL_UWB_NOTIFICATION attempt #2 with 232-byte buffer
+2023-04-03 16:04:56.440 VERB  [5636] [windows::devices::uwb::UwbConnector::OnSessionRangingData@618] Ignoring RangingData event due to missing session callback
+2023-04-03 16:04:56.440 VERB  [3616] [windows::devices::uwb::UwbConnector::OnSessionRangingData@618] Ignoring RangingData event due to missing session callback
+2023-04-03 16:04:56.626 DEBUG [7780] [windows::devices::uwb::UwbConnector::HandleNotifications@495] IOCTL_UWB_NOTIFICATION attempt #1 with 232-byte buffer completed 0 bytes required hr=0x800703e5 lastError 0x3e5
+2023-04-03 16:04:57.734 DEBUG [5460] [windows::devices::uwb::UwbConnector::HandleNotifications@495] IOCTL_UWB_NOTIFICATION attempt #2 with 232-byte buffer completed 232 bytes required hr=0x800703e5 lastError 0x3e5
+2023-04-03 16:04:57.738 VERB  [5636] [windows::devices::uwb::UwbConnector::OnSessionRangingData@618] Ignoring RangingData event due to missing session callback
+2023-04-03 16:04:57.738 DEBUG [7780] [windows::devices::uwb::UwbConnector::HandleNotifications@491] IOCTL_UWB_NOTIFICATION attempt #2 with 232-byte buffer
+2023-04-03 16:04:57.741 DEBUG [5460] [windows::devices::uwb::UwbConnector::HandleNotifications@491] IOCTL_UWB_NOTIFICATION attempt #1 with 232-byte buffer
+2023-04-03 16:04:57.741 VERB  [3616] [windows::devices::uwb::UwbConnector::OnSessionRangingData@618] Ignoring RangingData event due to missing session callback
+2023-04-03 16:04:58.725 DEBUG [5460] [windows::devices::uwb::UwbConnector::HandleNotifications@495] IOCTL_UWB_NOTIFICATION attempt #1 with 232-byte buffer completed 0 bytes required hr=0x800703e5 lastError 0x3e5
+2023-04-03 16:05:41.952 DEBUG [7780] [windows::devices::uwb::UwbConnector::HandleNotifications@495] IOCTL_UWB_NOTIFICATION attempt #2 with 232-byte buffer completed 232 bytes required hr=0x800703e5 lastError 0x3e5
+2023-04-03 16:05:41.954 VERB  [3616] [windows::devices::uwb::UwbConnector::OnSessionRangingData@618] Ignoring RangingData event due to missing session callback
+2023-04-03 16:05:41.954 DEBUG [5460] [windows::devices::uwb::UwbConnector::HandleNotifications@491] IOCTL_UWB_NOTIFICATION attempt #2 with 232-byte buffer
+2023-04-03 16:05:41.954 DEBUG [7780] [windows::devices::uwb::UwbConnector::HandleNotifications@491] IOCTL_UWB_NOTIFICATION attempt #1 with 232-byte buffer
+2023-04-03 16:05:41.954 VERB  [5636] [windows::devices::uwb::UwbConnector::OnSessionRangingData@618] Ignoring RangingData event due to missing session callback
+2023-04-03 16:11:05.421 INFO  [4584] [uwb::UwbDevice::Initialize@167] Initialize
+2023-04-03 16:11:05.426 VERB  [4584] [uwb::UwbSession::Configure@82] configure session with id 11
+2023-04-03 16:11:05.427 VERB  [4584] [windows::devices::uwb::UwbSession::ConfigureImpl@83] ConfigureImpl
+2023-04-03 16:11:05.428 DEBUG [4584] [windows::devices::uwb::UwbConnector::SessionInitialize@221] IOCTL_UWB_SESSION_INIT succeeded
+2023-04-03 16:11:05.430 DEBUG [4584] [windows::devices::uwb::UwbConnector::SetApplicationConfigurationParameters@467] IOCTL_UWB_SET_APP_CONFIG_PARAMS succeeded
+2023-04-03 16:11:05.430 VERB  [4584] [uwb::UwbSession::GetApplicationConfigurationParameters@133] get application configuration parameters
+2023-04-03 16:11:05.431 DEBUG [4584] [windows::devices::uwb::UwbConnector::GetApplicationConfigurationParameters@406] IOCTL_UWB_GET_APP_CONFIG_PARAMS attempt #1 with 0-byte buffer
+2023-04-03 16:11:05.432 DEBUG [4584] [windows::devices::uwb::UwbConnector::GetApplicationConfigurationParameters@406] IOCTL_UWB_GET_APP_CONFIG_PARAMS attempt #2 with 92-byte buffer
+2023-04-03 16:11:05.433 DEBUG [4584] [windows::devices::uwb::UwbConnector::GetApplicationConfigurationParameters@421] IOCTL_UWB_GET_APP_CONFIG_PARAMS succeeded
+2023-04-03 16:11:05.434 DEBUG [4584] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@43] Session Application Configuration Parameters: 
+2023-04-03 16:11:05.434 DEBUG [4584] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@45]  > DeviceType: Controlee
+2023-04-03 16:11:05.435 DEBUG [4584] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@45]  > MultiNodeMode: Unicast
+2023-04-03 16:11:05.435 DEBUG [4584] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@45]  > NumberOfControlees: 1
+2023-04-03 16:11:05.436 DEBUG [4584] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@45]  > DeviceMacAddress: 12:34
+2023-04-03 16:11:05.436 DEBUG [4584] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@45]  > DestinationMacAddresses: 23:45 
+2023-04-03 16:11:05.436 DEBUG [4584] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@45]  > DeviceRole: Responder
+2023-04-03 16:11:05.437 VERB  [4584] [uwb::UwbSession::StartRanging@97] start ranging
+2023-04-03 16:11:05.438 DEBUG [4584] [windows::devices::uwb::UwbConnector::SessionRangingStart@309] IOCTL_UWB_START_RANGING_SESSION succeeded
+2023-04-03 16:13:22.327 INFO  [6992] [uwb::UwbDevice::Initialize@167] Initialize
+2023-04-03 16:13:22.334 VERB  [6992] [uwb::UwbSession::Configure@82] configure session with id 12
+2023-04-03 16:13:32.632 VERB  [6992] [windows::devices::uwb::UwbSession::ConfigureImpl@83] ConfigureImpl
+2023-04-03 16:13:32.634 DEBUG [6992] [windows::devices::uwb::UwbConnector::SessionInitialize@221] IOCTL_UWB_SESSION_INIT succeeded
+2023-04-03 16:13:32.636 DEBUG [6992] [windows::devices::uwb::UwbConnector::SetApplicationConfigurationParameters@467] IOCTL_UWB_SET_APP_CONFIG_PARAMS succeeded
+2023-04-03 16:13:32.637 VERB  [6992] [uwb::UwbSession::GetApplicationConfigurationParameters@133] get application configuration parameters
+2023-04-03 16:13:32.637 DEBUG [6992] [windows::devices::uwb::UwbConnector::GetApplicationConfigurationParameters@406] IOCTL_UWB_GET_APP_CONFIG_PARAMS attempt #1 with 0-byte buffer
+2023-04-03 16:13:32.639 DEBUG [6992] [windows::devices::uwb::UwbConnector::GetApplicationConfigurationParameters@406] IOCTL_UWB_GET_APP_CONFIG_PARAMS attempt #2 with 92-byte buffer
+2023-04-03 16:13:32.639 DEBUG [6992] [windows::devices::uwb::UwbConnector::GetApplicationConfigurationParameters@421] IOCTL_UWB_GET_APP_CONFIG_PARAMS succeeded
+2023-04-03 16:13:32.641 DEBUG [6992] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@43] Session Application Configuration Parameters: 
+2023-04-03 16:13:32.642 DEBUG [6992] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@45]  > DeviceType: Controlee
+2023-04-03 16:13:32.642 DEBUG [6992] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@45]  > MultiNodeMode: Unicast
+2023-04-03 16:13:32.643 DEBUG [6992] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@45]  > NumberOfControlees: 1
+2023-04-03 16:13:32.643 DEBUG [6992] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@45]  > DeviceMacAddress: 12:34
+2023-04-03 16:13:32.644 DEBUG [6992] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@45]  > DestinationMacAddresses: 23:45 
+2023-04-03 16:13:32.645 DEBUG [6992] [nearobject::cli::NearObjectCliHandler::HandleDriverStartRanging@45]  > DeviceRole: Responder
+2023-04-03 16:13:32.645 VERB  [6992] [uwb::UwbSession::StartRanging@97] start ranging
+2023-04-03 16:13:32.646 DEBUG [6992] [windows::devices::uwb::UwbConnector::SessionRangingStart@309] IOCTL_UWB_START_RANGING_SESSION succeeded

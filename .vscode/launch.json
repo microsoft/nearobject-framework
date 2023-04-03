@@ -26,7 +26,20 @@
                 "uwb",
                 "range",
                 "--SessionId",
-                "3" ,"start", "--DeviceRole", "0", "--MultiNodeMode", "0", "--NumberOfControlees", "1", "--DeviceMacAddress", "12:34", "--DestinationMacAddress", "23:45", "--DeviceType", "0"
+                "${input:sessionId}",
+                "start",
+                "--DeviceRole",
+                "0",
+                "--MultiNodeMode",
+                "0",
+                "--NumberOfControlees",
+                "1",
+                "--DeviceMacAddress",
+                "12:34",
+                "--DestinationMacAddress",
+                "23:45",
+                "--DeviceType",
+                "0"
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
@@ -49,6 +62,11 @@
             "id": "deviceName",
             "type": "promptString",
             "description": "The uwb device name (GUID) to use for ranging"
+        },
+        {
+            "id": "sessionId",
+            "type": "promptString",
+            "description": "sessionId to use for ranging"
         }
     ]
 }
