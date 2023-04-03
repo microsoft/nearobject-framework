@@ -16,7 +16,7 @@ using namespace windows::devices::uwb::simulator;
 
 using UwbSimulatorDispatchEntryLrp = UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>;
 
-UwbSimulatorDispatchEntryLrp (*MakeLrpDispatchEntryWithSize)(ULONG, typename UwbSimulatorDispatchEntryLrp::HandlerFuncT, std:: size_t, std::size_t) = &MakeDispatchEntry<UwbSimulatorDdiHandler>;
+UwbSimulatorDispatchEntryLrp (*MakeLrpDispatchEntryWithSize)(ULONG, typename UwbSimulatorDispatchEntryLrp::HandlerFuncT, std::size_t, std::size_t) = &MakeDispatchEntry<UwbSimulatorDdiHandler>;
 
 /**
  * @brief Template function alias which partially specializes the

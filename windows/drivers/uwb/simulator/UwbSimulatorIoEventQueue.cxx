@@ -158,7 +158,7 @@ UwbSimulatorIoEventQueue::ProcessNotificationQueue(std::stop_token stopToken)
                 status = STATUS_BUFFER_OVERFLOW;
             }
         }
-        
+
         // Complete the request.
         DbgPrint("%p completing request %p with %llu byte payload %s\n", m_wdfQueue, request, outputSize, ToString(notification).c_str());
         WdfRequestCompleteWithInformation(request, status, outputSize);
