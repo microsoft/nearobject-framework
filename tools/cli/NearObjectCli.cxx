@@ -233,43 +233,18 @@ AddEnumOption(CLI::App* app, std::optional<EnumType>& assignTo, bool isMandatory
 }
 
 /**
- * @brief Validates input for nocli uwb range start.
+ * @brief Validates non-enum application configuration parameter inputs from nocli.
  *
  * @param cliData The nocli input data containing the application configuration parameters
  */
 void
-ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
+ValidateNonEnumParameterValues(std::shared_ptr<NearObjectCliData> cliData)
 {
     // Note: No restrictions other than type bounds checking given in FiRa UCI Generic Technical Specification v1.1.0 for the following parameters:
     // SlotDuration, SlotsPerRangingRound, VendorId, MaxRangingRoundRetry, BlockStrideLength, MaxNumberOfMeasurements, RangingInterval, StsIndex,
     // HoppingMode, StaticStsIv
 
     auto& parametersData = cliData->applicationConfigurationParametersData;
-
-    // DeviceType (mandatory)
-    if (!magic_enum::enum_contains<DeviceType>(parametersData.deviceType.value())) {
-        std::cerr << "Invalid DeviceType" << std::endl;
-    }
-
-    // RangingRoundUsage
-    if (parametersData.rangingRoundUsage.has_value() && !magic_enum::enum_contains<RangingRoundUsage>(parametersData.rangingRoundUsage.value())) {
-        std::cerr << "Invalid RangingRoundUsage" << std::endl;
-    }
-
-    // StsConfiguration
-    if (parametersData.stsConfiguration.has_value() && !magic_enum::enum_contains<StsConfiguration>(parametersData.stsConfiguration.value())) {
-        std::cerr << "Invalid StsConfiguration" << std::endl;
-    }
-
-    // MultiNodeMode (mandatory)
-    if (!magic_enum::enum_contains<MultiNodeMode>(parametersData.multiNodeMode.value())) {
-        std::cerr << "Invalid MultiNodeMode" << std::endl;
-    }
-
-    // Channel
-    if (parametersData.channelNumber.has_value() && !magic_enum::enum_contains<Channel>(parametersData.channelNumber.value())) {
-        std::cerr << "Invalid Channel" << std::endl;
-    }
 
     // NumberOfControlees (mandatory)
     if (parametersData.multiNodeMode == MultiNodeMode::Unicast) {
@@ -285,26 +260,6 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
     // TODO: Insert the correct Controlee mac address rather than simply inserting the entire destinationMacAddressString
     for (auto i = 0; i < parametersData.numberOfControlees; i++) {
         parametersData.destinationMacAddresses.value().insert(uwb::UwbMacAddress::FromString(cliData->destinationMacAddressString, macAddressType).value());
-    }
-
-    // MacFcsType
-    if (parametersData.macFcsType.has_value() && !magic_enum::enum_contains<uwb::UwbMacAddressFcsType>(parametersData.macFcsType.value())) {
-        std::cerr << "Invalid MacFcsType" << std::endl;
-    }
-
-    // RangingRoundControl
-    if (parametersData.rangingRoundControl.has_value() && !magic_enum::enum_contains<RangingRoundControl>(parametersData.rangingRoundControl.value())) {
-        std::cerr << "Invalid RangingRoundControl" << std::endl;
-    }
-
-    // AoaResultRequest
-    if (parametersData.aoaResultRequest.has_value() && !magic_enum::enum_contains<AoAResult>(parametersData.aoaResultRequest.value())) {
-        std::cerr << "Invalid AoAResultRequest" << std::endl;
-    }
-
-    // RangeDataNotificationConfig
-    if (parametersData.rangeDataNotificationConfig.has_value() && !magic_enum::enum_contains<RangeDataNotificationConfiguration>(parametersData.rangeDataNotificationConfig.value())) {
-        std::cerr << "Invalid RangeDataNotificationConfig" << std::endl;
     }
 
     // RangeDataNotificationProximityNear
@@ -324,16 +279,6 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
                 std::cerr << "Invalid RangeDataNotificationProximityFar" << std::endl;
             }
         }
-    }
-
-    // DeviceRole (mandatory)
-    if (!magic_enum::enum_contains<DeviceRole>(parametersData.deviceRole.value())) {
-        std::cerr << "Invalid DeviceRole" << std::endl;
-    }
-
-    // RFrameConfiguration
-    if (parametersData.rFrameConfiguration.has_value() && !magic_enum::enum_contains<StsPacketConfiguration>(parametersData.rFrameConfiguration.value())) {
-        std::cerr << "Invalid RFrameConfiguration" << std::endl;
     }
 
     // PreambleCodeIndex
@@ -362,44 +307,9 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
         }
     }
 
-    // PsduDataRate
-    if (parametersData.psduDataRate.has_value() && !magic_enum::enum_contains<PsduDataRate>(parametersData.psduDataRate.value())) {
-        std::cerr << "Invalid PsduDataRate" << std::endl;
-    }
-
-    // PreambleDuration
-    if (parametersData.preambleDuration.has_value() && !magic_enum::enum_contains<PreambleDuration>(parametersData.preambleDuration.value())) {
-        std::cerr << "Invalid PreambleDuration" << std::endl;
-    }
-
-    // RangingTimeStruct
-    if (parametersData.rangingTimeStruct.has_value() && !magic_enum::enum_contains<RangingMode>(parametersData.rangingTimeStruct.value())) {
-        std::cerr << "Invalid RangingTimeStruct" << std::endl;
-    }
-
-    // TxAdaptivePayloadPower
-    if (parametersData.txAdaptivePayloadPower.has_value() && !magic_enum::enum_contains<TxAdaptivePayloadPower>(parametersData.txAdaptivePayloadPower.value())) {
-        std::cerr << "Invalid TxAdaptivePayloadPower" << std::endl;
-    }
-
     // ResponderSlotIndex
     if (parametersData.responderSlotIndex.has_value() && parametersData.responderSlotIndex.value() < 1) { // TODO: > N, where N is number of Responders
         std::cerr << "Invalid ResponderSlotIndex. Out of range." << std::endl;
-    }
-
-    // PrfMode
-    if (parametersData.prfMode.has_value() && !magic_enum::enum_contains<PrfMode>(parametersData.prfMode.value())) {
-        std::cerr << "Invalid PrfMode" << std::endl;
-    }
-
-    // ScheduledMode
-    if (parametersData.scheduledMode.has_value() && !magic_enum::enum_contains<SchedulingMode>(parametersData.scheduledMode.value())) {
-        std::cerr << "Invalid ScheduledMode" << std::endl;
-    }
-
-    // KeyRotation
-    if (parametersData.keyRotation.has_value() && !magic_enum::enum_contains<KeyRotation>(parametersData.keyRotation.value())) {
-        std::cerr << "Invalid KeyRotation" << std::endl;
     }
 
     // KeyRotationRate
@@ -410,11 +320,6 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
     // SessionPriority
     if (parametersData.sessionPriority.has_value() && (parametersData.sessionPriority.value() < 1 || parametersData.sessionPriority.value() > 100)) {
         std::cerr << "Invalid SessionPriority. Out of range." << std::endl;
-    }
-
-    // MacAddressMode
-    if (parametersData.macAddressMode.has_value() && !magic_enum::enum_contains<uwb::UwbMacAddressType>(parametersData.macAddressMode.value())) {
-        std::cerr << "Invalid MacAddressMode" << std::endl;
     }
 
     // NumberOfStsSegments
@@ -485,10 +390,28 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
             std::cerr << "Invalid BprfPhrDataRate" << std::endl;
         }
     }
+}
 
-    // StsLength
-    if (parametersData.stsLength.has_value() && !magic_enum::enum_contains<StsLength>(parametersData.stsLength.value())) {
-        std::cerr << "Invalid StsLength" << std::endl;
+/**
+ * @brief Validates the enum application configuration parameter inputs from nocli.
+ * 
+ * @tparam EnumType The type of the enumeration.
+ * @param applicationConfigurationParameter The application configuration parameter of type EnumType.
+ */
+template <typename EnumType>
+// clang-format off
+requires std::is_enum_v<EnumType>
+void
+ValidateEnumParameterValue(const EnumType& applicationConfigurationParameter)
+// clang-format on
+{
+    auto parameterType = magic_enum::enum_type_name<EnumType>();
+    if (!magic_enum::enum_contains<EnumType>(applicationConfigurationParameter)) {
+        if (parameterType == "StsPacketConfiguration") { // Special case
+            std::cerr << "Invalid RFrameConfiguration" << std::endl;
+        } else {
+            std::cerr << "Invalid " << parameterType << std::endl;
+        }
     }
 }
 
@@ -501,7 +424,7 @@ ValidateUwbRangeStartInput(std::shared_ptr<NearObjectCliData> cliData)
 std::vector<uwb::protocol::fira::UwbApplicationConfigurationParameter>
 ProcessApplicationConfigurationParameters(std::shared_ptr<NearObjectCliData> cliData)
 {
-    detail::ValidateUwbRangeStartInput(cliData);
+    detail::ValidateNonEnumParameterValues(cliData);
     auto& applicationConfigurationParameterData = cliData->applicationConfigurationParametersData;
 
     std::vector<uwb::protocol::fira::UwbApplicationConfigurationParameter> applicationConfigurationParameters;
@@ -516,12 +439,9 @@ ProcessApplicationConfigurationParameters(std::shared_ptr<NearObjectCliData> cli
             std::ostringstream oss;
             oss << magic_enum::enum_name(applicationConfigurationParameter) << "::";
             if constexpr (std::is_enum_v<ParameterValueT>) {
+                ValidateEnumParameterValue(arg);
                 oss << magic_enum::enum_name(arg);
-            } else if constexpr (std::is_same_v<ParameterValueT, uint8_t>) {
-                oss << +arg;
-            } else if constexpr (std::is_same_v<ParameterValueT, uint16_t>) {
-                oss << +arg;
-            } else if constexpr (std::is_same_v<ParameterValueT, uint32_t>) {
+            } else if constexpr (std::is_unsigned_v<ParameterValueT>) {
                 oss << +arg;
             } else if constexpr (std::is_same_v<ParameterValueT, ::uwb::UwbMacAddress>) {
                 oss << ToString(arg);
