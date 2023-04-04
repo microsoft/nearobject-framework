@@ -14,5 +14,6 @@
   <ItemGroup>
     <None Include="windows.devices.nearobject.def" />
     <None Include="PropertySheet.props" />
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
