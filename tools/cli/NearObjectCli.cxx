@@ -211,7 +211,12 @@ CLI::Option*
 AddEnumOption(CLI::App* app, std::optional<EnumType>& assignTo, bool isMandatory = false)
 // clang-format on
 {
-    std::string optionName{ std::string("--").append(magic_enum::enum_type_name<EnumType>()) };
+    std::string optionName{ std::string("--") };
+    if (magic_enum::enum_type_name<EnumType>() == "StsPacketConfiguration") {
+        optionName.append("RFrameConfiguration");
+    } else {
+        optionName.append(magic_enum::enum_type_name<EnumType>());
+    }
 
     const auto map = CreateEnumerationStringMap<EnumType>();
     std::ostringstream enumUsage;
