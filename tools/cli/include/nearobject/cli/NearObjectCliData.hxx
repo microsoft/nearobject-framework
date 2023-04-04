@@ -104,7 +104,7 @@ struct UwbApplicationConfigurationParameterData
     std::optional<uint16_t> rangeDataNotificationProximityNear;
     std::optional<uint16_t> rangeDataNotificationProximityFar;
     std::optional<uwb::protocol::fira::DeviceRole> deviceRole;
-    std::optional<uwb::protocol::fira::StsPacketConfiguration> rFrameConfiguration;
+    std::optional<uwb::protocol::fira::RFrameConfiguration> rFrameConfiguration;
     std::optional<uint8_t> preambleCodeIndex;
     std::optional<uint8_t> sfdId;
     std::optional<uwb::protocol::fira::PsduDataRate> psduDataRate;
@@ -113,7 +113,7 @@ struct UwbApplicationConfigurationParameterData
     std::optional<uint8_t> slotsPerRangingRound;
     std::optional<uwb::protocol::fira::TxAdaptivePayloadPower> txAdaptivePayloadPower;
     std::optional<uint8_t> responderSlotIndex;
-    std::optional<uwb::protocol::fira::PrfMode> prfMode;
+    std::optional<uwb::protocol::fira::PrfModeDetailed> prfMode;
     std::optional<uwb::protocol::fira::SchedulingMode> scheduledMode;
     std::optional<uwb::protocol::fira::KeyRotation> keyRotation;
     std::optional<uint8_t> keyRotationRate;
@@ -152,7 +152,7 @@ struct NearObjectCliData
     std::string destinationMacAddressString; // TODO: List of strings (or large string of mac address substrings) to support multiple controlees
     std::string resultReportConfigurationString;
     UwbConfigurationData uwbConfiguration{};
-    UwbApplicationConfigurationParameterData appConfigParamsData{};
+    UwbApplicationConfigurationParameterData applicationConfigurationParametersData{};
     uwb::protocol::fira::StaticRangingInfo StaticRanging{};
     uwb::protocol::fira::UwbSessionData SessionData{};
     UwbRangingParameters RangingParameters{};
