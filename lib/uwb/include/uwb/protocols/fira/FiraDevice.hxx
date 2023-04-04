@@ -97,12 +97,14 @@ enum class StsConfiguration : uint8_t {
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
  * 5.3.
  */
-enum class StsPacketConfiguration : uint8_t {
+enum class RFrameConfiguration : uint8_t {
     SP0 = 0,
     SP1 = 1,
     SP2 = 2,
     SP3 = 3,
 };
+
+using StsPacketConfiguration = RFrameConfiguration;
 
 /**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
@@ -190,13 +192,11 @@ enum class Channel {
 
 /**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
- * 7.5.3.3, Table 53; and FiRa Consortium UWB Command Interface Generic Technical
- * Specification v1.1.0, Section 8.3, Table 29
+ * 7.5.3.3, Table 53.
  */
 enum class PrfMode {
     Bprf = 0,
     Hprf = 1,
-    HprfSpecialDataRate = 2,
 };
 
 /**
@@ -547,7 +547,7 @@ using UwbApplicationConfigurationParameterValue = std::variant<
     KeyRotation, // KEY_ROTATION, tag 0x23, size 1
     MultiNodeMode, // MULTI_NODE_MODE, tag 0x03, size 1
     PreambleDuration, // PREAMBLE_DURATION, tag 0x17, size 1
-    PrfMode, // PRF_MODE, tag 0x1F, size 1
+    PrfModeDetailed, // PRF_MODE, tag 0x1F, size 1
     PsduDataRate, // PSDU_DATA_RATE, tag 0x16, size 1
     RangeDataNotificationConfiguration, // RANGE_DATA_NTF_CONFIG, tag 0x0E, size 1
     RangingRoundUsage, // RANGING_ROUND_USAGE, tag0x01, size 1
@@ -557,7 +557,7 @@ using UwbApplicationConfigurationParameterValue = std::variant<
     SchedulingMode, // SCHEDULED_MODE, tag 0x22, size 1
     StsConfiguration, // STS_CONFIG, tag 0x02, size 1
     StsLength, // STS_LENGTH, tag 0x035, length 1,
-    StsPacketConfiguration, // RFRAME_CONFIG, tag 0x12, size 1
+    RFrameConfiguration, // RFRAME_CONFIG, tag 0x12, size 1
     TxAdaptivePayloadPower, // TX_ADAPTIVE_PAYLOAD_POWER, tag 0x1C, size 1
     ::uwb::UwbMacAddress, // DEVICE_MAC_ADDRESS, tag 0x06, size 2/8
     ::uwb::UwbMacAddressFcsType, // MAC_FCS_TYPE, tag 0x0B, size 1

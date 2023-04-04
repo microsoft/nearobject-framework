@@ -44,9 +44,6 @@ const std::unordered_map<UwbApplicationConfigurationParameterType, std::function
     { UwbApplicationConfigurationParameterType::SlotsPerRangingRound, [](const UwbConfiguration& config, DeviceType deviceType) -> std::optional<UwbApplicationConfigurationParameterValue> {
          return config.GetSlotsPerRangingRound();
      } },
-    { UwbApplicationConfigurationParameterType::PrfMode, [](const UwbConfiguration& config, DeviceType deviceType) -> std::optional<UwbApplicationConfigurationParameterValue> {
-         return config.GetPrfMode();
-     } },
     { UwbApplicationConfigurationParameterType::ScheduledMode, [](const UwbConfiguration& config, DeviceType deviceType) -> std::optional<UwbApplicationConfigurationParameterValue> {
          return config.GetSchedulingMode();
      } },
@@ -118,6 +115,14 @@ const std::unordered_map<UwbApplicationConfigurationParameterType, std::function
              }
          } else {
              return config.GetControllerMacAddress();
+         }
+     } },
+    { UwbApplicationConfigurationParameterType::PrfMode, [](const UwbConfiguration& config, DeviceType deviceType) -> std::optional<UwbApplicationConfigurationParameterValue> {
+         auto prfMode = config.GetPrfMode();
+         if (prfMode == PrfMode::Bprf) {
+             return PrfModeDetailed::Bprf62MHz;
+         } else {                                // HPRF
+             return PrfModeDetailed::Hprf124MHz; // TODO: Is there a way to determine OOB which Hprf frequency is used?
          }
      } },
     // TODO figure out the rest of the uci params

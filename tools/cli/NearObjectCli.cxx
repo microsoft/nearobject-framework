@@ -211,12 +211,7 @@ CLI::Option*
 AddEnumOption(CLI::App* app, std::optional<EnumType>& assignTo, bool isMandatory = false)
 // clang-format on
 {
-    std::string optionName{ std::string("--") };
-    if (magic_enum::enum_type_name<EnumType>() == "StsPacketConfiguration") {
-        optionName.append("RFrameConfiguration");
-    } else {
-        optionName.append(magic_enum::enum_type_name<EnumType>());
-    }
+    std::string optionName{ std::string("--").append(magic_enum::enum_type_name<EnumType>()) };
 
     const auto map = CreateEnumerationStringMap<EnumType>();
     std::ostringstream enumUsage;
@@ -243,13 +238,13 @@ AddEnumOption(CLI::App* app, std::optional<EnumType>& assignTo, bool isMandatory
  * @param cliData The nocli input data containing the application configuration parameters
  */
 void
-ValidateNonEnumParameterValues(std::shared_ptr<NearObjectCliData> cliData)
+ValidateNonEnumParameterValues(NearObjectCliData& cliData)
 {
     // Note: No restrictions other than type bounds checking given in FiRa UCI Generic Technical Specification v1.1.0 for the following parameters:
     // SlotDuration, SlotsPerRangingRound, VendorId, MaxRangingRoundRetry, BlockStrideLength, MaxNumberOfMeasurements, RangingInterval, StsIndex,
     // HoppingMode, StaticStsIv
 
-    auto& parametersData = cliData->applicationConfigurationParametersData;
+    auto& parametersData = cliData.applicationConfigurationParametersData;
 
     // NumberOfControlees (mandatory)
     if (parametersData.multiNodeMode == MultiNodeMode::Unicast) {
@@ -260,11 +255,11 @@ ValidateNonEnumParameterValues(std::shared_ptr<NearObjectCliData> cliData)
 
     // DeviceMacAddress (mandatory) and DestinationMacAddresses (mandatory)
     const auto macAddressType = parametersData.macAddressMode == uwb::UwbMacAddressType::Extended ? uwb::UwbMacAddressType::Extended : uwb::UwbMacAddressType::Short;
-    parametersData.deviceMacAddress = uwb::UwbMacAddress::FromString(cliData->deviceMacAddressString, macAddressType);
+    parametersData.deviceMacAddress = uwb::UwbMacAddress::FromString(cliData.deviceMacAddressString, macAddressType);
     parametersData.destinationMacAddresses.emplace();
     // TODO: Insert the correct Controlee mac address rather than simply inserting the entire destinationMacAddressString
     for (auto i = 0; i < parametersData.numberOfControlees; i++) {
-        parametersData.destinationMacAddresses.value().insert(uwb::UwbMacAddress::FromString(cliData->destinationMacAddressString, macAddressType).value());
+        parametersData.destinationMacAddresses.value().insert(uwb::UwbMacAddress::FromString(cliData.destinationMacAddressString, macAddressType).value());
     }
 
     // RangeDataNotificationProximityNear
@@ -288,7 +283,7 @@ ValidateNonEnumParameterValues(std::shared_ptr<NearObjectCliData> cliData)
 
     // PreambleCodeIndex
     if (parametersData.preambleCodeIndex.has_value()) {
-        if (!parametersData.prfMode.has_value() || (parametersData.prfMode.has_value() && parametersData.prfMode.value() == PrfMode::Bprf)) { // Either BPRF is set or PRF_MODE is left at default (BPRF)
+        if (!parametersData.prfMode.has_value() || (parametersData.prfMode.has_value() && parametersData.prfMode.value() == PrfModeDetailed::Bprf62MHz)) { // Either BPRF is set or PRF_MODE is left at default (BPRF)
             if (parametersData.preambleCodeIndex.value() < 9 || parametersData.preambleCodeIndex.value() > 12) {
                 std::cerr << "Invalid PreambleCodeIndex. Expected value range of 9-12 in BPRF mode" << std::endl;
             }
@@ -301,7 +296,7 @@ ValidateNonEnumParameterValues(std::shared_ptr<NearObjectCliData> cliData)
 
     // SfdId
     if (parametersData.sfdId.has_value()) {
-        if (!parametersData.prfMode.has_value() || (parametersData.prfMode.has_value() && parametersData.prfMode.value() == PrfMode::Bprf)) { // Either BPRF is set or PRF_MODE is left at default (BPRF)
+        if (!parametersData.prfMode.has_value() || (parametersData.prfMode.has_value() && parametersData.prfMode.value() == PrfModeDetailed::Bprf62MHz)) { // Either BPRF is set or PRF_MODE is left at default (BPRF)
             if (parametersData.sfdId.value() != 0 && parametersData.sfdId.value() != 2) {
                 std::cerr << "Invalid SfdId. Expected values of 0 or 2 in BPRF mode" << std::endl;
             }
@@ -332,7 +327,7 @@ ValidateNonEnumParameterValues(std::shared_ptr<NearObjectCliData> cliData)
         if (parametersData.numberOfStsSegments.value() > 4) {
             std::cerr << "Invalid NumberOfStsSegments. Out of range." << std::endl;
         }
-        if (!parametersData.prfMode.has_value() || (parametersData.prfMode.has_value() && parametersData.prfMode.value() == PrfMode::Bprf)) { // Either BPRF is set or PRF_MODE is left at default (BPRF)
+        if (!parametersData.prfMode.has_value() || (parametersData.prfMode.has_value() && parametersData.prfMode.value() == PrfModeDetailed::Bprf62MHz)) { // Either BPRF is set or PRF_MODE is left at default (BPRF)
             if (parametersData.numberOfStsSegments.value() >= 2) {
                 std::cerr << "Invalid NumberOfStsSegments. Only 0 or 1 STS segments expected in BPRF mode" << std::endl;
             }
@@ -354,18 +349,14 @@ ValidateNonEnumParameterValues(std::shared_ptr<NearObjectCliData> cliData)
             std::cerr << "Invalid ResultReportConfiguration length" << std::endl;
             return false;
         }
-        for (char c : resultReportConfigurationString) {
-            if (c != '0' && c != '1') {
-                std::cerr << "Invalid ResultReportConfiguration value" << std::endl;
-                return false;
-            }
-        }
-        return true;
+        return std::ranges::all_of(resultReportConfigurationString, [](const auto& c) {
+            return c == '0' || c == '1';
+        });
     };
-    if (IsValidResultReportConfigurationString(cliData->resultReportConfigurationString)) {
+    if (IsValidResultReportConfigurationString(cliData.resultReportConfigurationString)) {
         parametersData.resultReportConfig.emplace();
 
-        const std::bitset<resultReportConfigurationSize> resultReportConfigurationBits(cliData->resultReportConfigurationString);
+        const std::bitset<resultReportConfigurationSize> resultReportConfigurationBits(cliData.resultReportConfigurationString);
         for (auto i = 0; i < resultReportConfigurationSize; i++) {
             if (resultReportConfigurationBits.test(i)) {
                 parametersData.resultReportConfig.value().insert(magic_enum::enum_value<ResultReportConfiguration>(i));
@@ -386,7 +377,7 @@ ValidateNonEnumParameterValues(std::shared_ptr<NearObjectCliData> cliData)
     }
 
     // BprfPhrDataRate
-    if (parametersData.prfMode.has_value() && parametersData.prfMode.value() != PrfMode::Bprf) {
+    if (parametersData.prfMode.has_value() && parametersData.prfMode.value() != PrfModeDetailed::Bprf62MHz) {
         if (parametersData.bprfPhrDataRate.has_value()) {
             std::cerr << "Invalid BprfPhrDataRate. Value expected only in BPRF mode" << std::endl;
         }
@@ -412,11 +403,7 @@ ValidateEnumParameterValue(const EnumType& applicationConfigurationParameter)
 {
     auto parameterType = magic_enum::enum_type_name<EnumType>();
     if (!magic_enum::enum_contains<EnumType>(applicationConfigurationParameter)) {
-        if (parameterType == "StsPacketConfiguration") { // Special case
-            std::cerr << "Invalid RFrameConfiguration" << std::endl;
-        } else {
-            std::cerr << "Invalid " << parameterType << std::endl;
-        }
+        std::cerr << "Invalid " << parameterType << std::endl;
     }
 }
 
@@ -427,10 +414,10 @@ ValidateEnumParameterValue(const EnumType& applicationConfigurationParameter)
  * @return std::vector<uwb::protocol::fira::UwbApplicationConfigurationParameter>.
  */
 std::vector<uwb::protocol::fira::UwbApplicationConfigurationParameter>
-ProcessApplicationConfigurationParameters(std::shared_ptr<NearObjectCliData> cliData)
+ProcessApplicationConfigurationParameters(NearObjectCliData& cliData)
 {
     detail::ValidateNonEnumParameterValues(cliData);
-    auto& applicationConfigurationParameterData = cliData->applicationConfigurationParametersData;
+    auto& applicationConfigurationParameterData = cliData.applicationConfigurationParametersData;
 
     std::vector<uwb::protocol::fira::UwbApplicationConfigurationParameter> applicationConfigurationParameters;
 
@@ -715,10 +702,10 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
 
     // other
     rangeStartApp->add_option("--ResultReportConfig", m_cliData->resultReportConfigurationString, "4-bit report config, e.g. 0101. b3=AOA FOM, b2=AOA Elevation, b1=AOA Azimuth, b0=TOF")->capture_default_str();
-    rangeStartApp->add_option("--StaticStsInitializationVector", applicationConfigurationParametersData.staticStsIv, "6-octet array for vendor-defined static STS configuration, e.g. 11:22:33:44:55:66")->delimiter(':');
+    rangeStartApp->add_option("--StaticStsInitializationVector", applicationConfigurationParametersData.staticStsIv, "6-octet array for vendor-defined static STS initialization vector, e.g. 11:22:33:44:55:66")->delimiter(':');
 
     rangeStartApp->parse_complete_callback([this, rangeStartApp] {
-        m_cliData->RangingParameters.ApplicationConfigurationParameters = detail::ProcessApplicationConfigurationParameters(m_cliData);
+        m_cliData->RangingParameters.ApplicationConfigurationParameters = detail::ProcessApplicationConfigurationParameters(*m_cliData);
         RegisterCliAppWithOperation(rangeStartApp);
     });
 

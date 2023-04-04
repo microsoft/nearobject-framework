@@ -104,7 +104,7 @@ struct UwbApplicationConfigurationParameterData
     std::optional<uint16_t> rangeDataNotificationProximityNear;
     std::optional<uint16_t> rangeDataNotificationProximityFar;
     std::optional<uwb::protocol::fira::DeviceRole> deviceRole;
-    std::optional<uwb::protocol::fira::StsPacketConfiguration> rFrameConfiguration;
+    std::optional<uwb::protocol::fira::RFrameConfiguration> rFrameConfiguration;
     std::optional<uint8_t> preambleCodeIndex;
     std::optional<uint8_t> sfdId;
     std::optional<uwb::protocol::fira::PsduDataRate> psduDataRate;
@@ -113,7 +113,7 @@ struct UwbApplicationConfigurationParameterData
     std::optional<uint8_t> slotsPerRangingRound;
     std::optional<uwb::protocol::fira::TxAdaptivePayloadPower> txAdaptivePayloadPower;
     std::optional<uint8_t> responderSlotIndex;
-    std::optional<uwb::protocol::fira::PrfMode> prfMode;
+    std::optional<uwb::protocol::fira::PrfModeDetailed> prfMode;
     std::optional<uwb::protocol::fira::SchedulingMode> scheduledMode;
     std::optional<uwb::protocol::fira::KeyRotation> keyRotation;
     std::optional<uint8_t> keyRotationRate;

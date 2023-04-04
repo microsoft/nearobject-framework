@@ -1530,7 +1530,7 @@ windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM &applicationConfi
         detail::ConvertUwbApplicationConfigurationParameterTo<PreambleDuration>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
         break;
     case UWB_APP_CONFIG_PARAM_TYPE_PRF_MODE:
-        detail::ConvertUwbApplicationConfigurationParameterTo<PrfMode>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
+        detail::ConvertUwbApplicationConfigurationParameterTo<PrfModeDetailed>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
         break;
     case UWB_APP_CONFIG_PARAM_TYPE_PSDU_DATA_RATE:
         detail::ConvertUwbApplicationConfigurationParameterTo<PsduDataRate>(applicationConfigurationParameter, uwbApplicationConfigurationParameter);
