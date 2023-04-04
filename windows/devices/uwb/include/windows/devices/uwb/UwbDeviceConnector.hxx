@@ -206,12 +206,7 @@ private:
 
 private:
     mutable std::shared_mutex m_eventCallbacksGate;
-
-    mutable std::mutex m_callbacksPresentConditionVariableGate;
-    mutable std::condition_variable m_callbacksPresentConditionVariable;
-
     std::unordered_map<uint32_t, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks>> m_sessionEventCallbacks;
-
     std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> m_deviceEventCallbacks;
     std::string m_deviceName{};
     std::jthread m_notificationThread;

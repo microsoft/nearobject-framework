@@ -737,8 +737,9 @@ UwbConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDev
     std::lock_guard writerLock{ m_eventCallbacksGate };
     bool isFirstCallback = CallbacksPresent();
     m_deviceEventCallbacks = callbacks;
-    if (isFirstCallback)
+    if (isFirstCallback) {
         NotificationListenerStart();
+    }
     return nullptr;
 }
 
@@ -748,8 +749,9 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::
     std::lock_guard writerLock{ m_eventCallbacksGate };
     bool isFirstCallback = CallbacksPresent();
     m_sessionEventCallbacks.insert_or_assign(sessionId, callbacks);
-    if (isFirstCallback)
+    if (isFirstCallback) {
         NotificationListenerStart();
+    }
     return nullptr;
 }
 
