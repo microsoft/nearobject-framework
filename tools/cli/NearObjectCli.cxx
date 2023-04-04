@@ -399,7 +399,7 @@ ValidateNonEnumParameterValues(std::shared_ptr<NearObjectCliData> cliData)
 
 /**
  * @brief Validates the enum application configuration parameter inputs from nocli.
- * 
+ *
  * @tparam EnumType The type of the enumeration.
  * @param applicationConfigurationParameter The application configuration parameter of type EnumType.
  */
