@@ -734,22 +734,22 @@ UwbConnector::NotificationListenerStop()
 ::uwb::RegisteredCallbackToken*
 UwbConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks)
 {
-    
-        std::lock_guard writerLock{ m_eventCallbacksGate };
-        bool isFirstCallback = CallbacksPresent();
-        m_deviceEventCallbacks = callbacks;
-        if(isFirstCallback) NotificationListenerStart();
+    std::lock_guard writerLock{ m_eventCallbacksGate };
+    bool isFirstCallback = CallbacksPresent();
+    m_deviceEventCallbacks = callbacks;
+    if (isFirstCallback)
+        NotificationListenerStart();
     return nullptr;
 }
 
 ::uwb::RegisteredCallbackToken*
 UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks)
 {
-    
-        std::lock_guard writerLock{ m_eventCallbacksGate };
-        bool isFirstCallback = CallbacksPresent();
-        m_sessionEventCallbacks.insert_or_assign(sessionId, callbacks);
-        if(isFirstCallback) NotificationListenerStart();
+    std::lock_guard writerLock{ m_eventCallbacksGate };
+    bool isFirstCallback = CallbacksPresent();
+    m_sessionEventCallbacks.insert_or_assign(sessionId, callbacks);
+    if (isFirstCallback)
+        NotificationListenerStart();
     return nullptr;
 }
 
