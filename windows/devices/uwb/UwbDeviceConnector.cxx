@@ -706,22 +706,20 @@ UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNo
         uwbNotificationData);
 }
 
-bool
+void
 UwbConnector::NotificationListenerStart()
 {
     wil::shared_hfile notificationHandleDriver;
     auto hr = OpenDriverHandle(notificationHandleDriver, m_deviceName.c_str(), true);
     if (FAILED(hr)) {
         PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << hr;
-        return false;
+        return;
     }
 
     m_notificationHandleDriver = std::move(notificationHandleDriver);
     m_notificationThread = std::jthread([this](std::stop_token stopToken) {
         HandleNotifications(std::move(stopToken));
     });
-
-    return true;
 }
 
 void

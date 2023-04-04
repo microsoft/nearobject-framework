@@ -2,11 +2,9 @@
 #ifndef UWB_DEVICE_CONNECTOR_HXX
 #define UWB_DEVICE_CONNECTOR_HXX
 
-#include <condition_variable>
 #include <cstdint>
 #include <future>
 #include <memory>
-#include <mutex>
 #include <optional>
 #include <shared_mutex>
 #include <string>
@@ -144,7 +142,7 @@ private:
      * @return true If listening for notifications started successfully.
      * @return false If listening for notifications could not be started.
      */
-    bool
+    void
     NotificationListenerStart();
 
     /**
@@ -172,7 +170,8 @@ private:
 
     /**
      * @brief Response for calling the relevant registered callbacks for the session ended event.
-     *
+     * This function assumes the caller is holding the m_eventCallbacksGate
+     * 
      * @param sessionId The session identifier of the session that ended.
      * @param sessionEndReason The reason the session ended.
      */
@@ -181,7 +180,7 @@ private:
 
     /**
      * @brief Internal function that prepares the notification for processing by the m_sessionEventCallbacks
-     *
+     * This function assumes the caller is holding the m_eventCallbacksGate
      * @param statusMulticastList
      */
     void
@@ -189,14 +188,16 @@ private:
 
     /**
      * @brief Internal function that prepares the notification for processing by the m_sessionEventCallbacks
-     *
+     * This function assumes the caller is holding the m_eventCallbacksGate
+     * 
      * @param rangingData
      */
     void
     OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData);
 
     /**
-     * @brief Internal function to check if there are callbacks present
+     * @brief Internal function to check if there are callbacks present. 
+     * This function assumes the caller is holding the m_eventCallbacksGate
      *
      * @return true
      * @return false
@@ -205,6 +206,7 @@ private:
     CallbacksPresent();
 
 private:
+    // the following shared_mutex is used to protect access to both session and device event callbacks
     mutable std::shared_mutex m_eventCallbacksGate;
     std::unordered_map<uint32_t, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks>> m_sessionEventCallbacks;
     std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> m_deviceEventCallbacks;
