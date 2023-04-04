@@ -482,11 +482,6 @@ UwbConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vec
 void
 UwbConnector::HandleNotifications(std::stop_token stopToken)
 {
-    std::unique_lock lock{ m_callbacksPresentConditionVariableGate };
-    m_callbacksPresentConditionVariable.wait(lock, [this]() {
-        return CallbacksPresent();
-    });
-
     DWORD bytesRequired = 0;
     std::vector<uint8_t> uwbNotificationDataBuffer{};
     auto handleDriver = m_notificationHandleDriver;
@@ -739,24 +734,22 @@ UwbConnector::NotificationListenerStop()
 ::uwb::RegisteredCallbackToken*
 UwbConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks)
 {
-    {
-        std::lock_guard presenceLock{ m_callbacksPresentConditionVariableGate };
+    
         std::lock_guard writerLock{ m_eventCallbacksGate };
+        bool isFirstCallback = CallbacksPresent();
         m_deviceEventCallbacks = callbacks;
-    }
-    m_callbacksPresentConditionVariable.notify_one();
+        if(isFirstCallback) NotificationListenerStart();
     return nullptr;
 }
 
 ::uwb::RegisteredCallbackToken*
 UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks)
 {
-    {
-        std::lock_guard presenceLock{ m_callbacksPresentConditionVariableGate };
+    
         std::lock_guard writerLock{ m_eventCallbacksGate };
+        bool isFirstCallback = CallbacksPresent();
         m_sessionEventCallbacks.insert_or_assign(sessionId, callbacks);
-    }
-    m_callbacksPresentConditionVariable.notify_one();
+        if(isFirstCallback) NotificationListenerStart();
     return nullptr;
 }
 
