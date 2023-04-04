@@ -45,6 +45,23 @@
             "cwd": "${fileDirname}",
             "environment": [],
             "console": "externalTerminal"
+        },
+        {
+            "name": "uwbsim start random range data",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/build/dev/windows/tools/uwb/simulator/${input:buildFlavor}/uwbsim.exe",
+            "args": [
+                "trigger",
+                "-e",
+                "1",
+                "--sessionId",
+                "${input:sessionId}"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "console": "externalTerminal"
         }
     ],
     "inputs": [
