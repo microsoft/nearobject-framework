@@ -248,8 +248,12 @@ ValidateNonEnumParameterValues(NearObjectCliData& cliData)
 
     // NumberOfControlees (mandatory)
     if (parametersData.multiNodeMode == MultiNodeMode::Unicast) {
-        if (parametersData.numberOfControlees != 1) {
-            std::cerr << "Invalid NumberOfControlees. Only 1 controlee expected in Unicast mode" << std::endl;
+        if (parametersData.numberOfControlees != MinimumNumberOfControlees) {
+            std::cerr << "Invalid NumberOfControlees. Only " << +MinimumNumberOfControlees << " controlee expected in Unicast mode " << std::endl;
+        }
+    } else {
+        if (parametersData.numberOfControlees < MinimumNumberOfControlees) {
+            std::cerr << "Invalid NumberOfControlees. At least " << +MinimumNumberOfControlees << " controlee expected" << std::endl;
         }
     }
 
@@ -265,9 +269,9 @@ ValidateNonEnumParameterValues(NearObjectCliData& cliData)
     // RangeDataNotificationProximityNear
     if (parametersData.rangeDataNotificationProximityNear.has_value()) {
         if (parametersData.rangeDataNotificationConfig.has_value() && parametersData.rangeDataNotificationConfig.value() == RangeDataNotificationConfiguration::EnableInProximityRange) {
-            if ((!parametersData.rangeDataNotificationProximityFar.has_value() && parametersData.rangeDataNotificationProximityNear.value() > 20000) ||
+            if ((!parametersData.rangeDataNotificationProximityFar.has_value() && parametersData.rangeDataNotificationProximityNear.value() > DefaultRangeDataNotificationProximityFar) ||
                 (parametersData.rangeDataNotificationProximityFar.has_value() && parametersData.rangeDataNotificationProximityNear.value() > parametersData.rangeDataNotificationProximityFar.value())) {
-                std::cerr << "Invalid RangeDataNotificationProximityNear" << std::endl;
+                std::cerr << "Invalid RangeDataNotificationProximityNear. Should be less than or equal to RangeDataNotificationProximityFar (default: " << +DefaultRangeDataNotificationProximityFar << ")." << std::endl;
             }
         }
     }
@@ -276,7 +280,7 @@ ValidateNonEnumParameterValues(NearObjectCliData& cliData)
     if (parametersData.rangeDataNotificationProximityFar.has_value()) {
         if (parametersData.rangeDataNotificationConfig.has_value() && parametersData.rangeDataNotificationConfig.value() == RangeDataNotificationConfiguration::EnableInProximityRange) {
             if (parametersData.rangeDataNotificationProximityNear.has_value() && parametersData.rangeDataNotificationProximityFar.value() < parametersData.rangeDataNotificationProximityNear.value()) {
-                std::cerr << "Invalid RangeDataNotificationProximityFar" << std::endl;
+                std::cerr << "Invalid RangeDataNotificationProximityFar. Should be greater than or equal to RangeDataNotificationProximityNear (default: " << +DefaultRangeDataNotificationProximityNear << ")." << std::endl;
             }
         }
     }
@@ -284,12 +288,12 @@ ValidateNonEnumParameterValues(NearObjectCliData& cliData)
     // PreambleCodeIndex
     if (parametersData.preambleCodeIndex.has_value()) {
         if (!parametersData.prfMode.has_value() || (parametersData.prfMode.has_value() && parametersData.prfMode.value() == PrfModeDetailed::Bprf62MHz)) { // Either BPRF is set or PRF_MODE is left at default (BPRF)
-            if (parametersData.preambleCodeIndex.value() < 9 || parametersData.preambleCodeIndex.value() > 12) {
-                std::cerr << "Invalid PreambleCodeIndex. Expected value range of 9-12 in BPRF mode" << std::endl;
+            if (parametersData.preambleCodeIndex.value() < MinimumPreambleCodeIndexBprf || parametersData.preambleCodeIndex.value() > MaximumPreambleCodeIndexBprf) {
+                std::cerr << "Invalid PreambleCodeIndex. Expected value range of " << +MinimumPreambleCodeIndexBprf << "-" << +MaximumPreambleCodeIndexBprf << " in BPRF mode." << std::endl;
             }
         } else { // HPRF mode
-            if (parametersData.preambleCodeIndex.value() < 25 || parametersData.preambleCodeIndex.value() > 32) {
-                std::cerr << "Invalid PreambleCodeIndex. Expected value range of 25-32 in HPRF mode" << std::endl;
+            if (parametersData.preambleCodeIndex.value() < MinimumPreambleCodeIndexHprf || parametersData.preambleCodeIndex.value() > MaximumPreambleCodeIndexHprf) {
+                std::cerr << "Invalid PreambleCodeIndex. Expected value range of " << +MinimumPreambleCodeIndexHprf << "-" << +MaximumPreambleCodeIndexHprf << " in BPRF mode." << std::endl;
             }
         }
     }
@@ -297,49 +301,59 @@ ValidateNonEnumParameterValues(NearObjectCliData& cliData)
     // SfdId
     if (parametersData.sfdId.has_value()) {
         if (!parametersData.prfMode.has_value() || (parametersData.prfMode.has_value() && parametersData.prfMode.value() == PrfModeDetailed::Bprf62MHz)) { // Either BPRF is set or PRF_MODE is left at default (BPRF)
-            if (parametersData.sfdId.value() != 0 && parametersData.sfdId.value() != 2) {
-                std::cerr << "Invalid SfdId. Expected values of 0 or 2 in BPRF mode" << std::endl;
+            if (std::ranges::find(SfdIdValuesBprf, parametersData.sfdId.value()) == SfdIdValuesBprf.end()) {
+                std::string errorMessage = "Invalid SfdId. Expected values of { ";
+                for (auto& val : SfdIdValuesBprf) {
+                    errorMessage.append(std::to_string(val) + " ");
+                }
+                errorMessage.append("} in BPRF mode.");
+                std::cerr << errorMessage << std::endl;
             }
         } else { // HPRF mode
-            if (parametersData.sfdId.value() < 1 || parametersData.sfdId.value() > 4) {
-                std::cerr << "Invalid SfdId. Expected value range of 1-4 in HPRF mode" << std::endl;
+            if (std::ranges::find(SfdIdValuesHprf, parametersData.sfdId.value()) == SfdIdValuesHprf.end()) {
+                std::string errorMessage = "Invalid SfdId. Expected values of { ";
+                for (auto& val : SfdIdValuesHprf) {
+                    errorMessage.append(std::to_string(val) + " ");
+                }
+                errorMessage.append("} in HPRF mode.");
+                std::cerr << errorMessage << std::endl;
             }
         }
     }
 
     // ResponderSlotIndex
-    if (parametersData.responderSlotIndex.has_value() && parametersData.responderSlotIndex.value() < 1) { // TODO: > N, where N is number of Responders
-        std::cerr << "Invalid ResponderSlotIndex. Out of range." << std::endl;
+    if (parametersData.responderSlotIndex.has_value() && parametersData.responderSlotIndex.value() < MinimumResponderSlotIndex) { // TODO: > N, where N is number of Responders
+        std::cerr << "Invalid ResponderSlotIndex. Expected value range of " << +MinimumResponderSlotIndex << "- N Responders." << std::endl;
     }
 
     // KeyRotationRate
-    if (parametersData.keyRotationRate.has_value() && parametersData.keyRotationRate.value() > 15) {
-        std::cerr << "Invalid KeyRotationRate. Out of range." << std::endl;
+    if (parametersData.keyRotationRate.has_value() && parametersData.keyRotationRate.value() > MaximumKeyRotationRate) {
+        std::cerr << "Invalid KeyRotationRate. Expected value range of " << +MinimumKeyRotationRate << "-" << +MaximumKeyRotationRate << std::endl;
     }
 
     // SessionPriority
-    if (parametersData.sessionPriority.has_value() && (parametersData.sessionPriority.value() < 1 || parametersData.sessionPriority.value() > 100)) {
-        std::cerr << "Invalid SessionPriority. Out of range." << std::endl;
+    if (parametersData.sessionPriority.has_value() && (parametersData.sessionPriority.value() < MinimumSessionPriority || parametersData.sessionPriority.value() > MaximumSessionPriority)) {
+        std::cerr << "Invalid SessionPriority. Expected value range of " << +MinimumSessionPriority << "-" << +MaximumSessionPriority << std::endl;
     }
 
     // NumberOfStsSegments
     if (parametersData.numberOfStsSegments.has_value()) {
-        if (parametersData.numberOfStsSegments.value() > 4) {
-            std::cerr << "Invalid NumberOfStsSegments. Out of range." << std::endl;
+        if (parametersData.numberOfStsSegments.value() > MaximumNumberOfStsSegmentsHprf) {
+            std::cerr << "Invalid NumberOfStsSegments. Expected value range of " << +MinimumNumberOfStsSegments << "-" << +MaximumNumberOfStsSegmentsHprf << " STS segments." << std::endl;
         }
         if (!parametersData.prfMode.has_value() || (parametersData.prfMode.has_value() && parametersData.prfMode.value() == PrfModeDetailed::Bprf62MHz)) { // Either BPRF is set or PRF_MODE is left at default (BPRF)
-            if (parametersData.numberOfStsSegments.value() >= 2) {
-                std::cerr << "Invalid NumberOfStsSegments. Only 0 or 1 STS segments expected in BPRF mode" << std::endl;
+            if (parametersData.numberOfStsSegments.value() > MaximumNumberOfStsSegmentsBprf) {
+                std::cerr << "Invalid NumberOfStsSegments. Expected value range of " << +MinimumNumberOfStsSegments << "-" << +MaximumNumberOfStsSegmentsBprf << " in BPRF mode." << std::endl;
             }
         }
-        if (parametersData.rFrameConfiguration.value() == StsPacketConfiguration::SP0 && parametersData.numberOfStsSegments != 0) {
+        if (parametersData.rFrameConfiguration.value() == StsPacketConfiguration::SP0 && parametersData.numberOfStsSegments != MinimumNumberOfStsSegments) {
             std::cerr << "Invalid NumberOfStsSegments. No STS segments expected with non-STS frames" << std::endl;
         }
     }
 
     // UwbInitiationTime
-    if (parametersData.uwbInitiationTime.has_value() && parametersData.uwbInitiationTime.value() > 10000) {
-        std::cerr << "Invalid UwbInitiationTime. Out of range" << std::endl;
+    if (parametersData.uwbInitiationTime.has_value() && parametersData.uwbInitiationTime.value() > MaximumUwbInitiationTime) {
+        std::cerr << "Invalid UwbInitiationTime. Expected value range of " << +MinimumUwbInitiationTime << "-" << +MaximumUwbInitiationTime << std::endl;
     }
 
     // ResultReportConfig
@@ -365,8 +379,8 @@ ValidateNonEnumParameterValues(NearObjectCliData& cliData)
     }
 
     // InBandTerminationAttemptCount
-    if (parametersData.inBandTerminationAttemptCount.has_value() && parametersData.inBandTerminationAttemptCount.value() > 10) {
-        std::cerr << "Invalid InBandTerminationAttemptCount. Out of range." << std::endl;
+    if (parametersData.inBandTerminationAttemptCount.has_value() && parametersData.inBandTerminationAttemptCount.value() > MaximumInBandTerminationAttemptCount) {
+        std::cerr << "Invalid InBandTerminationAttemptCount. Expected value range of " << +MinimumInBandTerminationAttemptCount << "-" << +MaximumInBandTerminationAttemptCount << std::endl;
     }
 
     // SubSessionId
@@ -433,6 +447,8 @@ ProcessApplicationConfigurationParameters(NearObjectCliData& cliData)
             if constexpr (std::is_enum_v<ParameterValueT>) {
                 ValidateEnumParameterValue(arg);
                 oss << magic_enum::enum_name(arg);
+            } else if constexpr (std::is_same_v<ParameterValueT, bool>) {
+                oss << std::boolalpha << arg;
             } else if constexpr (std::is_unsigned_v<ParameterValueT>) {
                 oss << +arg;
             } else if constexpr (std::is_same_v<ParameterValueT, ::uwb::UwbMacAddress>) {
@@ -441,8 +457,6 @@ ProcessApplicationConfigurationParameters(NearObjectCliData& cliData)
                 for (const auto& address : arg) {
                     oss << ToString(arg);
                 }
-            } else if constexpr (std::is_same_v<ParameterValueT, bool>) {
-                oss << std::boolalpha << arg;
             } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<ResultReportConfiguration>>) {
                 oss << ToString(arg);
             } else if constexpr (std::is_same_v<ParameterValueT, std::array<uint8_t, StaticStsInitializationVectorLength>>) {
