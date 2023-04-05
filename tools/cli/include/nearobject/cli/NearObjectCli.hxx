@@ -277,6 +277,15 @@ private:
     AddSubcommandUwbRawSessionDeinitialize(CLI::App* parent);
 
     /**
+     * @brief Add the 'uwb raw getsessioncount' sub-command.
+     *
+     * @param parent The parent app to add the command.
+     * @return CLI::App*
+     */
+    CLI::App*
+    AddSubcommandUwbRawGetSessionCount(CLI::App* parent);
+
+    /**
      * @brief Add the 'uwb range start' sub-command.
      *
      * @param parent

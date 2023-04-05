@@ -198,7 +198,8 @@ UwbConnector::GetSessionCount()
     BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_SESSION_COUNT, nullptr, 0, &getSessionCount, sizeof getSessionCount, nullptr, nullptr);
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-        PLOG_ERROR << "error when sending IOCTL_UWB_GET_SESSION_COUNT" << ", hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << "error when sending IOCTL_UWB_GET_SESSION_COUNT"
+                   << ", hr=" << std::showbase << std::hex << hr;
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     } else {

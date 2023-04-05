@@ -113,7 +113,7 @@ UwbDevice::GetDeviceInformationImpl()
 {
     auto resultFuture = m_uwbDeviceConnector->GetDeviceInformation();
     if (!resultFuture.valid()) {
-        PLOG_ERROR << "failed to obtain capabilities from driver";
+        PLOG_ERROR << "failed to obtain device information from driver";
         throw std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected));
     }
 
@@ -122,6 +122,28 @@ UwbDevice::GetDeviceInformationImpl()
         return std::move(uwbDeviceInformation);
     } catch (const UwbException& e) {
         PLOG_ERROR << "caught exception obtaining uwb device information (" << ::ToString(e.Status) << ")";
+        throw e;
+    }
+}
+
+std::optional<uint32_t>
+UwbDevice::GetSessionCountImpl()
+{
+    auto resultFuture = m_uwbDeviceConnector->GetSessionCount();
+    if (!resultFuture.valid()) {
+        PLOG_ERROR << "failed to obtain session count from driver";
+        throw std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected));
+    }
+
+    try {
+        auto [uwbStatus, sessionCount] = resultFuture.get();
+        if (!IsUwbStatusOk(uwbStatus)) {
+            PLOG_ERROR << "uwb device reported an error obtaining session count, status =" << ::ToString(uwbStatus);
+            return {};
+        }
+        return sessionCount;
+    } catch (const UwbException& e) {
+        PLOG_ERROR << "caught exception obtaining session count (" << ::ToString(e.Status) << ")";
         throw e;
     }
 }
