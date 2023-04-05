@@ -54,6 +54,33 @@ constexpr std::size_t StaticStsInitializationVectorLength = 6;
 using StaticStsInitializationVector = std::array<uint8_t, StaticStsInitializationVectorLength>;
 
 /**
+ * @brief See FiRa Consortium UWB Command Interface Generic Technical
+ * Specification v1.1.0, Section 8.3, Table 29.
+ */
+constexpr uint8_t MinimumNumberOfControlees = 1;
+constexpr uint8_t MinimumPreambleCodeIndexBprf = 9;
+constexpr uint8_t MaximumPreambleCodeIndexBprf = 12;
+constexpr uint8_t MinimumPreambleCodeIndexHprf = 25;
+constexpr uint8_t MaximumPreambleCodeIndexHprf = 32;
+constexpr std::array<uint8_t, 2> SfdIdValuesBprf = { 0, 2 };
+constexpr std::array<uint8_t, 4> SfdIdValuesHprf = { 1, 2, 3, 4 };
+constexpr uint8_t MinimumResponderSlotIndex = 1;
+// TODO: MaximumResponderSlotIndex = N
+constexpr uint8_t MinimumKeyRotationRate = 0;
+constexpr uint8_t MaximumKeyRotationRate = 15;
+constexpr uint8_t MinimumSessionPriority = 1;
+constexpr uint8_t MaximumSessionPriority = 100;
+constexpr uint8_t MinimumNumberOfStsSegments = 0;
+constexpr uint8_t MaximumNumberOfStsSegmentsBprf = 1;
+constexpr uint8_t MaximumNumberOfStsSegmentsHprf = 4;
+constexpr uint8_t MinimumInBandTerminationAttemptCount = 0;
+constexpr uint8_t MaximumInBandTerminationAttemptCount = 10;
+constexpr uint16_t DefaultRangeDataNotificationProximityNear = 0;
+constexpr uint16_t DefaultRangeDataNotificationProximityFar = 20000;
+constexpr uint32_t MinimumUwbInitiationTime = 0;
+constexpr uint32_t MaximumUwbInitiationTime = 10000;
+
+/**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
  * 5.1.
  */
