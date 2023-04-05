@@ -253,7 +253,7 @@ ValidateNonEnumParameterValues(NearObjectCliData& cliData)
         }
     } else {
         if (parametersData.numberOfControlees < MinimumNumberOfControlees) {
-            std::cerr << "Invalid NumberOfControlees. At least " << +MinimumNumberOfControlees << " controlee expected" << std::endl;
+            std::cerr << "Invalid NumberOfControlees. At least " << +MinimumNumberOfControlees << " controlees expected" << std::endl;
         }
     }
 
@@ -301,18 +301,18 @@ ValidateNonEnumParameterValues(NearObjectCliData& cliData)
     // SfdId
     if (parametersData.sfdId.has_value()) {
         if (!parametersData.prfMode.has_value() || (parametersData.prfMode.has_value() && parametersData.prfMode.value() == PrfModeDetailed::Bprf62MHz)) { // Either BPRF is set or PRF_MODE is left at default (BPRF)
-            if (std::ranges::find(SfdIdValuesBprf, parametersData.sfdId.value()) == SfdIdValuesBprf.end()) {
+            if (std::ranges::find(SfdIdValuesBprf, parametersData.sfdId.value()) == std::ranges::end(SfdIdValuesBprf)) {
                 std::string errorMessage = "Invalid SfdId. Expected values of { ";
-                for (auto& val : SfdIdValuesBprf) {
+                for (const auto& val : SfdIdValuesBprf) {
                     errorMessage.append(std::to_string(val) + " ");
                 }
                 errorMessage.append("} in BPRF mode.");
                 std::cerr << errorMessage << std::endl;
             }
         } else { // HPRF mode
-            if (std::ranges::find(SfdIdValuesHprf, parametersData.sfdId.value()) == SfdIdValuesHprf.end()) {
+            if (std::ranges::find(SfdIdValuesHprf, parametersData.sfdId.value()) == std::ranges::end(SfdIdValuesHprf)) {
                 std::string errorMessage = "Invalid SfdId. Expected values of { ";
-                for (auto& val : SfdIdValuesHprf) {
+                for (const auto& val : SfdIdValuesHprf) {
                     errorMessage.append(std::to_string(val) + " ");
                 }
                 errorMessage.append("} in HPRF mode.");
