@@ -30,7 +30,6 @@ class RegisteredCallbackToken
 UwbConnector::UwbConnector(std::string deviceName) :
     m_deviceName(std::move(deviceName))
 {
-    NotificationListenerStart();
 }
 
 UwbConnector::~UwbConnector()
