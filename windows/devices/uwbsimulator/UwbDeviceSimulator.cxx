@@ -32,7 +32,6 @@ UwbDeviceSimulator::DeviceName() const noexcept
 bool
 UwbDeviceSimulator::Initialize()
 {
-    m_uwbDeviceConnector = std::make_shared<UwbConnector>(m_deviceName);
     m_uwbDeviceSimulatorConnector = std::make_shared<UwbDeviceSimulatorConnector>(m_deviceName);
     return true;
 }

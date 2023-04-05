@@ -6,6 +6,7 @@
 #include <future>
 #include <memory>
 #include <optional>
+#include <shared_mutex>
 #include <string>
 #include <thread>
 #include <tuple>
@@ -60,21 +61,6 @@ public:
 
 public:
     // IUwbDeviceDdiConnector
-    /**
-     * @brief Start listening for notifications.
-     *
-     * @return true If listening for notifications started successfully.
-     * @return false If listening for notifications could not be started.
-     */
-    virtual bool
-    NotificationListenerStart() override;
-
-    /**
-     * @brief Stop listening for notifications.
-     */
-    virtual void
-    NotificationListenerStop() override;
-
     /**
      * @brief Sets the callbacks for the UwbDevice that owns this UwbConnector
      *
@@ -151,6 +137,21 @@ public:
 
 private:
     /**
+     * @brief Start listening for notifications.
+     *
+     * @return true If listening for notifications started successfully.
+     * @return false If listening for notifications could not be started.
+     */
+    void
+    NotificationListenerStart();
+
+    /**
+     * @brief Stop listening for notifications.
+     */
+    void
+    NotificationListenerStop();
+
+    /**
      * @brief Thread function for handling UWB notifications from the driver.
      *
      * @param stopToken The token used to request the notification loop to stop.
@@ -169,7 +170,8 @@ private:
 
     /**
      * @brief Response for calling the relevant registered callbacks for the session ended event.
-     *
+     * This function assumes the caller is holding the m_eventCallbacksGate
+     * 
      * @param sessionId The session identifier of the session that ended.
      * @param sessionEndReason The reason the session ended.
      */
@@ -178,7 +180,7 @@ private:
 
     /**
      * @brief Internal function that prepares the notification for processing by the m_sessionEventCallbacks
-     *
+     * This function assumes the caller is holding the m_eventCallbacksGate
      * @param statusMulticastList
      */
     void
@@ -186,13 +188,26 @@ private:
 
     /**
      * @brief Internal function that prepares the notification for processing by the m_sessionEventCallbacks
-     *
+     * This function assumes the caller is holding the m_eventCallbacksGate
+     * 
      * @param rangingData
      */
     void
     OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData);
 
+    /**
+     * @brief Internal function to check if there are callbacks present. 
+     * This function assumes the caller is holding the m_eventCallbacksGate
+     *
+     * @return true
+     * @return false
+     */
+    bool
+    CallbacksPresent();
+
 private:
+    // the following shared_mutex is used to protect access to both session and device event callbacks
+    mutable std::shared_mutex m_eventCallbacksGate;
     std::unordered_map<uint32_t, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks>> m_sessionEventCallbacks;
     std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> m_deviceEventCallbacks;
     std::string m_deviceName{};

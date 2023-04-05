@@ -74,7 +74,6 @@ private:
 
 private:
     const std::string m_deviceName;
-    std::shared_ptr<IUwbDeviceDdiConnector> m_uwbDeviceConnector; // TODO why do we need this if the base class windows::device::uwb::UwbDevice already has this member?
     std::shared_ptr<UwbDeviceSimulatorConnector> m_uwbDeviceSimulatorConnector;
 };
 

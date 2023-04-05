@@ -29,7 +29,8 @@ class RegisteredCallbackToken
 
 UwbConnector::UwbConnector(std::string deviceName) :
     m_deviceName(std::move(deviceName))
-{}
+{
+}
 
 UwbConnector::~UwbConnector()
 {
@@ -586,7 +587,7 @@ UwbConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpda
 
     auto& [_, callbacksWeak] = *it;
     auto callbacks = callbacksWeak.lock();
-    if (not(callbacks->OnSessionMembershipChanged)) {
+    if (not(callbacks) or not(callbacks->OnSessionMembershipChanged)) {
         PLOG_WARNING << "Ignoring MulticastListStatus event due to missing session callback";
         m_sessionEventCallbacks.erase(it);
         return;
@@ -625,7 +626,7 @@ UwbConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData ranging
 
     auto& [_, callbacksWeak] = *it;
     auto callbacks = callbacksWeak.lock();
-    if (not(callbacks->OnPeerPropertiesChanged)) {
+    if (not(callbacks) or not(callbacks->OnPeerPropertiesChanged)) {
         PLOG_WARNING << "Ignoring RangingData event due to expired session callback";
         m_sessionEventCallbacks.erase(it);
         return;
@@ -671,6 +672,7 @@ Accessor(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks, st
 void
 UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNotificationData)
 {
+    std::shared_lock readerLock{ m_eventCallbacksGate };
     std::visit([this](auto&& arg) {
         using ValueType = std::decay_t<decltype(arg)>;
 
@@ -707,22 +709,20 @@ UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNo
         uwbNotificationData);
 }
 
-bool
+void
 UwbConnector::NotificationListenerStart()
 {
     wil::shared_hfile notificationHandleDriver;
     auto hr = OpenDriverHandle(notificationHandleDriver, m_deviceName.c_str(), true);
     if (FAILED(hr)) {
         PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << hr;
-        return false;
+        return;
     }
 
     m_notificationHandleDriver = std::move(notificationHandleDriver);
     m_notificationThread = std::jthread([this](std::stop_token stopToken) {
         HandleNotifications(std::move(stopToken));
     });
-
-    return true;
 }
 
 void
@@ -735,19 +735,36 @@ UwbConnector::NotificationListenerStop()
 ::uwb::RegisteredCallbackToken*
 UwbConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks)
 {
+    std::lock_guard writerLock{ m_eventCallbacksGate };
+    bool isFirstCallback = not CallbacksPresent();
     m_deviceEventCallbacks = callbacks;
+    if (isFirstCallback) {
+        NotificationListenerStart();
+    }
     return nullptr;
 }
 
 ::uwb::RegisteredCallbackToken*
 UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks)
 {
+    std::lock_guard writerLock{ m_eventCallbacksGate };
+    bool isFirstCallback = not CallbacksPresent();
     m_sessionEventCallbacks.insert_or_assign(sessionId, callbacks);
+    if (isFirstCallback) {
+        NotificationListenerStart();
+    }
     return nullptr;
+}
+
+bool
+UwbConnector::CallbacksPresent()
+{
+    return m_deviceEventCallbacks.lock() or (not m_sessionEventCallbacks.empty());
 }
 
 void
 UwbConnector::DeregisterEventCallback(::uwb::RegisteredCallbackToken* token)
 {
     // TODO implement
+    std::lock_guard writerLock{ m_eventCallbacksGate };
 }
