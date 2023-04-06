@@ -13,7 +13,7 @@
 #include <windows/devices/DeviceHandle.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
-#include <windows/devices/uwb/UwbDeviceConnector.hxx>
+#include <windows/devices/uwb/UwbConnector.hxx>
 
 using namespace windows::devices;
 using namespace windows::devices::uwb;
