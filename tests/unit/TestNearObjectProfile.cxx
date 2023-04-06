@@ -1,5 +1,5 @@
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <nearobject/NearObjectProfile.hxx>
 
@@ -16,7 +16,7 @@ TEST_CASE("near object profile equality operator works", "[basic]")
 
     SECTION("returns false for instances with differing security configuration")
     {
-        NearObjectProfile profile1{ NearObjectConnectionScope::Unicast};
+        NearObjectProfile profile1{ NearObjectConnectionScope::Unicast };
         NearObjectProfile profile2{ NearObjectConnectionScope::Unicast, NearObjectProfileSecurity{} };
         REQUIRE(profile1 != profile2);
     }

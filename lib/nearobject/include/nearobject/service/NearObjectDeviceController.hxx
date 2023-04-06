@@ -26,15 +26,15 @@ public:
     virtual ~NearObjectDeviceController() = default;
     NearObjectDeviceController(NearObjectDeviceController&) = delete;
     NearObjectDeviceController(NearObjectDeviceController&&) = delete;
-    NearObjectDeviceController& operator=(NearObjectDeviceController&) = delete;
-    NearObjectDeviceController& operator=(NearObjectDeviceController&&) = delete;
+    NearObjectDeviceController&
+    operator=(NearObjectDeviceController&) = delete;
+    NearObjectDeviceController&
+    operator=(NearObjectDeviceController&&) = delete;
 
     /**
-     * @brief Construct a new Near Object Device object
-     *
-     * @param deviceId
+     * @brief Construct a new NearObjectDeviceController object.
      */
-    explicit NearObjectDeviceController(uint64_t deviceId);
+    NearObjectDeviceController() = default;
 
     /**
      * @brief Holds the result of the StartSession() function.
@@ -56,12 +56,14 @@ public:
     StartSession(const NearObjectProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks);
 
     /**
-     * @brief Returns a value uniquely identifying this device.
-     *
-     * @return uint64_t
+     * @brief Determines if this controller is equal to another.
+     * 
+     * @param other 
+     * @return true 
+     * @return false 
      */
-    uint64_t
-    Id() const noexcept;
+    virtual bool
+    IsEqual(const NearObjectDeviceController& other) const noexcept = 0;
 
 private:
     /**
@@ -75,14 +77,15 @@ private:
     StartSessionImpl(const NearObjectProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) = 0;
 
 private:
-    const uint64_t m_deviceId;
-
     std::mutex m_sessionsGate;
     std::vector<std::weak_ptr<NearObjectSession>> m_sessions{};
 };
 
 bool
 operator==(const NearObjectDeviceController&, const NearObjectDeviceController&) noexcept;
+
+bool
+operator!=(const NearObjectDeviceController&, const NearObjectDeviceController&) noexcept;
 
 } // namespace service
 } // namespace nearobject

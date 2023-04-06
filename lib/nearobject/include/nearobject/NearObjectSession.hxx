@@ -2,10 +2,11 @@
 #ifndef NEAR_OBJECT_SESSION_HXX
 #define NEAR_OBJECT_SESSION_HXX
 
+#include <atomic>
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <mutex>
-#include <optional>
 #include <vector>
 
 #include <nearobject/NearObject.hxx>
@@ -34,16 +35,25 @@ public:
     /**
      * @brief Construct a new Near Object Session object
      *
+     * @param sessionId The unique session id.
      * @param capabilities The capabilities supported by this session.
      * @param nearObjects The initial near objects involved in this session.
      * @param eventCallbacks The callbacks used to signal events from this session.
      */
-    NearObjectSession(NearObjectCapabilities capabilities, const std::vector<std::shared_ptr<NearObject>>& nearObjects, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks);
+    NearObjectSession(uint32_t sessionId, NearObjectCapabilities capabilities, const std::vector<std::shared_ptr<NearObject>>& nearObjects, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks);
 
     /**
      * @brief Destroy the NearObjectSession object
      */
     ~NearObjectSession();
+
+    /**
+     * @brief Get the unique session id.
+     * 
+     * @return uint32_t 
+     */
+    uint32_t
+    GetId() const noexcept;
 
     /**
      * @brief Get the Capabilities object
@@ -77,7 +87,7 @@ public:
      *
      * @return StartRangingSessionResult
      */
-    StartRangingSessionResult
+    RangingSessionStatus
     StartRanging();
 
     /**
@@ -108,10 +118,7 @@ protected:
      *
      */
     void
-    InvokeEventCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor);
-
-    void
-    RunCallback(const std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor);
+    InvokeEventCallback(std::function<void(NearObjectSessionEventCallbacks& callbacks)> executor);
 
     /**
      * @brief Add a near object to this session.
@@ -176,18 +183,11 @@ protected:
     RangingSessionStatus
     CreateNewRangingSession();
 
-    struct RangingSession
-    {
-        explicit RangingSession(std::function<void()> rangingDataUpdated) :
-            RangingDataUpdated(std::move(rangingDataUpdated))
-        {}
-
-        const std::function<void()> RangingDataUpdated;
-    };
-
 private:
+    const uint32_t m_sessionId;
+
     mutable std::mutex m_rangingStateGate;
-    std::optional<RangingSession> m_rangingSession;
+    bool m_isRangingActive{ false };
 
     const NearObjectCapabilities m_capabilities;
     std::weak_ptr<NearObjectSessionEventCallbacks> m_eventCallbacks;

@@ -1,21 +1,25 @@
+
 #include <algorithm>
-#include <catch2/catch.hpp>
-#include <TlvSimple.hxx>
 #include <string>
 #include <vector>
+
+#include <catch2/catch_test_macros.hpp>
+#include <TlvSimple.hxx>
+
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 
 /**
 * @brief Convert a string to a byte vector
 *
 * @param str 
-* @return std::vector<std::byte>
+* @return std::vector<uint8_t>
 */
-std::vector<std::byte>
+std::vector<uint8_t>
 StringToByteVector(const std::string &str) noexcept
 {
-    std::vector<std::byte> vec(str.size());
+    std::vector<uint8_t> vec(str.size());
     std::transform(std::cbegin(str), std::cend(str), std::begin(vec), [](const auto &element) {
-        return std::byte(element);
+        return uint8_t(element);
     });
 
     return vec;
@@ -26,12 +30,12 @@ TEST_CASE("TlvSimple object can be created properly from the Parse function", "[
     SECTION("creating a TlvSimple from no data works as expected")
     {
         std::string mystr("");
-        std::vector<std::byte> mydataSmall = StringToByteVector(mystr);
+        std::vector<uint8_t> mydataSmall = StringToByteVector(mystr);
 
         // create the vector for the packet
-        std::byte tag{ 0x3 };
-        std::byte length{ 0 };
-        std::vector<std::byte> packet;
+        uint8_t tag{ 0x3 };
+        uint8_t length{ 0 };
+        std::vector<uint8_t> packet;
 
         packet.insert(std::cend(packet), tag);
         packet.insert(std::cend(packet), length);
@@ -53,12 +57,12 @@ TEST_CASE("TlvSimple object can be created properly from the Parse function", "[
     SECTION("creating a TlvSimple from a small amount of data works as expected")
     {
         std::string mystr("hellothisisbob");
-        std::vector<std::byte> mydataSmall = StringToByteVector(mystr);
+        std::vector<uint8_t> mydataSmall = StringToByteVector(mystr);
 
         // create the vector for the packet
-        std::byte tag{ 0x3 };
-        std::byte length{ uint8_t(mydataSmall.size()) };
-        std::vector<std::byte> packet;
+        uint8_t tag{ 0x3 };
+        uint8_t length{ uint8_t(mydataSmall.size()) };
+        std::vector<uint8_t> packet;
 
         packet.insert(std::cend(packet), tag);
         packet.insert(std::cend(packet), length);
@@ -80,12 +84,12 @@ TEST_CASE("TlvSimple object can be created properly from the Parse function", "[
     SECTION("creating a TlvSimple from a incorrect small amount of data fails as expected")
     {
         std::string mystr("hellothisisbob");
-        std::vector<std::byte> mydataSmall = StringToByteVector(mystr);
+        std::vector<uint8_t> mydataSmall = StringToByteVector(mystr);
 
         // create the vector for the packet
-        std::byte tag{ 0x3 };
-        std::byte length{ uint8_t(mydataSmall.size() + 1) };
-        std::vector<std::byte> packet;
+        uint8_t tag{ 0x3 };
+        uint8_t length{ uint8_t(mydataSmall.size() + 1) };
+        std::vector<uint8_t> packet;
 
         packet.insert(std::cend(packet), tag);
         packet.insert(std::cend(packet), length);
@@ -100,16 +104,16 @@ TEST_CASE("TlvSimple object can be created properly from the Parse function", "[
     SECTION("creating a TlvSimple from a large amount of data succeeds as expected")
     {
         std::size_t length(0x100);
-        std::vector<std::byte> mydata(length);
+        std::vector<uint8_t> mydata(length);
 
         // create the vector for the packet
-        std::byte tag{ 0x3 };
-        std::vector<std::byte> packet;
+        uint8_t tag{ 0x3 };
+        std::vector<uint8_t> packet;
 
         packet.insert(std::cend(packet), tag);
-        packet.insert(std::cend(packet), std::byte{ encoding::TlvSimple::ThreeByteLengthIndicatorValue });
-        packet.insert(std::cend(packet), std::byte{ 0x01 });
-        packet.insert(std::cend(packet), std::byte{ 0x00 });
+        packet.insert(std::cend(packet), uint8_t{ encoding::TlvSimple::ThreeByteLengthIndicatorValue });
+        packet.insert(std::cend(packet), uint8_t{ 0x01 });
+        packet.insert(std::cend(packet), uint8_t{ 0x00 });
         packet.insert(std::cend(packet), std::cbegin(mydata), std::cend(mydata));
 
         // try to parse
@@ -128,15 +132,15 @@ TEST_CASE("TlvSimple object can be created properly from the Parse function", "[
     SECTION("creating a TlvSimple from a incorrect large amount of data fails as expected")
     {
         std::size_t length(0x100);
-        std::vector<std::byte> mydata(length);
+        std::vector<uint8_t> mydata(length);
 
         // create the vector for the packet
-        std::byte tag{ 0x3 };
-        std::vector<std::byte> packet;
+        uint8_t tag{ 0x3 };
+        std::vector<uint8_t> packet;
 
         packet.insert(std::cend(packet), tag);
-        packet.insert(std::cend(packet), std::byte{ encoding::TlvSimple::ThreeByteLengthIndicatorValue });
-        packet.insert(std::cend(packet), std::byte{ 0x01 });
+        packet.insert(std::cend(packet), uint8_t{ encoding::TlvSimple::ThreeByteLengthIndicatorValue });
+        packet.insert(std::cend(packet), uint8_t{ 0x01 });
         packet.insert(std::cend(packet), std::cbegin(mydata), std::cend(mydata));
 
         // try to parse
@@ -145,3 +149,5 @@ TEST_CASE("TlvSimple object can be created properly from the Parse function", "[
         REQUIRE(result == encoding::Tlv::ParseResult::Failed);
     }
 }
+
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)

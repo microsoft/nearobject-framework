@@ -1,7 +1,7 @@
 
 #include <memory>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <nearobject/service/NearObjectDeviceControllerManager.hxx>
 
 TEST_CASE("near object device manager can be created", "[basic][service]")

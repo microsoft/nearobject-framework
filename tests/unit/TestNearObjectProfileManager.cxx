@@ -2,11 +2,11 @@
 #include <filesystem>
 #include <vector>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <nearobject/NearObjectProfile.hxx>
-#include <nearobject/service/NearObjectProfileManager.hxx>
 #include <nearobject/persist/NearObjectProfilePersisterFilesystem.hxx>
+#include <nearobject/service/NearObjectProfileManager.hxx>
 
 TEST_CASE("near object profile manager can be created", "[basic][service]")
 {
@@ -21,7 +21,7 @@ TEST_CASE("near object profile manager can be created", "[basic][service]")
     SECTION("creation with custom persister doesn't cause a crash")
     {
         auto persisterFs = std::make_unique<NearObjectProfilePersisterFilesystem>();
-        REQUIRE_NOTHROW(std::make_unique<NearObjectProfileManager>(std::move(persisterFs))); 
+        REQUIRE_NOTHROW(std::make_unique<NearObjectProfileManager>(std::move(persisterFs)));
     }
 
     SECTION("creation with invalid persister causes a crash")

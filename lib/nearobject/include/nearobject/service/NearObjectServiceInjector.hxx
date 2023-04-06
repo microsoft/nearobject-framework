@@ -6,6 +6,7 @@
 
 #include <nearobject/service/NearObjectDeviceControllerManager.hxx>
 #include <nearobject/service/NearObjectProfileManager.hxx>
+#include <nearobject/service/NearObjectSessionIdGenerator.hxx>
 
 namespace nearobject::service
 {
@@ -16,6 +17,7 @@ struct NearObjectServiceInjector
 {
     std::shared_ptr<NearObjectProfileManager> ProfileManager;
     std::shared_ptr<NearObjectDeviceControllerManager> DeviceManager;
+    std::unique_ptr<NearObjectSessionIdGenerator> SessionIdGenerator;
 };
 } // namespace nearobject::service
 

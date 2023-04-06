@@ -1,34 +1,163 @@
 
-#include <windows/uwb/UwbDevice.hxx>
+#include <future>
+#include <ios>
+#include <stdexcept>
+#include <tuple>
 
-using namespace windows::devices;
+#include <uwb/protocols/fira/FiraDevice.hxx>
+#include <uwb/protocols/fira/UwbException.hxx>
+#include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
+#include <windows/devices/uwb/UwbCxDdiLrp.hxx>
+#include <windows/devices/uwb/UwbDevice.hxx>
+#include <windows/devices/uwb/UwbDeviceConnector.hxx>
+#include <windows/devices/uwb/UwbSession.hxx>
 
-UwbDevice::UwbDevice(std::wstring deviceName) :
+#include <plog/Log.h>
+#include <wil/result.h>
+
+using namespace windows::devices::uwb;
+using namespace ::uwb::protocol::fira;
+
+UwbDevice::UwbDevice(std::string deviceName) :
     m_deviceName(std::move(deviceName))
-{}
+{
+    m_callbacks = std::make_shared<::uwb::UwbRegisteredDeviceEventCallbacks>(
+        [this](::uwb::protocol::fira::UwbStatus status) {
+            return OnStatusChanged(status);
+        },
+        [this](::uwb::protocol::fira::UwbStatusDevice status) {
+            return OnDeviceStatusChanged(status);
+        },
+        [this](::uwb::protocol::fira::UwbSessionStatus status) {
+            return OnSessionStatusChanged(status);
+        });
+}
 
-const std::wstring&
+const std::string&
 UwbDevice::DeviceName() const noexcept
 {
     return m_deviceName;
 }
 
-void
-UwbDevice::Initialize()
+std::shared_ptr<::uwb::UwbSession>
+UwbDevice::CreateSessionImpl(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
 {
-    wil::unique_hfile handleDriver(CreateFile(
-        m_deviceName.c_str(),
-        GENERIC_READ | GENERIC_WRITE,
-        FILE_SHARE_READ | FILE_SHARE_WRITE,
-        nullptr,
-        OPEN_EXISTING,
-        FILE_FLAG_OVERLAPPED,
-        nullptr));
+    return std::make_shared<UwbSession>(sessionId, std::move(callbacks), this);
+}
 
-    // TODO: wil::unique_hfile handleDriver(CreateFile(m_deviceName))
-    // TODO: call CM_Register_Notification(handleDriver, filterType=CM_NOTIFY_FILTER_TYPE_DEVICEHANDLE)
-    //   - handle CM_NOTIFY_ACTION_DEVICEQUERYREMOVE -> close handleDriver since device removal is requested
-    //   - handle CM_NOTIFY_ACTION_DEVICEQUERYREMOVEFAILED -> query removal failed
+std::shared_ptr<::uwb::UwbSession>
+UwbDevice::ResolveSessionImpl(uint32_t sessionId)
+{
+    std::vector<UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes({ UwbApplicationConfigurationParameterType::DeviceType });
 
-    m_handleDriver = std::move(handleDriver);
+    auto resultFuture = m_uwbSessionConnector->GetApplicationConfigurationParameters(sessionId, applicationConfigurationParameterTypes);
+    if (!resultFuture.valid()) {
+        PLOG_ERROR << "failed to obtain application configuration parameters for session id " << sessionId;
+        throw UwbException(UwbStatusGeneric::Failed);
+    }
+
+    UwbStatus uwbStatus;
+    std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters;
+    try {
+        std::tie(uwbStatus, applicationConfigurationParameters) = resultFuture.get();
+        if (!IsUwbStatusOk(uwbStatus)) {
+            PLOG_ERROR << "failed to obtain device type for session id " << sessionId << " (" << ToString(uwbStatus) << ")";
+            throw UwbException(uwbStatus);
+        }
+    } catch (UwbException& uwbException) {
+        PLOG_ERROR << "caught exception attempting to obtain application configuration parameters for session id " << sessionId << " (" << ToString(uwbException.Status) << ")";
+        throw uwbException;
+    } catch (std::exception& e) {
+        PLOG_ERROR << "caught unexpected exception attempting to obtain application configuration parameters for session id " << sessionId << " (" << e.what() << ")";
+        throw e;
+    }
+
+    // Validate the call provided the expected DeviceType parameter.
+    if (std::size(applicationConfigurationParameters) < 1 || !std::holds_alternative<DeviceType>(applicationConfigurationParameters.front().Value)) {
+        PLOG_FATAL << "invalid application configuration parameters returned";
+        throw std::runtime_error("GetApplicationConfigurationParameters() returned bad data; this is a bug!");
+    }
+
+    // Create an instance of the session.
+    auto deviceType = std::get<DeviceType>(applicationConfigurationParameters.front().Value);
+    auto session = std::make_shared<UwbSession>(sessionId, this, deviceType);
+
+    return session;
+}
+
+UwbCapability
+UwbDevice::GetCapabilitiesImpl()
+{
+    auto resultFuture = m_uwbDeviceConnector->GetCapabilities();
+    if (!resultFuture.valid()) {
+        // TODO: need to do something different than just return a default-constructed object here
+        PLOG_ERROR << "failed to obtain capabilities from driver";
+        return {};
+    }
+
+    try {
+        auto [uwbStatus, uwbCapability] = resultFuture.get();
+        if (!IsUwbStatusOk(uwbStatus)) {
+            PLOG_ERROR << "uwb device reported an error obtaining uwb capabilities, status =" << ::ToString(uwbStatus);
+            return {};
+        }
+        return std::move(uwbCapability);
+    } catch (std::exception& e) {
+        PLOG_ERROR << "caught exception obtaining uwb capabilities (" << e.what() << ")";
+        return {};
+    }
+}
+
+UwbDeviceInformation
+UwbDevice::GetDeviceInformationImpl()
+{
+    auto resultFuture = m_uwbDeviceConnector->GetDeviceInformation();
+    if (!resultFuture.valid()) {
+        PLOG_ERROR << "failed to obtain capabilities from driver";
+        throw std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected));
+    }
+
+    try {
+        auto uwbDeviceInformation = resultFuture.get();
+        return std::move(uwbDeviceInformation);
+    } catch (const UwbException& e) {
+        PLOG_ERROR << "caught exception obtaining uwb device information (" << ::ToString(e.Status) << ")";
+        throw e;
+    }
+}
+
+void
+UwbDevice::ResetImpl()
+{
+    auto resultFuture = m_uwbDeviceConnector->Reset();
+    if (!resultFuture.valid()) {
+        // TODO: need to do something different than just return a default-constructed object here
+        PLOG_ERROR << "failed to reset the uwb device";
+        throw UwbException(UwbStatusGeneric::Failed);
+    }
+
+    try {
+        resultFuture.get();
+    } catch (const UwbException& e) {
+        PLOG_ERROR << "caught exception resetting the uwb device (" << ::ToString(e.Status) << ")";
+        throw e;
+    }
+}
+
+bool
+UwbDevice::InitializeImpl()
+{
+    auto uwbConnector = std::make_shared<UwbConnector>(m_deviceName);
+    m_uwbDeviceConnector = uwbConnector;
+    m_uwbSessionConnector = uwbConnector;
+    m_callbacksToken = m_uwbDeviceConnector->RegisterDeviceEventCallbacks(m_callbacks);
+    return true;
+}
+
+bool
+UwbDevice::IsEqual(const ::uwb::UwbDevice& other) const noexcept
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast)
+    const auto& rhs = static_cast<const windows::devices::uwb::UwbDevice&>(other);
+    return (this->DeviceName() == rhs.DeviceName());
 }

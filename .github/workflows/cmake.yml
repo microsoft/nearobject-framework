@@ -1,30 +1,144 @@
-name: Build Release [CMake]
+name: Build [CMake]
 
 on:
-  pull_request:
-    branches: [ "main" ]
-
-env:
-  BUILD_TYPE: Release
+  workflow_dispatch:
+    inputs:
+      analyze-codeql:
+        required: true
+        default: true
+        type: boolean
+        description: 'Peform static analysis with CodeQL'
+      build-arm64:
+        required: false
+        default: false
+        type: boolean
+        description: 'Build ARM64 architecture'
+      install:
+        required: true
+        default: false
+        type: boolean
+        description: 'Invoke CMake install for the project'
+      package:
+        required: true
+        default: false
+        type: boolean
+        description: 'Invoke CMake CPack for the project'
+      publish-artifacts:
+        required: true
+        default: false
+        type: boolean
+        description: 'Publish build artifacts'
+      build-types:
+        required: true
+        # Note the string here contains a JSON array. This is later converted to an array using fromJson.
+        default: "[ 'Debug' ]"
+        type: string
+        description: 'The CMake build types (CMAKE_BUILD_TYPE) to run (must be encoded as a JSON array)'
+      preset-name:
+        required: true
+        default: 'cicd'
+        type: choice
+        options:
+          - 'dev'
+          - 'dev-vcpkg'
+          - 'dev-driver'
+          - 'vcpkg-dev'
+          - 'vcpkg-release'
+          - 'cicd'
+          - 'official-release'
+        description: 'The name of the preset to use for all CMake operations (configure, build, test, install, package)'
+  workflow_call:
+    inputs:
+      build-types:
+        required: false
+        # Note the string here contains a JSON array. This is later converted to an array using fromJson.
+        default: "[ 'Debug' ]"
+        type: string
+        description: 'The CMake build type (CMAKE_BUILD_TYPE) to run.'
+      analyze-codeql:
+        required: false
+        default: true
+        type: boolean
+      build-arm64:
+        required: false
+        default: false
+        type: boolean
+      install:
+        required: false
+        default: false
+        type: boolean
+      package:
+        required: false
+        default: false
+        type: boolean
+      publish-artifacts:
+        required: false
+        default: false
+        type: boolean
+      preset-name:
+        required: false
+        default: 'cicd'
+        type: string
 
 jobs:
   build:
+    name: cmake build
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-22.04, windows-latest ]
-    runs-on: ${{ matrix.os }}
-
+        config:
+          - { os: windows-2022, generator: 'Visual Studio 17 2022' }
+          - { os: windows-2022, generator: 'Visual Studio 17 2022', arch: 'ARM64' }
+          - { os: ubuntu-22.04, generator: 'Ninja Multi-Config' }
+        build-type: ${{ fromJson(inputs.build-types) }}
+    runs-on: ${{ matrix.config.os }}
+ 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-    - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+    - name: Install build tools
+      if: matrix.config.os == 'ubuntu-22.04'
+      run: sudo apt-get install ninja-build
 
-    - name: Build
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+    - name: Initialize CodeQL
+      if: inputs.analyze-codeql == true
+      uses: github/codeql-action/init@v2
+      with:
+        languages: 'cpp'
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      run: ctest -C ${{env.BUILD_TYPE}}
-      
+    - name: CMake Configure
+      run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -G"${{ matrix.config.generator }}"
+
+    - name: CMake Cross-Compile Build ${{ matrix.config.arch }}
+      if: ${{ matrix.config.arch }}
+      run: cmake --build --preset ${{ inputs.preset-name }} --config ${{ matrix.build-type }} -A ${{ matrix.config.arch }}
+
+    - name: CMake Build
+      if: ${{ ! matrix.config.arch }}
+      run: cmake --build --preset ${{ inputs.preset-name }} --config ${{ matrix.build-type }}
+
+    - name: CMake Test (ctest)
+      if: ${{ matrix.config.arch != 'ARM64' }}
+      run: ctest --preset ${{ inputs.preset-name }} -C ${{ matrix.build-type }}
+
+    - name: CMake Install
+      if: inputs.install == true
+      run: cmake --build --preset ${{ inputs.preset-name }} --target install --config ${{ matrix.build-type }}
+
+    - name: CMake Package (cpack)
+      if: inputs.package == true
+      run: cpack --preset ${{ inputs.preset-name }} -C ${{ matrix.build-type }}
+
+    - name: Perform CodeQL Analysis
+      if: inputs.analyze-codeql == true
+      uses: github/codeql-action/analyze@v2
+
+    - name: Publish Artifacts
+      if: inputs.publish-artifacts == true
+      uses: actions/upload-artifact@v3
+      with:
+        name: release-package-${{ runner.os }}-${{ matrix.build-type }}-${{ matrix.config.arch != '' && matrix.config.arch || runner.arch }}
+        path: |
+          ${{ github.workspace }}/out/package/${{ inputs.preset-name }}/*.tar.*
+          ${{ github.workspace }}/out/package/${{ inputs.preset-name }}/*.zip

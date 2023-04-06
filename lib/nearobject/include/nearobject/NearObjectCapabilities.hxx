@@ -31,19 +31,8 @@ struct NearObjectCapabilities
      */
     bool SupportsSecureChannels;
 
-    /**
-     * @brief Implement equality using member-wise comparison.
-     *
-     * @param other
-     * @return true
-     * @return false
-     */
-    bool
-    operator==(const NearObjectCapabilities& other) const noexcept
-    {
-        return std::tie(this->SupportsRanging, this->SupportsPositioning, this->SupportsSecureDevice, this->SupportsSecureChannels)
-            == std::tie(other.SupportsRanging, other.SupportsPositioning, other.SupportsSecureDevice, other.SupportsSecureChannels);
-    }
+    auto
+    operator<=>(const NearObjectCapabilities& other) const = default;
 };
 } // namespace nearobject
 

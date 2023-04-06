@@ -19,15 +19,17 @@ class lambda_call
 {
 public:
     lambda_call(const lambda_call&) = delete;
-    lambda_call& operator=(const lambda_call&) = delete;
-    lambda_call& operator=(lambda_call&& other) = delete;
+    lambda_call&
+    operator=(const lambda_call&) = delete;
+    lambda_call&
+    operator=(lambda_call&& other) = delete;
 
     /**
      * @brief Construct a new lambda call object.
      * 
      * @param lambda 
      */
-    explicit lambda_call(TLambda&& lambda) noexcept : 
+    explicit lambda_call(TLambda&& lambda) noexcept :
         m_lambda(std::move(lambda))
     {
         static_assert(std::is_same<decltype(lambda()), void>::value, "scope_exit lambdas must not have a return value");
@@ -40,8 +42,8 @@ public:
      * 
      * @param other 
      */
-    lambda_call(lambda_call&& other) noexcept : 
-        m_lambda(std::move(other.m_lambda)), 
+    lambda_call(lambda_call&& other) noexcept :
+        m_lambda(std::move(other.m_lambda)),
         m_call(other.m_call)
     {
         other.m_call = false;
@@ -58,13 +60,12 @@ public:
     /**
      * @brief Ensures the scope_exit lambda will not be called.
      */
-    void 
+    void
     release() noexcept
     {
         m_call = false;
     }
 
-    
     /**
      * @brief Executes the scope_exit lambda immediately if not yet run; ensures
      * it will not run again.
@@ -72,8 +73,7 @@ public:
     void
     reset() noexcept
     {
-        if (m_call)
-        {
+        if (m_call) {
             m_call = false;
             m_lambda();
         }
@@ -105,8 +105,8 @@ private:
  * @return auto 
  */
 template <typename TLambda>
-[[nodiscard]]
-inline auto scope_exit(TLambda&& lambda) noexcept
+[[nodiscard]] inline auto
+scope_exit(TLambda&& lambda) noexcept
 {
     return details::lambda_call<TLambda>(std::forward<TLambda>(lambda));
 }

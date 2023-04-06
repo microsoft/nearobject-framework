@@ -24,6 +24,16 @@ class NearObjectDeviceControllerUwb :
 public:
     NearObjectDeviceControllerUwb(std::unique_ptr<uwb::UwbDevice> uwbDevice);
 
+    /**
+     * @brief 
+     * 
+     * @param other 
+     * @return true 
+     * @return false 
+     */
+    bool
+    IsEqual(const NearObjectDeviceController& other) const noexcept override;
+
 private:
     StartSessionResult
     StartSessionImpl(const NearObjectProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) override;

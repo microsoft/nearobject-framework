@@ -1,9 +1,11 @@
 
+#include <limits>
+
 #include "TlvSimple.hxx"
 
 using namespace encoding;
 
-TlvSimple::TlvSimple(std::byte tag, std::vector<std::byte> value) :
+TlvSimple::TlvSimple(uint8_t tag, std::vector<uint8_t> value) :
     m_tag(1, tag),
     m_value(std::move(value))
 {
@@ -13,7 +15,7 @@ TlvSimple::TlvSimple(std::byte tag, std::vector<std::byte> value) :
 
 /* static */
 Tlv::ParseResult
-TlvSimple::Parse(TlvSimple **tlvOutput, const std::span<std::byte> &data)
+TlvSimple::Parse(TlvSimple **tlvOutput, const std::span<uint8_t> &data)
 {
     Tlv::ParseResult parseResult = Tlv::ParseResult::Failed;
     if (!tlvOutput) {
@@ -21,9 +23,9 @@ TlvSimple::Parse(TlvSimple **tlvOutput, const std::span<std::byte> &data)
     }
     *tlvOutput = nullptr;
 
-    std::byte tag{};
+    uint8_t tag{};
     uint16_t length = 0;
-    std::vector<std::byte> value;
+    std::vector<uint8_t> value;
 
     const auto datasize = data.size();
     if (datasize < TlvSimple::OneByteLengthMinimumSize) {
@@ -36,7 +38,7 @@ TlvSimple::Parse(TlvSimple **tlvOutput, const std::span<std::byte> &data)
             return parseResult;
         }
         length = (uint8_t)data[2];
-        length <<= 8;
+        length <<= (std::size_t)std::numeric_limits<uint8_t>::digits;
         length |= (uint8_t)data[3];
         if (datasize != TlvSimple::ThreeByteLengthMinimumSize + length) {
             return parseResult;

@@ -23,7 +23,7 @@ struct NearObjectServiceConfiguration
      * @return NearObjectServiceConfiguration 
      */
     static NearObjectServiceConfiguration
-    FromCommandLineArguments(int argc, char *argv[], bool throwOnParseError = false);
+    FromCommandLineArguments(int argc, char* argv[], bool throwOnParseError = false);
 
     /**
      * @brief Create a NearObjectServiceConfiguration from program command-line

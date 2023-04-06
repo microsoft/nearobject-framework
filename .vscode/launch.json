@@ -1,0 +1,89 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "cli start ranging probe",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/build/dev/windows/tools/nocli/${input:buildFlavor}/nocli.exe",
+            "args": [
+                "uwb",
+                "range",
+                "start",
+                "--probe",
+            ],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "console": "externalTerminal"
+        },
+        {
+            "name": "cli start ranging",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/build/dev/windows/tools/nocli/${input:buildFlavor}/nocli.exe",
+            "args": [
+                "uwb",
+                "range",
+                "--SessionId",
+                "${input:sessionId}",
+                "start",
+                "--DeviceRole",
+                "0",
+                "--MultiNodeMode",
+                "0",
+                "--NumberOfControlees",
+                "1",
+                "--DeviceMacAddress",
+                "12:34",
+                "--DestinationMacAddress",
+                "23:45",
+                "--DeviceType",
+                "0"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "console": "externalTerminal"
+        },
+        {
+            "name": "uwbsim start random range data",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/build/dev/windows/tools/uwb/simulator/${input:buildFlavor}/uwbsim.exe",
+            "args": [
+                "trigger",
+                "-e",
+                "1",
+                "--sessionId",
+                "${input:sessionId}"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "console": "externalTerminal"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "buildFlavor",
+            "type": "pickString",
+            "description": "The build flavor to use",
+            "default": "Debug",
+            "options": [
+                "Debug",
+                "Release"
+            ]
+        },
+        {
+            "id": "deviceName",
+            "type": "promptString",
+            "description": "The uwb device name (GUID) to use for ranging"
+        },
+        {
+            "id": "sessionId",
+            "type": "promptString",
+            "description": "sessionId to use for ranging"
+        }
+    ]
+}

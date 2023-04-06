@@ -7,7 +7,7 @@
 #include <optional>
 #include <vector>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <notstd/task_queue.hxx>
 
 using namespace std::chrono_literals;
@@ -57,7 +57,7 @@ TEST_CASE("task queue can be destroyed", "[notstd][shared][utility]")
     SECTION("destruction doesn't cause a crash")
     {
         auto taskQueue = std::make_unique<task_queue>();
-        REQUIRE_NOTHROW(taskQueue->~task_queue());
+        REQUIRE_NOTHROW(std::destroy_at(taskQueue.get()));
         taskQueue.release();
     }
 }
@@ -338,8 +338,8 @@ TEST_CASE("task queue can be explicitly stopped", "[notstd][shared][utility]")
                 // This assumes knowledge of queue implementation details,
                 // however, it is currently the best method available to test
                 // this functionality.
-                for (const auto i : {1,2,3,4,5,6,7,8,9}) {
-                    taskFutures.emplace_back(dispatcher->post([&]{
+                for ([[maybe_unused]] const auto _ : {1,2,3,4,5,6,7,8,9}) {
+                    taskFutures.emplace_back(dispatcher->post([&] {
                         numTasksRan++;
                     }));
                 }
