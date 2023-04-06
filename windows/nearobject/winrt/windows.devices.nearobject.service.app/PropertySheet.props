@@ -11,5 +11,11 @@
 	  <ReferenceCopyLocalPaths Include="$(SolutionDir)\$(PlatformShortName)\$(Configuration)\Windows.Devices.NearObject.Service\Windows.Devices.NearObject.Service.dll">
 		<IsWinMDFile>false</IsWinMDFile>
 	  </ReferenceCopyLocalPaths>
+	  <Reference Include="$(SolutionDir)\$(PlatformShortName)\$(Configuration)\Windows.Devices.NearObject\Windows.Devices.NearObject.winmd">
+		<IsWinMDFile>true</IsWinMDFile>
+	  </Reference>
+	  <ReferenceCopyLocalPaths Include="$(SolutionDir)\$(PlatformShortName)\$(Configuration)\Windows.Devices.NearObject\Windows.Devices.NearObject.dll">
+		<IsWinMDFile>false</IsWinMDFile>
+	  </ReferenceCopyLocalPaths>
 	</ItemGroup>
 </Project>
