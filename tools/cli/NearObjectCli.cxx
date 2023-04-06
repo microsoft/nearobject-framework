@@ -527,6 +527,7 @@ NearObjectCli::AddSubcommandUwbRaw(CLI::App* parent)
     AddSubcommandUwbRawDeviceReset(rawApp);
     AddSubcommandUwbRawGetDeviceInfo(rawApp);
     AddSubcommandUwbRawSessionDeinitialize(rawApp);
+    AddSubcommandUwbRawGetSessionCount(rawApp);
 
     return rawApp;
 }
@@ -645,6 +646,35 @@ NearObjectCli::AddSubcommandUwbRawSessionDeinitialize(CLI::App* parent)
     });
 
     return rawSessionDeinitializeApp;
+}
+
+CLI::App*
+NearObjectCli::AddSubcommandUwbRawGetSessionCount(CLI::App* parent)
+{
+    // top-level command
+    auto rawGetSessionCountApp = parent->add_subcommand("getsessioncount", "Get the number of sessions")->fallthrough();
+
+    rawGetSessionCountApp->parse_complete_callback([this, rawGetSessionCountApp] {
+        RegisterCliAppWithOperation(rawGetSessionCountApp);
+        std::cout << "get session count" << std::endl;
+    });
+
+    rawGetSessionCountApp->final_callback([this, rawGetSessionCountApp] {
+        auto uwbDevice = GetUwbDevice();
+        if (!uwbDevice) {
+            std::cerr << "no device found" << std::endl;
+            return;
+        }
+        if (!uwbDevice->Initialize()) {
+            std::cerr << "device not initialized" << std::endl;
+        }
+
+        m_cliHandler->HandleGetSessionCount(uwbDevice);
+
+        SignalCliAppOperationCompleted(rawGetSessionCountApp);
+    });
+
+    return rawGetSessionCountApp;
 }
 
 CLI::App*

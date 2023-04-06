@@ -184,7 +184,33 @@ UwbConnector::GetSessionCount()
 {
     std::promise<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<uint32_t>>> resultPromise;
     auto resultFuture = resultPromise.get_future();
-    // TODO: invoke IOCTL_UWB_GET_SESSION_COUNT
+
+    wil::shared_hfile handleDriver;
+    auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
+    if (FAILED(hr)) {
+        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
+        return resultFuture;
+    }
+
+    UWB_GET_SESSION_COUNT getSessionCount;
+
+    BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_SESSION_COUNT, nullptr, 0, &getSessionCount, sizeof getSessionCount, nullptr, nullptr);
+    if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
+        HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
+        PLOG_ERROR << "error when sending IOCTL_UWB_GET_SESSION_COUNT"
+                   << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
+        return resultFuture;
+    } else {
+        PLOG_DEBUG << "IOCTL_UWB_GET_SESSION_COUNT succeeded";
+        auto uwbStatus = UwbCxDdi::To(getSessionCount.status);
+        if (!IsUwbStatusOk(uwbStatus)) {
+            resultPromise.set_exception(std::make_exception_ptr(UwbException(std::move(uwbStatus))));
+        } else {
+            resultPromise.set_value(std::move(std::make_tuple(uwbStatus, getSessionCount.sessionCount)));
+        }
+    }
 
     return resultFuture;
 }
