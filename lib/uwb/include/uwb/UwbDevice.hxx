@@ -58,9 +58,9 @@ public:
     /**
      * @brief Get the number of sessions associated with the device.
      *
-     * @return std::optional<uint32_t>
+     * @return uint32_t
      */
-    std::optional<uint32_t>
+    uint32_t
     GetSessionCount();
 
     /**
@@ -134,9 +134,9 @@ private:
     /**
      * @brief Get the number of sessions associated with the device.
      *
-     * @return std::optional<uint32_t>
+     * @return uint32_t
      */
-    virtual std::optional<uint32_t>
+    virtual uint32_t
     GetSessionCountImpl() = 0;
 
     /**

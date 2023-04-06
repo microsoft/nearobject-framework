@@ -141,12 +141,8 @@ try {
 void
 NearObjectCliHandler::HandleGetSessionCount(std::shared_ptr<::uwb::UwbDevice> uwbDevice) noexcept
 try {
-    auto sessionCount = uwbDevice->GetSessionCount();
-    if (sessionCount.has_value()) {
-        std::cout << "Session count: " << sessionCount.value() << std::endl;
-    } else {
-        std::cout << "No current sessions exist" << std::endl;
-    }
+    auto sessionCount = uwbDevice->GetSessionCount());
+    std::cout << "Session count: " << sessionCount << std::endl;
 } catch (...) {
     PLOG_ERROR << "failed to get session count";
 }
