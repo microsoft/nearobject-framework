@@ -32,9 +32,9 @@ public:
 
     /**
      * @brief Obtains a shared reference to a pre-existing session.
-     * 
+     *
      * @param sessionId The session identifier.
-     * @return std::shared_ptr<UwbSession> 
+     * @return std::shared_ptr<UwbSession>
      */
     std::shared_ptr<UwbSession>
     GetSession(uint32_t sessionId);
@@ -54,6 +54,14 @@ public:
      */
     ::uwb::protocol::fira::UwbDeviceInformation
     GetDeviceInformation();
+
+    /**
+     * @brief Get the number of sessions associated with the device.
+     *
+     * @return std::optional<uint32_t>
+     */
+    std::optional<uint32_t>
+    GetSessionCount();
 
     /**
      * @brief Reset the device to an initial clean state.
@@ -96,13 +104,13 @@ private:
     CreateSessionImpl(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks) = 0;
 
     /**
-     * @brief Attempt to resolve a session from the underlying UWB device. 
-     * 
+     * @brief Attempt to resolve a session from the underlying UWB device.
+     *
      * This is used when a session may be pre-existing within the driver but
      * this instance is not yet aware of.
-     * 
+     *
      * @param sessionId The identifier of the session to resolve.
-     * @return std::shared_ptr<UwbSession> 
+     * @return std::shared_ptr<UwbSession>
      */
     virtual std::shared_ptr<UwbSession>
     ResolveSessionImpl(uint32_t sessionId) = 0;
@@ -122,6 +130,14 @@ private:
      */
     virtual ::uwb::protocol::fira::UwbDeviceInformation
     GetDeviceInformationImpl() = 0;
+
+    /**
+     * @brief Get the number of sessions associated with the device.
+     *
+     * @return std::optional<uint32_t>
+     */
+    virtual std::optional<uint32_t>
+    GetSessionCountImpl() = 0;
 
     /**
      * @brief Reset the device to an initial clean state.
@@ -151,10 +167,10 @@ protected:
      * @brief Internal function which finds the specified session but does not
      * enforce any mutual exclusion. The caller must hold the m_sessionsGate
      * mutex either in shared or exclusive mode in order to safely call this
-     * function. 
-     * 
+     * function.
+     *
      * @param sessionId The identifier of the session to find.
-     * @return std::shared_ptr<UwbSession> 
+     * @return std::shared_ptr<UwbSession>
      */
     std::shared_ptr<UwbSession>
     FindSessionLocked(uint32_t sessionId);

@@ -137,3 +137,16 @@ try {
 } catch (...) {
     PLOG_ERROR << "failed to deinitialize session";
 }
+
+void
+NearObjectCliHandler::HandleGetSessionCount(std::shared_ptr<::uwb::UwbDevice> uwbDevice) noexcept
+try {
+    auto sessionCount = uwbDevice->GetSessionCount();
+    if (sessionCount.has_value()) {
+        std::cout << "Session count: " << sessionCount.value() << std::endl;
+    } else {
+        std::cout << "No current sessions exist" << std::endl;
+    }
+} catch (...) {
+    PLOG_ERROR << "failed to get session count";
+}
