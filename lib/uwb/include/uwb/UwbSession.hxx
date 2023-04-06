@@ -136,6 +136,14 @@ public:
     GetApplicationConfigurationParameters();
 
     /**
+     * @brief Get the current state for this session.
+     *
+     * @return ::uwb::protocol::fira::UwbSessionState
+     */
+    ::uwb::protocol::fira::UwbSessionState
+    GetSessionState();
+
+    /**
      * @brief Destroy the session, making it unusable.
      */
     void
@@ -195,6 +203,14 @@ private:
      */
     virtual std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
     GetApplicationConfigurationParametersImpl() = 0;
+
+    /**
+     * @brief Get the current state for this session.
+     *
+     * @return ::uwb::protocol::fira::UwbSessionState
+     */
+    virtual ::uwb::protocol::fira::UwbSessionState
+    GetSessionStateImpl() = 0;
 
     /**
      * @brief Destroy the session, making it unusable.

@@ -134,6 +134,13 @@ UwbSession::GetApplicationConfigurationParameters()
     return GetApplicationConfigurationParametersImpl();
 }
 
+UwbSessionState
+UwbSession::GetSessionState()
+{
+    PLOG_VERBOSE << "get session state";
+    return GetSessionStateImpl();
+}
+
 void
 UwbSession::Destroy()
 {
