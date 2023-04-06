@@ -75,6 +75,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -115,6 +116,12 @@
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="windows.devices.nearobject.service.app.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Windows.Devices.NearObject">
+      <HintPath>..\x64\Debug\windows.devices.nearobject\Windows.Devices.NearObject.winmd</HintPath>
+      <IsWinMDFile>true</IsWinMDFile>
+    </Reference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
