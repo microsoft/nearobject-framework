@@ -142,16 +142,18 @@ UwbDevice::GetCapabilities()
     return GetCapabilitiesImpl();
 }
 
-/**
- * @brief Get the FiRa device information of the device.
- *
- * @return ::uwb::protocol::fira::UwbDeviceInformation
- */
 UwbDeviceInformation
 UwbDevice::GetDeviceInformation()
 {
     PLOG_INFO << "GetDeviceInformation";
     return GetDeviceInformationImpl();
+}
+
+std::optional<uint32_t>
+UwbDevice::GetSessionCount()
+{
+    PLOG_INFO << "GetSessionCount";
+    return GetSessionCountImpl();
 }
 
 void
