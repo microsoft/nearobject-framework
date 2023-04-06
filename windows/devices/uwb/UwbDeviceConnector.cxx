@@ -179,10 +179,10 @@ UwbConnector::GetCapabilities()
     return resultFuture;
 }
 
-std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<uint32_t>>>
+std::future<std::tuple<::uwb::protocol::fira::UwbStatus, uint32_t>>
 UwbConnector::GetSessionCount()
 {
-    std::promise<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<uint32_t>>> resultPromise;
+    std::promise<std::tuple<::uwb::protocol::fira::UwbStatus, uint32_t>> resultPromise;
     auto resultFuture = resultPromise.get_future();
 
     wil::shared_hfile handleDriver;
