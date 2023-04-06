@@ -352,7 +352,7 @@ UwbSimulatorDevice::UpdateDeviceState(UwbDeviceState deviceState)
     auto deviceStateStrNew = magic_enum::enum_name(deviceState);
 
     if (m_deviceState == deviceState) {
-        DbgPrint("device already in target state %s\n", deviceStateStrNew);
+        DbgPrint("device already in target state %s\n", std::data(deviceStateStrNew));
         return;
     }
 
