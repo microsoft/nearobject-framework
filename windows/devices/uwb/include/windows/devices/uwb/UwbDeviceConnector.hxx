@@ -103,7 +103,7 @@ public:
     virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbCapability>>
     GetCapabilities() override;
 
-    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<uint32_t>>>
+    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, uint32_t>>
     GetSessionCount() override;
 
 public:
@@ -171,7 +171,7 @@ private:
     /**
      * @brief Response for calling the relevant registered callbacks for the session ended event.
      * This function assumes the caller is holding the m_eventCallbacksGate
-     * 
+     *
      * @param sessionId The session identifier of the session that ended.
      * @param sessionEndReason The reason the session ended.
      */
@@ -189,14 +189,14 @@ private:
     /**
      * @brief Internal function that prepares the notification for processing by the m_sessionEventCallbacks
      * This function assumes the caller is holding the m_eventCallbacksGate
-     * 
+     *
      * @param rangingData
      */
     void
     OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData);
 
     /**
-     * @brief Internal function to check if there are callbacks present. 
+     * @brief Internal function to check if there are callbacks present.
      * This function assumes the caller is holding the m_eventCallbacksGate
      *
      * @return true

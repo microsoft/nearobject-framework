@@ -5,7 +5,6 @@
 #include <cstdint>
 #include <future>
 #include <memory>
-#include <optional>
 #include <tuple>
 #include <vector>
 
@@ -34,7 +33,7 @@ struct IUwbDeviceDdi
     GetCapabilities() = 0;
 
     // IOCTL_UWB_GET_SESSION_COUNT
-    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<uint32_t>>>
+    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, uint32_t>>
     GetSessionCount() = 0;
 
     // TODO: unspecified IOCTLs below
