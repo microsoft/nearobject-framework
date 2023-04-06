@@ -162,7 +162,7 @@ UwbSimulatorDevice::Initialize()
 
     m_ioQueue = ioQueue;
 
-    UpdateDeviceState(UwbDeviceState::Ready);
+    DeviceInitialize();
 
     return STATUS_SUCCESS;
 }
@@ -344,7 +344,32 @@ UwbSimulatorDevice::PushUwbNotification(UwbNotificationData uwbNotificationData)
 }
 
 void
-UwbSimulatorDevice::UpdateDeviceState(UwbDeviceState deviceState)
+UwbSimulatorDevice::DeviceInitialize(std::chrono::duration<double> initializeTime)
+{
+    DbgPrint("initializing device");
+
+    std::this_thread::sleep_for(initializeTime);
+    DeviceUpdateState(UwbDeviceState::Ready);
+}
+
+void
+UwbSimulatorDevice::DeviceUninitialize()
+{
+    DbgPrint("uninitializing device\n");
+
+    DeviceUpdateState(UwbDeviceState::Uninitialized);
+}
+
+void
+UwbSimulatorDevice::DeviceReset()
+{
+    DbgPrint("resetting device\n");
+    DeviceUninitialize();
+    DeviceInitialize();
+}
+
+void
+UwbSimulatorDevice::DeviceUpdateState(UwbDeviceState deviceState)
 {
     std::shared_lock deviceStateLockShared{ m_deviceStateGate };
 

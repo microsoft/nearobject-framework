@@ -94,7 +94,13 @@ protected:
      * @param deviceState The new device state.
      */
     void
-    DeviceUpdateState(UwbDeviceState deviceState);
+    UwbDeviceUpdateState(UwbDeviceState deviceState);
+
+    /**
+     * @brief Reset the device.
+     */
+    void
+    UwbDeviceReset();
 
     /**
      * @brief Obtain a reference to the session context for the specified

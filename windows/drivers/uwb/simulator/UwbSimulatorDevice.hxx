@@ -7,6 +7,7 @@
 #include <wdf.h>
 #include <wdfrequest.h>
 
+#include <chrono>
 #include <memory>
 #include <shared_mutex>
 #include <tuple>
@@ -89,6 +90,31 @@ public:
     GetSessionCount();
 
     /**
+     * @brief Perform device initialization.
+     *
+     * This simulates a real device by delaying for the specified amount of
+     * time.
+     *
+     * @param initializeTime The amount of time it should take the device to
+     * initialize. If not specified, a default value is used.
+     */
+    void
+    DeviceInitialize(std::chrono::duration<double> initializeTime = SimulatedInitializationTimeDefault);
+
+    /**
+     * @brief Perform device uninitialization.
+     */
+    void
+    DeviceUninitialize();
+
+    /**
+     * @brief Reset the device, cycling it from its current state to the
+     * deinitialized state,  then re-initializing it.
+     */
+    void
+    DeviceReset();
+
+    /**
      * @brief Update the device state.
      *
      * This will generate a UwbNotification if the state changes.
@@ -96,7 +122,7 @@ public:
      * @param deviceState The new device state.
      */
     void
-    UpdateDeviceState(::uwb::protocol::fira::UwbDeviceState deviceState);
+    DeviceUpdateState(::uwb::protocol::fira::UwbDeviceState deviceState);
 
     /**
      * @brief Push a simulated uwb notification.
@@ -154,6 +180,8 @@ private:
     OnD0Exit(WDF_POWER_DEVICE_STATE targetState);
 
 private:
+    static constexpr auto SimulatedInitializationTimeDefault = std::chrono::microseconds(10);
+
     WDFDEVICE m_wdfDevice;
     UwbSimulatorIoQueue *m_ioQueue{ nullptr };
     std::shared_ptr<windows::devices::uwb::simulator::IUwbSimulatorDdiHandler> m_ddiHandler;

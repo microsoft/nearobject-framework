@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <chrono>
 #include <iterator>
 #include <ranges>
 
@@ -13,6 +14,7 @@
 #include "UwbSimulatorDevice.hxx"
 #include "UwbSimulatorTracelogging.hxx"
 
+using namespace std::chrono_literals;
 using namespace windows::devices::uwb;
 using namespace windows::devices::uwb::simulator;
 
@@ -42,15 +44,27 @@ UwbSimulatorDdiCallbacks::RaiseUwbNotification(UwbNotificationData uwbNotificati
 }
 
 void
-UwbSimulatorDdiCallbacks::DeviceUpdateState(UwbDeviceState deviceState)
+UwbSimulatorDdiCallbacks::UwbDeviceUpdateState(UwbDeviceState deviceState)
 {
     auto device = m_device.lock();
     if (device == nullptr) {
-        // TODO: log
+        DbgPrint("failed to obtain device handle for state update; aborting\n");
         return;
     }
 
-    device->UpdateDeviceState(deviceState);
+    device->DeviceUpdateState(deviceState);
+}
+
+void
+UwbSimulatorDdiCallbacks::UwbDeviceReset()
+{
+    auto device = m_device.lock();
+    if (device == nullptr) {
+        DbgPrint("failed to obtain device handle for reset; aborting\n");
+        return;
+    }
+
+    device->DeviceReset();
 }
 
 std::tuple<UwbStatus, std::shared_ptr<UwbSimulatorSession>>
@@ -117,7 +131,7 @@ UwbSimulatorDdiCallbacks::DeviceReset()
         "DeviceReset",
         TraceLoggingLevel(TRACE_LEVEL_INFORMATION));
 
-    DeviceUpdateState(UwbDeviceState::Ready);
+    UwbDeviceReset();
 
     return UwbStatusOk;
 }
