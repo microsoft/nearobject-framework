@@ -126,7 +126,7 @@ UwbDevice::GetDeviceInformationImpl()
     }
 }
 
-std::optional<uint32_t>
+uint32_t
 UwbDevice::GetSessionCountImpl()
 {
     auto resultFuture = m_uwbDeviceConnector->GetSessionCount();
