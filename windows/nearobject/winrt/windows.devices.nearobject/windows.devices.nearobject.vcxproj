@@ -7,7 +7,7 @@
     <CppWinRTGenerateWindowsMetadata>true</CppWinRTGenerateWindowsMetadata>
     <MinimalCoreWin>true</MinimalCoreWin>
     <ProjectGuid>{58f1d053-3db7-4d58-a288-3687b1861c88}</ProjectGuid>
-    <ProjectName>windows.devices.nearobject</ProjectName>
+    <ProjectName>Windows.Devices.NearObject</ProjectName>
     <RootNamespace>Windows.Devices.NearObject</RootNamespace>
     <DefaultLanguage>en-US</DefaultLanguage>
     <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
@@ -80,7 +80,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-      <ModuleDefinitionFile>windows.devices.nearobject.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>Windows.Devices.NearObject.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
@@ -125,7 +125,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="windows.devices.nearobject.def" />
+    <None Include="Windows.Devices.NearObject.def" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PropertySheet.props" />

@@ -7,7 +7,7 @@
     <CppWinRTGenerateWindowsMetadata>true</CppWinRTGenerateWindowsMetadata>
     <MinimalCoreWin>true</MinimalCoreWin>
     <ProjectGuid>{320e3154-d6ab-4243-8291-3407d7df8f26}</ProjectGuid>
-    <ProjectName>windows.devices.nearobject.service</ProjectName>
+    <ProjectName>Windows.Devices.NearObject.Service</ProjectName>
     <RootNamespace>Windows.Devices.NearObject.Service</RootNamespace>
     <DefaultLanguage>en-US</DefaultLanguage>
     <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
@@ -96,7 +96,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-      <ModuleDefinitionFile>windows.devices.nearobject.service.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>Windows.Devices.NearObject.Service.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
@@ -133,7 +133,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="windows.devices.nearobject.service.def" />
+    <None Include="Windows.Devices.NearObject.Service.def" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PropertySheet.props" />

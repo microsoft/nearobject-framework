@@ -14,7 +14,7 @@ The following are helpful resources regarding Windows Runtime components, C++/Wi
 
 ## Development Guidelines
 
-Each WinRT object must be defined in its own `.idl` file which will result in the compiler generating one Windows Metadata `.winmd` file per object. The C++/WinRT toolchain has been configured to merge all component Windows metadata files into a single `.winmd` with named with the root namespace name (here, `windows.devices.nearobject.winmd`).
+Each WinRT object must be defined in its own `.idl` file which will result in the compiler generating one Windows Metadata `.winmd` file per object. The C++/WinRT toolchain has been configured to merge all component Windows metadata files into a single `.winmd` with named with the root namespace name (here, `Windows.Devices.NearObject.winmd`).
 
 ### Adding a new `.idl` file
 
