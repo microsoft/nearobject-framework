@@ -59,7 +59,7 @@ public:
      * @param sessionType
      * @return std::tuple<UwbStatus, std::shared_ptr<windows::devices::uwb::simulator::UwbSimulatorSession>>
      */
-    std::tuple<UwbStatus, std::shared_ptr<windows::devices::uwb::simulator::UwbSimulatorSession>>
+    std::tuple<::uwb::protocol::fira::UwbStatus, std::shared_ptr<windows::devices::uwb::simulator::UwbSimulatorSession>>
     SessionCreate(uint32_t sessionId, UwbSessionType sessionType);
 
     /**
@@ -68,7 +68,7 @@ public:
      * @param sessionId
      * @return std::tuple<UwbStatus, std::shared_ptr<windows::devices::uwb::simulator::UwbSimulatorSession>>
      */
-    std::tuple<UwbStatus, std::shared_ptr<windows::devices::uwb::simulator::UwbSimulatorSession>>
+    std::tuple<::uwb::protocol::fira::UwbStatus, std::shared_ptr<windows::devices::uwb::simulator::UwbSimulatorSession>>
     SessionDestroy(uint32_t sessionId);
 
     /**
@@ -87,6 +87,16 @@ public:
      */
     std::size_t
     GetSessionCount();
+
+    /**
+     * @brief Update the device state.
+     *
+     * This will generate a UwbNotification if the state changes.
+     *
+     * @param deviceState The new device state.
+     */
+    void
+    UpdateDeviceState(::uwb::protocol::fira::UwbDeviceState deviceState);
 
     /**
      * @brief Push a simulated uwb notification.
@@ -155,6 +165,10 @@ private:
     // Open file handles
     std::shared_mutex m_deviceFilesGate;
     std::vector<std::weak_ptr<UwbSimulatorDeviceFile>> m_deviceFiles;
+
+    // Device state
+    std::shared_mutex m_deviceStateGate;
+    ::uwb::protocol::fira::UwbDeviceState m_deviceState{ ::uwb::protocol::fira::UwbDeviceState::Uninitialized };
 };
 
 struct UwbSimulatorDeviceWdfContext

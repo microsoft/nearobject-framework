@@ -41,6 +41,18 @@ UwbSimulatorDdiCallbacks::RaiseUwbNotification(UwbNotificationData uwbNotificati
     device->PushUwbNotification(std::move(uwbNotificationData));
 }
 
+void
+UwbSimulatorDdiCallbacks::DeviceUpdateState(UwbDeviceState deviceState)
+{
+    auto device = m_device.lock();
+    if (device == nullptr) {
+        // TODO: log
+        return;
+    }
+
+    device->UpdateDeviceState(deviceState);
+}
+
 std::tuple<UwbStatus, std::shared_ptr<UwbSimulatorSession>>
 UwbSimulatorDdiCallbacks::SessionGet(uint32_t sessionId)
 {
@@ -104,6 +116,8 @@ UwbSimulatorDdiCallbacks::DeviceReset()
         UwbSimulatorTraceloggingProvider,
         "DeviceReset",
         TraceLoggingLevel(TRACE_LEVEL_INFORMATION));
+
+    DeviceUpdateState(UwbDeviceState::Ready);
 
     return UwbStatusOk;
 }

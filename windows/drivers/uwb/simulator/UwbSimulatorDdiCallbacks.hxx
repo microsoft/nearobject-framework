@@ -89,6 +89,14 @@ struct UwbSimulatorDdiCallbacks :
 
 protected:
     /**
+     * @brief Update the device state.
+     *
+     * @param deviceState The new device state.
+     */
+    void
+    DeviceUpdateState(UwbDeviceState deviceState);
+
+    /**
      * @brief Obtain a reference to the session context for the specified
      * session id.
      *
@@ -100,9 +108,9 @@ protected:
 
     /**
      * @brief Destroy session context for the specified sesion id.
-     * 
-     * @param sessionId The session id to destroy session context for. 
-     * @return std::tuple<UwbStatus, std::shared_ptr<UwbSimulatorSession>> 
+     *
+     * @param sessionId The session id to destroy session context for.
+     * @return std::tuple<UwbStatus, std::shared_ptr<UwbSimulatorSession>>
      */
     std::tuple<UwbStatus, std::shared_ptr<UwbSimulatorSession>>
     SessionDestroy(uint32_t sessionId);
