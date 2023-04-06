@@ -44,6 +44,12 @@ struct UwbDeviceTestBase : public uwb::UwbDevice
         return {};
     }
 
+    std::optional<uint32_t>
+    GetSessionCountImpl() override
+    {
+        return {};
+    }
+
     void
     ResetImpl() override
     {
