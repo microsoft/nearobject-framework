@@ -5,7 +5,7 @@
   <PropertyGroup />
   <ItemDefinitionGroup />
 	<ItemGroup>
-	  <Reference Include="$(SolutionDir)\$(PlatformShortName)\$(Configuration)\windows.devices.nearobject.service\windows.devices.nearobject.service.winmd">
+	  <Reference Include="$(SolutionDir)\$(PlatformShortName)\$(Configuration)\windows.devices.nearobject.service\Windows.Devices.NearObject.Service.winmd">
 		<IsWinMDFile>true</IsWinMDFile>
 	  </Reference>
 	  <ReferenceCopyLocalPaths Include="$(SolutionDir)\$(PlatformShortName)\$(Configuration)\windows.devices.nearobject.service\windows.devices.nearobject.service.dll">
