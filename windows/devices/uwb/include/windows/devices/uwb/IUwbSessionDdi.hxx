@@ -21,10 +21,6 @@ namespace windows::devices::uwb
  */
 struct IUwbSessionDdi
 {
-    // IOCTL_UWB_GET_SESSION_COUNT
-    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<uint32_t>>>
-    GetSessionCount() = 0;
-
     // IOCTL_UWB_SESSION_INIT
     virtual std::future<::uwb::protocol::fira::UwbStatus>
     SessionInitialize(uint32_t sessionId, ::uwb::protocol::fira::UwbSessionType sessionType) = 0;
@@ -60,10 +56,6 @@ struct IUwbSessionDdi
     // IOCTL_UWB_SET_APP_CONFIG_PARAMS
     virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<::uwb::protocol::fira::UwbSetApplicationConfigurationParameterStatus>>>
     SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> applicationConfigurationParameters) = 0;
-
-    // TODO: unspecified IOCTLs below
-    // IOCTL_UWB_SET_DEVICE_CONFIG_PARAMS
-    // IOCTL_UWB_GET_DEVICE_CONFIG_PARAMS
 };
 
 struct IUwbSessionDdiConnector : public IUwbSessionDdi
