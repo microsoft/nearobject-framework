@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
+  <assemblyIdentity version="1.0.0.0" name="windows.devices.nearobject.service.app.app"/>
+
+  <file name="windows.devices.nearobject.service.dll">
+    <activatableClass
+        name="windows.devices.nearobject.NearObjectService"
+        threadingModel="both"
+        xmlns="urn:schemas-microsoft-com:winrt.v1" />
+  </file>
+
+</assembly>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+	<ItemGroup>
+	  <Reference Include="$(SolutionDir)\$(PlatformShortName)\$(Configuration)\windows.devices.nearobject.service\windows.devices.nearobject.service.winmd">
+		<IsWinMDFile>true</IsWinMDFile>
+	  </Reference>
+	  <ReferenceCopyLocalPaths Include="$(SolutionDir)\$(PlatformShortName)\$(Configuration)\windows.devices.nearobject.service\windows.devices.nearobject.service.dll">
+		<IsWinMDFile>false</IsWinMDFile>
+	  </ReferenceCopyLocalPaths>
+	</ItemGroup>
+</Project>
