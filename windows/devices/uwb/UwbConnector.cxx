@@ -644,7 +644,7 @@ UwbConnector::GetResolvedSessionEventCallbacks(uint32_t sessionId)
     // Get a reference to the existing list of callbacks and attempt to resolve
     // each one into a shared_ptr. If the weak pointer expired, remove it from
     // the vector, otherwise move the shared_ptr into the new container of them
-    // to be returned to the caller. 
+    // to be returned to the caller.
     auto& sessionEventCallbacksWeak = node.mapped();
     std::vector<std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks>> sessionEventCallbacks;
     for (auto it = std::begin(sessionEventCallbacksWeak); it != std::end(sessionEventCallbacksWeak);) {
