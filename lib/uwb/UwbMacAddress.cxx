@@ -86,6 +86,35 @@ UwbMacAddress::Random(UwbMacAddressType type)
 }
 
 /* static */
+std::optional<std::unordered_set<UwbMacAddress>>
+UwbMacAddress::MacAddressesFromString(const std::string& addressesString, UwbMacAddressType addressType)
+{
+    const std::regex singleShortRegex(R"(([0-9A-Fa-f]{2}:){1}([0-9A-Fa-f]{2}))");
+    const std::regex singleExtendedRegex(R"((([0-9A-Fa-f]{2}:){7}[0-9A-Fa-f]{2}))");
+
+    const std::regex shortRegex("^([0-9A-Fa-f]{2}:){1}([0-9A-Fa-f]{2})(,([0-9A-Fa-f]{2}:){1}([0-9A-Fa-f]{2}))*$");
+    const std::regex extendedRegex("^([0-9A-Fa-f]{2}:){7}([0-9A-Fa-f]{2})(,([0-9A-Fa-f]{2}:){7}([0-9A-Fa-f]{2}))*$");
+
+    if ((addressType == UwbMacAddressType::Short && !std::regex_match(addressesString, shortRegex)) ||
+        (addressType == UwbMacAddressType::Extended && !std::regex_match(addressesString, extendedRegex))) {
+        return std::nullopt;
+    }
+
+    std::unordered_set<UwbMacAddress> macAddresses{};
+    std::stringstream ss(addressesString);
+
+    std::string macAddressString;
+    while (std::getline(ss, macAddressString, ',')) {
+        auto macAddress = UwbMacAddress::FromString(macAddressString, addressType);
+        if (macAddress.has_value()) {
+            macAddresses.insert(macAddress.value());
+        }
+    }
+
+    return macAddresses;
+}
+
+/* static */
 std::optional<UwbMacAddress>
 UwbMacAddress::FromString(const std::string& addressString, UwbMacAddressType addressType)
 {

@@ -249,21 +249,23 @@ ValidateNonEnumParameterValues(NearObjectCliData& cliData)
     // NumberOfControlees (mandatory)
     if (parametersData.multiNodeMode == MultiNodeMode::Unicast) {
         if (parametersData.numberOfControlees != MinimumNumberOfControlees) {
-            std::cerr << "Invalid NumberOfControlees. Only " << +MinimumNumberOfControlees << " controlee expected in Unicast mode " << std::endl;
+            std::cerr << "Invalid NumberOfControlees. Only " << +MinimumNumberOfControlees << " controlee expected in Unicast mode." << std::endl;
         }
     } else {
         if (parametersData.numberOfControlees < MinimumNumberOfControlees) {
-            std::cerr << "Invalid NumberOfControlees. At least " << +MinimumNumberOfControlees << " controlees expected" << std::endl;
+            std::cerr << "Invalid NumberOfControlees. At least " << +MinimumNumberOfControlees << " controlees expected." << std::endl;
         }
     }
 
-    // DeviceMacAddress (mandatory) and DestinationMacAddresses (mandatory)
-    const auto macAddressType = parametersData.macAddressMode == uwb::UwbMacAddressType::Extended ? uwb::UwbMacAddressType::Extended : uwb::UwbMacAddressType::Short;
-    parametersData.deviceMacAddress = uwb::UwbMacAddress::FromString(cliData.deviceMacAddressString, macAddressType);
-    parametersData.destinationMacAddresses.emplace();
-    // TODO: Insert the correct Controlee mac address rather than simply inserting the entire destinationMacAddressString
-    for (auto i = 0; i < parametersData.numberOfControlees; i++) {
-        parametersData.destinationMacAddresses.value().insert(uwb::UwbMacAddress::FromString(cliData.destinationMacAddressString, macAddressType).value());
+    // DestinationMacAddresses (mandatory)
+    if (parametersData.deviceType == DeviceType::Controller) {
+        if (parametersData.destinationMacAddresses.value().size() != parametersData.numberOfControlees) {
+            std::cerr << "Invalid number of DestinationMacAddresses. Should be equal to NumberOfControlees when device is a Controller." << std::endl;
+        }
+    } else {
+        if (parametersData.destinationMacAddresses.value().size() != DestinationMacAddressesCountWhenControlee) {
+            std::cerr << "Invalid number of DestinationMacAddresses. Should only contain " << DestinationMacAddressesCountWhenControlee << " mac address for the Controller when device is a Controlee." << std::endl;
+        }
     }
 
     // RangeDataNotificationProximityNear
@@ -359,7 +361,9 @@ ValidateNonEnumParameterValues(NearObjectCliData& cliData)
     // ResultReportConfig
     constexpr int resultReportConfigurationSize = magic_enum::enum_count<ResultReportConfiguration>();
     auto IsValidResultReportConfigurationString = [resultReportConfigurationSize](const std::string& resultReportConfigurationString) {
-        if (resultReportConfigurationString.length() != resultReportConfigurationSize) {
+        if (resultReportConfigurationString.empty()) {
+            return false;
+        } else if (!resultReportConfigurationString.empty() && resultReportConfigurationString.length() != resultReportConfigurationSize) {
             std::cerr << "Invalid ResultReportConfiguration length" << std::endl;
             return false;
         }
@@ -454,9 +458,7 @@ ProcessApplicationConfigurationParameters(NearObjectCliData& cliData)
             } else if constexpr (std::is_same_v<ParameterValueT, ::uwb::UwbMacAddress>) {
                 oss << ToString(arg);
             } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<::uwb::UwbMacAddress>>) {
-                for (const auto& address : arg) {
-                    oss << ToString(arg);
-                }
+                oss << ToString(arg);
             } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<ResultReportConfiguration>>) {
                 oss << ToString(arg);
             } else if constexpr (std::is_same_v<ParameterValueT, std::array<uint8_t, StaticStsInitializationVectorLength>>) {
@@ -786,6 +788,13 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     rangeStartApp->add_option("--StaticStsInitializationVector", applicationConfigurationParametersData.staticStsIv, "6-byte hexadecimal value, colon-delimited. Vendor-defined static STS initialization vector, e.g. 11:22:33:44:55:66")->delimiter(':');
 
     rangeStartApp->parse_complete_callback([this, rangeStartApp] {
+        auto& applicationConfigurationParametersData = m_cliData->applicationConfigurationParametersData;
+
+        // Set DeviceMacAddress and DestinationMacAddresses
+        const auto macAddressType = applicationConfigurationParametersData.macAddressMode == uwb::UwbMacAddressType::Extended ? uwb::UwbMacAddressType::Extended : uwb::UwbMacAddressType::Short;
+        applicationConfigurationParametersData.deviceMacAddress = uwb::UwbMacAddress::FromString(m_cliData->deviceMacAddressString, macAddressType);
+        applicationConfigurationParametersData.destinationMacAddresses = uwb::UwbMacAddress::MacAddressesFromString(m_cliData->destinationMacAddressString, macAddressType);
+
         m_cliData->RangingParameters.ApplicationConfigurationParameters = detail::ProcessApplicationConfigurationParameters(*m_cliData);
         RegisterCliAppWithOperation(rangeStartApp);
     });

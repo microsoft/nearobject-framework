@@ -13,6 +13,7 @@
 #include <span>
 #include <string>
 #include <type_traits>
+#include <unordered_set>
 #include <variant>
 
 #include <notstd/hash.hxx>
@@ -349,8 +350,18 @@ public:
     Random(UwbMacAddressType type);
 
     /**
+     * @brief Creates a set of UwbMacAddress from a comma-delimited string of multiple mac addresses.
+     *
+     * @param addressesString The comma-delimited string of mac addresses.
+     * @param addressType The type of each mac address.
+     * @return std::optional<std::unordered_set<UwbMacAddress>> The constructed optional set of UwbMacAddress.
+     */
+    static std::optional<std::unordered_set<UwbMacAddress>>
+    MacAddressesFromString(const std::string& addressesString, UwbMacAddressType addressType);
+
+    /**
      * @brief Creates a UwbMacAddress from a string representation of a mac address.
-     * 
+     *
      * @param addressString The mac address string.
      * @param addressType The type of mac address.
      * @return std::optional<UwbMacAddress> The constructed optional UwbMacAddress.
