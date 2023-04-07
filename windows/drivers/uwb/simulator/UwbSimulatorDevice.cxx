@@ -11,6 +11,7 @@
 #include "UwbSimulatorDeviceFile.hxx"
 #include "UwbSimulatorTracelogging.hxx"
 
+using ::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbSessionType, ::uwb::protocol::fira::UwbDeviceState;
 using windows::devices::uwb::simulator::UwbSimulatorDdiHandler;
 using windows::devices::uwb::simulator::UwbSimulatorSession;
 
@@ -160,6 +161,8 @@ UwbSimulatorDevice::Initialize()
     }
 
     m_ioQueue = ioQueue;
+
+    DeviceInitialize();
 
     return STATUS_SUCCESS;
 }
@@ -338,4 +341,53 @@ UwbSimulatorDevice::PushUwbNotification(UwbNotificationData uwbNotificationData)
             deviceFile->GetIoEventQueue()->PushNotification(uwbNotificationData);
         }
     }
+}
+
+void
+UwbSimulatorDevice::DeviceInitialize(std::chrono::duration<double> initializeTime)
+{
+    DbgPrint("initializing device");
+
+    std::this_thread::sleep_for(initializeTime);
+    DeviceUpdateState(UwbDeviceState::Ready);
+}
+
+void
+UwbSimulatorDevice::DeviceUninitialize()
+{
+    DbgPrint("uninitializing device\n");
+
+    DeviceUpdateState(UwbDeviceState::Uninitialized);
+}
+
+void
+UwbSimulatorDevice::DeviceReset()
+{
+    DbgPrint("resetting device\n");
+    DeviceUninitialize();
+    DeviceInitialize();
+}
+
+void
+UwbSimulatorDevice::DeviceUpdateState(UwbDeviceState deviceState)
+{
+    std::shared_lock deviceStateLockShared{ m_deviceStateGate };
+
+    auto deiveStateStrPrevious = magic_enum::enum_name(m_deviceState);
+    auto deviceStateStrNew = magic_enum::enum_name(deviceState);
+
+    if (m_deviceState == deviceState) {
+        DbgPrint("device already in target state %s\n", std::data(deviceStateStrNew));
+        return;
+    }
+
+    TraceLoggingWrite(
+        UwbSimulatorTraceloggingProvider,
+        "DeviceStateUpdate",
+        TraceLoggingLevel(TRACE_LEVEL_INFORMATION),
+        TraceLoggingString(std::data(deiveStateStrPrevious), "StatePrevious"),
+        TraceLoggingString(std::data(deviceStateStrNew), "StateNew"));
+
+    DbgPrint("device state change %s -> %s\n", std::data(deiveStateStrPrevious), std::data(deviceStateStrNew));
+    m_deviceState = deviceState;
 }
