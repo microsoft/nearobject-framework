@@ -537,6 +537,8 @@ UwbConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vec
 void
 UwbConnector::HandleNotifications(std::stop_token stopToken)
 {
+    LOG_INFO << "uwb notification listener started for device " << DeviceName();
+
     auto handleDriver = m_notificationHandleDriver;
 
     while (!stopToken.stop_requested()) {
@@ -608,6 +610,8 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
             });
         }
     }
+
+    LOG_INFO << "uwb notification listener stopped for device " << DeviceName();
 }
 
 std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>>
