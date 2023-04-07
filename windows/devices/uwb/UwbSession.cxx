@@ -11,7 +11,7 @@
 #include <uwb/protocols/fira/UwbException.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
-#include <windows/devices/uwb/UwbDeviceConnector.hxx>
+#include <windows/devices/uwb/UwbConnector.hxx>
 #include <windows/devices/uwb/UwbSession.hxx>
 
 using namespace windows::devices::uwb;
@@ -63,8 +63,8 @@ UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventC
         });
 
     auto uwbConnector = std::make_shared<UwbConnector>(uwbDevice->DeviceName());
-    m_uwbDeviceConnector = uwbConnector;
-    m_registeredCallbacksToken = m_uwbDeviceConnector->RegisterSessionEventCallbacks(m_sessionId, m_registeredCallbacks);
+    m_uwbSessionconnector = uwbConnector;
+    m_registeredCallbacksToken = m_uwbSessionconnector->RegisterSessionEventCallbacks(m_sessionId, m_registeredCallbacks);
 }
 
 UwbSession::UwbSession(uint32_t sessionId, UwbDevice *uwbDevice, ::uwb::protocol::fira::DeviceType deviceType) :
@@ -72,9 +72,9 @@ UwbSession::UwbSession(uint32_t sessionId, UwbDevice *uwbDevice, ::uwb::protocol
 {}
 
 std::shared_ptr<IUwbSessionDdiConnector>
-UwbSession::GetUwbDeviceConnector() noexcept
+UwbSession::GetUwbSessionConnector() noexcept
 {
-    return m_uwbDeviceConnector;
+    return m_uwbSessionconnector;
 }
 
 void
@@ -85,7 +85,7 @@ UwbSession::ConfigureImpl(const std::vector<::uwb::protocol::fira::UwbApplicatio
     UwbSessionType sessionType = UwbSessionType::RangingSession;
 
     // Request a new session from the driver.
-    auto sessionInitResultFuture = m_uwbDeviceConnector->SessionInitialize(m_sessionId, sessionType);
+    auto sessionInitResultFuture = m_uwbSessionconnector->SessionInitialize(m_sessionId, sessionType);
     if (!sessionInitResultFuture.valid()) {
         PLOG_ERROR << "failed to initialize session";
         throw UwbException(UwbStatusGeneric::Rejected);
@@ -98,7 +98,7 @@ UwbSession::ConfigureImpl(const std::vector<::uwb::protocol::fira::UwbApplicatio
     }
 
     // Set the application configuration parameters for the session.
-    auto setAppConfigParamsFuture = m_uwbDeviceConnector->SetApplicationConfigurationParameters(m_sessionId, configParams);
+    auto setAppConfigParamsFuture = m_uwbSessionconnector->SetApplicationConfigurationParameters(m_sessionId, configParams);
     if (!setAppConfigParamsFuture.valid()) {
         PLOG_ERROR << "failed to set the application configuration parameters";
         throw UwbException(UwbStatusGeneric::Rejected);
@@ -127,7 +127,7 @@ UwbSession::StartRangingImpl()
     // TODO: interface function should be modified to return a UwbStatus, and this value will be returned.
     UwbStatus status;
     uint32_t sessionId = GetId();
-    auto resultFuture = m_uwbDeviceConnector->SessionRangingStart(sessionId);
+    auto resultFuture = m_uwbSessionconnector->SessionRangingStart(sessionId);
     if (!resultFuture.valid()) {
         PLOG_ERROR << "failed to start ranging for session id " << sessionId;
         status = UwbStatusGeneric::Failed;
@@ -150,7 +150,7 @@ UwbSession::StopRangingImpl()
     // TODO: interface function should be modified to return a UwbStatus, and this value will be returned.
     UwbStatus status;
     uint32_t sessionId = GetId();
-    auto resultFuture = m_uwbDeviceConnector->SessionRangingStop(sessionId);
+    auto resultFuture = m_uwbSessionconnector->SessionRangingStop(sessionId);
     if (!resultFuture.valid()) {
         PLOG_ERROR << "failed to stop ranging for session id " << sessionId;
         status = UwbStatusGeneric::Failed;
@@ -233,7 +233,7 @@ UwbSession::GetApplicationConfigurationParametersImpl()
     constexpr auto allParameterTypesArray = magic_enum::enum_values<UwbApplicationConfigurationParameterType>();
     std::vector<UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes(std::cbegin(allParameterTypesArray), std::cend(allParameterTypesArray));
 
-    auto resultFuture = m_uwbDeviceConnector->GetApplicationConfigurationParameters(sessionId, applicationConfigurationParameterTypes);
+    auto resultFuture = m_uwbSessionconnector->GetApplicationConfigurationParameters(sessionId, applicationConfigurationParameterTypes);
     if (!resultFuture.valid()) {
         PLOG_ERROR << "failed to obtain application configuration parameters for session id " << sessionId;
         throw UwbException(UwbStatusGeneric::Failed);
@@ -284,7 +284,7 @@ void
 UwbSession::DestroyImpl()
 {
     uint32_t sessionId = GetId();
-    auto resultFuture = m_uwbDeviceConnector->SessionDeinitialize(sessionId);
+    auto resultFuture = m_uwbSessionconnector->SessionDeinitialize(sessionId);
     if (!resultFuture.valid()) {
         PLOG_ERROR << "failed to issue device deinitialization request for session id " << sessionId;
         throw UwbException(UwbStatusGeneric::Rejected);
