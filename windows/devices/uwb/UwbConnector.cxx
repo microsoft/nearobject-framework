@@ -634,13 +634,19 @@ UwbConnector::GetResolvedSessionEventCallbacks(uint32_t sessionId)
 {
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
 
-    std::vector<std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks>> sessionEventCallbacks;
+    // Lookup the set of callbacks for this session id. If the node is empty, no
+    // callbacks have ever been registered.
     auto node = m_sessionEventCallbacks.extract(sessionId);
     if (node.empty()) {
         return {};
     }
 
+    // Get a reference to the existing list of callbacks and attempt to resolve
+    // each one into a shared_ptr. If the weak pointer expired, remove it from
+    // the vector, otherwise move the shared_ptr into the new container of them
+    // to be returned to the caller. 
     auto& sessionEventCallbacksWeak = node.mapped();
+    std::vector<std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks>> sessionEventCallbacks;
     for (auto it = std::begin(sessionEventCallbacksWeak); it != std::end(sessionEventCallbacksWeak);) {
         auto& sessionEventCallbackWeak = *it;
         auto sessionEventCallback = sessionEventCallbackWeak.lock();
