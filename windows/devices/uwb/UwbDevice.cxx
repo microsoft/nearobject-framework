@@ -191,3 +191,15 @@ UwbDevice::IsEqual(const ::uwb::UwbDevice& other) const noexcept
     const auto& rhs = static_cast<const windows::devices::uwb::UwbDevice&>(other);
     return (this->DeviceName() == rhs.DeviceName());
 }
+
+std::shared_ptr<IUwbDeviceDdiConnector>
+UwbDevice::GetDeviceDdiConnector() noexcept
+{
+    return m_uwbDeviceConnector;
+}
+
+std::shared_ptr<IUwbSessionDdiConnector> 
+UwbDevice::GetSessionDdiConnector() noexcept
+{
+    return m_uwbSessionConnector;
+}
