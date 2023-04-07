@@ -27,21 +27,23 @@ public:
      * @brief Construct a new UwbSession object without callbacks.
      *
      * @param sessionId The session identifier.
+     * @param device Reference to the parent device.
      * @param uwbSessionConnector The connector used to communicate with the device.
      * @param deviceType The device type of the host in this session.
      */
-    UwbSession(uint32_t sessionId, std::shared_ptr<IUwbSessionDdiConnector> uwbSessionConnector, ::uwb::protocol::fira::DeviceType deviceType = ::uwb::protocol::fira::DeviceType::Controller);
+    UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> device, std::shared_ptr<IUwbSessionDdiConnector> uwbSessionConnector, ::uwb::protocol::fira::DeviceType deviceType = ::uwb::protocol::fira::DeviceType::Controller);
 
     /**
      * @brief Construct a new UwbSession object.
      * This also registers the callbacks with the UwbConnector
-     * 
+     *
      * @param sessionId The session identifier.
+     * @param device Reference to the parent device.
      * @param uwbSessionConnector The connector used to communicate with the device.
      * @param callbacks The event callback instance.
      * @param deviceType The device type of the host in this session.
      */
-    UwbSession(uint32_t sessionId, std::shared_ptr<IUwbSessionDdiConnector> uwbSessionConnector, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, ::uwb::protocol::fira::DeviceType deviceType = ::uwb::protocol::fira::DeviceType::Controller);
+    UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> device, std::shared_ptr<IUwbSessionDdiConnector> uwbSessionConnector, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, ::uwb::protocol::fira::DeviceType deviceType = ::uwb::protocol::fira::DeviceType::Controller);
 
 private:
     /**

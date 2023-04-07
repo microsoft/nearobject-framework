@@ -7,6 +7,7 @@
 #include <memory>
 #include <mutex>
 #include <shared_mutex>
+#include <type_traits>
 #include <unordered_set>
 
 #include <uwb/UwbMacAddress.hxx>
@@ -16,6 +17,8 @@
 
 namespace uwb
 {
+class UwbDevice;
+
 /**
  * @brief Represents a UWB session.
  */
@@ -28,19 +31,21 @@ public:
      * @brief Construct a new UwbSession object without callbacks.
      *
      * @param sessionId The session identifier.
+     * @param device The parent device of this session.
      * @param deviceType The host device type in the session (controller, controlee).
      */
-    UwbSession(uint32_t sessionId, uwb::protocol::fira::DeviceType deviceType = DeviceTypeDefault);
+    UwbSession(uint32_t sessionId, std::weak_ptr<UwbDevice> device, uwb::protocol::fira::DeviceType deviceType = DeviceTypeDefault);
 
     /**
      * @brief Construct a new UwbSession object.
      *
      *
      * @param sessionId The session identifier.
+     * @param device The parent device of this session.
      * @param callbacks The event callbacks to use.
      * @param deviceType The host device type in the session (controller, controlee).
      */
-    UwbSession(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks, uwb::protocol::fira::DeviceType deviceType = DeviceTypeDefault);
+    UwbSession(uint32_t sessionId, std::weak_ptr<UwbDevice> device, std::weak_ptr<UwbSessionEventCallbacks> callbacks, uwb::protocol::fira::DeviceType deviceType = DeviceTypeDefault);
 
     /**
      * @brief Destroy the UwbSession object.
@@ -159,6 +164,30 @@ protected:
     std::shared_ptr<UwbSessionEventCallbacks>
     ResolveEventCallbacks() noexcept;
 
+    /**
+     * @brief Attempt to resolve the parent device object instance.
+     *
+     * This is protected to prevent derived classes from obtaining the weak_ptr,
+     * which would never be useful to them.
+     *
+     * This allows derived types to obtain a properly typed smart pointer by
+     * specifying the type as the template argument. If not, it defaults to the
+     * base type.
+     *
+     * @tparam TDerived The derived type of the parent device.
+     * @return std::shared_ptr<UwbDevice>
+     */
+    template <typename TDerived = UwbDevice>
+    std::shared_ptr<UwbDevice>
+    ResolveParentDevice() noexcept
+    {
+        if constexpr (std::is_same_v<TDerived, UwbDevice>) {
+            return m_device.lock();
+        } else {
+            return dynamic_pointer_cast<TDerived>(m_device.lock());
+        }
+    }
+
 private:
     /**
      * @brief Internal function to insert a peer address to this session
@@ -229,6 +258,7 @@ protected:
     std::unordered_set<UwbMacAddress> m_peers{};
     std::shared_mutex m_callbacksGate;
     std::weak_ptr<UwbSessionEventCallbacks> m_callbacks;
+    std::weak_ptr<UwbDevice> m_device;
 };
 
 } // namespace uwb

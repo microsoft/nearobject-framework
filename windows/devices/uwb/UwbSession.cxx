@@ -9,16 +9,16 @@
 #include <wil/result.h>
 
 #include <uwb/protocols/fira/UwbException.hxx>
+#include <windows/devices/uwb/UwbConnector.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
-#include <windows/devices/uwb/UwbConnector.hxx>
 #include <windows/devices/uwb/UwbSession.hxx>
 
 using namespace windows::devices::uwb;
 using namespace ::uwb::protocol::fira;
 
-UwbSession::UwbSession(uint32_t sessionId, std::shared_ptr<IUwbSessionDdiConnector> uwbSessionConnector, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, ::uwb::protocol::fira::DeviceType deviceType) :
-    ::uwb::UwbSession(sessionId, std::move(callbacks), deviceType),
+UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> device, std::shared_ptr<IUwbSessionDdiConnector> uwbSessionConnector, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, ::uwb::protocol::fira::DeviceType deviceType) :
+    ::uwb::UwbSession(sessionId, std::move(device), std::move(callbacks), deviceType),
     m_uwbSessionConnector(std::move(uwbSessionConnector))
 {
     m_registeredCallbacks = std::make_shared<::uwb::UwbRegisteredSessionEventCallbacks>(
@@ -66,8 +66,8 @@ UwbSession::UwbSession(uint32_t sessionId, std::shared_ptr<IUwbSessionDdiConnect
     m_registeredCallbacksToken = m_uwbSessionConnector->RegisterSessionEventCallbacks(m_sessionId, m_registeredCallbacks);
 }
 
-UwbSession::UwbSession(uint32_t sessionId,  std::shared_ptr<IUwbSessionDdiConnector> uwbSessionConnector, ::uwb::protocol::fira::DeviceType deviceType) :
-    UwbSession(sessionId, std::move(uwbSessionConnector), std::weak_ptr<::uwb::UwbSessionEventCallbacks>{}, deviceType)
+UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> device, std::shared_ptr<IUwbSessionDdiConnector> uwbSessionConnector, ::uwb::protocol::fira::DeviceType deviceType) :
+    UwbSession(sessionId, std::move(device), std::move(uwbSessionConnector), std::weak_ptr<::uwb::UwbSessionEventCallbacks>{}, deviceType)
 {}
 
 std::shared_ptr<IUwbSessionDdiConnector>

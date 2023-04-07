@@ -50,7 +50,7 @@ UwbDevice::DeviceName() const noexcept
 std::shared_ptr<::uwb::UwbSession>
 UwbDevice::CreateSessionImpl(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
 {
-    return std::make_shared<UwbSession>(sessionId, m_uwbSessionConnector, std::move(callbacks));
+    return std::make_shared<UwbSession>(sessionId, shared_from_this(), m_uwbSessionConnector, std::move(callbacks));
 }
 
 std::shared_ptr<::uwb::UwbSession>
@@ -88,7 +88,7 @@ UwbDevice::ResolveSessionImpl(uint32_t sessionId)
 
     // Create an instance of the session.
     auto deviceType = std::get<DeviceType>(applicationConfigurationParameters.front().Value);
-    auto session = std::make_shared<UwbSession>(sessionId, m_uwbSessionConnector, deviceType);
+    auto session = std::make_shared<UwbSession>(sessionId, shared_from_this(), m_uwbSessionConnector, deviceType);
 
     return session;
 }
@@ -198,7 +198,7 @@ UwbDevice::GetDeviceDdiConnector() noexcept
     return m_uwbDeviceConnector;
 }
 
-std::shared_ptr<IUwbSessionDdiConnector> 
+std::shared_ptr<IUwbSessionDdiConnector>
 UwbDevice::GetSessionDdiConnector() noexcept
 {
     return m_uwbSessionConnector;
