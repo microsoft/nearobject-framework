@@ -20,6 +20,12 @@ class UwbSession;
  */
 class UwbDevice
 {
+protected:
+    /**
+     * @brief Only allow derived classes to instantiate an instance.
+     */
+    UwbDevice() = default;
+
 public:
     /**
      * @brief Creates a new UWB session with no configuration nor peers.
