@@ -540,7 +540,7 @@ NearObjectCli::AddSubcommandUwbRange(CLI::App* parent)
     auto rangeApp = parent->add_subcommand("range", "commands related to ranging")->require_subcommand()->fallthrough();
 
     // options
-    rangeApp->add_option("--SessionId", m_cliData->RangingParameters.SessionId)->capture_default_str()->required();
+    rangeApp->add_option("--SessionId", m_cliData->RangingParameters.SessionId)->required();
 
     // sub-commands
     m_uwbRangeStartApp = AddSubcommandUwbRangeStart(rangeApp);
@@ -712,7 +712,7 @@ CLI::App*
 NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
 {
     auto& applicationConfigurationParametersData = m_cliData->applicationConfigurationParametersData;
-    auto rangeStartApp = parent->add_subcommand("start", "start ranging. Please refer to Table 29 of the FiRa UCI spec for more info on the options")->fallthrough();
+    auto rangeStartApp = parent->add_subcommand("start", "start ranging")->fallthrough();
 
     // Remove labels from options
     rangeStartApp->get_formatter()->label("ENUM", "");
@@ -757,7 +757,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
 
     // uint32_t
     rangeStartApp->add_option("--RangingInterval", applicationConfigurationParametersData.rangingInterval, "Ranging interval in the unit of 1200 RSTU (1ms) between ranging rounds. Minimum should be duration of one ranging round")->capture_default_str();
-    rangeStartApp->add_option("--StsIndex", applicationConfigurationParametersData.stsIndex, "Test Mode only. See FiRa Consortium PHY Conformance Test Specification")->capture_default_str();
+    rangeStartApp->add_option("--StsIndex", applicationConfigurationParametersData.stsIndex, "4-byte value, encoded in hex. Test Mode only.")->capture_default_str();
     rangeStartApp->add_option("--SubSessionId", applicationConfigurationParametersData.subSessionId, "Sub-session ID for the controlee device. Required for Dynamic STS with responder specific sub-session key")->capture_default_str();
     rangeStartApp->add_option("--UwbInitiationTime", applicationConfigurationParametersData.uwbInitiationTime, "Value range: 0-10000")->capture_default_str();
 
@@ -829,7 +829,7 @@ CLI::App*
 NearObjectCli::AddSubcommandServiceRangeStart(CLI::App* parent)
 {
     auto& uwbConfig = m_cliData->uwbConfiguration;
-    auto rangeStartApp = parent->add_subcommand("start", "start ranging. Please refer to Table 53 of the FiRa CSML spec for more info on the options")->fallthrough();
+    auto rangeStartApp = parent->add_subcommand("start", "start ranging")->fallthrough();
 
     // TODO is there a way to put all the enums into a list of [optionName, optionDestination, optionMap] so we don't have to create the initializer list each time
 
