@@ -142,11 +142,23 @@ void
 NearObjectCliHandler::HandleGetSessionCount(std::shared_ptr<::uwb::UwbDevice> uwbDevice) noexcept
 try {
     auto sessionCount = uwbDevice->GetSessionCount();
-    if (sessionCount.has_value()) {
-        std::cout << "Session count: " << sessionCount.value() << std::endl;
-    } else {
-        std::cout << "No current sessions exist" << std::endl;
-    }
+    std::cout << "Session count: " << sessionCount << std::endl;
 } catch (...) {
     PLOG_ERROR << "failed to get session count";
+}
+
+void
+NearObjectCliHandler::HandleGetSessionState(std::shared_ptr<::uwb::UwbDevice> uwbDevice, uint32_t sessionId) noexcept
+try {
+    auto session = uwbDevice->GetSession(sessionId);
+    if (session == nullptr) {
+        PLOG_WARNING << "no session found with id " << sessionId;
+        return;
+    }
+
+    auto sessionState = session->GetSessionState();
+    std::cout << "Session state: " << magic_enum::enum_name(sessionState) << std::endl;
+
+} catch (...) {
+    PLOG_ERROR << "failed to get session state";
 }

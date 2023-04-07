@@ -149,7 +149,7 @@ UwbDevice::GetDeviceInformation()
     return GetDeviceInformationImpl();
 }
 
-std::optional<uint32_t>
+uint32_t
 UwbDevice::GetSessionCount()
 {
     PLOG_INFO << "GetSessionCount";

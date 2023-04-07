@@ -88,7 +88,7 @@ ResolveUwbDevice(const nearobject::cli::NearObjectCliDataWindows& cliData)
         return nullptr;
     }
 
-    return std::make_shared<windows::devices::uwb::UwbDevice>(deviceName);
+    return windows::devices::uwb::UwbDevice::Create(deviceName);
 }
 } // namespace detail
 
@@ -106,7 +106,7 @@ NearObjectCliHandlerWindows::ResolveUwbDevice(const nearobject::cli::NearObjectC
 void
 NearObjectCliHandlerWindows::OnDeviceArrived(const std::string& deviceName)
 {
-    auto uwbDevice = std::make_unique<windows::devices::uwb::UwbDevice>(deviceName);
+    auto uwbDevice = windows::devices::uwb::UwbDevice::Create(deviceName);
     if (!uwbDevice) {
         PLOG_ERROR << "Failed to instantiate UWB device with name " << deviceName;
         return;

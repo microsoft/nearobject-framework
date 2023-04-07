@@ -77,6 +77,14 @@ private:
     GetApplicationConfigurationParametersImpl() override;
 
     /**
+     * @brief Get the current state for this session.
+     *
+     * @return ::uwb::protocol::fira::UwbSessionState
+     */
+    virtual ::uwb::protocol::fira::UwbSessionState
+    GetSessionStateImpl() override;
+
+    /**
      * @brief Destroy the session, making it unusable.
      */
     void
@@ -89,10 +97,10 @@ protected:
      * @return std::shared_ptr<IUwbSessionDdiConnector>
      */
     std::shared_ptr<IUwbSessionDdiConnector>
-    GetUwbDeviceConnector() noexcept;
+    GetUwbSessionConnector() noexcept;
 
 private:
-    std::shared_ptr<IUwbSessionDdiConnector> m_uwbDeviceConnector;
+    std::shared_ptr<IUwbSessionDdiConnector> m_uwbSessionconnector;
     std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks> m_registeredCallbacks;
     ::uwb::RegisteredCallbackToken* m_registeredCallbacksToken;
 };

@@ -18,7 +18,7 @@ namespace detail
 std::shared_ptr<NearObjectDeviceControllerUwb>
 CreateNearObjectUwbDevice(std::string deviceName)
 {
-    auto uwbDevice = std::make_unique<windows::devices::uwb::UwbDevice>(std::move(deviceName));
+    auto uwbDevice = windows::devices::uwb::UwbDevice::Create(std::move(deviceName));
     return std::make_shared<NearObjectDeviceControllerUwb>(std::move(uwbDevice));
 }
 } // namespace detail

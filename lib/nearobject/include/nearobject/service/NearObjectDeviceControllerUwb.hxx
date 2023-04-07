@@ -22,14 +22,19 @@ class NearObjectDeviceControllerUwb :
     public NearObjectDeviceController
 {
 public:
-    NearObjectDeviceControllerUwb(std::unique_ptr<uwb::UwbDevice> uwbDevice);
+    /**
+     * @brief Construct a new NearObjectDeviceControllerUwb object.
+     *
+     * @param uwbDevice The underlying UWB device.
+     */
+    NearObjectDeviceControllerUwb(std::shared_ptr<uwb::UwbDevice> uwbDevice);
 
     /**
-     * @brief 
-     * 
-     * @param other 
-     * @return true 
-     * @return false 
+     * @brief
+     *
+     * @param other
+     * @return true
+     * @return false
      */
     bool
     IsEqual(const NearObjectDeviceController& other) const noexcept override;
@@ -39,7 +44,7 @@ private:
     StartSessionImpl(const NearObjectProfile& profile, std::weak_ptr<NearObjectSessionEventCallbacks> eventCallbacks) override;
 
 private:
-    std::unique_ptr<uwb::UwbDevice> m_uwbDevice{};
+    std::shared_ptr<::uwb::UwbDevice> m_uwbDevice{};
 };
 
 } // namespace service

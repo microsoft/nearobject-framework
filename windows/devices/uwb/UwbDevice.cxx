@@ -4,12 +4,13 @@
 #include <stdexcept>
 #include <tuple>
 
+#include <notstd/memory.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/UwbException.hxx>
+#include <windows/devices/uwb/UwbConnector.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
-#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 #include <windows/devices/uwb/UwbSession.hxx>
 
 #include <plog/Log.h>
@@ -31,6 +32,13 @@ UwbDevice::UwbDevice(std::string deviceName) :
         [this](::uwb::protocol::fira::UwbSessionStatus status) {
             return OnSessionStatusChanged(status);
         });
+}
+
+/* static */
+std::shared_ptr<UwbDevice>
+UwbDevice::Create(std::string deviceName)
+{
+    return std::make_shared<notstd::enable_make_protected<UwbDevice>>(std::move(deviceName));
 }
 
 const std::string&
@@ -126,7 +134,7 @@ UwbDevice::GetDeviceInformationImpl()
     }
 }
 
-std::optional<uint32_t>
+uint32_t
 UwbDevice::GetSessionCountImpl()
 {
     auto resultFuture = m_uwbDeviceConnector->GetSessionCount();

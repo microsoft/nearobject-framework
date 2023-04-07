@@ -103,7 +103,7 @@ public:
     virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbCapability>>
     GetCapabilities() override;
 
-    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<uint32_t>>>
+    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, uint32_t>>
     GetSessionCount() override;
 
 public:
@@ -114,7 +114,7 @@ public:
     virtual std::future<::uwb::protocol::fira::UwbStatus>
     SessionDeinitialize(uint32_t sessionId) override;
 
-    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<::uwb::protocol::fira::UwbSessionState>>>
+    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbSessionState>>
     SessionGetState(uint32_t sessionId) override;
 
     virtual std::future<::uwb::protocol::fira::UwbStatus>
@@ -171,7 +171,7 @@ private:
     /**
      * @brief Response for calling the relevant registered callbacks for the session ended event.
      * This function assumes the caller is holding the m_eventCallbacksGate
-     * 
+     *
      * @param sessionId The session identifier of the session that ended.
      * @param sessionEndReason The reason the session ended.
      */
@@ -189,14 +189,14 @@ private:
     /**
      * @brief Internal function that prepares the notification for processing by the m_sessionEventCallbacks
      * This function assumes the caller is holding the m_eventCallbacksGate
-     * 
+     *
      * @param rangingData
      */
     void
     OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData);
 
     /**
-     * @brief Internal function to check if there are callbacks present. 
+     * @brief Internal function to check if there are callbacks present.
      * This function assumes the caller is holding the m_eventCallbacksGate
      *
      * @return true
@@ -205,11 +205,32 @@ private:
     bool
     CallbacksPresent();
 
+    /**
+     * @brief Get a copy of the resolved session event callbacks for a particular session.
+     *
+     * This function removes expired callbacks in the process of making the copies.
+     *
+     * @param sessionId The session id to obtain registered callbacks for.
+     * @return std::vector<std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks>>
+     */
+    std::vector<std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks>>
+    GetResolvedSessionEventCallbacks(uint32_t sessionId);
+
+    /**
+     * @brief Get a copy of the resolved device event callbacks.
+     *
+     * This function removes expired callbacks in the process of making the copies.
+     *
+     * @return std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>>
+     */
+    std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>>
+    GetResolvedDeviceEventCallbacks();
+
 private:
     // the following shared_mutex is used to protect access to both session and device event callbacks
     mutable std::shared_mutex m_eventCallbacksGate;
-    std::unordered_map<uint32_t, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks>> m_sessionEventCallbacks;
-    std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> m_deviceEventCallbacks;
+    std::unordered_map<uint32_t, std::vector<std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks>>> m_sessionEventCallbacks;
+    std::vector<std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>> m_deviceEventCallbacks;
     std::string m_deviceName{};
     std::jthread m_notificationThread;
     wil::shared_hfile m_notificationHandleDriver;

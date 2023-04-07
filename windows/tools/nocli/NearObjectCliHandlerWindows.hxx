@@ -34,7 +34,7 @@ private:
     OnDeviceDeparted(const std::string& deviceName);
 
 private:
-    std::vector<std::unique_ptr<windows::devices::uwb::UwbDevice>> m_uwbDevices;
+    std::vector<std::shared_ptr<windows::devices::uwb::UwbDevice>> m_uwbDevices;
 };
 } // namespace nearobject::cli
 
