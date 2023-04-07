@@ -714,6 +714,12 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     auto& applicationConfigurationParametersData = m_cliData->applicationConfigurationParametersData;
     auto rangeStartApp = parent->add_subcommand("start", "start ranging. Please refer to Table 29 of the FiRa UCI spec for more info on the options")->fallthrough();
 
+    // Remove labels from options
+    rangeStartApp->get_formatter()->label("ENUM", "");
+    rangeStartApp->get_formatter()->label("TEXT", "");
+    rangeStartApp->get_formatter()->label("UINT", "");
+    rangeStartApp->get_formatter()->label("[UINT,UINT,UINT,UINT,UINT,UINT]", "");
+
     // List mandatory params first
     detail::AddEnumOption(rangeStartApp, applicationConfigurationParametersData.deviceRole, true);
     detail::AddEnumOption(rangeStartApp, applicationConfigurationParametersData.multiNodeMode, true);
