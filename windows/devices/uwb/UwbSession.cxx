@@ -242,7 +242,7 @@ UwbSession::GetApplicationConfigurationParametersImpl()
     try {
         auto [uwbStatus, applicationConfigurationParameters] = resultFuture.get();
         if (!IsUwbStatusOk(uwbStatus)) {
-            // TODO: this value should be returned
+            throw UwbException(uwbStatus);
         }
         return applicationConfigurationParameters;
     } catch (UwbException &uwbException) {
