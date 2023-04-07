@@ -259,7 +259,7 @@ UwbSession::GetSessionStateImpl()
 {
     uint32_t sessionId = GetId();
 
-    auto resultFuture = m_uwbDeviceConnector->SessionGetState(sessionId);
+    auto resultFuture = m_uwbSessionconnector->SessionGetState(sessionId);
     if (!resultFuture.valid()) {
         PLOG_ERROR << "failed to obtain session state for session id " << sessionId;
         throw UwbException(UwbStatusGeneric::Failed);
