@@ -623,6 +623,7 @@ UwbConnector::GetResolvedDeviceEventCallbacks()
         auto deviceEventCallback = deviceEventCallbackWeak.lock();
         if (deviceEventCallback != nullptr) {
             deviceEventCallbacks.push_back(std::move(deviceEventCallback));
+            it = std::next(it);
         } else {
             it = m_deviceEventCallbacks.erase(it);
         }
@@ -654,6 +655,7 @@ UwbConnector::GetResolvedSessionEventCallbacks(uint32_t sessionId)
         auto sessionEventCallback = sessionEventCallbackWeak.lock();
         if (sessionEventCallback != nullptr) {
             sessionEventCallbacks.push_back(std::move(sessionEventCallback));
+            it = std::next(it);
         } else {
             it = sessionEventCallbacksWeak.erase(it);
         }
@@ -808,6 +810,8 @@ UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNo
     constexpr auto getSessionStatusChangedCallback = [](auto&& callbacks) {
         return callbacks->OnSessionStatusChanged;
     };
+
+    LOG_DEBUG << "received notification: " << ToString(uwbNotificationData);
 
     std::visit([this](auto&& arg) {
         using ValueType = std::decay_t<decltype(arg)>;
