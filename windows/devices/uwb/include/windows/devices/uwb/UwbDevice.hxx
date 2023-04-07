@@ -34,15 +34,26 @@ namespace windows::devices::uwb
  * UWB DDI.
  */
 class UwbDevice :
-    public ::uwb::UwbDevice
+    public ::uwb::UwbDevice,
+    public std::enable_shared_from_this<UwbDevice>
 {
-public:
+protected:
     /**
      * @brief Construct a new Uwb Device object.
      *
      * @param deviceName The interface path name.
      */
     explicit UwbDevice(std::string deviceName);
+
+public:
+    /**
+     * @brief Create a new UwbDevice object instance.
+     *
+     * @param deviceName The interface path name.
+     * @return std::shared_ptr<UwbDevice>
+     */
+    static std::shared_ptr<UwbDevice>
+    Create(std::string deviceName);
 
     /**
      * @brief Get the name of this device.

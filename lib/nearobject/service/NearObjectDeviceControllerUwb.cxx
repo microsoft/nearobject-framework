@@ -5,7 +5,7 @@
 
 using namespace nearobject::service;
 
-NearObjectDeviceControllerUwb::NearObjectDeviceControllerUwb(std::unique_ptr<uwb::UwbDevice> uwbDevice) :
+NearObjectDeviceControllerUwb::NearObjectDeviceControllerUwb(std::shared_ptr<uwb::UwbDevice> uwbDevice) :
     m_uwbDevice(std::move(uwbDevice))
 {
 }
