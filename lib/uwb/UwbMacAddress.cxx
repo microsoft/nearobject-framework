@@ -89,9 +89,6 @@ UwbMacAddress::Random(UwbMacAddressType type)
 std::optional<std::unordered_set<UwbMacAddress>>
 UwbMacAddress::MacAddressesFromString(const std::string& addressesString, UwbMacAddressType addressType)
 {
-    const std::regex singleShortRegex(R"(([0-9A-Fa-f]{2}:){1}([0-9A-Fa-f]{2}))");
-    const std::regex singleExtendedRegex(R"((([0-9A-Fa-f]{2}:){7}[0-9A-Fa-f]{2}))");
-
     const std::regex shortRegex("^([0-9A-Fa-f]{2}:){1}([0-9A-Fa-f]{2})(,([0-9A-Fa-f]{2}:){1}([0-9A-Fa-f]{2}))*$");
     const std::regex extendedRegex("^([0-9A-Fa-f]{2}:){7}([0-9A-Fa-f]{2})(,([0-9A-Fa-f]{2}:){7}([0-9A-Fa-f]{2}))*$");
 
