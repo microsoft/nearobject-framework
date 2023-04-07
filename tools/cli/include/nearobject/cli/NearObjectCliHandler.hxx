@@ -115,6 +115,14 @@ struct NearObjectCliHandler
     virtual void
     HandleGetSessionCount(std::shared_ptr<::uwb::UwbDevice> uwbDevice) noexcept;
 
+    /**
+     * @brief Invoked by the command-line driver when the request is to get the current state of a session.
+     *
+     * @param uwbDevice
+     */
+    virtual void
+    HandleGetSessionState(std::shared_ptr<::uwb::UwbDevice> uwbDevice, uint32_t sessionId) noexcept;
+
 private:
     NearObjectCli* m_parent;
     std::shared_ptr<::uwb::UwbDevice> m_activeDevice;

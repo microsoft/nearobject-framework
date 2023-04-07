@@ -30,7 +30,7 @@ struct IUwbSessionDdi
     SessionDeinitialize(uint32_t sessionId) = 0;
 
     // IOCTL_UWB_GET_SESSION_STATE
-    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<::uwb::protocol::fira::UwbSessionState>>>
+    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbSessionState>>
     SessionGetState(uint32_t sessionId) = 0;
 
     // IOCTL_UWB_START_RANGING_SESSION

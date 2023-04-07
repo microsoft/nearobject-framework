@@ -77,6 +77,14 @@ private:
     GetApplicationConfigurationParametersImpl() override;
 
     /**
+     * @brief Get the current state for this session.
+     *
+     * @return ::uwb::protocol::fira::UwbSessionState
+     */
+    virtual ::uwb::protocol::fira::UwbSessionState
+    GetSessionStateImpl() override;
+
+    /**
      * @brief Destroy the session, making it unusable.
      */
     void

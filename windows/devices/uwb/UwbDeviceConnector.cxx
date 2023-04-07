@@ -294,12 +294,42 @@ UwbConnector::SessionDeinitialize(uint32_t sessionId)
     return resultFuture;
 }
 
-std::future<std::tuple<UwbStatus, std::optional<UwbSessionState>>>
+std::future<std::tuple<UwbStatus, UwbSessionState>>
 UwbConnector::SessionGetState(uint32_t sessionId)
 {
-    std::promise<std::tuple<UwbStatus, std::optional<UwbSessionState>>> resultPromise;
+    std::promise<std::tuple<UwbStatus, UwbSessionState>> resultPromise;
     auto resultFuture = resultPromise.get_future();
-    // TODO: invoke IOCTL_UWB_GET_SESSION_STATE
+
+    wil::shared_hfile handleDriver;
+    auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
+    if (FAILED(hr)) {
+        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
+        return resultFuture;
+    }
+
+    const UWB_GET_SESSION_STATE getSessionState{
+        .size = sizeof(UWB_GET_SESSION_STATE),
+        .sessionId = sessionId
+    };
+    UWB_SESSION_STATE_STATUS sessionStateStatus;
+
+    BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_SESSION_STATE, const_cast<UWB_GET_SESSION_STATE*>(&getSessionState), sizeof getSessionState, &sessionStateStatus, sizeof sessionStateStatus, nullptr, nullptr);
+    if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
+        HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
+        PLOG_ERROR << "error when sending IOCTL_UWB_GET_SESSION_STATE for session id " << sessionId
+                   << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
+        return resultFuture;
+    } else {
+        PLOG_DEBUG << "IOCTL_UWB_GET_SESSION_STATE succeeded";
+        auto uwbStatus = UwbCxDdi::To(sessionStateStatus.status);
+        if (!IsUwbStatusOk(uwbStatus)) {
+            resultPromise.set_exception(std::make_exception_ptr(UwbException(std::move(uwbStatus))));
+        } else {
+            resultPromise.set_value(std::move(std::make_tuple(uwbStatus, UwbCxDdi::To(sessionStateStatus.sessionState))));
+        }
+    }
 
     return resultFuture;
 }

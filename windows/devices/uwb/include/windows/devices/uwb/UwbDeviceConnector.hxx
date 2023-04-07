@@ -114,7 +114,7 @@ public:
     virtual std::future<::uwb::protocol::fira::UwbStatus>
     SessionDeinitialize(uint32_t sessionId) override;
 
-    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<::uwb::protocol::fira::UwbSessionState>>>
+    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbSessionState>>
     SessionGetState(uint32_t sessionId) override;
 
     virtual std::future<::uwb::protocol::fira::UwbStatus>

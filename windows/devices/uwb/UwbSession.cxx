@@ -242,7 +242,7 @@ UwbSession::GetApplicationConfigurationParametersImpl()
     try {
         auto [uwbStatus, applicationConfigurationParameters] = resultFuture.get();
         if (!IsUwbStatusOk(uwbStatus)) {
-            // TODO: this value should be returned
+            throw UwbException(uwbStatus);
         }
         return applicationConfigurationParameters;
     } catch (UwbException &uwbException) {
@@ -250,6 +250,32 @@ UwbSession::GetApplicationConfigurationParametersImpl()
         throw uwbException;
     } catch (std::exception &e) {
         PLOG_ERROR << "caught unexpected exception attempting to obtain application configuration parameters for session id " << sessionId << " (" << e.what() << ")";
+        throw e;
+    }
+}
+
+UwbSessionState
+UwbSession::GetSessionStateImpl()
+{
+    uint32_t sessionId = GetId();
+
+    auto resultFuture = m_uwbDeviceConnector->SessionGetState(sessionId);
+    if (!resultFuture.valid()) {
+        PLOG_ERROR << "failed to obtain session state for session id " << sessionId;
+        throw UwbException(UwbStatusGeneric::Failed);
+    }
+
+    try {
+        auto [uwbStatus, sessionState] = resultFuture.get();
+        if (!IsUwbStatusOk(uwbStatus)) {
+            // TODO: this value should be returned
+        }
+        return sessionState;
+    } catch (UwbException &uwbException) {
+        PLOG_ERROR << "caught exception attempting to obtain session state for session id " << sessionId << " (" << ToString(uwbException.Status) << ")";
+        throw uwbException;
+    } catch (std::exception &e) {
+        PLOG_ERROR << "caught unexpected exception attempting to obtain session state for session id " << sessionId << " (" << e.what() << ")";
         throw e;
     }
 }
