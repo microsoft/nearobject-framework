@@ -613,6 +613,8 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
 std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>>
 UwbConnector::GetResolvedDeviceEventCallbacks()
 {
+    std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
+
     std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>> deviceEventCallbacks;
     deviceEventCallbacks.reserve(std::size(m_deviceEventCallbacks));
 
