@@ -103,12 +103,15 @@ UwbSimulatorDdiHandler::OnUwbGetDeviceInformation(WDFREQUEST request, std::span<
 
     // Convert neutral type to DDI output type.
     auto uwbDeviceInformation = UwbCxDdi::From(deviceInformation);
-    outputSize = std::size(uwbDeviceInformation);
+    auto uwbDeviceInformationBuffer = std::data(uwbDeviceInformation);
+    auto uwbDeviceInformationBufferSize = std::size(uwbDeviceInformationBuffer);
 
-    // Update output buffer if sufficiently sized.
-    if (std::size(outputBuffer) >= outputSize) {
-        std::memcpy(std::data(outputBuffer), std::data(std::data(uwbDeviceInformation)), outputSize);
-    } else {
+    // Clamp the output size to what the size field reported, and copy that data to the output buffer.
+    outputSize = std::clamp(uwbDeviceInformationBufferSize, std::size_t(0), std::size(outputBuffer));
+    std::memcpy(std::data(outputBuffer), std::data(uwbDeviceInformationBuffer), outputSize);
+
+    // If the output buffer was too small, indicate a buffer overflow would have occurred.
+    if (outputSize < uwbDeviceInformationBufferSize) {
         status = STATUS_BUFFER_OVERFLOW;
     }
 
@@ -131,12 +134,15 @@ UwbSimulatorDdiHandler::OnUwbGetDeviceCapabilities(WDFREQUEST request, std::span
 
     // Convert neutral type to DDI output type.
     auto uwbCapabilities = UwbCxDdi::From(deviceCapabilities);
-    outputSize = std::size(uwbCapabilities);
+    auto uwbCapabilitiesBuffer = std::data(uwbCapabilities);
+    auto uwbCapabilitiesBufferSize = std::size(uwbCapabilitiesBuffer);
 
-    // Update output buffer if sufficiently sized.
-    if (std::size(outputBuffer) >= outputSize) {
-        std::memcpy(std::data(outputBuffer), std::data(std::data(uwbCapabilities)), outputSize);
-    } else {
+    // Clamp the output size to what the size field reported, and copy that data to the output buffer.
+    outputSize = std::clamp(uwbCapabilitiesBufferSize, std::size_t(0), std::size(outputBuffer));
+    std::memcpy(std::data(outputBuffer), std::data(uwbCapabilitiesBuffer), outputSize);
+
+    // If the output buffer was too small, indicate a buffer overflow would have occurred.
+    if (outputSize < uwbCapabilitiesBufferSize) {
         status = STATUS_BUFFER_OVERFLOW;
     }
 
@@ -217,10 +223,14 @@ UwbSimulatorDdiHandler::OnUwbGetApplicationConfigurationParameters(WDFREQUEST re
     if (IsUwbStatusOk(statusUwb)) {
         auto applicationConfigurationParametersWrapper = UwbCxDdi::From(uwbApplicationConfigurationParameters);
         auto applicationConfigurationParameterBuffer = std::data(applicationConfigurationParametersWrapper);
-        outputSize = std::size(applicationConfigurationParameterBuffer);
-        if (std::size(outputBuffer) >= outputSize) {
-            std::ranges::copy(applicationConfigurationParameterBuffer, std::begin(outputBuffer));
-        } else {
+        auto applicationConfigurationParameterBufferSize = std::size(applicationConfigurationParameterBuffer);
+
+        // Clamp the output size to what the size field reported, and copy that data to the output buffer.
+        outputSize = std::clamp(applicationConfigurationParameterBufferSize, std::size_t(0), std::size(outputBuffer));
+        std::memcpy(std::data(outputBuffer), std::data(applicationConfigurationParameterBuffer), outputSize);
+
+        // If the output buffer was too small, indicate a buffer overflow would have occurred.
+        if (outputSize < applicationConfigurationParameterBufferSize) {
             status = STATUS_BUFFER_OVERFLOW;
         }
     } else {
