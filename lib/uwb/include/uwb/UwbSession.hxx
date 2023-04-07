@@ -184,7 +184,7 @@ protected:
         if constexpr (std::is_same_v<TDerived, UwbDevice>) {
             return m_device.lock();
         } else {
-            return dynamic_pointer_cast<TDerived>(m_device.lock());
+            return std::dynamic_pointer_cast<TDerived>(m_device.lock());
         }
     }
 
