@@ -723,13 +723,13 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     // List mandatory params first
     detail::AddEnumOption(rangeStartApp, applicationConfigurationParametersData.deviceRole, true);
     detail::AddEnumOption(rangeStartApp, applicationConfigurationParametersData.multiNodeMode, true);
-    rangeStartApp->add_option("--NumberOfControlees", applicationConfigurationParametersData.numberOfControlees, "1 <= N <= 8")->capture_default_str()->required();
+    rangeStartApp->add_option("--NumberOfControlees", applicationConfigurationParametersData.numberOfControlees, "1-byte integer. Value in { 1-8 }")->capture_default_str()->required();
 
-    std::string deviceMacAddressDescription = "2-byte short MAC address of own device: e.g. 12:34";
-    std::string dstMacAddressDescription = "2-byte short MAC address(es) of other device(s). If device is Controller, list NumberOfControlees mac addresses. If device is Controlee, list Controller mac address";
+    std::string deviceMacAddressDescription = "2-byte hexadecimal value, colon-delimited. Short MAC address of own device, e.g. 12:34";
+    std::string dstMacAddressDescription = "Comma-delimited array with 2-byte hexadecimal values, colon-delimited. Short MAC address(es) of other device(s). If device is Controller, list NumberOfControlees mac addresses. If device is Controlee, list Controller mac address";
     if (applicationConfigurationParametersData.macAddressMode == uwb::UwbMacAddressType::Extended) { // TODO: Enable macAddressMode to be set before checking this value. Otherwise, the default empty value will always be used
-        deviceMacAddressDescription = "8-byte extended MAC address of own device: e.g. 12:34:56:78:87:65:43:21";
-        dstMacAddressDescription = "8-byte extended MAC address(es) of other device(s). If device is Controller, list NumberOfControlees mac addresses. If device is Controlee, list Controller mac address";
+        deviceMacAddressDescription = "8-byte hexadecimal value, colon-delimited. Extended MAC address of own device, e.g. 12:34:56:78:87:65:43:21";
+        dstMacAddressDescription = "Comma-delimited array with 8-byte hexadecimal values, colon-delimited. Extended MAC address(es) of other device(s). If device is Controller, list NumberOfControlees mac addresses. If device is Controlee, list Controller mac address";
     }
     rangeStartApp->add_option("--DeviceMacAddress", m_cliData->deviceMacAddressString, deviceMacAddressDescription)->capture_default_str()->required();
     rangeStartApp->add_option("--DestinationMacAddress", m_cliData->destinationMacAddressString, dstMacAddressDescription)->capture_default_str()->required();
@@ -737,32 +737,32 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
 
     // List remaining params
     // uint8_t
-    rangeStartApp->add_option("--BlockStrideLength", applicationConfigurationParametersData.blockStrideLength, "0 = No block striding; 1-255 = Number of ranging blocks to be skipped")->capture_default_str();
-    rangeStartApp->add_option("--InBandTerminationAttemptCount", applicationConfigurationParametersData.inBandTerminationAttemptCount, "0 = Disable in-band termination attempt; 1-10 = In-band termination attempt count")->capture_default_str();
-    rangeStartApp->add_option("--KeyRotationRate", applicationConfigurationParametersData.keyRotationRate, "Exponent n where 2^n is the key rotation rate. Value range: 0-15")->capture_default_str();
-    rangeStartApp->add_option("--NumberOfStsSegments", applicationConfigurationParametersData.numberOfStsSegments, "Value range: 0-4. Note: 2-4 for HPRF Mode only")->capture_default_str();
-    rangeStartApp->add_option("--PreambleCodeIndex", applicationConfigurationParametersData.preambleCodeIndex, "Value range: 9-12 for BPRF Mode; 25-32 for HPRF Mode")->capture_default_str();
-    rangeStartApp->add_option("--ResponderSlotIndex", applicationConfigurationParametersData.responderSlotIndex, "Responder index in TWR. 1=Responder 1 ... N=Responder N. Not applicable to Initiator")->capture_default_str();
-    rangeStartApp->add_option("--SessionPriority", applicationConfigurationParametersData.sessionPriority, "Value range: 1-100")->capture_default_str();
-    rangeStartApp->add_option("--SfdId", applicationConfigurationParametersData.sfdId, "{0,2} for BPRF Mode; {1,2,3,4} for HPRF Mode")->capture_default_str();
-    rangeStartApp->add_option("--SlotsPerRangingRound", applicationConfigurationParametersData.slotsPerRangingRound, "Number of slots per ranging round")->capture_default_str();
+    rangeStartApp->add_option("--BlockStrideLength", applicationConfigurationParametersData.blockStrideLength, "1-byte integer. Value in { 0(No block striding), 1-MAX(Number of ranging blocks to be skipped) }")->capture_default_str();
+    rangeStartApp->add_option("--InBandTerminationAttemptCount", applicationConfigurationParametersData.inBandTerminationAttemptCount, "1-byte integer. Value in { 0(Disable), 1-10(In-band termination attempt count) }")->capture_default_str();
+    rangeStartApp->add_option("--KeyRotationRate", applicationConfigurationParametersData.keyRotationRate, "1-byte integer. Exponent n where 2^n is the key rotation rate. Value in { 0-15 }")->capture_default_str();
+    rangeStartApp->add_option("--NumberOfStsSegments", applicationConfigurationParametersData.numberOfStsSegments, "1-byte integer. Value in { 0-4 }. Note: 2-4 for HPRF Mode only")->capture_default_str();
+    rangeStartApp->add_option("--PreambleCodeIndex", applicationConfigurationParametersData.preambleCodeIndex, "1-byte integer. Value in { 9-12(BPRF), 25-32(HPRF) }")->capture_default_str();
+    rangeStartApp->add_option("--ResponderSlotIndex", applicationConfigurationParametersData.responderSlotIndex, "1-byte integer. Responder index in TWR. Value in { 1-N(Number of responders) }")->capture_default_str();
+    rangeStartApp->add_option("--SessionPriority", applicationConfigurationParametersData.sessionPriority, "1-byte integer. Value in { 1-100 }")->capture_default_str();
+    rangeStartApp->add_option("--SfdId", applicationConfigurationParametersData.sfdId, "1-byte integer. Value in { 0, 2 } for BPRF Mode; { 1-4 } for HPRF Mode")->capture_default_str();
+    rangeStartApp->add_option("--SlotsPerRangingRound", applicationConfigurationParametersData.slotsPerRangingRound, "1-byte integer. Value in { 0-MAX }")->capture_default_str();
 
     // uint16_t
-    rangeStartApp->add_option("--MaxNumberOfMeasurements", applicationConfigurationParametersData.maxNumberOfMeasurements, "0 = Unlimited; 1+ = Max number of ranging measurements in a session")->capture_default_str();
-    rangeStartApp->add_option("--MaxRangingRoundRetry", applicationConfigurationParametersData.maxRangingRoundRetry, "Number of failed RR attempts before stopping the session. Value range: 0-65535")->capture_default_str();
-    rangeStartApp->add_option("--RangeDataNotificationProximityFar", applicationConfigurationParametersData.rangeDataNotificationProximityFar, "Upper bound in cm for ranging proximity mode. N >= RangeDataNotificationProximityNear")->capture_default_str();
-    rangeStartApp->add_option("--RangeDataNotificationProximityNear", applicationConfigurationParametersData.rangeDataNotificationProximityNear, "Lower bound in cm for ranging proximity mode. N <= RangeDataNotificationProximityFar")->capture_default_str();
-    rangeStartApp->add_option("--SlotDuration", applicationConfigurationParametersData.slotDuration, "Duration of a ranging slot in the unit of RSTU")->capture_default_str();
-    rangeStartApp->add_option("--VendorId", applicationConfigurationParametersData.vendorId, "Unique ID for vendor. Used for static STS")->capture_default_str();
+    rangeStartApp->add_option("--MaxNumberOfMeasurements", applicationConfigurationParametersData.maxNumberOfMeasurements, "2-byte integer. Value in { 0(Unlimited), 1-MAX(Max number of ranging measurements in a session) }")->capture_default_str();
+    rangeStartApp->add_option("--MaxRangingRoundRetry", applicationConfigurationParametersData.maxRangingRoundRetry, "2-byte integer. Number of failed RR attempts before stopping the session. Value in { 0-MAX }")->capture_default_str();
+    rangeStartApp->add_option("--RangeDataNotificationProximityFar", applicationConfigurationParametersData.rangeDataNotificationProximityFar, "2-byte integer. Upper bound in cm for ranging proximity mode. Value in { RangeDataNotificationProximityNear-MAX }")->capture_default_str();
+    rangeStartApp->add_option("--RangeDataNotificationProximityNear", applicationConfigurationParametersData.rangeDataNotificationProximityNear, "2-byte integer. Lower bound in cm for ranging proximity mode. Value in { 0-RangeDataNotificationProximityFar }")->capture_default_str();
+    rangeStartApp->add_option("--SlotDuration", applicationConfigurationParametersData.slotDuration, "2-byte integer. Duration of a ranging slot in the unit of RSTU. Value in { 0-MAX }")->capture_default_str();
+    rangeStartApp->add_option("--VendorId", applicationConfigurationParametersData.vendorId, "2-byte hexadecimal value. Unique ID for vendor. Used for static STS")->capture_default_str();
 
     // uint32_t
-    rangeStartApp->add_option("--RangingInterval", applicationConfigurationParametersData.rangingInterval, "Ranging interval in the unit of 1200 RSTU (1ms) between ranging rounds. Minimum should be duration of one ranging round")->capture_default_str();
-    rangeStartApp->add_option("--StsIndex", applicationConfigurationParametersData.stsIndex, "4-byte value, encoded in hex. Test Mode only.")->capture_default_str();
-    rangeStartApp->add_option("--SubSessionId", applicationConfigurationParametersData.subSessionId, "Sub-session ID for the controlee device. Required for Dynamic STS with responder specific sub-session key")->capture_default_str();
-    rangeStartApp->add_option("--UwbInitiationTime", applicationConfigurationParametersData.uwbInitiationTime, "Value range: 0-10000")->capture_default_str();
+    rangeStartApp->add_option("--RangingInterval", applicationConfigurationParametersData.rangingInterval, "4-byte integer. Ranging interval in the unit of 1200 RSTU (1ms) between ranging rounds. Value in { Duration of one ranging round-MAX }")->capture_default_str();
+    rangeStartApp->add_option("--StsIndex", applicationConfigurationParametersData.stsIndex, "4-byte hexadecimal value. Test Mode only.")->capture_default_str();
+    rangeStartApp->add_option("--SubSessionId", applicationConfigurationParametersData.subSessionId, "4-byte hexadecimal value. Sub-session ID for the controlee device. Required for Dynamic STS with responder specific sub-session key")->capture_default_str();
+    rangeStartApp->add_option("--UwbInitiationTime", applicationConfigurationParametersData.uwbInitiationTime, "4-byte integer. UWB initiation time in the unit of 1200 RSTU (1ms). Value in { 0-10000 }")->capture_default_str();
 
     // bool
-    rangeStartApp->add_flag("--HoppingMode", applicationConfigurationParametersData.hoppingMode, "Enables FiRa hopping");
+    rangeStartApp->add_flag("--HoppingMode", applicationConfigurationParametersData.hoppingMode, "Flag. Setting this enables FiRa hopping");
 
     // enums
     detail::AddEnumOption(rangeStartApp, applicationConfigurationParametersData.aoaResultRequest);
@@ -782,8 +782,8 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     detail::AddEnumOption(rangeStartApp, applicationConfigurationParametersData.txAdaptivePayloadPower);
 
     // other
-    rangeStartApp->add_option("--ResultReportConfig", m_cliData->resultReportConfigurationString, "4-bit report config, e.g. 0101. b3=AOA FOM, b2=AOA Elevation, b1=AOA Azimuth, b0=TOF")->capture_default_str();
-    rangeStartApp->add_option("--StaticStsInitializationVector", applicationConfigurationParametersData.staticStsIv, "6-octet array for vendor-defined static STS initialization vector, e.g. 11:22:33:44:55:66")->delimiter(':');
+    rangeStartApp->add_option("--ResultReportConfig", m_cliData->resultReportConfigurationString, "4-bit value, encoded as bit string, e.g. 0101. b3(AOA FOM), b2(AOA Elevation), b1(AOA Azimuth), b0(TOF)")->capture_default_str();
+    rangeStartApp->add_option("--StaticStsInitializationVector", applicationConfigurationParametersData.staticStsIv, "6-byte hexadecimal value, colon-delimited. Vendor-defined static STS initialization vector, e.g. 11:22:33:44:55:66")->delimiter(':');
 
     rangeStartApp->parse_complete_callback([this, rangeStartApp] {
         m_cliData->RangingParameters.ApplicationConfigurationParameters = detail::ProcessApplicationConfigurationParameters(*m_cliData);
