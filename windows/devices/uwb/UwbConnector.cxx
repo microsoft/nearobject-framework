@@ -11,9 +11,9 @@
 #include <uwb/UwbPeer.hxx>
 #include <uwb/protocols/fira/UwbException.hxx>
 #include <windows/devices/DeviceHandle.hxx>
+#include <windows/devices/uwb/UwbConnector.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
-#include <windows/devices/uwb/UwbConnector.hxx>
 
 using namespace windows::devices;
 using namespace windows::devices::uwb;
@@ -610,42 +610,79 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
     }
 }
 
+std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>>
+UwbConnector::GetResolvedDeviceEventCallbacks()
+{
+    std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>> deviceEventCallbacks;
+    deviceEventCallbacks.reserve(std::size(m_deviceEventCallbacks));
+
+    for (auto it = std::begin(m_deviceEventCallbacks); it != std::end(m_deviceEventCallbacks);) {
+        auto& deviceEventCallbackWeak = *it;
+        auto deviceEventCallback = deviceEventCallbackWeak.lock();
+        if (deviceEventCallback != nullptr) {
+            deviceEventCallbacks.push_back(std::move(deviceEventCallback));
+        } else {
+            it = m_deviceEventCallbacks.erase(it);
+        }
+    }
+
+    return deviceEventCallbacks;
+}
+
+std::vector<std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks>>
+UwbConnector::GetResolvedSessionEventCallbacks(uint32_t sessionId)
+{
+    std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
+
+    std::vector<std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks>> sessionEventCallbacks;
+    auto node = m_sessionEventCallbacks.extract(sessionId);
+    if (node.empty()) {
+        return {};
+    }
+
+    auto& sessionEventCallbacksWeak = node.mapped();
+    for (auto it = std::begin(sessionEventCallbacksWeak); it != std::end(sessionEventCallbacksWeak);) {
+        auto& sessionEventCallbackWeak = *it;
+        auto sessionEventCallback = sessionEventCallbackWeak.lock();
+        if (sessionEventCallback != nullptr) {
+            sessionEventCallbacks.push_back(std::move(sessionEventCallback));
+        } else {
+            it = sessionEventCallbacksWeak.erase(it);
+        }
+    }
+
+    m_sessionEventCallbacks.insert(std::move(node));
+
+    return sessionEventCallbacks;
+}
+
 void
 UwbConnector::OnSessionEnded(uint32_t sessionId, ::uwb::UwbSessionEndReason sessionEndReason)
 {
-    auto it = m_sessionEventCallbacks.find(sessionId);
-    if (it == std::end(m_sessionEventCallbacks)) {
-        PLOG_WARNING << "Ignoring SessionEnded event due to missing session callback";
+    auto sessionEventCallbacks = GetResolvedSessionEventCallbacks(sessionId);
+    if (sessionEventCallbacks.empty()) {
+        PLOG_DEBUG << "Ignoring SessionEnded event due to missing session callback";
         return;
     }
 
-    auto& [_, callbacksWeak] = *it;
-    auto callbacks = callbacksWeak.lock();
-    if (callbacks->OnSessionEnded == nullptr) {
-        PLOG_WARNING << "Ignoring SessionEnded event due to missing session callback";
-        m_sessionEventCallbacks.erase(it);
-        return;
-    }
+    PLOG_VERBOSE << "Session with id " << sessionId << " executing callbacks for session ended";
 
-    PLOG_VERBOSE << "Session with id " << sessionId << " executing callback for session ended";
-    callbacks->OnSessionEnded(sessionEndReason);
+    constexpr auto hasOnSessionEnded = [](auto&& callback) {
+        return callback->OnSessionEnded != nullptr;
+    };
+    std::ranges::for_each(sessionEventCallbacks | std::views::filter(hasOnSessionEnded), [&](auto&& callback) {
+        callback->OnSessionEnded(sessionEndReason);
+    });
 }
 
 void
 UwbConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList)
 {
     uint32_t sessionId = statusMulticastList.SessionId;
-    auto it = m_sessionEventCallbacks.find(sessionId);
-    if (it == std::end(m_sessionEventCallbacks)) {
-        PLOG_WARNING << "Ignoring MulticastListStatus event due to missing session callback";
-        return;
-    }
 
-    auto& [_, callbacksWeak] = *it;
-    auto callbacks = callbacksWeak.lock();
-    if (not(callbacks) or not(callbacks->OnSessionMembershipChanged)) {
-        PLOG_WARNING << "Ignoring MulticastListStatus event due to missing session callback";
-        m_sessionEventCallbacks.erase(it);
+    auto sessionEventCallbacks = GetResolvedSessionEventCallbacks(sessionId);
+    if (sessionEventCallbacks.empty()) {
+        PLOG_DEBUG << "Ignoring MulticastListStatus event due to missing session callback";
         return;
     }
 
@@ -657,7 +694,13 @@ UwbConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpda
     }
 
     PLOG_VERBOSE << "Session with id " << statusMulticastList.SessionId << " executing callback for adding peers";
-    callbacks->OnSessionMembershipChanged(peersAdded, {});
+
+    constexpr auto hasOnSessionMembershipChanged = [](auto&& callback) {
+        return callback->OnSessionMembershipChanged != nullptr;
+    };
+    std::ranges::for_each(sessionEventCallbacks | std::views::filter(hasOnSessionMembershipChanged), [&](auto&& callback) {
+        callback->OnSessionMembershipChanged(peersAdded, {});
+    });
 
     // Now log the bad status
     IF_PLOG(plog::verbose)
@@ -674,21 +717,15 @@ void
 UwbConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData)
 {
     uint32_t sessionId = rangingData.SessionId;
-    auto it = m_sessionEventCallbacks.find(sessionId);
-    if (it == std::end(m_sessionEventCallbacks)) {
+
+    auto sessionEventCallbacks = GetResolvedSessionEventCallbacks(sessionId);
+    if (sessionEventCallbacks.empty()) {
         PLOG_VERBOSE << "Ignoring RangingData event due to missing session callback";
         return;
     }
 
-    auto& [_, callbacksWeak] = *it;
-    auto callbacks = callbacksWeak.lock();
-    if (not(callbacks) or not(callbacks->OnPeerPropertiesChanged)) {
-        PLOG_WARNING << "Ignoring RangingData event due to expired session callback";
-        m_sessionEventCallbacks.erase(it);
-        return;
-    }
-
     PLOG_VERBOSE << "Session with id " << rangingData.SessionId << " processing new ranging data";
+
     std::vector<::uwb::UwbPeer> peersData;
     peersData.reserve(rangingData.RangingMeasurements.size());
     for (const auto& peerData : rangingData.RangingMeasurements) {
@@ -697,7 +734,12 @@ UwbConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData ranging
         peersData.push_back(std::move(data));
     }
 
-    callbacks->OnPeerPropertiesChanged(peersData);
+    constexpr auto hasOnPeerPropertiesChanged = [](auto&& callback) {
+        return callback->OnPeerPropertiesChanged != nullptr;
+    };
+    std::ranges::for_each(sessionEventCallbacks | std::views::filter(hasOnPeerPropertiesChanged), [&](auto&& callback) {
+        callback->OnPeerPropertiesChanged(peersData);
+    });
 }
 
 /**
@@ -705,12 +747,15 @@ UwbConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData ranging
  *
  * @tparam ArgT the argument type of the specific callback
  * @param callbacks the structure holding the callbacks
- * @param callbackAccessor the lambda that returns the specific callback in question. This function assumes that callbackAccessor(callbacks) is a valid pointer
- * @return bool True if the callback gets executed, False if the callback needs to be deregistered
+ * @param callbackAccessor the lambda that returns the specific callback in
+ * question. This function assumes that callbackAccessor(callbacks) is a valid
+ * pointer.
+ * @return bool True if the callback gets executed, False if the
+ * callback needs to be deregistered
  */
 template <typename ArgT>
 bool
-Accessor(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks, std::function<std::function<void(ArgT)>(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>)> callbackAccessor, ArgT& arg)
+InvokeDeviceEventCallback(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks, std::function<std::function<void(ArgT)>(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>)> callbackAccessor, ArgT& arg)
 {
     if (not callbacks) {
         PLOG_WARNING << "Ignoring " << typeid(ArgT).name() << " event due to missing callback";
@@ -725,34 +770,49 @@ Accessor(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks, st
     return true;
 }
 
+/**
+ * @brief Wrapper for container-based invocation of InvokeDeviceEventCallback helper above.
+ *
+ * @tparam ArgT the argument type of the specific callback
+ * @param callbacks the structure holding the callbacks
+ * @param callbackAccessor the lambda that returns the specific callback in
+ * question. This function assumes that callbackAccessor(callbacks) is a valid
+ * pointer.
+ */
+template <typename ArgT>
+void
+InvokeDeviceEventCallbacks(std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>> callbacks, std::function<std::function<void(ArgT)>(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>)> callbackAccessor, ArgT& arg)
+{
+    std::ranges::for_each(callbacks, [&](auto&& callbacksInstance) {
+        InvokeDeviceEventCallback(callbacksInstance, callbackAccessor, arg);
+    });
+}
+
 void
 UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNotificationData)
 {
-    std::shared_lock readerLock{ m_eventCallbacksGate };
+    constexpr auto getStatusChangedCallback = [](auto&& callbacks) {
+        return callbacks->OnStatusChanged;
+    };
+    constexpr auto getDeviceStatusChangedCallback = [](auto&& callbacks) {
+        return callbacks->OnDeviceStatusChanged;
+    };
+    constexpr auto getSessionStatusChangedCallback = [](auto&& callbacks) {
+        return callbacks->OnSessionStatusChanged;
+    };
+
     std::visit([this](auto&& arg) {
         using ValueType = std::decay_t<decltype(arg)>;
 
         if constexpr (std::is_same_v<ValueType, UwbStatus>) {
-            auto callbacks = m_deviceEventCallbacks.lock();
-            Accessor<UwbStatus>(
-                callbacks, [](auto callbacks) {
-                    return callbacks->OnStatusChanged;
-                },
-                arg);
+            auto deviceEventCallbacks = GetResolvedDeviceEventCallbacks();
+            InvokeDeviceEventCallbacks<UwbStatus>(std::move(deviceEventCallbacks), getStatusChangedCallback, arg);
         } else if constexpr (std::is_same_v<ValueType, UwbStatusDevice>) {
-            auto callbacks = m_deviceEventCallbacks.lock();
-            Accessor<UwbStatusDevice>(
-                callbacks, [](auto callbacks) {
-                    return callbacks->OnDeviceStatusChanged;
-                },
-                arg);
+            auto deviceEventCallbacks = GetResolvedDeviceEventCallbacks();
+            InvokeDeviceEventCallbacks<UwbStatusDevice>(std::move(deviceEventCallbacks), getDeviceStatusChangedCallback, arg);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionStatus>) {
-            auto callbacks = m_deviceEventCallbacks.lock();
-            Accessor<UwbSessionStatus>(
-                callbacks, [](auto callbacks) {
-                    return callbacks->OnSessionStatusChanged;
-                },
-                arg);
+            auto deviceEventCallbacks = GetResolvedDeviceEventCallbacks();
+            InvokeDeviceEventCallbacks<UwbSessionStatus>(std::move(deviceEventCallbacks), getSessionStatusChangedCallback, arg);
             if (arg.State == UwbSessionState::Deinitialized) {
                 OnSessionEnded(arg.SessionId, ::uwb::UwbSessionEndReason::Stopped);
             }
@@ -793,7 +853,7 @@ UwbConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDev
 {
     std::lock_guard writerLock{ m_eventCallbacksGate };
     bool isFirstCallback = not CallbacksPresent();
-    m_deviceEventCallbacks = callbacks;
+    m_deviceEventCallbacks.push_back(std::move(callbacks));
     if (isFirstCallback) {
         NotificationListenerStart();
     }
@@ -805,7 +865,16 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::
 {
     std::lock_guard writerLock{ m_eventCallbacksGate };
     bool isFirstCallback = not CallbacksPresent();
-    m_sessionEventCallbacks.insert_or_assign(sessionId, callbacks);
+    // Obtain the map node to the existing vector of callbacks, if present.
+    auto node = m_sessionEventCallbacks.extract(sessionId);
+    if (!node.empty()) {
+        auto& sessionEventCallbacks = node.mapped();
+        sessionEventCallbacks.push_back(std::move(callbacks));
+        m_sessionEventCallbacks.insert(std::move(node));
+    } else {
+        m_sessionEventCallbacks.insert({ sessionId, { std::move(callbacks) } });
+    }
+
     if (isFirstCallback) {
         NotificationListenerStart();
     }
@@ -815,7 +884,7 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::
 bool
 UwbConnector::CallbacksPresent()
 {
-    return m_deviceEventCallbacks.lock() or (not m_sessionEventCallbacks.empty());
+    return (not m_deviceEventCallbacks.empty()) or (not m_sessionEventCallbacks.empty());
 }
 
 void

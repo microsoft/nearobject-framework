@@ -205,11 +205,32 @@ private:
     bool
     CallbacksPresent();
 
+    /**
+     * @brief Get a copy of the resolved session event callbacks for a particular session.
+     *
+     * This function removes expired callbacks in the process of making the copies.
+     *
+     * @param sessionId The session id to obtain registered callbacks for.
+     * @return std::vector<std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks>>
+     */
+    std::vector<std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks>>
+    GetResolvedSessionEventCallbacks(uint32_t sessionId);
+
+    /**
+     * @brief Get a copy of the resolved device event callbacks.
+     *
+     * This function removes expired callbacks in the process of making the copies.
+     *
+     * @return std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>>
+     */
+    std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>>
+    GetResolvedDeviceEventCallbacks();
+
 private:
     // the following shared_mutex is used to protect access to both session and device event callbacks
     mutable std::shared_mutex m_eventCallbacksGate;
-    std::unordered_map<uint32_t, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks>> m_sessionEventCallbacks;
-    std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> m_deviceEventCallbacks;
+    std::unordered_map<uint32_t, std::vector<std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks>>> m_sessionEventCallbacks;
+    std::vector<std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>> m_deviceEventCallbacks;
     std::string m_deviceName{};
     std::jthread m_notificationThread;
     wil::shared_hfile m_notificationHandleDriver;
