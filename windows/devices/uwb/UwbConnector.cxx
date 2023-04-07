@@ -851,7 +851,7 @@ UwbConnector::NotificationListenerStop()
 ::uwb::RegisteredCallbackToken*
 UwbConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks)
 {
-    std::lock_guard writerLock{ m_eventCallbacksGate };
+    std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
     bool isFirstCallback = not CallbacksPresent();
     m_deviceEventCallbacks.push_back(std::move(callbacks));
     if (isFirstCallback) {
@@ -863,7 +863,7 @@ UwbConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDev
 ::uwb::RegisteredCallbackToken*
 UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks)
 {
-    std::lock_guard writerLock{ m_eventCallbacksGate };
+    std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
     bool isFirstCallback = not CallbacksPresent();
     // Obtain the map node to the existing vector of callbacks, if present.
     auto node = m_sessionEventCallbacks.extract(sessionId);
@@ -891,5 +891,5 @@ void
 UwbConnector::DeregisterEventCallback(::uwb::RegisteredCallbackToken* token)
 {
     // TODO implement
-    std::lock_guard writerLock{ m_eventCallbacksGate };
+    std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
 }
