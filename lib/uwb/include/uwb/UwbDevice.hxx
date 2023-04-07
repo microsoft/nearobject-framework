@@ -23,7 +23,6 @@ class UwbDevice
 protected:
     /**
      * @brief Only allow derived classes to instantiate an instance.
-     *
      */
     UwbDevice() = default;
 
