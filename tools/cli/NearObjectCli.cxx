@@ -257,14 +257,24 @@ ValidateNonEnumParameterValues(NearObjectCliData& cliData)
         }
     }
 
-    // DestinationMacAddresses (mandatory)
-    if (parametersData.deviceType == DeviceType::Controller) {
-        if (parametersData.destinationMacAddresses.value().size() != parametersData.numberOfControlees) {
-            std::cerr << "Invalid number of DestinationMacAddresses. Should be equal to NumberOfControlees when device is a Controller." << std::endl;
-        }
+    // DeviceMacAddress (mandatory) and DestinationMacAddresses (mandatory)
+    const auto macAddressType = parametersData.macAddressMode == uwb::UwbMacAddressType::Extended ? uwb::UwbMacAddressType::Extended : uwb::UwbMacAddressType::Short;
+
+    if (!parametersData.deviceMacAddress.has_value()) {
+        std::cerr << "Invalid DeviceMacAddress. Does not match format of MacAddressMode: " << ToString(macAddressType) << std::endl;
+    }
+
+    if (!parametersData.destinationMacAddresses.has_value()) {
+        std::cerr << "Invalid DestinationMacAddresses. Does not match format of MacAddressMode: " << ToString(macAddressType) << std::endl;
     } else {
-        if (parametersData.destinationMacAddresses.value().size() != DestinationMacAddressesCountWhenControlee) {
-            std::cerr << "Invalid number of DestinationMacAddresses. Should only contain " << DestinationMacAddressesCountWhenControlee << " mac address for the Controller when device is a Controlee." << std::endl;
+        if (parametersData.deviceType == DeviceType::Controller) {
+            if (parametersData.destinationMacAddresses.value().size() != parametersData.numberOfControlees) {
+                std::cerr << "Invalid number of DestinationMacAddresses. Should be equal to NumberOfControlees when device is a Controller." << std::endl;
+            }
+        } else {
+            if (parametersData.destinationMacAddresses.value().size() != DestinationMacAddressesCountWhenControlee) {
+                std::cerr << "Invalid number of DestinationMacAddresses. Should only contain " << DestinationMacAddressesCountWhenControlee << " mac address for the Controller when device is a Controlee." << std::endl;
+            }
         }
     }
 
