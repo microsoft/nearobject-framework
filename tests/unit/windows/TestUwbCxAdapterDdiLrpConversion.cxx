@@ -49,6 +49,23 @@ ValidateRoundtrip(const NeutralT& instance)
 }
 
 /**
+ * @brief Validate a neutral type round-trip conversion works.
+ * 
+ * This overload is used specifically for DestinationMacAddresses.
+ * 
+ * @tparam NeutralT
+ * @param instance An instance of the neutral type to validate.
+ * @param macAddressMode
+ */
+template <typename NeutralT>
+void
+ValidateRoundtrip(const NeutralT& instance, const ::uwb::UwbMacAddressType macAddressMode)
+{
+    auto instanceCopy = UwbCxDdi::To(UwbCxDdi::From(instance), macAddressMode);
+    REQUIRE(instanceCopy == instance);
+}
+
+/**
  * @brief Generate a random integral value.
  *
  * @tparam ReturnT
@@ -635,12 +652,12 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
 
     SECTION("UwbApplicationConfigurationParameter std::unordered_set<::uwb::UwbMacAddress> (single address) is stable")
     {
-        test::ValidateRoundtrip(parameterUwbMacAddressSetSingleAddress);
+        test::ValidateRoundtrip(parameterUwbMacAddressSetSingleAddress, ::uwb::UwbMacAddressType::Short);
     }
 
     SECTION("UwbApplicationConfigurationParameter std::unordered_set<::uwb::UwbMacAddress> (multiple addresses) is stable")
     {
-        test::ValidateRoundtrip(parameterUwbMacAddressSetMultipleAddresses);
+        test::ValidateRoundtrip(parameterUwbMacAddressSetMultipleAddresses, ::uwb::UwbMacAddressType::Short);
     }
 
     SECTION("std::vector<UwbApplicationConfigurationParameter> is stable")
