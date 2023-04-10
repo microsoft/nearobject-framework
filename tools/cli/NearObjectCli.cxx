@@ -744,7 +744,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
         dstMacAddressDescription = "Comma-delimited array with 8-byte hexadecimal values, colon-delimited. Extended MAC address(es) of other device(s). If device is Controller, list NumberOfControlees mac addresses. If device is Controlee, list Controller mac address";
     }
     rangeStartApp->add_option("--DeviceMacAddress", m_cliData->deviceMacAddressString, deviceMacAddressDescription)->capture_default_str()->required();
-    rangeStartApp->add_option("--DestinationMacAddress", m_cliData->destinationMacAddressString, dstMacAddressDescription)->capture_default_str()->required();
+    rangeStartApp->add_option("--DestinationMacAddresses", m_cliData->destinationMacAddressesString, dstMacAddressDescription)->capture_default_str()->required();
     detail::AddEnumOption(rangeStartApp, applicationConfigurationParametersData.deviceType, true);
 
     // List remaining params
@@ -803,7 +803,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
         // Set DeviceMacAddress and DestinationMacAddresses
         const auto macAddressType = applicationConfigurationParametersData.macAddressMode == uwb::UwbMacAddressType::Extended ? uwb::UwbMacAddressType::Extended : uwb::UwbMacAddressType::Short;
         applicationConfigurationParametersData.deviceMacAddress = uwb::UwbMacAddress::FromString(m_cliData->deviceMacAddressString, macAddressType);
-        applicationConfigurationParametersData.destinationMacAddresses = uwb::UwbMacAddress::MacAddressesFromString(m_cliData->destinationMacAddressString, macAddressType);
+        applicationConfigurationParametersData.destinationMacAddresses = uwb::UwbMacAddress::MacAddressesFromString(m_cliData->destinationMacAddressesString, macAddressType);
 
         m_cliData->RangingParameters.ApplicationConfigurationParameters = detail::ProcessApplicationConfigurationParameters(*m_cliData);
         RegisterCliAppWithOperation(rangeStartApp);
