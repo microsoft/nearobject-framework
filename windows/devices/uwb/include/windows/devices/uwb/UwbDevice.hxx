@@ -134,6 +134,23 @@ private:
     virtual bool
     InitializeImpl() override;
 
+protected:
+    /**
+     * @brief Get the device DDI connector object (derived classes only).
+     *
+     * @return std::shared_ptr<IUwbDeviceDdiConnector>
+     */
+    std::shared_ptr<IUwbDeviceDdiConnector>
+    GetDeviceDdiConnector() noexcept;
+
+    /**
+     * @brief Get the session DDI connector object (derived classes only).
+     *
+     * @return std::shared_ptr<IUwbSessionDdiConnector>
+     */
+    std::shared_ptr<IUwbSessionDdiConnector>
+    GetSessionDdiConnector() noexcept;
+
 private:
     const std::string m_deviceName;
     std::shared_ptr<IUwbDeviceDdiConnector> m_uwbDeviceConnector;

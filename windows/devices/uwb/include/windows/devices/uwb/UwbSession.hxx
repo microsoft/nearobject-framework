@@ -27,19 +27,23 @@ public:
      * @brief Construct a new UwbSession object without callbacks.
      *
      * @param sessionId The session identifier.
-     * @param uwbDevice The uwb device tied to the session.
+     * @param device Reference to the parent device.
+     * @param uwbSessionConnector The connector used to communicate with the device.
+     * @param deviceType The device type of the host in this session.
      */
-    UwbSession(uint32_t sessionId, UwbDevice* uwbDevice, ::uwb::protocol::fira::DeviceType deviceType = ::uwb::protocol::fira::DeviceType::Controller);
+    UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> device, std::shared_ptr<IUwbSessionDdiConnector> uwbSessionConnector, ::uwb::protocol::fira::DeviceType deviceType = ::uwb::protocol::fira::DeviceType::Controller);
 
     /**
      * @brief Construct a new UwbSession object.
      * This also registers the callbacks with the UwbConnector
      *
      * @param sessionId The session identifier.
+     * @param device Reference to the parent device.
+     * @param uwbSessionConnector The connector used to communicate with the device.
      * @param callbacks The event callback instance.
-     * @param uwbDevice The uwb device tied to the session.
+     * @param deviceType The device type of the host in this session.
      */
-    UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, UwbDevice* uwbDevice, ::uwb::protocol::fira::DeviceType deviceType = ::uwb::protocol::fira::DeviceType::Controller);
+    UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> device, std::shared_ptr<IUwbSessionDdiConnector> uwbSessionConnector, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, ::uwb::protocol::fira::DeviceType deviceType = ::uwb::protocol::fira::DeviceType::Controller);
 
 private:
     /**
@@ -100,7 +104,7 @@ protected:
     GetUwbSessionConnector() noexcept;
 
 private:
-    std::shared_ptr<IUwbSessionDdiConnector> m_uwbSessionconnector;
+    std::shared_ptr<IUwbSessionDdiConnector> m_uwbSessionConnector;
     std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks> m_registeredCallbacks;
     ::uwb::RegisteredCallbackToken* m_registeredCallbacksToken;
 };

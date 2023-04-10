@@ -14,11 +14,25 @@
 
 namespace windows::devices::uwb::simulator
 {
+/**
+ * @brief Simulator driver session.
+ *
+ * This class is used to represent simulator driver specific session context.
+ */
 class UwbSessionSimulator :
     public windows::devices::uwb::UwbSession
 {
 public:
-    UwbSessionSimulator(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, UwbDevice* uwbDevice, std::shared_ptr<UwbDeviceSimulatorConnector> uwbDeviceSimulatorConnector);
+    /**
+     * @brief Construct a new UwbSessionSimulator object.
+     *
+     * @param sessionId The session identifier.
+     * @param device Reference to the parent device.
+     * @param uwbSessionConnector The connector used to communicate with the uwb device.
+     * @param callbacks The event callback instance.
+     * @param uwbDeviceSimulatorConnector The connector used to communicate with the simulator device.
+     */
+    UwbSessionSimulator(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> device, std::shared_ptr<IUwbSessionDdiConnector> uwbSessionConnector, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, std::shared_ptr<UwbDeviceSimulatorConnector> uwbDeviceSimulatorConnector);
 
     virtual ~UwbSessionSimulator() = default;
 
