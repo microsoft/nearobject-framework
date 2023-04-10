@@ -50,9 +50,9 @@ ValidateRoundtrip(const NeutralT& instance)
 
 /**
  * @brief Validate a neutral type round-trip conversion works.
- * 
+ *
  * This overload is used specifically for DestinationMacAddresses.
- * 
+ *
  * @tparam NeutralT
  * @param instance An instance of the neutral type to validate.
  * @param macAddressMode

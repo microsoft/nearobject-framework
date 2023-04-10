@@ -1669,7 +1669,7 @@ windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAMS &applicationConf
         if (To(applicationConfigurationParameter.paramType) == UwbApplicationConfigurationParameterType::MacAddressMode) {
             macAddressMode = std::get<::uwb::UwbMacAddressType>(To(applicationConfigurationParameter).Value);
         }
-        
+
         // If parameter is DestinationMacAddresses, store until other parameters have been converted.
         if (To(applicationConfigurationParameter.paramType) == UwbApplicationConfigurationParameterType::DestinationMacAddresses) {
             destinationMacAddresses = applicationConfigurationParameter;
