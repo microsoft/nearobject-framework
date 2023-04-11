@@ -908,7 +908,6 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::
         NotificationListenerStart();
     }
     return token;
-    // TODO move the below to InsertSessionEventCallback
 }
 
 bool
