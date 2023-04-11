@@ -17,6 +17,10 @@ namespace uwb
  */
 class RegisteredCallbackToken;
 
+class RegisteredSessionCallbackToken;
+
+class RegisteredDeviceCallbackToken;
+
 /**
  * @brief Interface for receiving events from a UwbSession. This is the primary
  * method to receive information from near peers.

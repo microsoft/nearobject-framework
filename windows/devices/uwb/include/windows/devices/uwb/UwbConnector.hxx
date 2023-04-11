@@ -250,21 +250,8 @@ private:
 
     // the following shared_mutex is used to protect access to everything regarding the registered callbacks
     mutable std::shared_mutex m_eventCallbacksGate;
-
-    // map of callbackId to the actual callback
-    std::unordered_map<uint32_t, std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>> m_deviceEventCallbacksIdMap;
-
-    // map of callbackId to tuple of sessionId and the actual callback
-    std::unordered_map<uint32_t, std::pair<uint32_t, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks>>> m_sessionEventCallbacksIdMap;
-
-    // map of sessionId to vector of callbackIds. This is guaranteed to be synced to the m_sessionEventCallbacksIdMap (basically the inverse)
-    std::unordered_map<uint32_t, std::vector<uint32_t>> m_sessionIdToCallbackIdsMap;
-
-    // ensures each generated new callbackId is unique
-    uint32_t m_tokenUniqueState;
-
-    // strictly used for deregistration, the token will be evaluated lazily, and may or may not be synced ith the actual callback storage
-    std::vector<std::shared_ptr<::uwb::RegisteredCallbackToken>> m_tokens;
+    std::unordered_map<uint32_t, std::vector<std::weak_ptr<::uwb::RegisteredSessionCallbackToken>>> m_sessionEventCallbacks;
+    std::vector<std::shared_ptr<::uwb::RegisteredDeviceCallbackToken>> m_deviceEventCallbacks;
 };
 } // namespace windows::devices::uwb
 
