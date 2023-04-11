@@ -922,7 +922,7 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::
 bool
 UwbConnector::CallbacksPresent()
 {
-    return (not m_deviceEventCallbacksIdMap.empty()) or (not m_sessionEventCallbacksIdMap.empty());
+    return (not m_sessionEventCallbacks.empty()) or (not m_deviceEventCallbacks.empty());
 }
 
 void
@@ -961,35 +961,29 @@ UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackTok
             return; // no associated token found, bail
         }
         tokens.erase(tokenIt);
-        m_sessionEventCallbacks.insert({ sessionId, tokens });
+        m_sessionEventCallbacks.insert(std::move(node));
     }
 }
 
 std::shared_ptr<::uwb::RegisteredCallbackToken>
 UwbConnector::InsertDeviceEventCallback(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callback)
 {
-    m_tokenUniqueState++;
-    m_deviceEventCallbacksIdMap.insert({ m_tokenUniqueState, std::move(callback) });
-    m_tokens.push_back(std::make_shared<::uwb::RegisteredCallbackToken>(m_tokenUniqueState, true));
-    return m_tokens.back();
+    m_deviceEventCallbacks.push_back(std::make_shared<::uwb::RegisteredDeviceCallbackToken>(callback));
+    return m_deviceEventCallbacks.back();
 }
 
 std::shared_ptr<::uwb::RegisteredCallbackToken>
 UwbConnector::InsertSessionEventCallback(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callback)
 {
-    m_tokenUniqueState++;
-    auto callbackId = m_tokenUniqueState;
     // Obtain the map node to the existing vector of callbacks, if present.
-    auto node = m_sessionIdToCallbackIdsMap.extract(sessionId);
+    auto token = std::make_shared<::uwb::RegisteredSessionCallbackToken>(sessionId, callback);
+    auto node = m_sessionEventCallbacks.extract(sessionId);
     if (!node.empty()) {
         auto& sessionEventCallbacks = node.mapped();
-        sessionEventCallbacks.push_back(callbackId);
-        m_sessionIdToCallbackIdsMap.insert(std::move(node));
+        sessionEventCallbacks.push_back(token);
+        m_sessionEventCallbacks.insert(std::move(node));
     } else {
-        m_sessionIdToCallbackIdsMap.insert({ sessionId, { callbackId } });
+        m_sessionEventCallbacks.insert({ sessionId, { token } });
     }
-
-    m_sessionEventCallbacksIdMap.insert({ callbackId, { sessionId, std::move(callback) } });
-    m_tokens.push_back(std::make_shared<::uwb::RegisteredCallbackToken>(m_tokenUniqueState, false));
-    return m_tokens.back();
+    return token;
 }

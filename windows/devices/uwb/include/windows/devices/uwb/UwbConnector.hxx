@@ -250,7 +250,7 @@ private:
 
     // the following shared_mutex is used to protect access to everything regarding the registered callbacks
     mutable std::shared_mutex m_eventCallbacksGate;
-    std::unordered_map<uint32_t, std::vector<std::weak_ptr<::uwb::RegisteredSessionCallbackToken>>> m_sessionEventCallbacks;
+    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::RegisteredSessionCallbackToken>>> m_sessionEventCallbacks;
     std::vector<std::shared_ptr<::uwb::RegisteredDeviceCallbackToken>> m_deviceEventCallbacks;
 };
 } // namespace windows::devices::uwb
