@@ -934,55 +934,34 @@ UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackTok
     }
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
 
-    auto callbackId = tokenShared->callbackId;
-    auto isDeviceEventCallback = tokenShared->isDeviceEventCallback;
-
-    // remove the token from the list of tokens
-    for (auto it = std::cbegin(m_tokens); it != std::cend(m_tokens); it++) {
-        if ((*it)->callbackId == callbackId) {
-            m_tokens.erase(it);
-            break;
+    auto deviceCallback = std::dynamic_pointer_cast<::uwb::RegisteredDeviceCallbackToken>(tokenShared);
+    if (deviceCallback) {
+        // treat it as a device callback
+        auto tokenIt = std::find_if(std::cbegin(m_deviceEventCallbacks), std::cend(m_deviceEventCallbacks), [deviceCallback](const auto& token) {
+            return token.get() == deviceCallback.get();
+        });
+        if (tokenIt == std::cend(m_deviceEventCallbacks)) {
+            return; // no associated token found, bail
         }
-    }
-
-    if (isDeviceEventCallback) {
-        // first remove the id from the id map
-        auto result = m_deviceEventCallbacksIdMap.find(callbackId);
-        if (result == std::cend(m_deviceEventCallbacksIdMap)) {
-            PLOG_INFO << "the token is stale, the id is not present in the map. callbackId=" << callbackId;
-            return;
-        }
-        m_deviceEventCallbacksIdMap.erase(result);
+        m_deviceEventCallbacks.erase(tokenIt);
     } else {
-        // first remove the id from the id map
-        auto result = m_sessionEventCallbacksIdMap.find(callbackId);
-        if (result == std::cend(m_sessionEventCallbacksIdMap)) {
-            PLOG_INFO << "the token is stale, the id is not present in the map. callbackId=" << callbackId;
-            return;
-        }
-        m_sessionEventCallbacksIdMap.erase(result);
+        auto sessionCallback = dynamic_pointer_cast<::uwb::RegisteredSessionCallbackToken>(tokenShared);
+        auto sessionId = sessionCallback->sessionId;
 
-        // now remove the id from the list of m_sessionIdToCallbackIdsMap
-        auto& [_, pair] = *result;
-        auto& [sessionId, callbackWeak] = pair;
-
-        auto node = m_sessionIdToCallbackIdsMap.extract(sessionId);
+        auto node = m_sessionEventCallbacks.extract(sessionId);
         if (node.empty()) {
-            PLOG_ERROR << "m_sessionIdToCallbackIdsMap missing session callback when m_sessionEventCallbacksIdMap has it. sessionId=" << sessionId << ", callbackId=" << callbackId;
-            return;
+            return; // sessionId has no associated tokens
         }
 
-        auto callbackIds = node.mapped();
-
-        for (auto it = std::cbegin(callbackIds); it != std::cend(callbackIds); it++) {
-            auto& id = *it;
-            if (id == callbackId) {
-                callbackIds.erase(it);
-                break;
-            }
+        auto tokens = node.mapped();
+        auto tokenIt = std::find_if(std::cbegin(tokens), std::cend(tokens), [sessionCallback](const auto& token) {
+            return token.get() == sessionCallback.get();
+        });
+        if (tokenIt == std::cend(tokens)) {
+            return; // no associated token found, bail
         }
-
-        m_sessionIdToCallbackIdsMap.insert({ sessionId, callbackIds });
+        tokens.erase(tokenIt);
+        m_sessionEventCallbacks.insert({ sessionId, tokens });
     }
 }
 
