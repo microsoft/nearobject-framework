@@ -242,16 +242,6 @@ private:
     std::shared_ptr<::uwb::RegisteredCallbackToken>
     InsertSessionEventCallback(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callback);
 
-    /**
-     * @brief Internal helper function that deregisters event callbacks.
-     * If you pass in a token that is no longer valid, this function does nothing
-     * You must have grabbed the m_eventCallbacksGate mutex prior to calling this
-     *
-     * @param token
-     */
-    void
-    DeregisterEventCallback(::uwb::RegisteredCallbackToken token);
-
 private:
     std::string m_deviceName{};
     std::jthread m_notificationThread;

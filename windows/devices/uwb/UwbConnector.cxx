@@ -919,20 +919,14 @@ UwbConnector::CallbacksPresent()
 void
 UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackToken> token)
 {
-    auto tok = token.lock();
-    if (not tok) {
+    auto tokenShared = token.lock();
+    if (not tokenShared) {
         return;
     }
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
 
-    DeregisterEventCallback(*tok);
-}
-
-void
-UwbConnector::DeregisterEventCallback(::uwb::RegisteredCallbackToken token)
-{
-    auto callbackId = token.callbackId;
-    auto isDeviceEventCallback = token.isDeviceEventCallback;
+    auto callbackId = tokenShared->callbackId;
+    auto isDeviceEventCallback = tokenShared->isDeviceEventCallback;
 
     // remove the token from the list of tokens
     for (auto it = std::cbegin(m_tokens); it != std::cend(m_tokens); it++) {
@@ -946,6 +940,7 @@ UwbConnector::DeregisterEventCallback(::uwb::RegisteredCallbackToken token)
         // first remove the id from the id map
         auto result = m_deviceEventCallbacksIdMap.find(callbackId);
         if (result == std::cend(m_deviceEventCallbacksIdMap)) {
+            PLOG_INFO << "the token is stale, the id is not present in the map. callbackId=" << callbackId;
             return;
         }
         m_deviceEventCallbacksIdMap.erase(result);
@@ -953,6 +948,7 @@ UwbConnector::DeregisterEventCallback(::uwb::RegisteredCallbackToken token)
         // first remove the id from the id map
         auto result = m_sessionEventCallbacksIdMap.find(callbackId);
         if (result == std::cend(m_sessionEventCallbacksIdMap)) {
+            PLOG_INFO << "the token is stale, the id is not present in the map. callbackId=" << callbackId;
             return;
         }
         m_sessionEventCallbacksIdMap.erase(result);
@@ -973,7 +969,7 @@ UwbConnector::DeregisterEventCallback(::uwb::RegisteredCallbackToken token)
             auto& id = *it;
             if (id == callbackId) {
                 callbackIds.erase(it);
-                return;
+                break;
             }
         }
 
