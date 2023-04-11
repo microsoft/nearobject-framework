@@ -19,13 +19,14 @@ using namespace windows::devices;
 using namespace windows::devices::uwb;
 using namespace ::uwb::protocol::fira;
 
-namespace uwb
+namespace windows::devices::uwb
 {
-class RegisteredCallbackToken
+struct RegisteredCallbackToken
 {
     uint32_t callbackId;
+    bool isDeviceEventCallback;
 };
-} // namespace uwb
+} // namespace windows::devices::uwb
 
 UwbConnector::UwbConnector(std::string deviceName) :
     m_deviceName(std::move(deviceName))
@@ -633,15 +634,26 @@ UwbConnector::GetResolvedDeviceEventCallbacks()
     std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>> deviceEventCallbacks;
     deviceEventCallbacks.reserve(std::size(m_deviceEventCallbacks));
 
-    for (auto it = std::begin(m_deviceEventCallbacks); it != std::end(m_deviceEventCallbacks);) {
-        auto& deviceEventCallbackWeak = *it;
+    std::vector<uint32_t> staleCallbacks;
+
+    for (auto it = std::begin(m_deviceEventCallbacks); it != std::end(m_deviceEventCallbacks); it++) {
+        auto callbackId = *it;
+        auto result = m_deviceEventCallbacksIdMap.find(callbackId);
+        if (result == std::cend(m_deviceEventCallbacksIdMap)) {
+            PLOG_ERROR << "could not find a deviceEventCallback id in the id map when it is present in m_deviceEventCallbacks. id=" << callbackId;
+            return {};
+        }
+        auto& [id, deviceEventCallbackWeak] = *result;
         auto deviceEventCallback = deviceEventCallbackWeak.lock();
         if (deviceEventCallback != nullptr) {
             deviceEventCallbacks.push_back(std::move(deviceEventCallback));
-            it = std::next(it);
         } else {
-            it = m_deviceEventCallbacks.erase(it);
+            staleCallbacks.push_back(callbackId);
         }
+    }
+
+    for (auto id : staleCallbacks) {
+        DeregisterEventCallback(RegisteredCallbackToken{ id, true });
     }
 
     return deviceEventCallbacks;
@@ -663,20 +675,31 @@ UwbConnector::GetResolvedSessionEventCallbacks(uint32_t sessionId)
     // each one into a shared_ptr. If the weak pointer expired, remove it from
     // the vector, otherwise move the shared_ptr into the new container of them
     // to be returned to the caller.
-    auto& sessionEventCallbacksWeak = node.mapped();
+    auto& sessionEventCallbackIds = node.mapped();
+    std::vector<uint32_t> staleCallbacks;
+
     std::vector<std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks>> sessionEventCallbacks;
-    for (auto it = std::begin(sessionEventCallbacksWeak); it != std::end(sessionEventCallbacksWeak);) {
-        auto& sessionEventCallbackWeak = *it;
+    for (auto it = std::begin(sessionEventCallbackIds); it != std::end(sessionEventCallbackIds); it++) {
+        auto& sessionEventCallbackId = *it;
+        auto result = m_sessionEventCallbacksIdMap.find(sessionEventCallbackId);
+        if (result == std::cend(m_sessionEventCallbacksIdMap)) {
+            PLOG_ERROR << "could not find a sessionEventCallback id in the id map when it is present in m_deviceEventCallbacks. id=" << sessionEventCallbackId;
+            return {};
+        }
+        auto& [id, sessionEventCallbackWeak] = *result;
         auto sessionEventCallback = sessionEventCallbackWeak.lock();
         if (sessionEventCallback != nullptr) {
             sessionEventCallbacks.push_back(std::move(sessionEventCallback));
-            it = std::next(it);
         } else {
-            it = sessionEventCallbacksWeak.erase(it);
+            staleCallbacks.push_back(sessionEventCallbackId);
         }
     }
 
     m_sessionEventCallbacks.insert(std::move(node));
+
+    for (auto id : staleCallbacks) {
+        DeregisterEventCallback(RegisteredCallbackToken{ id, false });
+    }
 
     return sessionEventCallbacks;
 }
@@ -875,37 +898,38 @@ UwbConnector::NotificationListenerStop()
     m_notificationThread.request_stop();
 }
 
-::uwb::RegisteredCallbackToken*
+std::weak_ptr<RegisteredCallbackToken>
 UwbConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks)
 {
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
     bool isFirstCallback = not CallbacksPresent();
-    m_deviceEventCallbacks.push_back(std::move(callbacks));
+    auto token = InsertDeviceEventCallback(callbacks);
     if (isFirstCallback) {
         NotificationListenerStart();
     }
-    return nullptr;
+    return token;
 }
 
-::uwb::RegisteredCallbackToken*
+std::weak_ptr<RegisteredCallbackToken>
 UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks)
 {
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
     bool isFirstCallback = not CallbacksPresent();
+    auto token = InsertSessionEventCallback(callbacks);
     // Obtain the map node to the existing vector of callbacks, if present.
     auto node = m_sessionEventCallbacks.extract(sessionId);
     if (!node.empty()) {
         auto& sessionEventCallbacks = node.mapped();
-        sessionEventCallbacks.push_back(std::move(callbacks));
+        sessionEventCallbacks.push_back(token->callbackId);
         m_sessionEventCallbacks.insert(std::move(node));
     } else {
-        m_sessionEventCallbacks.insert({ sessionId, { std::move(callbacks) } });
+        m_sessionEventCallbacks.insert({ sessionId, { token->callbackId } });
     }
 
     if (isFirstCallback) {
         NotificationListenerStart();
     }
-    return nullptr;
+    return token;
 }
 
 bool
@@ -915,8 +939,91 @@ UwbConnector::CallbacksPresent()
 }
 
 void
-UwbConnector::DeregisterEventCallback(::uwb::RegisteredCallbackToken* token)
+UwbConnector::DeregisterEventCallback(std::weak_ptr<RegisteredCallbackToken> token)
 {
-    // TODO implement
+    auto tok = token.lock();
+    if (not tok) {
+        return;
+    }
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
+
+    DeregisterEventCallback(*tok);
+}
+
+void
+UwbConnector::DeregisterEventCallback(RegisteredCallbackToken token)
+{
+    auto callbackId = token.callbackId;
+    auto isDeviceEventCallback = token.isDeviceEventCallback;
+
+    // first remove the token from the list of tokens
+    for (auto it = std::cbegin(m_tokens); it != std::cend(m_tokens);) {
+        if ((*it)->callbackId == callbackId) {
+            it = m_tokens.erase(it);
+        } else {
+            it++;
+        }
+    }
+
+    // deal with the id map and list of callbacks
+    if (isDeviceEventCallback) {
+        // first remove the id from the id map
+        auto result = m_deviceEventCallbacksIdMap.find(callbackId);
+        if (result == std::cend(m_deviceEventCallbacksIdMap)) {
+            return;
+        }
+        m_deviceEventCallbacksIdMap.erase(result);
+
+        // now remove the id from the list of callbacks
+        for (auto it = std::cbegin(m_deviceEventCallbacks); it != std::cend(m_deviceEventCallbacks); it++) {
+            if (*it == callbackId) {
+                m_deviceEventCallbacks.erase(it);
+                return;
+            }
+        }
+    } else {
+        // first remove the id from the id map
+        auto result = m_sessionEventCallbacksIdMap.find(callbackId);
+        if (result == std::cend(m_sessionEventCallbacksIdMap)) {
+            return;
+        }
+        m_sessionEventCallbacksIdMap.erase(result);
+
+        // now remove the id from the list of callbacks
+        for (auto sessionIt = std::cbegin(m_sessionEventCallbacks); sessionIt != std::cend(m_sessionEventCallbacks); sessionIt++) {
+            auto [sessionId, sessionCallbackIds] = *sessionIt;
+            if (sessionCallbackIds.empty()) {
+                PLOG_ERROR << "empty sessionEventCallbacks for session with id=" << sessionId;
+                continue;
+            }
+            for (auto it = std::cbegin(sessionCallbackIds); it != std::cend(sessionCallbackIds); it++) {
+                if (*it == callbackId) {
+                    sessionCallbackIds.erase(it);
+                    // if this is the last sessionEventCallback for this sessionId, make sure to erase the entire vector from m_sessionEventCallbacks
+                    if (sessionCallbackIds.empty()) {
+                        m_sessionEventCallbacks.erase(sessionIt);
+                    }
+                    return;
+                }
+            }
+        }
+    }
+}
+
+std::shared_ptr<RegisteredCallbackToken>
+UwbConnector::InsertDeviceEventCallback(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callback)
+{
+    m_tokenUniqueState++;
+    m_deviceEventCallbacksIdMap.insert({ m_tokenUniqueState, std::move(callback) });
+    m_tokens.push_back(std::make_shared<RegisteredCallbackToken>(m_tokenUniqueState, true));
+    return m_tokens.back();
+}
+
+std::shared_ptr<RegisteredCallbackToken>
+UwbConnector::InsertSessionEventCallback(std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callback)
+{
+    m_tokenUniqueState++;
+    m_sessionEventCallbacksIdMap.insert({ m_tokenUniqueState, std::move(callback) });
+    m_tokens.push_back(std::make_shared<RegisteredCallbackToken>(m_tokenUniqueState, false));
+    return m_tokens.back();
 }
