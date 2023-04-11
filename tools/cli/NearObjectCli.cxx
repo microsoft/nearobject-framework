@@ -1,6 +1,7 @@
 
 #include <bitset>
 #include <optional>
+#include <regex>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -485,6 +486,31 @@ ProcessApplicationConfigurationParameters(NearObjectCliData& cliData)
     return applicationConfigurationParameters;
 }
 
+std::optional<std::unordered_set<UwbMacAddress>>
+MacAddressesFromString(const std::string& addressesString, ::uwb::UwbMacAddressType addressType)
+{
+    const std::regex shortRegex("^([0-9A-Fa-f]{2}:){1}([0-9A-Fa-f]{2})(,([0-9A-Fa-f]{2}:){1}([0-9A-Fa-f]{2}))*$");
+    const std::regex extendedRegex("^([0-9A-Fa-f]{2}:){7}([0-9A-Fa-f]{2})(,([0-9A-Fa-f]{2}:){7}([0-9A-Fa-f]{2}))*$");
+
+    if ((addressType == ::uwb::UwbMacAddressType::Short && !std::regex_match(addressesString, shortRegex)) ||
+        (addressType == ::uwb::UwbMacAddressType::Extended && !std::regex_match(addressesString, extendedRegex))) {
+        return std::nullopt;
+    }
+
+    std::unordered_set<UwbMacAddress> macAddresses{};
+    std::stringstream ss(addressesString);
+
+    std::string macAddressString;
+    while (std::getline(ss, macAddressString, ',')) {
+        auto macAddress = UwbMacAddress::FromString(macAddressString, addressType);
+        if (macAddress.has_value()) {
+            macAddresses.insert(macAddress.value());
+        }
+    }
+
+    return macAddresses;
+}
+
 } // namespace detail
 
 CLI::App*
@@ -803,7 +829,7 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
         // Set DeviceMacAddress and DestinationMacAddresses
         const auto macAddressType = applicationConfigurationParametersData.macAddressMode == uwb::UwbMacAddressType::Extended ? uwb::UwbMacAddressType::Extended : uwb::UwbMacAddressType::Short;
         applicationConfigurationParametersData.deviceMacAddress = uwb::UwbMacAddress::FromString(m_cliData->deviceMacAddressString, macAddressType);
-        applicationConfigurationParametersData.destinationMacAddresses = uwb::UwbMacAddress::MacAddressesFromString(m_cliData->destinationMacAddressesString, macAddressType);
+        applicationConfigurationParametersData.destinationMacAddresses = detail::MacAddressesFromString(m_cliData->destinationMacAddressesString, macAddressType);
 
         m_cliData->RangingParameters.ApplicationConfigurationParameters = detail::ProcessApplicationConfigurationParameters(*m_cliData);
         RegisterCliAppWithOperation(rangeStartApp);

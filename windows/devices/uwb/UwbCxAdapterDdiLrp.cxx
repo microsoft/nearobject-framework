@@ -678,7 +678,7 @@ windows::devices::uwb::ddi::lrp::From(const UwbApplicationConfigurationParameter
             for (const auto &uwbMacAddress : arg) {
                 const auto value = uwbMacAddress.GetValue();
                 parameterLength += std::size(value);
-                valueBuffer.insert(valueBuffer.end(), std::cbegin(value), std::cend(value));
+                valueBuffer.insert(std::end(valueBuffer), std::cbegin(value), std::cend(value));
             }
             totalSize += parameterLength;
             applicationConfigurationParameterWrapper = std::make_unique<UwbApplicationConfigurationParameterWrapper>(totalSize);
@@ -1652,6 +1652,7 @@ windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM &applicationConfi
         uwbApplicationConfigurationParameter.Value = std::move(value);
     } else {
         PLOG_ERROR << "unexpected uwb application configuration parameter type encountered, type=" << std::showbase << std::hex << notstd::to_underlying(applicationConfigurationParameter.paramType);
+        throw std::runtime_error("incorrect conversion function used for the given parameter type. Expected UWB_APP_CONFIG_PARAM_TYPE_DST_MAC_ADDRESS");
     }
 
     return uwbApplicationConfigurationParameter;
@@ -1686,6 +1687,8 @@ windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAMS &applicationConf
         } else {
             uwbApplicationConfigurationParameters.push_back(std::move(To(destinationMacAddresses.value(), ::uwb::UwbMacAddressType::Short)));
         }
+    } else {
+        PLOG_ERROR << "missing DestinationMacAddresses value";
     }
 
     return std::move(uwbApplicationConfigurationParameters);
