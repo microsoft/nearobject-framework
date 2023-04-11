@@ -97,7 +97,7 @@ UwbConnector::GetDeviceInformation()
     }
 
     std::vector<uint8_t> deviceInformationBuffer{};
-    DWORD bytesRequired = sizeof(UWB_DEVICE_INFO);
+    DWORD bytesRequired = offsetof(UWB_DEVICE_INFO, vendorSpecificInfo);
 
     // Attempt at most twice to obtain device information. On the first attempt,
     // we guess that no vendor-specific information will be supplied. If this is
@@ -118,6 +118,8 @@ UwbConnector::GetDeviceInformation()
                 break;
             }
             // Attempt to retry the ioctl with the appropriate buffer size, which is now held in bytesRequired.
+            const auto& deviceInformationPartial = *reinterpret_cast<UWB_DEVICE_INFO*>(std::data(deviceInformationBuffer));
+            bytesRequired = deviceInformationPartial.size;
             continue;
         } else {
             PLOG_DEBUG << "IOCTL_UWB_GET_DEVICE_INFO succeeded";
@@ -149,32 +151,39 @@ UwbConnector::GetCapabilities()
         return resultFuture;
     }
 
-    // Determine the amount of memory required for the UWB_DEVICE_CAPABILITIES from the driver.
-    DWORD bytesRequired = 0;
-    BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_DEVICE_CAPABILITIES, nullptr, 0, nullptr, 0, &bytesRequired, nullptr);
-    if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
-        // TODO: need to do something different here
-        HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-        PLOG_ERROR << "error when sending IOCTL_UWB_GET_DEVICE_CAPABILITIES, hr=" << std::showbase << std::hex << hr;
-        return resultFuture;
-    }
+    std::vector<uint8_t> uwbDeviceCapabilitiesBuffer{};
+    DWORD bytesRequired = offsetof(UWB_DEVICE_CAPABILITIES, capabilityParams);
 
-    // Allocate memory for the UWB_DEVICE_CAPABILITIES structure, and pass this to the driver request.
-    DWORD uwbCapabilitiesSize = bytesRequired;
-    auto uwbDeviceCapabilitiesBuffer = std::make_unique<uint8_t[]>(uwbCapabilitiesSize);
-    ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_DEVICE_CAPABILITIES, nullptr, 0, uwbDeviceCapabilitiesBuffer.get(), uwbCapabilitiesSize, &bytesRequired, nullptr);
-    if (!ioResult) {
-        // TODO: need to do something different here
-        HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-        PLOG_ERROR << "error when sending IOCTL_UWB_GET_DEVICE_CAPABILITIES, hr=" << std::showbase << std::hex << hr;
-        return resultFuture;
+    for (const auto i : std::ranges::iota_view{ 0, 2 }) {
+        uwbDeviceCapabilitiesBuffer.resize(bytesRequired);
+        PLOG_DEBUG << "IOCTL_UWB_GET_DEVICE_CAPABILITIES attempt #" << (i + 1) << " with " << std::size(uwbDeviceCapabilitiesBuffer) << "-byte buffer";
+        BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_DEVICE_CAPABILITIES, nullptr, 0, std::data(uwbDeviceCapabilitiesBuffer), std::size(uwbDeviceCapabilitiesBuffer), &bytesRequired, nullptr);
+        if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
+            DWORD lastError = GetLastError();
+            // Treat all errors other than insufficient buffer size as fatal.
+            if (lastError != ERROR_MORE_DATA) {
+                HRESULT hr = HRESULT_FROM_WIN32(lastError);
+                PLOG_ERROR << "error when sending IOCTL_UWB_GET_DEVICE_CAPABILITIES, hr=" << std::showbase << std::hex << hr;
+                resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Failed)));
+                break;
+            }
+            // Attempt to retry the ioctl with the appropriate buffer size, which is now held in bytesRequired.
+            const auto& deviceCapabilitiesPartial = *reinterpret_cast<UWB_DEVICE_CAPABILITIES*>(std::data(uwbDeviceCapabilitiesBuffer));
+            bytesRequired = deviceCapabilitiesPartial.size;
+            continue;
+        } else {
+            PLOG_DEBUG << "IOCTL_UWB_GET_DEVICE_CAPABILITIES succeeded";
+            auto& deviceCapabilities = *reinterpret_cast<UWB_DEVICE_CAPABILITIES*>(std::data(uwbDeviceCapabilitiesBuffer));
+            auto uwbStatus = UwbCxDdi::To(deviceCapabilities.status);
+            if (!IsUwbStatusOk(uwbStatus)) {
+                resultPromise.set_exception(std::make_exception_ptr(UwbException(std::move(uwbStatus))));
+            } else {
+                auto uwbDeviceCapabilities = UwbCxDdi::To(deviceCapabilities);
+                resultPromise.set_value(std::make_tuple(uwbStatus, std::move(uwbDeviceCapabilities)));
+            }
+            break;
+        }
     }
-
-    const UWB_DEVICE_CAPABILITIES& uwbDeviceCapabilities = *reinterpret_cast<UWB_DEVICE_CAPABILITIES*>(uwbDeviceCapabilitiesBuffer.get());
-    auto deviceCapabilities = UwbCxDdi::To(uwbDeviceCapabilities);
-    auto uwbStatus = UwbCxDdi::To(uwbDeviceCapabilities.status);
-    auto result = std::make_tuple(uwbStatus, std::move(deviceCapabilities));
-    resultPromise.set_value(std::move(result));
 
     return resultFuture;
 }
@@ -453,7 +462,7 @@ UwbConnector::GetApplicationConfigurationParameters(uint32_t sessionId, std::vec
     auto getAppConfigParams = UwbCxDdi::From(uwbGetApplicationConfigurationParameters);
     auto getAppConfigParamsBuffer = std::data(getAppConfigParams);
 
-    DWORD bytesRequired = 0;
+    DWORD bytesRequired = offsetof(UWB_APP_CONFIG_PARAMS, appConfigParams);
     std::vector<uint8_t> getAppConfigParamsResultBuffer{};
 
     for (const auto i : std::ranges::iota_view{ 0, 2 }) {
@@ -470,6 +479,8 @@ UwbConnector::GetApplicationConfigurationParameters(uint32_t sessionId, std::vec
                 break;
             }
             // Attempt to retry the ioctl with the appropriate buffer size, which is now held in bytesRequired.
+            const auto& appConfigParamsPartial = *reinterpret_cast<UWB_APP_CONFIG_PARAMS*>(std::data(getAppConfigParamsResultBuffer));
+            bytesRequired = appConfigParamsPartial.size;
             continue;
         }
 
