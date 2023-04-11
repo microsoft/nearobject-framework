@@ -229,8 +229,7 @@ std::vector<UwbApplicationConfigurationParameter>
 UwbSession::GetApplicationConfigurationParametersImpl()
 {
     uint32_t sessionId = GetId();
-    constexpr auto allParameterTypesArray = magic_enum::enum_values<UwbApplicationConfigurationParameterType>();
-    std::vector<UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes(std::cbegin(allParameterTypesArray), std::cend(allParameterTypesArray));
+    std::vector<UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes{}; // Leaving empty in order to get ALL set parameters from the device
 
     auto resultFuture = m_uwbSessionConnector->GetApplicationConfigurationParameters(sessionId, applicationConfigurationParameterTypes);
     if (!resultFuture.valid()) {
