@@ -674,14 +674,16 @@ windows::devices::uwb::ddi::lrp::From(const UwbApplicationConfigurationParameter
             UWB_APP_CONFIG_PARAM &applicationConfigurationParameter = applicationConfigurationParameterWrapper->value();
             applicationConfigurationParameter.paramValue[0] = value;
         } else if constexpr (std::is_same_v<T, std::unordered_set<::uwb::UwbMacAddress>>) {
-            // TODO: Get all values from set, not just first one
-            const auto val = *std::begin(arg);
-            const auto value = val.GetValue();
-            parameterLength = std::size(value);
+            std::vector<uint8_t> valueBuffer{};
+            for (const auto &uwbMacAddress : arg) {
+                const auto value = uwbMacAddress.GetValue();
+                parameterLength += std::size(value);
+                valueBuffer.insert(std::end(valueBuffer), std::cbegin(value), std::cend(value));
+            }
             totalSize += parameterLength;
             applicationConfigurationParameterWrapper = std::make_unique<UwbApplicationConfigurationParameterWrapper>(totalSize);
             UWB_APP_CONFIG_PARAM &applicationConfigurationParameter = applicationConfigurationParameterWrapper->value();
-            std::memcpy(&applicationConfigurationParameter.paramValue[0], std::data(value), parameterLength);
+            std::memcpy(&applicationConfigurationParameter.paramValue[0], std::data(valueBuffer), parameterLength);
         } else {
             throw std::runtime_error("unknown UwbApplicationConfigurationParameter variant value encountered");
         }
@@ -1610,21 +1612,7 @@ windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM &applicationConfi
         break;
     }
     case UWB_APP_CONFIG_PARAM_TYPE_DST_MAC_ADDRESS: {
-        // TODO: we can't infer the length as is done with
-        // UWB_APP_CONFIG_PARAM_TYPE_DEVICE_MAC_ADDRESS since the number of
-        // bytes is ambiguous (eg. paramLength == 8 could mean 4 short addresses
-        // or 1 extended address). The mac address type needs to be provided in
-        // in some way, but it's unclear how that information would be injected
-        // here. Re-visit.
-        std::unordered_set<::uwb::UwbMacAddress> value{};
-
-        // TODO: Currently assuming that DST_MAC_ADDRESS is a single, short address.
-        // However, the addresses could be extended and there could be multiple.
-        // Re-visit.
-        ::uwb::UwbMacAddress::ShortType data{};
-        std::memcpy(std::data(data), &applicationConfigurationParameter.paramValue[0], std::size(data));
-        value.insert(::uwb::UwbMacAddress(std::move(data)));
-        uwbApplicationConfigurationParameter.Value = std::move(value);
+        PLOG_ERROR << "unexpected uwb application configuration parameter type encountered for this conversion function, type=" << std::showbase << std::hex << notstd::to_underlying(applicationConfigurationParameter.paramType);
         break;
     }
     default:
@@ -1635,15 +1623,73 @@ windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM &applicationConfi
     return uwbApplicationConfigurationParameter;
 }
 
+UwbApplicationConfigurationParameter
+windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAM &applicationConfigurationParameter, const ::uwb::UwbMacAddressType macAddressMode)
+{
+    UwbApplicationConfigurationParameter uwbApplicationConfigurationParameter{
+        .Type = To(applicationConfigurationParameter.paramType)
+    };
+
+    if (applicationConfigurationParameter.paramType == UWB_APP_CONFIG_PARAM_TYPE_DST_MAC_ADDRESS) {
+        std::unordered_set<::uwb::UwbMacAddress> value{};
+
+        if (macAddressMode == ::uwb::UwbMacAddressType::Short) {
+            for (auto i = 0; i < (applicationConfigurationParameter.paramLength / ::uwb::UwbMacAddress::ShortLength); i++) {
+                ::uwb::UwbMacAddress::ShortType data{};
+                auto offset = i * ::uwb::UwbMacAddress::ShortLength;
+                std::memcpy(std::data(data), &applicationConfigurationParameter.paramValue[0] + offset, std::size(data));
+                value.insert(::uwb::UwbMacAddress(std::move(data)));
+            }
+        } else { // ::uwb::UwbMacAddressType::Extended
+            for (auto i = 0; i < (applicationConfigurationParameter.paramLength / ::uwb::UwbMacAddress::ExtendedLength); i++) {
+                ::uwb::UwbMacAddress::ExtendedType data{};
+                auto offset = i * ::uwb::UwbMacAddress::ExtendedLength;
+                std::memcpy(std::data(data), &applicationConfigurationParameter.paramValue[0] + offset, std::size(data));
+                value.insert(::uwb::UwbMacAddress(std::move(data)));
+            }
+        }
+
+        uwbApplicationConfigurationParameter.Value = std::move(value);
+    } else {
+        PLOG_ERROR << "unexpected uwb application configuration parameter type encountered, type=" << std::showbase << std::hex << notstd::to_underlying(applicationConfigurationParameter.paramType);
+        throw std::runtime_error("incorrect conversion function used for the given parameter type. Expected UWB_APP_CONFIG_PARAM_TYPE_DST_MAC_ADDRESS");
+    }
+
+    return uwbApplicationConfigurationParameter;
+}
+
 std::vector<UwbApplicationConfigurationParameter>
 windows::devices::uwb::ddi::lrp::To(const UWB_APP_CONFIG_PARAMS &applicationConfigurationParameters)
 {
     std::vector<UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters{};
 
-    detail::ForEachApplicationConfigurationParameter(applicationConfigurationParameters, [&uwbApplicationConfigurationParameters](const auto &applicationConfigurationParameter) {
-        auto uwbApplicationConfigurationParameter = To(applicationConfigurationParameter);
-        uwbApplicationConfigurationParameters.push_back(std::move(uwbApplicationConfigurationParameter));
+    std::optional<::uwb::UwbMacAddressType> macAddressMode;
+    std::optional<UWB_APP_CONFIG_PARAM> destinationMacAddresses;
+    detail::ForEachApplicationConfigurationParameter(applicationConfigurationParameters, [&uwbApplicationConfigurationParameters, &macAddressMode, &destinationMacAddresses](const auto &applicationConfigurationParameter) {
+        // If parameter is MacAddressMode, store value
+        if (To(applicationConfigurationParameter.paramType) == UwbApplicationConfigurationParameterType::MacAddressMode) {
+            macAddressMode = std::get<::uwb::UwbMacAddressType>(To(applicationConfigurationParameter).Value);
+        }
+
+        // If parameter is DestinationMacAddresses, store until other parameters have been converted.
+        if (To(applicationConfigurationParameter.paramType) == UwbApplicationConfigurationParameterType::DestinationMacAddresses) {
+            destinationMacAddresses = applicationConfigurationParameter;
+        } else {
+            auto uwbApplicationConfigurationParameter = To(applicationConfigurationParameter);
+            uwbApplicationConfigurationParameters.push_back(std::move(uwbApplicationConfigurationParameter));
+        }
     });
+
+    // Now that the other parameters have been converted, convert DestinationMacAddresses with special conversion function
+    if (destinationMacAddresses.has_value()) {
+        if (macAddressMode.has_value()) {
+            uwbApplicationConfigurationParameters.push_back(std::move(To(destinationMacAddresses.value(), macAddressMode.value())));
+        } else {
+            uwbApplicationConfigurationParameters.push_back(std::move(To(destinationMacAddresses.value(), ::uwb::UwbMacAddressType::Short)));
+        }
+    } else {
+        PLOG_ERROR << "missing DestinationMacAddresses value";
+    }
 
     return std::move(uwbApplicationConfigurationParameters);
 }

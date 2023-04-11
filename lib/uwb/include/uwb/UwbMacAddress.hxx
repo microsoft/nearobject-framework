@@ -13,6 +13,7 @@
 #include <span>
 #include <string>
 #include <type_traits>
+#include <unordered_set>
 #include <variant>
 
 #include <notstd/hash.hxx>
@@ -350,7 +351,7 @@ public:
 
     /**
      * @brief Creates a UwbMacAddress from a string representation of a mac address.
-     * 
+     *
      * @param addressString The mac address string.
      * @param addressType The type of mac address.
      * @return std::optional<UwbMacAddress> The constructed optional UwbMacAddress.
