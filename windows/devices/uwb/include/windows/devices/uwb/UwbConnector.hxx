@@ -23,11 +23,6 @@
 namespace windows::devices::uwb
 {
 /**
- * @brief Opaque class forward declaration to help with the deregistration
- */
-// class ::uwb::RegisteredCallbackToken;
-
-/**
  * @brief Class representing a logical communication channel with a UWB driver.
  *
  * This class exposes functions which map 1-1 to the UWB LRP DDI as defined in
@@ -65,7 +60,7 @@ public:
      * @brief Sets the callbacks for the UwbDevice that owns this UwbConnector
      *
      * @param callbacks
-     * @return ::uwb::RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback
+     * @return std::weak_ptr<::uwb::RegisteredCallbackToken> You can pass this pointer into DeregisterEventCallback to deregister this event callback
      */
     virtual std::weak_ptr<::uwb::RegisteredCallbackToken>
     RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks) override;
@@ -77,7 +72,7 @@ public:
      *
      * @param sessionId
      * @param callbacks
-     * @return ::uwb::RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback
+     * @return std::weak_ptr<::uwb::RegisteredCallbackToken> You can pass this pointer into DeregisterEventCallback to deregister this event callback
      */
     virtual std::weak_ptr<::uwb::RegisteredCallbackToken>
     RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks) override;

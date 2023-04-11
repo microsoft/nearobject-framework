@@ -21,7 +21,7 @@ using namespace ::uwb::protocol::fira;
 
 namespace uwb
 {
-struct ::uwb::RegisteredCallbackToken
+struct RegisteredCallbackToken
 {
     uint32_t callbackId;
     bool isDeviceEventCallback;
@@ -957,11 +957,10 @@ UwbConnector::DeregisterEventCallback(::uwb::RegisteredCallbackToken token)
     auto isDeviceEventCallback = token.isDeviceEventCallback;
 
     // first remove the token from the list of tokens
-    for (auto it = std::cbegin(m_tokens); it != std::cend(m_tokens);) {
+    for (auto it = std::cbegin(m_tokens); it != std::cend(m_tokens); it++) {
         if ((*it)->callbackId == callbackId) {
-            it = m_tokens.erase(it);
-        } else {
-            it++;
+            m_tokens.erase(it);
+            break;
         }
     }
 
