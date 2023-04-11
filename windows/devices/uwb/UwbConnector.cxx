@@ -632,28 +632,17 @@ UwbConnector::GetResolvedDeviceEventCallbacks()
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
 
     std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>> deviceEventCallbacks;
-    deviceEventCallbacks.reserve(std::size(m_deviceEventCallbacks));
+    deviceEventCallbacks.reserve(std::size(m_deviceEventCallbacksIdMap));
 
-    std::vector<uint32_t> staleCallbacks;
-
-    for (auto it = std::begin(m_deviceEventCallbacks); it != std::end(m_deviceEventCallbacks); it++) {
-        auto callbackId = *it;
-        auto result = m_deviceEventCallbacksIdMap.find(callbackId);
-        if (result == std::cend(m_deviceEventCallbacksIdMap)) {
-            PLOG_ERROR << "could not find a deviceEventCallback id in the id map when it is present in m_deviceEventCallbacks. id=" << callbackId;
-            return {};
-        }
-        auto& [id, deviceEventCallbackWeak] = *result;
+    for (auto it = std::begin(m_deviceEventCallbacksIdMap); it != std::end(m_deviceEventCallbacksIdMap);) {
+        auto& [id, deviceEventCallbackWeak] = *it;
         auto deviceEventCallback = deviceEventCallbackWeak.lock();
         if (deviceEventCallback != nullptr) {
             deviceEventCallbacks.push_back(std::move(deviceEventCallback));
+            it = std::next(it);
         } else {
-            staleCallbacks.push_back(callbackId);
+            it = m_deviceEventCallbacksIdMap.erase(it);
         }
-    }
-
-    for (auto id : staleCallbacks) {
-        DeregisterEventCallback(::uwb::RegisteredCallbackToken{ id, true });
     }
 
     return deviceEventCallbacks;
@@ -666,7 +655,7 @@ UwbConnector::GetResolvedSessionEventCallbacks(uint32_t sessionId)
 
     // Lookup the set of callbacks for this session id. If the node is empty, no
     // callbacks have ever been registered.
-    auto node = m_sessionEventCallbacks.extract(sessionId);
+    auto node = m_sessionIdToCallbackIdsMap.extract(sessionId);
     if (node.empty()) {
         return {};
     }
@@ -676,30 +665,29 @@ UwbConnector::GetResolvedSessionEventCallbacks(uint32_t sessionId)
     // the vector, otherwise move the shared_ptr into the new container of them
     // to be returned to the caller.
     auto& sessionEventCallbackIds = node.mapped();
-    std::vector<uint32_t> staleCallbacks;
 
     std::vector<std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks>> sessionEventCallbacks;
-    for (auto it = std::begin(sessionEventCallbackIds); it != std::end(sessionEventCallbackIds); it++) {
+    for (auto it = std::begin(sessionEventCallbackIds); it != std::end(sessionEventCallbackIds);) {
         auto& sessionEventCallbackId = *it;
         auto result = m_sessionEventCallbacksIdMap.find(sessionEventCallbackId);
         if (result == std::cend(m_sessionEventCallbacksIdMap)) {
-            PLOG_ERROR << "could not find a sessionEventCallback id in the id map when it is present in m_deviceEventCallbacks. id=" << sessionEventCallbackId;
+            PLOG_ERROR << "could not find a sessionEventCallback id in the id map when it is present in m_sessionIdToCallbackIdsMap. id=" << sessionEventCallbackId;
             return {};
         }
-        auto& [id, sessionEventCallbackWeak] = *result;
+        auto& [callbackId, sessionIdAndsessionEventCallbackWeak] = *result;
+        auto& [sessionId, sessionEventCallbackWeak] = sessionIdAndsessionEventCallbackWeak;
         auto sessionEventCallback = sessionEventCallbackWeak.lock();
         if (sessionEventCallback != nullptr) {
             sessionEventCallbacks.push_back(std::move(sessionEventCallback));
+            it = std::next(it);
         } else {
-            staleCallbacks.push_back(sessionEventCallbackId);
+            // this callback is stale, erase it
+            it = sessionEventCallbackIds.erase(it);
+            m_sessionEventCallbacksIdMap.erase(result);
         }
     }
 
-    m_sessionEventCallbacks.insert(std::move(node));
-
-    for (auto id : staleCallbacks) {
-        DeregisterEventCallback(::uwb::RegisteredCallbackToken{ id, false });
-    }
+    m_sessionIdToCallbackIdsMap.insert(std::move(node));
 
     return sessionEventCallbacks;
 }

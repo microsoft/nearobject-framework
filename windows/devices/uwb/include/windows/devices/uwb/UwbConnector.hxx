@@ -252,20 +252,27 @@ private:
     DeregisterEventCallback(::uwb::RegisteredCallbackToken token);
 
 private:
-    // the following shared_mutex is used to protect access to both session and device event callbacks
-    mutable std::shared_mutex m_eventCallbacksGate;
-    std::unordered_map<uint32_t, std::vector<uint32_t>> m_sessionEventCallbacks;
-    std::vector<uint32_t> m_deviceEventCallbacks;
     std::string m_deviceName{};
     std::jthread m_notificationThread;
     wil::shared_hfile m_notificationHandleDriver;
     OVERLAPPED m_notificationOverlapped;
 
-private:
-    // the following is related to how the UwbConnector keeps track of its callbacks
-    uint32_t m_tokenUniqueState;
-    std::unordered_map<uint32_t, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks>> m_sessionEventCallbacksIdMap;
+    // the following shared_mutex is used to protect access to everything regarding the registered callbacks
+    mutable std::shared_mutex m_eventCallbacksGate;
+    
+    // map of callbackId to tuple of sessionId and the actual callback
+    std::unordered_map<uint32_t, std::pair<uint32_t,std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks>>> m_sessionEventCallbacksIdMap;
+    
+    // map of callbackId to the actual callback
     std::unordered_map<uint32_t, std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>> m_deviceEventCallbacksIdMap;
+    
+    // map of sessionId to vector of callbackIds
+    std::unordered_map<uint32_t, std::vector<uint32_t>> m_sessionIdToCallbackIdsMap;
+    
+    // ensures each generated new callbackId is unique
+    uint32_t m_tokenUniqueState;
+    
+    // strictly used for deregistration, the token will be evaluated lazily, and may or may not be synced ith the actual callback storage
     std::vector<std::shared_ptr<::uwb::RegisteredCallbackToken>> m_tokens;
 };
 } // namespace windows::devices::uwb
