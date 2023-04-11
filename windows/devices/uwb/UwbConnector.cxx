@@ -935,7 +935,7 @@ UwbConnector::DeregisterEventCallback(::uwb::RegisteredCallbackToken token)
     auto callbackId = token.callbackId;
     auto isDeviceEventCallback = token.isDeviceEventCallback;
 
-    // first remove the token from the list of tokens
+    // remove the token from the list of tokens
     for (auto it = std::cbegin(m_tokens); it != std::cend(m_tokens); it++) {
         if ((*it)->callbackId == callbackId) {
             m_tokens.erase(it);
@@ -943,7 +943,6 @@ UwbConnector::DeregisterEventCallback(::uwb::RegisteredCallbackToken token)
         }
     }
 
-    // deal with the id map and list of callbacks
     if (isDeviceEventCallback) {
         // first remove the id from the id map
         auto result = m_deviceEventCallbacksIdMap.find(callbackId);
@@ -951,14 +950,6 @@ UwbConnector::DeregisterEventCallback(::uwb::RegisteredCallbackToken token)
             return;
         }
         m_deviceEventCallbacksIdMap.erase(result);
-
-        // now remove the id from the list of callbacks
-        for (auto it = std::cbegin(m_deviceEventCallbacks); it != std::cend(m_deviceEventCallbacks); it++) {
-            if (*it == callbackId) {
-                m_deviceEventCallbacks.erase(it);
-                return;
-            }
-        }
     } else {
         // first remove the id from the id map
         auto result = m_sessionEventCallbacksIdMap.find(callbackId);
@@ -967,24 +958,27 @@ UwbConnector::DeregisterEventCallback(::uwb::RegisteredCallbackToken token)
         }
         m_sessionEventCallbacksIdMap.erase(result);
 
-        // now remove the id from the list of callbacks
-        for (auto sessionIt = std::cbegin(m_sessionEventCallbacks); sessionIt != std::cend(m_sessionEventCallbacks); sessionIt++) {
-            auto [sessionId, sessionCallbackIds] = *sessionIt;
-            if (sessionCallbackIds.empty()) {
-                PLOG_ERROR << "empty sessionEventCallbacks for session with id=" << sessionId;
-                continue;
-            }
-            for (auto it = std::cbegin(sessionCallbackIds); it != std::cend(sessionCallbackIds); it++) {
-                if (*it == callbackId) {
-                    sessionCallbackIds.erase(it);
-                    // if this is the last sessionEventCallback for this sessionId, make sure to erase the entire vector from m_sessionEventCallbacks
-                    if (sessionCallbackIds.empty()) {
-                        m_sessionEventCallbacks.erase(sessionIt);
-                    }
-                    return;
-                }
+        // now remove the id from the list of m_sessionIdToCallbackIdsMap
+        auto& [_, pair] = *result;
+        auto& [sessionId, callbackWeak] = pair;
+
+        auto node = m_sessionIdToCallbackIdsMap.extract(sessionId);
+        if (node.empty()) {
+            PLOG_ERROR << "m_sessionIdToCallbackIdsMap missing session callback when m_sessionEventCallbacksIdMap has it. sessionId=" << sessionId << ", callbackId=" << callbackId;
+            return;
+        }
+
+        auto callbackIds = node.mapped();
+
+        for (auto it = std::cbegin(callbackIds); it != std::cend(callbackIds); it++) {
+            auto& id = *it;
+            if (id == callbackId) {
+                callbackIds.erase(it);
+                return;
             }
         }
+
+        m_sessionIdToCallbackIdsMap.insert({ sessionId, callbackIds });
     }
 }
 
