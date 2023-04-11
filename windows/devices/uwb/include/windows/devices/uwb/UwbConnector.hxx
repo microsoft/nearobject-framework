@@ -25,7 +25,7 @@ namespace windows::devices::uwb
 /**
  * @brief Opaque class forward declaration to help with the deregistration
  */
-class RegisteredCallbackToken;
+// class ::uwb::RegisteredCallbackToken;
 
 /**
  * @brief Class representing a logical communication channel with a UWB driver.
@@ -65,9 +65,9 @@ public:
      * @brief Sets the callbacks for the UwbDevice that owns this UwbConnector
      *
      * @param callbacks
-     * @return RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback
+     * @return ::uwb::RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback
      */
-    virtual std::weak_ptr<RegisteredCallbackToken>
+    virtual std::weak_ptr<::uwb::RegisteredCallbackToken>
     RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks) override;
 
 public:
@@ -77,9 +77,9 @@ public:
      *
      * @param sessionId
      * @param callbacks
-     * @return RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback
+     * @return ::uwb::RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback
      */
-    virtual std::weak_ptr<RegisteredCallbackToken>
+    virtual std::weak_ptr<::uwb::RegisteredCallbackToken>
     RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks) override;
 
 public:
@@ -90,7 +90,7 @@ public:
      * @param token
      */
     void
-    DeregisterEventCallback(std::weak_ptr<RegisteredCallbackToken> token);
+    DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackToken> token);
 
 public:
     // IUwbDeviceDdi
@@ -229,32 +229,32 @@ private:
     /**
      * @brief Internal helper function to insert the callback into the hashmap of ids to callbacks
      * You MUST have grabbed the m_eventCallbacksGate mutex prior to calling this.
-     * 
-     * @param callback 
-     * @return std::weak_ptr<RegisteredCallbackToken>
+     *
+     * @param callback
+     * @return std::weak_ptr<::uwb::RegisteredCallbackToken>
      */
-    std::shared_ptr<RegisteredCallbackToken>
+    std::shared_ptr<::uwb::RegisteredCallbackToken>
     InsertDeviceEventCallback(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callback);
 
     /**
      * @brief Internal helper function to insert the callback into the hashmap of ids to callbacks
      * You MUST have grabbed the m_eventCallbacksGate mutex prior to calling this.
-     * 
-     * @param callback 
-     * @return std::weak_ptr<RegisteredCallbackToken>
+     *
+     * @param callback
+     * @return std::weak_ptr<::uwb::RegisteredCallbackToken>
      */
-    std::shared_ptr<RegisteredCallbackToken>
+    std::shared_ptr<::uwb::RegisteredCallbackToken>
     InsertSessionEventCallback(std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callback);
 
     /**
-     * @brief Internal helper function that deregisters event callbacks. 
+     * @brief Internal helper function that deregisters event callbacks.
      * If you pass in a token that is no longer valid, this function does nothing
      * You must have grabbed the m_eventCallbacksGate mutex prior to calling this
      *
      * @param token
      */
     void
-    DeregisterEventCallback(RegisteredCallbackToken token);
+    DeregisterEventCallback(::uwb::RegisteredCallbackToken token);
 
 private:
     // the following shared_mutex is used to protect access to both session and device event callbacks
@@ -269,9 +269,9 @@ private:
 private:
     // the following is related to how the UwbConnector keeps track of its callbacks
     uint32_t m_tokenUniqueState;
-    std::unordered_map<uint32_t,std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks>> m_sessionEventCallbacksIdMap;
-    std::unordered_map<uint32_t,std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>> m_deviceEventCallbacksIdMap;
-    std::vector<std::shared_ptr<RegisteredCallbackToken>> m_tokens;
+    std::unordered_map<uint32_t, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks>> m_sessionEventCallbacksIdMap;
+    std::unordered_map<uint32_t, std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>> m_deviceEventCallbacksIdMap;
+    std::vector<std::shared_ptr<::uwb::RegisteredCallbackToken>> m_tokens;
 };
 } // namespace windows::devices::uwb
 

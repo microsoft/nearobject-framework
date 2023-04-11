@@ -19,14 +19,14 @@ using namespace windows::devices;
 using namespace windows::devices::uwb;
 using namespace ::uwb::protocol::fira;
 
-namespace windows::devices::uwb
+namespace uwb
 {
-struct RegisteredCallbackToken
+struct ::uwb::RegisteredCallbackToken
 {
     uint32_t callbackId;
     bool isDeviceEventCallback;
 };
-} // namespace windows::devices::uwb
+} // namespace uwb
 
 UwbConnector::UwbConnector(std::string deviceName) :
     m_deviceName(std::move(deviceName))
@@ -653,7 +653,7 @@ UwbConnector::GetResolvedDeviceEventCallbacks()
     }
 
     for (auto id : staleCallbacks) {
-        DeregisterEventCallback(RegisteredCallbackToken{ id, true });
+        DeregisterEventCallback(::uwb::RegisteredCallbackToken{ id, true });
     }
 
     return deviceEventCallbacks;
@@ -698,7 +698,7 @@ UwbConnector::GetResolvedSessionEventCallbacks(uint32_t sessionId)
     m_sessionEventCallbacks.insert(std::move(node));
 
     for (auto id : staleCallbacks) {
-        DeregisterEventCallback(RegisteredCallbackToken{ id, false });
+        DeregisterEventCallback(::uwb::RegisteredCallbackToken{ id, false });
     }
 
     return sessionEventCallbacks;
@@ -898,7 +898,7 @@ UwbConnector::NotificationListenerStop()
     m_notificationThread.request_stop();
 }
 
-std::weak_ptr<RegisteredCallbackToken>
+std::weak_ptr<::uwb::RegisteredCallbackToken>
 UwbConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks)
 {
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
@@ -910,7 +910,7 @@ UwbConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDev
     return token;
 }
 
-std::weak_ptr<RegisteredCallbackToken>
+std::weak_ptr<::uwb::RegisteredCallbackToken>
 UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks)
 {
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
@@ -939,7 +939,7 @@ UwbConnector::CallbacksPresent()
 }
 
 void
-UwbConnector::DeregisterEventCallback(std::weak_ptr<RegisteredCallbackToken> token)
+UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackToken> token)
 {
     auto tok = token.lock();
     if (not tok) {
@@ -951,7 +951,7 @@ UwbConnector::DeregisterEventCallback(std::weak_ptr<RegisteredCallbackToken> tok
 }
 
 void
-UwbConnector::DeregisterEventCallback(RegisteredCallbackToken token)
+UwbConnector::DeregisterEventCallback(::uwb::RegisteredCallbackToken token)
 {
     auto callbackId = token.callbackId;
     auto isDeviceEventCallback = token.isDeviceEventCallback;
@@ -1010,20 +1010,20 @@ UwbConnector::DeregisterEventCallback(RegisteredCallbackToken token)
     }
 }
 
-std::shared_ptr<RegisteredCallbackToken>
+std::shared_ptr<::uwb::RegisteredCallbackToken>
 UwbConnector::InsertDeviceEventCallback(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callback)
 {
     m_tokenUniqueState++;
     m_deviceEventCallbacksIdMap.insert({ m_tokenUniqueState, std::move(callback) });
-    m_tokens.push_back(std::make_shared<RegisteredCallbackToken>(m_tokenUniqueState, true));
+    m_tokens.push_back(std::make_shared<::uwb::RegisteredCallbackToken>(m_tokenUniqueState, true));
     return m_tokens.back();
 }
 
-std::shared_ptr<RegisteredCallbackToken>
+std::shared_ptr<::uwb::RegisteredCallbackToken>
 UwbConnector::InsertSessionEventCallback(std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callback)
 {
     m_tokenUniqueState++;
     m_sessionEventCallbacksIdMap.insert({ m_tokenUniqueState, std::move(callback) });
-    m_tokens.push_back(std::make_shared<RegisteredCallbackToken>(m_tokenUniqueState, false));
+    m_tokens.push_back(std::make_shared<::uwb::RegisteredCallbackToken>(m_tokenUniqueState, false));
     return m_tokens.back();
 }
