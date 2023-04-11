@@ -235,11 +235,12 @@ private:
      * @brief Internal helper function to insert the callback into the hashmap of ids to callbacks
      * You MUST have grabbed the m_eventCallbacksGate mutex prior to calling this.
      *
+     * @param sessionId
      * @param callback
      * @return std::weak_ptr<::uwb::RegisteredCallbackToken>
      */
     std::shared_ptr<::uwb::RegisteredCallbackToken>
-    InsertSessionEventCallback(std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callback);
+    InsertSessionEventCallback(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callback);
 
     /**
      * @brief Internal helper function that deregisters event callbacks.
@@ -259,19 +260,19 @@ private:
 
     // the following shared_mutex is used to protect access to everything regarding the registered callbacks
     mutable std::shared_mutex m_eventCallbacksGate;
-    
-    // map of callbackId to tuple of sessionId and the actual callback
-    std::unordered_map<uint32_t, std::pair<uint32_t,std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks>>> m_sessionEventCallbacksIdMap;
-    
+
     // map of callbackId to the actual callback
     std::unordered_map<uint32_t, std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>> m_deviceEventCallbacksIdMap;
-    
-    // map of sessionId to vector of callbackIds
+
+    // map of callbackId to tuple of sessionId and the actual callback
+    std::unordered_map<uint32_t, std::pair<uint32_t, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks>>> m_sessionEventCallbacksIdMap;
+
+    // map of sessionId to vector of callbackIds. This is guaranteed to be synced to the m_sessionEventCallbacksIdMap (basically the inverse)
     std::unordered_map<uint32_t, std::vector<uint32_t>> m_sessionIdToCallbackIdsMap;
-    
+
     // ensures each generated new callbackId is unique
     uint32_t m_tokenUniqueState;
-    
+
     // strictly used for deregistration, the token will be evaluated lazily, and may or may not be synced ith the actual callback storage
     std::vector<std::shared_ptr<::uwb::RegisteredCallbackToken>> m_tokens;
 };

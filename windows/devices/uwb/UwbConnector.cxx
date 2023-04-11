@@ -681,7 +681,7 @@ UwbConnector::GetResolvedSessionEventCallbacks(uint32_t sessionId)
             sessionEventCallbacks.push_back(std::move(sessionEventCallback));
             it = std::next(it);
         } else {
-            // this callback is stale, erase it
+            // this callback is stale, erase it from the id map and the m_sessionIdToCallbackIdsMap
             it = sessionEventCallbackIds.erase(it);
             m_sessionEventCallbacksIdMap.erase(result);
         }
@@ -903,27 +903,18 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::
 {
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
     bool isFirstCallback = not CallbacksPresent();
-    auto token = InsertSessionEventCallback(callbacks);
-    // Obtain the map node to the existing vector of callbacks, if present.
-    auto node = m_sessionEventCallbacks.extract(sessionId);
-    if (!node.empty()) {
-        auto& sessionEventCallbacks = node.mapped();
-        sessionEventCallbacks.push_back(token->callbackId);
-        m_sessionEventCallbacks.insert(std::move(node));
-    } else {
-        m_sessionEventCallbacks.insert({ sessionId, { token->callbackId } });
-    }
-
+    auto token = InsertSessionEventCallback(sessionId, callbacks);
     if (isFirstCallback) {
         NotificationListenerStart();
     }
     return token;
+    // TODO move the below to InsertSessionEventCallback
 }
 
 bool
 UwbConnector::CallbacksPresent()
 {
-    return (not m_deviceEventCallbacks.empty()) or (not m_sessionEventCallbacks.empty());
+    return (not m_deviceEventCallbacksIdMap.empty()) or (not m_sessionEventCallbacksIdMap.empty());
 }
 
 void
@@ -1007,10 +998,21 @@ UwbConnector::InsertDeviceEventCallback(std::weak_ptr<::uwb::UwbRegisteredDevice
 }
 
 std::shared_ptr<::uwb::RegisteredCallbackToken>
-UwbConnector::InsertSessionEventCallback(std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callback)
+UwbConnector::InsertSessionEventCallback(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callback)
 {
     m_tokenUniqueState++;
-    m_sessionEventCallbacksIdMap.insert({ m_tokenUniqueState, std::move(callback) });
+    auto callbackId = m_tokenUniqueState;
+    // Obtain the map node to the existing vector of callbacks, if present.
+    auto node = m_sessionIdToCallbackIdsMap.extract(sessionId);
+    if (!node.empty()) {
+        auto& sessionEventCallbacks = node.mapped();
+        sessionEventCallbacks.push_back(callbackId);
+        m_sessionIdToCallbackIdsMap.insert(std::move(node));
+    } else {
+        m_sessionIdToCallbackIdsMap.insert({ sessionId, { callbackId } });
+    }
+
+    m_sessionEventCallbacksIdMap.insert({ callbackId, { sessionId, std::move(callback) } });
     m_tokens.push_back(std::make_shared<::uwb::RegisteredCallbackToken>(m_tokenUniqueState, false));
     return m_tokens.back();
 }
