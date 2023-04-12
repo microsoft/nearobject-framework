@@ -21,9 +21,25 @@ using namespace ::uwb::protocol::fira;
 
 namespace uwb
 {
-class RegisteredCallbackToken
+struct RegisteredCallbackToken
 {
-    uint32_t callbackId;
+    virtual ~RegisteredCallbackToken() = default;
+};
+
+struct RegisteredSessionCallbackToken : public RegisteredCallbackToken
+{
+    RegisteredSessionCallbackToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks) :
+        SessionId(sessionId),
+        Callbacks(std::move(callbacks)){};
+    uint32_t SessionId;
+    std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> Callbacks;
+};
+
+struct RegisteredDeviceCallbackToken : public RegisteredCallbackToken
+{
+    RegisteredDeviceCallbackToken(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks) :
+        Callbacks(Callbacks){};
+    std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> Callbacks;
 };
 } // namespace uwb
 
@@ -634,7 +650,8 @@ UwbConnector::GetResolvedDeviceEventCallbacks()
     deviceEventCallbacks.reserve(std::size(m_deviceEventCallbacks));
 
     for (auto it = std::begin(m_deviceEventCallbacks); it != std::end(m_deviceEventCallbacks);) {
-        auto& deviceEventCallbackWeak = *it;
+        auto& deviceEventCallbackToken = *it;
+        auto& deviceEventCallbackWeak = deviceEventCallbackToken->Callbacks;
         auto deviceEventCallback = deviceEventCallbackWeak.lock();
         if (deviceEventCallback != nullptr) {
             deviceEventCallbacks.push_back(std::move(deviceEventCallback));
@@ -663,16 +680,19 @@ UwbConnector::GetResolvedSessionEventCallbacks(uint32_t sessionId)
     // each one into a shared_ptr. If the weak pointer expired, remove it from
     // the vector, otherwise move the shared_ptr into the new container of them
     // to be returned to the caller.
-    auto& sessionEventCallbacksWeak = node.mapped();
+    auto& tokens = node.mapped();
+
     std::vector<std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks>> sessionEventCallbacks;
-    for (auto it = std::begin(sessionEventCallbacksWeak); it != std::end(sessionEventCallbacksWeak);) {
-        auto& sessionEventCallbackWeak = *it;
+    for (auto it = std::begin(tokens); it != std::end(tokens);) {
+        auto& sessionEventCallbackToken = *it;
+        auto& sessionEventCallbackWeak = sessionEventCallbackToken->Callbacks;
         auto sessionEventCallback = sessionEventCallbackWeak.lock();
         if (sessionEventCallback != nullptr) {
             sessionEventCallbacks.push_back(std::move(sessionEventCallback));
             it = std::next(it);
         } else {
-            it = sessionEventCallbacksWeak.erase(it);
+            // this callback is stale, erase it from the tokens
+            it = tokens.erase(it);
         }
     }
 
@@ -875,48 +895,84 @@ UwbConnector::NotificationListenerStop()
     m_notificationThread.request_stop();
 }
 
-::uwb::RegisteredCallbackToken*
+std::weak_ptr<::uwb::RegisteredCallbackToken>
 UwbConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks)
 {
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
     bool isFirstCallback = not CallbacksPresent();
-    m_deviceEventCallbacks.push_back(std::move(callbacks));
+    auto token = std::make_shared<::uwb::RegisteredDeviceCallbackToken>(callbacks);
+    m_deviceEventCallbacks.push_back(token);
     if (isFirstCallback) {
         NotificationListenerStart();
     }
-    return nullptr;
+    return token;
 }
 
-::uwb::RegisteredCallbackToken*
+std::weak_ptr<::uwb::RegisteredCallbackToken>
 UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks)
 {
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
     bool isFirstCallback = not CallbacksPresent();
-    // Obtain the map node to the existing vector of callbacks, if present.
+    auto token = std::make_shared<::uwb::RegisteredSessionCallbackToken>(sessionId, callbacks);
     auto node = m_sessionEventCallbacks.extract(sessionId);
     if (!node.empty()) {
         auto& sessionEventCallbacks = node.mapped();
-        sessionEventCallbacks.push_back(std::move(callbacks));
+        sessionEventCallbacks.push_back(token);
         m_sessionEventCallbacks.insert(std::move(node));
     } else {
-        m_sessionEventCallbacks.insert({ sessionId, { std::move(callbacks) } });
+        m_sessionEventCallbacks.insert({ sessionId, { token } });
     }
-
     if (isFirstCallback) {
         NotificationListenerStart();
     }
-    return nullptr;
+    return token;
 }
 
 bool
 UwbConnector::CallbacksPresent()
 {
-    return (not m_deviceEventCallbacks.empty()) or (not m_sessionEventCallbacks.empty());
+    return (not m_sessionEventCallbacks.empty()) or (not m_deviceEventCallbacks.empty());
 }
 
 void
-UwbConnector::DeregisterEventCallback(::uwb::RegisteredCallbackToken* token)
+UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackToken> token)
 {
-    // TODO implement
+    auto tokenShared = token.lock();
+    if (not tokenShared) {
+        return;
+    }
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
+
+    auto sessionCallback = dynamic_pointer_cast<::uwb::RegisteredSessionCallbackToken>(tokenShared);
+    if (sessionCallback) {
+        // treat it as a session callback
+        auto sessionId = sessionCallback->SessionId;
+
+        auto node = m_sessionEventCallbacks.extract(sessionId);
+        if (node.empty()) {
+            return; // sessionId has no associated tokens
+        }
+
+        auto tokens = node.mapped();
+        auto tokenIt = std::find_if(std::cbegin(tokens), std::cend(tokens), [sessionCallback](const auto& token) {
+            return token.get() == sessionCallback.get();
+        });
+        if (tokenIt == std::cend(tokens)) {
+            return; // no associated token found, bail
+        }
+        tokens.erase(tokenIt);
+        m_sessionEventCallbacks.insert(std::move(node));
+    } else {
+        auto deviceCallback = std::dynamic_pointer_cast<::uwb::RegisteredDeviceCallbackToken>(tokenShared);
+        if (deviceCallback == nullptr) {
+            throw std::runtime_error("invalid callback type used, this is a bug!");
+        }
+        auto tokenIt = std::find_if(std::cbegin(m_deviceEventCallbacks), std::cend(m_deviceEventCallbacks), [deviceCallback](const auto& token) {
+            return token.get() == deviceCallback.get();
+        });
+        if (tokenIt == std::cend(m_deviceEventCallbacks)) {
+            return; // no associated token found, bail
+        }
+        m_deviceEventCallbacks.erase(tokenIt);
+    }
 }
