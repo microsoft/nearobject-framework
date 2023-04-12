@@ -21,6 +21,22 @@ using namespace ::uwb::protocol::fira;
 
 namespace uwb
 {
+namespace UwbRegisteredSessionEventCallbackTypes
+{
+using OnSessionEnded = std::function<void(UwbSessionEndReason reason)>;
+using OnRangingStarted = std::function<void()>;
+using OnRangingStopped = std::function<void()>;
+using OnPeerPropertiesChanged = std::function<void(const std::vector<UwbPeer> peersChanged)>;
+using OnSessionMembershipChanged = std::function<void(const std::vector<UwbPeer> peersAdded, const std::vector<UwbPeer> peersRemoved)>;
+}; // namespace UwbRegisteredSessionEventCallbackTypes
+
+namespace UwbRegisteredDeviceEventCallbackTypes
+{
+using OnStatusChanged = std::function<void(::uwb::protocol::fira::UwbStatus)>;
+using OnDeviceStatusChanged = std::function<void(::uwb::protocol::fira::UwbStatusDevice)>;
+using OnSessionStatusChanged = std::function<void(::uwb::protocol::fira::UwbSessionStatus)>;
+}; // namespace UwbRegisteredDeviceEventCallbackTypes
+
 struct RegisteredCallbackToken
 {
     virtual ~RegisteredCallbackToken() = default;
@@ -33,28 +49,63 @@ struct RegisteredSessionCallbackToken : public RegisteredCallbackToken
     uint32_t SessionId;
 };
 
+class OnSessionEndedToken : public RegisteredSessionCallbackToken
+{
+    OnSessionEndedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionEnded> callback) :
+        RegisteredSessionCallbackToken(sessionId),
+        Callback(std::move(callback)){};
+    std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionEnded> Callback;
+};
+class OnRangingStartedToken : public RegisteredSessionCallbackToken
+{
+    OnRangingStartedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted> callback) :
+        RegisteredSessionCallbackToken(sessionId),
+        Callback(std::move(callback)){};
+    std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted> Callback;
+};
+class OnRangingStoppedToken : public RegisteredSessionCallbackToken
+{
+    OnRangingStoppedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped> callback) :
+        RegisteredSessionCallbackToken(sessionId),
+        Callback(std::move(callback)){};
+    std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped> Callback;
+};
+class OnPeerPropertiesChangedToken : public RegisteredSessionCallbackToken
+{
+    OnPeerPropertiesChangedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged> callback) :
+        RegisteredSessionCallbackToken(sessionId),
+        Callback(std::move(callback)){};
+    std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged> Callback;
+};
+class OnSessionMembershipChangedToken : public RegisteredSessionCallbackToken
+{
+    OnSessionMembershipChangedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionMembershipChanged> callback) :
+        RegisteredSessionCallbackToken(sessionId),
+        Callback(std::move(callback)){};
+    std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionMembershipChanged> Callback;
+};
+
 struct RegisteredDeviceCallbackToken : public RegisteredCallbackToken
 {
 };
-
-class OnSessionEndedToken : public RegisteredSessionCallbackToken
+class OnStatusChangedToken : public RegisteredDeviceCallbackToken
 {
-    OnSessionEndedToken(uint32_t sessionId, std::weak_ptr<::uwb::OnSessionEndedToken> callbacks) :
-        SessionId(sessionId),
-        Callbacks(std::move(callbacks)){};
-    uint32_t SessionId;
-    std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> Callbacks;
+    OnStatusChangedToken(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged> callback) :
+        Callback(std::move(callback)){};
+    std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged> Callback;
 };
-class OnRangingStartedToken;
-class OnRangingStoppedToken;
-class OnPeerPropertiesChangedToken;
-class OnSessionMembershipChangedToken;
-
-class RegisteredDeviceCallbackToken;
-class OnStatusChangedToken;
-class OnDeviceStatusChangedToken;
-class OnSessionStatusChangedToken;
-
+class OnDeviceStatusChangedToken : public RegisteredDeviceCallbackToken
+{
+    OnDeviceStatusChangedToken(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnDeviceStatusChanged> callback) :
+        Callback(std::move(callback)){};
+    std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnDeviceStatusChanged> Callback;
+};
+class OnSessionStatusChangedToken : public RegisteredDeviceCallbackToken
+{
+    OnSessionStatusChangedToken(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged> callback) :
+        Callback(std::move(callback)){};
+    std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged> Callback;
+};
 } // namespace uwb
 
 UwbConnector::UwbConnector(std::string deviceName) :
