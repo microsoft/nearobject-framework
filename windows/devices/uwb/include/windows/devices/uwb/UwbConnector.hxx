@@ -259,7 +259,7 @@ private:
 
     std::vector<std::shared_ptr<::uwb::OnStatusChangedToken>> m_onStatusChangedCallbacks;
     std::vector<std::shared_ptr<::uwb::OnDeviceStatusChangedToken>> m_onDeviceStatusChangedCallbacks;
-    std::vector<std::shared_ptr<::uwb::OnSessionStatusChangedToken>> m_OnSessionStatusChangedCallbacks;
+    std::vector<std::shared_ptr<::uwb::OnSessionStatusChangedToken>> m_onSessionStatusChangedCallbacks;
 };
 } // namespace windows::devices::uwb
 
