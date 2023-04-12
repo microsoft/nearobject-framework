@@ -960,17 +960,60 @@ UwbConnector::NotificationListenerStop()
     m_notificationThread.request_stop();
 }
 
-std::weak_ptr<::uwb::RegisteredCallbackToken>
+template <typename L>
+std::shared_ptr<::uwb::RegisteredDeviceCallbackToken>
+GetToken(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks, std::function<L(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>)> accessor, std::function<std::shared_ptr<::uwb::RegisteredDeviceCallbackToken>(L)> tokenizer)
+{
+    auto cbs = callbacks.lock();
+    if (not cbs) {
+        return nullptr;
+    }
+    auto cb = accessor(cbs);
+    if (not cb) {
+        return nullptr;
+    }
+    return tokenizer(cb);
+}
+
+::uwb::UwbRegisteredDeviceEventCallbackTokens
 UwbConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks)
 {
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
     bool isFirstCallback = not CallbacksPresent();
-    auto token = std::make_shared<::uwb::RegisteredDeviceCallbackToken>(callbacks);
-    m_deviceEventCallbacks.push_back(token);
-    if (isFirstCallback) {
-        NotificationListenerStart();
-    }
-    return token;
+
+    auto OnStatusChangedToken = GetToken<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged>(
+        callbacks, [](auto&& cbs) {
+            return cbs->OnStatusChanged;
+        },
+        [](auto&& cb) {
+            return std::make_shared<::uwb::OnStatusChangedToken>(cb);
+        });
+
+    auto OnDeviceStatusChangedToken = GetToken<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnDeviceStatusChanged>(
+        callbacks, [](auto&& cbs) {
+            return cbs->OnDeviceStatusChanged;
+        },
+        [](auto&& cb) {
+            return std::make_shared<::uwb::OnDeviceStatusChangedToken>(cb);
+        });
+
+    auto OnSessionStatusChangedToken = GetToken<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged>(
+        callbacks, [](auto&& cbs) {
+            return cbs->OnSessionStatusChanged;
+        },
+        [](auto&& cb) {
+            return std::make_shared<::uwb::OnSessionStatusChangedToken>(cb);
+        });
+
+    m_onStatusChangedCallbacks.push_back(std::dynamic_pointer_cast<::uwb::OnStatusChangedToken>(OnStatusChangedToken));
+    m_onDeviceStatusChangedCallbacks.push_back(std::dynamic_pointer_cast<::uwb::OnDeviceStatusChangedToken>(OnDeviceStatusChangedToken));
+    m_OnSessionStatusChangedCallbacks.push_back(std::dynamic_pointer_cast<::uwb::OnSessionStatusChangedToken>(OnSessionStatusChangedToken));
+
+    return {
+        OnStatusChangedToken,
+        OnDeviceStatusChangedToken,
+        OnSessionStatusChangedToken
+    };
 }
 
 std::weak_ptr<::uwb::RegisteredCallbackToken>
