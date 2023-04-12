@@ -27,7 +27,17 @@ namespace uwb
  *
  */
 class RegisteredSessionCallbackToken;
+class OnSessionEndedToken;
+class OnRangingStartedToken;
+class OnRangingStoppedToken;
+class OnPeerPropertiesChangedToken;
+class OnSessionMembershipChangedToken;
+
 class RegisteredDeviceCallbackToken;
+class OnStatusChangedToken;
+class OnDeviceStatusChangedToken;
+class OnSessionStatusChangedToken;
+
 } // namespace uwb
 
 namespace windows::devices::uwb
@@ -241,8 +251,15 @@ private:
 
     // the following shared_mutex is used to protect access to everything regarding the registered callbacks
     mutable std::shared_mutex m_eventCallbacksGate;
-    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::RegisteredSessionCallbackToken>>> m_sessionEventCallbacks;
-    std::vector<std::shared_ptr<::uwb::RegisteredDeviceCallbackToken>> m_deviceEventCallbacks;
+    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnSessionEndedToken>>> m_onSessionEndedCallbacks;
+    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnRangingStartedToken>>> m_onRangingStartedCallbacks;
+    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnRangingStoppedToken>>> m_onRangingStoppedCallbacks;
+    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnPeerPropertiesChangedToken>>> m_onPeerPropertiesChangedCallbacks;
+    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnSessionMembershipChangedToken>>> m_onSessionMembershipChangedToken;
+
+    std::vector<std::shared_ptr<::uwb::OnStatusChangedToken>> m_onStatusChangedCallbacks;
+    std::vector<std::shared_ptr<::uwb::OnDeviceStatusChangedToken>> m_onDeviceStatusChangedCallbacks;
+    std::vector<std::shared_ptr<::uwb::OnSessionStatusChangedToken>> m_OnSessionStatusChangedCallbacks;
 };
 } // namespace windows::devices::uwb
 
