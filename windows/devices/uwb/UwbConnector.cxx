@@ -28,19 +28,33 @@ struct RegisteredCallbackToken
 
 struct RegisteredSessionCallbackToken : public RegisteredCallbackToken
 {
-    RegisteredSessionCallbackToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks) :
+    RegisteredSessionCallbackToken(uint32_t sessionId) :
+        SessionId(sessionId){};
+    uint32_t SessionId;
+};
+
+struct RegisteredDeviceCallbackToken : public RegisteredCallbackToken
+{
+};
+
+class OnSessionEndedToken : public RegisteredSessionCallbackToken
+{
+    OnSessionEndedToken(uint32_t sessionId, std::weak_ptr<::uwb::OnSessionEndedToken> callbacks) :
         SessionId(sessionId),
         Callbacks(std::move(callbacks)){};
     uint32_t SessionId;
     std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> Callbacks;
 };
+class OnRangingStartedToken;
+class OnRangingStoppedToken;
+class OnPeerPropertiesChangedToken;
+class OnSessionMembershipChangedToken;
 
-struct RegisteredDeviceCallbackToken : public RegisteredCallbackToken
-{
-    RegisteredDeviceCallbackToken(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks) :
-        Callbacks(Callbacks){};
-    std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> Callbacks;
-};
+class RegisteredDeviceCallbackToken;
+class OnStatusChangedToken;
+class OnDeviceStatusChangedToken;
+class OnSessionStatusChangedToken;
+
 } // namespace uwb
 
 UwbConnector::UwbConnector(std::string deviceName) :
