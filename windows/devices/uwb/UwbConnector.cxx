@@ -23,21 +23,21 @@ namespace uwb
 {
 struct RegisteredCallbackToken
 {
-    virtual ~RegisteredCallbackToken(){};
+    virtual ~RegisteredCallbackToken() = default;
 };
 
 struct RegisteredSessionCallbackToken : public RegisteredCallbackToken
 {
-    RegisteredSessionCallbackToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> Callbacks) :
-        sessionId(sessionId),
-        Callbacks(Callbacks){};
-    uint32_t sessionId;
+    RegisteredSessionCallbackToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks) :
+        SessionId(sessionId),
+        Callbacks(std::move(callbacks)){};
+    uint32_t SessionId;
     std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> Callbacks;
 };
 
 struct RegisteredDeviceCallbackToken : public RegisteredCallbackToken
 {
-    RegisteredDeviceCallbackToken(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> Callbacks) :
+    RegisteredDeviceCallbackToken(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks) :
         Callbacks(Callbacks){};
     std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> Callbacks;
 };
@@ -946,7 +946,7 @@ UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackTok
         m_deviceEventCallbacks.erase(tokenIt);
     } else {
         auto sessionCallback = dynamic_pointer_cast<::uwb::RegisteredSessionCallbackToken>(tokenShared);
-        auto sessionId = sessionCallback->sessionId;
+        auto sessionId = sessionCallback->SessionId;
 
         auto node = m_sessionEventCallbacks.extract(sessionId);
         if (node.empty()) {

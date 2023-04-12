@@ -20,6 +20,12 @@
 #include <windows/devices/uwb/IUwbDeviceDdi.hxx>
 #include <windows/devices/uwb/IUwbSessionDdi.hxx>
 
+namespace uwb
+{
+class RegisteredSessionCallbackToken;
+class RegisteredDeviceCallbackToken;
+} // namespace uwb
+
 namespace windows::devices::uwb
 {
 /**
