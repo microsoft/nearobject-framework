@@ -79,6 +79,7 @@ constexpr uint16_t DefaultRangeDataNotificationProximityNear = 0;
 constexpr uint16_t DefaultRangeDataNotificationProximityFar = 20000;
 constexpr uint32_t MinimumUwbInitiationTime = 0;
 constexpr uint32_t MaximumUwbInitiationTime = 10000;
+constexpr size_t DestinationMacAddressesCountWhenControlee = 1;
 
 /**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section

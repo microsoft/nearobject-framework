@@ -612,6 +612,19 @@ To(const UWB_SET_APP_CONFIG_PARAMS_STATUS &applicationConfigurationParameterStat
 To(const UWB_APP_CONFIG_PARAM &applicationConfigurationParameter);
 
 /**
+ * @brief Converts UWB_APP_CONFIG_PARAM to UwbApplicationConfigurationParameter.
+ *
+ * This special conversion function is only used for UWB_APP_CONFIG_PARAM_TYPE_DST_MAC_ADDRESS.
+ * This is because an additional parameter is needed to do the conversion.
+ *
+ * @param applicationConfigurationParameter
+ * @param macAddressMode
+ * @return ::uwb::protocol::fira::UwbApplicationConfigurationParameter
+ */
+::uwb::protocol::fira::UwbApplicationConfigurationParameter
+To(const UWB_APP_CONFIG_PARAM &applicationConfigurationParameter, const ::uwb::UwbMacAddressType macAddressMode);
+
+/**
  * @brief Converts UWB_APP_CONFIG_PARAMS to a vector of UwbApplicationConfigurationParameter.
  *
  * @param applicationConfigurationParameters

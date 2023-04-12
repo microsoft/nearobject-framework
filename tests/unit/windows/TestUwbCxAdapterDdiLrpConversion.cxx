@@ -49,6 +49,23 @@ ValidateRoundtrip(const NeutralT& instance)
 }
 
 /**
+ * @brief Validate a neutral type round-trip conversion works.
+ *
+ * This overload is used specifically for DestinationMacAddresses.
+ *
+ * @tparam NeutralT
+ * @param instance An instance of the neutral type to validate.
+ * @param macAddressMode
+ */
+template <typename NeutralT>
+void
+ValidateRoundtrip(const NeutralT& instance, const ::uwb::UwbMacAddressType macAddressMode)
+{
+    auto instanceCopy = UwbCxDdi::To(UwbCxDdi::From(instance), macAddressMode);
+    REQUIRE(instanceCopy == instance);
+}
+
+/**
  * @brief Generate a random integral value.
  *
  * @tparam ReturnT
@@ -561,6 +578,16 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         .Value = std::move(uwbMacAddressSetSingleAddress),
     };
 
+    // UWB_APP_CONFIG_PARAM_TYPE_DST_MAC_ADDRESS (multiple addresses)
+    const std::unordered_set<::uwb::UwbMacAddress> uwbMacAddressSetMultipleAddresses{
+        std::array<uint8_t, ::uwb::UwbMacAddressLength::Short>{ 0xAA, 0xBB },
+        std::array<uint8_t, ::uwb::UwbMacAddressLength::Short>{ 0x12, 0x34 },
+    };
+    const UwbApplicationConfigurationParameter parameterUwbMacAddressSetMultipleAddresses = {
+        .Type = UwbApplicationConfigurationParameterType::DestinationMacAddresses,
+        .Value = std::move(uwbMacAddressSetMultipleAddresses),
+    };
+
     constexpr UwbSetApplicationConfigurationParameterStatus uwbSetApplicationConfigurationParameterStatusAoaResulReq{
         .Status = UwbStatusOk,
         .ParameterType = UwbApplicationConfigurationParameterType::AoAResultRequest,
@@ -625,7 +652,12 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
 
     SECTION("UwbApplicationConfigurationParameter std::unordered_set<::uwb::UwbMacAddress> (single address) is stable")
     {
-        test::ValidateRoundtrip(parameterUwbMacAddressSetSingleAddress);
+        test::ValidateRoundtrip(parameterUwbMacAddressSetSingleAddress, ::uwb::UwbMacAddressType::Short);
+    }
+
+    SECTION("UwbApplicationConfigurationParameter std::unordered_set<::uwb::UwbMacAddress> (multiple addresses) is stable")
+    {
+        test::ValidateRoundtrip(parameterUwbMacAddressSetMultipleAddresses, ::uwb::UwbMacAddressType::Short);
     }
 
     SECTION("std::vector<UwbApplicationConfigurationParameter> is stable")
