@@ -934,18 +934,9 @@ UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackTok
     }
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
 
-    auto deviceCallback = std::dynamic_pointer_cast<::uwb::RegisteredDeviceCallbackToken>(tokenShared);
-    if (deviceCallback) {
-        // treat it as a device callback
-        auto tokenIt = std::find_if(std::cbegin(m_deviceEventCallbacks), std::cend(m_deviceEventCallbacks), [deviceCallback](const auto& token) {
-            return token.get() == deviceCallback.get();
-        });
-        if (tokenIt == std::cend(m_deviceEventCallbacks)) {
-            return; // no associated token found, bail
-        }
-        m_deviceEventCallbacks.erase(tokenIt);
-    } else {
-        auto sessionCallback = dynamic_pointer_cast<::uwb::RegisteredSessionCallbackToken>(tokenShared);
+    auto sessionCallback = dynamic_pointer_cast<::uwb::RegisteredSessionCallbackToken>(tokenShared);
+    if (sessionCallback) {
+        // treat it as a session callback
         auto sessionId = sessionCallback->SessionId;
 
         auto node = m_sessionEventCallbacks.extract(sessionId);
@@ -962,6 +953,18 @@ UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackTok
         }
         tokens.erase(tokenIt);
         m_sessionEventCallbacks.insert(std::move(node));
+    } else {
+        auto deviceCallback = std::dynamic_pointer_cast<::uwb::RegisteredDeviceCallbackToken>(tokenShared);
+        if (deviceCallback == nullptr) {
+            throw std::runtime_error("invalid callback type used, this is a bug!");
+        }
+        auto tokenIt = std::find_if(std::cbegin(m_deviceEventCallbacks), std::cend(m_deviceEventCallbacks), [deviceCallback](const auto& token) {
+            return token.get() == deviceCallback.get();
+        });
+        if (tokenIt == std::cend(m_deviceEventCallbacks)) {
+            return; // no associated token found, bail
+        }
+        m_deviceEventCallbacks.erase(tokenIt);
     }
 }
 

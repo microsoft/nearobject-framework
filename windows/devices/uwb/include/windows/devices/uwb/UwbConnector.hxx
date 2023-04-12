@@ -22,6 +22,10 @@
 
 namespace uwb
 {
+/**
+ * @brief The following are opaque class declarations that are used in this file
+ * 
+ */
 class RegisteredSessionCallbackToken;
 class RegisteredDeviceCallbackToken;
 } // namespace uwb
