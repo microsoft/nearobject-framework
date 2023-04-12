@@ -230,28 +230,7 @@ private:
      */
     std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>>
     GetResolvedDeviceEventCallbacks();
-
-    /**
-     * @brief Internal helper function to insert the callback into the hashmap of ids to callbacks
-     * You MUST have grabbed the m_eventCallbacksGate mutex prior to calling this.
-     *
-     * @param callback
-     * @return std::weak_ptr<::uwb::RegisteredCallbackToken>
-     */
-    std::shared_ptr<::uwb::RegisteredCallbackToken>
-    InsertDeviceEventCallback(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callback);
-
-    /**
-     * @brief Internal helper function to insert the callback into the hashmap of ids to callbacks
-     * You MUST have grabbed the m_eventCallbacksGate mutex prior to calling this.
-     *
-     * @param sessionId
-     * @param callback
-     * @return std::weak_ptr<::uwb::RegisteredCallbackToken>
-     */
-    std::shared_ptr<::uwb::RegisteredCallbackToken>
-    InsertSessionEventCallback(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callback);
-
+    
 private:
     std::string m_deviceName{};
     std::jthread m_notificationThread;
