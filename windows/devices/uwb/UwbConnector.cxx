@@ -23,16 +23,22 @@ namespace uwb
 {
 struct RegisteredCallbackToken
 {
+    virtual ~RegisteredCallbackToken(){};
 };
 
 struct RegisteredSessionCallbackToken : public RegisteredCallbackToken
 {
+    RegisteredSessionCallbackToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> Callbacks) :
+        sessionId(sessionId),
+        Callbacks(Callbacks){};
     uint32_t sessionId;
     std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> Callbacks;
 };
 
 struct RegisteredDeviceCallbackToken : public RegisteredCallbackToken
 {
+    RegisteredDeviceCallbackToken(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> Callbacks) :
+        Callbacks(Callbacks){};
     std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> Callbacks;
 };
 } // namespace uwb
