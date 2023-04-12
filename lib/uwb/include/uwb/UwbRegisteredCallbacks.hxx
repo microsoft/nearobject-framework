@@ -112,7 +112,7 @@ struct UwbRegisteredSessionEventCallbackTokens
  * @brief structure containing the tokens corresponding to the callbacks you register
  * 
  */
-struct UwbRegisteredDeviceEventCallbackToken
+struct UwbRegisteredDeviceEventCallbackTokens
 {
     std::weak_ptr<RegisteredCallbackToken> OnStatusChangedToken;
     std::weak_ptr<RegisteredCallbackToken> OnDeviceStatusChangedToken;

@@ -65,9 +65,9 @@ struct IUwbSessionDdiConnector : public IUwbSessionDdi
      *
      * @param sessionId
      * @param callbacks
-     * @return std::weak_ptr<::uwb::RegisteredCallbackToken> You can pass this pointer into DeregisterEventCallback to deregister this event callback
+     * @return ::uwb::UwbRegisteredSessionEventCallbackTokens You can pass the pointers into DeregisterEventCallback to deregister the event callbacks
      */
-    virtual std::weak_ptr<::uwb::RegisteredCallbackToken>
+    virtual ::uwb::UwbRegisteredSessionEventCallbackTokens
     RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks) = 0;
 };
 

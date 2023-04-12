@@ -24,7 +24,7 @@ namespace uwb
 {
 /**
  * @brief The following are opaque class declarations that are used in this file
- * 
+ *
  */
 class RegisteredSessionCallbackToken;
 class RegisteredDeviceCallbackToken;
@@ -68,23 +68,25 @@ public:
     // IUwbDeviceDdiConnector
     /**
      * @brief Sets the callbacks for the UwbDevice that owns this UwbConnector
+     * You can pass in a partially filled in struct, in which case this function returns a partially filled in struct of tokens corresponding to those callbacks.
      *
      * @param callbacks
-     * @return std::weak_ptr<::uwb::RegisteredCallbackToken> You can pass this pointer into DeregisterEventCallback to deregister this event callback
+     * @return ::uwb::UwbRegisteredDeviceEventCallbackTokens You can pass the pointers into DeregisterEventCallback to deregister the event callbacks
      */
-    virtual std::weak_ptr<::uwb::RegisteredCallbackToken>
+    virtual ::uwb::UwbRegisteredDeviceEventCallbackTokens
     RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks) override;
 
 public:
     // IUwbSessionDdiConnector
     /**
-     * @brief Registers the callbacks for a particular session
+     * @brief Registers the callbacks for a particular session.
+     * You can pass in a partially filled in struct, in which case this function returns a partially filled in struct of tokens corresponding to those callbacks.
      *
      * @param sessionId
      * @param callbacks
-     * @return std::weak_ptr<::uwb::RegisteredCallbackToken> You can pass this pointer into DeregisterEventCallback to deregister this event callback
+     * @return ::uwb::UwbRegisteredSessionEventCallbackTokens You can pass the pointers into DeregisterEventCallback to deregister the event callbacks
      */
-    virtual std::weak_ptr<::uwb::RegisteredCallbackToken>
+    virtual ::uwb::UwbRegisteredSessionEventCallbackTokens
     RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks) override;
 
 public:
@@ -230,7 +232,7 @@ private:
      */
     std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>>
     GetResolvedDeviceEventCallbacks();
-    
+
 private:
     std::string m_deviceName{};
     std::jthread m_notificationThread;
