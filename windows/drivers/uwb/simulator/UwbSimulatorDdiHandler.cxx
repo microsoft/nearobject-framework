@@ -6,6 +6,8 @@
 #include <type_traits>
 #include <unordered_map>
 
+#include <magic_enum.hpp>
+
 #include "UwbSimulatorDdiCallbacks.hxx"
 #include "UwbSimulatorDdiHandler.hxx"
 
@@ -208,11 +210,16 @@ UwbSimulatorDdiHandler::OnUwbGetApplicationConfigurationParameters(WDFREQUEST re
     auto &applicationConfigurationParametersIn = *reinterpret_cast<UWB_GET_APP_CONFIG_PARAMS *>(std::data(inputBuffer));
 
     std::vector<UwbApplicationConfigurationParameterType> uwbApplicationConfigurationParameterTypes{};
-    uwbApplicationConfigurationParameterTypes.reserve(applicationConfigurationParametersIn.appConfigParamsCount);
-    std::span uwbApplicationConfigurationParameterTypesRange{ applicationConfigurationParametersIn.appConfigParams, applicationConfigurationParametersIn.appConfigParamsCount };
-    std::ranges::transform(uwbApplicationConfigurationParameterTypesRange, std::back_inserter(uwbApplicationConfigurationParameterTypes), [](const auto &applicationConfigurationParameterType) {
-        return UwbCxDdi::To(applicationConfigurationParameterType);
-    });
+    if (applicationConfigurationParametersIn.appConfigParamsCount == 0) {
+        constexpr auto allParameterTypesArray = magic_enum::enum_values<UwbApplicationConfigurationParameterType>();
+        uwbApplicationConfigurationParameterTypes.insert(std::end(uwbApplicationConfigurationParameterTypes), std::cbegin(allParameterTypesArray), std::cend(allParameterTypesArray));
+    } else {
+        uwbApplicationConfigurationParameterTypes.reserve(applicationConfigurationParametersIn.appConfigParamsCount);
+        std::span uwbApplicationConfigurationParameterTypesRange{ applicationConfigurationParametersIn.appConfigParams, applicationConfigurationParametersIn.appConfigParamsCount };
+        std::ranges::transform(uwbApplicationConfigurationParameterTypesRange, std::back_inserter(uwbApplicationConfigurationParameterTypes), [](const auto &applicationConfigurationParameterType) {
+            return UwbCxDdi::To(applicationConfigurationParameterType);
+        });
+    }
 
     // Invoke callback.
     std::vector<UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters{};
