@@ -12,12 +12,6 @@
 namespace uwb
 {
 /**
- * @brief Opaque class forward declaration to help with the deregistration
- *
- */
-class RegisteredCallbackToken;
-
-/**
  * @brief Interface for receiving events from a UwbSession. This is the primary
  * method to receive information from near peers.
  *
@@ -93,6 +87,36 @@ struct UwbRegisteredDeviceEventCallbacks
      * @param statusSession The new status of the session.
      */
     std::function<void(::uwb::protocol::fira::UwbSessionStatus)> OnSessionStatusChanged;
+};
+
+/**
+ * @brief Opaque class forward declaration to help with the deregistration
+ *
+ */
+class RegisteredCallbackToken;
+
+/**
+ * @brief structure containing the tokens corresponding to the callbacks you register
+ * 
+ */
+struct UwbRegisteredSessionEventCallbackTokens
+{
+    std::weak_ptr<RegisteredCallbackToken> OnSessionEndedToken;
+    std::weak_ptr<RegisteredCallbackToken> OnRangingStartedToken;
+    std::weak_ptr<RegisteredCallbackToken> OnRangingStoppedToken;
+    std::weak_ptr<RegisteredCallbackToken> OnPeerPropertiesChangedToken;
+    std::weak_ptr<RegisteredCallbackToken> OnSessionMembershipChangedToken;
+};
+
+/**
+ * @brief structure containing the tokens corresponding to the callbacks you register
+ * 
+ */
+struct UwbRegisteredDeviceEventCallbackToken
+{
+    std::weak_ptr<RegisteredCallbackToken> OnStatusChangedToken;
+    std::weak_ptr<RegisteredCallbackToken> OnDeviceStatusChangedToken;
+    std::weak_ptr<RegisteredCallbackToken> OnSessionStatusChangedToken;
 };
 
 } // namespace uwb
