@@ -97,7 +97,7 @@ class RegisteredCallbackToken;
 
 /**
  * @brief structure containing the tokens corresponding to the callbacks you register
- * 
+ *
  */
 struct UwbRegisteredSessionEventCallbackTokens
 {
@@ -110,7 +110,7 @@ struct UwbRegisteredSessionEventCallbackTokens
 
 /**
  * @brief structure containing the tokens corresponding to the callbacks you register
- * 
+ *
  */
 struct UwbRegisteredDeviceEventCallbackTokens
 {
