@@ -37,6 +37,27 @@ using OnDeviceStatusChanged = std::function<void(::uwb::protocol::fira::UwbStatu
 using OnSessionStatusChanged = std::function<void(::uwb::protocol::fira::UwbSessionStatus)>;
 }; // namespace UwbRegisteredDeviceEventCallbackTypes
 
+/**
+ * @brief Enum to keep track of the callback type.
+ * TODO This should eventually be combined with ::uwb::protocol::fira::UwbNotificationData because there is a one-to-one corresondence between the two
+ *
+ */
+enum class CallbackType {
+    // session callbacks
+    OnSessionEnded,
+    OnRangingStarted,
+    OnRangingStopped,
+    OnPeerPropertiesChanged,
+    OnSessionMembershipChanged,
+
+    // device callbacks
+    OnStatusChanged,
+    OnDeviceStatusChanged,
+    OnSessionStatusChanged,
+
+    UnknownCallbackType
+};
+
 struct RegisteredCallbackToken
 {
     virtual ~RegisteredCallbackToken() = default;
@@ -1146,6 +1167,42 @@ UwbConnector::CallbacksPresent()
         m_onStatusChangedCallbacks.empty() and m_onDeviceStatusChangedCallbacks.empty() and m_onSessionStatusChangedCallbacks.empty());
 }
 
+/**
+ * @brief Internal helper function to try to deregister this token as this type
+ *
+ * @tparam T the type to try to dynamic_cast this token to
+ * @param token
+ * @param tokens
+ * @return true
+ * @return false
+ */
+template <typename T>
+bool
+DeregisterSessionEventCallback(std::shared_ptr<::uwb::RegisteredCallbackToken> token, std::unordered_map<uint32_t, std::vector<std::shared_ptr<T>>>& tokens)
+{
+    auto callback = dynamic_pointer_cast<T> token;
+    if (not callback) {
+        return false;
+    }
+    auto sessionId = callback->SessionId;
+
+    auto node = m_sessionEventCallbacks.extract(sessionId);
+    if (node.empty()) {
+        return; // sessionId has no associated tokens
+    }
+
+    auto tokens = node.mapped();
+    auto tokenIt = std::find_if(std::cbegin(tokens), std::cend(tokens), [callback](const auto& token) {
+        return token.get() == callback.get();
+    });
+    if (tokenIt == std::cend(tokens)) {
+        return; // no associated token found, bail
+    }
+    tokens.erase(tokenIt);
+    m_sessionEventCallbacks.insert(std::move(node));
+    return true;
+}
+
 void
 UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackToken> token)
 {
@@ -1160,20 +1217,13 @@ UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackTok
         // treat it as a session callback
         auto sessionId = sessionCallback->SessionId;
 
-        auto node = m_sessionEventCallbacks.extract(sessionId);
-        if (node.empty()) {
-            return; // sessionId has no associated tokens
-        }
-
-        auto tokens = node.mapped();
-        auto tokenIt = std::find_if(std::cbegin(tokens), std::cend(tokens), [sessionCallback](const auto& token) {
-            return token.get() == sessionCallback.get();
-        });
-        if (tokenIt == std::cend(tokens)) {
-            return; // no associated token found, bail
-        }
-        tokens.erase(tokenIt);
-        m_sessionEventCallbacks.insert(std::move(node));
+        DeregisterSessionEventCallback<::uwb::OnSessionEndedToken>(tokenShared, m_onSessionEndedCallbacks)                               ? 0
+            : DeregisterSessionEventCallback<::uwb::OnRangingStartedToken>(tokenShared, m_onRangingStartedCallbacks)                     ? 0
+            : DeregisterSessionEventCallback<::uwb::OnRangingStoppedToken>(tokenShared, m_onRangingStoppedCallbacks)                     ? 0
+            : DeregisterSessionEventCallback<::uwb::OnPeerPropertiesChangedToken>(tokenShared, m_onPeerPropertiesChangedCallbacks)       ? 0
+            : DeregisterSessionEventCallback<::uwb::OnSessionMembershipChangedToken>(tokenShared, m_onSessionMembershipChangedCallbacks) ? 0
+                                                                                                                                         : 0;
+        return;
     } else {
         auto deviceCallback = std::dynamic_pointer_cast<::uwb::RegisteredDeviceCallbackToken>(tokenShared);
         if (deviceCallback == nullptr) {
