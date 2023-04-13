@@ -222,27 +222,6 @@ private:
     bool
     CallbacksPresent();
 
-    /**
-     * @brief Get a copy of the resolved session event callbacks for a particular session.
-     *
-     * This function removes expired callbacks in the process of making the copies.
-     *
-     * @param sessionId The session id to obtain registered callbacks for.
-     * @return std::vector<std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks>>
-     */
-    std::vector<std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks>>
-    GetResolvedSessionEventCallbacks(uint32_t sessionId);
-
-    /**
-     * @brief Get a copy of the resolved device event callbacks.
-     *
-     * This function removes expired callbacks in the process of making the copies.
-     *
-     * @return std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>>
-     */
-    std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>>
-    GetResolvedDeviceEventCallbacks();
-
 private:
     std::string m_deviceName{};
     std::jthread m_notificationThread;

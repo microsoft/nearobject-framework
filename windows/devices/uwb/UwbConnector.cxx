@@ -23,7 +23,7 @@ namespace uwb
 {
 namespace UwbRegisteredSessionEventCallbackTypes
 {
-using OnSessionEnded = std::function<void(UwbSessionEndReason reason)>;
+using OnSessionEnded = std::function<void(::uwb::UwbSessionEndReason reason)>;
 using OnRangingStarted = std::function<void()>;
 using OnRangingStopped = std::function<void()>;
 using OnPeerPropertiesChanged = std::function<void(const std::vector<UwbPeer> peersChanged)>;
@@ -727,83 +727,65 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
     LOG_INFO << "uwb notification listener stopped for device " << DeviceName();
 }
 
-std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>>
-UwbConnector::GetResolvedDeviceEventCallbacks()
+/**
+ * @brief Internal helper function to invoke the callbacks with the arg
+ * If the weak_ptr callback held within a token is not valid, then the token is removed
+ *
+ * @tparam ArgT the type of the arg
+ * @tparam TokenT the type of the token
+ * @param tokens
+ * @param arg
+ */
+template <typename TokenT, typename ArgT>
+void
+InvokeCallbacks(std::vector<std::shared_ptr<TokenT>>& tokens, ArgT& arg)
 {
-    std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
-
-    std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>> deviceEventCallbacks;
-    deviceEventCallbacks.reserve(std::size(m_deviceEventCallbacks));
-
-    for (auto it = std::begin(m_deviceEventCallbacks); it != std::end(m_deviceEventCallbacks);) {
-        auto& deviceEventCallbackToken = *it;
-        auto& deviceEventCallbackWeak = deviceEventCallbackToken->Callbacks;
-        auto deviceEventCallback = deviceEventCallbackWeak.lock();
-        if (deviceEventCallback != nullptr) {
-            deviceEventCallbacks.push_back(std::move(deviceEventCallback));
-            it = std::next(it);
-        } else {
-            it = m_deviceEventCallbacks.erase(it);
-        }
+    if (tokens.empty()) {
+        PLOG_INFO << "Ignoring " << typeid(ArgT).name() << " event due to missing callbacks";
     }
 
-    return deviceEventCallbacks;
+    for (auto it = std::cbegin(tokens); it != std::cend(tokens);) {
+        auto token = *it;
+        auto callback = token->Callback;
+        if (not callback) {
+            it = tokens.erase(it);
+        } else {
+            callback(arg);
+            it = std::next(it);
+        }
+    }
 }
 
-std::vector<std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks>>
-UwbConnector::GetResolvedSessionEventCallbacks(uint32_t sessionId)
+/**
+ * @brief Internal helper function that does the same as InvokeCallbacks, but this time specifically for the session callback maps
+ *
+ * @tparam ArgT
+ * @tparam TokenT
+ * @param sessionMap
+ * @param sessionId
+ * @param arg
+ */
+template <typename TokenT, typename ArgT>
+void
+InvokeSessionCallbacks(std::unordered_map<uint32_t, std::vector<std::shared_ptr<TokenT>>>& sessionMap, uint32_t sessionId, ArgT& arg)
 {
-    std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
-
-    // Lookup the set of callbacks for this session id. If the node is empty, no
-    // callbacks have ever been registered.
-    auto node = m_sessionEventCallbacks.extract(sessionId);
+    auto node = sessionMap.extract(sessionId);
     if (node.empty()) {
-        return {};
+        PLOG_INFO << "Ignoring " << typeid(ArgT).name() << " event due to missing callbacks";
+        return;
     }
-
-    // Get a reference to the existing list of callbacks and attempt to resolve
-    // each one into a shared_ptr. If the weak pointer expired, remove it from
-    // the vector, otherwise move the shared_ptr into the new container of them
-    // to be returned to the caller.
     auto& tokens = node.mapped();
-
-    std::vector<std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks>> sessionEventCallbacks;
-    for (auto it = std::begin(tokens); it != std::end(tokens);) {
-        auto& sessionEventCallbackToken = *it;
-        auto& sessionEventCallbackWeak = sessionEventCallbackToken->Callbacks;
-        auto sessionEventCallback = sessionEventCallbackWeak.lock();
-        if (sessionEventCallback != nullptr) {
-            sessionEventCallbacks.push_back(std::move(sessionEventCallback));
-            it = std::next(it);
-        } else {
-            // this callback is stale, erase it from the tokens
-            it = tokens.erase(it);
-        }
+    InvokeCallbacks<TokenT, ArgT>(tokens, arg);
+    if (not tokens.empty()) {
+        sessionMap.insert(std::move(node));
     }
-
-    m_sessionEventCallbacks.insert(std::move(node));
-
-    return sessionEventCallbacks;
 }
 
 void
 UwbConnector::OnSessionEnded(uint32_t sessionId, ::uwb::UwbSessionEndReason sessionEndReason)
 {
-    auto sessionEventCallbacks = GetResolvedSessionEventCallbacks(sessionId);
-    if (sessionEventCallbacks.empty()) {
-        PLOG_DEBUG << "Ignoring SessionEnded event due to missing session callback";
-        return;
-    }
-
     PLOG_VERBOSE << "Session with id " << sessionId << " executing callbacks for session ended";
-
-    constexpr auto hasOnSessionEnded = [](auto&& callback) {
-        return callback->OnSessionEnded != nullptr;
-    };
-    std::ranges::for_each(sessionEventCallbacks | std::views::filter(hasOnSessionEnded), [&](auto&& callback) {
-        callback->OnSessionEnded(sessionEndReason);
-    });
+    InvokeSessionCallbacks<::uwb::OnSessionEndedToken, ::uwb::UwbSessionEndReason>(m_onSessionEndedCallbacks, sessionId, ::uwb::UwbSessionEndReason::Stopped);
 }
 
 void
@@ -811,12 +793,7 @@ UwbConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpda
 {
     uint32_t sessionId = statusMulticastList.SessionId;
 
-    auto sessionEventCallbacks = GetResolvedSessionEventCallbacks(sessionId);
-    if (sessionEventCallbacks.empty()) {
-        PLOG_DEBUG << "Ignoring MulticastListStatus event due to missing session callback";
-        return;
-    }
-
+    // TODO there's probably a way to create a range view like we did before so we don't actually loop through the peers before checking if there's any callbacks for this
     std::vector<::uwb::UwbPeer> peersAdded;
     for (const auto& peer : statusMulticastList.Status) {
         if (peer.Status == UwbStatusMulticast::OkUpdate) {
@@ -826,12 +803,7 @@ UwbConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpda
 
     PLOG_VERBOSE << "Session with id " << statusMulticastList.SessionId << " executing callback for adding peers";
 
-    constexpr auto hasOnSessionMembershipChanged = [](auto&& callback) {
-        return callback->OnSessionMembershipChanged != nullptr;
-    };
-    std::ranges::for_each(sessionEventCallbacks | std::views::filter(hasOnSessionMembershipChanged), [&](auto&& callback) {
-        callback->OnSessionMembershipChanged(peersAdded, {});
-    });
+    InvokeSessionCallbacks<::uwb::OnSessionMembershipChangedToken, std::vector<::uwb::UwbPeer>>(m_onSessionMembershipChangedCallbacks, sessionId, peersAdded);
 
     // Now log the bad status
     IF_PLOG(plog::verbose)
@@ -849,14 +821,9 @@ UwbConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData ranging
 {
     uint32_t sessionId = rangingData.SessionId;
 
-    auto sessionEventCallbacks = GetResolvedSessionEventCallbacks(sessionId);
-    if (sessionEventCallbacks.empty()) {
-        PLOG_VERBOSE << "Ignoring RangingData event due to missing session callback";
-        return;
-    }
-
     PLOG_VERBOSE << "Session with id " << rangingData.SessionId << " processing new ranging data";
 
+    // TODO there's probably a way to create a range view like we did before so we don't actually loop through the peers before checking if there's any callbacks for this
     std::vector<::uwb::UwbPeer> peersData;
     peersData.reserve(rangingData.RangingMeasurements.size());
     for (const auto& peerData : rangingData.RangingMeasurements) {
@@ -865,58 +832,7 @@ UwbConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData ranging
         peersData.push_back(std::move(data));
     }
 
-    constexpr auto hasOnPeerPropertiesChanged = [](auto&& callback) {
-        return callback->OnPeerPropertiesChanged != nullptr;
-    };
-    std::ranges::for_each(sessionEventCallbacks | std::views::filter(hasOnPeerPropertiesChanged), [&](auto&& callback) {
-        callback->OnPeerPropertiesChanged(peersData);
-    });
-}
-
-/**
- * @brief Helper function to handle the deregistration of missing callbacks
- *
- * @tparam ArgT the argument type of the specific callback
- * @param callbacks the structure holding the callbacks
- * @param callbackAccessor the lambda that returns the specific callback in
- * question. This function assumes that callbackAccessor(callbacks) is a valid
- * pointer.
- * @return bool True if the callback gets executed, False if the
- * callback needs to be deregistered
- */
-template <typename ArgT>
-bool
-InvokeDeviceEventCallback(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks, std::function<std::function<void(ArgT)>(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>)> callbackAccessor, ArgT& arg)
-{
-    if (not callbacks) {
-        PLOG_WARNING << "Ignoring " << typeid(ArgT).name() << " event due to missing callback";
-        return false;
-    }
-    auto callback = callbackAccessor(callbacks);
-    if (not callback) {
-        PLOG_WARNING << "Ignoring " << typeid(ArgT).name() << " event due to missing callback";
-        return false;
-    }
-    callback(arg);
-    return true;
-}
-
-/**
- * @brief Wrapper for container-based invocation of InvokeDeviceEventCallback helper above.
- *
- * @tparam ArgT the argument type of the specific callback
- * @param callbacks the structure holding the callbacks
- * @param callbackAccessor the lambda that returns the specific callback in
- * question. This function assumes that callbackAccessor(callbacks) is a valid
- * pointer.
- */
-template <typename ArgT>
-void
-InvokeDeviceEventCallbacks(std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>> callbacks, std::function<std::function<void(ArgT)>(std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>)> callbackAccessor, ArgT& arg)
-{
-    std::ranges::for_each(callbacks, [&](auto&& callbacksInstance) {
-        InvokeDeviceEventCallback(callbacksInstance, callbackAccessor, arg);
-    });
+    InvokeSessionCallbacks<::uwb::OnPeerPropertiesChangedToken, std::vector<::uwb::UwbPeer>>(m_onPeerPropertiesChangedCallbacks, sessionId, peersData);
 }
 
 void
@@ -938,14 +854,11 @@ UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNo
         using ValueType = std::decay_t<decltype(arg)>;
 
         if constexpr (std::is_same_v<ValueType, UwbStatus>) {
-            auto deviceEventCallbacks = GetResolvedDeviceEventCallbacks();
-            InvokeDeviceEventCallbacks<UwbStatus>(std::move(deviceEventCallbacks), getStatusChangedCallback, arg);
+            InvokeCallbacks<::uwb::OnStatusChangedToken, UwbStatus>(m_onStatusChangedCallbacks, arg);
         } else if constexpr (std::is_same_v<ValueType, UwbStatusDevice>) {
-            auto deviceEventCallbacks = GetResolvedDeviceEventCallbacks();
-            InvokeDeviceEventCallbacks<UwbStatusDevice>(std::move(deviceEventCallbacks), getDeviceStatusChangedCallback, arg);
+            InvokeCallbacks<::uwb::OnDeviceStatusChangedToken, UwbStatusDevice>(m_onDeviceStatusChangedCallbacks, arg);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionStatus>) {
-            auto deviceEventCallbacks = GetResolvedDeviceEventCallbacks();
-            InvokeDeviceEventCallbacks<UwbSessionStatus>(std::move(deviceEventCallbacks), getSessionStatusChangedCallback, arg);
+            InvokeCallbacks<::uwb::OnSessionStatusChangedToken, UwbSessionStatus>(m_onSessionStatusChangedCallbacks, arg);
             if (arg.State == UwbSessionState::Deinitialized) {
                 OnSessionEnded(arg.SessionId, ::uwb::UwbSessionEndReason::Stopped);
             }
@@ -1173,7 +1086,7 @@ UwbConnector::CallbacksPresent()
  * @tparam T the type to try to dynamic_cast this token to
  * @param token
  * @param tokens
- * @return true
+ * @return true if this succeeded in removing the token
  * @return false
  */
 template <typename T>
@@ -1209,7 +1122,7 @@ DeregisterSessionEventCallback(std::shared_ptr<::uwb::RegisteredCallbackToken> t
  * @tparam T the type to try to dynamic_cast this token to
  * @param token
  * @param tokens
- * @return true
+ * @return true if this succeeded in removing the token
  * @return false
  */
 template <typename T>
