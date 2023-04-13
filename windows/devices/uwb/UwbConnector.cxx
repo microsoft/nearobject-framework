@@ -1028,6 +1028,28 @@ UwbConnector::RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDev
 }
 
 /**
+ * @brief Internal helper function to insert a token into the map of session tokens
+ *
+ * @tparam T the type of the token
+ * @param tokens the map of tokens to insert into
+ * @param sessionId
+ * @param token
+ */
+template <typename T>
+void
+InsertSessionToken(std::unordered_map<uint32_t, std::vector<std::shared_ptr<T>>>& tokens, uint32_t sessionId, std::shared_ptr<T> token)
+{
+    auto node = tokens.extract(sessionId);
+    if (!node.empty()) {
+        auto& callbacks = node.mapped();
+        callbacks.push_back(token);
+        tokens.insert(std::move(node));
+    } else {
+        tokens.insert({ sessionId, { token } });
+    }
+}
+
+/**
  * @brief Internal helper function that tokenizes a callback if it can be resolved
  *
  * @tparam L the type of the callback lambda
@@ -1057,27 +1079,71 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::
 {
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
     bool isFirstCallback = not CallbacksPresent();
-    auto token = std::make_shared<::uwb::RegisteredSessionCallbackToken>(sessionId, callbacks);
-    auto node = m_sessionEventCallbacks.extract(sessionId);
-    if (!node.empty()) {
-        auto& sessionEventCallbacks = node.mapped();
-        sessionEventCallbacks.push_back(token);
-        m_sessionEventCallbacks.insert(std::move(node));
-    } else {
-        m_sessionEventCallbacks.insert({ sessionId, { token } });
-    }
-    if (isFirstCallback) {
-        NotificationListenerStart();
-    }
-    return token;
+
+    auto OnSessionEndedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionEnded>(
+        sessionId, callbacks, [](auto&& cbs) {
+            return cbs->OnSessionEnded;
+        },
+        [this](uint32_t sessionId, auto&& cb) {
+            auto token = std::make_shared<::uwb::OnSessionEndedToken>(sessionId, cb);
+            InsertSessionToken(m_onSessionEndedCallbacks, sessionId, token);
+            return token;
+        });
+
+    auto OnRangingStartedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted>(
+        sessionId, callbacks, [](auto&& cbs) {
+            return cbs->OnRangingStarted;
+        },
+        [this](uint32_t sessionId, auto&& cb) {
+            auto token = std::make_shared<::uwb::OnRangingStartedToken>(sessionId, cb);
+            InsertSessionToken(m_onRangingStartedCallbacks, sessionId, token);
+            return token;
+        });
+
+    auto OnRangingStoppedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped>(
+        sessionId, callbacks, [](auto&& cbs) {
+            return cbs->OnRangingStopped;
+        },
+        [this](uint32_t sessionId, auto&& cb) {
+            auto token = std::make_shared<::uwb::OnRangingStoppedToken>(sessionId, cb);
+            InsertSessionToken(m_onRangingStoppedCallbacks, sessionId, token);
+            return token;
+        });
+
+    auto OnPeerPropertiesChangedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged>(
+        sessionId, callbacks, [](auto&& cbs) {
+            return cbs->OnPeerPropertiesChanged;
+        },
+        [this](uint32_t sessionId, auto&& cb) {
+            auto token = std::make_shared<::uwb::OnPeerPropertiesChangedToken>(sessionId, cb);
+            InsertSessionToken(m_onPeerPropertiesChangedCallbacks, sessionId, token);
+            return token;
+        });
+    auto OnSessionMembershipChangedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionMembershipChanged>(
+        sessionId, callbacks, [](auto&& cbs) {
+            return cbs->OnSessionMembershipChanged;
+        },
+        [this](uint32_t sessionId, auto&& cb) {
+            auto token = std::make_shared<::uwb::OnSessionMembershipChangedToken>(sessionId, cb);
+            InsertSessionToken(m_onSessionMembershipChangedCallbacks, sessionId, token);
+            return token;
+        });
+
+    return {
+        OnSessionEndedToken,
+        OnRangingStartedToken,
+        OnRangingStoppedToken,
+        OnPeerPropertiesChangedToken,
+        OnSessionMembershipChangedToken
+    };
 }
 
 bool
 UwbConnector::CallbacksPresent()
 {
-    return not(m_onSessionEndedCallbacks.empty() and m_onRangingStartedCallbacks.empty() and 
-               m_onRangingStoppedCallbacks.empty() and m_onPeerPropertiesChangedCallbacks.empty() and m_onSessionMembershipChangedToken.empty() and
-               m_onStatusChangedCallbacks.empty() and m_onDeviceStatusChangedCallbacks.empty() and m_onSessionStatusChangedCallbacks.empty());
+    return not(m_onSessionEndedCallbacks.empty() and m_onRangingStartedCallbacks.empty() and
+        m_onRangingStoppedCallbacks.empty() and m_onPeerPropertiesChangedCallbacks.empty() and m_onSessionMembershipChangedCallbacks.empty() and
+        m_onStatusChangedCallbacks.empty() and m_onDeviceStatusChangedCallbacks.empty() and m_onSessionStatusChangedCallbacks.empty());
 }
 
 void
