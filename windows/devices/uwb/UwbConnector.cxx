@@ -1203,6 +1203,34 @@ DeregisterSessionEventCallback(std::shared_ptr<::uwb::RegisteredCallbackToken> t
     return true;
 }
 
+/**
+ * @brief Internal helper function to try to deregister this token as this type
+ *
+ * @tparam T the type to try to dynamic_cast this token to
+ * @param token
+ * @param tokens
+ * @return true
+ * @return false
+ */
+template <typename T>
+bool
+DeregisterDeviceEventCallback(std::shared_ptr<::uwb::RegisteredCallbackToken> token, std::vector<std::shared_ptr<T>>& tokens)
+{
+    auto callback = dynamic_pointer_cast<T> token;
+    if (not callback) {
+        return false;
+    }
+
+    auto tokenIt = std::find_if(std::cbegin(tokens), std::cend(tokens), [callback](const auto& token) {
+        return token.get() == callback.get();
+    });
+    if (tokenIt == std::cend(tokens)) {
+        return; // no associated token found, bail
+    }
+    tokens.erase(tokenIt);
+    return true;
+}
+
 void
 UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackToken> token)
 {
@@ -1229,12 +1257,10 @@ UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackTok
         if (deviceCallback == nullptr) {
             throw std::runtime_error("invalid callback type used, this is a bug!");
         }
-        auto tokenIt = std::find_if(std::cbegin(m_deviceEventCallbacks), std::cend(m_deviceEventCallbacks), [deviceCallback](const auto& token) {
-            return token.get() == deviceCallback.get();
-        });
-        if (tokenIt == std::cend(m_deviceEventCallbacks)) {
-            return; // no associated token found, bail
-        }
-        m_deviceEventCallbacks.erase(tokenIt);
+        DeregisterDeviceEventCallback<::uwb::OnStatusChangedToken>(tokenShared, m_onStatusChangedCallbacks)                     ? 0
+            : DeregisterDeviceEventCallback<::uwb::OnDeviceStatusChangedToken>(tokenShared, m_onDeviceStatusChangedCallbacks)   ? 0
+            : DeregisterDeviceEventCallback<::uwb::OnSessionStatusChangedToken>(tokenShared, m_onSessionStatusChangedCallbacks) ? 0
+                                                                                                                                : 0;
+        return;
     }
 }
