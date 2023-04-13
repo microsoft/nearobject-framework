@@ -23,7 +23,6 @@ target_link_libraries(windows-devices-uwb-cx-adapter
     PRIVATE
         windows-devices-util
         magic_enum::magic_enum
-        synchronization.lib
     PUBLIC
         cfgmgr32.lib
         plog::plog
