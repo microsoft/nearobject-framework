@@ -7,6 +7,7 @@
 
 #include "UwbSimulatorDriver.hxx"
 #include "UwbSimulatorDevice.hxx"
+#include "UwbSimulatorLogging.hxx"
 #include "UwbSimulatorTracelogging.hxx"
 
 /**
@@ -27,6 +28,7 @@
 NTSTATUS
 DriverEntry(PDRIVER_OBJECT driverObject, PUNICODE_STRING registryPath)
 {
+    UwbSimulatorLoggingInitialize();
     TraceLoggingRegister(UwbSimulatorTraceloggingProvider);
     TraceLoggingWrite(UwbSimulatorTraceloggingProvider, "DriverEntry");
 

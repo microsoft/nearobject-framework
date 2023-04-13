@@ -18,6 +18,7 @@
     <ClCompile Include="UwbSimulatorIoQueue.cxx" />
     <ClCompile Include="UwbSimulatorDevice.cxx" />
     <ClCompile Include="UwbSimulatorDeviceFile.cxx" />
+    <ClCompile Include="UwbSimulatorLogging.cxx" />
     <ClCompile Include="UwbSimulatorSession.cxx" />
     <ClCompile Include="UwbSimulatorTracelogging.cxx" />
   </ItemGroup>
@@ -37,6 +38,7 @@
     <ClInclude Include="UwbSimulatorDevice.hxx" />
     <ClInclude Include="UwbSimulatorDeviceFile.hxx" />
     <ClInclude Include="IUwbSimulatorSession.hxx" />
+    <ClInclude Include="UwbSimulatorLogging.hxx" />
     <ClInclude Include="UwbSimulatorSession.hxx" />
     <ClInclude Include="UwbSimulatorTracelogging.hxx" />
   </ItemGroup>
