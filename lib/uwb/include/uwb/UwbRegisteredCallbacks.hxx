@@ -11,6 +11,22 @@
 
 namespace uwb
 {
+namespace UwbRegisteredSessionEventCallbackTypes
+{
+using OnSessionEnded = std::function<void(::uwb::UwbSessionEndReason reason)>;
+using OnRangingStarted = std::function<void()>;
+using OnRangingStopped = std::function<void()>;
+using OnPeerPropertiesChanged = std::function<void(const std::vector<UwbPeer> peersChanged)>;
+using OnSessionMembershipChanged = std::function<void(const std::vector<UwbPeer> peersAdded, const std::vector<UwbPeer> peersRemoved)>;
+}; // namespace UwbRegisteredSessionEventCallbackTypes
+
+namespace UwbRegisteredDeviceEventCallbackTypes
+{
+using OnStatusChanged = std::function<void(::uwb::protocol::fira::UwbStatus)>;
+using OnDeviceStatusChanged = std::function<void(::uwb::protocol::fira::UwbStatusDevice)>;
+using OnSessionStatusChanged = std::function<void(::uwb::protocol::fira::UwbSessionStatus)>;
+}; // namespace UwbRegisteredDeviceEventCallbackTypes
+
 /**
  * @brief Interface for receiving events from a UwbSession. This is the primary
  * method to receive information from near peers.
@@ -24,21 +40,21 @@ struct UwbRegisteredSessionEventCallbacks
      * @param session The session for which the event occurred.
      * @param reason The reason the session ended.
      */
-    std::function<void(UwbSessionEndReason reason)> OnSessionEnded;
+    std::shared_ptr<UwbRegisteredSessionEventCallbacks::OnSessionEnded> OnSessionEnded;
 
     /**
      * @brief Invoked when active ranging starts.
      *
      * @param session The session for which the event occurred.
      */
-    std::function<void()> OnRangingStarted;
+    std::shared_ptr<UwbRegisteredSessionEventCallbacks::OnRangingStarted> OnRangingStarted;
 
     /**
      * @brief Invoked when active ranging stops.
      *
      * @param session The session for which the event occurred.
      */
-    std::function<void()> OnRangingStopped;
+    std::shared_ptr<UwbRegisteredSessionEventCallbacks::OnRangingStopped> OnRangingStopped;
 
     /**
      * @brief Invoked when the properties of a peer involved in the session
@@ -47,7 +63,7 @@ struct UwbRegisteredSessionEventCallbacks
      * @param session The session for which the event occurred.
      * @param peersChanged A list of peers whose properties changed.
      */
-    std::function<void(const std::vector<UwbPeer> peersChanged)> OnPeerPropertiesChanged;
+    std::shared_ptr<UwbRegisteredSessionEventCallbacks::OnPeerPropertiesChanged> OnPeerPropertiesChanged;
 
     /**
      * @brief Invoked when membership of one or more near peers involved in
@@ -58,7 +74,7 @@ struct UwbRegisteredSessionEventCallbacks
      * @param peersAdded A list of peers that were added to the session.
      * @param peersRemoved A list of peers that were removed from the session.
      */
-    std::function<void(const std::vector<UwbPeer> peersAdded, const std::vector<UwbPeer> peersRemoved)> OnSessionMembershipChanged;
+    std::shared_ptr<UwbRegisteredSessionEventCallbacks::OnSessionMembershipChanged> OnSessionMembershipChanged;
 };
 
 /**
@@ -72,21 +88,21 @@ struct UwbRegisteredDeviceEventCallbacks
      *
      * @param status The generic error that occurred.
      */
-    std::function<void(::uwb::protocol::fira::UwbStatus)> OnStatusChanged;
+    std::shared_ptr<UwbRegisteredDeviceEventCallbacks::OnStatusChanged> OnStatusChanged;
 
     /**
      * @brief Invoked when the device status changes.
      *
      * @param statusDevice
      */
-    std::function<void(::uwb::protocol::fira::UwbStatusDevice)> OnDeviceStatusChanged;
+    std::shared_ptr<UwbRegisteredDeviceEventCallbacks::OnDeviceStatusChanged> OnDeviceStatusChanged;
 
     /**
      * @brief Invoked when the status of a session changes.
      *
      * @param statusSession The new status of the session.
      */
-    std::function<void(::uwb::protocol::fira::UwbSessionStatus)> OnSessionStatusChanged;
+    std::shared_ptr<UwbRegisteredDeviceEventCallbacks::OnSessionStatusChanged> OnSessionStatusChanged;
 };
 
 /**
