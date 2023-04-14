@@ -84,6 +84,9 @@
     <ClInclude Include="UwbSimulatorIoEventQueue.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="UwbSimulatorLogging.hxx">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UwbSimulatorIoQueue.cxx">
@@ -111,6 +114,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UwbSimulatorIoEventQueue.cxx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UwbSimulatorLogging.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

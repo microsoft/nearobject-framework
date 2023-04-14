@@ -205,7 +205,7 @@ UwbSimulatorDevice::OnFileCreate(WDFDEVICE device, WDFREQUEST request, WDFFILEOB
         DbgPrint("%p added file object %p\n", m_wdfDevice, file);
     } else {
         uwbSimulatorFileContext->~UwbSimulatorDeviceFileWdfContext();
-        DbgPrint("%p failed to initialize file context object with status 0x%08x\n", uwbSimulatorFileStatus);
+        DbgPrint("%p failed to initialize file context object with status 0x%08x\n", m_wdfDevice, uwbSimulatorFileStatus);
     }
 
     WdfRequestComplete(request, uwbSimulatorFileStatus);
@@ -346,7 +346,7 @@ UwbSimulatorDevice::PushUwbNotification(UwbNotificationData uwbNotificationData)
 void
 UwbSimulatorDevice::DeviceInitialize(std::chrono::duration<double> initializeTime)
 {
-    DbgPrint("initializing device");
+    DbgPrint("initializing device\n");
 
     std::this_thread::sleep_for(initializeTime);
     DeviceUpdateState(UwbDeviceState::Ready);
