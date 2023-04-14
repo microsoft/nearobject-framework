@@ -762,15 +762,8 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
     detail::AddEnumOption(rangeStartApp, applicationConfigurationParametersData.deviceRole, true);
     detail::AddEnumOption(rangeStartApp, applicationConfigurationParametersData.multiNodeMode, true);
     rangeStartApp->add_option("--NumberOfControlees", applicationConfigurationParametersData.numberOfControlees, "1-byte integer. Value in { 1-8 }")->capture_default_str()->required();
-
-    std::string deviceMacAddressDescription = "2-byte hexadecimal value, colon-delimited. Short MAC address of own device, e.g. 12:34";
-    std::string dstMacAddressDescription = "Comma-delimited array with 2-byte hexadecimal values, colon-delimited. Short MAC address(es) of other device(s). If device is Controller, list NumberOfControlees mac addresses. If device is Controlee, list Controller mac address";
-    if (applicationConfigurationParametersData.macAddressMode == uwb::UwbMacAddressType::Extended) { // TODO: Enable macAddressMode to be set before checking this value. Otherwise, the default empty value will always be used
-        deviceMacAddressDescription = "8-byte hexadecimal value, colon-delimited. Extended MAC address of own device, e.g. 12:34:56:78:87:65:43:21";
-        dstMacAddressDescription = "Comma-delimited array with 8-byte hexadecimal values, colon-delimited. Extended MAC address(es) of other device(s). If device is Controller, list NumberOfControlees mac addresses. If device is Controlee, list Controller mac address";
-    }
-    rangeStartApp->add_option("--DeviceMacAddress", m_cliData->deviceMacAddressString, deviceMacAddressDescription)->capture_default_str()->required();
-    rangeStartApp->add_option("--DestinationMacAddresses", m_cliData->destinationMacAddressesString, dstMacAddressDescription)->capture_default_str()->required();
+    rangeStartApp->add_option("--DeviceMacAddress", m_cliData->deviceMacAddressString, "2-byte/8-byte hexadecimal value, colon-delimited. Short/Extended MAC address of own device, e.g. 12:34")->capture_default_str()->required();
+    rangeStartApp->add_option("--DestinationMacAddresses", m_cliData->destinationMacAddressesString, "Comma-delimited array with 2-byte/8-byte hexadecimal values, colon-delimited. Short/Extended MAC address(es) of other device(s). If device is Controller, list NumberOfControlees mac addresses. If device is Controlee, list Controller mac address, e.g. 12:34,56:78")->capture_default_str()->required();
     detail::AddEnumOption(rangeStartApp, applicationConfigurationParametersData.deviceType, true);
 
     // List remaining params
