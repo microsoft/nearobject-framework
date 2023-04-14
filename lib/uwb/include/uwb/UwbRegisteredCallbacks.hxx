@@ -40,21 +40,21 @@ struct UwbRegisteredSessionEventCallbacks
      * @param session The session for which the event occurred.
      * @param reason The reason the session ended.
      */
-    std::shared_ptr<UwbRegisteredSessionEventCallbacks::OnSessionEnded> OnSessionEnded;
+    std::shared_ptr<UwbRegisteredSessionEventCallbackTypes::OnSessionEnded> OnSessionEnded;
 
     /**
      * @brief Invoked when active ranging starts.
      *
      * @param session The session for which the event occurred.
      */
-    std::shared_ptr<UwbRegisteredSessionEventCallbacks::OnRangingStarted> OnRangingStarted;
+    std::shared_ptr<UwbRegisteredSessionEventCallbackTypes::OnRangingStarted> OnRangingStarted;
 
     /**
      * @brief Invoked when active ranging stops.
      *
      * @param session The session for which the event occurred.
      */
-    std::shared_ptr<UwbRegisteredSessionEventCallbacks::OnRangingStopped> OnRangingStopped;
+    std::shared_ptr<UwbRegisteredSessionEventCallbackTypes::OnRangingStopped> OnRangingStopped;
 
     /**
      * @brief Invoked when the properties of a peer involved in the session
@@ -63,7 +63,7 @@ struct UwbRegisteredSessionEventCallbacks
      * @param session The session for which the event occurred.
      * @param peersChanged A list of peers whose properties changed.
      */
-    std::shared_ptr<UwbRegisteredSessionEventCallbacks::OnPeerPropertiesChanged> OnPeerPropertiesChanged;
+    std::shared_ptr<UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged> OnPeerPropertiesChanged;
 
     /**
      * @brief Invoked when membership of one or more near peers involved in
@@ -74,7 +74,7 @@ struct UwbRegisteredSessionEventCallbacks
      * @param peersAdded A list of peers that were added to the session.
      * @param peersRemoved A list of peers that were removed from the session.
      */
-    std::shared_ptr<UwbRegisteredSessionEventCallbacks::OnSessionMembershipChanged> OnSessionMembershipChanged;
+    std::shared_ptr<UwbRegisteredSessionEventCallbackTypes::OnSessionMembershipChanged> OnSessionMembershipChanged;
 };
 
 /**
@@ -88,21 +88,21 @@ struct UwbRegisteredDeviceEventCallbacks
      *
      * @param status The generic error that occurred.
      */
-    std::shared_ptr<UwbRegisteredDeviceEventCallbacks::OnStatusChanged> OnStatusChanged;
+    std::shared_ptr<UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged> OnStatusChanged;
 
     /**
      * @brief Invoked when the device status changes.
      *
      * @param statusDevice
      */
-    std::shared_ptr<UwbRegisteredDeviceEventCallbacks::OnDeviceStatusChanged> OnDeviceStatusChanged;
+    std::shared_ptr<UwbRegisteredDeviceEventCallbackTypes::OnDeviceStatusChanged> OnDeviceStatusChanged;
 
     /**
      * @brief Invoked when the status of a session changes.
      *
      * @param statusSession The new status of the session.
      */
-    std::shared_ptr<UwbRegisteredDeviceEventCallbacks::OnSessionStatusChanged> OnSessionStatusChanged;
+    std::shared_ptr<UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged> OnSessionStatusChanged;
 };
 
 /**
