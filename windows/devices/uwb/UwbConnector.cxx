@@ -1062,7 +1062,7 @@ UwbConnector::CallbacksPresent()
  * @tparam T the type to try to dynamic_cast this token to
  * @param token
  * @param tokensMap
- * @return true if this succeeded in removing the token
+ * @return true if this succeeded in finding the class to cast the token to
  * @return false
  */
 template <typename T>
@@ -1077,7 +1077,7 @@ DeregisterSessionEventCallback(std::shared_ptr<::uwb::RegisteredCallbackToken> t
 
     auto node = tokensMap.extract(sessionId);
     if (node.empty()) {
-        return false; // sessionId has no associated tokens
+        return true; // sessionId has no associated tokens
     }
 
     auto tokens = node.mapped();
@@ -1085,7 +1085,7 @@ DeregisterSessionEventCallback(std::shared_ptr<::uwb::RegisteredCallbackToken> t
         return token.get() == callback.get();
     });
     if (tokenIt == std::cend(tokens)) {
-        return false; // no associated token found, bail
+        return true; // no associated token found, bail
     }
     tokens.erase(tokenIt);
     tokensMap.insert(std::move(node));
@@ -1098,7 +1098,7 @@ DeregisterSessionEventCallback(std::shared_ptr<::uwb::RegisteredCallbackToken> t
  * @tparam T the type to try to dynamic_cast this token to
  * @param token
  * @param tokens
- * @return true if this succeeded in removing the token
+ * @return true if this succeeded in finding the class to cast the token to
  * @return false
  */
 template <typename T>
@@ -1114,7 +1114,7 @@ DeregisterDeviceEventCallback(std::shared_ptr<::uwb::RegisteredCallbackToken> to
         return token.get() == callback.get();
     });
     if (tokenIt == std::cend(tokens)) {
-        return false; // no associated token found, bail
+        return true; // no associated token found, bail
     }
     tokens.erase(tokenIt);
     return true;
