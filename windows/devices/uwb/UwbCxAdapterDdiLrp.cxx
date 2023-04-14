@@ -1410,11 +1410,32 @@ windows::devices::uwb::ddi::lrp::To(const UWB_SET_APP_CONFIG_PARAMS &setApplicat
     };
     uwbSetApplicationConfigurationParameters.Parameters.reserve(setApplicationConfigurationParameters.appConfigParamsCount);
 
+    std::optional<::uwb::UwbMacAddressType> macAddressMode;
+    std::optional<UWB_APP_CONFIG_PARAM> destinationMacAddresses;
     auto *appConfigParam = reinterpret_cast<const UWB_APP_CONFIG_PARAM *>(&setApplicationConfigurationParameters.appConfigParams[0]);
     for (auto i = 0; i < setApplicationConfigurationParameters.appConfigParamsCount; i++) {
-        auto uwbAppConfigParam = To(*appConfigParam);
-        uwbSetApplicationConfigurationParameters.Parameters.push_back(std::move(uwbAppConfigParam));
+        // If parameter is MacAddressMode or DestinationMacAddresses, store value
+        if (To(appConfigParam->paramType) == UwbApplicationConfigurationParameterType::MacAddressMode) {
+            macAddressMode = std::get<::uwb::UwbMacAddressType>(To(*appConfigParam).Value);
+        } else if (To(appConfigParam->paramType) == UwbApplicationConfigurationParameterType::DestinationMacAddresses) {
+            destinationMacAddresses = *appConfigParam;
+        } else {
+            auto uwbAppConfigParam = To(*appConfigParam);
+            uwbSetApplicationConfigurationParameters.Parameters.push_back(std::move(uwbAppConfigParam));
+        }
+
         appConfigParam = reinterpret_cast<const UWB_APP_CONFIG_PARAM *>(reinterpret_cast<uintptr_t>(appConfigParam) + appConfigParam->size);
+    }
+
+    // Now that the other parameters have been converted, convert DestinationMacAddresses with special conversion function
+    if (destinationMacAddresses.has_value()) {
+        UwbApplicationConfigurationParameter uwbAppConfigParam;
+        if (macAddressMode.has_value()) {
+            uwbAppConfigParam = To(destinationMacAddresses.value(), macAddressMode.value());
+        } else {
+            uwbAppConfigParam = To(destinationMacAddresses.value(), ::uwb::UwbMacAddressType::Short);
+        }
+        uwbSetApplicationConfigurationParameters.Parameters.push_back(std::move(uwbAppConfigParam));
     }
 
     return std::move(uwbSetApplicationConfigurationParameters);
