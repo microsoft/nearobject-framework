@@ -822,6 +822,8 @@ UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNo
 
     LOG_DEBUG << "received notification: " << ToString(uwbNotificationData);
 
+    std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
+
     std::visit([this](auto&& arg) {
         using ValueType = std::decay_t<decltype(arg)>;
 
