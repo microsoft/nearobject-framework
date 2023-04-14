@@ -910,21 +910,21 @@ UwbConnector::RegisterDeviceEventCallbacks(::uwb::UwbRegisteredDeviceEventCallba
         });
 
     auto OnDeviceStatusChangedToken = GetToken<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnDeviceStatusChanged>(
-        callbacks, [](auto&& cbs) {
-            return cbs.OnDeviceStatusChanged;
+        callbacks, [](auto&& callbackStruct) {
+            return callbackStruct.OnDeviceStatusChanged;
         },
-        [this](auto&& cb) {
-            auto token = std::make_shared<::uwb::OnDeviceStatusChangedToken>(cb);
+        [this](auto&& callback) {
+            auto token = std::make_shared<::uwb::OnDeviceStatusChangedToken>(callback);
             m_onDeviceStatusChangedCallbacks.push_back(token);
             return token;
         });
 
     auto OnSessionStatusChangedToken = GetToken<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged>(
-        callbacks, [](auto&& cbs) {
-            return cbs.OnSessionStatusChanged;
+        callbacks, [](auto&& callbackStruct) {
+            return callbackStruct.OnSessionStatusChanged;
         },
-        [this](auto&& cb) {
-            auto token = std::make_shared<::uwb::OnSessionStatusChangedToken>(cb);
+        [this](auto&& callback) {
+            auto token = std::make_shared<::uwb::OnSessionStatusChangedToken>(callback);
             m_onSessionStatusChangedCallbacks.push_back(token);
             return token;
         });
@@ -991,50 +991,50 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbRegist
     bool isFirstCallback = not CallbacksPresent();
 
     auto OnSessionEndedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionEnded>(
-        sessionId, callbacks, [](auto&& cbs) {
-            return cbs.OnSessionEnded;
+        sessionId, callbacks, [](auto&& callbackStruct) {
+            return callbackStruct.OnSessionEnded;
         },
-        [this](uint32_t sessionId, auto&& cb) {
-            auto token = std::make_shared<::uwb::OnSessionEndedToken>(sessionId, cb);
+        [this](uint32_t sessionId, auto&& callback) {
+            auto token = std::make_shared<::uwb::OnSessionEndedToken>(sessionId, callback);
             InsertSessionToken(m_onSessionEndedCallbacks, sessionId, token);
             return token;
         });
 
     auto OnRangingStartedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted>(
-        sessionId, callbacks, [](auto&& cbs) {
-            return cbs.OnRangingStarted;
+        sessionId, callbacks, [](auto&& callbackStruct) {
+            return callbackStruct.OnRangingStarted;
         },
-        [this](uint32_t sessionId, auto&& cb) {
-            auto token = std::make_shared<::uwb::OnRangingStartedToken>(sessionId, cb);
+        [this](uint32_t sessionId, auto&& callback) {
+            auto token = std::make_shared<::uwb::OnRangingStartedToken>(sessionId, callback);
             InsertSessionToken(m_onRangingStartedCallbacks, sessionId, token);
             return token;
         });
 
     auto OnRangingStoppedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped>(
-        sessionId, callbacks, [](auto&& cbs) {
-            return cbs.OnRangingStopped;
+        sessionId, callbacks, [](auto&& callbackStruct) {
+            return callbackStruct.OnRangingStopped;
         },
-        [this](uint32_t sessionId, auto&& cb) {
-            auto token = std::make_shared<::uwb::OnRangingStoppedToken>(sessionId, cb);
+        [this](uint32_t sessionId, auto&& callback) {
+            auto token = std::make_shared<::uwb::OnRangingStoppedToken>(sessionId, callback);
             InsertSessionToken(m_onRangingStoppedCallbacks, sessionId, token);
             return token;
         });
 
     auto OnPeerPropertiesChangedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged>(
-        sessionId, callbacks, [](auto&& cbs) {
-            return cbs.OnPeerPropertiesChanged;
+        sessionId, callbacks, [](auto&& callbackStruct) {
+            return callbackStruct.OnPeerPropertiesChanged;
         },
-        [this](uint32_t sessionId, auto&& cb) {
-            auto token = std::make_shared<::uwb::OnPeerPropertiesChangedToken>(sessionId, cb);
+        [this](uint32_t sessionId, auto&& callback) {
+            auto token = std::make_shared<::uwb::OnPeerPropertiesChangedToken>(sessionId, callback);
             InsertSessionToken(m_onPeerPropertiesChangedCallbacks, sessionId, token);
             return token;
         });
     auto OnSessionMembershipChangedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionMembershipChanged>(
-        sessionId, callbacks, [](auto&& cbs) {
-            return cbs.OnSessionMembershipChanged;
+        sessionId, callbacks, [](auto&& callbackStruct) {
+            return callbackStruct.OnSessionMembershipChanged;
         },
-        [this](uint32_t sessionId, auto&& cb) {
-            auto token = std::make_shared<::uwb::OnSessionMembershipChangedToken>(sessionId, cb);
+        [this](uint32_t sessionId, auto&& callback) {
+            auto token = std::make_shared<::uwb::OnSessionMembershipChangedToken>(sessionId, callback);
             InsertSessionToken(m_onSessionMembershipChangedCallbacks, sessionId, token);
             return token;
         });
