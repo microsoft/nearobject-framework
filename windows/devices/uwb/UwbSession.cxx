@@ -22,48 +22,48 @@ UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> devic
     m_uwbSessionConnector(std::move(uwbSessionConnector))
 {
     m_registeredCallbacks = std::make_shared<::uwb::UwbRegisteredSessionEventCallbacks>(
-        [this](::uwb::UwbSessionEndReason reason) {
+        std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionEnded>([this](::uwb::UwbSessionEndReason reason) {
             auto callbacks = ResolveEventCallbacks();
             if (callbacks == nullptr) {
                 PLOG_WARNING << "missing session event callback for UwbSessionEndReason, skipping";
                 // TODO deregister
             }
             return callbacks->OnSessionEnded(this, reason);
-        },
-        [this]() {
+        }),
+        std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted>([this]() {
             auto callbacks = ResolveEventCallbacks();
             if (callbacks == nullptr) {
                 PLOG_WARNING << "missing session event callback for ranging started, skipping";
                 // TODO deregister
             }
             return callbacks->OnRangingStarted(this);
-        },
-        [this]() {
+        }),
+        std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped>([this]() {
             auto callbacks = ResolveEventCallbacks();
             if (callbacks == nullptr) {
                 PLOG_WARNING << "missing session event callback for ranging stopped, skipping";
                 // TODO deregister
             }
             return callbacks->OnRangingStopped(this);
-        },
-        [this](const std::vector<::uwb::UwbPeer> peersChanged) {
+        }),
+        std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged>([this](const std::vector<::uwb::UwbPeer> peersChanged) {
             auto callbacks = ResolveEventCallbacks();
             if (callbacks == nullptr) {
                 PLOG_WARNING << "missing session event callback for ranging data, skipping";
                 // TODO deregister
             }
             return callbacks->OnPeerPropertiesChanged(this, peersChanged);
-        },
-        [this](const std::vector<::uwb::UwbPeer> peersAdded, const std::vector<::uwb::UwbPeer> peersRemoved) {
+        }),
+        std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionMembershipChanged>([this](const std::vector<::uwb::UwbPeer> peersAdded, const std::vector<::uwb::UwbPeer> peersRemoved) {
             auto callbacks = ResolveEventCallbacks();
             if (callbacks == nullptr) {
                 PLOG_WARNING << "missing session event callback for peer list changes, skipping";
                 // TODO deregister
             }
             return callbacks->OnSessionMembershipChanged(this, peersAdded, peersRemoved);
-        });
+        }));
 
-    m_registeredCallbacksToken = m_uwbSessionConnector->RegisterSessionEventCallbacks(m_sessionId, m_registeredCallbacks);
+    m_registeredCallbacksTokens = m_uwbSessionConnector->RegisterSessionEventCallbacks(m_sessionId, m_registeredCallbacks);
 }
 
 UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> device, std::shared_ptr<IUwbSessionDdiConnector> uwbSessionConnector, ::uwb::protocol::fira::DeviceType deviceType) :

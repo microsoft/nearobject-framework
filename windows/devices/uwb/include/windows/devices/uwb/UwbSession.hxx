@@ -106,7 +106,7 @@ protected:
 private:
     std::shared_ptr<IUwbSessionDdiConnector> m_uwbSessionConnector;
     std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks> m_registeredCallbacks;
-    std::weak_ptr<::uwb::RegisteredCallbackToken> m_registeredCallbacksToken;
+    ::uwb::UwbRegisteredSessionEventCallbackTokens m_registeredCallbacksTokens;
 };
 
 } // namespace windows::devices::uwb
