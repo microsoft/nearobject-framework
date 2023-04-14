@@ -869,7 +869,11 @@ NearObjectCli::AddSubcommandServiceRangeStart(CLI::App* parent)
     auto& uwbConfig = m_cliData->uwbConfiguration;
     auto rangeStartApp = parent->add_subcommand("start", "start ranging")->fallthrough();
 
-    // TODO is there a way to put all the enums into a list of [optionName, optionDestination, optionMap] so we don't have to create the initializer list each time
+    // Remove labels from options
+    rangeStartApp->get_formatter()->label("ENUM", "");
+    rangeStartApp->get_formatter()->label("TEXT", "");
+    rangeStartApp->get_formatter()->label("UINT", "");
+    rangeStartApp->get_formatter()->label("[UINT,UINT,UINT,UINT,UINT,UINT]", "");
 
     // enumerations
     detail::AddEnumOption(rangeStartApp, uwbConfig.deviceRole);
