@@ -703,7 +703,7 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
  */
 template <typename TokenT, typename... ArgTs>
 void
-InvokeCallbacks(std::vector<std::shared_ptr<TokenT>>& tokens, ArgTs... args)
+InvokeCallbacks(std::vector<std::shared_ptr<TokenT>>& tokens, ArgTs&... args)
 {
     if (tokens.empty()) {
         PLOG_INFO << "Ignoring " << typeid(TokenT).name() << " event due to missing callbacks";
@@ -737,7 +737,7 @@ InvokeCallbacks(std::vector<std::shared_ptr<TokenT>>& tokens, ArgTs... args)
  */
 template <typename TokenT, typename... ArgTs>
 void
-InvokeSessionCallbacks(std::unordered_map<uint32_t, std::vector<std::shared_ptr<TokenT>>>& sessionMap, uint32_t sessionId, ArgTs... args)
+InvokeSessionCallbacks(std::unordered_map<uint32_t, std::vector<std::shared_ptr<TokenT>>>& sessionMap, uint32_t sessionId, ArgTs&... args)
 {
     auto node = sessionMap.extract(sessionId);
     if (node.empty()) {
@@ -771,9 +771,11 @@ UwbConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpda
         }
     }
 
+    std::vector<::uwb::UwbPeer> peersRemoved{};
+
     PLOG_VERBOSE << "Session with id " << statusMulticastList.SessionId << " executing callback for adding peers";
 
-    InvokeSessionCallbacks<::uwb::OnSessionMembershipChangedToken, std::vector<::uwb::UwbPeer>>(m_onSessionMembershipChangedCallbacks, sessionId, peersAdded, std::vector<::uwb::UwbPeer>{});
+    InvokeSessionCallbacks<::uwb::OnSessionMembershipChangedToken, std::vector<::uwb::UwbPeer>>(m_onSessionMembershipChangedCallbacks, sessionId, peersAdded, peersRemoved);
 
     // Now log the bad status
     IF_PLOG(plog::verbose)
