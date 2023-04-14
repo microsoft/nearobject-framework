@@ -22,16 +22,15 @@ using namespace ::uwb::protocol::fira;
 UwbDevice::UwbDevice(std::string deviceName) :
     m_deviceName(std::move(deviceName))
 {
-    m_callbacks = std::make_shared<::uwb::UwbRegisteredDeviceEventCallbacks>(
-        std::make_shared<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged>([this](::uwb::protocol::fira::UwbStatus status) {
-            return OnStatusChanged(status);
-        }),
-        std::make_shared<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnDeviceStatusChanged>([this](::uwb::protocol::fira::UwbStatusDevice status) {
-            return OnDeviceStatusChanged(status);
-        }),
-        std::make_shared<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged>([this](::uwb::protocol::fira::UwbSessionStatus status) {
-            return OnSessionStatusChanged(status);
-        }));
+    m_onStatusChangedCallback = std::make_shared<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged>([this](::uwb::protocol::fira::UwbStatus status) {
+        return OnStatusChanged(status);
+    });
+    m_onDeviceStatusChangedCallback = std::make_shared<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnDeviceStatusChanged>([this](::uwb::protocol::fira::UwbStatusDevice status) {
+        return OnDeviceStatusChanged(status);
+    });
+    m_onSessionStatusChangedCallback = std::make_shared<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged>([this](::uwb::protocol::fira::UwbSessionStatus status) {
+        return OnSessionStatusChanged(status);
+    });
 }
 
 /* static */
@@ -180,7 +179,7 @@ UwbDevice::InitializeImpl()
     auto uwbConnector = std::make_shared<UwbConnector>(m_deviceName);
     m_uwbDeviceConnector = uwbConnector;
     m_uwbSessionConnector = uwbConnector;
-    m_callbacksToken = m_uwbDeviceConnector->RegisterDeviceEventCallbacks(m_callbacks);
+    m_callbacksToken = m_uwbDeviceConnector->RegisterDeviceEventCallbacks({ m_onStatusChangedCallback, m_onDeviceStatusChangedCallback, m_onSessionStatusChangedCallback });
     return true;
 }
 
