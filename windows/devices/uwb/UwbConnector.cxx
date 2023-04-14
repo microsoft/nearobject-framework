@@ -696,10 +696,10 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
  * @brief Internal helper function to invoke the callbacks with the arg
  * If the weak_ptr callback held within a token is not valid, then the token is removed
  *
- * @tparam ArgT the type of the arg
+ * @tparam ArgTs the type of the args to be passed into the callbacks
  * @tparam TokenT the type of the token
  * @param tokens
- * @param arg
+ * @param args
  */
 template <typename TokenT, typename... ArgTs>
 void
@@ -729,8 +729,8 @@ InvokeCallbacks(std::vector<std::shared_ptr<TokenT>>& tokens, ArgTs&... args)
 /**
  * @brief Internal helper function that does the same as InvokeCallbacks, but this time specifically for the session callback maps
  *
- * @tparam ArgT
- * @tparam TokenT
+ * @tparam ArgTs the types of the arguments given to the callback
+ * @tparam TokenT the type of the token
  * @param sessionMap
  * @param sessionId
  * @param arg
@@ -745,7 +745,7 @@ InvokeSessionCallbacks(std::unordered_map<uint32_t, std::vector<std::shared_ptr<
         return;
     }
     auto& tokens = node.mapped();
-    InvokeCallbacks<TokenT, ArgTs...>(tokens, args...);
+    InvokeCallbacks(tokens, args...);
     if (not tokens.empty()) {
         sessionMap.insert(std::move(node));
     }
@@ -755,7 +755,7 @@ void
 UwbConnector::OnSessionEnded(uint32_t sessionId, ::uwb::UwbSessionEndReason sessionEndReason)
 {
     PLOG_VERBOSE << "Session with id " << sessionId << " executing callbacks for session ended";
-    InvokeSessionCallbacks<::uwb::OnSessionEndedToken, ::uwb::UwbSessionEndReason>(m_onSessionEndedCallbacks, sessionId, sessionEndReason);
+    InvokeSessionCallbacks(m_onSessionEndedCallbacks, sessionId, sessionEndReason);
 }
 
 void
@@ -775,7 +775,7 @@ UwbConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpda
 
     PLOG_VERBOSE << "Session with id " << statusMulticastList.SessionId << " executing callback for adding peers";
 
-    InvokeSessionCallbacks<::uwb::OnSessionMembershipChangedToken, std::vector<::uwb::UwbPeer>>(m_onSessionMembershipChangedCallbacks, sessionId, peersAdded, peersRemoved);
+    InvokeSessionCallbacks(m_onSessionMembershipChangedCallbacks, sessionId, peersAdded, peersRemoved);
 
     // Now log the bad status
     IF_PLOG(plog::verbose)
@@ -804,7 +804,7 @@ UwbConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData ranging
         peersData.push_back(std::move(data));
     }
 
-    InvokeSessionCallbacks<::uwb::OnPeerPropertiesChangedToken, std::vector<::uwb::UwbPeer>>(m_onPeerPropertiesChangedCallbacks, sessionId, peersData);
+    InvokeSessionCallbacks(m_onPeerPropertiesChangedCallbacks, sessionId, peersData);
 }
 
 void
@@ -828,11 +828,11 @@ UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNo
         using ValueType = std::decay_t<decltype(arg)>;
 
         if constexpr (std::is_same_v<ValueType, UwbStatus>) {
-            InvokeCallbacks<::uwb::OnStatusChangedToken, UwbStatus>(m_onStatusChangedCallbacks, arg);
+            InvokeCallbacks(m_onStatusChangedCallbacks, arg);
         } else if constexpr (std::is_same_v<ValueType, UwbStatusDevice>) {
-            InvokeCallbacks<::uwb::OnDeviceStatusChangedToken, UwbStatusDevice>(m_onDeviceStatusChangedCallbacks, arg);
+            InvokeCallbacks(m_onDeviceStatusChangedCallbacks, arg);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionStatus>) {
-            InvokeCallbacks<::uwb::OnSessionStatusChangedToken, UwbSessionStatus>(m_onSessionStatusChangedCallbacks, arg);
+            InvokeCallbacks(m_onSessionStatusChangedCallbacks, arg);
             if (arg.State == UwbSessionState::Deinitialized) {
                 OnSessionEnded(arg.SessionId, ::uwb::UwbSessionEndReason::Stopped);
             }
@@ -871,15 +871,15 @@ UwbConnector::NotificationListenerStop()
 /**
  * @brief Internal helper function that tokenizes a callback if it can be resolved
  *
- * @tparam L the type of the callback lambda
+ * @tparam LambdaT the type of the callback lambda
  * @param callbacks the struct holding the callbacks
  * @param accessor the accessor for the specific callback
- * @param tokenizer the function that actually tokenizes the callback and gives ownership to the UwbConnector
+ * @param tokenize the function that actually tokenizes the callback and gives ownership to the UwbConnector
  * @return std::weak_ptr<::uwb::RegisteredDeviceCallbackToken>
  */
-template <typename L>
+template <typename LambdaT>
 std::weak_ptr<::uwb::RegisteredDeviceCallbackToken>
-GetToken(::uwb::UwbRegisteredDeviceEventCallbacks callbacks, std::function<std::weak_ptr<L>(::uwb::UwbRegisteredDeviceEventCallbacks)> accessor, std::function<std::weak_ptr<::uwb::RegisteredDeviceCallbackToken>(std::weak_ptr<L>)> tokenizer)
+GetToken(::uwb::UwbRegisteredDeviceEventCallbacks callbacks, std::function<std::weak_ptr<LambdaT>(::uwb::UwbRegisteredDeviceEventCallbacks)> accessor, std::function<std::weak_ptr<::uwb::RegisteredDeviceCallbackToken>(std::weak_ptr<LambdaT>)> tokenize)
 {
     auto callbackWeak = accessor(callbacks);
     auto callbackShared = callbackWeak.lock();
@@ -890,7 +890,7 @@ GetToken(::uwb::UwbRegisteredDeviceEventCallbacks callbacks, std::function<std::
     if (not callback) {
         return std::shared_ptr<::uwb::RegisteredDeviceCallbackToken>();
     }
-    return tokenizer(callbackWeak);
+    return tokenize(callbackWeak);
 }
 
 ::uwb::UwbRegisteredDeviceEventCallbackTokens
@@ -900,11 +900,11 @@ UwbConnector::RegisterDeviceEventCallbacks(::uwb::UwbRegisteredDeviceEventCallba
     bool isFirstCallback = not CallbacksPresent();
 
     auto OnStatusChangedToken = GetToken<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged>(
-        callbacks, [](auto&& cbs) {
-            return cbs.OnStatusChanged;
+        callbacks, [](auto&& callbackStruct) {
+            return callbackStruct.OnStatusChanged;
         },
-        [this](auto&& cb) {
-            auto token = std::make_shared<::uwb::OnStatusChangedToken>(cb);
+        [this](auto&& callback) {
+            auto token = std::make_shared<::uwb::OnStatusChangedToken>(callback);
             m_onStatusChangedCallbacks.push_back(token);
             return token;
         });
@@ -965,12 +965,12 @@ InsertSessionToken(std::unordered_map<uint32_t, std::vector<std::shared_ptr<T>>>
  * @param sessionId
  * @param callbacks the struct holding the callbacks
  * @param accessor the accessor for the specific callback
- * @param tokenizer the function that actually tokenizes the callback and gives ownership to the UwbConnector
+ * @param tokenize the function that actually tokenizes the callback and gives ownership to the UwbConnector
  * @return std::weak_ptr<::uwb::RegisteredSessionCallbackToken>
  */
-template <typename L>
+template <typename LambdaT>
 std::weak_ptr<::uwb::RegisteredSessionCallbackToken>
-GetToken(uint32_t sessionId, ::uwb::UwbRegisteredSessionEventCallbacks callbacks, std::function<std::weak_ptr<L>(::uwb::UwbRegisteredSessionEventCallbacks)> accessor, std::function<std::weak_ptr<::uwb::RegisteredSessionCallbackToken>(uint32_t, std::weak_ptr<L>)> tokenizer)
+GetToken(uint32_t sessionId, ::uwb::UwbRegisteredSessionEventCallbacks callbacks, std::function<std::weak_ptr<LambdaT>(::uwb::UwbRegisteredSessionEventCallbacks)> accessor, std::function<std::weak_ptr<::uwb::RegisteredSessionCallbackToken>(uint32_t, std::weak_ptr<LambdaT>)> tokenize)
 {
     auto callbackWeak = accessor(callbacks);
     auto callbackShared = callbackWeak.lock();
@@ -981,7 +981,7 @@ GetToken(uint32_t sessionId, ::uwb::UwbRegisteredSessionEventCallbacks callbacks
     if (not callback) {
         return std::shared_ptr<::uwb::RegisteredSessionCallbackToken>();
     }
-    return tokenizer(sessionId, callbackWeak);
+    return tokenize(sessionId, callbackWeak);
 }
 
 ::uwb::UwbRegisteredSessionEventCallbackTokens
@@ -1061,7 +1061,7 @@ UwbConnector::CallbacksPresent()
  *
  * @tparam T the type to try to dynamic_cast this token to
  * @param token
- * @param tokens
+ * @param tokensMap
  * @return true if this succeeded in removing the token
  * @return false
  */
@@ -1140,7 +1140,6 @@ UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackTok
             : DeregisterSessionEventCallback<::uwb::OnPeerPropertiesChangedToken>(tokenShared, m_onPeerPropertiesChangedCallbacks)       ? 0
             : DeregisterSessionEventCallback<::uwb::OnSessionMembershipChangedToken>(tokenShared, m_onSessionMembershipChangedCallbacks) ? 0
                                                                                                                                          : 0;
-        return;
     } else {
         auto deviceCallback = std::dynamic_pointer_cast<::uwb::RegisteredDeviceCallbackToken>(tokenShared);
         if (deviceCallback == nullptr) {
@@ -1150,6 +1149,5 @@ UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackTok
             : DeregisterDeviceEventCallback<::uwb::OnDeviceStatusChangedToken>(tokenShared, m_onDeviceStatusChangedCallbacks)   ? 0
             : DeregisterDeviceEventCallback<::uwb::OnSessionStatusChangedToken>(tokenShared, m_onSessionStatusChangedCallbacks) ? 0
                                                                                                                                 : 0;
-        return;
     }
 }
