@@ -84,7 +84,7 @@ public:
      * @return ::uwb::UwbRegisteredDeviceEventCallbackTokens You can pass the pointers into DeregisterEventCallback to deregister the event callbacks
      */
     virtual ::uwb::UwbRegisteredDeviceEventCallbackTokens
-    RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks) override;
+    RegisterDeviceEventCallbacks(::uwb::UwbRegisteredDeviceEventCallbacks callbacks) override;
 
 public:
     // IUwbSessionDdiConnector
@@ -97,7 +97,7 @@ public:
      * @return ::uwb::UwbRegisteredSessionEventCallbackTokens You can pass the pointers into DeregisterEventCallback to deregister the event callbacks
      */
     virtual ::uwb::UwbRegisteredSessionEventCallbackTokens
-    RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks) override;
+    RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbRegisteredSessionEventCallbacks callbacks) override;
 
 public:
     /**
