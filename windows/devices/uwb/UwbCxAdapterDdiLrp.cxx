@@ -1436,8 +1436,6 @@ windows::devices::uwb::ddi::lrp::To(const UWB_SET_APP_CONFIG_PARAMS &setApplicat
             uwbAppConfigParam = To(destinationMacAddresses.value(), ::uwb::UwbMacAddressType::Short);
         }
         uwbSetApplicationConfigurationParameters.Parameters.push_back(std::move(uwbAppConfigParam));
-    } else {
-        PLOG_ERROR << "missing DestinationMacAddresses value";
     }
 
     return std::move(uwbSetApplicationConfigurationParameters);
