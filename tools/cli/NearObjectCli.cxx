@@ -875,27 +875,16 @@ NearObjectCli::AddSubcommandServiceRangeStart(CLI::App* parent)
     rangeStartApp->get_formatter()->label("UINT", "");
     rangeStartApp->get_formatter()->label("[UINT,UINT,UINT,UINT,UINT,UINT]", "");
 
-    // enumerations
-    detail::AddEnumOption(rangeStartApp, uwbConfig.deviceRole);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingDirection);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingMeasurementReportMode);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.stsConfiguration);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.multiNodeMode);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingTimeStruct);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.schedulingMode);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.channel);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.rframeConfig);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.convolutionalCodeConstraintLength);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.prfMode);
-    detail::AddEnumOption(rangeStartApp, uwbConfig.macAddressFcsType);
+    // List mandatory params first
+    detail::AddEnumOption(rangeStartApp, uwbConfig.deviceRole, true);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.multiNodeMode, true);
+    rangeStartApp->add_option("--NumberOfControlees", uwbConfig.numberOfControlees, "1-byte integer. Value in { 1-8 }")->capture_default_str()->required();
+    rangeStartApp->add_option("--ControllerMacAddress", m_cliData->deviceMacAddressString, "2-byte/8-byte hexadecimal value, colon-delimited. Short/Extended MAC address of Controller, e.g. 12:34")->capture_default_str()->required();
+    rangeStartApp->add_option("--ControleeMacAddresses", m_cliData->destinationMacAddressesString, "Comma-delimited array with 2-byte/8-byte hexadecimal values, colon-delimited. Short/Extended MAC address(es) of Controlee(s), e.g. 12:34,56:78")->capture_default_str()->required();
+    detail::AddEnumOption(rangeStartApp, uwbConfig.deviceType, true);
 
-    // booleans
-    rangeStartApp->add_flag("--controller,!--controlee", m_cliData->HostIsController, "default is controlee")->capture_default_str();
-    rangeStartApp->add_flag("--HoppingMode", uwbConfig.hoppingMode)->capture_default_str();
-    rangeStartApp->add_flag("--BlockStriding", uwbConfig.blockStriding)->capture_default_str();
-
-    // TODO check for int sizes when parsing input
-    rangeStartApp->add_option("--UwbInitiationTime", uwbConfig.uwbInitiationTime, "uint32_t")->capture_default_str();
+    // List remaining params
+    // uint8_t
     rangeStartApp->add_option("--Sp0PhySetNumber", uwbConfig.sp0PhySetNumber, "uint8_t")->capture_default_str();
     rangeStartApp->add_option("--Sp1PhySetNumber", uwbConfig.sp1PhySetNumber, "uint8_t")->capture_default_str();
     rangeStartApp->add_option("--Sp3PhySetNumber", uwbConfig.sp3PhySetNumber, "uint8_t")->capture_default_str();
@@ -903,15 +892,35 @@ NearObjectCli::AddSubcommandServiceRangeStart(CLI::App* parent)
     rangeStartApp->add_option("--SlotsPerRangingRound", uwbConfig.slotsPerRangingRound, "uint8_t")->capture_default_str();
     rangeStartApp->add_option("--MaxContentionPhaseLength", uwbConfig.maxContentionPhaseLength, "uint8_t")->capture_default_str();
     rangeStartApp->add_option("--SlotDuration", uwbConfig.slotDuration, "uint8_t")->capture_default_str();
-    rangeStartApp->add_option("--RangingInterval", uwbConfig.rangingInterval, "uint16_t")->capture_default_str();
     rangeStartApp->add_option("--KeyRotationRate", uwbConfig.keyRotationRate, "uint8_t")->capture_default_str();
+
+    // uint16_t
+    rangeStartApp->add_option("--RangingInterval", uwbConfig.rangingInterval, "uint16_t")->capture_default_str();
     rangeStartApp->add_option("--MaxRangingRoundRetry", uwbConfig.maxRangingRoundRetry, "uint16_t")->capture_default_str();
     rangeStartApp->add_option("--StaticRangingInfoVendorId", m_cliData->StaticRanging.VendorId, "uint16_t. If --SecureRangingInfo* options are used, this option will be overridden")->capture_default_str();
 
-    // arrays
-    rangeStartApp->add_option("--StaticRangingInfoInitializationVector", m_cliData->StaticRanging.InitializationVector, "array of uint8_t. If --SecureRangingInfo* options are used, this option will be overridden")->delimiter(':');
+    // uint32_t
+    rangeStartApp->add_option("--UwbInitiationTime", uwbConfig.uwbInitiationTime, "uint32_t")->capture_default_str();
 
-    // strings
+    // booleans
+    rangeStartApp->add_flag("--HoppingMode", uwbConfig.hoppingMode)->capture_default_str();
+    rangeStartApp->add_flag("--BlockStriding", uwbConfig.blockStriding)->capture_default_str();
+
+    // enums
+    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingDirection);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingMeasurementReportMode);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.stsConfiguration);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.rangingTimeStruct);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.schedulingMode);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.channel);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.rframeConfig);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.convolutionalCodeConstraintLength);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.prfMode);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.macAddressMode);
+    detail::AddEnumOption(rangeStartApp, uwbConfig.macAddressFcsType);
+
+    // other
+    rangeStartApp->add_option("--StaticRangingInfoInitializationVector", m_cliData->StaticRanging.InitializationVector, "array of uint8_t. If --SecureRangingInfo* options are used, this option will be overridden")->delimiter(':');
     rangeStartApp->add_option("--FiraPhyVersion", uwbConfig.firaPhyVersionString)->capture_default_str();
     rangeStartApp->add_option("--FiraMacVersion", uwbConfig.firaMacVersionString)->capture_default_str();
     rangeStartApp->add_option("--ResultReportConfiguration", uwbConfig.resultReportConfigurationString)->capture_default_str();
@@ -920,15 +929,41 @@ NearObjectCli::AddSubcommandServiceRangeStart(CLI::App* parent)
         m_cliData->SessionData.uwbConfiguration = m_cliData->uwbConfiguration;
         m_cliData->SessionData.staticRangingInfo = m_cliData->StaticRanging;
 
-        std::cout << "Selected parameters:" << std::endl;
+        // Set ControllerMacAddress and ControleeMacAddresses
+        const auto macAddressType = m_cliData->uwbConfiguration.macAddressMode == uwb::UwbMacAddressType::Extended ? uwb::UwbMacAddressType::Extended : uwb::UwbMacAddressType::Short;
+        // TODO: Support multiple controlees as well as extended controlee mac addresses
+        if (m_cliData->uwbConfiguration.deviceType == DeviceType::Controller) {
+            m_cliData->uwbConfiguration.controllerMacAddress = uwb::UwbMacAddress::FromString(m_cliData->deviceMacAddressString, macAddressType);
+            m_cliData->uwbConfiguration.controleeShortMacAddress = uwb::UwbMacAddress::FromString(m_cliData->destinationMacAddressesString, macAddressType);
+        } else {
+            m_cliData->uwbConfiguration.controllerMacAddress = uwb::UwbMacAddress::FromString(m_cliData->destinationMacAddressesString, macAddressType);
+            m_cliData->uwbConfiguration.controleeShortMacAddress = uwb::UwbMacAddress::FromString(m_cliData->deviceMacAddressString, macAddressType);
+        }
 
-        for (const auto& [parameterTag, parameterValue] : m_cliData->SessionData.uwbConfiguration.GetValueMap()) {
-            std::visit([](auto&& arg) {
+        std::cout << "Selected parameters:" << std::endl;
+        const auto parameterValues = m_cliData->SessionData.uwbConfiguration.GetValueMap();
+        for (const auto& [parameterTag, parameterValue] : parameterValues) {
+            std::visit([&parameterTag](auto&& arg) {
                 using ParameterValueT = std::decay_t<decltype(arg)>;
+                std::ostringstream oss;
+                oss << magic_enum::enum_name(parameterTag) << "::";
                 if constexpr (std::is_enum_v<ParameterValueT>) {
-                    std::cout << magic_enum::enum_type_name<ParameterValueT>() << "::" << magic_enum::enum_name(arg) << std::endl;
+                    detail::ValidateEnumParameterValue(arg);
+                    oss << magic_enum::enum_name(arg);
+                } else if constexpr (std::is_same_v<ParameterValueT, bool>) {
+                    oss << std::boolalpha << arg;
+                } else if constexpr (std::is_unsigned_v<ParameterValueT>) {
+                    oss << +arg;
+                } else if constexpr (std::is_same_v<ParameterValueT, ::uwb::UwbMacAddress>) {
+                    oss << ToString(arg);
+                } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<::uwb::UwbMacAddress>>) {
+                    oss << ToString(arg);
                 } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<ResultReportConfiguration>>) {
-                    std::cout << "ResultReportConfigurations: " << ToString(arg) << std::endl;
+                    oss << ToString(arg);
+                } else if constexpr (std::is_same_v<ParameterValueT, std::array<uint8_t, StaticStsInitializationVectorLength>>) {
+                    for (const auto& value : arg) {
+                        oss << "0x" << std::setw(2) << std::internal << std::setfill('0') << std::hex << +value << " ";
+                    }
                 }
             },
                 parameterValue);

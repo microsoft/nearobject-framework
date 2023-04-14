@@ -43,7 +43,7 @@ struct UwbConfigurationData
     std::optional<bool> blockStriding;
     std::optional<uint32_t> uwbInitiationTime;
     std::optional<uwb::protocol::fira::Channel> channel;
-    std::optional<uwb::protocol::fira::StsPacketConfiguration> rframeConfig;
+    std::optional<uwb::protocol::fira::RFrameConfiguration> rframeConfig;
     std::optional<uwb::protocol::fira::ConvolutionalCodeConstraintLength> convolutionalCodeConstraintLength;
     std::optional<uwb::protocol::fira::PrfMode> prfMode;
     std::optional<uint8_t> sp0PhySetNumber;
@@ -51,8 +51,8 @@ struct UwbConfigurationData
     std::optional<uint8_t> sp3PhySetNumber;
     std::optional<uint8_t> preambleCodeIndex;
     std::optional<uwb::UwbMacAddressType> macAddressMode;
-    std::optional<uwb::UwbMacAddress> controleeShortMacAddress;
     std::optional<uwb::UwbMacAddress> controllerMacAddress;
+    std::optional<uwb::UwbMacAddress> controleeShortMacAddress;
     std::optional<uint8_t> slotsPerRangingRound;
     std::optional<uint8_t> maxContentionPhaseLength;
     std::optional<uint8_t> slotDuration;
@@ -147,7 +147,6 @@ struct NearObjectCliData
 {
     virtual ~NearObjectCliData() = default;
 
-    bool HostIsController{ false };
     std::string deviceMacAddressString;
     std::string destinationMacAddressesString;
     std::string resultReportConfigurationString;
