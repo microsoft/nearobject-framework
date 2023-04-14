@@ -1134,20 +1134,19 @@ UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackTok
         // treat it as a session callback
         auto sessionId = sessionCallback->SessionId;
 
-        DeregisterSessionEventCallback<::uwb::OnSessionEndedToken>(tokenShared, m_onSessionEndedCallbacks)                               ? 0
-            : DeregisterSessionEventCallback<::uwb::OnRangingStartedToken>(tokenShared, m_onRangingStartedCallbacks)                     ? 0
-            : DeregisterSessionEventCallback<::uwb::OnRangingStoppedToken>(tokenShared, m_onRangingStoppedCallbacks)                     ? 0
-            : DeregisterSessionEventCallback<::uwb::OnPeerPropertiesChangedToken>(tokenShared, m_onPeerPropertiesChangedCallbacks)       ? 0
-            : DeregisterSessionEventCallback<::uwb::OnSessionMembershipChangedToken>(tokenShared, m_onSessionMembershipChangedCallbacks) ? 0
-                                                                                                                                         : 0;
+        DeregisterSessionEventCallback<::uwb::OnSessionEndedToken>(tokenShared, m_onSessionEndedCallbacks) or
+            DeregisterSessionEventCallback<::uwb::OnRangingStartedToken>(tokenShared, m_onRangingStartedCallbacks) or
+            DeregisterSessionEventCallback<::uwb::OnRangingStoppedToken>(tokenShared, m_onRangingStoppedCallbacks) or
+            DeregisterSessionEventCallback<::uwb::OnPeerPropertiesChangedToken>(tokenShared, m_onPeerPropertiesChangedCallbacks) or
+            DeregisterSessionEventCallback<::uwb::OnSessionMembershipChangedToken>(tokenShared, m_onSessionMembershipChangedCallbacks);
+
     } else {
         auto deviceCallback = std::dynamic_pointer_cast<::uwb::RegisteredDeviceCallbackToken>(tokenShared);
         if (deviceCallback == nullptr) {
             throw std::runtime_error("invalid callback type used, this is a bug!");
         }
-        DeregisterDeviceEventCallback<::uwb::OnStatusChangedToken>(tokenShared, m_onStatusChangedCallbacks)                     ? 0
-            : DeregisterDeviceEventCallback<::uwb::OnDeviceStatusChangedToken>(tokenShared, m_onDeviceStatusChangedCallbacks)   ? 0
-            : DeregisterDeviceEventCallback<::uwb::OnSessionStatusChangedToken>(tokenShared, m_onSessionStatusChangedCallbacks) ? 0
-                                                                                                                                : 0;
+        DeregisterDeviceEventCallback<::uwb::OnStatusChangedToken>(tokenShared, m_onStatusChangedCallbacks) or
+            DeregisterDeviceEventCallback<::uwb::OnDeviceStatusChangedToken>(tokenShared, m_onDeviceStatusChangedCallbacks) or
+            DeregisterDeviceEventCallback<::uwb::OnSessionStatusChangedToken>(tokenShared, m_onSessionStatusChangedCallbacks);
     }
 }
