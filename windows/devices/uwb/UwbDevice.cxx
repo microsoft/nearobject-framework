@@ -23,13 +23,16 @@ UwbDevice::UwbDevice(std::string deviceName) :
     m_deviceName(std::move(deviceName))
 {
     m_onStatusChangedCallback = std::make_shared<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged>([this](::uwb::protocol::fira::UwbStatus status) {
-        return OnStatusChanged(status);
+        OnStatusChanged(status);
+        return false;
     });
     m_onDeviceStatusChangedCallback = std::make_shared<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnDeviceStatusChanged>([this](::uwb::protocol::fira::UwbStatusDevice status) {
-        return OnDeviceStatusChanged(status);
+        OnDeviceStatusChanged(status);
+        return false;
     });
     m_onSessionStatusChangedCallback = std::make_shared<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged>([this](::uwb::protocol::fira::UwbSessionStatus status) {
-        return OnSessionStatusChanged(status);
+        OnSessionStatusChanged(status);
+        return false;
     });
 }
 
