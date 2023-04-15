@@ -720,8 +720,12 @@ InvokeCallbacks(std::vector<std::shared_ptr<TokenT>>& tokens, ArgTs&... args)
             if (not callback) {
                 it = tokens.erase(it);
             }
-            callback(args...);
-            it = std::next(it);
+            auto remove = callback(args...);
+            if (remove) {
+                it = tokens.erase(it);
+            } else {
+                it = std::next(it);
+            }
         }
     }
 }

@@ -228,8 +228,8 @@ private:
     wil::shared_hfile m_notificationHandleDriver;
     OVERLAPPED m_notificationOverlapped;
 
-    // the following recursive_mutex is used to protect access to everything regarding the registered callbacks
-    mutable std::recursive_mutex m_eventCallbacksGate;
+    // the following shared_mutex is used to protect access to everything regarding the registered callbacks
+    mutable std::shared_mutex m_eventCallbacksGate;
     std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnSessionEndedToken>>> m_onSessionEndedCallbacks;
     std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnRangingStartedToken>>> m_onRangingStartedCallbacks;
     std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnRangingStoppedToken>>> m_onRangingStoppedCallbacks;
