@@ -897,7 +897,7 @@ GetToken(::uwb::UwbRegisteredDeviceEventCallbacks callbacks, std::function<std::
 UwbConnector::RegisterDeviceEventCallbacks(::uwb::UwbRegisteredDeviceEventCallbacks callbacks)
 {
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
-    bool isFirstCallback = not CallbacksPresent();
+    bool noCallbacksPrior = not CallbacksPresent();
 
     auto OnStatusChangedToken = GetToken<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged>(
         callbacks, [](auto&& callbackStruct) {
@@ -929,7 +929,7 @@ UwbConnector::RegisterDeviceEventCallbacks(::uwb::UwbRegisteredDeviceEventCallba
             return token;
         });
 
-    if (isFirstCallback) {
+    if (noCallbacksPrior and CallbacksPresent()) {
         NotificationListenerStart();
     }
 
@@ -992,7 +992,7 @@ GetToken(uint32_t sessionId, ::uwb::UwbRegisteredSessionEventCallbacks callbacks
 UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbRegisteredSessionEventCallbacks callbacks)
 {
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
-    bool isFirstCallback = not CallbacksPresent();
+    bool noCallbacksPrior = not CallbacksPresent();
 
     auto OnSessionEndedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionEnded>(
         sessionId, callbacks, [](auto&& callbackStruct) {
@@ -1043,7 +1043,7 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbRegist
             return token;
         });
 
-    if (isFirstCallback) {
+    if (noCallbacksPrior and CallbacksPresent()) {
         NotificationListenerStart();
     }
 
