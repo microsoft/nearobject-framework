@@ -929,6 +929,10 @@ UwbConnector::RegisterDeviceEventCallbacks(::uwb::UwbRegisteredDeviceEventCallba
             return token;
         });
 
+    if (isFirstCallback) {
+        NotificationListenerStart();
+    }
+
     return {
         OnStatusChangedToken,
         OnDeviceStatusChangedToken,
@@ -1039,6 +1043,10 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbRegist
             return token;
         });
 
+    if (isFirstCallback) {
+        NotificationListenerStart();
+    }
+
     return {
         OnSessionEndedToken,
         OnRangingStartedToken,
@@ -1129,6 +1137,8 @@ UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackTok
     }
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
 
+    auto callbacksPresentPrior = CallbacksPresent();
+
     auto sessionCallback = dynamic_pointer_cast<::uwb::RegisteredSessionCallbackToken>(tokenShared);
     if (sessionCallback) {
         // treat it as a session callback
@@ -1148,5 +1158,8 @@ UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackTok
         DeregisterDeviceEventCallback<::uwb::OnStatusChangedToken>(tokenShared, m_onStatusChangedCallbacks) or
             DeregisterDeviceEventCallback<::uwb::OnDeviceStatusChangedToken>(tokenShared, m_onDeviceStatusChangedCallbacks) or
             DeregisterDeviceEventCallback<::uwb::OnSessionStatusChangedToken>(tokenShared, m_onSessionStatusChangedCallbacks);
+    }
+    if ((not CallbacksPresent()) and callbacksPresentPrior) {
+        NotificationListenerStop();
     }
 }
