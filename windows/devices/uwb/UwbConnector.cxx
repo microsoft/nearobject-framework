@@ -29,7 +29,7 @@ struct RegisteredCallbackToken
 
     /**
      * @brief Handles Deregistration
-     * 
+     *
      * @param token the token to deregister. This is needed because the function exists before the token is created.
      */
     std::function<void(std::shared_ptr<RegisteredCallbackToken> token)> Deregister;
@@ -45,35 +45,35 @@ struct RegisteredSessionCallbackToken : public RegisteredCallbackToken
 
 struct OnSessionEndedToken : public RegisteredSessionCallbackToken
 {
-    OnSessionEndedToken(std::function<void(std::shared_ptr<RegisteredCallbackToken>)> deregister, uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionEnded> callback) :
+    OnSessionEndedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionEnded> callback, std::function<void(std::shared_ptr<RegisteredCallbackToken>)> deregister) :
         RegisteredSessionCallbackToken(deregister, sessionId),
         Callback(std::move(callback)){};
     std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionEnded> Callback;
 };
 struct OnRangingStartedToken : public RegisteredSessionCallbackToken
 {
-    OnRangingStartedToken(std::function<void(std::shared_ptr<RegisteredCallbackToken>)> deregister, uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted> callback) :
+    OnRangingStartedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted> callback, std::function<void(std::shared_ptr<RegisteredCallbackToken>)> deregister) :
         RegisteredSessionCallbackToken(deregister, sessionId),
         Callback(std::move(callback)){};
     std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted> Callback;
 };
 struct OnRangingStoppedToken : public RegisteredSessionCallbackToken
 {
-    OnRangingStoppedToken(std::function<void(std::shared_ptr<RegisteredCallbackToken>)> deregister, uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped> callback) :
+    OnRangingStoppedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped> callback, std::function<void(std::shared_ptr<RegisteredCallbackToken>)> deregister) :
         RegisteredSessionCallbackToken(deregister, sessionId),
         Callback(std::move(callback)){};
     std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped> Callback;
 };
 struct OnPeerPropertiesChangedToken : public RegisteredSessionCallbackToken
 {
-    OnPeerPropertiesChangedToken(std::function<void(std::shared_ptr<RegisteredCallbackToken>)> deregister, uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged> callback) :
+    OnPeerPropertiesChangedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged> callback, std::function<void(std::shared_ptr<RegisteredCallbackToken>)> deregister) :
         RegisteredSessionCallbackToken(deregister, sessionId),
         Callback(std::move(callback)){};
     std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged> Callback;
 };
 struct OnSessionMembershipChangedToken : public RegisteredSessionCallbackToken
 {
-    OnSessionMembershipChangedToken(std::function<void(std::shared_ptr<RegisteredCallbackToken>)> deregister, uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionMembershipChanged> callback) :
+    OnSessionMembershipChangedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionMembershipChanged> callback, std::function<void(std::shared_ptr<RegisteredCallbackToken>)> deregister) :
         RegisteredSessionCallbackToken(deregister, sessionId),
         Callback(std::move(callback)){};
     std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionMembershipChanged> Callback;
@@ -87,21 +87,21 @@ struct RegisteredDeviceCallbackToken : public RegisteredCallbackToken
 };
 struct OnStatusChangedToken : public RegisteredDeviceCallbackToken
 {
-    OnStatusChangedToken(std::function<void(std::shared_ptr<RegisteredCallbackToken>)> deregister, std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged> callback) :
+    OnStatusChangedToken(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged> callback, std::function<void(std::shared_ptr<RegisteredCallbackToken>)> deregister) :
         RegisteredDeviceCallbackToken(deregister),
         Callback(std::move(callback)){};
     std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged> Callback;
 };
 struct OnDeviceStatusChangedToken : public RegisteredDeviceCallbackToken
 {
-    OnDeviceStatusChangedToken(std::function<void(std::shared_ptr<RegisteredCallbackToken>)> deregister, std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnDeviceStatusChanged> callback) :
+    OnDeviceStatusChangedToken(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnDeviceStatusChanged> callback, std::function<void(std::shared_ptr<RegisteredCallbackToken>)> deregister) :
         RegisteredDeviceCallbackToken(deregister),
         Callback(std::move(callback)){};
     std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnDeviceStatusChanged> Callback;
 };
 struct OnSessionStatusChangedToken : public RegisteredDeviceCallbackToken
 {
-    OnSessionStatusChangedToken(std::function<void(std::shared_ptr<RegisteredCallbackToken>)> deregister, std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged> callback) :
+    OnSessionStatusChangedToken(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged> callback, std::function<void(std::shared_ptr<RegisteredCallbackToken>)> deregister) :
         RegisteredDeviceCallbackToken(deregister),
         Callback(std::move(callback)){};
     std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged> Callback;
@@ -888,6 +888,70 @@ UwbConnector::NotificationListenerStop()
 }
 
 /**
+ * @brief Internal helper function to try to deregister this token as this type
+ *
+ * @tparam T the type to try to dynamic_cast this token to
+ * @param token
+ * @param tokensMap
+ * @return true if this succeeded in finding the class to cast the token to
+ * @return false
+ */
+template <typename T>
+bool
+DeregisterSessionEventCallback(std::shared_ptr<::uwb::RegisteredCallbackToken> token, std::unordered_map<uint32_t, std::vector<std::shared_ptr<T>>>& tokensMap)
+{
+    auto callback = dynamic_pointer_cast<T>(token);
+    if (not callback) {
+        return false;
+    }
+    auto sessionId = callback->SessionId;
+
+    auto node = tokensMap.extract(sessionId);
+    if (node.empty()) {
+        return true; // sessionId has no associated tokens
+    }
+
+    auto tokens = node.mapped();
+    auto tokenIt = std::find_if(std::cbegin(tokens), std::cend(tokens), [callback](const auto& token) {
+        return token.get() == callback.get();
+    });
+    if (tokenIt == std::cend(tokens)) {
+        return true; // no associated token found, bail
+    }
+    tokens.erase(tokenIt);
+    tokensMap.insert(std::move(node));
+    return true;
+}
+
+/**
+ * @brief Internal helper function to try to deregister this token as this type
+ *
+ * @tparam T the type to try to dynamic_cast this token to
+ * @param token
+ * @param tokens
+ * @return true if this succeeded in finding the class to cast the token to
+ * @return false
+ */
+template <typename T>
+bool
+DeregisterDeviceEventCallback(std::shared_ptr<::uwb::RegisteredCallbackToken> token, std::vector<std::shared_ptr<T>>& tokens)
+{
+    auto callback = dynamic_pointer_cast<T>(token);
+    if (not callback) {
+        return false;
+    }
+
+    auto tokenIt = std::find_if(std::cbegin(tokens), std::cend(tokens), [callback](const auto& token) {
+        return token.get() == callback.get();
+    });
+    if (tokenIt == std::cend(tokens)) {
+        return true; // no associated token found, bail
+    }
+    tokens.erase(tokenIt);
+    return true;
+}
+
+/**
  * @brief Internal helper function that tokenizes a callback if it can be resolved
  *
  * @tparam LambdaT the type of the callback lambda
@@ -1081,70 +1145,6 @@ UwbConnector::CallbacksPresent()
     return not(m_onSessionEndedCallbacks.empty() and m_onRangingStartedCallbacks.empty() and
         m_onRangingStoppedCallbacks.empty() and m_onPeerPropertiesChangedCallbacks.empty() and m_onSessionMembershipChangedCallbacks.empty() and
         m_onStatusChangedCallbacks.empty() and m_onDeviceStatusChangedCallbacks.empty() and m_onSessionStatusChangedCallbacks.empty());
-}
-
-/**
- * @brief Internal helper function to try to deregister this token as this type
- *
- * @tparam T the type to try to dynamic_cast this token to
- * @param token
- * @param tokensMap
- * @return true if this succeeded in finding the class to cast the token to
- * @return false
- */
-template <typename T>
-bool
-DeregisterSessionEventCallback(std::shared_ptr<::uwb::RegisteredCallbackToken> token, std::unordered_map<uint32_t, std::vector<std::shared_ptr<T>>>& tokensMap)
-{
-    auto callback = dynamic_pointer_cast<T>(token);
-    if (not callback) {
-        return false;
-    }
-    auto sessionId = callback->SessionId;
-
-    auto node = tokensMap.extract(sessionId);
-    if (node.empty()) {
-        return true; // sessionId has no associated tokens
-    }
-
-    auto tokens = node.mapped();
-    auto tokenIt = std::find_if(std::cbegin(tokens), std::cend(tokens), [callback](const auto& token) {
-        return token.get() == callback.get();
-    });
-    if (tokenIt == std::cend(tokens)) {
-        return true; // no associated token found, bail
-    }
-    tokens.erase(tokenIt);
-    tokensMap.insert(std::move(node));
-    return true;
-}
-
-/**
- * @brief Internal helper function to try to deregister this token as this type
- *
- * @tparam T the type to try to dynamic_cast this token to
- * @param token
- * @param tokens
- * @return true if this succeeded in finding the class to cast the token to
- * @return false
- */
-template <typename T>
-bool
-DeregisterDeviceEventCallback(std::shared_ptr<::uwb::RegisteredCallbackToken> token, std::vector<std::shared_ptr<T>>& tokens)
-{
-    auto callback = dynamic_pointer_cast<T>(token);
-    if (not callback) {
-        return false;
-    }
-
-    auto tokenIt = std::find_if(std::cbegin(tokens), std::cend(tokens), [callback](const auto& token) {
-        return token.get() == callback.get();
-    });
-    if (tokenIt == std::cend(tokens)) {
-        return true; // no associated token found, bail
-    }
-    tokens.erase(tokenIt);
-    return true;
 }
 
 void
