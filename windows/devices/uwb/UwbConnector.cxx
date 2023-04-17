@@ -1182,7 +1182,7 @@ UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackTok
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
 
     auto callbacksPresentPrior = CallbacksPresent();
-    
+
     tokenShared->Deregister(tokenShared);
 
     if ((not CallbacksPresent()) and callbacksPresentPrior) {
