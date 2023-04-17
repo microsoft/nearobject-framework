@@ -495,23 +495,23 @@ typedef struct _UWB_RANGING_MEASUREMENT {
     uint16_t distance;
     // AoA Azimuth in degrees
     // Allowed values range from -180 to +180
-    uint8_t aoaAzimuth[2];
+    uint16_t aoaAzimuth;
     // IEEE 802.15.4z-2020, Section 6.9.1.7: Ranging FoM
     // Figure of Merit goes from 0 to 100
     uint8_t aoaAzimuthFigureOfMerit;
     // AoA Elevation in degrees
     // Allowed values range from -90 to +90
-    uint8_t aoaElevation[2];
+    uint16_t aoaElevation;
     // Figure of Merit goes from 0 to 100
     uint8_t aoaElevationFigureOfMerit;
     // AoA Destination Azimuth in degrees
     // Allowed values range from -180 to +180
-    uint8_t aoaDestinationAzimuth[2];
+    uint16_t aoaDestinationAzimuth;
     // Figure of Merit goes from 0 to 100
     uint8_t aoaDestinationAzimuthFigureOfMerit;
     // AoA Destination Elevation in degrees
     // Allowed values range from -90 to +90
-    uint8_t aoaDestinationElevation[2];
+    uint16_t aoaDestinationElevation;
     // Figure of Merit goes from 0 to 100
     uint8_t aoaDestinationElevationFigureOfMerit;
     // Slot number starts from 0
