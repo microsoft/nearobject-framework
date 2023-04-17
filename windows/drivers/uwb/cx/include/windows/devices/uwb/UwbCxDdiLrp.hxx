@@ -9,4 +9,10 @@
 
 #include <windows/devices/uwb/UwbCxLrpDevice.h>
 
+namespace windows::drivers::uwbcx
+{
+const std::string UwbNotificationNamespace = "\\Notifications";
+
+} // namespace windows::drivers::uwbcx
+
 #endif // UWBCX_DDI_LRP_HXX
