@@ -4,6 +4,7 @@
 
 #include <concepts>
 #include <memory>
+#include <string>
 
 #include <windows.h>
 
@@ -82,6 +83,7 @@ OpenDriverHandleShared(wil::shared_hfile &driverHandle, const char *deviceName, 
 HRESULT
 OpenDriverHandleUnique(wil::unique_hfile &driverHandle, const char *deviceName, bool isOverlapped = false);
 
+const std::string NotificationHandleNamespaceString = "\\Notifications";
 } // namespace windows::devices
 
 #endif // DEVICE_HANDLE_HXX
