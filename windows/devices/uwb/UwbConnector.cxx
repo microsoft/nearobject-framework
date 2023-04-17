@@ -703,7 +703,7 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
  */
 template <typename TokenT, typename... ArgTs>
 void
-InvokeCallbacks(std::vector<std::shared_ptr<TokenT>>& tokens, ArgTs&... args)
+InvokeCallbacks(std::vector<std::shared_ptr<TokenT>>& tokens, ArgTs&&... args)
 {
     if (tokens.empty()) {
         PLOG_INFO << "Ignoring " << typeid(TokenT).name() << " event due to missing callbacks";
@@ -719,12 +719,13 @@ InvokeCallbacks(std::vector<std::shared_ptr<TokenT>>& tokens, ArgTs&... args)
             auto callback = *callbackShared;
             if (not callback) {
                 it = tokens.erase(it);
-            }
-            auto remove = callback(args...);
-            if (remove) {
-                it = tokens.erase(it);
             } else {
-                it = std::next(it);
+                auto remove = callback(std::forward<ArgTs>(args)...);
+                if (remove) {
+                    it = tokens.erase(it);
+                } else {
+                    it = std::next(it);
+                }
             }
         }
     }
@@ -741,7 +742,7 @@ InvokeCallbacks(std::vector<std::shared_ptr<TokenT>>& tokens, ArgTs&... args)
  */
 template <typename TokenT, typename... ArgTs>
 void
-InvokeSessionCallbacks(std::unordered_map<uint32_t, std::vector<std::shared_ptr<TokenT>>>& sessionMap, uint32_t sessionId, ArgTs&... args)
+InvokeSessionCallbacks(std::unordered_map<uint32_t, std::vector<std::shared_ptr<TokenT>>>& sessionMap, uint32_t sessionId, ArgTs&&... args)
 {
     auto node = sessionMap.extract(sessionId);
     if (node.empty()) {
@@ -749,7 +750,7 @@ InvokeSessionCallbacks(std::unordered_map<uint32_t, std::vector<std::shared_ptr<
         return;
     }
     auto& tokens = node.mapped();
-    InvokeCallbacks(tokens, args...);
+    InvokeCallbacks(tokens, std::forward<ArgTs>(args)...);
     if (not tokens.empty()) {
         sessionMap.insert(std::move(node));
     }
