@@ -47,9 +47,10 @@ struct IUwbDeviceDdiConnector : public IUwbDeviceDdi
      * @brief Sets the callbacks for the UwbDevice that owns this UwbConnector
      *
      * @param callbacks
-     * @return std::weak_ptr<::uwb::RegisteredCallbackToken> You can pass this pointer into DeregisterEventCallback to deregister this event callback
+     * @return ::uwb::UwbRegisteredDeviceEventCallbackTokens You can pass the pointers into DeregisterEventCallback to deregister the event callbacks
      */
-    virtual std::weak_ptr<::uwb::RegisteredCallbackToken> RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>) = 0;
+    virtual ::uwb::UwbRegisteredDeviceEventCallbackTokens
+    RegisterDeviceEventCallbacks(::uwb::UwbRegisteredDeviceEventCallbacks callbacks) = 0;
 };
 
 } // namespace windows::devices::uwb
