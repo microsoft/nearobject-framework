@@ -437,21 +437,13 @@ windows::devices::uwb::ddi::lrp::From(const ::uwb::protocol::fira::UwbRangingMea
         .status = From(uwbRangingMeasurement.Status),
         .lineOfSightIndicator = From(uwbRangingMeasurement.LineOfSightIndicator),
         .distance = uwbRangingMeasurement.Distance,
-        .aoaAzimuth = {
-            (uwbRangingMeasurement.AoAAzimuth.Result & 0x00FFU),
-            (uwbRangingMeasurement.AoAAzimuth.Result & 0xFF00U) >> 8U },
+        .aoaAzimuth = uwbRangingMeasurement.AoAAzimuth.Result,
         .aoaAzimuthFigureOfMerit = uwbRangingMeasurement.AoAAzimuth.FigureOfMerit.value_or(0),
-        .aoaElevation = {
-            (uwbRangingMeasurement.AoAElevation.Result & 0x00FFU),
-            (uwbRangingMeasurement.AoAElevation.Result & 0xFF00U) >> 8U },
+        .aoaElevation = uwbRangingMeasurement.AoAElevation.Result,
         .aoaElevationFigureOfMerit = uwbRangingMeasurement.AoAElevation.FigureOfMerit.value_or(0),
-        .aoaDestinationAzimuth = {
-            (uwbRangingMeasurement.AoaDestinationAzimuth.Result & 0x00FFU),
-            (uwbRangingMeasurement.AoaDestinationAzimuth.Result & 0xFF00U) >> 8U },
+        .aoaDestinationAzimuth = uwbRangingMeasurement.AoaDestinationAzimuth.Result,
         .aoaDestinationAzimuthFigureOfMerit = uwbRangingMeasurement.AoaDestinationAzimuth.FigureOfMerit.value_or(0),
-        .aoaDestinationElevation = {
-            (uwbRangingMeasurement.AoaDestinationElevation.Result & 0x00FFU),
-            (uwbRangingMeasurement.AoaDestinationElevation.Result & 0xFF00U) >> 8U },
+        .aoaDestinationElevation = uwbRangingMeasurement.AoaDestinationElevation.Result,
         .aoaDestinationElevationFigureOfMerit = uwbRangingMeasurement.AoaDestinationElevation.FigureOfMerit.value_or(0),
         .slotIndex = uwbRangingMeasurement.SlotIndex
     };
