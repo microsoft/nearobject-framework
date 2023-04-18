@@ -30,7 +30,7 @@ struct RegisteredCallbackToken
      * The lambda assumes that the caller is holding the mutex UwbConnector::m_eventCallbacksGate
      */
     RegisteredCallbackToken(std::function<void(RegisteredCallbackToken*)> deregister) :
-        Deregister([this, deregister]() {
+        Deregister([this, deregister = std::move(deregister)]() {
             return deregister(this);
         })
     {}
@@ -46,7 +46,7 @@ struct RegisteredCallbackToken
 struct RegisteredSessionCallbackToken : public RegisteredCallbackToken
 {
     RegisteredSessionCallbackToken(std::function<void(RegisteredCallbackToken*)> deregister, uint32_t sessionId) :
-        RegisteredCallbackToken(deregister), SessionId(sessionId){};
+        RegisteredCallbackToken(std::move(deregister)), SessionId(sessionId){};
     virtual ~RegisteredSessionCallbackToken() = default;
     uint32_t SessionId;
 };
@@ -54,35 +54,35 @@ struct RegisteredSessionCallbackToken : public RegisteredCallbackToken
 struct OnSessionEndedToken : public RegisteredSessionCallbackToken
 {
     OnSessionEndedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionEnded> callback, std::function<void(RegisteredCallbackToken*)> deregister) :
-        RegisteredSessionCallbackToken(deregister, sessionId),
+        RegisteredSessionCallbackToken(std::move(deregister), sessionId),
         Callback(std::move(callback)){};
     std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionEnded> Callback;
 };
 struct OnRangingStartedToken : public RegisteredSessionCallbackToken
 {
     OnRangingStartedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted> callback, std::function<void(RegisteredCallbackToken*)> deregister) :
-        RegisteredSessionCallbackToken(deregister, sessionId),
+        RegisteredSessionCallbackToken(std::move(deregister), sessionId),
         Callback(std::move(callback)){};
     std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted> Callback;
 };
 struct OnRangingStoppedToken : public RegisteredSessionCallbackToken
 {
     OnRangingStoppedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped> callback, std::function<void(RegisteredCallbackToken*)> deregister) :
-        RegisteredSessionCallbackToken(deregister, sessionId),
+        RegisteredSessionCallbackToken(std::move(deregister), sessionId),
         Callback(std::move(callback)){};
     std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped> Callback;
 };
 struct OnPeerPropertiesChangedToken : public RegisteredSessionCallbackToken
 {
     OnPeerPropertiesChangedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged> callback, std::function<void(RegisteredCallbackToken*)> deregister) :
-        RegisteredSessionCallbackToken(deregister, sessionId),
+        RegisteredSessionCallbackToken(std::move(deregister), sessionId),
         Callback(std::move(callback)){};
     std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged> Callback;
 };
 struct OnSessionMembershipChangedToken : public RegisteredSessionCallbackToken
 {
     OnSessionMembershipChangedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionMembershipChanged> callback, std::function<void(RegisteredCallbackToken*)> deregister) :
-        RegisteredSessionCallbackToken(deregister, sessionId),
+        RegisteredSessionCallbackToken(std::move(deregister), sessionId),
         Callback(std::move(callback)){};
     std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionMembershipChanged> Callback;
 };
@@ -90,27 +90,27 @@ struct OnSessionMembershipChangedToken : public RegisteredSessionCallbackToken
 struct RegisteredDeviceCallbackToken : public RegisteredCallbackToken
 {
     RegisteredDeviceCallbackToken(std::function<void(RegisteredCallbackToken*)> deregister) :
-        RegisteredCallbackToken(deregister){};
+        RegisteredCallbackToken(std::move(deregister)){};
     virtual ~RegisteredDeviceCallbackToken() = default;
 };
 struct OnStatusChangedToken : public RegisteredDeviceCallbackToken
 {
     OnStatusChangedToken(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged> callback, std::function<void(RegisteredCallbackToken*)> deregister) :
-        RegisteredDeviceCallbackToken(deregister),
+        RegisteredDeviceCallbackToken(std::move(deregister)),
         Callback(std::move(callback)){};
     std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged> Callback;
 };
 struct OnDeviceStatusChangedToken : public RegisteredDeviceCallbackToken
 {
     OnDeviceStatusChangedToken(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnDeviceStatusChanged> callback, std::function<void(RegisteredCallbackToken*)> deregister) :
-        RegisteredDeviceCallbackToken(deregister),
+        RegisteredDeviceCallbackToken(std::move(deregister)),
         Callback(std::move(callback)){};
     std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnDeviceStatusChanged> Callback;
 };
 struct OnSessionStatusChangedToken : public RegisteredDeviceCallbackToken
 {
     OnSessionStatusChangedToken(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged> callback, std::function<void(RegisteredCallbackToken*)> deregister) :
-        RegisteredDeviceCallbackToken(deregister),
+        RegisteredDeviceCallbackToken(std::move(deregister)),
         Callback(std::move(callback)){};
     std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged> Callback;
 };
