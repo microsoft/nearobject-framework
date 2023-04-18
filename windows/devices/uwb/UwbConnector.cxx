@@ -876,9 +876,10 @@ void
 UwbConnector::NotificationListenerStart()
 {
     wil::shared_hfile notificationHandleDriver;
-    auto hr = OpenDriverHandle(notificationHandleDriver, m_deviceName.c_str(), true);
+    const std::string notificationHandleDeviceName = m_deviceName + windows::drivers::uwbcx::UwbNotificationNamespace;
+    auto hr = OpenDriverHandle(notificationHandleDriver, notificationHandleDeviceName.c_str(), true);
     if (FAILED(hr)) {
-        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << hr;
+        PLOG_ERROR << "failed to obtain driver handle for " << notificationHandleDeviceName << ", hr=" << hr;
         return;
     }
 
