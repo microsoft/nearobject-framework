@@ -837,16 +837,6 @@ UwbConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData ranging
 void
 UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNotificationData)
 {
-    constexpr auto getStatusChangedCallback = [](auto&& callbacks) {
-        return callbacks->OnStatusChanged;
-    };
-    constexpr auto getDeviceStatusChangedCallback = [](auto&& callbacks) {
-        return callbacks->OnDeviceStatusChanged;
-    };
-    constexpr auto getSessionStatusChangedCallback = [](auto&& callbacks) {
-        return callbacks->OnSessionStatusChanged;
-    };
-
     LOG_DEBUG << "received notification: " << ToString(uwbNotificationData);
 
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
