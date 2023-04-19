@@ -67,10 +67,15 @@ private:
     StopRangingImpl() override;
 
     /**
-     * @brief Add a new peer to the session.
+     * @brief Attempt to add a controlee to this session.
+     *
+     * @param controleeMacAddress The mac address of the controlee. This is
+     * expected to be in the mac address format configured for the session.
+     * @return UwbStatus The status of the operation. UwbStatusGeneric::Ok is
+     * returned if the controlee was successfully added.
      */
-    virtual void
-    AddPeerImpl(::uwb::UwbMacAddress peerMacAddress) override;
+    virtual ::uwb::protocol::fira::UwbStatus
+    TryAddControleeImpl(::uwb::UwbMacAddress controleeMacAddress) override;
 
     /**
      * @brief Get the application configuration parameters for this session.
