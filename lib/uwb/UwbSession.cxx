@@ -69,12 +69,15 @@ UwbSession::SetMacAddressType(UwbMacAddressType uwbMacAddressType) noexcept
     // TODO: update driver with new mac address type (aka "mode" in FiRa-speak).
 }
 
-void
-UwbSession::AddPeer(UwbMacAddress peerMacAddress)
+UwbStatus
+UwbSession::TryAddControlee(UwbMacAddress controleeMacAddress)
 {
     std::scoped_lock peersLock{ m_peerGate };
-    PLOG_VERBOSE << "Session with id " << m_sessionId << " requesting to add peer via DDI with mac address " << peerMacAddress.ToString();
-    AddPeerImpl(std::move(peerMacAddress));
+    PLOG_VERBOSE << "Session with id " << m_sessionId << " requesting to add controlee with mac address " << controleeMacAddress.ToString();
+    AddPeerImpl(std::move(controleeMacAddress));
+
+    // TODO: return result from TryAddControleeImpl
+    return UwbStatusOk;
 }
 
 void

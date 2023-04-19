@@ -13,6 +13,7 @@
 #include <uwb/UwbMacAddress.hxx>
 #include <uwb/UwbPeer.hxx>
 #include <uwb/UwbSessionEventCallbacks.hxx>
+#include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/UwbSessionData.hxx>
 
 namespace uwb
@@ -109,8 +110,17 @@ public:
      * @param peerMacAddress The mac address of the peer. This is expected to be
      * in the mac address format configured for the session.
      */
-    void
-    AddPeer(UwbMacAddress peerMacAddress);
+
+    /**
+     * @brief Attempt to add a controlee to this session.
+     * 
+     * @param controleeMacAddress The mac address of the controlee. This is
+     * expected to be in the mac address format configured for the session.
+     * @return UwbStatus The status of the operation. UwbStatusGeneric::Ok is
+     * returned if the controlee was successfully added.
+     */
+    uwb::protocol::fira::UwbStatus
+    TryAddControlee(uwb::protocol::fira::UwbMacAddress controleeMacAddress);
 
     /**
      * @brief Start ranging.
