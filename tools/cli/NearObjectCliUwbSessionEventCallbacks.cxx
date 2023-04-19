@@ -72,7 +72,7 @@ NearObjectCliUwbSessionEventCallbacks::OnRangingStopped(::uwb::UwbSession* sessi
 }
 
 void
-NearObjectCliUwbSessionEventCallbacks::OnPeerPropertiesChanged(::uwb::UwbSession* session, const std::vector<::uwb::UwbPeer> peersChanged)
+NearObjectCliUwbSessionEventCallbacks::OnPeerPropertiesChanged(::uwb::UwbSession* session, std::vector<::uwb::UwbPeer> peersChanged)
 {
     std::cout << LogPrefix(session->GetId()) << "Peer Properties Changed" << std::endl;
 
@@ -82,7 +82,7 @@ NearObjectCliUwbSessionEventCallbacks::OnPeerPropertiesChanged(::uwb::UwbSession
 }
 
 void
-NearObjectCliUwbSessionEventCallbacks::OnSessionMembershipChanged(::uwb::UwbSession* session, const std::vector<::uwb::UwbPeer> peersAdded, const std::vector<::uwb::UwbPeer> peersRemoved)
+NearObjectCliUwbSessionEventCallbacks::OnSessionMembershipChanged(::uwb::UwbSession* session, std::vector<::uwb::UwbPeer> peersAdded, std::vector<::uwb::UwbPeer> peersRemoved)
 {
     std::cout << LogPrefix(session->GetId()) << "Membership Changed" << std::endl;
 
