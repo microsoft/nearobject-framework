@@ -263,6 +263,11 @@ elseif (BUILD_FOR_WINDOWS)
       WIN32_LEAN_AND_MEAN
   )
 
+  # Allow more than default number of section in object files.
+  add_compile_options(
+    /bigobj
+  )
+
   if (NOF_USE_MSVC_STATIC_RUNTIME)
     # Enable explicit selection of MSVC runtime library.
     if (POLICY CMP0091)
