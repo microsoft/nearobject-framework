@@ -31,14 +31,6 @@ protected:
 
 public:
     /**
-     * @brief Initializes the file object for use.
-     *
-     * @return NTSTATUS
-     */
-    NTSTATUS
-    Initialize();
-
-    /**
      * @brief Register a DDI handler with this file instance.
      *
      * @param handler The handler to register.
@@ -78,11 +70,19 @@ public:
     GetDevice() noexcept;
 
     /**
+     * @brief Initializes the file object for use.
+     *
+     * @return NTSTATUS
+     */
+    virtual NTSTATUS
+    Initialize();
+
+    /**
      * @brief Get a reference to the i/o event queue for this open file handle.
      *
      * @return std::shared_ptr<UwbSimulatorIoEventQueue>
      */
-    std::shared_ptr<UwbSimulatorIoEventQueue>
+    virtual std::shared_ptr<UwbSimulatorIoEventQueue>
     GetIoEventQueue();
 
 public:
@@ -95,7 +95,7 @@ private:
      * EvtDestroyCallback WDF event (OnWdfDestroy) for the corresponding file
      * object.
      */
-    void
+    virtual void
     OnDestroy();
 
     /**
@@ -112,16 +112,6 @@ private:
     WDFFILEOBJECT m_wdfFile;
     std::weak_ptr<UwbSimulatorDevice> m_uwbSimulatorDevice;
     std::vector<std::shared_ptr<windows::devices::uwb::simulator::IUwbSimulatorDdiHandler>> m_ddiHandlers{};
-    std::shared_ptr<UwbSimulatorIoEventQueue> m_ioEventQueue;
-
-    /**
-     * @brief Default size for the data queue. This should be large enough to
-     * contain the expected number of entries that could be generated in the
-     * time it takes a client to process a single notification. The current
-     * value (16) was selected to hopefully satisfy this, however, will be tuned
-     * later once real-world empirical data is collected and analzyed.
-     */
-    static constexpr std::size_t MaximumQueueSizeDefault = 16;
 };
 
 struct UwbSimulatorDeviceFileWdfContext

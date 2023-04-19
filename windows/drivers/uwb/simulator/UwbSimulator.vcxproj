@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UwbSimulatorDdiHandler.cxx" />
+    <ClCompile Include="UwbSimulatorDeviceFileNotification.cxx" />
     <ClCompile Include="UwbSimulatorDriver.cxx" />
     <ClCompile Include="UwbSimulatorDdiCallbacks.cxx" />
     <ClCompile Include="UwbSimulatorIoEventQueue.cxx" />
@@ -27,6 +28,7 @@
     <ClInclude Include="IUwbSimulatorDdiCallbacksSimulator.hxx" />
     <ClInclude Include="IUwbSimulatorDdiHandler.hxx" />
     <ClInclude Include="UwbSimulatorDdiHandler.hxx" />
+    <ClInclude Include="UwbSimulatorDeviceFileNotification.hxx" />
     <ClInclude Include="UwbSimulatorDispatchEntry.hxx" />
     <ClInclude Include="UwbSimulatorDriver.hxx" />
     <ClInclude Include="include\UwbSimulatorDdi.h" />
