@@ -83,7 +83,7 @@ struct UwbSessionEventCallbacks
      * @param peersChanged A list of peers whose properties changed.
      */
     virtual void
-    OnPeerPropertiesChanged(UwbSession *session, const std::vector<UwbPeer> peersChanged) = 0;
+    OnPeerPropertiesChanged(UwbSession *session, std::vector<UwbPeer> peersChanged) = 0;
 
     /**
      * @brief Invoked when membership of one or more near peers involved in
@@ -95,7 +95,7 @@ struct UwbSessionEventCallbacks
      * @param peersRemoved A list of peers that were removed from the session.
      */
     virtual void
-    OnSessionMembershipChanged(UwbSession *session, const std::vector<UwbPeer> peersAdded, const std::vector<UwbPeer> peersRemoved) = 0;
+    OnSessionMembershipChanged(UwbSession *session, std::vector<UwbPeer> peersAdded, std::vector<UwbPeer> peersRemoved) = 0;
 
     /**
      * @brief Destroy the UwbSessionEventCallbacks object, defined to support

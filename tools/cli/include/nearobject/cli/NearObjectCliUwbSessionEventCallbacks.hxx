@@ -54,7 +54,7 @@ struct NearObjectCliUwbSessionEventCallbacks :
      * @param peersChanged A list of peers whose properties changed.
      */
     void
-    OnPeerPropertiesChanged(::uwb::UwbSession *session, const std::vector<::uwb::UwbPeer> peersChanged);
+    OnPeerPropertiesChanged(::uwb::UwbSession *session, std::vector<::uwb::UwbPeer> peersChanged);
 
     /**
      * @brief Invoked when membership of one or more near peers involved in
@@ -66,7 +66,7 @@ struct NearObjectCliUwbSessionEventCallbacks :
      * @param peersRemoved A list of peers that were removed from the session.
      */
     void
-    OnSessionMembershipChanged(::uwb::UwbSession *session, const std::vector<::uwb::UwbPeer> peersAdded, const std::vector<::uwb::UwbPeer> peersRemoved);
+    OnSessionMembershipChanged(::uwb::UwbSession *session, std::vector<::uwb::UwbPeer> peersAdded, std::vector<::uwb::UwbPeer> peersRemoved);
 
 private:
     std::function<void()> m_onSessionEndedCallback;
