@@ -40,7 +40,7 @@ using OnRangingStopped = std::function<bool()>;
  * @param peersChanged A list of peers whose properties changed.
  * @return true if this callback needs to be deregistered
  */
-using OnPeerPropertiesChanged = std::function<bool(const std::vector<UwbPeer> peersChanged)>;
+using OnPeerPropertiesChanged = std::function<bool(std::vector<UwbPeer> peersChanged)>;
 
 /**
  * @brief Invoked when membership of one or more near peers involved in
@@ -51,7 +51,7 @@ using OnPeerPropertiesChanged = std::function<bool(const std::vector<UwbPeer> pe
  * @param peersRemoved A list of peers that were removed from the session.
  * @return true if this callback needs to be deregistered
  */
-using OnSessionMembershipChanged = std::function<bool(const std::vector<UwbPeer> peersAdded, const std::vector<UwbPeer> peersRemoved)>;
+using OnSessionMembershipChanged = std::function<bool(std::vector<UwbPeer> peersAdded, std::vector<UwbPeer> peersRemoved)>;
 }; // namespace UwbRegisteredSessionEventCallbackTypes
 
 namespace UwbRegisteredDeviceEventCallbackTypes
