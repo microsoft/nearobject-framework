@@ -174,10 +174,11 @@ UwbSession::StopRangingImpl()
     // TODO: return uwbStatus;
 }
 
-void
-UwbSession::AddPeerImpl([[maybe_unused]] ::uwb::UwbMacAddress peerMacAddress)
+UwbStatus
+UwbSession::TryAddControleeImpl([[maybe_unused]] ::uwb::UwbMacAddress controleeMacAddress)
 {
-    PLOG_VERBOSE << "AddPeerImpl";
+    PLOG_VERBOSE << "TryAddControleeImpl";
+    return UwbStatusGeneric::Rejected;
 
     // TODO: convert code below to invoke IOCTL_UWB_SET_APP_CONFIG_PARAMS to use connector
 
