@@ -1,9 +1,0 @@
-
-namespace Windows.Devices.NearObject
-{
-    [default_interface]
-    runtimeclass NearObject 
-    {
-        NearObject();
-    }
-}
