@@ -17,28 +17,30 @@ namespace UwbRegisteredSessionEventCallbackTypes
  * @brief Invoked when the session is ended.
  *
  * @param reason The reason the session ended.
+ * @return true if this callback needs to be deregistered
  */
-using OnSessionEnded = std::function<void(::uwb::UwbSessionEndReason reason)>;
+using OnSessionEnded = std::function<bool(::uwb::UwbSessionEndReason reason)>;
 
 /**
  * @brief Invoked when active ranging starts.
- *
+ * @return true if this callback needs to be deregistered
  */
-using OnRangingStarted = std::function<void()>;
+using OnRangingStarted = std::function<bool()>;
 
 /**
  * @brief Invoked when active ranging stops.
- *
+ * @return true if this callback needs to be deregistered
  */
-using OnRangingStopped = std::function<void()>;
+using OnRangingStopped = std::function<bool()>;
 
 /**
  * @brief Invoked when the properties of a peer involved in the session
  * changes. This includes the spatial properties of the peer(s).
  *
  * @param peersChanged A list of peers whose properties changed.
+ * @return true if this callback needs to be deregistered
  */
-using OnPeerPropertiesChanged = std::function<void(const std::vector<UwbPeer> peersChanged)>;
+using OnPeerPropertiesChanged = std::function<bool(const std::vector<UwbPeer> peersChanged)>;
 
 /**
  * @brief Invoked when membership of one or more near peers involved in
@@ -47,8 +49,9 @@ using OnPeerPropertiesChanged = std::function<void(const std::vector<UwbPeer> pe
  *
  * @param peersAdded A list of peers that were added to the session.
  * @param peersRemoved A list of peers that were removed from the session.
+ * @return true if this callback needs to be deregistered
  */
-using OnSessionMembershipChanged = std::function<void(const std::vector<UwbPeer> peersAdded, const std::vector<UwbPeer> peersRemoved)>;
+using OnSessionMembershipChanged = std::function<bool(const std::vector<UwbPeer> peersAdded, const std::vector<UwbPeer> peersRemoved)>;
 }; // namespace UwbRegisteredSessionEventCallbackTypes
 
 namespace UwbRegisteredDeviceEventCallbackTypes
@@ -57,22 +60,25 @@ namespace UwbRegisteredDeviceEventCallbackTypes
  * @brief Invoked when a generic error occurs.
  *
  * @param status The generic error that occurred.
+ * @return true if this callback needs to be deregistered
  */
-using OnStatusChanged = std::function<void(::uwb::protocol::fira::UwbStatus)>;
+using OnStatusChanged = std::function<bool(::uwb::protocol::fira::UwbStatus)>;
 
 /**
  * @brief Invoked when the device status changes.
  *
  * @param statusDevice
+ * @return true if this callback needs to be deregistered
  */
-using OnDeviceStatusChanged = std::function<void(::uwb::protocol::fira::UwbStatusDevice)>;
+using OnDeviceStatusChanged = std::function<bool(::uwb::protocol::fira::UwbStatusDevice)>;
 
 /**
  * @brief Invoked when the status of a session changes.
  *
  * @param statusSession The new status of the session.
+ * @return true if this callback needs to be deregistered
  */
-using OnSessionStatusChanged = std::function<void(::uwb::protocol::fira::UwbSessionStatus)>;
+using OnSessionStatusChanged = std::function<bool(::uwb::protocol::fira::UwbSessionStatus)>;
 }; // namespace UwbRegisteredDeviceEventCallbackTypes
 
 /**
