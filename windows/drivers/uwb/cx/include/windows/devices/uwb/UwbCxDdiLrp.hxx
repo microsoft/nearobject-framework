@@ -11,7 +11,7 @@
 
 namespace windows::drivers::uwbcx
 {
-const std::string UwbNotificationNamespace = "\\Notifications";
+constexpr auto UwbNotificationNamespace = "\\Notifications";
 
 } // namespace windows::drivers::uwbcx
 
