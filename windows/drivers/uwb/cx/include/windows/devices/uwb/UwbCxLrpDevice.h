@@ -36,7 +36,7 @@ DEFINE_GUID(GUID_UWB_DEVICE_INTERFACE, 0xa7424370, 0x45e5, 0x49c3, 0xae, 0x35, 0
 #define IOCTL_UWB_SESSION_DEINIT                           CTL_CODE(FILE_DEVICE_UNKNOWN, 0x0106, METHOD_BUFFERED, FILE_ANY_ACCESS) // Input: UWB_SESSION_DEINIT,                            Output: UWB_STATUS
 #define IOCTL_UWB_SET_APP_CONFIG_PARAMS                    CTL_CODE(FILE_DEVICE_UNKNOWN, 0x0107, METHOD_BUFFERED, FILE_ANY_ACCESS) // Input: UWB_SET_APP_CONFIG_PARAMS,                     Output: UWB_SET_APP_CONFIG_PARAMS_STATUS
 #define IOCTL_UWB_GET_APP_CONFIG_PARAMS                    CTL_CODE(FILE_DEVICE_UNKNOWN, 0x0108, METHOD_BUFFERED, FILE_ANY_ACCESS) // Input: UWB_GET_APP_CONFIG_PARAMS,                     Output: UWB_APP_CONFIG_PARAMS
-#define IOCTL_UWB_GET_SESSION_COUNT                        CTL_CODE(FILE_DEVICE_UNKNOWN, 0x0109, METHOD_BUFFERED, FILE_ANY_ACCESS) // Input: nullptr,                                       Output: UWB_SESSION_COUNT
+#define IOCTL_UWB_GET_SESSION_COUNT                        CTL_CODE(FILE_DEVICE_UNKNOWN, 0x0109, METHOD_BUFFERED, FILE_ANY_ACCESS) // Input: nullptr,                                       Output: UWB_GET_SESSION_COUNT
 #define IOCTL_UWB_GET_SESSION_STATE                        CTL_CODE(FILE_DEVICE_UNKNOWN, 0x010A, METHOD_BUFFERED, FILE_ANY_ACCESS) // Input: UWB_GET_SESSION_STATE,                         Output: UWB_SESSION_STATE_STATUS
 #define IOCTL_UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST CTL_CODE(FILE_DEVICE_UNKNOWN, 0x010B, METHOD_BUFFERED, FILE_ANY_ACCESS) // Input: UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST,  Output: UWB_STATUS
 #define IOCTL_UWB_START_RANGING_SESSION                    CTL_CODE(FILE_DEVICE_UNKNOWN, 0x010C, METHOD_BUFFERED, FILE_ANY_ACCESS) // Input: UWB_START_RANGING_SESSION,                     Output: UWB_STATUS
@@ -365,7 +365,7 @@ enum UWB_SESSION_REASON_CODE {
     UWB_SESSION_REASON_CODE_ERROR_INVALID_RFRAME_CONFIG
 };
 
-typedef struct _UWB_SESSION_COUNT {
+typedef struct _UWB_GET_SESSION_COUNT {
     uint32_t size;
     UWB_STATUS status;
     uint32_t sessionCount;
@@ -495,23 +495,23 @@ typedef struct _UWB_RANGING_MEASUREMENT {
     uint16_t distance;
     // AoA Azimuth in degrees
     // Allowed values range from -180 to +180
-    uint8_t aoaAzimuth[2];
+    uint16_t aoaAzimuth;
     // IEEE 802.15.4z-2020, Section 6.9.1.7: Ranging FoM
     // Figure of Merit goes from 0 to 100
     uint8_t aoaAzimuthFigureOfMerit;
     // AoA Elevation in degrees
     // Allowed values range from -90 to +90
-    uint8_t aoaElevation[2];
+    uint16_t aoaElevation;
     // Figure of Merit goes from 0 to 100
     uint8_t aoaElevationFigureOfMerit;
     // AoA Destination Azimuth in degrees
     // Allowed values range from -180 to +180
-    uint8_t aoaDestinationAzimuth[2];
+    uint16_t aoaDestinationAzimuth;
     // Figure of Merit goes from 0 to 100
     uint8_t aoaDestinationAzimuthFigureOfMerit;
     // AoA Destination Elevation in degrees
     // Allowed values range from -90 to +90
-    uint8_t aoaDestinationElevation[2];
+    uint16_t aoaDestinationElevation;
     // Figure of Merit goes from 0 to 100
     uint8_t aoaDestinationElevationFigureOfMerit;
     // Slot number starts from 0

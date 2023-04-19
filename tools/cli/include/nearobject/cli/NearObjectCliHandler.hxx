@@ -99,13 +99,29 @@ struct NearObjectCliHandler
     HandleGetDeviceInfo(std::shared_ptr<uwb::UwbDevice> uwbDevice) noexcept;
 
     /**
-     * @brief Invoked by the command-line driver when the request is to deinitialize a pre-existing session. 
-     * 
-     * @param uwbDevice 
-     * @param sessionId 
+     * @brief Invoked by the command-line driver when the request is to deinitialize a pre-existing session.
+     *
+     * @param uwbDevice
+     * @param sessionId
      */
     virtual void
     HandleSessionDeinitialize(std::shared_ptr<::uwb::UwbDevice> uwbDevice, uint32_t sessionId) noexcept;
+
+    /**
+     * @brief Invoked by the command-line driver when the request is to get the number of sessions.
+     *
+     * @param uwbDevice
+     */
+    virtual void
+    HandleGetSessionCount(std::shared_ptr<::uwb::UwbDevice> uwbDevice) noexcept;
+
+    /**
+     * @brief Invoked by the command-line driver when the request is to get the current state of a session.
+     *
+     * @param uwbDevice
+     */
+    virtual void
+    HandleGetSessionState(std::shared_ptr<::uwb::UwbDevice> uwbDevice, uint32_t sessionId) noexcept;
 
 private:
     NearObjectCli* m_parent;

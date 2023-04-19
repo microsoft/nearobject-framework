@@ -27,19 +27,23 @@ public:
      * @brief Construct a new UwbSession object without callbacks.
      *
      * @param sessionId The session identifier.
-     * @param uwbDevice The uwb device tied to the session.
+     * @param device Reference to the parent device.
+     * @param uwbSessionConnector The connector used to communicate with the device.
+     * @param deviceType The device type of the host in this session.
      */
-    UwbSession(uint32_t sessionId, UwbDevice* uwbDevice, ::uwb::protocol::fira::DeviceType deviceType = ::uwb::protocol::fira::DeviceType::Controller);
+    UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> device, std::shared_ptr<IUwbSessionDdiConnector> uwbSessionConnector, ::uwb::protocol::fira::DeviceType deviceType = ::uwb::protocol::fira::DeviceType::Controller);
 
     /**
      * @brief Construct a new UwbSession object.
      * This also registers the callbacks with the UwbConnector
      *
      * @param sessionId The session identifier.
+     * @param device Reference to the parent device.
+     * @param uwbSessionConnector The connector used to communicate with the device.
      * @param callbacks The event callback instance.
-     * @param uwbDevice The uwb device tied to the session.
+     * @param deviceType The device type of the host in this session.
      */
-    UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, UwbDevice* uwbDevice, ::uwb::protocol::fira::DeviceType deviceType = ::uwb::protocol::fira::DeviceType::Controller);
+    UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> device, std::shared_ptr<IUwbSessionDdiConnector> uwbSessionConnector, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, ::uwb::protocol::fira::DeviceType deviceType = ::uwb::protocol::fira::DeviceType::Controller);
 
 private:
     /**
@@ -63,10 +67,15 @@ private:
     StopRangingImpl() override;
 
     /**
-     * @brief Add a new peer to the session.
+     * @brief Attempt to add a controlee to this session.
+     *
+     * @param controleeMacAddress The mac address of the controlee. This is
+     * expected to be in the mac address format configured for the session.
+     * @return UwbStatus The status of the operation. UwbStatusGeneric::Ok is
+     * returned if the controlee was successfully added.
      */
-    virtual void
-    AddPeerImpl(::uwb::UwbMacAddress peerMacAddress) override;
+    virtual ::uwb::protocol::fira::UwbStatus
+    TryAddControleeImpl(::uwb::UwbMacAddress controleeMacAddress) override;
 
     /**
      * @brief Get the application configuration parameters for this session.
@@ -75,6 +84,14 @@ private:
      */
     virtual std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
     GetApplicationConfigurationParametersImpl() override;
+
+    /**
+     * @brief Get the current state for this session.
+     *
+     * @return ::uwb::protocol::fira::UwbSessionState
+     */
+    virtual ::uwb::protocol::fira::UwbSessionState
+    GetSessionStateImpl() override;
 
     /**
      * @brief Destroy the session, making it unusable.
@@ -89,12 +106,16 @@ protected:
      * @return std::shared_ptr<IUwbSessionDdiConnector>
      */
     std::shared_ptr<IUwbSessionDdiConnector>
-    GetUwbDeviceConnector() noexcept;
+    GetUwbSessionConnector() noexcept;
 
 private:
-    std::shared_ptr<IUwbSessionDdiConnector> m_uwbDeviceConnector;
-    std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks> m_registeredCallbacks;
-    ::uwb::RegisteredCallbackToken* m_registeredCallbacksToken;
+    std::shared_ptr<IUwbSessionDdiConnector> m_uwbSessionConnector;
+    std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionEnded> m_onSessionEndedCallback;
+    std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted> m_onRangingStartedCallback;
+    std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped> m_onRangingStoppedCallback;
+    std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged> m_onPeerPropertiesChangedCallback;
+    std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionMembershipChanged> m_onSessionMembershipChangedCallback;
+    ::uwb::UwbRegisteredSessionEventCallbackTokens m_registeredCallbacksTokens;
 };
 
 } // namespace windows::devices::uwb

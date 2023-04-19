@@ -4,12 +4,13 @@
 #include <stdexcept>
 #include <tuple>
 
+#include <notstd/memory.hxx>
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/UwbException.hxx>
+#include <windows/devices/uwb/UwbConnector.hxx>
 #include <windows/devices/uwb/UwbCxAdapterDdiLrp.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
-#include <windows/devices/uwb/UwbDeviceConnector.hxx>
 #include <windows/devices/uwb/UwbSession.hxx>
 
 #include <plog/Log.h>
@@ -21,16 +22,25 @@ using namespace ::uwb::protocol::fira;
 UwbDevice::UwbDevice(std::string deviceName) :
     m_deviceName(std::move(deviceName))
 {
-    m_callbacks = std::make_shared<::uwb::UwbRegisteredDeviceEventCallbacks>(
-        [this](::uwb::protocol::fira::UwbStatus status) {
-            return OnStatusChanged(status);
-        },
-        [this](::uwb::protocol::fira::UwbStatusDevice status) {
-            return OnDeviceStatusChanged(status);
-        },
-        [this](::uwb::protocol::fira::UwbSessionStatus status) {
-            return OnSessionStatusChanged(status);
-        });
+    m_onStatusChangedCallback = std::make_shared<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged>([this](::uwb::protocol::fira::UwbStatus status) {
+        OnStatusChanged(status);
+        return false;
+    });
+    m_onDeviceStatusChangedCallback = std::make_shared<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnDeviceStatusChanged>([this](::uwb::protocol::fira::UwbStatusDevice status) {
+        OnDeviceStatusChanged(status);
+        return false;
+    });
+    m_onSessionStatusChangedCallback = std::make_shared<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged>([this](::uwb::protocol::fira::UwbSessionStatus status) {
+        OnSessionStatusChanged(status);
+        return false;
+    });
+}
+
+/* static */
+std::shared_ptr<UwbDevice>
+UwbDevice::Create(std::string deviceName)
+{
+    return std::make_shared<notstd::enable_make_protected<UwbDevice>>(std::move(deviceName));
 }
 
 const std::string&
@@ -42,7 +52,7 @@ UwbDevice::DeviceName() const noexcept
 std::shared_ptr<::uwb::UwbSession>
 UwbDevice::CreateSessionImpl(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks)
 {
-    return std::make_shared<UwbSession>(sessionId, std::move(callbacks), this);
+    return std::make_shared<UwbSession>(sessionId, shared_from_this(), m_uwbSessionConnector, std::move(callbacks));
 }
 
 std::shared_ptr<::uwb::UwbSession>
@@ -80,7 +90,7 @@ UwbDevice::ResolveSessionImpl(uint32_t sessionId)
 
     // Create an instance of the session.
     auto deviceType = std::get<DeviceType>(applicationConfigurationParameters.front().Value);
-    auto session = std::make_shared<UwbSession>(sessionId, this, deviceType);
+    auto session = std::make_shared<UwbSession>(sessionId, shared_from_this(), m_uwbSessionConnector, deviceType);
 
     return session;
 }
@@ -113,7 +123,7 @@ UwbDevice::GetDeviceInformationImpl()
 {
     auto resultFuture = m_uwbDeviceConnector->GetDeviceInformation();
     if (!resultFuture.valid()) {
-        PLOG_ERROR << "failed to obtain capabilities from driver";
+        PLOG_ERROR << "failed to obtain device information from driver";
         throw std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected));
     }
 
@@ -122,6 +132,28 @@ UwbDevice::GetDeviceInformationImpl()
         return std::move(uwbDeviceInformation);
     } catch (const UwbException& e) {
         PLOG_ERROR << "caught exception obtaining uwb device information (" << ::ToString(e.Status) << ")";
+        throw e;
+    }
+}
+
+uint32_t
+UwbDevice::GetSessionCountImpl()
+{
+    auto resultFuture = m_uwbDeviceConnector->GetSessionCount();
+    if (!resultFuture.valid()) {
+        PLOG_ERROR << "failed to obtain session count from driver";
+        throw std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected));
+    }
+
+    try {
+        auto [uwbStatus, sessionCount] = resultFuture.get();
+        if (!IsUwbStatusOk(uwbStatus)) {
+            PLOG_ERROR << "uwb device reported an error obtaining session count, status =" << ::ToString(uwbStatus);
+            return {};
+        }
+        return sessionCount;
+    } catch (const UwbException& e) {
+        PLOG_ERROR << "caught exception obtaining session count (" << ::ToString(e.Status) << ")";
         throw e;
     }
 }
@@ -150,8 +182,7 @@ UwbDevice::InitializeImpl()
     auto uwbConnector = std::make_shared<UwbConnector>(m_deviceName);
     m_uwbDeviceConnector = uwbConnector;
     m_uwbSessionConnector = uwbConnector;
-    m_callbacksToken = m_uwbDeviceConnector->RegisterDeviceEventCallbacks(m_callbacks);
-    m_uwbDeviceConnector->NotificationListenerStart();
+    m_callbacksToken = m_uwbDeviceConnector->RegisterDeviceEventCallbacks({ m_onStatusChangedCallback, m_onDeviceStatusChangedCallback, m_onSessionStatusChangedCallback });
     return true;
 }
 
@@ -161,4 +192,16 @@ UwbDevice::IsEqual(const ::uwb::UwbDevice& other) const noexcept
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast)
     const auto& rhs = static_cast<const windows::devices::uwb::UwbDevice&>(other);
     return (this->DeviceName() == rhs.DeviceName());
+}
+
+std::shared_ptr<IUwbDeviceDdiConnector>
+UwbDevice::GetDeviceDdiConnector() noexcept
+{
+    return m_uwbDeviceConnector;
+}
+
+std::shared_ptr<IUwbSessionDdiConnector>
+UwbDevice::GetSessionDdiConnector() noexcept
+{
+    return m_uwbSessionConnector;
 }

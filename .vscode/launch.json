@@ -5,7 +5,7 @@
             "name": "cli start ranging probe",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/windows/tools/nocli/${input:buildFlavor}/nocli.exe",
+            "program": "${workspaceFolder}/out/build/dev/windows/tools/nocli/${input:buildFlavor}/nocli.exe",
             "args": [
                 "uwb",
                 "range",
@@ -21,13 +21,42 @@
             "name": "cli start ranging",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/windows/tools/nocli/${input:buildFlavor}/nocli.exe",
+            "program": "${workspaceFolder}/out/build/dev/windows/tools/nocli/${input:buildFlavor}/nocli.exe",
             "args": [
                 "uwb",
                 "range",
+                "--SessionId",
+                "${input:sessionId}",
                 "start",
-                "--deviceName",
-                "${input:deviceName}"
+                "--DeviceRole",
+                "0",
+                "--MultiNodeMode",
+                "0",
+                "--NumberOfControlees",
+                "1",
+                "--DeviceMacAddress",
+                "12:34",
+                "--DestinationMacAddresses",
+                "23:45",
+                "--DeviceType",
+                "0"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "console": "externalTerminal"
+        },
+        {
+            "name": "uwbsim start random range data",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/build/dev/windows/tools/uwb/simulator/${input:buildFlavor}/uwbsim.exe",
+            "args": [
+                "trigger",
+                "-e",
+                "1",
+                "--sessionId",
+                "${input:sessionId}"
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
@@ -50,6 +79,11 @@
             "id": "deviceName",
             "type": "promptString",
             "description": "The uwb device name (GUID) to use for ranging"
+        },
+        {
+            "id": "sessionId",
+            "type": "promptString",
+            "description": "sessionId to use for ranging"
         }
     ]
 }

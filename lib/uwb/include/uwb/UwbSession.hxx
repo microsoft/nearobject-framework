@@ -7,15 +7,19 @@
 #include <memory>
 #include <mutex>
 #include <shared_mutex>
+#include <type_traits>
 #include <unordered_set>
 
 #include <uwb/UwbMacAddress.hxx>
 #include <uwb/UwbPeer.hxx>
 #include <uwb/UwbSessionEventCallbacks.hxx>
+#include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/protocols/fira/UwbSessionData.hxx>
 
 namespace uwb
 {
+class UwbDevice;
+
 /**
  * @brief Represents a UWB session.
  */
@@ -28,19 +32,21 @@ public:
      * @brief Construct a new UwbSession object without callbacks.
      *
      * @param sessionId The session identifier.
+     * @param device The parent device of this session.
      * @param deviceType The host device type in the session (controller, controlee).
      */
-    UwbSession(uint32_t sessionId, uwb::protocol::fira::DeviceType deviceType = DeviceTypeDefault);
+    UwbSession(uint32_t sessionId, std::weak_ptr<UwbDevice> device, uwb::protocol::fira::DeviceType deviceType = DeviceTypeDefault);
 
     /**
      * @brief Construct a new UwbSession object.
      *
      *
      * @param sessionId The session identifier.
+     * @param device The parent device of this session.
      * @param callbacks The event callbacks to use.
      * @param deviceType The host device type in the session (controller, controlee).
      */
-    UwbSession(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks, uwb::protocol::fira::DeviceType deviceType = DeviceTypeDefault);
+    UwbSession(uint32_t sessionId, std::weak_ptr<UwbDevice> device, std::weak_ptr<UwbSessionEventCallbacks> callbacks, uwb::protocol::fira::DeviceType deviceType = DeviceTypeDefault);
 
     /**
      * @brief Destroy the UwbSession object.
@@ -99,13 +105,15 @@ public:
     SetMacAddressType(UwbMacAddressType uwbMacAddressType) noexcept;
 
     /**
-     * @brief Add a peer to this session.
-     *
-     * @param peerMacAddress The mac address of the peer. This is expected to be
-     * in the mac address format configured for the session.
+     * @brief Attempt to add a controlee to this session.
+     * 
+     * @param controleeMacAddress The mac address of the controlee. This is
+     * expected to be in the mac address format configured for the session.
+     * @return UwbStatus The status of the operation. UwbStatusGeneric::Ok is
+     * returned if the controlee was successfully added.
      */
-    void
-    AddPeer(UwbMacAddress peerMacAddress);
+    uwb::protocol::fira::UwbStatus
+    TryAddControlee(uwb::protocol::fira::UwbMacAddress controleeMacAddress);
 
     /**
      * @brief Start ranging.
@@ -136,6 +144,14 @@ public:
     GetApplicationConfigurationParameters();
 
     /**
+     * @brief Get the current state for this session.
+     *
+     * @return ::uwb::protocol::fira::UwbSessionState
+     */
+    ::uwb::protocol::fira::UwbSessionState
+    GetSessionState();
+
+    /**
      * @brief Destroy the session, making it unusable.
      */
     void
@@ -150,6 +166,30 @@ protected:
      */
     std::shared_ptr<UwbSessionEventCallbacks>
     ResolveEventCallbacks() noexcept;
+
+    /**
+     * @brief Attempt to resolve the parent device object instance.
+     *
+     * This is protected to prevent derived classes from obtaining the weak_ptr,
+     * which would never be useful to them.
+     *
+     * This allows derived types to obtain a properly typed smart pointer by
+     * specifying the type as the template argument. If not, it defaults to the
+     * base type.
+     *
+     * @tparam TDerived The derived type of the parent device.
+     * @return std::shared_ptr<UwbDevice>
+     */
+    template <typename TDerived = UwbDevice>
+    std::shared_ptr<UwbDevice>
+    ResolveParentDevice() noexcept
+    {
+        if constexpr (std::is_same_v<TDerived, UwbDevice>) {
+            return m_device.lock();
+        } else {
+            return std::dynamic_pointer_cast<TDerived>(m_device.lock());
+        }
+    }
 
 private:
     /**
@@ -181,12 +221,15 @@ private:
     StopRangingImpl() = 0;
 
     /**
-     * @brief Add a new peer to the session.
-     *
-     * @param peerMacAddress
+     * @brief Attempt to add a controlee to this session.
+     * 
+     * @param controleeMacAddress The mac address of the controlee. This is
+     * expected to be in the mac address format configured for the session.
+     * @return UwbStatus The status of the operation. UwbStatusGeneric::Ok is
+     * returned if the controlee was successfully added.
      */
-    virtual void
-    AddPeerImpl(UwbMacAddress peerMacAddress) = 0;
+    virtual uwb::protocol::fira::UwbStatus
+    TryAddControleeImpl(UwbMacAddress controleeMacAddress) = 0;
 
     /**
      * @brief Get the application configuration parameters for this session.
@@ -195,6 +238,14 @@ private:
      */
     virtual std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
     GetApplicationConfigurationParametersImpl() = 0;
+
+    /**
+     * @brief Get the current state for this session.
+     *
+     * @return ::uwb::protocol::fira::UwbSessionState
+     */
+    virtual ::uwb::protocol::fira::UwbSessionState
+    GetSessionStateImpl() = 0;
 
     /**
      * @brief Destroy the session, making it unusable.
@@ -213,6 +264,7 @@ protected:
     std::unordered_set<UwbMacAddress> m_peers{};
     std::shared_mutex m_callbacksGate;
     std::weak_ptr<UwbSessionEventCallbacks> m_callbacks;
+    std::weak_ptr<UwbDevice> m_device;
 };
 
 } // namespace uwb

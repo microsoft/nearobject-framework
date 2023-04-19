@@ -21,10 +21,6 @@ namespace windows::devices::uwb
  */
 struct IUwbSessionDdi
 {
-    // IOCTL_UWB_GET_SESSION_COUNT
-    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<uint32_t>>>
-    GetSessionCount() = 0;
-
     // IOCTL_UWB_SESSION_INIT
     virtual std::future<::uwb::protocol::fira::UwbStatus>
     SessionInitialize(uint32_t sessionId, ::uwb::protocol::fira::UwbSessionType sessionType) = 0;
@@ -34,7 +30,7 @@ struct IUwbSessionDdi
     SessionDeinitialize(uint32_t sessionId) = 0;
 
     // IOCTL_UWB_GET_SESSION_STATE
-    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<::uwb::protocol::fira::UwbSessionState>>>
+    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbSessionState>>
     SessionGetState(uint32_t sessionId) = 0;
 
     // IOCTL_UWB_START_RANGING_SESSION
@@ -60,10 +56,6 @@ struct IUwbSessionDdi
     // IOCTL_UWB_SET_APP_CONFIG_PARAMS
     virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<::uwb::protocol::fira::UwbSetApplicationConfigurationParameterStatus>>>
     SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> applicationConfigurationParameters) = 0;
-
-    // TODO: unspecified IOCTLs below
-    // IOCTL_UWB_SET_DEVICE_CONFIG_PARAMS
-    // IOCTL_UWB_GET_DEVICE_CONFIG_PARAMS
 };
 
 struct IUwbSessionDdiConnector : public IUwbSessionDdi
@@ -73,10 +65,10 @@ struct IUwbSessionDdiConnector : public IUwbSessionDdi
      *
      * @param sessionId
      * @param callbacks
-     * @return RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback
+     * @return ::uwb::UwbRegisteredSessionEventCallbackTokens You can pass the pointers into DeregisterEventCallback to deregister the event callbacks
      */
-    virtual ::uwb::RegisteredCallbackToken*
-    RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks) = 0;
+    virtual ::uwb::UwbRegisteredSessionEventCallbackTokens
+    RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbRegisteredSessionEventCallbacks callbacks) = 0;
 };
 
 } // namespace windows::devices::uwb

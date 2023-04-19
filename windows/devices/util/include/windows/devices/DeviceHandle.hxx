@@ -4,6 +4,7 @@
 
 #include <concepts>
 #include <memory>
+#include <string>
 
 #include <windows.h>
 

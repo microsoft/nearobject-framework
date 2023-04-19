@@ -54,6 +54,34 @@ constexpr std::size_t StaticStsInitializationVectorLength = 6;
 using StaticStsInitializationVector = std::array<uint8_t, StaticStsInitializationVectorLength>;
 
 /**
+ * @brief See FiRa Consortium UWB Command Interface Generic Technical
+ * Specification v1.1.0, Section 8.3, Table 29.
+ */
+constexpr uint8_t MinimumNumberOfControlees = 1;
+constexpr uint8_t MinimumPreambleCodeIndexBprf = 9;
+constexpr uint8_t MaximumPreambleCodeIndexBprf = 12;
+constexpr uint8_t MinimumPreambleCodeIndexHprf = 25;
+constexpr uint8_t MaximumPreambleCodeIndexHprf = 32;
+constexpr std::array<uint8_t, 2> SfdIdValuesBprf = { 0, 2 };
+constexpr std::array<uint8_t, 4> SfdIdValuesHprf = { 1, 2, 3, 4 };
+constexpr uint8_t MinimumResponderSlotIndex = 1;
+// TODO: MaximumResponderSlotIndex = N
+constexpr uint8_t MinimumKeyRotationRate = 0;
+constexpr uint8_t MaximumKeyRotationRate = 15;
+constexpr uint8_t MinimumSessionPriority = 1;
+constexpr uint8_t MaximumSessionPriority = 100;
+constexpr uint8_t MinimumNumberOfStsSegments = 0;
+constexpr uint8_t MaximumNumberOfStsSegmentsBprf = 1;
+constexpr uint8_t MaximumNumberOfStsSegmentsHprf = 4;
+constexpr uint8_t MinimumInBandTerminationAttemptCount = 0;
+constexpr uint8_t MaximumInBandTerminationAttemptCount = 10;
+constexpr uint16_t DefaultRangeDataNotificationProximityNear = 0;
+constexpr uint16_t DefaultRangeDataNotificationProximityFar = 20000;
+constexpr uint32_t MinimumUwbInitiationTime = 0;
+constexpr uint32_t MaximumUwbInitiationTime = 10000;
+constexpr size_t DestinationMacAddressesCountWhenControlee = 1;
+
+/**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
  * 5.1.
  */
@@ -97,12 +125,14 @@ enum class StsConfiguration : uint8_t {
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
  * 5.3.
  */
-enum class StsPacketConfiguration : uint8_t {
+enum class RFrameConfiguration : uint8_t {
     SP0 = 0,
     SP1 = 1,
     SP2 = 2,
     SP3 = 3,
 };
+
+using StsPacketConfiguration = RFrameConfiguration;
 
 /**
  * @brief See FiRa Consortium UWB MAC Technical Requirements v1.3.0, Section
@@ -435,6 +465,7 @@ enum class AoAResult : uint8_t {
 enum class RangeDataNotificationConfiguration : uint8_t {
     Disable = 0U,
     Enable = 1U,
+    EnableInProximityRange = 2U,
 };
 
 enum class PreambleDuration : uint8_t {
@@ -544,7 +575,7 @@ using UwbApplicationConfigurationParameterValue = std::variant<
     KeyRotation, // KEY_ROTATION, tag 0x23, size 1
     MultiNodeMode, // MULTI_NODE_MODE, tag 0x03, size 1
     PreambleDuration, // PREAMBLE_DURATION, tag 0x17, size 1
-    PrfMode, // PRF_MODE, tag 0x1F, size 1
+    PrfModeDetailed, // PRF_MODE, tag 0x1F, size 1
     PsduDataRate, // PSDU_DATA_RATE, tag 0x16, size 1
     RangeDataNotificationConfiguration, // RANGE_DATA_NTF_CONFIG, tag 0x0E, size 1
     RangingRoundUsage, // RANGING_ROUND_USAGE, tag0x01, size 1
@@ -554,7 +585,7 @@ using UwbApplicationConfigurationParameterValue = std::variant<
     SchedulingMode, // SCHEDULED_MODE, tag 0x22, size 1
     StsConfiguration, // STS_CONFIG, tag 0x02, size 1
     StsLength, // STS_LENGTH, tag 0x035, length 1,
-    StsPacketConfiguration, // RFRAME_CONFIG, tag 0x12, size 1
+    RFrameConfiguration, // RFRAME_CONFIG, tag 0x12, size 1
     TxAdaptivePayloadPower, // TX_ADAPTIVE_PAYLOAD_POWER, tag 0x1C, size 1
     ::uwb::UwbMacAddress, // DEVICE_MAC_ADDRESS, tag 0x06, size 2/8
     ::uwb::UwbMacAddressFcsType, // MAC_FCS_TYPE, tag 0x0B, size 1

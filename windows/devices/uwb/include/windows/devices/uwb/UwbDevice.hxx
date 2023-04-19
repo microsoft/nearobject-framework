@@ -34,15 +34,26 @@ namespace windows::devices::uwb
  * UWB DDI.
  */
 class UwbDevice :
-    public ::uwb::UwbDevice
+    public ::uwb::UwbDevice,
+    public std::enable_shared_from_this<UwbDevice>
 {
-public:
+protected:
     /**
      * @brief Construct a new Uwb Device object.
      *
      * @param deviceName The interface path name.
      */
     explicit UwbDevice(std::string deviceName);
+
+public:
+    /**
+     * @brief Create a new UwbDevice object instance.
+     *
+     * @param deviceName The interface path name.
+     * @return std::shared_ptr<UwbDevice>
+     */
+    static std::shared_ptr<UwbDevice>
+    Create(std::string deviceName);
 
     /**
      * @brief Get the name of this device.
@@ -102,6 +113,14 @@ private:
     GetDeviceInformationImpl() override;
 
     /**
+     * @brief Get the number of sessions associated with the device.
+     *
+     * @return uint32_t
+     */
+    virtual uint32_t
+    GetSessionCountImpl() override;
+
+    /**
      * @brief Reset the device to an initial clean state.
      */
     virtual void
@@ -115,12 +134,31 @@ private:
     virtual bool
     InitializeImpl() override;
 
+protected:
+    /**
+     * @brief Get the device DDI connector object (derived classes only).
+     *
+     * @return std::shared_ptr<IUwbDeviceDdiConnector>
+     */
+    std::shared_ptr<IUwbDeviceDdiConnector>
+    GetDeviceDdiConnector() noexcept;
+
+    /**
+     * @brief Get the session DDI connector object (derived classes only).
+     *
+     * @return std::shared_ptr<IUwbSessionDdiConnector>
+     */
+    std::shared_ptr<IUwbSessionDdiConnector>
+    GetSessionDdiConnector() noexcept;
+
 private:
     const std::string m_deviceName;
     std::shared_ptr<IUwbDeviceDdiConnector> m_uwbDeviceConnector;
     std::shared_ptr<IUwbSessionDdiConnector> m_uwbSessionConnector;
-    std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> m_callbacks;
-    ::uwb::RegisteredCallbackToken* m_callbacksToken;
+    std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged> m_onStatusChangedCallback;
+    std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnDeviceStatusChanged> m_onDeviceStatusChangedCallback;
+    std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged> m_onSessionStatusChangedCallback;
+    ::uwb::UwbRegisteredDeviceEventCallbackTokens m_callbacksToken;
 };
 } // namespace windows::devices::uwb
 

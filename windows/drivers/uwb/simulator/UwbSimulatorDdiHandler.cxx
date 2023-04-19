@@ -6,6 +6,8 @@
 #include <type_traits>
 #include <unordered_map>
 
+#include <magic_enum.hpp>
+
 #include "UwbSimulatorDdiCallbacks.hxx"
 #include "UwbSimulatorDdiHandler.hxx"
 
@@ -13,6 +15,10 @@
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 
 using namespace windows::devices::uwb::simulator;
+
+using UwbSimulatorDispatchEntryLrp = UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>;
+
+UwbSimulatorDispatchEntryLrp (*MakeLrpDispatchEntryWithSize)(ULONG, typename UwbSimulatorDispatchEntryLrp::HandlerFuncT, std::size_t, std::size_t) = &MakeDispatchEntry<UwbSimulatorDdiHandler>;
 
 /**
  * @brief Template function alias which partially specializes the
@@ -30,7 +36,7 @@ using namespace windows::devices::uwb::simulator;
 template <
     typename InputT = Unrestricted,
     typename OutputT = Unrestricted>
-UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler> (*MakeLrpDispatchEntry)(ULONG, typename UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>::HandlerFuncT) = &MakeDispatchEntry<UwbSimulatorDdiHandler, InputT, OutputT>;
+UwbSimulatorDispatchEntryLrp (*MakeLrpDispatchEntry)(ULONG, typename UwbSimulatorDispatchEntryLrp::HandlerFuncT) = &MakeDispatchEntry<UwbSimulatorDdiHandler, InputT, OutputT>;
 
 /**
  * @brief Dispatch table for the LRP DDI driver IOCTLs.
@@ -41,12 +47,12 @@ UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler> (*MakeLrpDispatchEntry)(ULONG,
 const std::initializer_list<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>> UwbSimulatorDdiHandler::Dispatch{
     // GUID_UWB_DEVICE_INTERFACE Handlers
     MakeLrpDispatchEntry<UWB_DEVICE_RESET, UWB_STATUS>(IOCTL_UWB_DEVICE_RESET, &UwbSimulatorDdiHandler::OnUwbDeviceReset),
-    MakeLrpDispatchEntry<Unrestricted, Unrestricted>(IOCTL_UWB_GET_DEVICE_INFO, &UwbSimulatorDdiHandler::OnUwbGetDeviceInformation),
-    MakeLrpDispatchEntry<Unrestricted, Unrestricted>(IOCTL_UWB_GET_DEVICE_CAPABILITIES, &UwbSimulatorDdiHandler::OnUwbGetDeviceCapabilities),
+    MakeLrpDispatchEntryWithSize(IOCTL_UWB_GET_DEVICE_INFO, &UwbSimulatorDdiHandler::OnUwbGetDeviceInformation, 0, offsetof(UWB_DEVICE_INFO, vendorSpecificInfo)),
+    MakeLrpDispatchEntryWithSize(IOCTL_UWB_GET_DEVICE_CAPABILITIES, &UwbSimulatorDdiHandler::OnUwbGetDeviceCapabilities, 0, offsetof(UWB_DEVICE_CAPABILITIES, capabilityParams)),
     MakeLrpDispatchEntry<UWB_SET_DEVICE_CONFIG_PARAMS, Unrestricted>(IOCTL_UWB_GET_DEVICE_CONFIG_PARAMS, &UwbSimulatorDdiHandler::OnUwbGetDeviceConfigurationParameters),
     MakeLrpDispatchEntry<UWB_GET_DEVICE_CONFIG_PARAMS, Unrestricted>(IOCTL_UWB_SET_DEVICE_CONFIG_PARAMS, &UwbSimulatorDdiHandler::OnUwbSetDeviceConfigurationParameters),
-    MakeLrpDispatchEntry<UWB_GET_APP_CONFIG_PARAMS, Unrestricted>(IOCTL_UWB_GET_APP_CONFIG_PARAMS, &UwbSimulatorDdiHandler::OnUwbGetApplicationConfigurationParameters),
-    MakeLrpDispatchEntry<UWB_SET_APP_CONFIG_PARAMS, Unrestricted>(IOCTL_UWB_SET_APP_CONFIG_PARAMS, &UwbSimulatorDdiHandler::OnUwbSetApplicationConfigurationParameters),
+    MakeLrpDispatchEntryWithSize(IOCTL_UWB_GET_APP_CONFIG_PARAMS, &UwbSimulatorDdiHandler::OnUwbGetApplicationConfigurationParameters, offsetof(UWB_GET_APP_CONFIG_PARAMS, appConfigParams), offsetof(UWB_APP_CONFIG_PARAMS, appConfigParams)),
+    MakeLrpDispatchEntryWithSize(IOCTL_UWB_SET_APP_CONFIG_PARAMS, &UwbSimulatorDdiHandler::OnUwbSetApplicationConfigurationParameters, offsetof(UWB_SET_APP_CONFIG_PARAMS, appConfigParams), offsetof(UWB_SET_APP_CONFIG_PARAMS_STATUS, appConfigParamsStatus)),
     MakeLrpDispatchEntry<Unrestricted, UWB_GET_SESSION_COUNT>(IOCTL_UWB_GET_SESSION_COUNT, &UwbSimulatorDdiHandler::OnUwbGetSessionCount),
     MakeLrpDispatchEntry<UWB_SESSION_INIT, UWB_STATUS>(IOCTL_UWB_SESSION_INIT, &UwbSimulatorDdiHandler::OnUwbSessionInitialize),
     MakeLrpDispatchEntry<UWB_SESSION_DEINIT, UWB_STATUS>(IOCTL_UWB_SESSION_DEINIT, &UwbSimulatorDdiHandler::OnUwbSessionDeinitialize),
@@ -55,7 +61,7 @@ const std::initializer_list<UwbSimulatorDispatchEntry<UwbSimulatorDdiHandler>> U
     MakeLrpDispatchEntry<UWB_START_RANGING_SESSION, UWB_STATUS>(IOCTL_UWB_START_RANGING_SESSION, &UwbSimulatorDdiHandler::OnUwbSessionStartRanging),
     MakeLrpDispatchEntry<UWB_STOP_RANGING_SESSION, UWB_STATUS>(IOCTL_UWB_STOP_RANGING_SESSION, &UwbSimulatorDdiHandler::OnUwbSessionStopRanging),
     MakeLrpDispatchEntry<UWB_GET_RANGING_COUNT, UWB_RANGING_COUNT>(IOCTL_UWB_GET_RANGING_COUNT, &UwbSimulatorDdiHandler::OnUwbSessionGetRangingCount),
-    MakeLrpDispatchEntry<Unrestricted, Unrestricted>(IOCTL_UWB_NOTIFICATION, &UwbSimulatorDdiHandler::OnUwbNotification),
+    MakeLrpDispatchEntry<Unrestricted, UWB_NOTIFICATION_DATA>(IOCTL_UWB_NOTIFICATION, &UwbSimulatorDdiHandler::OnUwbNotification),
     // GUID_DEVINTERFACE_UWB_SIMULATOR Handlers
     MakeLrpDispatchEntry<Unrestricted, UwbSimulatorCapabilities>(IOCTL_UWB_DEVICE_SIM_GET_CAPABILITIES, &UwbSimulatorDdiHandler::OnUwbSimulatorCapabilities),
     MakeLrpDispatchEntry<UwbSimulatorTriggerSessionEventArgs, Unrestricted>(IOCTL_UWB_DEVICE_SIM_TRIGGER_SESSION_EVENT, &UwbSimulatorDdiHandler::OnUwbSimulatorTriggerSessionEvent),
@@ -99,12 +105,15 @@ UwbSimulatorDdiHandler::OnUwbGetDeviceInformation(WDFREQUEST request, std::span<
 
     // Convert neutral type to DDI output type.
     auto uwbDeviceInformation = UwbCxDdi::From(deviceInformation);
-    outputSize = std::size(uwbDeviceInformation);
+    auto uwbDeviceInformationBuffer = std::data(uwbDeviceInformation);
+    auto uwbDeviceInformationBufferSize = std::size(uwbDeviceInformationBuffer);
 
-    // Update output buffer if sufficiently sized.
-    if (std::size(outputBuffer) >= outputSize) {
-        std::memcpy(std::data(outputBuffer), std::data(std::data(uwbDeviceInformation)), outputSize);
-    } else {
+    // Clamp the output size to what the size field reported, and copy that data to the output buffer.
+    outputSize = std::clamp(uwbDeviceInformationBufferSize, std::size_t(0), std::size(outputBuffer));
+    std::memcpy(std::data(outputBuffer), std::data(uwbDeviceInformationBuffer), outputSize);
+
+    // If the output buffer was too small, indicate a buffer overflow would have occurred.
+    if (outputSize < uwbDeviceInformationBufferSize) {
         status = STATUS_BUFFER_OVERFLOW;
     }
 
@@ -127,12 +136,15 @@ UwbSimulatorDdiHandler::OnUwbGetDeviceCapabilities(WDFREQUEST request, std::span
 
     // Convert neutral type to DDI output type.
     auto uwbCapabilities = UwbCxDdi::From(deviceCapabilities);
-    outputSize = std::size(uwbCapabilities);
+    auto uwbCapabilitiesBuffer = std::data(uwbCapabilities);
+    auto uwbCapabilitiesBufferSize = std::size(uwbCapabilitiesBuffer);
 
-    // Update output buffer if sufficiently sized.
-    if (std::size(outputBuffer) >= outputSize) {
-        std::memcpy(std::data(outputBuffer), std::data(std::data(uwbCapabilities)), outputSize);
-    } else {
+    // Clamp the output size to what the size field reported, and copy that data to the output buffer.
+    outputSize = std::clamp(uwbCapabilitiesBufferSize, std::size_t(0), std::size(outputBuffer));
+    std::memcpy(std::data(outputBuffer), std::data(uwbCapabilitiesBuffer), outputSize);
+
+    // If the output buffer was too small, indicate a buffer overflow would have occurred.
+    if (outputSize < uwbCapabilitiesBufferSize) {
         status = STATUS_BUFFER_OVERFLOW;
     }
 
@@ -198,11 +210,16 @@ UwbSimulatorDdiHandler::OnUwbGetApplicationConfigurationParameters(WDFREQUEST re
     auto &applicationConfigurationParametersIn = *reinterpret_cast<UWB_GET_APP_CONFIG_PARAMS *>(std::data(inputBuffer));
 
     std::vector<UwbApplicationConfigurationParameterType> uwbApplicationConfigurationParameterTypes{};
-    uwbApplicationConfigurationParameterTypes.reserve(applicationConfigurationParametersIn.appConfigParamsCount);
-    std::span uwbApplicationConfigurationParameterTypesRange{ applicationConfigurationParametersIn.appConfigParams, applicationConfigurationParametersIn.appConfigParamsCount };
-    std::ranges::transform(uwbApplicationConfigurationParameterTypesRange, std::back_inserter(uwbApplicationConfigurationParameterTypes), [](const auto &applicationConfigurationParameterType) {
-        return UwbCxDdi::To(applicationConfigurationParameterType);
-    });
+    if (applicationConfigurationParametersIn.appConfigParamsCount == 0) {
+        constexpr auto allParameterTypesArray = magic_enum::enum_values<UwbApplicationConfigurationParameterType>();
+        uwbApplicationConfigurationParameterTypes.insert(std::end(uwbApplicationConfigurationParameterTypes), std::cbegin(allParameterTypesArray), std::cend(allParameterTypesArray));
+    } else {
+        uwbApplicationConfigurationParameterTypes.reserve(applicationConfigurationParametersIn.appConfigParamsCount);
+        std::span uwbApplicationConfigurationParameterTypesRange{ applicationConfigurationParametersIn.appConfigParams, applicationConfigurationParametersIn.appConfigParamsCount };
+        std::ranges::transform(uwbApplicationConfigurationParameterTypesRange, std::back_inserter(uwbApplicationConfigurationParameterTypes), [](const auto &applicationConfigurationParameterType) {
+            return UwbCxDdi::To(applicationConfigurationParameterType);
+        });
+    }
 
     // Invoke callback.
     std::vector<UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters{};
@@ -213,10 +230,14 @@ UwbSimulatorDdiHandler::OnUwbGetApplicationConfigurationParameters(WDFREQUEST re
     if (IsUwbStatusOk(statusUwb)) {
         auto applicationConfigurationParametersWrapper = UwbCxDdi::From(uwbApplicationConfigurationParameters);
         auto applicationConfigurationParameterBuffer = std::data(applicationConfigurationParametersWrapper);
-        outputSize = std::size(applicationConfigurationParameterBuffer);
-        if (std::size(outputBuffer) >= outputSize) {
-            std::ranges::copy(applicationConfigurationParameterBuffer, std::begin(outputBuffer));
-        } else {
+        auto applicationConfigurationParameterBufferSize = std::size(applicationConfigurationParameterBuffer);
+
+        // Clamp the output size to what the size field reported, and copy that data to the output buffer.
+        outputSize = std::clamp(applicationConfigurationParameterBufferSize, std::size_t(0), std::size(outputBuffer));
+        std::memcpy(std::data(outputBuffer), std::data(applicationConfigurationParameterBuffer), outputSize);
+
+        // If the output buffer was too small, indicate a buffer overflow would have occurred.
+        if (outputSize < applicationConfigurationParameterBufferSize) {
             status = STATUS_BUFFER_OVERFLOW;
         }
     } else {
@@ -252,13 +273,23 @@ UwbSimulatorDdiHandler::OnUwbSetApplicationConfigurationParameters(WDFREQUEST re
     auto statusUwb = m_callbacks->SetApplicationConfigurationParameters(applicationConfigurationParameters.SessionId, applicationConfigurationParameters.Parameters, uwbSetApplicationConfigurationParametersStatus.ParameterStatuses);
 
     // Convert neutral type to DDI output type.
-    auto &outputValue = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS_STATUS *>(std::data(outputBuffer));
     auto setApplicationConfigurationParametersStatus = UwbCxDdi::From(uwbSetApplicationConfigurationParametersStatus);
     auto setApplicationConfigurationParametersStatusBuffer = std::data(setApplicationConfigurationParametersStatus);
-    std::memcpy(std::data(outputBuffer), std::data(setApplicationConfigurationParametersStatusBuffer), std::size(setApplicationConfigurationParametersStatusBuffer));
+    auto setApplicationConfigurationParametersStatusBufferSize = std::size(setApplicationConfigurationParametersStatusBuffer);
+
+    // Clamp the output size to what the size field reported, and copy that data to the output buffer.
+    auto outputSize = std::clamp(setApplicationConfigurationParametersStatusBufferSize, std::size_t(0), std::size(outputBuffer));
+    std::memcpy(std::data(outputBuffer), std::data(setApplicationConfigurationParametersStatusBuffer), outputSize);
+
+    // If the output buffer was too small, indicate a buffer overflow would have occurred.
+    if (outputSize < setApplicationConfigurationParametersStatusBufferSize) {
+        status = STATUS_BUFFER_OVERFLOW;
+    } else {
+        status = STATUS_SUCCESS;
+    }
 
     // Complete the request.
-    WdfRequestCompleteWithInformation(request, status, outputValue.size);
+    WdfRequestCompleteWithInformation(request, status, outputSize);
 
     return status;
 }

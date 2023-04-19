@@ -84,7 +84,7 @@ MESSAGE(STATUS "using build environment '${NOF_BUILD_ENVIRONMENT}' with dependen
 
 project(nearobject-framework 
   LANGUAGES CXX
-  VERSION 0.3.1
+  VERSION 0.4.1
 )
 
 # Conditional inclusion of OS-dependent source trees.
@@ -261,6 +261,11 @@ elseif (BUILD_FOR_WINDOWS)
       UNICODE
       NOMINMAX
       WIN32_LEAN_AND_MEAN
+  )
+
+  # Allow more than default number of section in object files.
+  add_compile_options(
+    /bigobj
   )
 
   if (NOF_USE_MSVC_STATIC_RUNTIME)

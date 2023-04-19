@@ -11,15 +11,16 @@
 using namespace uwb;
 using namespace uwb::protocol::fira;
 
-UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks, DeviceType deviceType) :
+UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<UwbDevice> device, std::weak_ptr<UwbSessionEventCallbacks> callbacks, DeviceType deviceType) :
     m_uwbMacAddressSelf(UwbMacAddress::Random<UwbMacAddressType::Extended>()),
     m_callbacks(std::move(callbacks)),
     m_deviceType{ deviceType },
-    m_sessionId(sessionId)
+    m_sessionId(sessionId),
+    m_device(std::move(device))
 {}
 
-UwbSession::UwbSession(uint32_t sessionId, DeviceType deviceType) :
-    UwbSession(sessionId, std::weak_ptr<UwbSessionEventCallbacks>{}, deviceType)
+UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<UwbDevice> device, DeviceType deviceType) :
+    UwbSession(sessionId, std::move(device), std::weak_ptr<UwbSessionEventCallbacks>{}, deviceType)
 {}
 
 std::weak_ptr<UwbSessionEventCallbacks>
@@ -68,12 +69,14 @@ UwbSession::SetMacAddressType(UwbMacAddressType uwbMacAddressType) noexcept
     // TODO: update driver with new mac address type (aka "mode" in FiRa-speak).
 }
 
-void
-UwbSession::AddPeer(UwbMacAddress peerMacAddress)
+UwbStatus
+UwbSession::TryAddControlee(UwbMacAddress controleeMacAddress)
 {
     std::scoped_lock peersLock{ m_peerGate };
-    PLOG_VERBOSE << "Session with id " << m_sessionId << " requesting to add peer via DDI with mac address " << peerMacAddress.ToString();
-    AddPeerImpl(std::move(peerMacAddress));
+    PLOG_VERBOSE << "Session with id " << m_sessionId << " requesting to add controlee with mac address " << controleeMacAddress.ToString();
+
+    auto uwbStatus = TryAddControleeImpl(std::move(controleeMacAddress));
+    return uwbStatus;
 }
 
 void
@@ -132,6 +135,13 @@ UwbSession::GetApplicationConfigurationParameters()
 {
     PLOG_VERBOSE << "get application configuration parameters";
     return GetApplicationConfigurationParametersImpl();
+}
+
+UwbSessionState
+UwbSession::GetSessionState()
+{
+    PLOG_VERBOSE << "get session state";
+    return GetSessionStateImpl();
 }
 
 void

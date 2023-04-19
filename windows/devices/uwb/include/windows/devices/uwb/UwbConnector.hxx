@@ -6,6 +6,7 @@
 #include <future>
 #include <memory>
 #include <optional>
+#include <shared_mutex>
 #include <string>
 #include <thread>
 #include <tuple>
@@ -19,13 +20,28 @@
 #include <windows/devices/uwb/IUwbDeviceDdi.hxx>
 #include <windows/devices/uwb/IUwbSessionDdi.hxx>
 
-namespace windows::devices::uwb
+namespace uwb
 {
 /**
- * @brief Opaque class forward declaration to help with the deregistration
+ * @brief The following are opaque class declarations that are used in this file
+ *
  */
-class RegisteredCallbackToken;
+class RegisteredSessionCallbackToken;
+class OnSessionEndedToken;
+class OnRangingStartedToken;
+class OnRangingStoppedToken;
+class OnPeerPropertiesChangedToken;
+class OnSessionMembershipChangedToken;
 
+class RegisteredDeviceCallbackToken;
+class OnStatusChangedToken;
+class OnDeviceStatusChangedToken;
+class OnSessionStatusChangedToken;
+
+} // namespace uwb
+
+namespace windows::devices::uwb
+{
 /**
  * @brief Class representing a logical communication channel with a UWB driver.
  *
@@ -61,40 +77,27 @@ public:
 public:
     // IUwbDeviceDdiConnector
     /**
-     * @brief Start listening for notifications.
-     *
-     * @return true If listening for notifications started successfully.
-     * @return false If listening for notifications could not be started.
-     */
-    virtual bool
-    NotificationListenerStart() override;
-
-    /**
-     * @brief Stop listening for notifications.
-     */
-    virtual void
-    NotificationListenerStop() override;
-
-    /**
      * @brief Sets the callbacks for the UwbDevice that owns this UwbConnector
+     * You can pass in a partially filled in struct, in which case this function returns a partially filled in struct of tokens corresponding to those callbacks.
      *
      * @param callbacks
-     * @return RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback
+     * @return ::uwb::UwbRegisteredDeviceEventCallbackTokens You can pass the pointers into DeregisterEventCallback to deregister the event callbacks
      */
-    virtual ::uwb::RegisteredCallbackToken*
-    RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks) override;
+    virtual ::uwb::UwbRegisteredDeviceEventCallbackTokens
+    RegisterDeviceEventCallbacks(::uwb::UwbRegisteredDeviceEventCallbacks callbacks) override;
 
 public:
     // IUwbSessionDdiConnector
     /**
-     * @brief Registers the callbacks for a particular session
+     * @brief Registers the callbacks for a particular session.
+     * You can pass in a partially filled in struct, in which case this function returns a partially filled in struct of tokens corresponding to those callbacks.
      *
      * @param sessionId
      * @param callbacks
-     * @return RegisteredCallbackToken* You can pass this pointer into DeregisterEventCallback to deregister this event callback
+     * @return ::uwb::UwbRegisteredSessionEventCallbackTokens You can pass the pointers into DeregisterEventCallback to deregister the event callbacks
      */
-    virtual ::uwb::RegisteredCallbackToken*
-    RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks) override;
+    virtual ::uwb::UwbRegisteredSessionEventCallbackTokens
+    RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbRegisteredSessionEventCallbacks callbacks) override;
 
 public:
     /**
@@ -104,7 +107,7 @@ public:
      * @param token
      */
     void
-    DeregisterEventCallback(::uwb::RegisteredCallbackToken* token);
+    DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackToken> token);
 
 public:
     // IUwbDeviceDdi
@@ -117,7 +120,7 @@ public:
     virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbCapability>>
     GetCapabilities() override;
 
-    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<uint32_t>>>
+    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, uint32_t>>
     GetSessionCount() override;
 
 public:
@@ -128,7 +131,7 @@ public:
     virtual std::future<::uwb::protocol::fira::UwbStatus>
     SessionDeinitialize(uint32_t sessionId) override;
 
-    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<::uwb::protocol::fira::UwbSessionState>>>
+    virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbSessionState>>
     SessionGetState(uint32_t sessionId) override;
 
     virtual std::future<::uwb::protocol::fira::UwbStatus>
@@ -151,6 +154,21 @@ public:
 
 private:
     /**
+     * @brief Start listening for notifications.
+     *
+     * @return true If listening for notifications started successfully.
+     * @return false If listening for notifications could not be started.
+     */
+    void
+    NotificationListenerStart();
+
+    /**
+     * @brief Stop listening for notifications.
+     */
+    void
+    NotificationListenerStop();
+
+    /**
      * @brief Thread function for handling UWB notifications from the driver.
      *
      * @param stopToken The token used to request the notification loop to stop.
@@ -169,6 +187,7 @@ private:
 
     /**
      * @brief Response for calling the relevant registered callbacks for the session ended event.
+     * This function assumes the caller is holding the m_eventCallbacksGate
      *
      * @param sessionId The session identifier of the session that ended.
      * @param sessionEndReason The reason the session ended.
@@ -178,7 +197,7 @@ private:
 
     /**
      * @brief Internal function that prepares the notification for processing by the m_sessionEventCallbacks
-     *
+     * This function assumes the caller is holding the m_eventCallbacksGate
      * @param statusMulticastList
      */
     void
@@ -186,19 +205,40 @@ private:
 
     /**
      * @brief Internal function that prepares the notification for processing by the m_sessionEventCallbacks
+     * This function assumes the caller is holding the m_eventCallbacksGate
      *
      * @param rangingData
      */
     void
     OnSessionRangingData(::uwb::protocol::fira::UwbRangingData rangingData);
 
+    /**
+     * @brief Internal function to check if there are callbacks present.
+     * This function assumes the caller is holding the m_eventCallbacksGate
+     *
+     * @return true
+     * @return false
+     */
+    bool
+    CallbacksPresent();
+
 private:
-    std::unordered_map<uint32_t, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks>> m_sessionEventCallbacks;
-    std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> m_deviceEventCallbacks;
     std::string m_deviceName{};
     std::jthread m_notificationThread;
     wil::shared_hfile m_notificationHandleDriver;
     OVERLAPPED m_notificationOverlapped;
+
+    // the following shared_mutex is used to protect access to everything regarding the registered callbacks
+    mutable std::shared_mutex m_eventCallbacksGate;
+    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnSessionEndedToken>>> m_onSessionEndedCallbacks;
+    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnRangingStartedToken>>> m_onRangingStartedCallbacks;
+    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnRangingStoppedToken>>> m_onRangingStoppedCallbacks;
+    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnPeerPropertiesChangedToken>>> m_onPeerPropertiesChangedCallbacks;
+    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnSessionMembershipChangedToken>>> m_onSessionMembershipChangedCallbacks;
+
+    std::vector<std::shared_ptr<::uwb::OnStatusChangedToken>> m_onStatusChangedCallbacks;
+    std::vector<std::shared_ptr<::uwb::OnDeviceStatusChangedToken>> m_onDeviceStatusChangedCallbacks;
+    std::vector<std::shared_ptr<::uwb::OnSessionStatusChangedToken>> m_onSessionStatusChangedCallbacks;
 };
 } // namespace windows::devices::uwb
 
