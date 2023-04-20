@@ -21,49 +21,57 @@ UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> devic
     ::uwb::UwbSession(sessionId, std::move(device), std::move(callbacks), deviceType),
     m_uwbSessionConnector(std::move(uwbSessionConnector))
 {
-    m_registeredCallbacks = std::make_shared<::uwb::UwbRegisteredSessionEventCallbacks>(
-        [this](::uwb::UwbSessionEndReason reason) {
+    m_onSessionEndedCallback =
+        std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionEnded>([this](::uwb::UwbSessionEndReason reason) {
             auto callbacks = ResolveEventCallbacks();
             if (callbacks == nullptr) {
                 PLOG_WARNING << "missing session event callback for UwbSessionEndReason, skipping";
-                // TODO deregister
+                return true;
             }
-            return callbacks->OnSessionEnded(this, reason);
-        },
-        [this]() {
-            auto callbacks = ResolveEventCallbacks();
-            if (callbacks == nullptr) {
-                PLOG_WARNING << "missing session event callback for ranging started, skipping";
-                // TODO deregister
-            }
-            return callbacks->OnRangingStarted(this);
-        },
-        [this]() {
+            callbacks->OnSessionEnded(this, reason);
+            return false;
+        });
+    m_onRangingStartedCallback = std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted>([this]() {
+        auto callbacks = ResolveEventCallbacks();
+        if (callbacks == nullptr) {
+            PLOG_WARNING << "missing session event callback for ranging started, skipping";
+            return true;
+        }
+        callbacks->OnRangingStarted(this);
+        return false;
+    });
+    m_onRangingStoppedCallback =
+        std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped>([this]() {
             auto callbacks = ResolveEventCallbacks();
             if (callbacks == nullptr) {
                 PLOG_WARNING << "missing session event callback for ranging stopped, skipping";
-                // TODO deregister
+                return true;
             }
-            return callbacks->OnRangingStopped(this);
-        },
-        [this](const std::vector<::uwb::UwbPeer> peersChanged) {
+            callbacks->OnRangingStopped(this);
+            return false;
+        });
+    m_onPeerPropertiesChangedCallback =
+        std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged>([this](std::vector<::uwb::UwbPeer> peersChanged) {
             auto callbacks = ResolveEventCallbacks();
             if (callbacks == nullptr) {
                 PLOG_WARNING << "missing session event callback for ranging data, skipping";
-                // TODO deregister
+                return true;
             }
-            return callbacks->OnPeerPropertiesChanged(this, peersChanged);
-        },
-        [this](const std::vector<::uwb::UwbPeer> peersAdded, const std::vector<::uwb::UwbPeer> peersRemoved) {
+            callbacks->OnPeerPropertiesChanged(this, peersChanged);
+            return false;
+        });
+    m_onSessionMembershipChangedCallback =
+        std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionMembershipChanged>([this](std::vector<::uwb::UwbPeer> peersAdded, std::vector<::uwb::UwbPeer> peersRemoved) {
             auto callbacks = ResolveEventCallbacks();
             if (callbacks == nullptr) {
                 PLOG_WARNING << "missing session event callback for peer list changes, skipping";
-                // TODO deregister
+                return true;
             }
-            return callbacks->OnSessionMembershipChanged(this, peersAdded, peersRemoved);
+            callbacks->OnSessionMembershipChanged(this, peersAdded, peersRemoved);
+            return false;
         });
 
-    m_registeredCallbacksToken = m_uwbSessionConnector->RegisterSessionEventCallbacks(m_sessionId, m_registeredCallbacks);
+    m_registeredCallbacksTokens = m_uwbSessionConnector->RegisterSessionEventCallbacks(m_sessionId, { m_onSessionEndedCallback, m_onRangingStartedCallback, m_onRangingStoppedCallback, m_onPeerPropertiesChangedCallback, m_onSessionMembershipChangedCallback });
 }
 
 UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> device, std::shared_ptr<IUwbSessionDdiConnector> uwbSessionConnector, ::uwb::protocol::fira::DeviceType deviceType) :
@@ -166,10 +174,11 @@ UwbSession::StopRangingImpl()
     // TODO: return uwbStatus;
 }
 
-void
-UwbSession::AddPeerImpl([[maybe_unused]] ::uwb::UwbMacAddress peerMacAddress)
+UwbStatus
+UwbSession::TryAddControleeImpl([[maybe_unused]] ::uwb::UwbMacAddress controleeMacAddress)
 {
-    PLOG_VERBOSE << "AddPeerImpl";
+    PLOG_VERBOSE << "TryAddControleeImpl";
+    return UwbStatusGeneric::Rejected;
 
     // TODO: convert code below to invoke IOCTL_UWB_SET_APP_CONFIG_PARAMS to use connector
 

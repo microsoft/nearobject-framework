@@ -9,6 +9,7 @@
 #include "UwbSimulatorDdiHandler.hxx"
 #include "UwbSimulatorDevice.hxx"
 #include "UwbSimulatorDeviceFile.hxx"
+#include "UwbSimulatorDeviceFileNotification.hxx"
 #include "UwbSimulatorTracelogging.hxx"
 
 using ::uwb::protocol::fira::UwbStatus, ::uwb::protocol::fira::UwbSessionType, ::uwb::protocol::fira::UwbDeviceState;
@@ -182,6 +183,8 @@ UwbSimulatorDevice::Uninitialize()
 void
 UwbSimulatorDevice::OnFileCreate(WDFDEVICE device, WDFREQUEST request, WDFFILEOBJECT file)
 {
+    DECLARE_CONST_UNICODE_STRING(NotificationFilename, L"\\Notifications");
+
     TraceLoggingWrite(
         UwbSimulatorTraceloggingProvider,
         "OnFileCreate",
@@ -190,12 +193,20 @@ UwbSimulatorDevice::OnFileCreate(WDFDEVICE device, WDFREQUEST request, WDFFILEOB
         TraceLoggingPointer(request, "Request"),
         TraceLoggingPointer(file, "File"));
 
+    // Determine the type of file handle that was opened and create the corresponding tracking instance.
+    std::shared_ptr<UwbSimulatorDeviceFile> uwbSimulatorFile;
+    UNICODE_STRING *fileName = WdfFileObjectGetFileName(file);
+    if (RtlEqualUnicodeString(&NotificationFilename, fileName, /* case insensitive */ FALSE) == TRUE) {
+        uwbSimulatorFile = std::make_shared<notstd::enable_make_protected<UwbSimulatorDeviceFileNotification>>(file, weak_from_this());
+    } else {
+        uwbSimulatorFile = std::make_shared<notstd::enable_make_protected<UwbSimulatorDeviceFile>>(file, weak_from_this());
+    }
+
     auto uwbSimulatorFileContextBuffer = GetUwbSimulatorDeviceFileWdfContext(file);
     auto uwbSimulatorFileContext = new (uwbSimulatorFileContextBuffer) UwbSimulatorDeviceFileWdfContext{
-        .File = std::make_shared<notstd::enable_make_protected<UwbSimulatorDeviceFile>>(file, weak_from_this())
+        .File = uwbSimulatorFile,
     };
 
-    auto uwbSimulatorFile = uwbSimulatorFileContext->File;
     auto uwbSimulatorFileStatus = uwbSimulatorFile->Initialize();
     if (uwbSimulatorFileStatus == STATUS_SUCCESS) {
         uwbSimulatorFile->RegisterHandler(m_ddiHandler);
@@ -322,8 +333,11 @@ UwbSimulatorDevice::GetSessionCount()
 void
 UwbSimulatorDevice::PushUwbNotification(UwbNotificationData uwbNotificationData)
 {
-    constexpr auto resolveWeak = [](auto deviceFileWeak) {
+    constexpr auto resolveWeak = [](auto &deviceFileWeak) {
         return deviceFileWeak.lock();
+    };
+    constexpr auto hasIoEventQueue = [](const auto &deviceFile) {
+        return deviceFile->GetIoEventQueue() != nullptr;
     };
 
     DbgPrint("%p received push notification payload %s\n", m_wdfDevice, std::data(ToString(uwbNotificationData)));
@@ -335,11 +349,9 @@ UwbSimulatorDevice::PushUwbNotification(UwbNotificationData uwbNotificationData)
         std::ranges::transform(m_deviceFiles, std::back_inserter(deviceFiles), resolveWeak);
     }
 
-    // Distribute a copy of the notification data to each open file handle.
-    for (auto deviceFile : deviceFiles) {
-        if (deviceFile != nullptr) {
-            deviceFile->GetIoEventQueue()->PushNotification(uwbNotificationData);
-        }
+    // Distribute a copy of the notification data to each open file handle that has an i/o event queue.
+    for (auto &deviceFile : deviceFiles | std::views::filter(hasIoEventQueue)) {
+        deviceFile->GetIoEventQueue()->PushNotification(uwbNotificationData);
     }
 }
 

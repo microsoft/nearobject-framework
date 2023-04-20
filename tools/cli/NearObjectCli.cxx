@@ -71,7 +71,9 @@ NearObjectCli::SignalCliAppOperationCompleted(CLI::App* app)
 void
 NearObjectCli::WaitForExecutionComplete()
 {
-    m_cliControlFlowContext->OperationsWaitForComplete();
+    if (m_cliAppOperations.size() > 0) {
+        m_cliControlFlowContext->OperationsWaitForComplete();
+    }
 }
 
 void

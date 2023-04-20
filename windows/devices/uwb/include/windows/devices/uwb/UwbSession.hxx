@@ -67,10 +67,15 @@ private:
     StopRangingImpl() override;
 
     /**
-     * @brief Add a new peer to the session.
+     * @brief Attempt to add a controlee to this session.
+     *
+     * @param controleeMacAddress The mac address of the controlee. This is
+     * expected to be in the mac address format configured for the session.
+     * @return UwbStatus The status of the operation. UwbStatusGeneric::Ok is
+     * returned if the controlee was successfully added.
      */
-    virtual void
-    AddPeerImpl(::uwb::UwbMacAddress peerMacAddress) override;
+    virtual ::uwb::protocol::fira::UwbStatus
+    TryAddControleeImpl(::uwb::UwbMacAddress controleeMacAddress) override;
 
     /**
      * @brief Get the application configuration parameters for this session.
@@ -105,8 +110,12 @@ protected:
 
 private:
     std::shared_ptr<IUwbSessionDdiConnector> m_uwbSessionConnector;
-    std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks> m_registeredCallbacks;
-    std::weak_ptr<::uwb::RegisteredCallbackToken> m_registeredCallbacksToken;
+    std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionEnded> m_onSessionEndedCallback;
+    std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted> m_onRangingStartedCallback;
+    std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped> m_onRangingStoppedCallback;
+    std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged> m_onPeerPropertiesChangedCallback;
+    std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionMembershipChanged> m_onSessionMembershipChangedCallback;
+    ::uwb::UwbRegisteredSessionEventCallbackTokens m_registeredCallbacksTokens;
 };
 
 } // namespace windows::devices::uwb

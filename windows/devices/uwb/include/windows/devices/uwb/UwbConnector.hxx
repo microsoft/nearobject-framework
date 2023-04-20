@@ -24,10 +24,20 @@ namespace uwb
 {
 /**
  * @brief The following are opaque class declarations that are used in this file
- * 
+ *
  */
 class RegisteredSessionCallbackToken;
+class OnSessionEndedToken;
+class OnRangingStartedToken;
+class OnRangingStoppedToken;
+class OnPeerPropertiesChangedToken;
+class OnSessionMembershipChangedToken;
+
 class RegisteredDeviceCallbackToken;
+class OnStatusChangedToken;
+class OnDeviceStatusChangedToken;
+class OnSessionStatusChangedToken;
+
 } // namespace uwb
 
 namespace windows::devices::uwb
@@ -68,24 +78,26 @@ public:
     // IUwbDeviceDdiConnector
     /**
      * @brief Sets the callbacks for the UwbDevice that owns this UwbConnector
+     * You can pass in a partially filled in struct, in which case this function returns a partially filled in struct of tokens corresponding to those callbacks.
      *
      * @param callbacks
-     * @return std::weak_ptr<::uwb::RegisteredCallbackToken> You can pass this pointer into DeregisterEventCallback to deregister this event callback
+     * @return ::uwb::UwbRegisteredDeviceEventCallbackTokens You can pass the pointers into DeregisterEventCallback to deregister the event callbacks
      */
-    virtual std::weak_ptr<::uwb::RegisteredCallbackToken>
-    RegisterDeviceEventCallbacks(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> callbacks) override;
+    virtual ::uwb::UwbRegisteredDeviceEventCallbackTokens
+    RegisterDeviceEventCallbacks(::uwb::UwbRegisteredDeviceEventCallbacks callbacks) override;
 
 public:
     // IUwbSessionDdiConnector
     /**
-     * @brief Registers the callbacks for a particular session
+     * @brief Registers the callbacks for a particular session.
+     * You can pass in a partially filled in struct, in which case this function returns a partially filled in struct of tokens corresponding to those callbacks.
      *
      * @param sessionId
      * @param callbacks
-     * @return std::weak_ptr<::uwb::RegisteredCallbackToken> You can pass this pointer into DeregisterEventCallback to deregister this event callback
+     * @return ::uwb::UwbRegisteredSessionEventCallbackTokens You can pass the pointers into DeregisterEventCallback to deregister the event callbacks
      */
-    virtual std::weak_ptr<::uwb::RegisteredCallbackToken>
-    RegisterSessionEventCallbacks(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbacks> callbacks) override;
+    virtual ::uwb::UwbRegisteredSessionEventCallbackTokens
+    RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbRegisteredSessionEventCallbacks callbacks) override;
 
 public:
     /**
@@ -210,27 +222,6 @@ private:
     bool
     CallbacksPresent();
 
-    /**
-     * @brief Get a copy of the resolved session event callbacks for a particular session.
-     *
-     * This function removes expired callbacks in the process of making the copies.
-     *
-     * @param sessionId The session id to obtain registered callbacks for.
-     * @return std::vector<std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks>>
-     */
-    std::vector<std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbacks>>
-    GetResolvedSessionEventCallbacks(uint32_t sessionId);
-
-    /**
-     * @brief Get a copy of the resolved device event callbacks.
-     *
-     * This function removes expired callbacks in the process of making the copies.
-     *
-     * @return std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>>
-     */
-    std::vector<std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks>>
-    GetResolvedDeviceEventCallbacks();
-    
 private:
     std::string m_deviceName{};
     std::jthread m_notificationThread;
@@ -239,8 +230,15 @@ private:
 
     // the following shared_mutex is used to protect access to everything regarding the registered callbacks
     mutable std::shared_mutex m_eventCallbacksGate;
-    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::RegisteredSessionCallbackToken>>> m_sessionEventCallbacks;
-    std::vector<std::shared_ptr<::uwb::RegisteredDeviceCallbackToken>> m_deviceEventCallbacks;
+    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnSessionEndedToken>>> m_onSessionEndedCallbacks;
+    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnRangingStartedToken>>> m_onRangingStartedCallbacks;
+    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnRangingStoppedToken>>> m_onRangingStoppedCallbacks;
+    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnPeerPropertiesChangedToken>>> m_onPeerPropertiesChangedCallbacks;
+    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnSessionMembershipChangedToken>>> m_onSessionMembershipChangedCallbacks;
+
+    std::vector<std::shared_ptr<::uwb::OnStatusChangedToken>> m_onStatusChangedCallbacks;
+    std::vector<std::shared_ptr<::uwb::OnDeviceStatusChangedToken>> m_onDeviceStatusChangedCallbacks;
+    std::vector<std::shared_ptr<::uwb::OnSessionStatusChangedToken>> m_onSessionStatusChangedCallbacks;
 };
 } // namespace windows::devices::uwb
 

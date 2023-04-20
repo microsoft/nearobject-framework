@@ -155,8 +155,10 @@ private:
     const std::string m_deviceName;
     std::shared_ptr<IUwbDeviceDdiConnector> m_uwbDeviceConnector;
     std::shared_ptr<IUwbSessionDdiConnector> m_uwbSessionConnector;
-    std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbacks> m_callbacks;
-    std::weak_ptr<::uwb::RegisteredCallbackToken> m_callbacksToken;
+    std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged> m_onStatusChangedCallback;
+    std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnDeviceStatusChanged> m_onDeviceStatusChangedCallback;
+    std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged> m_onSessionStatusChangedCallback;
+    ::uwb::UwbRegisteredDeviceEventCallbackTokens m_callbacksToken;
 };
 } // namespace windows::devices::uwb
 

@@ -22,16 +22,18 @@ using namespace ::uwb::protocol::fira;
 UwbDevice::UwbDevice(std::string deviceName) :
     m_deviceName(std::move(deviceName))
 {
-    m_callbacks = std::make_shared<::uwb::UwbRegisteredDeviceEventCallbacks>(
-        [this](::uwb::protocol::fira::UwbStatus status) {
-            return OnStatusChanged(status);
-        },
-        [this](::uwb::protocol::fira::UwbStatusDevice status) {
-            return OnDeviceStatusChanged(status);
-        },
-        [this](::uwb::protocol::fira::UwbSessionStatus status) {
-            return OnSessionStatusChanged(status);
-        });
+    m_onStatusChangedCallback = std::make_shared<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged>([this](::uwb::protocol::fira::UwbStatus status) {
+        OnStatusChanged(status);
+        return false;
+    });
+    m_onDeviceStatusChangedCallback = std::make_shared<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnDeviceStatusChanged>([this](::uwb::protocol::fira::UwbStatusDevice status) {
+        OnDeviceStatusChanged(status);
+        return false;
+    });
+    m_onSessionStatusChangedCallback = std::make_shared<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged>([this](::uwb::protocol::fira::UwbSessionStatus status) {
+        OnSessionStatusChanged(status);
+        return false;
+    });
 }
 
 /* static */
@@ -180,7 +182,7 @@ UwbDevice::InitializeImpl()
     auto uwbConnector = std::make_shared<UwbConnector>(m_deviceName);
     m_uwbDeviceConnector = uwbConnector;
     m_uwbSessionConnector = uwbConnector;
-    m_callbacksToken = m_uwbDeviceConnector->RegisterDeviceEventCallbacks(m_callbacks);
+    m_callbacksToken = m_uwbDeviceConnector->RegisterDeviceEventCallbacks({ m_onStatusChangedCallback, m_onDeviceStatusChangedCallback, m_onSessionStatusChangedCallback });
     return true;
 }
 
