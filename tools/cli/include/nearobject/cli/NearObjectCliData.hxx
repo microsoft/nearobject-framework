@@ -55,7 +55,7 @@ struct UwbConfigurationData
     std::optional<uwb::UwbMacAddress> controleeShortMacAddress;
     std::optional<uint8_t> slotsPerRangingRound;
     std::optional<uint8_t> maxContentionPhaseLength;
-    std::optional<uint8_t> slotDuration;
+    std::optional<uint16_t> slotDuration;
     std::optional<uint16_t> rangingInterval;
     std::optional<uint8_t> keyRotationRate;
     std::optional<uwb::UwbMacAddressFcsType> macAddressFcsType;
