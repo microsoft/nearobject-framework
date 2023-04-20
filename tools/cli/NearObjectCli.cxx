@@ -9,6 +9,9 @@
 #include <variant>
 #include <vector>
 
+#define MAGIC_ENUM_RANGE_MIN 0
+#define MAGIC_ENUM_RANGE_MAX 256
+
 #include <magic_enum.hpp>
 #include <nearobject/cli/NearObjectCli.hxx>
 #include <notstd/tostring.hxx>
@@ -928,9 +931,6 @@ NearObjectCli::AddSubcommandServiceRangeStart(CLI::App* parent)
     rangeStartApp->add_option("--ResultReportConfiguration", uwbConfig.resultReportConfigurationString, "4-bit value, encoded as bit string, e.g. 0101. b3(AOA FOM), b2(AOA Elevation), b1(AOA Azimuth), b0(TOF)")->capture_default_str();
 
     rangeStartApp->parse_complete_callback([this, rangeStartApp] {
-        m_cliData->SessionData.uwbConfiguration = m_cliData->uwbConfiguration;
-        m_cliData->SessionData.staticRangingInfo = m_cliData->StaticRanging;
-
         // Set ControllerMacAddress and ControleeMacAddresses
         const auto macAddressType = m_cliData->uwbConfiguration.macAddressMode == uwb::UwbMacAddressType::Extended ? uwb::UwbMacAddressType::Extended : uwb::UwbMacAddressType::Short;
         // TODO: Support multiple controlees as well as extended controlee mac addresses
@@ -941,6 +941,9 @@ NearObjectCli::AddSubcommandServiceRangeStart(CLI::App* parent)
             m_cliData->uwbConfiguration.controllerMacAddress = uwb::UwbMacAddress::FromString(m_cliData->destinationMacAddressesString, macAddressType);
             m_cliData->uwbConfiguration.controleeShortMacAddress = uwb::UwbMacAddress::FromString(m_cliData->deviceMacAddressString, macAddressType);
         }
+
+        m_cliData->SessionData.uwbConfiguration = m_cliData->uwbConfiguration;
+        m_cliData->SessionData.staticRangingInfo = m_cliData->StaticRanging;
 
         std::cout << "Selected parameters:" << std::endl;
         const auto parameterValues = m_cliData->SessionData.uwbConfiguration.GetValueMap();
