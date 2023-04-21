@@ -46,7 +46,8 @@ struct IUwbSessionDdi
     SessionGetRangingCount(uint32_t sessionId) = 0;
 
     // IOCTL_UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST
-    virtual std::future<::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus>
+    // This function requires that the mac addresses are short
+    virtual std::future<::uwb::protocol::fira::UwbStatus>
     SessionUpdateControllerMulticastList(uint32_t sessionId, ::uwb::protocol::fira::UwbMulticastAction multicastAction, std::vector<::uwb::UwbMacAddress> controlees) = 0;
 
     // IOCTL_UWB_GET_APP_CONFIG_PARAMS
