@@ -9,7 +9,7 @@
 
 #include <notstd/utility.hxx>
 
-#include <TlvSimple.hxx>
+#include <tlv/TlvSimple.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
 
 using namespace uwb::protocol::fira;

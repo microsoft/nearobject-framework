@@ -10,7 +10,7 @@
 #include <notstd/unique_ptr_out.hxx>
 #include <catch2/catch_test_macros.hpp>
 
-#include <TlvBer.hxx>
+#include <tlv/TlvBer.hxx>
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 
