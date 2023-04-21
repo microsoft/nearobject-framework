@@ -187,36 +187,29 @@ UwbSession::TryAddControleeImpl([[maybe_unused]] ::uwb::UwbMacAddress controleeM
 
     auto params = GetApplicationConfigurationParameters({ UwbApplicationConfigurationParameterType::DestinationMacAddresses });
 
-    // if (IsUwbStatusOk(uwbStatus)) {
-    {
-        std::unordered_set<::uwb::UwbMacAddress> macAddresses;
-        for (auto &param : params) {
-            auto pvalue = std::get_if<std::unordered_set<::uwb::UwbMacAddress>>(&(param.Value));
-            if (pvalue) {
-                macAddresses = *pvalue;
-                break;
-            }
+    std::unordered_set<::uwb::UwbMacAddress> macAddresses;
+    for (auto &param : params) {
+        auto pvalue = std::get_if<std::unordered_set<::uwb::UwbMacAddress>>(&(param.Value));
+        if (pvalue) {
+            macAddresses = *pvalue;
+            break;
         }
-        auto [_, inserted] = macAddresses.insert(controleeMacAddress);
-        if (not inserted) {
-            PLOG_INFO << "controleeMacAddress already added, skipping";
-            return UwbStatusGeneric::Ok;
-        }
-        if (macAddresses.size() > 8) {
-            PLOG_WARNING << "exceeded max number of controlees with numberOfControlees=" << macAddresses.size();
-            return UwbStatusGeneric::Rejected;
-        }
-        UwbApplicationConfigurationParameter dstMacAddresses{ .Type = UwbApplicationConfigurationParameterType::DestinationMacAddresses, .Value = macAddresses };
-        UwbApplicationConfigurationParameter numControlees{ .Type = UwbApplicationConfigurationParameterType::NumberOfControlees, .Value = uint8_t(macAddresses.size()) };
-        UwbStatus overallStatus = UwbStatusGeneric::CommandRetry;
-        while (IsUwbStatusRetry(overallStatus)) {
-            auto fut = m_uwbSessionConnector->SetApplicationConfigurationParameters(m_sessionId, { numControlees, dstMacAddresses });
-            auto [setStatus, paramStatuses] = fut.get();
-
-            overallStatus = setStatus;
-        }
-        return overallStatus;
     }
+    auto [_, inserted] = macAddresses.insert(controleeMacAddress);
+    if (not inserted) {
+        PLOG_INFO << "controleeMacAddress already added, skipping";
+        return UwbStatusGeneric::Ok;
+    }
+    if (macAddresses.size() > 8) {
+        PLOG_WARNING << "exceeded max number of controlees with numberOfControlees=" << macAddresses.size();
+        return UwbStatusGeneric::Rejected;
+    }
+    UwbApplicationConfigurationParameter dstMacAddresses{ .Type = UwbApplicationConfigurationParameterType::DestinationMacAddresses, .Value = macAddresses };
+    UwbApplicationConfigurationParameter numControlees{ .Type = UwbApplicationConfigurationParameterType::NumberOfControlees, .Value = uint8_t(macAddresses.size()) };
+
+    SetApplicationConfigurationParameters({ numControlees, dstMacAddresses });
+
+    return UwbStatusGeneric::Ok;
 }
 
 std::vector<UwbApplicationConfigurationParameter>
@@ -275,6 +268,27 @@ UwbSession::GetApplicationConfigurationParametersImpl(std::vector<::uwb::protoco
 void
 UwbSession::SetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> params)
 {
+    uint32_t sessionId = GetId();
+    while (true) {
+        auto resultFuture = m_uwbSessionConnector->SetApplicationConfigurationParameters(sessionId, params);
+        try {
+            auto [uwbStatus, applicationConfigurationParametersStatus] = resultFuture.get();
+
+            if (IsUwbStatusOk(uwbStatus)) {
+                return;
+            } else if (IsUwbStatusRetry(uwbStatus)) {
+                continue;
+            } else {
+                throw UwbException(uwbStatus);
+            }
+        } catch (UwbException &uwbException) {
+            PLOG_ERROR << "caught exception attempting to obtain application configuration parameters for session id " << sessionId << " (" << ToString(uwbException.Status) << ")";
+            throw uwbException;
+        } catch (std::exception &e) {
+            PLOG_ERROR << "caught unexpected exception attempting to obtain application configuration parameters for session id " << sessionId << " (" << e.what() << ")";
+            throw e;
+        }
+    }
 }
 
 UwbSessionState
