@@ -75,6 +75,8 @@ constexpr uint8_t MaximumNumberOfStsSegmentsBprf = 1;
 constexpr uint8_t MaximumNumberOfStsSegmentsHprf = 4;
 constexpr uint8_t MinimumInBandTerminationAttemptCount = 0;
 constexpr uint8_t MaximumInBandTerminationAttemptCount = 10;
+constexpr uint8_t MinumumMandatoryMaximumNumberOfControleesInMulticastSession = 8;
+constexpr uint8_t MaximumNumberOfControleesInMulticastSession = MinumumMandatoryMaximumNumberOfControleesInMulticastSession; // CSML spec says this maximum can be implementation dependent, but must be at least 8?
 constexpr uint16_t DefaultRangeDataNotificationProximityNear = 0;
 constexpr uint16_t DefaultRangeDataNotificationProximityFar = 20000;
 constexpr uint32_t MinimumUwbInitiationTime = 0;
@@ -611,8 +613,6 @@ constexpr std::array<UwbApplicationConfigurationParameterType, 5> UwbApplication
     UwbApplicationConfigurationParameterType::RangeDataNotificationProximityNear,
     UwbApplicationConfigurationParameterType::RangeDataNotificationProximityFar,
 };
-
-constexpr auto MAX_CONTROLEES = 8;
 
 /**
  * @brief Determines whether the specified application configuration parameter

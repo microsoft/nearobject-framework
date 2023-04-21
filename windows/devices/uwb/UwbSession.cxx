@@ -194,7 +194,7 @@ UwbSession::TryAddControleeImpl([[maybe_unused]] ::uwb::UwbMacAddress controleeM
         PLOG_INFO << "controleeMacAddress already added, skipping";
         return UwbStatusGeneric::Ok;
     }
-    if (macAddresses.size() > MAX_CONTROLEES) {
+    if (macAddresses.size() > MaximumNumberOfControleesInMulticastSession) {
         PLOG_WARNING << "exceeded max number of controlees with numberOfControlees=" << macAddresses.size();
         return UwbStatusGeneric::Rejected;
     }
