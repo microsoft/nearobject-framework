@@ -269,25 +269,21 @@ void
 UwbSession::SetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> params)
 {
     uint32_t sessionId = GetId();
-    while (true) {
-        auto resultFuture = m_uwbSessionConnector->SetApplicationConfigurationParameters(sessionId, params);
-        try {
-            auto [uwbStatus, applicationConfigurationParametersStatus] = resultFuture.get();
+    auto resultFuture = m_uwbSessionConnector->SetApplicationConfigurationParameters(sessionId, params);
+    try {
+        auto [uwbStatus, applicationConfigurationParametersStatus] = resultFuture.get();
 
-            if (IsUwbStatusOk(uwbStatus)) {
-                return;
-            } else if (IsUwbStatusRetry(uwbStatus)) {
-                continue;
-            } else {
-                throw UwbException(uwbStatus);
-            }
-        } catch (UwbException &uwbException) {
-            PLOG_ERROR << "caught exception attempting to obtain application configuration parameters for session id " << sessionId << " (" << ToString(uwbException.Status) << ")";
-            throw uwbException;
-        } catch (std::exception &e) {
-            PLOG_ERROR << "caught unexpected exception attempting to obtain application configuration parameters for session id " << sessionId << " (" << e.what() << ")";
-            throw e;
+        if (IsUwbStatusOk(uwbStatus)) {
+            return;
+        } else {
+            throw UwbException(uwbStatus);
         }
+    } catch (UwbException &uwbException) {
+        PLOG_ERROR << "caught exception attempting to set application configuration parameters for session id " << sessionId << " (" << ToString(uwbException.Status) << ")";
+        throw uwbException;
+    } catch (std::exception &e) {
+        PLOG_ERROR << "caught unexpected exception attempting to obtain application configuration parameters for session id " << sessionId << " (" << e.what() << ")";
+        throw e;
     }
 }
 
