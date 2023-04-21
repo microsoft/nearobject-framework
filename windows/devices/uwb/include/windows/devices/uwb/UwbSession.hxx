@@ -86,6 +86,24 @@ private:
     GetApplicationConfigurationParametersImpl() override;
 
     /**
+     * @brief Get the Application Configuration Parameters object
+     *
+     * @param requestedTypes
+     * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
+     */
+    virtual std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
+    GetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> requestedTypes) override;
+
+    /**
+     * @brief Get the Application Configuration Parameters object
+     *
+     * @param requestedTypes
+     * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
+     */
+    virtual void
+    SetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> params) override;
+
+    /**
      * @brief Get the current state for this session.
      *
      * @return ::uwb::protocol::fira::UwbSessionState
