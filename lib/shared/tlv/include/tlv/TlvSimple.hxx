@@ -2,7 +2,7 @@
 #ifndef TLV_SIMPLE_HXX
 #define TLV_SIMPLE_HXX
 
-#include "Tlv.hxx"
+#include <tlv/Tlv.hxx>
 
 #include <cstddef>
 #include <memory>
