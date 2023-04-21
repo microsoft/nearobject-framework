@@ -5,7 +5,7 @@
 #include <optional>
 #include <string>
 
-#include <jsonify.hxx>
+#include <jsonify/jsonify.hxx>
 #include <nlohmann/json.hpp>
 
 #include <nearobject/NearObjectProfileSecurity.hxx>
