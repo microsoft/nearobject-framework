@@ -31,6 +31,10 @@ struct RegisteredCallbackToken
      */
     RegisteredCallbackToken(std::function<void(RegisteredCallbackToken*)> deregister) :
         Deregister([this, deregister = std::move(deregister)]() {
+            if (not deregister) {
+                PLOG_WARNING << "empty callback token";
+                return;
+            }
             return deregister(this);
         })
     {}
