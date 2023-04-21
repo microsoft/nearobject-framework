@@ -357,6 +357,16 @@ using UwbStatus = std::variant<UwbStatusGeneric, UwbStatusSession, UwbStatusRang
 bool
 IsUwbStatusOk(const UwbStatus& uwbStatus) noexcept;
 
+/**
+ * @brief Determines if the specified UWB status describes a retry command
+ *
+ * @param uwbStatus The status to check.
+ * @return true
+ * @return false
+ */
+bool
+IsUwbStatusRetry(const UwbStatus& uwbStatus) noexcept;
+
 enum class UwbStatusMulticast {
     OkUpdate,
     ErrorListFull,
