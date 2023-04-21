@@ -195,7 +195,7 @@ UwbSession::TryAddControleeImpl([[maybe_unused]] ::uwb::UwbMacAddress controleeM
     }
     if (std::size(macAddresses) > MaximumNumberOfControleesInMulticastSession) {
         PLOG_WARNING << "exceeded max number of controlees with numberOfControlees=" << std::size(macAddresses);
-        return UwbStatusGeneric::InvalidRange;
+        return UwbStatusSession::MulticastListFull;
     }
     UwbApplicationConfigurationParameter dstMacAddresses{ .Type = UwbApplicationConfigurationParameterType::DestinationMacAddresses, .Value = macAddresses };
     UwbApplicationConfigurationParameter numControlees{ .Type = UwbApplicationConfigurationParameterType::NumberOfControlees, .Value = static_cast<uint8_t>(std::size(macAddresses)) };
