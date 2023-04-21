@@ -153,10 +153,10 @@ public:
     GetApplicationConfigurationParameters(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> requestedTypes);
 
     /**
-     * @brief Get the Application Configuration Parameters object
+     * @brief Set the Application Configuration Parameters object
      *
-     * @param requestedTypes
-     * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
+     * @param params
+     * @return void
      */
     void
     SetApplicationConfigurationParameters(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> params);
@@ -267,10 +267,10 @@ private:
     GetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> requestedTypes) = 0;
 
     /**
-     * @brief Get the Application Configuration Parameters object
+     * @brief Set the Application Configuration Parameters object
      *
-     * @param requestedTypes
-     * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
+     * @param params
+     * @return void
      */
     virtual void
     SetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> params) = 0;
