@@ -13,7 +13,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include <TlvBer.hxx>
+#include <tlv/TlvBer.hxx>
 #include <uwb/protocols/fira/UwbCapability.hxx>
 
 namespace uwb::protocol::fira::TestUwbCapability

@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <vector>
 
-#include <jsonify.hxx>
+#include <jsonify/jsonify.hxx>
 #include <nearobject/NearObjectProfile.hxx>
 #include <nearobject/persist/NearObjectProfilePersister.hxx>
 

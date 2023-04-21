@@ -4,7 +4,7 @@
 
 #include <string>
 
-#include <jsonify.hxx>
+#include <jsonify/jsonify.hxx>
 
 namespace nearobject
 {

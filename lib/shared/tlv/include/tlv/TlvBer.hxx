@@ -2,7 +2,7 @@
 #ifndef TLV_BER_HXX
 #define TLV_BER_HXX
 
-#include "Tlv.hxx"
+#include <tlv/Tlv.hxx>
 
 #include <array>
 #include <cstddef>

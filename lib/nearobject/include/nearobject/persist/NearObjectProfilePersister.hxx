@@ -4,7 +4,7 @@
 
 #include <vector>
 
-#include <jsonify.hxx>
+#include <jsonify/jsonify.hxx>
 #include <nearobject/NearObjectProfile.hxx>
 
 namespace nearobject::persistence
