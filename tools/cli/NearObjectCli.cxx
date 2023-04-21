@@ -9,9 +9,6 @@
 #include <variant>
 #include <vector>
 
-#define MAGIC_ENUM_RANGE_MIN 0
-#define MAGIC_ENUM_RANGE_MAX 256
-
 #include <magic_enum.hpp>
 #include <nearobject/cli/NearObjectCli.hxx>
 #include <notstd/tostring.hxx>

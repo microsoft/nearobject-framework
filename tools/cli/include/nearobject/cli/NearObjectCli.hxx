@@ -7,6 +7,7 @@
 #include <unordered_set>
 
 #include <CLI/CLI.hpp>
+#include <magic_enum.hpp>
 #include <nearobject/cli/NearObjectCliControlFlowContext.hxx>
 #include <nearobject/cli/NearObjectCliData.hxx>
 #include <nearobject/cli/NearObjectCliHandler.hxx>
@@ -350,5 +351,12 @@ private:
     CLI::App* m_serviceRangeStopApp;
 };
 } // namespace nearobject::cli
+
+template <>
+struct magic_enum::customize::enum_range<::uwb::protocol::fira::UwbConfiguration::ParameterTag>
+{
+    static constexpr int min = 0x80; // Current minimum value is UwbConfiguration::ParameterTag::FiraPhyVersion == 0x80
+    static constexpr int max = 0x9D; // Current maximum value is UwbConfiguration::ParameterTag::MaxRrRetry == 0x9D
+};
 
 #endif // NEAR_OBJECT_CLI_HXX
