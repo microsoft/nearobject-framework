@@ -178,7 +178,7 @@ UwbStatus
 UwbSession::TryAddControleeImpl([[maybe_unused]] ::uwb::UwbMacAddress controleeMacAddress)
 {
     PLOG_VERBOSE << "TryAddControleeImpl";
-    if (not m_uwbSessionConnector) {
+    if (!m_uwbSessionConnector) {
         PLOG_WARNING << "No associated connector";
         return UwbStatusGeneric::Failed;
     }
@@ -190,12 +190,12 @@ UwbSession::TryAddControleeImpl([[maybe_unused]] ::uwb::UwbMacAddress controleeM
     }
     auto macAddresses = std::get<std::unordered_set<::uwb::UwbMacAddress>>(params.front().Value);
     auto [_, inserted] = macAddresses.insert(controleeMacAddress);
-    if (not inserted) {
+    if (!inserted) {
         PLOG_INFO << "controleeMacAddress already added, skipping";
         return UwbStatusGeneric::Ok;
     }
-    if (macAddresses.size() > MaximumNumberOfControleesInMulticastSession) {
-        PLOG_WARNING << "exceeded max number of controlees with numberOfControlees=" << macAddresses.size();
+    if (std::size(macAddresses) > MaximumNumberOfControleesInMulticastSession) {
+        PLOG_WARNING << "exceeded max number of controlees with numberOfControlees=" << std::size(macAddresses);
         return UwbStatusGeneric::Rejected;
     }
     UwbApplicationConfigurationParameter dstMacAddresses{ .Type = UwbApplicationConfigurationParameterType::DestinationMacAddresses, .Value = macAddresses };
