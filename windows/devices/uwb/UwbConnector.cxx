@@ -591,6 +591,27 @@ UwbConnector::GetApplicationConfigurationParameters(uint32_t sessionId, std::vec
 
     return resultFuture;
 }
+template <typename PromiseT>
+void
+DeviceIoControlWrapper(std::string m_deviceName,std::promise<PromiseT> &resultPromise, HANDLE hDevice, DWORD dwIoControlCode, LPVOID lpInBuffer, DWORD nInBufferSize, LPVOID lpOutBuffer, DWORD nOutBufferSize, LPDWORD lpBytesReturned, std::string strFail, std::string strSuccess, std::function<void(LPDWORD)> interpret){
+    wil::unique_hfile handleDriver;
+    auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
+    if (FAILED(hr)) {
+        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
+        return;
+    }
+    
+    BOOL ioResult = DeviceIoControl(hDevice, dwIoControlCode, lpInBuffer, nInBufferSize, lpOutBuffer, nOutBufferSize, lpBytesReturned, nullptr);
+    if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
+        HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
+        PLOG_ERROR << strFail;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
+    } else {
+        PLOG_DEBUG << strSuccess;
+        interpret(lpOutBuffer);
+    }
+}
 
 std::future<std::tuple<UwbStatus, std::vector<UwbSetApplicationConfigurationParameterStatus>>>
 UwbConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters)
@@ -621,7 +642,6 @@ UwbConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vec
         HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
         PLOG_ERROR << "error when sending IOCTL_UWB_SET_APP_CONFIG_PARAMS with sessionId " << sessionId << ", hr = " << std::showbase << std::hex << hr;
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
-        return resultFuture;
     } else {
         PLOG_DEBUG << "IOCTL_UWB_SET_APP_CONFIG_PARAMS succeeded";
         auto& setApplicationConfigurationParametersStatus = *reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS_STATUS*>(std::data(statusBuffer));

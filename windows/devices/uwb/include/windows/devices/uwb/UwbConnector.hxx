@@ -222,6 +222,10 @@ private:
     bool
     CallbacksPresent();
 
+    // Internal function that wraps DeviceIoControl, handles errors and insufficient buffer size
+    void
+    DeviceIoControlWrapper();
+
 private:
     std::string m_deviceName{};
     std::jthread m_notificationThread;
