@@ -191,11 +191,11 @@ UwbSession::TryAddControleeImpl([[maybe_unused]] ::uwb::UwbMacAddress controleeM
     auto [_, inserted] = macAddresses.insert(controleeMacAddress);
     if (!inserted) {
         PLOG_INFO << "controleeMacAddress already added, skipping";
-        return UwbStatusGeneric::Ok;
+        return UwbStatusSession::AddressAlreadyPresent;
     }
     if (std::size(macAddresses) > MaximumNumberOfControleesInMulticastSession) {
         PLOG_WARNING << "exceeded max number of controlees with numberOfControlees=" << std::size(macAddresses);
-        return UwbStatusGeneric::Rejected;
+        return UwbStatusGeneric::InvalidRange;
     }
     UwbApplicationConfigurationParameter dstMacAddresses{ .Type = UwbApplicationConfigurationParameterType::DestinationMacAddresses, .Value = macAddresses };
     UwbApplicationConfigurationParameter numControlees{ .Type = UwbApplicationConfigurationParameterType::NumberOfControlees, .Value = static_cast<uint8_t>(std::size(macAddresses)) };
