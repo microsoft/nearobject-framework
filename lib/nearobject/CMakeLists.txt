@@ -40,7 +40,26 @@ target_link_libraries(nearobject
         uwb
 )
 
+list(APPEND NO_PUBLIC_HEADERS
+    ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/NearObject.hxx
+    ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectIdentityToken.hxx
+    ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectIdentityTokenUwb.hxx
+    ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectCapabilities.hxx
+    ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectManager.hxx
+    ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectProfile.hxx
+    ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectProfileSecurity.hxx
+    ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectSession.hxx
+    ${NO_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectSessionEventCallbacks.hxx
+)
+
 set_target_properties(nearobject PROPERTIES FOLDER lib/nearobject)
+set_target_properties(nearobject PROPERTIES PUBLIC_HEADER "${NO_PUBLIC_HEADERS}")
+
+install(
+    TARGETS nearobject
+    EXPORT nearobject
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nearobject
+)
 
 add_subdirectory(discovery)
 add_subdirectory(persist)

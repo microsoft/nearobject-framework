@@ -30,5 +30,5 @@ set_target_properties(nearobject-persist PROPERTIES PUBLIC_HEADER "${NO_PERSIST_
 install(
     TARGETS nearobject-persist
     EXPORT nearobject-persist
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nearobject/persistence
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nearobject/persist
 )
