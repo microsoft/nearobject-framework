@@ -92,7 +92,7 @@ private:
      * @param params
      */
     virtual void
-    SetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> params) override;
+    SetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters) override;
 
     /**
      * @brief Get the current state for this session.

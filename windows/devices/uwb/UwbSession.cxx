@@ -233,10 +233,10 @@ UwbSession::GetApplicationConfigurationParametersImpl(std::vector<::uwb::protoco
 }
 
 void
-UwbSession::SetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> params)
+UwbSession::SetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters)
 {
     uint32_t sessionId = GetId();
-    auto resultFuture = m_uwbSessionConnector->SetApplicationConfigurationParameters(sessionId, params);
+    auto resultFuture = m_uwbSessionConnector->SetApplicationConfigurationParameters(sessionId, uwbApplicationConfigurationParameters);
     try {
         auto [uwbStatus, applicationConfigurationParametersStatus] = resultFuture.get();
 

@@ -148,10 +148,9 @@ public:
      * @brief Set the Application Configuration Parameters object
      *
      * @param params
-     * @return void
      */
     void
-    SetApplicationConfigurationParameters(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> params);
+    SetApplicationConfigurationParameters(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters);
 
     /**
      * @brief Get the current state for this session.
@@ -256,7 +255,7 @@ private:
      * @param params
      */
     virtual void
-    SetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> params) = 0;
+    SetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters) = 0;
 
     /**
      * @brief Get the current state for this session.
