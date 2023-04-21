@@ -49,10 +49,28 @@ target_link_libraries(nearobject-service
         nearobject-persist
 )
 
+list(APPEND NO_SERVICE_PUBLIC_HEADERS
+    ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectDeviceController.hxx
+    ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectDeviceControllerDiscoveryAgent.hxx
+    ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectDeviceControllerManager.hxx
+    ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectDeviceControllerUwb.hxx
+    ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectProfileManager.hxx
+    ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectService.hxx
+    ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectServiceConfiguration.hxx
+    ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectServiceInjector.hxx
+    ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectSessionIdGenerator.hxx
+    ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectSessionIdGeneratorRandom.hxx
+    ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/SecureDevice.hxx
+    ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/SecureDeviceChannel.hxx
+    ${NO_SERVICE_DIR_PUBLIC_INCLUDE_PREFIX}/ServiceRuntime.hxx
+)
+
 set_target_properties(nearobject-service PROPERTIES FOLDER lib/nearobject/service)
+set_target_properties(nearobject-service PROPERTIES PUBLIC_HEADER "${NO_SERVICE_PUBLIC_HEADERS}")
 
 install(
     TARGETS nearobject-service
     EXPORT nearobject-service
     ARCHIVE
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nearobject/service
 )
