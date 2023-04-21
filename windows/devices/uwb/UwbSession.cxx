@@ -185,8 +185,7 @@ UwbSession::TryAddControleeImpl([[maybe_unused]] ::uwb::UwbMacAddress controleeM
 
     auto params = GetApplicationConfigurationParameters({ UwbApplicationConfigurationParameterType::DestinationMacAddresses });
     if (std::size(params) != 1) {
-        PLOG_ERROR << "did not return the correct number of parameters";
-        return UwbStatusGeneric::Failed;
+        throw std::runtime_error("GetApplicationConfigurationParameters() for 1 parameter did not return exactly 1 result. This is a bug!");
     }
     auto macAddresses = std::get<std::unordered_set<::uwb::UwbMacAddress>>(params.front().Value);
     auto [_, inserted] = macAddresses.insert(controleeMacAddress);
