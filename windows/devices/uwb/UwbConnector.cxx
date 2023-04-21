@@ -543,11 +543,11 @@ UwbConnector::SessionUpdateControllerMulticastList(uint32_t sessionId, UwbMultic
         .Action = multicastAction,
     };
 
-    for (const auto& controlee : controlees) {
-        multicastList.Controlees.push_back(UwbSessionUpdateMulticastListEntry{
+    std::ranges::transform(controlees, std::back_inserter(multicastList.Controlees), [](const auto& controlee) {
+        return UwbSessionUpdateMulticastListEntry{
             .ControleeMacAddress = controlee,
-        });
-    }
+        };
+    });
 
     auto multicastListDdi = UwbCxDdi::From(multicastList);
     auto multicastListDdiBuffer = std::data(multicastListDdi);
