@@ -147,7 +147,7 @@ UwbSession::GetApplicationConfigurationParameters(std::vector<::uwb::protocol::f
 void
 UwbSession::SetApplicationConfigurationParameters(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> params)
 {
-    PLOG_VERBOSE << "get application configuration parameters";
+    PLOG_VERBOSE << "set application configuration parameters";
     return SetApplicationConfigurationParametersImpl(params);
 }
 
