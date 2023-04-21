@@ -207,33 +207,6 @@ UwbSession::TryAddControleeImpl([[maybe_unused]] ::uwb::UwbMacAddress controleeM
 }
 
 std::vector<UwbApplicationConfigurationParameter>
-UwbSession::GetApplicationConfigurationParametersImpl()
-{
-    uint32_t sessionId = GetId();
-    std::vector<UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes{}; // Leaving empty in order to get ALL set parameters from the device
-
-    auto resultFuture = m_uwbSessionConnector->GetApplicationConfigurationParameters(sessionId, applicationConfigurationParameterTypes);
-    if (!resultFuture.valid()) {
-        PLOG_ERROR << "failed to obtain application configuration parameters for session id " << sessionId;
-        throw UwbException(UwbStatusGeneric::Failed);
-    }
-
-    try {
-        auto [uwbStatus, applicationConfigurationParameters] = resultFuture.get();
-        if (!IsUwbStatusOk(uwbStatus)) {
-            throw UwbException(uwbStatus);
-        }
-        return applicationConfigurationParameters;
-    } catch (UwbException &uwbException) {
-        PLOG_ERROR << "caught exception attempting to obtain application configuration parameters for session id " << sessionId << " (" << ToString(uwbException.Status) << ")";
-        throw uwbException;
-    } catch (std::exception &e) {
-        PLOG_ERROR << "caught unexpected exception attempting to obtain application configuration parameters for session id " << sessionId << " (" << e.what() << ")";
-        throw e;
-    }
-}
-
-std::vector<UwbApplicationConfigurationParameter>
 UwbSession::GetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> requestedTypes)
 {
     uint32_t sessionId = GetId();

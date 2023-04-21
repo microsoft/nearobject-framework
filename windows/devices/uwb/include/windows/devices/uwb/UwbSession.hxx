@@ -78,17 +78,9 @@ private:
     TryAddControleeImpl(::uwb::UwbMacAddress controleeMacAddress) override;
 
     /**
-     * @brief Get the application configuration parameters for this session.
-     *
-     * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
-     */
-    virtual std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
-    GetApplicationConfigurationParametersImpl() override;
-
-    /**
      * @brief Get the Application Configuration Parameters object
      *
-     * @param requestedTypes
+     * @param requestedTypes leave this as an empty vector to request all parameters
      * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
      */
     virtual std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
@@ -98,7 +90,6 @@ private:
      * @brief Set the Application Configuration Parameters object
      *
      * @param params
-     * @return void
      */
     virtual void
     SetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> params) override;
