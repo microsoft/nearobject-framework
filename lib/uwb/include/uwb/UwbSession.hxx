@@ -136,7 +136,7 @@ public:
     SetSessionStatus(const uwb::protocol::fira::UwbSessionStatus& status);
 
     /**
-     * @brief Get the Application Configuration Parameters object
+     * @brief Get the application configuration parameters for this session.
      *
      * @param requestedTypes leave this as an empty vector to request all parameters
      * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
@@ -145,7 +145,7 @@ public:
     GetApplicationConfigurationParameters(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> requestedTypes);
 
     /**
-     * @brief Set the Application Configuration Parameters object
+     * @brief Set the application configuration parameters for this session.
      *
      * @param uwbApplicationConfigurationParameters
      */
