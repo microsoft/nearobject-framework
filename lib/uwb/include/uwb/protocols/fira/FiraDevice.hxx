@@ -612,6 +612,8 @@ constexpr std::array<UwbApplicationConfigurationParameterType, 5> UwbApplication
     UwbApplicationConfigurationParameterType::RangeDataNotificationProximityFar,
 };
 
+constexpr auto MAX_CONTROLEES = 8;
+
 /**
  * @brief Determines whether the specified application configuration parameter
  * (type) is allowed to be updated while a session is in the 'Active' state.
