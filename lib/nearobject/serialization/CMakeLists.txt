@@ -23,4 +23,17 @@ target_link_libraries(nearobject-serialization
         uwb
 )
 
+list(APPEND NO_SERIALIZATION_PUBLIC_HEADERS
+    ${NO_SERIALIZATION_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectIdentityTokenUwbJsonSerializer.hxx
+    ${NO_SERIALIZATION_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectProfileJsonSerializer.hxx
+    ${NO_SERIALIZATION_DIR_PUBLIC_INCLUDE_PREFIX}/UwbMacAddressJsonSerializer.hxx
+)
+
 set_target_properties(nearobject-serialization PROPERTIES FOLDER lib/nearobject)
+set_target_properties(nearobject-serialization PROPERTIES PUBLIC_HEADER "${NO_SERIALIZATION_PUBLIC_HEADERS}")
+
+install(
+    TARGETS nearobject-serialization
+    EXPORT nearobject
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nearobject/serialization
+)
