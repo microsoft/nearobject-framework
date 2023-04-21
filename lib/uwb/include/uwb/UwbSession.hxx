@@ -147,7 +147,7 @@ public:
     /**
      * @brief Set the Application Configuration Parameters object
      *
-     * @param params
+     * @param uwbApplicationConfigurationParameters
      */
     void
     SetApplicationConfigurationParameters(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters);
@@ -252,7 +252,7 @@ private:
     /**
      * @brief Set the Application Configuration Parameters object
      *
-     * @param params
+     * @param uwbApplicationConfigurationParameters
      */
     virtual void
     SetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters) = 0;

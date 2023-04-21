@@ -89,7 +89,7 @@ private:
     /**
      * @brief Set the Application Configuration Parameters object
      *
-     * @param params
+     * @param uwbApplicationConfigurationParameters
      */
     virtual void
     SetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters) override;
