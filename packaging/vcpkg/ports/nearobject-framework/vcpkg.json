@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "nearobject-framework",
-  "version-string": "0.4.3",
+  "version-string": "0.4.4",
   "dependencies": [
     "catch2",
     "nlohmann-json",

@@ -524,12 +524,51 @@ UwbConnector::SessionGetRangingCount(uint32_t sessionId)
     return resultFuture;
 }
 
-std::future<UwbSessionUpdateMulicastListStatus>
+std::future<UwbStatus>
 UwbConnector::SessionUpdateControllerMulticastList(uint32_t sessionId, UwbMulticastAction multicastAction, std::vector<::uwb::UwbMacAddress> controlees)
 {
-    std::promise<UwbSessionUpdateMulicastListStatus> resultPromise;
+    std::promise<UwbStatus> resultPromise;
     auto resultFuture = resultPromise.get_future();
-    // TODO: invoke IOCTL_UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST
+
+    wil::unique_hfile handleDriver;
+    auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
+    if (FAILED(hr)) {
+        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
+        return resultFuture;
+    }
+
+    UwbSessionUpdateMulicastList multicastList{
+        .SessionId = sessionId,
+        .Action = multicastAction,
+    };
+
+    std::ranges::transform(controlees, std::back_inserter(multicastList.Controlees), [](const auto& controlee) {
+        return UwbSessionUpdateMulticastListEntry{
+            .ControleeMacAddress = controlee,
+        };
+    });
+
+    auto multicastListDdi = UwbCxDdi::From(multicastList);
+    auto multicastListDdiBuffer = std::data(multicastListDdi);
+
+    UWB_STATUS status;
+
+    BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST, std::data(multicastListDdiBuffer), std::size(multicastListDdiBuffer), &status, sizeof status, nullptr, nullptr);
+    if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
+        HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
+        PLOG_ERROR << "error when sending IOCTL_UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST for session id " << sessionId << ", hr=" << std::showbase << std::hex << hr;
+        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
+        return resultFuture;
+    } else {
+        PLOG_DEBUG << "IOCTL_UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST succeeded";
+        auto uwbStatus = UwbCxDdi::To(status);
+        if (!IsUwbStatusOk(uwbStatus)) {
+            resultPromise.set_exception(std::make_exception_ptr(UwbException(std::move(uwbStatus))));
+        } else {
+            resultPromise.set_value(std::move(uwbStatus));
+        }
+    }
 
     return resultFuture;
 }
