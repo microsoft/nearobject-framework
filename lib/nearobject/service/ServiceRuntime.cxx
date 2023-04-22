@@ -9,6 +9,12 @@ ServiceRuntime::~ServiceRuntime()
     Stop();
 }
 
+std::shared_ptr<NearObjectService>
+ServiceRuntime::GetServiceInstance()
+{
+    return m_service;
+}
+
 ServiceRuntime&
 ServiceRuntime::SetServiceInstance(std::shared_ptr<NearObjectService> service)
 {
