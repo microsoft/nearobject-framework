@@ -191,18 +191,18 @@ windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulicastList &uwbSes
 }
 
 UwbSessionUpdateMulticastListStatusWrapper
-windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulticastListStatus &UwbSessionUpdateMulticastListStatus)
+windows::devices::uwb::ddi::lrp::From(const UwbSessionUpdateMulticastListStatus &uwbSessionUpdateMulticastListStatus)
 {
-    auto multicastListStatusWrapper = UwbSessionUpdateMulticastListStatusWrapper::from_num_elements<decltype(UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF::statusList)>(std::size(UwbSessionUpdateMulticastListStatus.Status));
+    auto multicastListStatusWrapper = UwbSessionUpdateMulticastListStatusWrapper::from_num_elements<decltype(UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF::statusList)>(std::size(uwbSessionUpdateMulticastListStatus.Status));
     UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF &multicastListStatus = multicastListStatusWrapper;
     multicastListStatus.size = multicastListStatusWrapper.size();
-    multicastListStatus.sessionId = UwbSessionUpdateMulticastListStatus.SessionId;
-    multicastListStatus.numberOfControlees = std::size(UwbSessionUpdateMulticastListStatus.Status);
+    multicastListStatus.sessionId = uwbSessionUpdateMulticastListStatus.SessionId;
+    multicastListStatus.numberOfControlees = std::size(uwbSessionUpdateMulticastListStatus.Status);
     multicastListStatus.remainingMulticastListSize = 0;
 
     for (auto i = 0; i < multicastListStatus.numberOfControlees; i++) {
         auto &status = multicastListStatus.statusList[i];
-        status = From(UwbSessionUpdateMulticastListStatus.Status[i]);
+        status = From(uwbSessionUpdateMulticastListStatus.Status[i]);
     }
 
     return multicastListStatusWrapper;
@@ -518,12 +518,12 @@ windows::devices::uwb::ddi::lrp::From(const UwbNotificationData &uwbNotification
             notificationData.notificationType = NotificationTypeMap.at(typeid(arg));
             notificationData.sessionStatus = From(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionUpdateMulticastListStatus>) {
-            auto UwbSessionUpdateMulticastListStatusWrapper = From(arg);
-            totalSize += std::size(UwbSessionUpdateMulticastListStatusWrapper);
+            auto uwbSessionUpdateMulticastListStatusWrapper = From(arg);
+            totalSize += std::size(uwbSessionUpdateMulticastListStatusWrapper);
             notificationDataWrapper = std::make_unique<UwbNotificationDataWrapper>(totalSize);
             UWB_NOTIFICATION_DATA &notificationData = notificationDataWrapper->value();
             notificationData.notificationType = NotificationTypeMap.at(typeid(arg));
-            auto data = UwbSessionUpdateMulticastListStatusWrapper.data();
+            auto data = uwbSessionUpdateMulticastListStatusWrapper.data();
             std::memcpy(&notificationData.sessionUpdateControllerMulticastList, std::data(data), std::size(data));
         } else if constexpr (std::is_same_v<ValueType, UwbRangingData>) {
             auto uwbRangingDataWrapper = From(arg);
@@ -1115,12 +1115,12 @@ windows::devices::uwb::ddi::lrp::To(const UWB_SESSION_UPDATE_CONTROLLER_MULTICAS
         status.push_back(To(multicastListStatus));
     }
 
-    UwbSessionUpdateMulticastListStatus UwbSessionUpdateMulticastListStatus{
+    UwbSessionUpdateMulticastListStatus uwbSessionUpdateMulticastListStatus{
         .SessionId = sessionUpdateControllerMulticastListNtf.sessionId,
         .Status = std::move(status)
     };
 
-    return UwbSessionUpdateMulticastListStatus;
+    return uwbSessionUpdateMulticastListStatus;
 }
 
 UwbRangingMeasurementType

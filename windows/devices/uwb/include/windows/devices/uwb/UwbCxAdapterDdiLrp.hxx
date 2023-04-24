@@ -111,11 +111,11 @@ using UwbSessionUpdateMulticastListStatusWrapper = notstd::flextype_wrapper<UWB_
 /**
  * @brief Converts UwbSessionUpdateMulticastListStatus to UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF.
  *
- * @param UwbSessionUpdateMulticastListStatus
+ * @param uwbSessionUpdateMulticastListStatus
  * @return UwbSessionUpdateMulticastListStatusWrapper
  */
 UwbSessionUpdateMulticastListStatusWrapper
-From(const ::uwb::protocol::fira::UwbSessionUpdateMulticastListStatus &UwbSessionUpdateMulticastListStatus);
+From(const ::uwb::protocol::fira::UwbSessionUpdateMulticastListStatus &uwbSessionUpdateMulticastListStatus);
 
 /**
  * @brief Converts UwbRangingMeasurementType to UWB_RANGING_MEASUREMENT_TYPE.
