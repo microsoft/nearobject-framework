@@ -201,7 +201,7 @@ private:
      * @param statusMulticastList
      */
     void
-    OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList);
+    OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulticastListStatus statusMulticastList);
 
     /**
      * @brief Internal function that prepares the notification for processing by the m_sessionEventCallbacks
