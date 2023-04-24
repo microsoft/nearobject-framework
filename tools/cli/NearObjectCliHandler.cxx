@@ -39,7 +39,7 @@ try {
     auto controlFlowContext = (m_parent != nullptr) ? m_parent->GetControlFlowContext() : nullptr;
     auto session = uwbDevice->CreateSession(rangingParameters.SessionId, m_sessionEventCallbacks);
     session->Configure(rangingParameters.ApplicationConfigurationParameters);
-    auto applicationConfigurationParameters = session->GetApplicationConfigurationParameters();
+    auto applicationConfigurationParameters = session->GetApplicationConfigurationParameters({});
     PLOG_DEBUG << "Session Application Configuration Parameters: ";
     for (const auto& applicationConfigurationParameter : applicationConfigurationParameters) {
         PLOG_DEBUG << " > " << applicationConfigurationParameter.ToString();
@@ -76,7 +76,7 @@ try {
     session->Configure(applicationConfigurationParameters);
 
     // Obtain the configured session application configuration parameters.
-    auto applicationConfigurationParametersSet = session->GetApplicationConfigurationParameters();
+    auto applicationConfigurationParametersSet = session->GetApplicationConfigurationParameters({});
     PLOG_DEBUG << "Session Application Configuration Parameters: ";
     for (const auto& applicationConfigurationParameter : applicationConfigurationParametersSet) {
         PLOG_DEBUG << " > " << applicationConfigurationParameter.ToString();

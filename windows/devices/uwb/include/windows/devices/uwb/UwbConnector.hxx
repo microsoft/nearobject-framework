@@ -143,7 +143,7 @@ public:
     virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::optional<uint32_t>>>
     SessionGetRangingCount(uint32_t sessionId) override;
 
-    virtual std::future<::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus>
+    virtual std::future<::uwb::protocol::fira::UwbStatus>
     SessionUpdateControllerMulticastList(uint32_t sessionId, ::uwb::protocol::fira::UwbMulticastAction multicastAction, std::vector<::uwb::UwbMacAddress> controlees) override;
 
     virtual std::future<std::tuple<::uwb::protocol::fira::UwbStatus, std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>>>
@@ -201,7 +201,7 @@ private:
      * @param statusMulticastList
      */
     void
-    OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList);
+    OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulticastListStatus statusMulticastList);
 
     /**
      * @brief Internal function that prepares the notification for processing by the m_sessionEventCallbacks

@@ -106,7 +106,7 @@ public:
 
     /**
      * @brief Attempt to add a controlee to this session.
-     * 
+     *
      * @param controleeMacAddress The mac address of the controlee. This is
      * expected to be in the mac address format configured for the session.
      * @return UwbStatus The status of the operation. UwbStatusGeneric::Ok is
@@ -138,10 +138,19 @@ public:
     /**
      * @brief Get the application configuration parameters for this session.
      *
+     * @param requestedTypes leave this as an empty vector to request all parameters
      * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
      */
     std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
-    GetApplicationConfigurationParameters();
+    GetApplicationConfigurationParameters(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> requestedTypes);
+
+    /**
+     * @brief Set the application configuration parameters for this session.
+     *
+     * @param uwbApplicationConfigurationParameters
+     */
+    void
+    SetApplicationConfigurationParameters(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters);
 
     /**
      * @brief Get the current state for this session.
@@ -222,7 +231,7 @@ private:
 
     /**
      * @brief Attempt to add a controlee to this session.
-     * 
+     *
      * @param controleeMacAddress The mac address of the controlee. This is
      * expected to be in the mac address format configured for the session.
      * @return UwbStatus The status of the operation. UwbStatusGeneric::Ok is
@@ -232,12 +241,21 @@ private:
     TryAddControleeImpl(UwbMacAddress controleeMacAddress) = 0;
 
     /**
-     * @brief Get the application configuration parameters for this session.
+     * @brief Get the Application Configuration Parameters object
      *
+     * @param requestedTypes leave this as an empty vector to request all parameters
      * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
      */
     virtual std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
-    GetApplicationConfigurationParametersImpl() = 0;
+    GetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> requestedTypes) = 0;
+
+    /**
+     * @brief Set the Application Configuration Parameters object
+     *
+     * @param uwbApplicationConfigurationParameters
+     */
+    virtual void
+    SetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters) = 0;
 
     /**
      * @brief Get the current state for this session.

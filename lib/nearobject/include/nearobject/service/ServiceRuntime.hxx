@@ -27,6 +27,15 @@ public:
     ServiceRuntime(ServiceRuntime&&) = default;
 
     /**
+     * @brief Obtain a shared reference to the NearObjectService instance
+     * managed by this runtime.
+     * 
+     * @return std::shared_ptr<NearObjectService> 
+     */
+    std::shared_ptr<NearObjectService>
+    GetServiceInstance();
+
+    /**
      * @brief Set the Service instance object.
      *
      * @param service The near object service to run.

@@ -80,10 +80,19 @@ private:
     /**
      * @brief Get the application configuration parameters for this session.
      *
+     * @param requestedTypes leave this as an empty vector to request all parameters
      * @return std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
      */
     virtual std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
-    GetApplicationConfigurationParametersImpl() override;
+    GetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> requestedTypes) override;
+
+    /**
+     * @brief Set the application configuration parameters for this session.
+     *
+     * @param uwbApplicationConfigurationParameters
+     */
+    virtual void
+    SetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters) override;
 
     /**
      * @brief Get the current state for this session.
