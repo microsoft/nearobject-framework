@@ -106,16 +106,16 @@ using UwbSessionUpdateMulicastListWrapper = notstd::flextype_wrapper<UWB_SESSION
 UwbSessionUpdateMulicastListWrapper
 From(const ::uwb::protocol::fira::UwbSessionUpdateMulicastList &uwbSessionUpdateMulicastList);
 
-using UwbSessionUpdateMulicastListStatusWrapper = notstd::flextype_wrapper<UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF>;
+using UwbSessionUpdateMulticastListStatusWrapper = notstd::flextype_wrapper<UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF>;
 
 /**
- * @brief Converts UwbSessionUpdateMulicastListStatus to UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF.
+ * @brief Converts UwbSessionUpdateMulticastListStatus to UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF.
  *
- * @param uwbSessionUpdateMulicastListStatus
- * @return UwbSessionUpdateMulicastListStatusWrapper
+ * @param uwbSessionUpdateMulticastListStatus
+ * @return UwbSessionUpdateMulticastListStatusWrapper
  */
-UwbSessionUpdateMulicastListStatusWrapper
-From(const ::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus &uwbSessionUpdateMulicastListStatus);
+UwbSessionUpdateMulticastListStatusWrapper
+From(const ::uwb::protocol::fira::UwbSessionUpdateMulticastListStatus &uwbSessionUpdateMulticastListStatus);
 
 /**
  * @brief Converts UwbRangingMeasurementType to UWB_RANGING_MEASUREMENT_TYPE.
@@ -486,12 +486,12 @@ To(const UWB_SESSION_STATUS &sessionStatus);
 To(const UWB_DEVICE_INFO &deviceInfo);
 
 /**
- * @brief Converts UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF to UwbSessionUpdateMulicastListStatus.
+ * @brief Converts UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF to UwbSessionUpdateMulticastListStatus.
  *
  * @param sessionUpdateControllerMulticastListNtf
- * @return ::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus
+ * @return ::uwb::protocol::fira::UwbSessionUpdateMulticastListStatus
  */
-::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus
+::uwb::protocol::fira::UwbSessionUpdateMulticastListStatus
 To(const UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST_NTF &sessionUpdateControllerMulticastListNtf);
 
 /**

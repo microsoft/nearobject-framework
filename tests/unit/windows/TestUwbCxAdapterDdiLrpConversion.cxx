@@ -231,7 +231,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         }
     }
 
-    SECTION("UwbSessionUpdateMulicastListStatus is stable")
+    SECTION("UwbSessionUpdateMulticastListStatus is stable")
     {
         std::vector<UwbMulticastListStatus> uwbMulticastListStatus{};
         for (const auto& uwbStatusMulticast : magic_enum::enum_values<UwbStatusMulticast>()) {
@@ -241,12 +241,12 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
                 .Status = uwbStatusMulticast });
         }
 
-        const UwbSessionUpdateMulicastListStatus uwbSessionUpdateMulicastListStatus{
+        const UwbSessionUpdateMulticastListStatus uwbSessionUpdateMulticastListStatus{
             .SessionId = RandomDistribution(RandomEngine),
             .Status = std::move(uwbMulticastListStatus)
         };
 
-        test::ValidateRoundtrip(uwbSessionUpdateMulicastListStatus);
+        test::ValidateRoundtrip(uwbSessionUpdateMulticastListStatus);
     }
 
     SECTION("UwbRangingMeasurementType is stable")
@@ -449,7 +449,7 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
         }
     }
 
-    SECTION("UwbNotificationData UwbSessionUpdateMulicastListStatus variant is stable")
+    SECTION("UwbNotificationData UwbSessionUpdateMulticastListStatus variant is stable")
     {
         std::vector<UwbMulticastListStatus> uwbMulticastListStatus{};
         for (const auto& uwbStatusMulticast : magic_enum::enum_values<UwbStatusMulticast>()) {
@@ -459,11 +459,11 @@ TEST_CASE("ddi <-> neutral type conversions are stable", "[basic][conversion][wi
                 .Status = uwbStatusMulticast });
         }
 
-        const UwbSessionUpdateMulicastListStatus uwbSessionUpdateMulicastListStatus{
+        const UwbSessionUpdateMulticastListStatus uwbSessionUpdateMulticastListStatus{
             .SessionId = test::GetRandom<uint32_t>(),
             .Status = std::move(uwbMulticastListStatus)
         };
-        const UwbNotificationData uwbNotificationDataSessionUpdateMulicastListStatus{ uwbSessionUpdateMulicastListStatus };
+        const UwbNotificationData uwbNotificationDataSessionUpdateMulicastListStatus{ uwbSessionUpdateMulticastListStatus };
         test::ValidateRoundtrip(uwbNotificationDataSessionUpdateMulicastListStatus);
     }
 
