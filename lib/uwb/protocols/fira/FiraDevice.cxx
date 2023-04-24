@@ -166,7 +166,7 @@ UwbRangingMeasurementData::ToString() const
 }
 
 std::string
-UwbSessionUpdateMulicastListStatus::ToString() const
+UwbSessionUpdateMulticastListStatus::ToString() const
 {
     std::ostringstream ss{};
     ss << "SessionId: " << SessionId << '\n'
@@ -231,7 +231,7 @@ uwb::protocol::fira::ToString(const UwbNotificationData& uwbNotificationData)
         { std::type_index(typeid(UwbStatus)), "Status" },
         { std::type_index(typeid(UwbStatusDevice)), "Device Status" },
         { std::type_index(typeid(UwbSessionStatus)), "Session Status" },
-        { std::type_index(typeid(UwbSessionUpdateMulicastListStatus)), "Session Multicast List Status" },
+        { std::type_index(typeid(UwbSessionUpdateMulticastListStatus)), "Session Multicast List Status" },
         { std::type_index(typeid(UwbRangingData)), "Ranging Data" },
     };
 
@@ -240,7 +240,7 @@ uwb::protocol::fira::ToString(const UwbNotificationData& uwbNotificationData)
     std::visit([&](auto&& arg) {
         using ValueType = std::decay_t<decltype(arg)>;
         ss << TypeNameMap.at(typeid(ValueType)) << " {";
-        if constexpr (std::is_same_v<ValueType, UwbStatusDevice> || std::is_same_v<ValueType, UwbSessionStatus> || std::is_same_v<ValueType, UwbSessionUpdateMulicastListStatus> || std::is_same_v<ValueType, UwbRangingData>) {
+        if constexpr (std::is_same_v<ValueType, UwbStatusDevice> || std::is_same_v<ValueType, UwbSessionStatus> || std::is_same_v<ValueType, UwbSessionUpdateMulticastListStatus> || std::is_same_v<ValueType, UwbRangingData>) {
             ss << arg;
         } else if constexpr (std::is_enum_v<ValueType>) {
             ss << magic_enum::enum_name(arg);
