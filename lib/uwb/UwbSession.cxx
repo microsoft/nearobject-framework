@@ -134,14 +134,14 @@ std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
 UwbSession::GetApplicationConfigurationParameters(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> requestedTypes)
 {
     PLOG_VERBOSE << "get application configuration parameters";
-    return GetApplicationConfigurationParametersImpl(requestedTypes);
+    return GetApplicationConfigurationParametersImpl(std::move(requestedTypes));
 }
 
 void
 UwbSession::SetApplicationConfigurationParameters(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters)
 {
     PLOG_VERBOSE << "set application configuration parameters";
-    return SetApplicationConfigurationParametersImpl(uwbApplicationConfigurationParameters);
+    return SetApplicationConfigurationParametersImpl(std::move(uwbApplicationConfigurationParameters));
 }
 
 UwbSessionState
