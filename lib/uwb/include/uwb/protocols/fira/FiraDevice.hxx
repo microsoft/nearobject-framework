@@ -709,13 +709,13 @@ struct UwbSessionUpdateMulicastList
     operator<=>(const UwbSessionUpdateMulicastList&) const noexcept = default;
 };
 
-struct UwbSessionUpdateMulicastListStatus
+struct UwbSessionUpdateMulticastListStatus
 {
     uint32_t SessionId;
     std::vector<UwbMulticastListStatus> Status;
 
     auto
-    operator<=>(const UwbSessionUpdateMulicastListStatus&) const noexcept = default;
+    operator<=>(const UwbSessionUpdateMulticastListStatus&) const noexcept = default;
 
     /**
      * @brief Returns a string representation of the object.
@@ -805,7 +805,7 @@ struct UwbRangingData
     ToString() const;
 };
 
-using UwbNotificationData = std::variant<UwbStatus, UwbStatusDevice, UwbSessionStatus, UwbSessionUpdateMulicastListStatus, UwbRangingData>;
+using UwbNotificationData = std::variant<UwbStatus, UwbStatusDevice, UwbSessionStatus, UwbSessionUpdateMulticastListStatus, UwbRangingData>;
 
 /**
  * @brief Returns a string representation of the object.
