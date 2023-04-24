@@ -240,12 +240,16 @@ set(NOF_DIR_WINDOWS ${CMAKE_CURRENT_LIST_DIR}/windows)
 if (BUILD_FOR_LINUX)
   add_subdirectory(linux)
 elseif (BUILD_FOR_WINDOWS)
+  # Define Windows-specific package dependency versions.
+  set(VERSION_CPPWINRT 2.0.230225.1)
+
   # Make public version of wil available.
   set(WIL_BUILD_TESTS OFF CACHE INTERNAL "Turn off wil tests")
   set(WIL_BUILD_PACKAGING OFF CACHE INTERNAL "Turn off wil packaging")
 
   if (NOF_DEPENDENCY_RESOLUTION_METHOD STREQUAL NOF_DEPENDENCY_RESOLUTION_METHOD_VCPKG)
     find_package(wil CONFIG REQUIRED)
+    find_package(cppwinrt CONFIG REQUIRED)
   else()
     FetchContent_Declare(WIL
         GIT_REPOSITORY "https://github.com/microsoft/wil"
@@ -253,7 +257,25 @@ elseif (BUILD_FOR_WINDOWS)
         GIT_SHALLOW OFF
     )
     FetchContent_MakeAvailable(WIL)
+
+    FetchContent_Declare(cppwinrt URL https://github.com/microsoft/cppwinrt/archive/refs/tags/${VERSION_CPPWINRT}.tar.gz)
+    FetchContent_MakeAvailable(cppwinrt)
   endif()
+
+  # Find nuget and restore packages for this project.
+  # Get nuget program (assumes it is on PATH).
+  find_program(nuget NAMES nuget REQUIRED)
+
+  # Configure the nuget packages configuration with variable substitutions.
+  configure_file(
+    ${CMAKE_CURRENT_LIST_DIR}/packages.config.in
+    ${CMAKE_CURRENT_LIST_DIR}/packages.config
+  )
+
+  # Restore nuget package dependencies.
+  include(cmake/cppwinrt.cmake)
+  include(cmake/nuget.cmake)
+  restore_nuget_packages()
 
   # Add Windows-specific global compile definitions.
   add_compile_definitions(
@@ -286,6 +308,7 @@ elseif (BUILD_FOR_WINDOWS)
   add_subdirectory(windows)
 endif()
 
+add_subdirectory(external)
 add_subdirectory(lib)
 add_subdirectory(tools)
 add_subdirectory(packaging)

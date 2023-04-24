@@ -4,6 +4,7 @@
   "version-string": "0.4.4",
   "dependencies": [
     "catch2",
+    "cppwinrt",
     "nlohmann-json",
     "magic-enum",
     "cli11",
