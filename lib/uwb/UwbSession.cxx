@@ -131,10 +131,17 @@ UwbSession::InsertPeerImpl(const uwb::UwbMacAddress& peerAddress)
 }
 
 std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
-UwbSession::GetApplicationConfigurationParameters()
+UwbSession::GetApplicationConfigurationParameters(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> requestedTypes)
 {
     PLOG_VERBOSE << "get application configuration parameters";
-    return GetApplicationConfigurationParametersImpl();
+    return GetApplicationConfigurationParametersImpl(std::move(requestedTypes));
+}
+
+void
+UwbSession::SetApplicationConfigurationParameters(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters)
+{
+    PLOG_VERBOSE << "set application configuration parameters";
+    return SetApplicationConfigurationParametersImpl(std::move(uwbApplicationConfigurationParameters));
 }
 
 UwbSessionState

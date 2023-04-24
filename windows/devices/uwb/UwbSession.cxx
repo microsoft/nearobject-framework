@@ -178,69 +178,35 @@ UwbStatus
 UwbSession::TryAddControleeImpl([[maybe_unused]] ::uwb::UwbMacAddress controleeMacAddress)
 {
     PLOG_VERBOSE << "TryAddControleeImpl";
-    return UwbStatusGeneric::Rejected;
+    if (!m_uwbSessionConnector) {
+        PLOG_WARNING << "No associated connector";
+        return UwbStatusGeneric::Failed;
+    }
 
-    // TODO: convert code below to invoke IOCTL_UWB_SET_APP_CONFIG_PARAMS to use connector
+    auto params = GetApplicationConfigurationParameters({ UwbApplicationConfigurationParameterType::DestinationMacAddresses });
+    if (std::size(params) != 1) {
+        throw std::runtime_error("GetApplicationConfigurationParameters() for 1 parameter did not return exactly 1 result. This is a bug!");
+    }
+    auto macAddresses = std::get<std::unordered_set<::uwb::UwbMacAddress>>(params.front().Value);
+    auto [_, inserted] = macAddresses.insert(controleeMacAddress);
+    if (!inserted) {
+        PLOG_INFO << "controleeMacAddress already added, skipping";
+        return UwbStatusSession::AddressAlreadyPresent;
+    }
+    UwbApplicationConfigurationParameter dstMacAddresses{ .Type = UwbApplicationConfigurationParameterType::DestinationMacAddresses, .Value = macAddresses };
+    UwbApplicationConfigurationParameter numControlees{ .Type = UwbApplicationConfigurationParameterType::NumberOfControlees, .Value = static_cast<uint8_t>(std::size(macAddresses)) };
 
-    // TODO: two main options for updating the UWB-CLX peer list:
-    //  1) Every time a peer is added (on-demand)
-    //  2) Only when StartRanging() is called.
-    // Below sample code exemplifies 1) for simplicity but this is not necessarily the way to go.
-    //
-    // TODO: request UWB-CLX to update controlee list per below pseudo-code,
-    // which is *very* rough and some parts probably plain wrong:
-    //
+    SetApplicationConfigurationParameters({ numControlees, dstMacAddresses });
 
-    // const auto macAddressLength = m_uwbMacAddressSelf.GetLength();
-    // const auto macAddressessLength = macAddressLength * m_peers.size();
-
-    // std::size_t appConfigParamsSize = 0;
-    // appConfigParamsSize += macAddressessLength;
-    // // TODO: all other memory required for this structure must be accounted for, the above calculation was left incomplete.
-    // // Also, proper memory alignment of trailing structures in the allocated buffer has not been taken into account.
-    // auto appConfigParamsBuffer = std::make_unique<uint8_t[]>(appConfigParamsSize);
-    // auto *appConfigParams = reinterpret_cast<UWB_SET_APP_CONFIG_PARAMS *>(appConfigParamsBuffer.get());
-    // appConfigParams->sessionId = GetId();
-    // appConfigParams->appConfigParamsCount = 2;
-    // UWB_APP_CONFIG_PARAM *appConfigParamList = reinterpret_cast<UWB_APP_CONFIG_PARAM *>(appConfigParams + 1);
-    // UWB_APP_CONFIG_PARAM *appConfigParamNumberOfControlees = appConfigParamList + 0;
-    // UWB_APP_CONFIG_PARAM *appConfigParamDstMacAddress = appConfigParamList + 1;
-
-    // // Populate NUMBER_OF_CONTROLEES app configuration parameter.
-    // auto &numberOfControleesPayload = *reinterpret_cast<uint8_t *>(appConfigParamNumberOfControlees + 1);
-    // appConfigParamNumberOfControlees->paramType = UWB_APP_CONFIG_PARAM_TYPE_NUMBER_OF_CONTROLEES;
-    // appConfigParamNumberOfControlees->paramLength = 1;
-    // numberOfControleesPayload = static_cast<uint8_t>(m_peers.size());
-
-    // // Populate DST_MAC_ADDRESS app configuration parameter.
-    // auto dstMacAddressPayload = reinterpret_cast<uint8_t *>(appConfigParamDstMacAddress + 1);
-    // appConfigParamDstMacAddress->paramType = UWB_APP_CONFIG_PARAM_TYPE_DST_MAC_ADDRESS;
-    // appConfigParamDstMacAddress->paramLength = static_cast<uint32_t>(macAddressessLength);
-    // auto dstMacAddress = dstMacAddressPayload;
-    // for (const auto &peer : m_peers) {
-    //     const auto value = peer.GetValue();
-    //     std::copy(std::cbegin(value), std::cend(value), dstMacAddress);
-    //     std::advance(dstMacAddress, std::size(value));
-    // }
-
-    // // Attempt to set all new parameters.
-    // DWORD bytesReturned = 0;
-    // UWB_SET_APP_CONFIG_PARAMS_STATUS appConfigParamsStatus; // TODO: this needs to be dynamically allocated to fit returned content
-    // BOOL ioResult = DeviceIoControl(m_handleDriver.get(), IOCTL_UWB_SET_APP_CONFIG_PARAMS, &appConfigParams, static_cast<DWORD>(appConfigParamsSize), &appConfigParamsStatus, sizeof appConfigParamsStatus, &bytesReturned, nullptr);
-    // if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
-    //     // TODO
-    //     HRESULT hr = GetLastError();
-    //     PLOG_ERROR << "could not send params to driver, hr=" << std::showbase << std::hex << hr;
-    // }
+    return UwbStatusGeneric::Ok;
 }
 
 std::vector<UwbApplicationConfigurationParameter>
-UwbSession::GetApplicationConfigurationParametersImpl()
+UwbSession::GetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> requestedTypes)
 {
     uint32_t sessionId = GetId();
-    std::vector<UwbApplicationConfigurationParameterType> applicationConfigurationParameterTypes{}; // Leaving empty in order to get ALL set parameters from the device
 
-    auto resultFuture = m_uwbSessionConnector->GetApplicationConfigurationParameters(sessionId, applicationConfigurationParameterTypes);
+    auto resultFuture = m_uwbSessionConnector->GetApplicationConfigurationParameters(sessionId, requestedTypes);
     if (!resultFuture.valid()) {
         PLOG_ERROR << "failed to obtain application configuration parameters for session id " << sessionId;
         throw UwbException(UwbStatusGeneric::Failed);
@@ -254,6 +220,28 @@ UwbSession::GetApplicationConfigurationParametersImpl()
         return applicationConfigurationParameters;
     } catch (UwbException &uwbException) {
         PLOG_ERROR << "caught exception attempting to obtain application configuration parameters for session id " << sessionId << " (" << ToString(uwbException.Status) << ")";
+        throw uwbException;
+    } catch (std::exception &e) {
+        PLOG_ERROR << "caught unexpected exception attempting to obtain application configuration parameters for session id " << sessionId << " (" << e.what() << ")";
+        throw e;
+    }
+}
+
+void
+UwbSession::SetApplicationConfigurationParametersImpl(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters)
+{
+    uint32_t sessionId = GetId();
+    auto resultFuture = m_uwbSessionConnector->SetApplicationConfigurationParameters(sessionId, uwbApplicationConfigurationParameters);
+    try {
+        auto [uwbStatus, applicationConfigurationParametersStatus] = resultFuture.get();
+
+        if (IsUwbStatusOk(uwbStatus)) {
+            return;
+        } else {
+            throw UwbException(uwbStatus);
+        }
+    } catch (UwbException &uwbException) {
+        PLOG_ERROR << "caught exception attempting to set application configuration parameters for session id " << sessionId << " (" << ToString(uwbException.Status) << ")";
         throw uwbException;
     } catch (std::exception &e) {
         PLOG_ERROR << "caught unexpected exception attempting to obtain application configuration parameters for session id " << sessionId << " (" << e.what() << ")";

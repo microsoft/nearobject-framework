@@ -259,6 +259,13 @@ uwb::protocol::fira::IsUwbStatusOk(const UwbStatus& uwbStatus) noexcept
     return (status != nullptr) && (*status == UwbStatusGeneric::Ok);
 }
 
+bool
+uwb::protocol::fira::IsUwbStatusRetry(const UwbStatus& uwbStatus) noexcept
+{
+    const auto* status = std::get_if<UwbStatusGeneric>(&uwbStatus);
+    return (status != nullptr) && (*status == UwbStatusGeneric::CommandRetry);
+}
+
 std::string
 UwbApplicationConfigurationParameter::ToString() const
 {

@@ -75,6 +75,8 @@ constexpr uint8_t MaximumNumberOfStsSegmentsBprf = 1;
 constexpr uint8_t MaximumNumberOfStsSegmentsHprf = 4;
 constexpr uint8_t MinimumInBandTerminationAttemptCount = 0;
 constexpr uint8_t MaximumInBandTerminationAttemptCount = 10;
+constexpr uint8_t MinimumMandatoryMaximumNumberOfControleesInMulticastSession = 8;
+constexpr uint8_t MaximumNumberOfControleesInMulticastSession = MinimumMandatoryMaximumNumberOfControleesInMulticastSession; // CSML spec says this maximum can be implementation dependent, but must be at least 8?
 constexpr uint16_t DefaultRangeDataNotificationProximityNear = 0;
 constexpr uint16_t DefaultRangeDataNotificationProximityFar = 20000;
 constexpr uint32_t MinimumUwbInitiationTime = 0;
@@ -356,6 +358,16 @@ using UwbStatus = std::variant<UwbStatusGeneric, UwbStatusSession, UwbStatusRang
  */
 bool
 IsUwbStatusOk(const UwbStatus& uwbStatus) noexcept;
+
+/**
+ * @brief Determines if the specified UWB status describes a retry command
+ *
+ * @param uwbStatus The status to check.
+ * @return true
+ * @return false
+ */
+bool
+IsUwbStatusRetry(const UwbStatus& uwbStatus) noexcept;
 
 enum class UwbStatusMulticast {
     OkUpdate,
