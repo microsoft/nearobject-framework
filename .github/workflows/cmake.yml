@@ -40,7 +40,6 @@ on:
         type: choice
         options:
           - 'dev'
-          - 'dev-vcpkg'
           - 'dev-driver'
           - 'vcpkg-dev'
           - 'vcpkg-release'

@@ -24,6 +24,8 @@
 
 #include <logging/LogUtils.hxx>
 
+#include <winrt/windows.devices.nearobject.h>
+
 int
 main(int argc, char* argv[])
 try {
