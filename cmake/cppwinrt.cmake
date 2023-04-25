@@ -17,13 +17,13 @@ set(CPPWINRT_FUNCTION_PREFIX CPPWINRT)
 function(cppwinrt_add_project_import)
   set(OPTION_ARGS EXCLUDE_FROM_SOURCE)
   set(SINGLE_VALUE_ARGS TARGET IMPORT)
-  set(MULIT_VALUE_ARGS "")
+  set(MULTI_VALUE_ARGS "")
 
   cmake_parse_arguments(
     ${CPPWINRT_FUNCTION_PREFIX}
     "${OPTION_ARGS}"
     "${SINGLE_VALUE_ARGS}"
-    "${MULIT_VALUE_ARGS}"
+    "${MULTI_VALUE_ARGS}"
     ${ARGN}
   )
 
