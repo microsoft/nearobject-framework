@@ -1,4 +1,7 @@
 add_subdirectory(devices)
 add_subdirectory(nearobject)
 add_subdirectory(nearobjectd)
-add_subdirectory(tools)
+
+if (NOT NOF_DISABLE_TOOLS)
+  add_subdirectory(tools)
+endif()

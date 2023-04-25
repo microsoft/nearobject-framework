@@ -52,6 +52,9 @@ if (NOF_VCPKG_ENABLE)
   set(NOF_BUILD_ENVIRONMENT ${NOF_BUILD_ENVIRONMENT_VCPKG} CACHE STRING "override" FORCE)
 endif()
 
+# Configure vcpkg to resolve dependencies.
+vcpkg_configure(SUBMODULE_ROOT ${NOF_VCPKG_SUBMODULE_ROOT})
+
 # Apply build-environment specific settings and configuration.
 if (NOF_BUILD_ENVIRONMENT STREQUAL NOF_BUILD_ENVIRONMENT_VCPKG)
   # Enable static runtime linking if requested via vcpkg feature.
@@ -63,10 +66,7 @@ if (NOF_BUILD_ENVIRONMENT STREQUAL NOF_BUILD_ENVIRONMENT_VCPKG)
     set(NOF_VCPKG_TARGET ${NOF_VCPKG_TARGET_DEVELOPMENT} CACHE STRING "override") 
   endif()
 elseif (NOF_BUILD_ENVIRONMENT STREQUAL NOF_BUILD_ENVIRONMENT_DEVELOPMENT)
-  # If using vcpkg to resolve dependencies, clone the vcpkg github repository so
-  # that it's usable directly in the project without having to install it
-  # manually. This must occur prior to the first project statement.
-  vcpkg_configure(SUBMODULE_ROOT ${NOF_VCPKG_SUBMODULE_ROOT})
+  # Nothing special needed for the development build envrionment.
 else()
   MESSAGE(FATAL_ERROR "Unknown build environment '${NOF_BUILD_ENVIRONMENT}' specified")
 endif()
@@ -89,11 +89,6 @@ endif()
 
 MESSAGE(STATUS "Target OS ${CMAKE_SYSTEM_NAME} detected")
 
-# Ensure FetchContent-based dependencies are rebuilt if their URL changes.
-if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
-  cmake_policy(SET CMP0135 NEW)
-endif()
-
 # Set language configutation options. The C++ standard used must be the lowest
 # common denominator for all the OS-dependent projects. In practice, since this
 # project must build under the Windows build system (build.exe), its toolchain
@@ -109,7 +104,6 @@ set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED 1)
 include(CheckPIESupported)
 include(CTest)
 include(GNUInstallDirs)
-include(FetchContent)
 include(cmake/cpack.cmake)
 
 # Set external dependency target versions.
@@ -222,21 +216,23 @@ elseif (BUILD_FOR_WINDOWS)
   set(WIL_BUILD_PACKAGING OFF CACHE INTERNAL "Turn off wil packaging")
 
   find_package(wil CONFIG REQUIRED)
-  find_package(cppwinrt CONFIG REQUIRED)
-  # Find nuget and restore packages for this project.
-  # Get nuget program (assumes it is on PATH).
-  find_program(nuget NAMES nuget REQUIRED)
 
-  # Configure the nuget packages configuration with variable substitutions.
-  configure_file(
-    ${CMAKE_CURRENT_LIST_DIR}/packages.config.in
-    ${CMAKE_CURRENT_LIST_DIR}/packages.config
-  )
+  if (NOT NOF_VCPKG_ENABLE)
+    # Find nuget and restore packages for this project.
+    # Get nuget program (assumes it is on PATH).
+    find_program(nuget NAMES nuget REQUIRED)
 
-  # Restore nuget package dependencies.
-  include(cmake/cppwinrt.cmake)
-  include(cmake/nuget.cmake)
-  restore_nuget_packages()
+    # Configure the nuget packages configuration with variable substitutions.
+    configure_file(
+      ${CMAKE_CURRENT_LIST_DIR}/packages.config.in
+      ${CMAKE_CURRENT_LIST_DIR}/packages.config
+    )
+
+    # Restore nuget package dependencies.
+    include(cmake/cppwinrt.cmake)
+    include(cmake/nuget.cmake)
+    restore_nuget_packages()
+  endif()
 
   # Add Windows-specific global compile definitions.
   add_compile_definitions(
@@ -246,7 +242,7 @@ elseif (BUILD_FOR_WINDOWS)
       WIN32_LEAN_AND_MEAN
   )
 
-  # Allow more than default number of section in object files.
+  # Allow more than default number of sections in object files.
   add_compile_options(
     /bigobj
   )
@@ -271,8 +267,11 @@ endif()
 
 add_subdirectory(external)
 add_subdirectory(lib)
-add_subdirectory(tools)
 add_subdirectory(packaging)
+
+if (NOT NOF_DISABLE_TOOLS)
+  add_subdirectory(tools)
+endif()
 
 if (NOT NOF_DISABLE_TESTS)
   add_subdirectory(tests)
