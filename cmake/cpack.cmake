@@ -12,4 +12,6 @@ set(CPACK_BINARY_ZIP ON)
 set(CPACK_BINARY_TXZ ON)
 set(CPACK_SOURCE_ZIP ON)
 
-include(CPack)
+if (NOT CPack_CMake_INCLUDED)
+  include(CPack)
+endif()
