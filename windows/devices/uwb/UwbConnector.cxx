@@ -632,7 +632,8 @@ UwbConnector::GetApplicationConfigurationParameters(uint32_t sessionId, std::vec
 }
 template <typename PromiseT>
 void
-DeviceIoControlWrapper(std::string m_deviceName,std::promise<PromiseT> &resultPromise, HANDLE hDevice, DWORD dwIoControlCode, LPVOID lpInBuffer, DWORD nInBufferSize, LPVOID lpOutBuffer, DWORD nOutBufferSize, LPDWORD lpBytesReturned, std::string strFail, std::string strSuccess, std::function<void(LPDWORD)> interpret){
+DeviceIoControlWrapper(std::string m_deviceName, std::promise<PromiseT>& resultPromise, std::string strFail, std::string strSuccess, std::function<void(LPDWORD)> interpret, HANDLE hDevice, DWORD dwIoControlCode, LPVOID lpInBuffer, DWORD nInBufferSize, LPVOID lpOutBuffer, DWORD nOutBufferSize, LPDWORD lpBytesReturned)
+{
     wil::unique_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
@@ -640,7 +641,7 @@ DeviceIoControlWrapper(std::string m_deviceName,std::promise<PromiseT> &resultPr
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return;
     }
-    
+
     BOOL ioResult = DeviceIoControl(hDevice, dwIoControlCode, lpInBuffer, nInBufferSize, lpOutBuffer, nOutBufferSize, lpBytesReturned, nullptr);
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
