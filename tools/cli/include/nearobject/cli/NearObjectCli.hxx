@@ -81,12 +81,12 @@ public:
     CancelExecution();
 
     /**
-     * @brief Get the app object associated with the "uwb" sub-command.
+     * @brief Get the app object associated with the "driver" sub-command.
      *
      * @return CLI::App&
      */
     CLI::App&
-    GetUwbApp() noexcept;
+    GetDriverApp() noexcept;
 
     /**
      * @brief Get the app object associated with the "service" sub-command.
@@ -97,36 +97,44 @@ public:
     GetServiceApp() noexcept;
 
     /**
-     * @brief Get the app object associated with the "uwb range" sub-command.
-     *
+     * @brief Get the app object associated with the "driver uwb" sub-command.
+     * 
      * @return CLI::App&
      */
     CLI::App&
-    GetUwbRangeApp() noexcept;
+    GetDriverUwbApp() noexcept;
 
     /**
-     * @brief Get the app object associated with the "uwb raw" sub-command.
+     * @brief Get the app object associated with the "driver uwb range" sub-command.
      *
      * @return CLI::App&
      */
     CLI::App&
-    GetUwbRawApp() noexcept;
+    GetDriverUwbRangeApp() noexcept;
 
     /**
-     * @brief Get the app object associated with the "uwb range start" sub-command.
+     * @brief Get the app object associated with the "driver uwb raw" sub-command.
      *
      * @return CLI::App&
      */
     CLI::App&
-    GetUwbRangeStartApp() noexcept;
+    GetDriverUwbRawApp() noexcept;
 
     /**
-     * @brief Get the app object associated with the "uwb range stop" sub-command.
+     * @brief Get the app object associated with the "driver uwb range start" sub-command.
      *
      * @return CLI::App&
      */
     CLI::App&
-    GetUwbRangeStopApp() noexcept;
+    GetDriverUwbRangeStartApp() noexcept;
+
+    /**
+     * @brief Get the app object associated with the "driver uwb range stop" sub-command.
+     *
+     * @return CLI::App&
+     */
+    CLI::App&
+    GetDriverUwbRangeStopApp() noexcept;
 
     /**
      * @brief Get the app object associated with the "service range" sub-command.
@@ -197,13 +205,13 @@ private:
     CreateParser() noexcept;
 
     /**
-     * @brief Add the 'uwb' sub-command.
+     * @brief Add the 'driver' sub-command.
      *
      * @param parent The parent app to add the command to.
      * @return CLI::App*
      */
     CLI::App*
-    AddSubcommandUwb(CLI::App* parent);
+    AddSubcommandDriver(CLI::App* parent);
 
     /**
      * @brief Add the 'service' sub-command.
@@ -215,31 +223,40 @@ private:
     AddSubcommandService(CLI::App* parent);
 
     /**
-     * @brief Add the 'uwb monitor' sub-command.
-     *
+     * @brief Add the 'driver uwb' sub-command.
+     * 
      * @param parent The parent app to add the command to.
      * @return CLI::App*
      */
     CLI::App*
-    AddSubcommandUwbMonitor(CLI::App* parent);
+    AddSubcommandDriverUwb(CLI::App* parent);
 
     /**
-     * @brief Add the 'uwb raw' sub-command.
+     * @brief Add the 'driver uwb raw' sub-command.
      *
      * @param parent The parent app to add the command to.
      * @return CLI::App*
      */
     CLI::App*
-    AddSubcommandUwbRaw(CLI::App* parent);
+    AddSubcommandDriverUwbRaw(CLI::App* parent);
 
     /**
-     * @brief Add the 'uwb range' sub-command.
+     * @brief Add the 'driver uwb range' sub-command.
      *
      * @param parent The parent app to add the command to.
      * @return CLI::App*
      */
     CLI::App*
-    AddSubcommandUwbRange(CLI::App* parent);
+    AddSubcommandDriverUwbRange(CLI::App* parent);
+
+    /**
+     * @brief Add the 'service monitor' sub-command.
+     *
+     * @param parent The parent app to add the command to.
+     * @return CLI::App*
+     */
+    CLI::App*
+    AddSubcommandServiceMonitor(CLI::App* parent);
 
     /**
      * @brief Add the 'service range' sub-command.
@@ -251,67 +268,67 @@ private:
     AddSubcommandServiceRange(CLI::App* parent);
 
     /**
-     * @brief Add the 'uwb raw devicereset' sub-command.
+     * @brief Add the 'driver uwb raw devicereset' sub-command.
      *
      * @param parent The parent app to add the command to.
      * @return CLI::App*
      */
     CLI::App*
-    AddSubcommandUwbRawDeviceReset(CLI::App* parent);
+    AddSubcommandDriverUwbRawDeviceReset(CLI::App* parent);
 
     /**
-     * @brief Add the 'uwb raw getdeviceinfo' sub-command.
+     * @brief Add the 'driver uwb raw getdeviceinfo' sub-command.
      *
      * @param parent The parent app to add the command to.
      * @return CLI::App*
      */
     CLI::App*
-    AddSubcommandUwbRawGetDeviceInfo(CLI::App* parent);
+    AddSubcommandDriverUwbRawGetDeviceInfo(CLI::App* parent);
 
     /**
-     * @brief Add the 'uwb raw sessiondeinit' sub-command.
+     * @brief Add the 'driver uwb raw sessiondeinit' sub-command.
      *
      * @param parent The parent app to add the command.
      * @return CLI::App*
      */
     CLI::App*
-    AddSubcommandUwbRawSessionDeinitialize(CLI::App* parent);
+    AddSubcommandDriverUwbRawSessionDeinitialize(CLI::App* parent);
 
     /**
-     * @brief Add the 'uwb raw getsessioncount' sub-command.
+     * @brief Add the 'driver uwb raw getsessioncount' sub-command.
      *
      * @param parent The parent app to add the command.
      * @return CLI::App*
      */
     CLI::App*
-    AddSubcommandUwbRawGetSessionCount(CLI::App* parent);
+    AddSubcommandDriverUwbRawGetSessionCount(CLI::App* parent);
 
     /**
-     * @brief Add the 'uwb raw getsessionstate' sub-command.
+     * @brief Add the 'driver uwb raw getsessionstate' sub-command.
      *
      * @param parent The parent app to add the command.
      * @return CLI::App*
      */
     CLI::App*
-    AddSubcommandUwbRawGetSessionState(CLI::App* parent);
+    AddSubcommandDriverUwbRawGetSessionState(CLI::App* parent);
 
     /**
-     * @brief Add the 'uwb range start' sub-command.
+     * @brief Add the 'driver uwb range start' sub-command.
      *
      * @param parent
      * @return CLI::App*
      */
     CLI::App*
-    AddSubcommandUwbRangeStart(CLI::App* parent);
+    AddSubcommandDriverUwbRangeStart(CLI::App* parent);
 
     /**
-     * @brief Add the 'uwb range stop' sub-command.
+     * @brief Add the 'driver uwb range stop' sub-command.
      *
      * @param parent The parent app to add the command to.
      * @return CLI::App*
      */
     CLI::App*
-    AddSubcommandUwbRangeStop(CLI::App* parent);
+    AddSubcommandDriverUwbRangeStop(CLI::App* parent);
 
     /**
      * @brief Add the 'service range start' sub-command.
@@ -339,14 +356,15 @@ private:
 
     std::unique_ptr<CLI::App> m_cliApp;
     // The following are helper references to the subcommands of m_cliApp, the memory is managed by CLI11.
-    CLI::App* m_uwbApp;
+    CLI::App* m_driverApp;
     CLI::App* m_serviceApp;
-    CLI::App* m_monitorApp;
-    CLI::App* m_uwbRawApp;
-    CLI::App* m_uwbRangeApp;
+    CLI::App* m_driverUwbApp;
+    CLI::App* m_driverUwbRawApp;
+    CLI::App* m_driverUwbRangeApp;
+    CLI::App* m_serviceMonitorApp;
     CLI::App* m_serviceRangeApp;
-    CLI::App* m_uwbRangeStartApp;
-    CLI::App* m_uwbRangeStopApp;
+    CLI::App* m_driverUwbRangeStartApp;
+    CLI::App* m_driverUwbRangeStopApp;
     CLI::App* m_serviceRangeStartApp;
     CLI::App* m_serviceRangeStopApp;
 };
