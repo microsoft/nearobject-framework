@@ -7,7 +7,6 @@ target_sources(nearobject-cli-windows
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectCliDataWindows.hxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectCliHandlerWindows.hxx
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectCliHandlerWindows.cxx
-
 )
 
 target_link_libraries(nearobject-cli-windows
@@ -21,6 +20,9 @@ target_link_libraries(nearobject-cli-windows
         windows-devices-util
         windows-devices-uwb
 )
+
+cppwinrt_enable(TARGET nearobject-cli-windows)
+cppwinrt_add_project_import(TARGET nearobject-cli-windows IMPORT ${CMAKE_BINARY_DIR}/external/windows/winrt/windows.devices.nearobject.props)
 
 set_target_properties(nearobject-cli-windows PROPERTIES OUTPUT_NAME nocli)
 set_target_properties(nearobject-cli-windows PROPERTIES FOLDER windows/tools)

@@ -15,11 +15,6 @@ set(NOF_BUILD_ENVIRONMENT_DEVELOPMENT "development")
 set(NOF_BUILD_ENVIRONMENT_VCPKG "vcpkg")
 set(NOF_BUILD_ENVIRONMENT ${NOF_BUILD_ENVIRONMENT_DEVELOPMENT} CACHE STRING "Build profile: either local 'development' or 'vcpkg'")
 
-# Dependency resolution configuration.
-set(NOF_DEPENDENCY_RESOLUTION_METHOD_FETCHCONTENT "FetchContent")
-set(NOF_DEPENDENCY_RESOLUTION_METHOD_VCPKG "vcpkg")
-set(NOF_DEPENDENCY_RESOLUTION_METHOD ${NOF_DEPENDENCY_RESOLUTION_METHOD_FETCHCONTENT} CACHE STRING "Method used to resolve dependencies: either 'FetchContent' or 'vcpkg'")
-
 include(cmake/vcpkg.cmake)
 
 # vcpkg feature related variables and options.
@@ -59,8 +54,6 @@ endif()
 
 # Apply build-environment specific settings and configuration.
 if (NOF_BUILD_ENVIRONMENT STREQUAL NOF_BUILD_ENVIRONMENT_VCPKG)
-  # vcpkg build environment must use vcpkg for dependency resolution, so override the cache value.
-  set(NOF_DEPENDENCY_RESOLUTION_METHOD ${NOF_DEPENDENCY_RESOLUTION_METHOD_VCPKG} CACHE STRING "override" FORCE)
   # Enable static runtime linking if requested via vcpkg feature.
   if (NOF_VCPKG_FEATURE_USE_MSVC_STATIC_RUNTIME)
     set(NOF_USE_MSVC_STATIC_RUNTIME TRUE CACHE BOOL "override" FORCE)
@@ -73,14 +66,12 @@ elseif (NOF_BUILD_ENVIRONMENT STREQUAL NOF_BUILD_ENVIRONMENT_DEVELOPMENT)
   # If using vcpkg to resolve dependencies, clone the vcpkg github repository so
   # that it's usable directly in the project without having to install it
   # manually. This must occur prior to the first project statement.
-  if (NOF_DEPENDENCY_RESOLUTION_METHOD STREQUAL NOF_DEPENDENCY_RESOLUTION_METHOD_VCPKG)
-    vcpkg_configure(SUBMODULE_ROOT ${NOF_VCPKG_SUBMODULE_ROOT})
-  endif()
+  vcpkg_configure(SUBMODULE_ROOT ${NOF_VCPKG_SUBMODULE_ROOT})
 else()
   MESSAGE(FATAL_ERROR "Unknown build environment '${NOF_BUILD_ENVIRONMENT}' specified")
 endif()
 
-MESSAGE(STATUS "using build environment '${NOF_BUILD_ENVIRONMENT}' with dependency resolution method '${NOF_DEPENDENCY_RESOLUTION_METHOD}'")
+MESSAGE(STATUS "using build environment '${NOF_BUILD_ENVIRONMENT}'")
 
 project(nearobject-framework 
   LANGUAGES CXX
@@ -129,29 +120,11 @@ set(VERSION_CATCH2 3.1.0)
 set(VERSION_PLOG 1.1.9)
 
 # Pull in external dependencies.
-if (NOF_DEPENDENCY_RESOLUTION_METHOD STREQUAL NOF_DEPENDENCY_RESOLUTION_METHOD_VCPKG)
-  set(nlohmann-json_IMPLICIT_CONVERSIONS OFF)
-  find_package(nlohmann_json CONFIG ${VERSION_NLOHMANN_JSON} REQUIRED)
-  find_package(magic_enum CONFIG ${VERSION_MAGIC_ENUM} REQUIRED)
-  find_package(CLI11 CONFIG ${VERSION_CLI11} REQUIRED)
-  find_package(plog CONFIG REQUIRED)
-elseif (NOF_DEPENDENCY_RESOLUTION_METHOD STREQUAL NOF_DEPENDENCY_RESOLUTION_METHOD_FETCHCONTENT)
-  set(JSON_ImplicitConversions OFF)
-  FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v${VERSION_NLOHMANN_JSON}/json.tar.xz)
-  FetchContent_MakeAvailable(json)
-
-  FetchContent_Declare(magic_enum URL https://github.com/Neargye/magic_enum/archive/refs/tags/v${VERSION_MAGIC_ENUM}.tar.gz)
-  FetchContent_MakeAvailable(magic_enum)
-
-  FetchContent_Declare(cli11 URL https://github.com/CLIUtils/CLI11/archive/refs/tags/v${VERSION_CLI11}.tar.gz)
-  FetchContent_MakeAvailable(cli11)
-
-  FetchContent_Declare(plog URL https://github.com/SergiusTheBest/plog/archive/refs/tags/${VERSION_PLOG}.tar.gz)
-  FetchContent_MakeAvailable(plog)
-else()
-  MESSAGE(FATAL_ERROR "Unknown dependency resolution method '${NOF_DEPENDENCY_RESOLUTION_METHOD}' specified")
-endif() 
-
+set(nlohmann-json_IMPLICIT_CONVERSIONS OFF)
+find_package(nlohmann_json CONFIG ${VERSION_NLOHMANN_JSON} REQUIRED)
+find_package(magic_enum CONFIG ${VERSION_MAGIC_ENUM} REQUIRED)
+find_package(CLI11 CONFIG ${VERSION_CLI11} REQUIRED)
+find_package(plog CONFIG REQUIRED)
 find_package(Threads REQUIRED)
 
 # Uncomment for verbose build information
@@ -240,20 +213,30 @@ set(NOF_DIR_WINDOWS ${CMAKE_CURRENT_LIST_DIR}/windows)
 if (BUILD_FOR_LINUX)
   add_subdirectory(linux)
 elseif (BUILD_FOR_WINDOWS)
+  # Define Windows-specific package dependency versions.
+  set(VERSION_CPPWINRT 2.0.230225.1)
+  set(CPPWINRT_BUILD_VERSION ${VERSION_CPPWINRT})
+
   # Make public version of wil available.
   set(WIL_BUILD_TESTS OFF CACHE INTERNAL "Turn off wil tests")
   set(WIL_BUILD_PACKAGING OFF CACHE INTERNAL "Turn off wil packaging")
 
-  if (NOF_DEPENDENCY_RESOLUTION_METHOD STREQUAL NOF_DEPENDENCY_RESOLUTION_METHOD_VCPKG)
-    find_package(wil CONFIG REQUIRED)
-  else()
-    FetchContent_Declare(WIL
-        GIT_REPOSITORY "https://github.com/microsoft/wil"
-        GIT_TAG "5eb59d60e167482639cc47ffb40442158da7fd04"
-        GIT_SHALLOW OFF
-    )
-    FetchContent_MakeAvailable(WIL)
-  endif()
+  find_package(wil CONFIG REQUIRED)
+  find_package(cppwinrt CONFIG REQUIRED)
+  # Find nuget and restore packages for this project.
+  # Get nuget program (assumes it is on PATH).
+  find_program(nuget NAMES nuget REQUIRED)
+
+  # Configure the nuget packages configuration with variable substitutions.
+  configure_file(
+    ${CMAKE_CURRENT_LIST_DIR}/packages.config.in
+    ${CMAKE_CURRENT_LIST_DIR}/packages.config
+  )
+
+  # Restore nuget package dependencies.
+  include(cmake/cppwinrt.cmake)
+  include(cmake/nuget.cmake)
+  restore_nuget_packages()
 
   # Add Windows-specific global compile definitions.
   add_compile_definitions(
@@ -286,6 +269,7 @@ elseif (BUILD_FOR_WINDOWS)
   add_subdirectory(windows)
 endif()
 
+add_subdirectory(external)
 add_subdirectory(lib)
 add_subdirectory(tools)
 add_subdirectory(packaging)
