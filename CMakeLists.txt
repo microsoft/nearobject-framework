@@ -242,6 +242,7 @@ if (BUILD_FOR_LINUX)
 elseif (BUILD_FOR_WINDOWS)
   # Define Windows-specific package dependency versions.
   set(VERSION_CPPWINRT 2.0.230225.1)
+  set(CPPWINRT_BUILD_VERSION ${VERSION_CPPWINRT})
 
   # Make public version of wil available.
   set(WIL_BUILD_TESTS OFF CACHE INTERNAL "Turn off wil tests")
