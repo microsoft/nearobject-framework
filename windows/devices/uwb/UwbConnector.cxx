@@ -829,7 +829,7 @@ UwbConnector::OnSessionEnded(uint32_t sessionId, ::uwb::UwbSessionEndReason sess
 }
 
 void
-UwbConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulicastListStatus statusMulticastList)
+UwbConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulticastListStatus statusMulticastList)
 {
     uint32_t sessionId = statusMulticastList.SessionId;
 
@@ -896,7 +896,7 @@ UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNo
             if (arg.State == UwbSessionState::Deinitialized) {
                 OnSessionEnded(arg.SessionId, ::uwb::UwbSessionEndReason::Stopped);
             }
-        } else if constexpr (std::is_same_v<ValueType, UwbSessionUpdateMulicastListStatus>) {
+        } else if constexpr (std::is_same_v<ValueType, UwbSessionUpdateMulticastListStatus>) {
             OnSessionMulticastListStatus(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbRangingData>) {
             OnSessionRangingData(arg);

@@ -24,24 +24,6 @@
             }
         },
         {
-            "name": "resolve-deps-fetchcontent",
-            "hidden": true,
-            "displayName": "Resolve dependencies with FetchContent",
-            "description": "configures project to resolve dependencies with FetchContent",
-            "cacheVariables": {
-                "NOF_DEPENDENCY_RESOLUTION_METHOD": "FetchContent"
-            }
-        },
-        {
-            "name": "resolve-deps-vcpkg",
-            "hidden": true,
-            "displayName": "Resolve dependencies with vcpkg",
-            "description": "configures project to resolve dependencies with vcpkg",
-            "cacheVariables": {
-                "NOF_DEPENDENCY_RESOLUTION_METHOD": "vcpkg"
-            }
-        },
-        {
             "name": "out-of-source-build",
             "hidden": true,
             "displayName": "Out of source build",
@@ -76,7 +58,6 @@
             "displayName": "vcpkg (base)",
             "description": "Base options for all vcpkg presets",
             "inherits":[
-                "resolve-deps-vcpkg",
                 "in-source-build"
             ],
             "cacheVariables": {
@@ -85,20 +66,10 @@
         },
         {
             "name": "dev",
-            "displayName": "Development (with FetchContent)",
-            "description": "Development build for inner-loop with FetchContent",
+            "displayName": "Development",
+            "description": "Development build for inner-loop",
             "inherits": [
-                "dev-base",
-                "resolve-deps-fetchcontent"
-            ]
-        },
-        {
-            "name": "dev-vcpkg",
-            "displayName": "Development (with vcpkg)",
-            "description": "Development build for inner-loop with vcpkg",
-            "inherits": [
-                "dev-base",
-                "resolve-deps-vcpkg"
+                "dev-base"
             ]
         },
         {
@@ -150,7 +121,7 @@
             "displayName": "CI/CD",
             "description": "Continuous integration and continuous delivery (CI/CD) based build",
             "inherits": [
-                "dev-vcpkg"
+                "dev"
             ]
         },
         {
