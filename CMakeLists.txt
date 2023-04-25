@@ -258,9 +258,6 @@ elseif (BUILD_FOR_WINDOWS)
         GIT_SHALLOW OFF
     )
     FetchContent_MakeAvailable(WIL)
-
-    FetchContent_Declare(cppwinrt URL https://github.com/microsoft/cppwinrt/archive/refs/tags/${VERSION_CPPWINRT}.tar.gz)
-    FetchContent_MakeAvailable(cppwinrt)
   endif()
 
   # Find nuget and restore packages for this project.
