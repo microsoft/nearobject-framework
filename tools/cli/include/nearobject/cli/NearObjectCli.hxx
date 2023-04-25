@@ -98,7 +98,7 @@ public:
 
     /**
      * @brief Get the app object associated with the "driver uwb" sub-command.
-     * 
+     *
      * @return CLI::App&
      */
     CLI::App&
@@ -224,7 +224,7 @@ private:
 
     /**
      * @brief Add the 'driver uwb' sub-command.
-     * 
+     *
      * @param parent The parent app to add the command to.
      * @return CLI::App*
      */
