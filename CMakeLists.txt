@@ -66,7 +66,7 @@ if (NOF_BUILD_ENVIRONMENT STREQUAL NOF_BUILD_ENVIRONMENT_VCPKG)
     set(NOF_VCPKG_TARGET ${NOF_VCPKG_TARGET_DEVELOPMENT} CACHE STRING "override") 
   endif()
 elseif (NOF_BUILD_ENVIRONMENT STREQUAL NOF_BUILD_ENVIRONMENT_DEVELOPMENT)
-  # Nothing special needed for the development build envrionment.
+  # Nothing special needed for the development build environment.
 else()
   MESSAGE(FATAL_ERROR "Unknown build environment '${NOF_BUILD_ENVIRONMENT}' specified")
 endif()
