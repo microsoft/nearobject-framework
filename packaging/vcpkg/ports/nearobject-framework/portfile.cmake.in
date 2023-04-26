@@ -18,6 +18,7 @@ vcpkg_cmake_configure(
     OPTIONS
         -DNOF_VCPKG_ENABLE=TRUE
         -DNOF_DISABLE_TESTS=TRUE
+        -DNOF_DISABLE_TOOLS=TRUE
         ${FEATURE_OPTIONS}
 )
 
