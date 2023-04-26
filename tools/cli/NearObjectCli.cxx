@@ -92,9 +92,9 @@ NearObjectCli::GetParser()
 }
 
 CLI::App&
-NearObjectCli::GetUwbApp() noexcept
+NearObjectCli::GetDriverApp() noexcept
 {
-    return *m_uwbApp;
+    return *m_driverApp;
 }
 
 CLI::App&
@@ -104,15 +104,21 @@ NearObjectCli::GetServiceApp() noexcept
 }
 
 CLI::App&
-NearObjectCli::GetUwbRawApp() noexcept
+NearObjectCli::GetDriverUwbApp() noexcept
 {
-    return *m_uwbRawApp;
+    return *m_driverUwbApp;
 }
 
 CLI::App&
-NearObjectCli::GetUwbRangeApp() noexcept
+NearObjectCli::GetDriverUwbRawApp() noexcept
 {
-    return *m_uwbRangeApp;
+    return *m_driverUwbRawApp;
+}
+
+CLI::App&
+NearObjectCli::GetDriverUwbRangeApp() noexcept
+{
+    return *m_driverUwbRangeApp;
 }
 
 CLI::App&
@@ -122,15 +128,15 @@ NearObjectCli::GetServiceRangeApp() noexcept
 }
 
 CLI::App&
-NearObjectCli::GetUwbRangeStartApp() noexcept
+NearObjectCli::GetDriverUwbRangeStartApp() noexcept
 {
-    return *m_uwbRangeStartApp;
+    return *m_driverUwbRangeStartApp;
 }
 
 CLI::App&
-NearObjectCli::GetUwbRangeStopApp() noexcept
+NearObjectCli::GetDriverUwbRangeStopApp() noexcept
 {
-    return *m_uwbRangeStopApp;
+    return *m_driverUwbRangeStopApp;
 }
 
 CLI::App&
@@ -163,7 +169,7 @@ NearObjectCli::CreateParser() noexcept
     });
 
     // sub-commands
-    m_uwbApp = AddSubcommandUwb(app.get());
+    m_driverApp = AddSubcommandDriver(app.get());
     m_serviceApp = AddSubcommandService(app.get());
 
     return app;
@@ -516,35 +522,79 @@ MacAddressesFromString(const std::string& addressesString, ::uwb::UwbMacAddressT
 } // namespace detail
 
 CLI::App*
-NearObjectCli::AddSubcommandUwb(CLI::App* parent)
+NearObjectCli::AddSubcommandDriver(CLI::App* parent)
 {
     // top-level command
-    auto uwbApp = parent->add_subcommand("uwb", "commands related to UWB driver testing")->require_subcommand()->fallthrough();
+    auto driverApp = parent->add_subcommand("driver", "Commands related to NearObject technology driver testing")->require_subcommand()->fallthrough();
 
     // sub-commands
-    m_monitorApp = AddSubcommandUwbMonitor(uwbApp);
-    m_uwbRawApp = AddSubcommandUwbRaw(uwbApp);
-    m_uwbRangeApp = AddSubcommandUwbRange(uwbApp);
+    m_driverUwbApp = AddSubcommandDriverUwb(driverApp);
 
-    return uwbApp;
+    return driverApp;
 }
 
 CLI::App*
 NearObjectCli::AddSubcommandService(CLI::App* parent)
 {
     // top-level command
-    auto serviceApp = parent->add_subcommand("service", "commands related to NearObject service testing")->require_subcommand()->fallthrough();
+    auto serviceApp = parent->add_subcommand("service", "Commands related to NearObject service testing")->require_subcommand()->fallthrough();
 
     // sub-commands
+    m_serviceMonitorApp = AddSubcommandServiceMonitor(serviceApp);
     m_serviceRangeApp = AddSubcommandServiceRange(serviceApp);
 
     return serviceApp;
 }
 
 CLI::App*
-NearObjectCli::AddSubcommandUwbMonitor(CLI::App* parent)
+NearObjectCli::AddSubcommandDriverUwb(CLI::App* parent)
 {
-    auto monitorApp = parent->add_subcommand("monitor", "commands relating to monitor mode")->fallthrough();
+    // top-level command
+    auto uwbApp = parent->add_subcommand("uwb", "Commands related to UWB driver testing")->require_subcommand()->fallthrough();
+
+    // sub-commands
+    m_driverUwbRawApp = AddSubcommandDriverUwbRaw(uwbApp);
+    m_driverUwbRangeApp = AddSubcommandDriverUwbRange(uwbApp);
+
+    return uwbApp;
+}
+
+CLI::App*
+NearObjectCli::AddSubcommandDriverUwbRaw(CLI::App* parent)
+{
+    // top-level command
+    auto rawApp = parent->add_subcommand("raw", "Individual commands for UWB driver testing")->require_subcommand()->fallthrough();
+
+    // sub-commands
+    AddSubcommandDriverUwbRawDeviceReset(rawApp);
+    AddSubcommandDriverUwbRawGetDeviceInfo(rawApp);
+    AddSubcommandDriverUwbRawSessionDeinitialize(rawApp);
+    AddSubcommandDriverUwbRawGetSessionCount(rawApp);
+    AddSubcommandDriverUwbRawGetSessionState(rawApp);
+
+    return rawApp;
+}
+
+CLI::App*
+NearObjectCli::AddSubcommandDriverUwbRange(CLI::App* parent)
+{
+    // top-level command
+    auto rangeApp = parent->add_subcommand("range", "Commands related to UWB ranging")->require_subcommand()->fallthrough();
+
+    // options
+    rangeApp->add_option("--SessionId", m_cliData->RangingParameters.SessionId)->required();
+
+    // sub-commands
+    m_driverUwbRangeStartApp = AddSubcommandDriverUwbRangeStart(rangeApp);
+    m_driverUwbRangeStopApp = AddSubcommandDriverUwbRangeStop(rangeApp);
+
+    return rangeApp;
+}
+
+CLI::App*
+NearObjectCli::AddSubcommandServiceMonitor(CLI::App* parent)
+{
+    auto monitorApp = parent->add_subcommand("monitor", "Commands related to NearObject service monitor mode")->fallthrough();
 
     monitorApp->parse_complete_callback([this, monitorApp] {
         RegisterCliAppWithOperation(monitorApp);
@@ -558,47 +608,15 @@ NearObjectCli::AddSubcommandUwbMonitor(CLI::App* parent)
 }
 
 CLI::App*
-NearObjectCli::AddSubcommandUwbRaw(CLI::App* parent)
-{
-    // top-level command
-    auto rawApp = parent->add_subcommand("raw", "individual commands for driver testing")->require_subcommand()->fallthrough();
-
-    // sub-commands
-    AddSubcommandUwbRawDeviceReset(rawApp);
-    AddSubcommandUwbRawGetDeviceInfo(rawApp);
-    AddSubcommandUwbRawSessionDeinitialize(rawApp);
-    AddSubcommandUwbRawGetSessionCount(rawApp);
-    AddSubcommandUwbRawGetSessionState(rawApp);
-
-    return rawApp;
-}
-
-CLI::App*
-NearObjectCli::AddSubcommandUwbRange(CLI::App* parent)
-{
-    // top-level command
-    auto rangeApp = parent->add_subcommand("range", "commands related to ranging")->require_subcommand()->fallthrough();
-
-    // options
-    rangeApp->add_option("--SessionId", m_cliData->RangingParameters.SessionId)->required();
-
-    // sub-commands
-    m_uwbRangeStartApp = AddSubcommandUwbRangeStart(rangeApp);
-    m_uwbRangeStopApp = AddSubcommandUwbRangeStop(rangeApp);
-
-    return rangeApp;
-}
-
-CLI::App*
 NearObjectCli::AddSubcommandServiceRange(CLI::App* parent)
 {
     // top-level command
-    auto rangeApp = parent->add_subcommand("range", "commands related to ranging")->require_subcommand()->fallthrough();
+    auto rangeApp = parent->add_subcommand("range", "Commands related to NearObject service ranging")->require_subcommand()->fallthrough();
 
     // options
-    rangeApp->add_option("--SessionDataVersion", m_cliData->SessionData.sessionDataVersion)->capture_default_str();
-    rangeApp->add_option("--SessionId", m_cliData->SessionData.sessionId)->capture_default_str();
-    rangeApp->add_option("--SubSessionId", m_cliData->SessionData.subSessionId)->capture_default_str();
+    rangeApp->add_option("--SessionDataVersion", m_cliData->SessionData.sessionDataVersion);
+    rangeApp->add_option("--SessionId", m_cliData->SessionData.sessionId);
+    rangeApp->add_option("--SubSessionId", m_cliData->SessionData.subSessionId);
 
     // sub-commands
     m_serviceRangeStartApp = AddSubcommandServiceRangeStart(rangeApp);
@@ -608,10 +626,10 @@ NearObjectCli::AddSubcommandServiceRange(CLI::App* parent)
 }
 
 CLI::App*
-NearObjectCli::AddSubcommandUwbRawDeviceReset(CLI::App* parent)
+NearObjectCli::AddSubcommandDriverUwbRawDeviceReset(CLI::App* parent)
 {
     // top-level command
-    auto rawDeviceResetApp = parent->add_subcommand("devicereset", "DeviceReset")->fallthrough();
+    auto rawDeviceResetApp = parent->add_subcommand("devicereset", "Reset the UWB device")->fallthrough();
 
     rawDeviceResetApp->parse_complete_callback([this] {
         std::cout << "device reset" << std::endl;
@@ -634,10 +652,10 @@ NearObjectCli::AddSubcommandUwbRawDeviceReset(CLI::App* parent)
 }
 
 CLI::App*
-NearObjectCli::AddSubcommandUwbRawGetDeviceInfo(CLI::App* parent)
+NearObjectCli::AddSubcommandDriverUwbRawGetDeviceInfo(CLI::App* parent)
 {
     // top-level command
-    auto rawGetDeviceInfoApp = parent->add_subcommand("getdeviceinfo", "GetDeviceInfo")->fallthrough();
+    auto rawGetDeviceInfoApp = parent->add_subcommand("getdeviceinfo", "Get the UWB device info")->fallthrough();
 
     rawGetDeviceInfoApp->parse_complete_callback([this] {
         std::cout << "get device info" << std::endl;
@@ -660,7 +678,7 @@ NearObjectCli::AddSubcommandUwbRawGetDeviceInfo(CLI::App* parent)
 }
 
 CLI::App*
-NearObjectCli::AddSubcommandUwbRawSessionDeinitialize(CLI::App* parent)
+NearObjectCli::AddSubcommandDriverUwbRawSessionDeinitialize(CLI::App* parent)
 {
     // top-level command
     auto rawSessionDeinitializeApp = parent->add_subcommand("sessiondeinit", "Deinitialize a pre-existing session")->fallthrough();
@@ -690,7 +708,7 @@ NearObjectCli::AddSubcommandUwbRawSessionDeinitialize(CLI::App* parent)
 }
 
 CLI::App*
-NearObjectCli::AddSubcommandUwbRawGetSessionCount(CLI::App* parent)
+NearObjectCli::AddSubcommandDriverUwbRawGetSessionCount(CLI::App* parent)
 {
     // top-level command
     auto rawGetSessionCountApp = parent->add_subcommand("getsessioncount", "Get the number of sessions")->fallthrough();
@@ -719,7 +737,7 @@ NearObjectCli::AddSubcommandUwbRawGetSessionCount(CLI::App* parent)
 }
 
 CLI::App*
-NearObjectCli::AddSubcommandUwbRawGetSessionState(CLI::App* parent)
+NearObjectCli::AddSubcommandDriverUwbRawGetSessionState(CLI::App* parent)
 {
     // top-level command
     auto rawGetSessionStateApp = parent->add_subcommand("getsessionstate", "Get the current state of a session")->fallthrough();
@@ -749,10 +767,10 @@ NearObjectCli::AddSubcommandUwbRawGetSessionState(CLI::App* parent)
 }
 
 CLI::App*
-NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
+NearObjectCli::AddSubcommandDriverUwbRangeStart(CLI::App* parent)
 {
     auto& applicationConfigurationParametersData = m_cliData->applicationConfigurationParametersData;
-    auto rangeStartApp = parent->add_subcommand("start", "start ranging")->fallthrough();
+    auto rangeStartApp = parent->add_subcommand("start", "Start a UWB ranging session")->fallthrough();
 
     // Remove labels from options
     rangeStartApp->get_formatter()->label("ENUM", "");
@@ -847,10 +865,10 @@ NearObjectCli::AddSubcommandUwbRangeStart(CLI::App* parent)
 }
 
 CLI::App*
-NearObjectCli::AddSubcommandUwbRangeStop(CLI::App* parent)
+NearObjectCli::AddSubcommandDriverUwbRangeStop(CLI::App* parent)
 {
     // top-level command
-    auto rangeStopApp = parent->add_subcommand("stop", "stop ranging")->fallthrough();
+    auto rangeStopApp = parent->add_subcommand("stop", "Stop a UWB ranging session")->fallthrough();
 
     rangeStopApp->parse_complete_callback([this, rangeStopApp] {
         std::cout << "stop ranging" << std::endl;
@@ -869,7 +887,7 @@ CLI::App*
 NearObjectCli::AddSubcommandServiceRangeStart(CLI::App* parent)
 {
     auto& uwbConfig = m_cliData->uwbConfiguration;
-    auto rangeStartApp = parent->add_subcommand("start", "start ranging")->fallthrough();
+    auto rangeStartApp = parent->add_subcommand("start", "Start a NearObject ranging session")->fallthrough();
 
     // Remove labels from options
     rangeStartApp->get_formatter()->label("ENUM", "");
@@ -898,7 +916,7 @@ NearObjectCli::AddSubcommandServiceRangeStart(CLI::App* parent)
     // uint16_t
     rangeStartApp->add_option("--RangingInterval", uwbConfig.rangingInterval, "2-byte integer. Ranging interval in the unit of 1200 RSTU (1ms) between ranging rounds. Value in { Duration of one ranging round-MAX }")->capture_default_str();
     rangeStartApp->add_option("--MaxRangingRoundRetry", uwbConfig.maxRangingRoundRetry, "2-byte integer. Number of failed RR attempts before stopping the session. Value in { 0-MAX }")->capture_default_str();
-    rangeStartApp->add_option("--StaticRangingInfoVendorId", m_cliData->StaticRanging.VendorId, "2-byte hexadecimal value. Unique ID for vendor. Used for static STS. If --SecureRangingInfo* options are used, this option will be overridden")->capture_default_str();
+    rangeStartApp->add_option("--StaticRangingInfoVendorId", m_cliData->StaticRanging.VendorId, "2-byte hexadecimal value. Unique ID for vendor. Used for static STS. If --SecureRangingInfo* options are used, this option will be overridden");
     rangeStartApp->add_option("--SlotDuration", uwbConfig.slotDuration, "2-byte integer. Duration of a ranging slot in the unit of RSTU. Value in { 0-MAX }")->capture_default_str();
 
     // uint32_t
@@ -997,7 +1015,7 @@ CLI::App*
 NearObjectCli::AddSubcommandServiceRangeStop(CLI::App* parent)
 {
     // top-level command
-    auto rangeStopApp = parent->add_subcommand("stop", "stop ranging")->fallthrough();
+    auto rangeStopApp = parent->add_subcommand("stop", "Stop a NearObject ranging session")->fallthrough();
 
     rangeStopApp->parse_complete_callback([this, rangeStopApp] {
         std::cout << "stop ranging" << std::endl;
