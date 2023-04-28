@@ -223,8 +223,20 @@ private:
     CallbacksPresent();
 
     // Internal function that wraps DeviceIoControl, handles errors and insufficient buffer size
-    // void
-    // DeviceIoControlWrapper();
+    /**
+     * @brief
+     *
+     * @tparam PromiseT
+     * @tparam ArgTs is everything that goes into a standard DeviceIOControl() call, aside from the leading handle argument
+     * @param resultPromise
+     * @param strFail
+     * @param strSuccess
+     * @param interpret
+     * @param args
+     */
+    template <typename PromiseT, typename... ArgTs>
+    void
+    DeviceIoControlWrapper(std::promise<PromiseT>& resultPromise, std::string strFail, std::string strSuccess, std::function<void()> interpret, ArgTs&&... args);
 
 private:
     std::string m_deviceName{};

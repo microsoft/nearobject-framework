@@ -136,9 +136,9 @@ UwbConnector::DeviceName() const noexcept
     return m_deviceName;
 }
 
-template <typename PromiseT>
+template <typename PromiseT, typename... ArgTs>
 void
-DeviceIoControlWrapper(std::string m_deviceName, std::promise<PromiseT>& resultPromise, std::string strFail, std::string strSuccess, std::function<void()> interpret, DWORD dwIoControlCode, LPVOID lpInBuffer, DWORD nInBufferSize, LPVOID lpOutBuffer, DWORD nOutBufferSize, LPDWORD lpBytesReturned)
+UwbConnector::DeviceIoControlWrapper(std::promise<PromiseT>& resultPromise, std::string strFail, std::string strSuccess, std::function<void()> interpret, ArgTs&&... args)
 {
     wil::unique_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
@@ -148,7 +148,7 @@ DeviceIoControlWrapper(std::string m_deviceName, std::promise<PromiseT>& resultP
         return;
     }
 
-    BOOL ioResult = DeviceIoControl(handleDriver.get(), dwIoControlCode, lpInBuffer, nInBufferSize, lpOutBuffer, nOutBufferSize, lpBytesReturned, nullptr);
+    BOOL ioResult = DeviceIoControl(handleDriver.get(), std::forward<ArgTs>(args)...);
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
         PLOG_ERROR << strFail << ", hr = " << std::showbase << std::hex << hr;
@@ -194,6 +194,26 @@ UwbConnector::Reset()
             resultPromise.set_value();
         }
     }
+
+    DeviceIoControlWrapper(
+        resultPromise,
+        "error when sending IOCTL_UWB_DEVICE_RESET",
+        "IOCTL_UWB_DEVICE_RESET succeeded",
+        [&]() {
+            auto uwbStatus = UwbCxDdi::To(status);
+            if (!IsUwbStatusOk(uwbStatus)) {
+                resultPromise.set_exception(std::make_exception_ptr(UwbException(std::move(uwbStatus))));
+            } else {
+                resultPromise.set_value();
+            }
+        },
+        IOCTL_UWB_DEVICE_RESET,
+        const_cast<UWB_DEVICE_RESET*>(&deviceReset),
+        sizeof deviceReset,
+        &status,
+        sizeof status,
+        nullptr,
+        nullptr);
 
     return resultFuture;
 }
@@ -672,7 +692,6 @@ UwbConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vec
     std::vector<uint8_t> statusBuffer(statusSize);
 
     DeviceIoControlWrapper(
-        m_deviceName,
         resultPromise,
         "error when sending IOCTL_UWB_SET_APP_CONFIG_PARAMS with sessionId " + std::to_string(sessionId),
         "IOCTL_UWB_SET_APP_CONFIG_PARAMS succeeded",
@@ -692,6 +711,7 @@ UwbConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vec
         std::size(paramsBuffer),
         std::data(statusBuffer),
         statusSize,
+        nullptr,
         nullptr);
 
     return resultFuture;
