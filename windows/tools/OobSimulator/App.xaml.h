@@ -7,13 +7,14 @@
 
 namespace winrt::OobSimulator::implementation
 {
-    struct App : AppT<App>
-    {
-        App();
+struct App : AppT<App>
+{
+    App();
 
-        void OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&);
+    void
+    OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&);
 
-    private:
-        winrt::Microsoft::UI::Xaml::Window window{ nullptr };
-    };
-}
+private:
+    winrt::Microsoft::UI::Xaml::Window window{ nullptr };
+};
+} // namespace winrt::OobSimulator::implementation

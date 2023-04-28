@@ -5,4 +5,5 @@
 
 #include "pch.h"
 
-uint32_t HstringToUint32(winrt::hstring hstring);
+uint32_t
+HstringToUint32(winrt::hstring hstring);
