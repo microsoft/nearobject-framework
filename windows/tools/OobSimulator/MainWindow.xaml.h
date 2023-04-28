@@ -12,9 +12,9 @@ struct MainWindow : MainWindowT<MainWindow>
 {
     MainWindow();
 
-    void
-    SetUwbSessionData(uwb::protocol::fira::UwbSessionData const& uwbSessionData, std::string const& outputDirectory);
-    void
+    winrt::Windows::Foundation::IAsyncAction
+    SetUwbSessionData(uwb::protocol::fira::UwbSessionData const& uwbSessionData);
+    winrt::Windows::Foundation::IAsyncAction
     SetUwbSessionData_Click(Windows::Foundation::IInspectable const& sender, Microsoft::UI::Xaml::RoutedEventArgs const& args);
 };
 } // namespace winrt::OobSimulator::implementation

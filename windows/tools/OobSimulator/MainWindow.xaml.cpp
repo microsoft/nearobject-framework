@@ -12,8 +12,14 @@
 #include "Utils.hxx"
 #include "uwb/protocols/fira/UwbConfigurationBuilder.hxx"
 #include <fstream>
+#include <microsoft.ui.xaml.window.h>
+#include <shobjidl.h>
 
 using namespace winrt;
+using namespace winrt::Windows::Foundation;
+using namespace winrt::Windows::Storage;
+using namespace winrt::Windows::Storage::Pickers;
+using namespace winrt::Windows::UI::Core;
 using namespace Microsoft::UI::Xaml;
 using namespace uwb::protocol::fira;
 
@@ -27,9 +33,19 @@ MainWindow::MainWindow()
     InitializeComponent();
 }
 
-void
-MainWindow::SetUwbSessionData(UwbSessionData const& uwbSessionData, std::string const& outputDirectory)
+IAsyncAction
+MainWindow::SetUwbSessionData(UwbSessionData const& uwbSessionData)
 {
+    // Retrieve the window handle (HWND) of the current WinUI 3 window.
+    auto windowNative{ this->try_as<::IWindowNative>() };
+    winrt::check_bool(windowNative);
+    HWND hwnd{ 0 };
+    windowNative->get_WindowHandle(&hwnd);
+
+    FileSavePicker fileSavePicker;
+    auto initializeWithWindow{ fileSavePicker.as<::IInitializeWithWindow>() };
+    initializeWithWindow->Initialize(hwnd);
+
     // Convert the input data into JSON
     nlohmann::json json{};
     json["sessionId"] = uwbSessionData.sessionId;
@@ -42,21 +58,18 @@ MainWindow::SetUwbSessionData(UwbSessionData const& uwbSessionData, std::string 
     std::vector<uint8_t> sessionDataBytes = nlohmann::json::to_msgpack(json);
 
     // Write to file
-    std::filesystem::path outfilePath = outputDirectory + "/uwbsessiondata.msgpack";
-    std::ofstream outfile(outfilePath, std::ios::out | std::ios::binary);
-    if (outfile.fail() || outfile.bad()) {
-        std::cerr << "Error opening file" << std::endl;
-    }
+    fileSavePicker.FileTypeChoices().Insert(L"Message Pack", winrt::single_threaded_vector<winrt::hstring>({ L".msgpack" }));
+    fileSavePicker.SuggestedStartLocation(PickerLocationId::DocumentsLibrary);
+    fileSavePicker.SuggestedFileName(L"uwbsessiondata.msgpack");
+    auto file = co_await fileSavePicker.PickSaveFileAsync();
 
-    outfile.write(reinterpret_cast<const char*>(std::data(sessionDataBytes)), std::size(sessionDataBytes));
-    if (outfile.fail() || outfile.bad()) {
-        std::cerr << "Error writing to file" << std::endl;
+    if (file != nullptr) {
+        auto storageFile = file.as<IStorageFile>();
+        co_await FileIO::WriteBytesAsync(storageFile, sessionDataBytes);
     }
-
-    outfile.close();
 }
 
-void
+IAsyncAction
 MainWindow::SetUwbSessionData_Click(IInspectable const&, RoutedEventArgs const&)
 {
     UwbSessionData uwbSessionData;
@@ -87,13 +100,10 @@ MainWindow::SetUwbSessionData_Click(IInspectable const&, RoutedEventArgs const&)
     // Controlee Short MAC Address
     builder.SetMacAddressControleeShort(uwb::UwbMacAddress::FromString(winrt::to_string(ControleeShortMacAddressTextBox().Text()), uwb::UwbMacAddressType::Short).value());
 
-    // Output directory
-    std::string outputDirectory = winrt::to_string(OutputDirectoryTextBox().Text());
-
     // Set UWB Configuration of UWB Session Data
     uwbSessionData.uwbConfiguration = std::move(builder);
 
     // Set the UWB Session Data
-    SetUwbSessionData(uwbSessionData, outputDirectory);
+    co_await SetUwbSessionData(uwbSessionData);
 }
 } // namespace winrt::OobSimulator::implementation
