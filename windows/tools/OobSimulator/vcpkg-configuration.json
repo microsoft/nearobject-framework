@@ -13,6 +13,6 @@
     }
   ],
   "overlay-ports": [
-    "../nearobject-framework/packaging/vcpkg/ports"
+    "../../../packaging/vcpkg/ports"
   ]
 }
