@@ -10,10 +10,12 @@
 // clang-format on
 
 #include "Utils.hxx"
-#include "uwb/protocols/fira/UwbConfigurationBuilder.hxx"
+
 #include <fstream>
 #include <microsoft.ui.xaml.window.h>
+#include <nearobject/serialization/UwbSessionDataJsonSerializer.hxx>
 #include <shobjidl.h>
+#include <uwb/protocols/fira/UwbConfigurationBuilder.hxx>
 
 using namespace winrt;
 using namespace winrt::Windows::Foundation;
@@ -47,12 +49,13 @@ MainWindow::SetUwbSessionData(UwbSessionData const& uwbSessionData)
     initializeWithWindow->Initialize(hwnd);
 
     // Convert the input data into JSON
-    nlohmann::json json{};
-    json["sessionId"] = uwbSessionData.sessionId;
-    json["deviceRole"] = static_cast<int>(uwbSessionData.uwbConfiguration.GetDeviceRole().value());
-    json["multiNodeMode"] = static_cast<int>(uwbSessionData.uwbConfiguration.GetMultiNodeMode().value());
-    json["controllerMacAddress"] = uwbSessionData.uwbConfiguration.GetControllerMacAddress().value().ToString();         // Is ToString() the best way to store this?
-    json["controleeShortMacAddress"] = uwbSessionData.uwbConfiguration.GetControleeShortMacAddress().value().ToString(); // Is ToString() the best way to store this?
+    nlohmann::json json = uwbSessionData;
+    // nlohmann::json json{};
+    // json["sessionId"] = uwbSessionData.sessionId;
+    // json["deviceRole"] = static_cast<int>(uwbSessionData.uwbConfiguration.GetDeviceRole().value());
+    // json["multiNodeMode"] = static_cast<int>(uwbSessionData.uwbConfiguration.GetMultiNodeMode().value());
+    // json["controllerMacAddress"] = uwbSessionData.uwbConfiguration.GetControllerMacAddress().value().ToString();         // Is ToString() the best way to store this?
+    // json["controleeShortMacAddress"] = uwbSessionData.uwbConfiguration.GetControleeShortMacAddress().value().ToString(); // Is ToString() the best way to store this?
 
     // Serialize JSON to byte array (MessagePack)
     std::vector<uint8_t> sessionDataBytes = nlohmann::json::to_msgpack(json);
