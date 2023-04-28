@@ -9,7 +9,7 @@ using namespace uwb;
 void
 uwb::protocol::fira::to_json(nlohmann::json& json, const UwbSessionData& uwbSessionData)
 {
-    json = nlohmann::json {
+    json = nlohmann::json{
         { "SessionDataVersion", uwbSessionData.sessionDataVersion },
         { "SessionId", uwbSessionData.sessionId },
         { "SubSessionId", uwbSessionData.subSessionId },
