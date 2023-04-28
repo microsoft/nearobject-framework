@@ -8,11 +8,6 @@
 #include <unordered_map>
 #include <vector>
 
-// NB: This must come before any other Windows include
-#include <windows.h>
-
-#include <cfgmgr32.h>
-
 #include <nearobject/service/NearObjectDeviceControllerDiscoveryAgent.hxx>
 #include <windows/devices/DevicePresenceMonitor.hxx>
 #include <windows/devices/DeviceResource.hxx>
@@ -76,8 +71,6 @@ private:
     ExtractCachedNearObjectDevice(const std::string &deviceName);
 
 private:
-    unique_hcmnotification m_uwbHcmNotificationHandle;
-
     std::mutex m_nearObjectDeviceCacheGate;
     std::unordered_map<std::string, std::weak_ptr<::nearobject::service::NearObjectDeviceControllerUwb>> m_nearObjectDeviceCache;
 
