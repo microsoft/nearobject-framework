@@ -117,6 +117,18 @@
             }
         },
         {
+            "name": "external-build",
+            "displayName": "External build",
+            "description": "external vcpkg-based build with release (stable) sources",
+            "inherits": [
+                "vcpkg-dev"
+            ],
+            "cacheVariables": {
+                "NOF_DISABLE_TESTS": true,
+                "NOF_VCPKG_ENABLE": true
+            }
+        },
+        {
             "name": "cicd",
             "displayName": "CI/CD",
             "description": "Continuous integration and continuous delivery (CI/CD) based build",
