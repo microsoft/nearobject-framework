@@ -4,7 +4,7 @@
 
 #include <nlohmann/json.hpp>
 
-namespace uwb
+namespace uwb::protocol::fira
 {
 class UwbSessionData;
 
@@ -26,6 +26,6 @@ to_json(nlohmann::json& json, const UwbSessionData& uwbSessionData);
 void
 from_json(const nlohmann::json& json, UwbSessionData& uwbSessionData);
 
-} // namespace uwb
+} // namespace uwb::protocol::fira
 
 #endif // UWB_SESSION_DATA_JSON_SERIALIZER_HXX
