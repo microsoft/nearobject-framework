@@ -1,5 +1,4 @@
 
-#include <filesystem>
 #include <magic_enum.hpp>
 #include <plog/Log.h>
 #include <string>
@@ -86,43 +85,6 @@ NearObjectDeviceDiscoveryAgentUwb::ExtractCachedNearObjectDevice(const std::stri
     return nearObjectExtractResult.empty()
         ? nullptr
         : nearObjectExtractResult.mapped().lock();
-}
-
-void
-NearObjectDeviceDiscoveryAgentUwb::OnDeviceInterfaceNotification(HCMNOTIFICATION hcmNotificationHandle, CM_NOTIFY_ACTION action, CM_NOTIFY_EVENT_DATA *eventData, DWORD eventDataSize)
-{
-    std::string deviceName;
-    std::filesystem::path devicePath;
-
-    switch (action) {
-    case CM_NOTIFY_ACTION_DEVICEINTERFACEARRIVAL: {
-        devicePath = std::filesystem::path(std::wstring(eventData->u.DeviceInterface.SymbolicLink));
-        deviceName = devicePath.string();
-        auto nearObjectDeviceControllerUwb = AddCachedUwbNearObjectDevice(deviceName);
-        DevicePresenceChanged(NearObjectDevicePresence::Arrived, std::move(nearObjectDeviceControllerUwb));
-        break;
-    }
-    case CM_NOTIFY_ACTION_DEVICEINTERFACEREMOVAL: {
-        devicePath = std::filesystem::path(std::wstring(eventData->u.DeviceInterface.SymbolicLink));
-        deviceName = devicePath.string();
-        auto nearObjectDeviceControllerUwb = ExtractCachedNearObjectDevice(deviceName);
-        if (nearObjectDeviceControllerUwb) {
-            DevicePresenceChanged(NearObjectDevicePresence::Departed, std::move(nearObjectDeviceControllerUwb));
-        }
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-/* static */
-DWORD CALLBACK
-NearObjectDeviceDiscoveryAgentUwb::OnDeviceInterfaceNotificationCallback(HCMNOTIFICATION hcmNotificationHandle, void *context, CM_NOTIFY_ACTION action, CM_NOTIFY_EVENT_DATA *eventData, DWORD eventDataSize)
-{
-    auto self = static_cast<NearObjectDeviceDiscoveryAgentUwb *>(context);
-    self->OnDeviceInterfaceNotification(hcmNotificationHandle, action, eventData, eventDataSize);
-    return S_OK;
 }
 
 /* static */

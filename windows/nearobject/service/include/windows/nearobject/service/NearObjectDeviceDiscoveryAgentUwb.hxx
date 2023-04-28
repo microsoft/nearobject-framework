@@ -12,11 +12,10 @@
 #include <windows.h>
 
 #include <cfgmgr32.h>
-#include <wil/resource.h>
 
 #include <nearobject/service/NearObjectDeviceControllerDiscoveryAgent.hxx>
-#include <windows/devices/DeviceResource.hxx>
 #include <windows/devices/DevicePresenceMonitor.hxx>
+#include <windows/devices/DeviceResource.hxx>
 
 namespace nearobject
 {
@@ -55,30 +54,6 @@ protected:
 private:
     std::vector<std::shared_ptr<::nearobject::service::NearObjectDeviceController>>
     Probe();
-
-    /**
-     * @brief Bound callback function for when a UWB class driver event occurs.
-     *
-     * @param hcmNotificationHandle
-     * @param action
-     * @param eventData
-     * @param eventDataSize
-     */
-    void
-    OnDeviceInterfaceNotification(HCMNOTIFICATION hcmNotificationHandle, CM_NOTIFY_ACTION action, CM_NOTIFY_EVENT_DATA *eventData, DWORD eventDataSize);
-
-    /**
-     * @brief Unbound callback function for when a UWB class driver event occurs.
-     *
-     * @param hcmNotificationHandle
-     * @param context
-     * @param action
-     * @param eventData
-     * @param eventDataSize
-     * @return DWORD
-     */
-    static DWORD CALLBACK
-    OnDeviceInterfaceNotificationCallback(HCMNOTIFICATION hcmNotificationHandle, void *context, CM_NOTIFY_ACTION action, CM_NOTIFY_EVENT_DATA *eventData, DWORD eventDataSize);
 
     /**
      * @brief Create (if necessary) and add NearObjectDeviceControllerUwb wrapper instance
