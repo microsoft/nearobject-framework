@@ -26,7 +26,7 @@ CreateNearObjectUwbDevice(std::string deviceName)
 
 NearObjectDeviceDiscoveryAgentUwb::NearObjectDeviceDiscoveryAgentUwb() :
     m_devicePresenceMonitor(
-        windows::devices::uwb::InterfaceClassUwb, [&](auto &&deviceGuid, auto &&presenceEvent, auto &&deviceName) {
+        windows::devices::uwb::InterfaceClassUwb, [this](auto &&deviceGuid, auto &&presenceEvent, auto &&deviceName) {
             const auto presenceEventName = magic_enum::enum_name(presenceEvent);
             PLOG_INFO << deviceName << " " << presenceEventName << std::endl;
             switch (presenceEvent) {
