@@ -165,35 +165,11 @@ UwbConnector::Reset()
     std::promise<void> resultPromise{};
     auto resultFuture = resultPromise.get_future();
 
-    wil::unique_hfile handleDriver;
-    auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
-    if (FAILED(hr)) {
-        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
-        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
-        return resultFuture;
-    }
-
     const UWB_DEVICE_RESET deviceReset{
         .size = sizeof(UWB_DEVICE_RESET),
         .resetConfig = UWB_RESET_CONFIG_UWBS_RESET,
     };
     UWB_STATUS status;
-
-    BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_DEVICE_RESET, const_cast<UWB_DEVICE_RESET*>(&deviceReset), sizeof deviceReset, &status, sizeof status, nullptr, nullptr);
-    if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
-        HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-        PLOG_ERROR << "error when sending IOCTL_UWB_DEVICE_RESET, hr=" << std::showbase << std::hex << hr;
-        resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Failed)));
-        return resultFuture;
-    } else {
-        PLOG_DEBUG << "IOCTL_UWB_DEVICE_RESET succeeded";
-        auto uwbStatus = UwbCxDdi::To(status);
-        if (!IsUwbStatusOk(uwbStatus)) {
-            resultPromise.set_exception(std::make_exception_ptr(UwbException(std::move(uwbStatus))));
-        } else {
-            resultPromise.set_value();
-        }
-    }
 
     DeviceIoControlWrapper(
         resultPromise,
