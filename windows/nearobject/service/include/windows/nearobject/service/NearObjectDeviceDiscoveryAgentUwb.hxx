@@ -16,6 +16,7 @@
 
 #include <nearobject/service/NearObjectDeviceControllerDiscoveryAgent.hxx>
 #include <windows/devices/DeviceResource.hxx>
+#include <windows/devices/DevicePresenceMonitor.hxx>
 
 namespace nearobject
 {
@@ -38,6 +39,9 @@ namespace nearobject::service
 class NearObjectDeviceDiscoveryAgentUwb :
     public ::nearobject::service::NearObjectDeviceControllerDiscoveryAgent
 {
+public:
+    NearObjectDeviceDiscoveryAgentUwb();
+
 protected:
     void
     StartImpl() override;
@@ -51,18 +55,6 @@ protected:
 private:
     std::vector<std::shared_ptr<::nearobject::service::NearObjectDeviceController>>
     Probe();
-
-    /**
-     * @brief Register for notifications of UWB device driver events.
-     */
-    void
-    RegisterForUwbDeviceClassNotifications();
-
-    /**
-     * @brief Unregister from notifications of UWB device driver events.
-     */
-    void
-    UnregisterForUwbDeviceClassNotifications();
 
     /**
      * @brief Bound callback function for when a UWB class driver event occurs.
@@ -113,6 +105,9 @@ private:
 
     std::mutex m_nearObjectDeviceCacheGate;
     std::unordered_map<std::string, std::weak_ptr<::nearobject::service::NearObjectDeviceControllerUwb>> m_nearObjectDeviceCache;
+
+    // this member is actually in charge of handling the presence monitoring
+    windows::devices::DevicePresenceMonitor m_devicePresenceMonitor;
 };
 } // namespace nearobject::service
 } // namespace windows
