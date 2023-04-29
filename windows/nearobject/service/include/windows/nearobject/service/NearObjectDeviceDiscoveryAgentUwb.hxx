@@ -70,6 +70,16 @@ private:
     std::shared_ptr<::nearobject::service::NearObjectDeviceControllerUwb>
     ExtractCachedNearObjectDevice(const std::string &deviceName);
 
+    /**
+     * @brief Callback function invoked when device presence changes.
+     *
+     * @param deviceGuid The GUID of the device that changed presence.
+     * @param presenceEvent The type of presence change that ocurred.
+     * @param deviceName The device name (interface path) of the device.
+     */
+    void
+    OnDevicePresenceChanged(const GUID &deviceGuid, windows::devices::DevicePresenceEvent presenceEvent, std::string deviceName);
+
 private:
     std::mutex m_nearObjectDeviceCacheGate;
     std::unordered_map<std::string, std::weak_ptr<::nearobject::service::NearObjectDeviceControllerUwb>> m_nearObjectDeviceCache;
