@@ -26,23 +26,8 @@ CreateNearObjectUwbDevice(std::string deviceName)
 
 NearObjectDeviceDiscoveryAgentUwb::NearObjectDeviceDiscoveryAgentUwb() :
     m_devicePresenceMonitor(
-        windows::devices::uwb::InterfaceClassUwb, [this](auto &&deviceGuid, auto &&presenceEvent, auto &&deviceName) {
-            const auto presenceEventName = magic_enum::enum_name(presenceEvent);
-            PLOG_INFO << deviceName << " " << presenceEventName << std::endl;
-            switch (presenceEvent) {
-            case windows::devices::DevicePresenceEvent::Arrived: {
-                auto nearObjectDeviceControllerUwb = AddCachedUwbNearObjectDevice(deviceName);
-                DevicePresenceChanged(NearObjectDevicePresence::Arrived, std::move(nearObjectDeviceControllerUwb));
-                break;
-            }
-            case windows::devices::DevicePresenceEvent::Departed: {
-                auto nearObjectDeviceControllerUwb = ExtractCachedNearObjectDevice(deviceName);
-                if (nearObjectDeviceControllerUwb) {
-                    DevicePresenceChanged(NearObjectDevicePresence::Departed, std::move(nearObjectDeviceControllerUwb));
-                }
-                break;
-            }
-            }
+        windows::devices::uwb::InterfaceClassUwb, [this]<typename... Args>(Args &&...args) {
+            return OnDevicePresenceChanged(std::forward<Args>(args)...);
         },
         true)
 {
@@ -85,6 +70,27 @@ NearObjectDeviceDiscoveryAgentUwb::ExtractCachedNearObjectDevice(const std::stri
     return nearObjectExtractResult.empty()
         ? nullptr
         : nearObjectExtractResult.mapped().lock();
+}
+
+void
+NearObjectDeviceDiscoveryAgentUwb::OnDevicePresenceChanged(const GUID &deviceGuid, windows::devices::DevicePresenceEvent presenceEvent, std::string deviceName)
+{
+    const auto presenceEventName = magic_enum::enum_name(presenceEvent);
+    PLOG_INFO << deviceName << " " << presenceEventName << std::endl;
+    switch (presenceEvent) {
+    case windows::devices::DevicePresenceEvent::Arrived: {
+        auto nearObjectDeviceControllerUwb = AddCachedUwbNearObjectDevice(deviceName);
+        DevicePresenceChanged(NearObjectDevicePresence::Arrived, std::move(nearObjectDeviceControllerUwb));
+        break;
+    }
+    case windows::devices::DevicePresenceEvent::Departed: {
+        auto nearObjectDeviceControllerUwb = ExtractCachedNearObjectDevice(deviceName);
+        if (nearObjectDeviceControllerUwb) {
+            DevicePresenceChanged(NearObjectDevicePresence::Departed, std::move(nearObjectDeviceControllerUwb));
+        }
+        break;
+    }
+    }
 }
 
 /* static */
