@@ -6,7 +6,7 @@
 
 namespace uwb::protocol::fira
 {
-class UwbSessionData;
+struct UwbSessionData;
 
 /**
  * @brief 
