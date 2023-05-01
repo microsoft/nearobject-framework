@@ -1,6 +1,7 @@
 
 #include <stdexcept>
 
+#include <nearobject/serialization/UwbConfigurationJsonSerializer.hxx>
 #include <nearobject/serialization/UwbSessionDataJsonSerializer.hxx>
 #include <uwb/protocols/fira/UwbSessionData.hxx>
 
