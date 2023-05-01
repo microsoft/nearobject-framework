@@ -38,24 +38,19 @@ MainWindow::MainWindow()
 IAsyncAction
 MainWindow::SetUwbSessionData(UwbSessionData const& uwbSessionData)
 {
-    // Retrieve the window handle (HWND) of the current WinUI 3 window.
+    // Retrieve the window handle (HWND) of the current WinUI 3 window
     auto windowNative{ this->try_as<::IWindowNative>() };
     winrt::check_bool(windowNative);
     HWND hwnd{ 0 };
     windowNative->get_WindowHandle(&hwnd);
 
+    // Create FileSavePicker and initialize with current WinUI 3 window
     FileSavePicker fileSavePicker;
     auto initializeWithWindow{ fileSavePicker.as<::IInitializeWithWindow>() };
     initializeWithWindow->Initialize(hwnd);
 
-    // Convert the input data into JSON
+    // Convert the input data to JSON
     nlohmann::json json = uwbSessionData;
-    // nlohmann::json json{};
-    // json["sessionId"] = uwbSessionData.sessionId;
-    // json["deviceRole"] = static_cast<int>(uwbSessionData.uwbConfiguration.GetDeviceRole().value());
-    // json["multiNodeMode"] = static_cast<int>(uwbSessionData.uwbConfiguration.GetMultiNodeMode().value());
-    // json["controllerMacAddress"] = uwbSessionData.uwbConfiguration.GetControllerMacAddress().value().ToString();         // Is ToString() the best way to store this?
-    // json["controleeShortMacAddress"] = uwbSessionData.uwbConfiguration.GetControleeShortMacAddress().value().ToString(); // Is ToString() the best way to store this?
 
     // Serialize JSON to byte array (MessagePack)
     std::vector<uint8_t> sessionDataBytes = nlohmann::json::to_msgpack(json);
