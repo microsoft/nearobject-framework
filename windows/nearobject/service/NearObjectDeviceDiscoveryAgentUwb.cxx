@@ -1,5 +1,6 @@
 
-#include <filesystem>
+#include <magic_enum.hpp>
+#include <plog/Log.h>
 #include <string>
 
 #include <nearobject/service/NearObjectDeviceControllerUwb.hxx>
@@ -22,6 +23,15 @@ CreateNearObjectUwbDevice(std::string deviceName)
     return std::make_shared<NearObjectDeviceControllerUwb>(std::move(uwbDevice));
 }
 } // namespace detail
+
+NearObjectDeviceDiscoveryAgentUwb::NearObjectDeviceDiscoveryAgentUwb() :
+    m_devicePresenceMonitor(
+        windows::devices::uwb::InterfaceClassUwb, [this]<typename... Args>(Args &&...args) {
+            return OnDevicePresenceChanged(std::forward<Args>(args)...);
+        },
+        true)
+{
+}
 
 std::shared_ptr<NearObjectDeviceControllerUwb>
 NearObjectDeviceDiscoveryAgentUwb::AddCachedUwbNearObjectDevice(const std::string &deviceName)
@@ -63,61 +73,24 @@ NearObjectDeviceDiscoveryAgentUwb::ExtractCachedNearObjectDevice(const std::stri
 }
 
 void
-NearObjectDeviceDiscoveryAgentUwb::RegisterForUwbDeviceClassNotifications()
+NearObjectDeviceDiscoveryAgentUwb::OnDevicePresenceChanged(const GUID &deviceGuid, windows::devices::DevicePresenceEvent presenceEvent, std::string deviceName)
 {
-    CM_NOTIFY_FILTER interfaceFilter{};
-    interfaceFilter.cbSize = sizeof interfaceFilter;
-    interfaceFilter.FilterType = CM_NOTIFY_FILTER_TYPE_DEVICEINTERFACE;
-    interfaceFilter.u.DeviceInterface.ClassGuid = windows::devices::uwb::InterfaceClassUwb;
-
-    auto notifyRegistrationResult = CM_Register_Notification(&interfaceFilter, this, OnDeviceInterfaceNotificationCallback, &m_uwbHcmNotificationHandle);
-    if (notifyRegistrationResult != CR_SUCCESS) {
-        // TODO: log? throw?
-    }
-}
-
-void
-NearObjectDeviceDiscoveryAgentUwb::UnregisterForUwbDeviceClassNotifications()
-{
-    m_uwbHcmNotificationHandle.reset();
-    // TODO: anything else needed here?
-}
-
-void
-NearObjectDeviceDiscoveryAgentUwb::OnDeviceInterfaceNotification(HCMNOTIFICATION hcmNotificationHandle, CM_NOTIFY_ACTION action, CM_NOTIFY_EVENT_DATA *eventData, DWORD eventDataSize)
-{
-    std::string deviceName;
-    std::filesystem::path devicePath;
-
-    switch (action) {
-    case CM_NOTIFY_ACTION_DEVICEINTERFACEARRIVAL: {
-        devicePath = std::filesystem::path(std::wstring(eventData->u.DeviceInterface.SymbolicLink));
-        deviceName = devicePath.string();
+    const auto presenceEventName = magic_enum::enum_name(presenceEvent);
+    PLOG_INFO << deviceName << " " << presenceEventName << std::endl;
+    switch (presenceEvent) {
+    case windows::devices::DevicePresenceEvent::Arrived: {
         auto nearObjectDeviceControllerUwb = AddCachedUwbNearObjectDevice(deviceName);
         DevicePresenceChanged(NearObjectDevicePresence::Arrived, std::move(nearObjectDeviceControllerUwb));
         break;
     }
-    case CM_NOTIFY_ACTION_DEVICEINTERFACEREMOVAL: {
-        devicePath = std::filesystem::path(std::wstring(eventData->u.DeviceInterface.SymbolicLink));
-        deviceName = devicePath.string();
+    case windows::devices::DevicePresenceEvent::Departed: {
         auto nearObjectDeviceControllerUwb = ExtractCachedNearObjectDevice(deviceName);
         if (nearObjectDeviceControllerUwb) {
             DevicePresenceChanged(NearObjectDevicePresence::Departed, std::move(nearObjectDeviceControllerUwb));
         }
         break;
     }
-    default:
-        break;
     }
-}
-
-/* static */
-DWORD CALLBACK
-NearObjectDeviceDiscoveryAgentUwb::OnDeviceInterfaceNotificationCallback(HCMNOTIFICATION hcmNotificationHandle, void *context, CM_NOTIFY_ACTION action, CM_NOTIFY_EVENT_DATA *eventData, DWORD eventDataSize)
-{
-    auto self = static_cast<NearObjectDeviceDiscoveryAgentUwb *>(context);
-    self->OnDeviceInterfaceNotification(hcmNotificationHandle, action, eventData, eventDataSize);
-    return S_OK;
 }
 
 /* static */
@@ -140,13 +113,13 @@ NearObjectDeviceDiscoveryAgentUwb::Probe()
 void
 NearObjectDeviceDiscoveryAgentUwb::StartImpl()
 {
-    RegisterForUwbDeviceClassNotifications();
+    m_devicePresenceMonitor.Start();
 }
 
 void
 NearObjectDeviceDiscoveryAgentUwb::StopImpl()
 {
-    UnregisterForUwbDeviceClassNotifications();
+    m_devicePresenceMonitor.Stop();
 }
 
 std::future<std::vector<std::shared_ptr<NearObjectDeviceController>>>

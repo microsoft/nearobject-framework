@@ -8,13 +8,8 @@
 #include <unordered_map>
 #include <vector>
 
-// NB: This must come before any other Windows include
-#include <windows.h>
-
-#include <cfgmgr32.h>
-#include <wil/resource.h>
-
 #include <nearobject/service/NearObjectDeviceControllerDiscoveryAgent.hxx>
+#include <windows/devices/DevicePresenceMonitor.hxx>
 #include <windows/devices/DeviceResource.hxx>
 
 namespace nearobject
@@ -38,6 +33,9 @@ namespace nearobject::service
 class NearObjectDeviceDiscoveryAgentUwb :
     public ::nearobject::service::NearObjectDeviceControllerDiscoveryAgent
 {
+public:
+    NearObjectDeviceDiscoveryAgentUwb();
+
 protected:
     void
     StartImpl() override;
@@ -51,42 +49,6 @@ protected:
 private:
     std::vector<std::shared_ptr<::nearobject::service::NearObjectDeviceController>>
     Probe();
-
-    /**
-     * @brief Register for notifications of UWB device driver events.
-     */
-    void
-    RegisterForUwbDeviceClassNotifications();
-
-    /**
-     * @brief Unregister from notifications of UWB device driver events.
-     */
-    void
-    UnregisterForUwbDeviceClassNotifications();
-
-    /**
-     * @brief Bound callback function for when a UWB class driver event occurs.
-     *
-     * @param hcmNotificationHandle
-     * @param action
-     * @param eventData
-     * @param eventDataSize
-     */
-    void
-    OnDeviceInterfaceNotification(HCMNOTIFICATION hcmNotificationHandle, CM_NOTIFY_ACTION action, CM_NOTIFY_EVENT_DATA *eventData, DWORD eventDataSize);
-
-    /**
-     * @brief Unbound callback function for when a UWB class driver event occurs.
-     *
-     * @param hcmNotificationHandle
-     * @param context
-     * @param action
-     * @param eventData
-     * @param eventDataSize
-     * @return DWORD
-     */
-    static DWORD CALLBACK
-    OnDeviceInterfaceNotificationCallback(HCMNOTIFICATION hcmNotificationHandle, void *context, CM_NOTIFY_ACTION action, CM_NOTIFY_EVENT_DATA *eventData, DWORD eventDataSize);
 
     /**
      * @brief Create (if necessary) and add NearObjectDeviceControllerUwb wrapper instance
@@ -108,11 +70,22 @@ private:
     std::shared_ptr<::nearobject::service::NearObjectDeviceControllerUwb>
     ExtractCachedNearObjectDevice(const std::string &deviceName);
 
-private:
-    unique_hcmnotification m_uwbHcmNotificationHandle;
+    /**
+     * @brief Callback function invoked when device presence changes.
+     *
+     * @param deviceGuid The GUID of the device that changed presence.
+     * @param presenceEvent The type of presence change that ocurred.
+     * @param deviceName The device name (interface path) of the device.
+     */
+    void
+    OnDevicePresenceChanged(const GUID &deviceGuid, windows::devices::DevicePresenceEvent presenceEvent, std::string deviceName);
 
+private:
     std::mutex m_nearObjectDeviceCacheGate;
     std::unordered_map<std::string, std::weak_ptr<::nearobject::service::NearObjectDeviceControllerUwb>> m_nearObjectDeviceCache;
+
+    // this member is actually in charge of handling the presence monitoring
+    windows::devices::DevicePresenceMonitor m_devicePresenceMonitor;
 };
 } // namespace nearobject::service
 } // namespace windows
