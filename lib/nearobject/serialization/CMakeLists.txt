@@ -9,11 +9,13 @@ target_sources(nearobject-serialization
         ${CMAKE_CURRENT_LIST_DIR}/NearObjectProfileJsonSerializer.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbMacAddressJsonSerializer.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbSessionDataJsonSerializer.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/UwbConfigurationJsonSerializer.cxx
     PUBLIC
         ${NO_SERIALIZATION_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectIdentityTokenUwbJsonSerializer.hxx
         ${NO_SERIALIZATION_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectProfileJsonSerializer.hxx
         ${NO_SERIALIZATION_DIR_PUBLIC_INCLUDE_PREFIX}/UwbMacAddressJsonSerializer.hxx
         ${NO_SERIALIZATION_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionDataJsonSerializer.hxx
+        ${NO_SERIALIZATION_DIR_PUBLIC_INCLUDE_PREFIX}/UwbConfigurationJsonSerializer.hxx
 )
 
 target_link_libraries(nearobject-serialization
@@ -30,6 +32,7 @@ list(APPEND NO_SERIALIZATION_PUBLIC_HEADERS
     ${NO_SERIALIZATION_DIR_PUBLIC_INCLUDE_PREFIX}/NearObjectProfileJsonSerializer.hxx
     ${NO_SERIALIZATION_DIR_PUBLIC_INCLUDE_PREFIX}/UwbMacAddressJsonSerializer.hxx
     ${NO_SERIALIZATION_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionDataJsonSerializer.hxx
+    ${NO_SERIALIZATION_DIR_PUBLIC_INCLUDE_PREFIX}/UwbConfigurationJsonSerializer.hxx
 )
 
 set_target_properties(nearobject-serialization PROPERTIES FOLDER lib/nearobject)

@@ -9,19 +9,19 @@ namespace uwb::protocol::fira
 struct UwbSessionData;
 
 /**
- * @brief 
- * 
- * @param json 
- * @param uwbSessionData 
+ * @brief
+ *
+ * @param json
+ * @param uwbSessionData
  */
 void
 to_json(nlohmann::json& json, const UwbSessionData& uwbSessionData);
 
 /**
- * @brief 
- * 
- * @param json 
- * @param uwbSessionData 
+ * @brief
+ *
+ * @param json
+ * @param uwbSessionData
  */
 void
 from_json(const nlohmann::json& json, UwbSessionData& uwbSessionData);
