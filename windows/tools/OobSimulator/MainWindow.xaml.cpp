@@ -1,5 +1,4 @@
 // Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
 
 // clang-format off
 #include "pch.h"

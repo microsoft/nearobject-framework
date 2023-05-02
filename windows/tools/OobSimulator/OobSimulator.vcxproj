@@ -108,6 +108,8 @@
     <Manifest Include="app.manifest" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ViewModels\DelegateCommand.h" />
+    <ClInclude Include="ViewModels\MainViewModel.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="App.xaml.h">
       <DependentUpon>App.xaml</DependentUpon>
@@ -122,6 +124,8 @@
     <Page Include="MainWindow.xaml" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ViewModels\DelegateCommand.cpp" />
+    <ClCompile Include="ViewModels\MainViewModel.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
