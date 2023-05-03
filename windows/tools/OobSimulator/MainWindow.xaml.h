@@ -13,8 +13,6 @@ struct MainWindow : MainWindowT<MainWindow>
 
     OobSimulator::OobSimulatorViewModel
     MainViewModel();
-    void
-    OnSetUwbSessionDataButtonClick(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& e);
 
 private:
     OobSimulator::OobSimulatorViewModel m_mainViewModel;
