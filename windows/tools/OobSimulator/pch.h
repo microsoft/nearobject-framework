@@ -30,4 +30,5 @@
 #include <wil/cppwinrt_helpers.h>
 // clang-format on
 
+#include "Globals.h"
 #include <nlohmann/json.hpp>

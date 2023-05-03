@@ -7,6 +7,7 @@
 #include "Utils.hxx"
 
 #include <nearobject/serialization/UwbSessionDataJsonSerializer.hxx>
+#include <shobjidl.h>
 #include <uwb/protocols/fira/UwbConfigurationBuilder.hxx>
 #include <uwb/protocols/fira/UwbSessionData.hxx>
 
@@ -49,16 +50,18 @@ OobSimulatorViewModel::SetUwbSessionData()
     */
 
     // Controller MAC Address
-    builder.SetMacAddressController(uwb::UwbMacAddress::FromString(winrt::to_string(m_uwbSessionData.ControllerMacAddress()), uwb::UwbMacAddressType::Short).value());
+    // builder.SetMacAddressController(uwb::UwbMacAddress::FromString(winrt::to_string(m_uwbSessionData.ControllerMacAddress()), uwb::UwbMacAddressType::Short).value());
 
     // Controlee Short MAC Address
-    builder.SetMacAddressControleeShort(uwb::UwbMacAddress::FromString(winrt::to_string(m_uwbSessionData.ControleeShortMacAddress()), uwb::UwbMacAddressType::Short).value());
+    // builder.SetMacAddressControleeShort(uwb::UwbMacAddress::FromString(winrt::to_string(m_uwbSessionData.ControleeShortMacAddress()), uwb::UwbMacAddressType::Short).value());
 
     // Set UWB Configuration of UWB Session Data
     uwbSessionData.uwbConfiguration = std::move(builder);
 
     // Create FileSavePicker
     winrt::Windows::Storage::Pickers::FileSavePicker fileSavePicker;
+    auto initializeWithWindow{ fileSavePicker.as<::IInitializeWithWindow>() };
+    initializeWithWindow->Initialize(g_hwnd);
 
     // Convert the input data to JSON
     nlohmann::json json = uwbSessionData;

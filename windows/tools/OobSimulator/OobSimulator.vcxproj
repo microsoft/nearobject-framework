@@ -110,6 +110,7 @@
   <ItemGroup>
     <ClInclude Include="BindableBase.h" />
     <ClInclude Include="DelegateCommand.h" />
+    <ClInclude Include="Globals.h" />
     <ClInclude Include="OobSimulatorViewModel.h" />
     <ClInclude Include="UwbSessionData.h" />
     <ClInclude Include="pch.h" />
@@ -128,6 +129,7 @@
   <ItemGroup>
     <ClCompile Include="BindableBase.cpp" />
     <ClCompile Include="DelegateCommand.cpp" />
+    <ClCompile Include="Globals.cpp" />
     <ClCompile Include="OobSimulatorViewModel.cpp" />
     <ClCompile Include="UwbSessionData.cpp" />
     <ClCompile Include="pch.cpp">
