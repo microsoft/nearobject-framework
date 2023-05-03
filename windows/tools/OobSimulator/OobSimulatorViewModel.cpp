@@ -17,6 +17,11 @@ OobSimulatorViewModel::OobSimulatorViewModel()
 {
     m_uwbSessionData = winrt::make<OobSimulator::implementation::UwbSessionData>();
     m_setUwbSessionData = winrt::make<OobSimulator::implementation::DelegateCommand>(std::bind(&OobSimulatorViewModel::SetUwbSessionData, this));
+
+    // Set default values
+    m_uwbSessionData.SessionId(L"1234");
+    m_uwbSessionData.ControllerMacAddress(L"12:34");
+    m_uwbSessionData.ControleeShortMacAddress(L"67:89");
 }
 
 winrt::OobSimulator::UwbSessionData
