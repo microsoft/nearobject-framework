@@ -108,8 +108,10 @@
     <Manifest Include="app.manifest" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ViewModels\DelegateCommand.h" />
-    <ClInclude Include="ViewModels\MainViewModel.h" />
+    <ClInclude Include="BindableBase.h" />
+    <ClInclude Include="DelegateCommand.h" />
+    <ClInclude Include="OobSimulatorViewModel.h" />
+    <ClInclude Include="UwbSessionData.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="App.xaml.h">
       <DependentUpon>App.xaml</DependentUpon>
@@ -124,8 +126,10 @@
     <Page Include="MainWindow.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ViewModels\DelegateCommand.cpp" />
-    <ClCompile Include="ViewModels\MainViewModel.cpp" />
+    <ClCompile Include="BindableBase.cpp" />
+    <ClCompile Include="DelegateCommand.cpp" />
+    <ClCompile Include="OobSimulatorViewModel.cpp" />
+    <ClCompile Include="UwbSessionData.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -143,10 +147,14 @@
       <SubType>Code</SubType>
       <DependentUpon>App.xaml</DependentUpon>
     </Midl>
+    <Midl Include="BindableBase.idl" />
+    <Midl Include="DelegateCommand.idl" />
     <Midl Include="MainWindow.idl">
       <SubType>Code</SubType>
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Midl>
+    <Midl Include="OobSimulatorViewModel.idl" />
+    <Midl Include="UwbSessionData.idl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt">

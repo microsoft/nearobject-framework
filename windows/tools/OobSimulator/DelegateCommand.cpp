@@ -1,5 +1,3 @@
-// Copyright (c) Microsoft Corporation and Contributors.
-
 // clang-format off
 #include "pch.h"
 #include "DelegateCommand.h"
@@ -7,7 +5,7 @@
 
 using namespace winrt::Windows::Foundation;
 
-namespace winrt::OobSimulator::ViewModels::implementation
+namespace winrt::OobSimulator::implementation
 {
 DelegateCommand::DelegateCommand(std::function<void(IInspectable)> const& execute, std::function<bool(IInspectable)> const& canExecute)
 {
@@ -43,7 +41,6 @@ DelegateCommand::CanExecute(IInspectable const& parameter)
     return m_lastCanExecute;
 }
 
-// Event Handlers
 winrt::event_token
 DelegateCommand::CanExecuteChanged(EventHandler<IInspectable> const& handler)
 {
@@ -61,4 +58,4 @@ DelegateCommand::RaiseCanExecuteChanged()
 {
     m_canExecuteChanged(*this, IInspectable());
 }
-} // namespace winrt::OobSimulator::ViewModels::implementation
+} // namespace winrt::OobSimulator::implementation

@@ -1,0 +1,25 @@
+// UwbSessionData.idl
+namespace OobSimulator
+{
+enum DeviceRole {
+    Responder,
+    Initiator,
+};
+
+enum MultiNodeMode {
+    Unicast,
+    OneToMany,
+    ManyToMany,
+};
+
+runtimeclass UwbSessionData : Windows.UI.Xaml.Data.INotifyPropertyChanged
+{
+    UwbSessionData();
+
+    String SessionId;
+    DeviceRole DeviceRole;
+    MultiNodeMode MultiNodeMode;
+    String ControllerMacAddress;
+    String ControleeShortMacAddress;
+}
+} // namespace OobSimulator
