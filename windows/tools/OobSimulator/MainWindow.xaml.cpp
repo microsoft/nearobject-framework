@@ -20,4 +20,10 @@ MainWindow::MainViewModel()
 {
     return m_mainViewModel;
 }
+
+void
+winrt::OobSimulator::implementation::MainWindow::OnSetUwbSessionDataButtonClick(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& e)
+{
+    MainViewModel().SetUwbSessionDataCommand();
+}
 } // namespace winrt::OobSimulator::implementation

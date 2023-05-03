@@ -25,7 +25,7 @@
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10">
             <TextBlock Text="UWB Session ID: " VerticalAlignment="Center" />
-            <TextBox x:Name="UwbSessionIdTextBox" Margin="10" VerticalAlignment="Center" Text="1234" />
+            <TextBox Margin="10" VerticalAlignment="Center" Text="{x:Bind MainViewModel.UwbSessionData.SessionId}" />
         </StackPanel>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="10">
@@ -47,14 +47,14 @@
 
         <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="10">
             <TextBlock Text="Controller MAC Address: " VerticalAlignment="Center" />
-            <TextBox x:Name="ControllerMacAddressTextBox" Margin="10" VerticalAlignment="Center" Text="12:34" />
+            <TextBox Margin="10" VerticalAlignment="Center" Text="{x:Bind MainViewModel.UwbSessionData.ControllerMacAddress}" />
         </StackPanel>
 
         <StackPanel Grid.Row="5" Orientation="Horizontal" Margin="10">
             <TextBlock Text="Controlee Short MAC Address: " VerticalAlignment="Center" />
-            <TextBox x:Name="ControleeShortMacAddressTextBox" Margin="10" VerticalAlignment="Center" Text="67:89" />
+            <TextBox Margin="10" VerticalAlignment="Center" Text="{x:Bind MainViewModel.UwbSessionData.ControleeShortMacAddress}" />
         </StackPanel>
 
-        <Button Grid.Row="6" Content="Set UWB Session Data" FontSize="16" FontWeight="Bold" Margin="10" Command="{x:Bind MainViewModel.SetUwbSessionDataCommand}" CommandParameter="{x:Bind MainViewModel.UwbSessionData}"/>
+        <Button Grid.Row="6" Content="Set UWB Session Data" FontSize="16" FontWeight="Bold" Margin="10" Command="{x:Bind MainViewModel.SetUwbSessionDataCommand}"/>
     </Grid>
 </Window>

@@ -3,7 +3,10 @@ import "OobSimulatorViewModel.idl";
 
 namespace OobSimulator
 {
-[default_interface] runtimeclass MainWindow : Microsoft.UI.Xaml.Window
+// clang-format off
+[default_interface]
+runtimeclass MainWindow : Microsoft.UI.Xaml.Window
+// clang-format on
 {
     MainWindow();
 
