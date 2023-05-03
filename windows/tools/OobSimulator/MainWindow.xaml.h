@@ -14,9 +14,6 @@ struct MainWindow : MainWindowT<MainWindow>
     OobSimulator::OobSimulatorViewModel
     MainViewModel();
 
-    void
-    ClickHandler(Windows::Foundation::IInspectable const&, Microsoft::UI::Xaml::RoutedEventArgs const&);
-
 private:
     OobSimulator::OobSimulatorViewModel m_mainViewModel;
 };

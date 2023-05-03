@@ -15,12 +15,6 @@ MainWindow::MainWindow()
     InitializeComponent();
 }
 
-void
-MainWindow::ClickHandler(Windows::Foundation::IInspectable const& /* sender */, Microsoft::UI::Xaml::RoutedEventArgs const& /* args */)
-{
-    MainViewModel().UwbSessionData().SessionId(L"1234"); // TODO: I don't think we need this ClickHandler
-}
-
 OobSimulator::OobSimulatorViewModel
 MainWindow::MainViewModel()
 {

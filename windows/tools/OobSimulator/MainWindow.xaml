@@ -55,6 +55,6 @@
             <TextBox x:Name="ControleeShortMacAddressTextBox" Margin="10" VerticalAlignment="Center" Text="67:89" />
         </StackPanel>
 
-        <Button Grid.Row="6" Content="Set UWB Session Data" FontSize="16" FontWeight="Bold" Margin="10" Command="{x:Bind MainViewModel.SetUwbSessionDataCommand}" />
+        <Button Grid.Row="6" Content="Set UWB Session Data" FontSize="16" FontWeight="Bold" Margin="10" Command="{x:Bind MainViewModel.SetUwbSessionDataCommand}" CommandParameter="{x:Bind MainViewModel.UwbSessionData}"/>
     </Grid>
 </Window>
