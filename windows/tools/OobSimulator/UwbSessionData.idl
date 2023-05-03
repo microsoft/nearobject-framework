@@ -12,7 +12,7 @@ enum MultiNodeMode {
     ManyToMany,
 };
 
-runtimeclass UwbSessionData : Windows.UI.Xaml.Data.INotifyPropertyChanged
+runtimeclass UwbSessionData : Microsoft.UI.Xaml.Data.INotifyPropertyChanged
 {
     UwbSessionData();
 

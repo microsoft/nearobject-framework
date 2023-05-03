@@ -12,7 +12,7 @@ namespace winrt::OobSimulator::implementation
     {
         if (m_sessionId != value) {
             m_sessionId = value;
-            m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs{ L"UWB Session ID" });
+            m_propertyChanged(*this, winrt::Microsoft::UI::Xaml::Data::PropertyChangedEventArgs{ L"UWB Session ID" });
         }
     }
     winrt::OobSimulator::DeviceRole UwbSessionData::DeviceRole()
@@ -23,7 +23,7 @@ namespace winrt::OobSimulator::implementation
     {
         if (m_deviceRole != value) {
             m_deviceRole = value;
-            m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs{ L"Device Role" });
+            m_propertyChanged(*this, winrt::Microsoft::UI::Xaml::Data::PropertyChangedEventArgs{ L"Device Role" });
         }
     }
     winrt::OobSimulator::MultiNodeMode UwbSessionData::MultiNodeMode()
@@ -34,7 +34,7 @@ namespace winrt::OobSimulator::implementation
     {
         if (m_multiNodeMode != value) {
             m_multiNodeMode = value;
-            m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs{ L"Multi Node Mode" });
+            m_propertyChanged(*this, winrt::Microsoft::UI::Xaml::Data::PropertyChangedEventArgs{ L"Multi Node Mode" });
         }
     }
     hstring UwbSessionData::ControllerMacAddress()
@@ -45,7 +45,7 @@ namespace winrt::OobSimulator::implementation
     {
         if (m_controllerMacAddress != value) {
             m_controllerMacAddress = value;
-            m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs{ L"Controller MAC Address" });
+            m_propertyChanged(*this, winrt::Microsoft::UI::Xaml::Data::PropertyChangedEventArgs{ L"Controller MAC Address" });
         }
     }
     hstring UwbSessionData::ControleeShortMacAddress()
@@ -56,10 +56,10 @@ namespace winrt::OobSimulator::implementation
     {
         if (m_controleeShortMacAddress != value) {
             m_controleeShortMacAddress = value;
-            m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs{ L"Controlee Short MAC Address" });
+            m_propertyChanged(*this, winrt::Microsoft::UI::Xaml::Data::PropertyChangedEventArgs{ L"Controlee Short MAC Address" });
         }
     }
-    winrt::event_token UwbSessionData::PropertyChanged(winrt::Windows::UI::Xaml::Data::PropertyChangedEventHandler const& handler)
+    winrt::event_token UwbSessionData::PropertyChanged(winrt::Microsoft::UI::Xaml::Data::PropertyChangedEventHandler const& handler)
     {
         return m_propertyChanged.add(handler);
     }

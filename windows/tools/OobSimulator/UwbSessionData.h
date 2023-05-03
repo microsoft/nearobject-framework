@@ -17,7 +17,7 @@ namespace winrt::OobSimulator::implementation
         void ControllerMacAddress(hstring const& value);
         hstring ControleeShortMacAddress();
         void ControleeShortMacAddress(hstring const& value);
-        winrt::event_token PropertyChanged(winrt::Windows::UI::Xaml::Data::PropertyChangedEventHandler const& handler);
+        winrt::event_token PropertyChanged(winrt::Microsoft::UI::Xaml::Data::PropertyChangedEventHandler const& handler);
         void PropertyChanged(winrt::event_token const& token) noexcept;
 
     private:
@@ -27,7 +27,7 @@ namespace winrt::OobSimulator::implementation
         winrt::hstring m_controllerMacAddress;
         winrt::hstring m_controleeShortMacAddress;
 
-        winrt::event<Windows::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;
+        winrt::event<winrt::Microsoft::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;
     };
 }
 namespace winrt::OobSimulator::factory_implementation
