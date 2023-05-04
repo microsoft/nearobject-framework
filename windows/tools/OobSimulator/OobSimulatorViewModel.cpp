@@ -20,6 +20,8 @@ OobSimulatorViewModel::OobSimulatorViewModel()
 
     // Set default values
     m_uwbSessionData.SessionId(L"1234");
+    m_uwbSessionData.DeviceRole(OobSimulator::DeviceRole::Responder);
+    m_uwbSessionData.MultiNodeMode(OobSimulator::MultiNodeMode::Unicast);
     m_uwbSessionData.ControllerMacAddress(L"12:34");
     m_uwbSessionData.ControleeShortMacAddress(L"67:89");
 }
@@ -45,20 +47,37 @@ OobSimulatorViewModel::SetUwbSessionData()
     // UWB Session ID
     uwbSessionData.sessionId = HstringToUint32(m_uwbSessionData.SessionId());
 
-    // TODO: Conversion
-    /*
+    // Convert OobSimulator::DeviceRole to uwb::protocol::fira::DeviceRole
+    auto oobSimulatorDeviceRole = m_uwbSessionData.DeviceRole();
+    uwb::protocol::fira::DeviceRole deviceRole;
+    if (oobSimulatorDeviceRole == OobSimulator::DeviceRole::Responder) {
+        deviceRole = uwb::protocol::fira::DeviceRole::Responder;
+    } else if (oobSimulatorDeviceRole == OobSimulator::DeviceRole::Initiator) {
+        deviceRole = uwb::protocol::fira::DeviceRole::Initiator;
+    }
+
+    // Convert OobSimulator::MultiNodeMode to uwb::protocol::fira::MultiNodeMode
+    auto oobSimulatorMultiNodeMode = m_uwbSessionData.MultiNodeMode();
+    uwb::protocol::fira::MultiNodeMode multiNodeMode;
+    if (oobSimulatorMultiNodeMode == OobSimulator::MultiNodeMode::Unicast) {
+        multiNodeMode = uwb::protocol::fira::MultiNodeMode::Unicast;
+    } else if (oobSimulatorMultiNodeMode == OobSimulator::MultiNodeMode::OneToMany) {
+        multiNodeMode = uwb::protocol::fira::MultiNodeMode::OneToMany;
+    } else if (oobSimulatorMultiNodeMode == OobSimulator::MultiNodeMode::ManyToMany) {
+        multiNodeMode = uwb::protocol::fira::MultiNodeMode::ManyToMany;
+    }
+
     // Device Role
-    builder.SetDeviceRole(m_uwbSessionData.DeviceRole());
+    builder.SetDeviceRole(deviceRole);
 
     // Multi-Node Mode
-    builder.SetMultiNodeMode(m_uwbSessionData.MultiNodeMode());
-    */
+    builder.SetMultiNodeMode(multiNodeMode);
 
     // Controller MAC Address
-    // builder.SetMacAddressController(uwb::UwbMacAddress::FromString(winrt::to_string(m_uwbSessionData.ControllerMacAddress()), uwb::UwbMacAddressType::Short).value());
+    builder.SetMacAddressController(uwb::UwbMacAddress::FromString(winrt::to_string(m_uwbSessionData.ControllerMacAddress()), uwb::UwbMacAddressType::Short).value());
 
     // Controlee Short MAC Address
-    // builder.SetMacAddressControleeShort(uwb::UwbMacAddress::FromString(winrt::to_string(m_uwbSessionData.ControleeShortMacAddress()), uwb::UwbMacAddressType::Short).value());
+    builder.SetMacAddressControleeShort(uwb::UwbMacAddress::FromString(winrt::to_string(m_uwbSessionData.ControleeShortMacAddress()), uwb::UwbMacAddressType::Short).value());
 
     // Set UWB Configuration of UWB Session Data
     uwbSessionData.uwbConfiguration = std::move(builder);

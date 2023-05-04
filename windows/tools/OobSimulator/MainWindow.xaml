@@ -27,7 +27,9 @@
             <TextBlock Text="UWB Session ID: " VerticalAlignment="Center" />
             <TextBox Margin="10" VerticalAlignment="Center" Text="{x:Bind MainViewModel.UwbSessionData.SessionId, Mode=TwoWay}" />
         </StackPanel>
-
+        <!-- TODO: Default RadioButton options are set initially and cannot be changed. This is due to UI issues, 
+             where ideally a IValueConverter impl would convert the IsChecked property of each RadioButton to an enum value. However,
+             the converter cannot be used in Window since it's not a FrameworkElement like Page.-->
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="10">
             <TextBlock Text="Device Role: " VerticalAlignment="Center" />
             <StackPanel Margin="10" Orientation="Horizontal">
