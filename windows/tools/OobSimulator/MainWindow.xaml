@@ -29,7 +29,7 @@
         </StackPanel>
         <!-- TODO: Default RadioButton options are set initially and cannot be changed. This is due to UI issues, 
              where ideally a IValueConverter impl would convert the IsChecked property of each RadioButton to an enum value. However,
-             the converter cannot be used in Window since it's not a FrameworkElement like Page.-->
+             it appears that the converter cannot be used in Window. Should consider changing Window to Page.-->
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="10">
             <TextBlock Text="Device Role: " VerticalAlignment="Center" />
             <StackPanel Margin="10" Orientation="Horizontal">
