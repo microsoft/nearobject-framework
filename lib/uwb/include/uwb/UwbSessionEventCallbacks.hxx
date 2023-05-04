@@ -9,7 +9,7 @@
 
 namespace uwb
 {
-struct UwbSession;
+class UwbSession;
 
 /**
  * @brief The possible reasons for a session ending.
