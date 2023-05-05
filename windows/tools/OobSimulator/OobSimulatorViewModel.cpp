@@ -89,10 +89,8 @@ uwb::protocol::fira::DeviceRole
 OobSimulatorViewModel::ConvertDeviceRole()
 {
     auto oobSimulatorDeviceRole = m_uwbSessionData.DeviceRole();
-    uwb::protocol::fira::DeviceRole deviceRole;
-    if (oobSimulatorDeviceRole == OobSimulator::DeviceRole::Responder) {
-        deviceRole = uwb::protocol::fira::DeviceRole::Responder;
-    } else if (oobSimulatorDeviceRole == OobSimulator::DeviceRole::Initiator) {
+    auto deviceRole = uwb::protocol::fira::DeviceRole::Responder;
+    if (oobSimulatorDeviceRole == OobSimulator::DeviceRole::Initiator) {
         deviceRole = uwb::protocol::fira::DeviceRole::Initiator;
     }
 
@@ -103,10 +101,8 @@ uwb::protocol::fira::MultiNodeMode
 OobSimulatorViewModel::ConvertMultiNodeMode()
 {
     auto oobSimulatorMultiNodeMode = m_uwbSessionData.MultiNodeMode();
-    uwb::protocol::fira::MultiNodeMode multiNodeMode;
-    if (oobSimulatorMultiNodeMode == OobSimulator::MultiNodeMode::Unicast) {
-        multiNodeMode = uwb::protocol::fira::MultiNodeMode::Unicast;
-    } else if (oobSimulatorMultiNodeMode == OobSimulator::MultiNodeMode::OneToMany) {
+    auto multiNodeMode = uwb::protocol::fira::MultiNodeMode::Unicast;
+    if (oobSimulatorMultiNodeMode == OobSimulator::MultiNodeMode::OneToMany) {
         multiNodeMode = uwb::protocol::fira::MultiNodeMode::OneToMany;
     } else if (oobSimulatorMultiNodeMode == OobSimulator::MultiNodeMode::ManyToMany) {
         multiNodeMode = uwb::protocol::fira::MultiNodeMode::ManyToMany;
