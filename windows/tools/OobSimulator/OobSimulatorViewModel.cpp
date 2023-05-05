@@ -41,7 +41,7 @@ OobSimulatorViewModel::SetUwbSessionDataCommand()
 winrt::Windows::Foundation::IAsyncAction
 OobSimulatorViewModel::SetUwbSessionData()
 {
-    uwb::protocol::fira::UwbSessionData uwbSessionData;
+    uwb::protocol::fira::UwbSessionData uwbSessionData{};
     uwb::protocol::fira::UwbConfiguration::Builder builder{};
 
     // UWB Session ID
