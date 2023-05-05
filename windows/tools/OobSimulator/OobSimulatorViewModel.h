@@ -6,6 +6,7 @@
 #include "DelegateCommand.h"
 #include "UwbSessionData.h"
 // clang-format on
+#include <uwb/protocols/fira/FiraDevice.hxx>
 
 namespace winrt::OobSimulator::implementation
 {
