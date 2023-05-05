@@ -24,6 +24,12 @@ private:
 
     winrt::Windows::Foundation::IAsyncAction
     SetUwbSessionData();
+
+    uwb::protocol::fira::DeviceRole
+    ConvertDeviceRole();
+
+    uwb::protocol::fira::MultiNodeMode
+    ConvertMultiNodeMode();
 };
 } // namespace winrt::OobSimulator::implementation
 
