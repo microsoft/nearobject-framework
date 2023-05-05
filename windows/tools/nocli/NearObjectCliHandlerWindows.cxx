@@ -1,4 +1,5 @@
 
+#include <fstream>
 #include <iostream>
 #include <limits>
 #include <string>
@@ -13,11 +14,17 @@
 #include <windows/devices/uwb/UwbDevice.hxx>
 #include <windows/devices/uwb/UwbDeviceDriver.hxx>
 
+#include <winrt/Windows.Foundation.h>
+#include <winrt/Windows.Storage.Streams.h>
+#include <winrt/windows.devices.nearobject.h>
+
 #include "NearObjectCliDataWindows.hxx"
 #include "NearObjectCliHandlerWindows.hxx"
 
 using namespace nearobject::cli;
 using namespace windows::devices;
+using namespace winrt::Windows::Devices;
+using namespace winrt::Windows::Foundation;
 
 namespace detail
 {
@@ -101,6 +108,49 @@ NearObjectCliHandlerWindows::ResolveUwbDevice(const nearobject::cli::NearObjectC
     }
 
     return detail::ResolveUwbDevice(*cliDataWindows);
+}
+
+void
+NearObjectCliHandlerWindows::HandleStartRanging(::uwb::protocol::fira::DeviceType deviceType, std::filesystem::path sessionDataFilePath) noexcept
+{
+    std::ifstream inputFileStream(sessionDataFilePath, std::ios::binary);
+    if (!inputFileStream.is_open()) {
+        // TODO: Log error
+        return;
+    }
+
+    // Read file and store data into byte buffer
+    std::vector<uint8_t> uwbSessionDataSerialized;
+    std::string line;
+    // File only contains one line of data
+    if (std::getline(inputFileStream, line)) {
+        uwbSessionDataSerialized = std::vector<uint8_t>(line.begin(), line.end());
+    }
+
+    inputFileStream.close();
+
+    // Create the NearObjectIdentityToken from the byte buffer
+    winrt::Windows::Storage::Streams::Buffer uwbSessionDataBuffer(static_cast<uint32_t>(std::size(uwbSessionDataSerialized)));
+    std::memcpy(std::data(uwbSessionDataBuffer), std::data(uwbSessionDataSerialized), std::size(uwbSessionDataSerialized));
+
+    auto uwbSessionDataIBuffer = uwbSessionDataBuffer.as<winrt::Windows::Storage::Streams::IBuffer>();
+    auto identityTokenUwb = NearObject::NearObjectIdentityToken::TryParse(uwbSessionDataIBuffer);
+
+    // Create the NearObjectSessionConfiguration
+    NearObject::NearObjectSessionConfiguration sessionConfiguration;
+    sessionConfiguration.IdentityToken(identityTokenUwb);
+
+    // Create the NearObjectSession
+    IAsyncOperation<NearObject::NearObjectSessionCreateResult> sessionCreateResultAsyncOperation = NearObject::NearObjectSession::CreateAsync(sessionConfiguration);
+
+    // Get the result from the async operation
+    NearObject::NearObjectSessionCreateResult sessionCreateResult = sessionCreateResultAsyncOperation.get();
+
+    // TODO: Check which type of session client we want to be
+    NearObject::NearObjectSessionHostClient hostClient = sessionCreateResult.HostClient();
+
+    // Start the ranging session
+    hostClient.Start();
 }
 
 void
