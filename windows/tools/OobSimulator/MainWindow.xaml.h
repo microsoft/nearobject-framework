@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 
-#pragma once
+#ifndef MAIN_WINDOW_XAML_H
+#define MAIN_WINDOW_XAML_H
 
 #include "MainWindow.g.h"
 #include "OobSimulatorViewModel.h"
@@ -25,3 +26,5 @@ struct MainWindow : MainWindowT<MainWindow, implementation::MainWindow>
 {
 };
 } // namespace winrt::OobSimulator::factory_implementation
+
+#endif // MAIN_WINDOW_XAML_H

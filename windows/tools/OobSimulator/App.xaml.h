@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
 
-#pragma once
+#ifndef APP_XAML_H
+#define APP_XAML_H
 
 #include "App.xaml.g.h"
 
@@ -18,3 +18,5 @@ private:
     winrt::Microsoft::UI::Xaml::Window window{ nullptr };
 };
 } // namespace winrt::OobSimulator::implementation
+
+#endif // APP_XAML_H

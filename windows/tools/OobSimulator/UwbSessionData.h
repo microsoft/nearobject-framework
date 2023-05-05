@@ -1,4 +1,5 @@
-#pragma once
+#ifndef UWB_SESSION_DATA_H
+#define UWB_SESSION_DATA_H
 
 #include "UwbSessionData.g.h"
 
@@ -49,3 +50,5 @@ struct UwbSessionData : UwbSessionDataT<UwbSessionData, implementation::UwbSessi
 {
 };
 } // namespace winrt::OobSimulator::factory_implementation
+
+#endif // UWB_SESSION_DATA_H

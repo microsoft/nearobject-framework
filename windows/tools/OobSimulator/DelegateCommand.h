@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DELEGATE_COMMAND_H
+#define DELEGATE_COMMAND_H
 
 #include "DelegateCommand.g.h"
 #include <functional>
@@ -32,3 +33,5 @@ private:
     winrt::event<winrt::Windows::Foundation::EventHandler<winrt::Windows::Foundation::IInspectable>> m_canExecuteChanged;
 };
 } // namespace winrt::OobSimulator::implementation
+
+#endif // DELEGATE_COMMAND_H

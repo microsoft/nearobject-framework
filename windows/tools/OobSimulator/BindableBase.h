@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BINDABLE_BASE_H
+#define BINDABLE_BASE_H
 
 #include "BindableBase.g.h"
 
@@ -24,3 +25,5 @@ struct BindableBase : BindableBaseT<BindableBase, implementation::BindableBase>
 {
 };
 } // namespace winrt::OobSimulator::factory_implementation
+
+#endif // BINDABLE_BASE_H

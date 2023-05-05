@@ -1,4 +1,5 @@
-#pragma once
+#ifndef OOB_SIMULATOR_VIEW_MODEL_H
+#define OOB_SIMULATOR_VIEW_MODEL_H
 
 // clang-format off
 #include "OobSimulatorViewModel.g.h"
@@ -40,3 +41,5 @@ struct OobSimulatorViewModel : OobSimulatorViewModelT<OobSimulatorViewModel, imp
 {
 };
 } // namespace winrt::OobSimulator::factory_implementation
+
+#endif // OOB_SIMULATOR_VIEW_MODEL_H
