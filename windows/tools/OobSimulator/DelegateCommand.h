@@ -25,8 +25,8 @@ struct DelegateCommand : DelegateCommandT<DelegateCommand>
     RaiseCanExecuteChanged();
 
 private:
-    std::function<void(winrt::Windows::Foundation::IInspectable)> m_execute;
-    std::function<bool(winrt::Windows::Foundation::IInspectable)> m_canExecute;
+    std::function<void(winrt::Windows::Foundation::IInspectable)> m_executeDelegate;
+    std::function<bool(winrt::Windows::Foundation::IInspectable)> m_canExecuteDelegate;
     bool m_lastCanExecute = true;
 
     winrt::event<winrt::Windows::Foundation::EventHandler<winrt::Windows::Foundation::IInspectable>> m_canExecuteChanged;

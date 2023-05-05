@@ -9,30 +9,30 @@ namespace winrt::OobSimulator::implementation
 {
 DelegateCommand::DelegateCommand(std::function<void(IInspectable)> const& execute, std::function<bool(IInspectable)> const& canExecute)
 {
-    if (execute == nullptr) {
+    if (!execute) {
         throw winrt::hresult_invalid_argument(L"execute");
     }
 
-    m_execute = execute;
-    m_canExecute = canExecute;
+    m_executeDelegate = execute;
+    m_canExecuteDelegate = canExecute;
 }
 
 void
 DelegateCommand::Execute(IInspectable const& parameter)
 {
-    if (m_execute != nullptr) {
-        m_execute(parameter);
+    if (m_executeDelegate) {
+        m_executeDelegate(parameter);
     }
 }
 
 bool
 DelegateCommand::CanExecute(IInspectable const& parameter)
 {
-    if (m_canExecute == nullptr) {
+    if (!m_canExecuteDelegate) {
         return true;
     }
 
-    bool canExecute = m_canExecute(parameter);
+    bool canExecute = m_canExecuteDelegate(parameter);
     if (m_lastCanExecute != canExecute) {
         m_lastCanExecute = canExecute;
         RaiseCanExecuteChanged();
