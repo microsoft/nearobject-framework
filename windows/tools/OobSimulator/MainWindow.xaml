@@ -1,5 +1,4 @@
 <!-- Copyright (c) Microsoft Corporation and Contributors. -->
-<!-- Licensed under the MIT License. -->
 
 <Window
     x:Class="OobSimulator.MainWindow"
@@ -26,9 +25,11 @@
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10">
             <TextBlock Text="UWB Session ID: " VerticalAlignment="Center" />
-            <TextBox x:Name="UwbSessionIdTextBox" Margin="10" VerticalAlignment="Center" Text="1234" />
+            <TextBox Margin="10" VerticalAlignment="Center" Text="{x:Bind MainViewModel.UwbSessionData.SessionId, Mode=TwoWay}" />
         </StackPanel>
-
+        <!-- TODO: Default RadioButton options are set initially and cannot be changed. This is due to UI issues, 
+             where ideally a IValueConverter impl would convert the IsChecked property of each RadioButton to an enum value. However,
+             it appears that the converter cannot be used in Window. Should consider changing Window to Page.-->
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="10">
             <TextBlock Text="Device Role: " VerticalAlignment="Center" />
             <StackPanel Margin="10" Orientation="Horizontal">
@@ -48,14 +49,14 @@
 
         <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="10">
             <TextBlock Text="Controller MAC Address: " VerticalAlignment="Center" />
-            <TextBox x:Name="ControllerMacAddressTextBox" Margin="10" VerticalAlignment="Center" Text="12:34" />
+            <TextBox Margin="10" VerticalAlignment="Center" Text="{x:Bind MainViewModel.UwbSessionData.ControllerMacAddress, Mode=TwoWay}" />
         </StackPanel>
 
         <StackPanel Grid.Row="5" Orientation="Horizontal" Margin="10">
             <TextBlock Text="Controlee Short MAC Address: " VerticalAlignment="Center" />
-            <TextBox x:Name="ControleeShortMacAddressTextBox" Margin="10" VerticalAlignment="Center" Text="67:89" />
+            <TextBox Margin="10" VerticalAlignment="Center" Text="{x:Bind MainViewModel.UwbSessionData.ControleeShortMacAddress, Mode=TwoWay}" />
         </StackPanel>
 
-        <Button Grid.Row="6" x:Name="SetUwbSessionDataButton" Content="Set UWB Session Data" FontSize="16" FontWeight="Bold" Margin="10" Click="SetUwbSessionData_Click" />
+        <Button Grid.Row="6" Content="Set UWB Session Data" FontSize="16" FontWeight="Bold" Margin="10" Command="{x:Bind MainViewModel.SetUwbSessionDataCommand}"/>
     </Grid>
 </Window>

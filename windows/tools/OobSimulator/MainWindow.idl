@@ -1,11 +1,18 @@
-// Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
+// MainWindow.idl
+import "OobSimulatorViewModel.idl";
 
 namespace OobSimulator
 {
-    [default_interface]
-    runtimeclass MainWindow : Microsoft.UI.Xaml.Window
+// clang-format off
+[default_interface]
+runtimeclass MainWindow : Microsoft.UI.Xaml.Window
+// clang-format on
+{
+    MainWindow();
+
+    OobSimulatorViewModel MainViewModel
     {
-        MainWindow();
-    }
+        get;
+    };
 }
+} // namespace OobSimulator

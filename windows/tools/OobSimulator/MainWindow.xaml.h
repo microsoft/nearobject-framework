@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
 
-#pragma once
+#ifndef MAIN_WINDOW_XAML_H
+#define MAIN_WINDOW_XAML_H
 
 #include "MainWindow.g.h"
-#include "uwb/protocols/fira/UwbSessionData.hxx"
+#include "OobSimulatorViewModel.h"
 
 namespace winrt::OobSimulator::implementation
 {
@@ -12,10 +12,11 @@ struct MainWindow : MainWindowT<MainWindow>
 {
     MainWindow();
 
-    winrt::Windows::Foundation::IAsyncAction
-    SetUwbSessionData(uwb::protocol::fira::UwbSessionData const& uwbSessionData);
-    winrt::Windows::Foundation::IAsyncAction
-    SetUwbSessionData_Click(Windows::Foundation::IInspectable const& sender, Microsoft::UI::Xaml::RoutedEventArgs const& args);
+    OobSimulator::OobSimulatorViewModel
+    MainViewModel();
+
+private:
+    OobSimulator::OobSimulatorViewModel m_mainViewModel;
 };
 } // namespace winrt::OobSimulator::implementation
 
@@ -25,3 +26,5 @@ struct MainWindow : MainWindowT<MainWindow, implementation::MainWindow>
 {
 };
 } // namespace winrt::OobSimulator::factory_implementation
+
+#endif // MAIN_WINDOW_XAML_H

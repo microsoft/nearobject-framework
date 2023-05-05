@@ -1,0 +1,15 @@
+// BindableBase.idl
+
+namespace OobSimulator
+{
+// clang-format off
+[default_interface]
+unsealed runtimeclass BindableBase : Microsoft.UI.Xaml.DependencyObject, Microsoft.UI.Xaml.Data.INotifyPropertyChanged
+// clang-format on
+{
+    BindableBase();
+    // clang-format off
+    protected void RaisePropertyChanged(String propertyName);
+    // clang-format on
+}
+} // namespace OobSimulator

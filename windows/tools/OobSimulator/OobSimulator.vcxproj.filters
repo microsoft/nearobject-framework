@@ -14,10 +14,14 @@
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
     <ClCompile Include="Utils.cxx" />
+    <ClCompile Include="ViewModels\MainViewModel.cpp" />
+    <ClCompile Include="ViewModels\DelegateCommand.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="Utils.hxx" />
+    <ClInclude Include="ViewModels\MainViewModel.h" />
+    <ClInclude Include="ViewModels\DelegateCommand.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Wide310x150Logo.scale-200.png">
@@ -60,5 +64,8 @@
     <None Include="packages.config" />
     <None Include="vcpkg.json" />
     <None Include="vcpkg-configuration.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natvis" />
   </ItemGroup>
 </Project>
