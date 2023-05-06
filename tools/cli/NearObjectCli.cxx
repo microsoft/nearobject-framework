@@ -887,20 +887,17 @@ NearObjectCli::AddSubcommandServiceRangeStart(CLI::App* parent)
     rangeStartApp->get_formatter()->label("ENUM", "");
     rangeStartApp->get_formatter()->label("TEXT", "");
 
-    std::optional<uwb::protocol::fira::DeviceType> deviceType;
-    std::filesystem::path sessionDataFilePath;
-
-    detail::AddEnumOption(rangeStartApp, deviceType, true);
-    rangeStartApp->add_option("--SessionDataFilePath", sessionDataFilePath, "Path to file containing OOB session data")->required();
+    detail::AddEnumOption(rangeStartApp, m_cliData->uwbConfiguration.deviceType, true);
+    rangeStartApp->add_option("--SessionDataFilePath", m_cliData->sessionDataFilePathString, "Path to file containing OOB session data")->required();
 
     rangeStartApp->parse_complete_callback([this, rangeStartApp] {
         std::cout << "start ranging" << std::endl;
         RegisterCliAppWithOperation(rangeStartApp);
     });
 
-    rangeStartApp->final_callback([this, &deviceType, &sessionDataFilePath] {
-        // DeviceType is mandatory, so no need to check for has_value()
-        m_cliHandler->HandleStartRanging(deviceType.value(), sessionDataFilePath);
+    rangeStartApp->final_callback([this] {
+        std::filesystem::path sessionDataFilePath(m_cliData->sessionDataFilePathString);
+        m_cliHandler->HandleStartRanging(m_cliData->uwbConfiguration.deviceType.value(), sessionDataFilePath);
     });
 
     return rangeStartApp;

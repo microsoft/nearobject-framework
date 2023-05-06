@@ -124,7 +124,7 @@ NearObjectCliHandlerWindows::HandleStartRanging(::uwb::protocol::fira::DeviceTyp
     std::string line;
     // File only contains one line of data
     if (std::getline(inputFileStream, line)) {
-        uwbSessionDataSerialized = std::vector<uint8_t>(line.begin(), line.end());
+        uwbSessionDataSerialized = std::vector<uint8_t>(std::cbegin(line), std::cend(line));
     }
 
     inputFileStream.close();
