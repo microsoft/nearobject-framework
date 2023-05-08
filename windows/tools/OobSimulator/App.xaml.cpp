@@ -4,6 +4,7 @@
 
 #include "App.xaml.h"
 #include "MainWindow.xaml.h"
+#include "UwbSessionDataPage.xaml.h"
 
 using namespace winrt;
 using namespace Windows::Foundation;
@@ -39,8 +40,12 @@ App::App()
 /// </summary>
 /// <param name="e">Details about the launch request and process.</param>
 void
-App::OnLaunched(LaunchActivatedEventArgs const&)
+App::OnLaunched(LaunchActivatedEventArgs const& e)
 {
+    Frame rootFrame = Frame();
+    rootFrame.Navigate(xaml_typename<OobSimulator::UwbSessionDataPage>(), box_value(e.Arguments()));
+
     window = make<MainWindow>();
+    window.Content(rootFrame);
     window.Activate();
 }
