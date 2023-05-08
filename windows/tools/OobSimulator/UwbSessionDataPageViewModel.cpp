@@ -1,7 +1,9 @@
-// clang-format off
+﻿// clang-format off
 #include "pch.h"
-#include "OobSimulatorViewModel.h"
-#include "OobSimulatorViewModel.g.cpp"
+#include "UwbSessionDataPageViewModel.h"
+#if __has_include("UwbSessionDataPageViewModel.g.cpp")
+#include "UwbSessionDataPageViewModel.g.cpp"
+#endif
 // clang-format on
 
 #include "Utils.hxx"
@@ -13,10 +15,10 @@
 
 namespace winrt::OobSimulator::implementation
 {
-OobSimulatorViewModel::OobSimulatorViewModel()
+UwbSessionDataPageViewModel::UwbSessionDataPageViewModel()
 {
     m_uwbSessionData = winrt::make<OobSimulator::implementation::UwbSessionData>();
-    m_setUwbSessionData = winrt::make<OobSimulator::implementation::DelegateCommand>(std::bind(&OobSimulatorViewModel::SetUwbSessionData, this));
+    m_setUwbSessionData = winrt::make<OobSimulator::implementation::DelegateCommand>(std::bind(&UwbSessionDataPageViewModel::SetUwbSessionData, this));
 
     // Set default values
     m_uwbSessionData.SessionId(L"1234");
@@ -27,19 +29,19 @@ OobSimulatorViewModel::OobSimulatorViewModel()
 }
 
 winrt::OobSimulator::UwbSessionData
-OobSimulatorViewModel::UwbSessionData()
+UwbSessionDataPageViewModel::UwbSessionData()
 {
     return m_uwbSessionData;
 }
 
 winrt::Microsoft::UI::Xaml::Input::ICommand
-OobSimulatorViewModel::SetUwbSessionDataCommand()
+UwbSessionDataPageViewModel::SetUwbSessionDataCommand()
 {
     return m_setUwbSessionData;
 }
 
 winrt::Windows::Foundation::IAsyncAction
-OobSimulatorViewModel::SetUwbSessionData()
+UwbSessionDataPageViewModel::SetUwbSessionData()
 {
     uwb::protocol::fira::UwbSessionData uwbSessionData{};
     uwb::protocol::fira::UwbConfiguration::Builder builder{};
@@ -86,7 +88,7 @@ OobSimulatorViewModel::SetUwbSessionData()
 }
 
 uwb::protocol::fira::DeviceRole
-OobSimulatorViewModel::ConvertDeviceRole()
+UwbSessionDataPageViewModel::ConvertDeviceRole()
 {
     auto oobSimulatorDeviceRole = m_uwbSessionData.DeviceRole();
     auto deviceRole = uwb::protocol::fira::DeviceRole::Responder;
@@ -98,7 +100,7 @@ OobSimulatorViewModel::ConvertDeviceRole()
 }
 
 uwb::protocol::fira::MultiNodeMode
-OobSimulatorViewModel::ConvertMultiNodeMode()
+UwbSessionDataPageViewModel::ConvertMultiNodeMode()
 {
     auto oobSimulatorMultiNodeMode = m_uwbSessionData.MultiNodeMode();
     auto multiNodeMode = uwb::protocol::fira::MultiNodeMode::Unicast;

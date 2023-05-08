@@ -5,23 +5,42 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="MainWindow.xaml" />
+    <Page Include="UwbSessionDataPage.xaml">
+      <Filter>Views</Filter>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="App.idl" />
     <Midl Include="MainWindow.idl" />
+    <Midl Include="BindableBase.idl" />
+    <Midl Include="DelegateCommand.idl" />
+    <Midl Include="UwbSessionData.idl">
+      <Filter>Models</Filter>
+    </Midl>
+    <Midl Include="UwbSessionDataPageViewModel.idl">
+      <Filter>ViewModels</Filter>
+    </Midl>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
     <ClCompile Include="Utils.cxx" />
-    <ClCompile Include="ViewModels\MainViewModel.cpp" />
-    <ClCompile Include="ViewModels\DelegateCommand.cpp" />
+    <ClCompile Include="BindableBase.cpp" />
+    <ClCompile Include="DelegateCommand.cpp" />
+    <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="UwbSessionData.cpp">
+      <Filter>Models</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="Utils.hxx" />
-    <ClInclude Include="ViewModels\MainViewModel.h" />
-    <ClInclude Include="ViewModels\DelegateCommand.h" />
+    <ClInclude Include="BindableBase.h" />
+    <ClInclude Include="DelegateCommand.h" />
+    <ClInclude Include="Globals.h" />
+    <ClInclude Include="UwbSessionData.h">
+      <Filter>Models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Wide310x150Logo.scale-200.png">
@@ -49,6 +68,15 @@
   <ItemGroup>
     <Filter Include="Assets">
       <UniqueIdentifier>{8dae6c93-ef78-4906-8dc3-e46055b28abb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Views">
+      <UniqueIdentifier>{1cb602bc-81e6-4ec2-9c0f-741fe9142298}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ViewModels">
+      <UniqueIdentifier>{f292c95a-cf48-4b5d-8e4e-7ce9ce7c8376}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Models">
+      <UniqueIdentifier>{7523b5af-f982-401c-94a1-6f8c2221f290}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

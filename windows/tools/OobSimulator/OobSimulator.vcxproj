@@ -111,7 +111,6 @@
     <ClInclude Include="BindableBase.h" />
     <ClInclude Include="DelegateCommand.h" />
     <ClInclude Include="Globals.h" />
-    <ClInclude Include="OobSimulatorViewModel.h" />
     <ClInclude Include="UwbSessionData.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="App.xaml.h">
@@ -121,16 +120,26 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </ClInclude>
     <ClInclude Include="Utils.hxx" />
+    <ClInclude Include="UwbSessionDataPage.xaml.h">
+      <DependentUpon>UwbSessionDataPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClInclude>
+    <ClInclude Include="UwbSessionDataPageViewModel.h">
+      <DependentUpon>UwbSessionDataPageViewModel.idl</DependentUpon>
+      <SubType>Code</SubType>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml" />
     <Page Include="MainWindow.xaml" />
+    <Page Include="UwbSessionDataPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BindableBase.cpp" />
     <ClCompile Include="DelegateCommand.cpp" />
     <ClCompile Include="Globals.cpp" />
-    <ClCompile Include="OobSimulatorViewModel.cpp" />
     <ClCompile Include="UwbSessionData.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -143,6 +152,14 @@
     </ClCompile>
     <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
     <ClCompile Include="Utils.cxx" />
+    <ClCompile Include="UwbSessionDataPage.xaml.cpp">
+      <DependentUpon>UwbSessionDataPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClCompile>
+    <ClCompile Include="UwbSessionDataPageViewModel.cpp">
+      <DependentUpon>UwbSessionDataPageViewModel.idl</DependentUpon>
+      <SubType>Code</SubType>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="App.idl">
@@ -155,8 +172,14 @@
       <SubType>Code</SubType>
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Midl>
-    <Midl Include="OobSimulatorViewModel.idl" />
     <Midl Include="UwbSessionData.idl" />
+    <Midl Include="UwbSessionDataPage.idl">
+      <DependentUpon>UwbSessionDataPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Midl>
+    <Midl Include="UwbSessionDataPageViewModel.idl">
+      <SubType>Designer</SubType>
+    </Midl>
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt">

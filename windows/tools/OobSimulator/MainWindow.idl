@@ -1,5 +1,4 @@
 // MainWindow.idl
-import "OobSimulatorViewModel.idl";
 
 namespace OobSimulator
 {
@@ -9,10 +8,5 @@ runtimeclass MainWindow : Microsoft.UI.Xaml.Window
 // clang-format on
 {
     MainWindow();
-
-    OobSimulatorViewModel MainViewModel
-    {
-        get;
-    };
 }
 } // namespace OobSimulator

@@ -22,10 +22,4 @@ MainWindow::MainWindow()
     winrt::check_bool(windowNative);
     windowNative->get_WindowHandle(&g_hwnd);
 }
-
-OobSimulator::OobSimulatorViewModel
-MainWindow::MainViewModel()
-{
-    return m_mainViewModel;
-}
 } // namespace winrt::OobSimulator::implementation
