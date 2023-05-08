@@ -11,12 +11,6 @@ namespace winrt::OobSimulator::implementation
 struct MainWindow : MainWindowT<MainWindow>
 {
     MainWindow();
-
-    OobSimulator::OobSimulatorViewModel
-    MainViewModel();
-
-private:
-    OobSimulator::OobSimulatorViewModel m_mainViewModel;
 };
 } // namespace winrt::OobSimulator::implementation
 
