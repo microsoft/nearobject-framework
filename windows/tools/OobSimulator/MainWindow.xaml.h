@@ -4,7 +4,6 @@
 #define MAIN_WINDOW_XAML_H
 
 #include "MainWindow.g.h"
-#include "OobSimulatorViewModel.h"
 
 namespace winrt::OobSimulator::implementation
 {
