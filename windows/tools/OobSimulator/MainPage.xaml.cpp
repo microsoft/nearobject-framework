@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 #include "pch.h"
+
 #include "MainPage.xaml.h"
 #if __has_include("MainPage.g.cpp")
 #include "MainPage.g.cpp"
@@ -20,8 +21,7 @@ MainPage::MainPage()
     InitializeComponent();
 
     // Map of page string tags to their corresponding xaml type.
-    m_pages.push_back(std::make_pair<std::wstring, Windows::UI::Xaml::Interop::TypeName>
-        (L"uwbsessiondata", winrt::xaml_typename<OobSimulator::UwbSessionDataPage>()));
+    m_pages.push_back(std::make_pair<std::wstring, Windows::UI::Xaml::Interop::TypeName>(L"uwbsessiondata", winrt::xaml_typename<OobSimulator::UwbSessionDataPage>()));
 }
 
 double
@@ -46,34 +46,31 @@ winrt::OobSimulator::implementation::MainPage::NavView_Loaded(winrt::Windows::Fo
     NavView_Navigate(m_pages.front().first, Microsoft::UI::Xaml::Media::Animation::EntranceNavigationTransitionInfo());
 }
 
-void MainPage::NavView_ItemInvoked(Windows::Foundation::IInspectable const& /* sender */, muxc::NavigationViewItemInvokedEventArgs const& args)
+void
+MainPage::NavView_ItemInvoked(Windows::Foundation::IInspectable const& /* sender */, muxc::NavigationViewItemInvokedEventArgs const& args)
 {
-    if (args.IsSettingsInvoked())
-    {
+    if (args.IsSettingsInvoked()) {
         // TODO: settings page
         // NavView_Navigate(L"settings", args.RecommendedNavigationTransitionInfo());
-    }
-    else if (args.InvokedItemContainer())
-    {
+    } else if (args.InvokedItemContainer()) {
         NavView_Navigate(winrt::unbox_value_or<winrt::hstring>(args.InvokedItemContainer().Tag(), L"").c_str(), args.RecommendedNavigationTransitionInfo());
     }
 }
 
-void MainPage::NavView_Navigate(std::wstring navItemTag, Microsoft::UI::Xaml::Media::Animation::NavigationTransitionInfo const& transitionInfo)
+void
+MainPage::NavView_Navigate(std::wstring navItemTag, Microsoft::UI::Xaml::Media::Animation::NavigationTransitionInfo const& transitionInfo)
 {
     Windows::UI::Xaml::Interop::TypeName pageTypeName;
-    
+
     // TOOD: settings page
-    //if (navItemTag == L"settings")
+    // if (navItemTag == L"settings")
     //{
     //    pageTypeName = winrt::xaml_typename<NavigationViewCppWinRT::SettingsPage>();
     //}
-    //else
+    // else
     {
-        for (auto&& eachPage : m_pages)
-        {
-            if (eachPage.first == navItemTag)
-            {
+        for (auto&& eachPage : m_pages) {
+            if (eachPage.first == navItemTag) {
                 pageTypeName = eachPage.second;
                 break;
             }
@@ -84,8 +81,7 @@ void MainPage::NavView_Navigate(std::wstring navItemTag, Microsoft::UI::Xaml::Me
     Windows::UI::Xaml::Interop::TypeName preNavPageType = ContentFrame().CurrentSourcePageType();
 
     // Navigate only if the selected page isn't currently loaded.
-    if (pageTypeName.Name != L"" && preNavPageType.Name != pageTypeName.Name)
-    {
+    if (pageTypeName.Name != L"" && preNavPageType.Name != pageTypeName.Name) {
         ContentFrame().Navigate(pageTypeName, nullptr, transitionInfo);
     }
 }
@@ -108,29 +104,23 @@ winrt::OobSimulator::implementation::MainPage::ContentFrame_Navigated(winrt::Win
     NavView().IsBackEnabled(ContentFrame().CanGoBack());
 
     // TODO: settings page
-    //if (ContentFrame().SourcePageType().Name ==
+    // if (ContentFrame().SourcePageType().Name ==
     //    winrt::xaml_typename<NavigationViewCppWinRT::SettingsPage>().Name)
     //{
     //    // SettingsItem is not part of NavView.MenuItems, and doesn't have a Tag.
     //    NavView().SelectedItem(NavView().SettingsItem().as<muxc::NavigationViewItem>());
     //    NavView().Header(winrt::box_value(L"Settings"));
     //}
-    //else if (ContentFrame().SourcePageType().Name != L"")
-    if (ContentFrame().SourcePageType().Name != L"")
-    {
-        for (auto&& eachPage : m_pages)
-        {
-            if (eachPage.second.Name == args.SourcePageType().Name)
-            {
-                for (auto&& eachMenuItem : NavView().MenuItems())
-                {
+    // else if (ContentFrame().SourcePageType().Name != L"")
+    if (ContentFrame().SourcePageType().Name != L"") {
+        for (auto&& eachPage : m_pages) {
+            if (eachPage.second.Name == args.SourcePageType().Name) {
+                for (auto&& eachMenuItem : NavView().MenuItems()) {
                     auto navigationViewItem = eachMenuItem.try_as<muxc::NavigationViewItem>();
                     {
-                        if (navigationViewItem)
-                        {
+                        if (navigationViewItem) {
                             winrt::hstring hstringValue = winrt::unbox_value_or<winrt::hstring>(navigationViewItem.Tag(), L"");
-                            if (hstringValue == eachPage.first)
-                            {
+                            if (hstringValue == eachPage.first) {
                                 NavView().SelectedItem(navigationViewItem);
                                 NavView().Header(navigationViewItem.Content());
                             }
