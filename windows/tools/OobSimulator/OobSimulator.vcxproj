@@ -111,7 +111,6 @@
     <ClInclude Include="BindableBase.h" />
     <ClInclude Include="DelegateCommand.h" />
     <ClInclude Include="Globals.h" />
-    <ClInclude Include="OobSimulatorViewModel.h" />
     <ClInclude Include="UwbSessionData.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="App.xaml.h">
@@ -141,7 +140,6 @@
     <ClCompile Include="BindableBase.cpp" />
     <ClCompile Include="DelegateCommand.cpp" />
     <ClCompile Include="Globals.cpp" />
-    <ClCompile Include="OobSimulatorViewModel.cpp" />
     <ClCompile Include="UwbSessionData.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -174,7 +172,6 @@
       <SubType>Code</SubType>
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Midl>
-    <Midl Include="OobSimulatorViewModel.idl" />
     <Midl Include="UwbSessionData.idl" />
     <Midl Include="UwbSessionDataPage.idl">
       <DependentUpon>UwbSessionDataPage.xaml</DependentUpon>
