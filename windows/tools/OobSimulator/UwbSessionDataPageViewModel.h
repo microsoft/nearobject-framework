@@ -19,7 +19,7 @@ struct UwbSessionDataPageViewModel : UwbSessionDataPageViewModelT<UwbSessionData
 
     winrt::OobSimulator::UwbSessionData
     UwbSessionData();
-    
+
     winrt::Microsoft::UI::Xaml::Input::ICommand
     SetUwbSessionDataCommand();
 
@@ -37,13 +37,13 @@ private:
     winrt::OobSimulator::UwbSessionData m_uwbSessionData{ nullptr };
     OobSimulator::DelegateCommand m_setUwbSessionData{ nullptr };
 };
-} // winrt::OobSimulator::implementation
+} // namespace winrt::OobSimulator::implementation
 
 namespace winrt::OobSimulator::factory_implementation
 {
 struct UwbSessionDataPageViewModel : UwbSessionDataPageViewModelT<UwbSessionDataPageViewModel, implementation::UwbSessionDataPageViewModel>
 {
 };
-} // winrt::OobSimulator::factory_implementation
+} // namespace winrt::OobSimulator::factory_implementation
 
 #endif // UWB_SESSION_DATA_PAGE_VIEW_MODEL_H

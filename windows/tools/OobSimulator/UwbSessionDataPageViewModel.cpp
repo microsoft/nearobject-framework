@@ -106,11 +106,10 @@ UwbSessionDataPageViewModel::ConvertMultiNodeMode()
     auto multiNodeMode = uwb::protocol::fira::MultiNodeMode::Unicast;
     if (oobSimulatorMultiNodeMode == OobSimulator::MultiNodeMode::OneToMany) {
         multiNodeMode = uwb::protocol::fira::MultiNodeMode::OneToMany;
-    }
-    else if (oobSimulatorMultiNodeMode == OobSimulator::MultiNodeMode::ManyToMany) {
+    } else if (oobSimulatorMultiNodeMode == OobSimulator::MultiNodeMode::ManyToMany) {
         multiNodeMode = uwb::protocol::fira::MultiNodeMode::ManyToMany;
     }
 
     return std::move(multiNodeMode);
 }
-}
+} // namespace winrt::OobSimulator::implementation

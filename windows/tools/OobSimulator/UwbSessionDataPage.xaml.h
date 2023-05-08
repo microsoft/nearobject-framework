@@ -7,20 +7,21 @@
 
 namespace winrt::OobSimulator::implementation
 {
-    struct UwbSessionDataPage : UwbSessionDataPageT<UwbSessionDataPage>
-    {
-        UwbSessionDataPage();
+struct UwbSessionDataPage : UwbSessionDataPageT<UwbSessionDataPage>
+{
+    UwbSessionDataPage();
 
-        winrt::OobSimulator::UwbSessionDataPageViewModel ViewModel();
+    winrt::OobSimulator::UwbSessionDataPageViewModel
+    ViewModel();
 
-    private:
-        winrt::OobSimulator::UwbSessionDataPageViewModel m_viewModel;
-    };
-}
+private:
+    winrt::OobSimulator::UwbSessionDataPageViewModel m_viewModel;
+};
+} // namespace winrt::OobSimulator::implementation
 
 namespace winrt::OobSimulator::factory_implementation
 {
-    struct UwbSessionDataPage : UwbSessionDataPageT<UwbSessionDataPage, implementation::UwbSessionDataPage>
-    {
-    };
-}
+struct UwbSessionDataPage : UwbSessionDataPageT<UwbSessionDataPage, implementation::UwbSessionDataPage>
+{
+};
+} // namespace winrt::OobSimulator::factory_implementation
