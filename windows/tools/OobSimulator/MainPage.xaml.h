@@ -22,11 +22,6 @@ namespace muxc
     using namespace winrt::Microsoft::UI::Xaml::Controls;
 };
 
-namespace wuxc
-{
-    using namespace winrt::Windows::UI::Xaml::Controls;
-};
-
 namespace winrt::OobSimulator::implementation
 {
 struct MainPage : MainPageT<MainPage>
@@ -54,15 +49,6 @@ struct MainPage : MainPageT<MainPage>
     void
     ContentFrame_Navigated(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::Navigation::NavigationEventArgs const& e);
 
-    void
-    CoreDispatcher_AcceleratorKeyActivated(Windows::UI::Core::CoreDispatcher const& /* sender */, Windows::UI::Core::AcceleratorKeyEventArgs const& args);
-    
-    void
-    CoreWindow_PointerPressed(Windows::UI::Core::CoreWindow const& /* sender */, Windows::UI::Core::PointerEventArgs const& args);
-    
-    void 
-    System_BackRequested(Windows::Foundation::IInspectable const& /* sender */, Windows::UI::Core::BackRequestedEventArgs const& args);
-    
     bool
     TryGoBack();
 

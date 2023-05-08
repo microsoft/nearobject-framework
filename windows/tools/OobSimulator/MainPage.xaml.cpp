@@ -15,13 +15,11 @@ using namespace Microsoft::UI::Xaml;
 
 namespace winrt::OobSimulator::implementation
 {
-// List of ValueTuple holding the Navigation Tag and the relative Navigation Page
-// std::vector<std::pair<std::wstring, Windows::UI::Xaml::Interop::TypeName>> m_pages;
-
 MainPage::MainPage()
 {
     InitializeComponent();
 
+    // Map of page string tags to their corresponding xaml type.
     m_pages.push_back(std::make_pair<std::wstring, Windows::UI::Xaml::Interop::TypeName>
         (L"uwbsessiondata", winrt::xaml_typename<OobSimulator::UwbSessionDataPage>()));
 }
@@ -32,7 +30,7 @@ MainPage::NavViewCompactModeThresholdWidth()
     return NavView().CompactModeThresholdWidth();
 }
 
-void 
+void
 winrt::OobSimulator::implementation::MainPage::NavView_Loaded(winrt::Windows::Foundation::IInspectable const& /*sender*/, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& /*e*/)
 {
     // Add handler for ContentFrame navigation.
@@ -40,16 +38,12 @@ winrt::OobSimulator::implementation::MainPage::NavView_Loaded(winrt::Windows::Fo
 
     // NavView doesn't load any page by default, so load home page.
     NavView().SelectedItem(NavView().MenuItems().GetAt(0));
+
     // If navigation occurs on SelectionChanged, then this isn't needed.
     // Because we use ItemInvoked to navigate, we need to call Navigate
     // here to load the home page.
-    NavView_Navigate(L"uwbsessiondata", Microsoft::UI::Xaml::Media::Animation::EntranceNavigationTransitionInfo());
-
-    // Listen to the window directly so the app responds
-    // to accelerator keys regardless of which element has focus.
-    winrt::Windows::UI::Xaml::Window::Current().CoreWindow().Dispatcher().AcceleratorKeyActivated({ this, &MainPage::CoreDispatcher_AcceleratorKeyActivated });
-    winrt::Windows::UI::Xaml::Window::Current().CoreWindow().PointerPressed({ this, &MainPage::CoreWindow_PointerPressed });
-    Windows::UI::Core::SystemNavigationManager::GetForCurrentView().BackRequested({ this, &MainPage::System_BackRequested });
+    // Load the first page.
+    NavView_Navigate(m_pages.front().first, Microsoft::UI::Xaml::Media::Animation::EntranceNavigationTransitionInfo());
 }
 
 void MainPage::NavView_ItemInvoked(Windows::Foundation::IInspectable const& /* sender */, muxc::NavigationViewItemInvokedEventArgs const& args)
@@ -162,38 +156,6 @@ MainPage::TryGoBack()
 
     ContentFrame().GoBack();
     return true;
-}
-
-void
-MainPage::CoreDispatcher_AcceleratorKeyActivated(Windows::UI::Core::CoreDispatcher const& /* sender */, Windows::UI::Core::AcceleratorKeyEventArgs const& args)
-{
-    // When Alt+Left are pressed navigate back
-    if (args.EventType() == Windows::UI::Core::CoreAcceleratorKeyEventType::SystemKeyDown
-        && args.VirtualKey() == Windows::System::VirtualKey::Left
-        && args.KeyStatus().IsMenuKeyDown
-        && !args.Handled())
-    {
-        args.Handled(TryGoBack());
-    }
-}
-
-void
-MainPage::CoreWindow_PointerPressed(Windows::UI::Core::CoreWindow const& /* sender */, Windows::UI::Core::PointerEventArgs const& args)
-{
-    // Handle mouse back button.
-    if (args.CurrentPoint().Properties().IsXButton1Pressed())
-    {
-        args.Handled(TryGoBack());
-    }
-}
-
-void 
-MainPage::System_BackRequested(Windows::Foundation::IInspectable const& /* sender */, Windows::UI::Core::BackRequestedEventArgs const& args)
-{
-    if (!args.Handled())
-    {
-        args.Handled(TryGoBack());
-    }
 }
 
 } // namespace winrt::OobSimulator::implementation
