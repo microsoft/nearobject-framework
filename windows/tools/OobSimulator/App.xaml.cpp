@@ -3,8 +3,8 @@
 #include "pch.h"
 
 #include "App.xaml.h"
+#include "MainPage.xaml.h"
 #include "MainWindow.xaml.h"
-#include "UwbSessionDataPage.xaml.h"
 
 using namespace winrt;
 using namespace Windows::Foundation;
@@ -13,9 +13,6 @@ using namespace Microsoft::UI::Xaml::Controls;
 using namespace Microsoft::UI::Xaml::Navigation;
 using namespace OobSimulator;
 using namespace OobSimulator::implementation;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 /// <summary>
 /// Initializes the singleton application object.  This is the first line of authored code
@@ -42,10 +39,8 @@ App::App()
 void
 App::OnLaunched(LaunchActivatedEventArgs const& e)
 {
-    Frame rootFrame = Frame();
-    rootFrame.Navigate(xaml_typename<OobSimulator::UwbSessionDataPage>(), box_value(e.Arguments()));
-
+    auto mainPage = make<MainPage>();
     window = make<MainWindow>();
-    window.Content(rootFrame);
+    window.Content(mainPage);
     window.Activate();
 }
