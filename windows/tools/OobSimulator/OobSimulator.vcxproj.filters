@@ -4,8 +4,16 @@
     <ApplicationDefinition Include="App.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="MainWindow.xaml" />
     <Page Include="UwbSessionDataPage.xaml">
+      <Filter>Views</Filter>
+    </Page>
+    <Page Include="SettingsPage.xaml">
+      <Filter>Views</Filter>
+    </Page>
+    <Page Include="MainPage.xaml">
+      <Filter>Views</Filter>
+    </Page>
+    <Page Include="MainWindow.xaml">
       <Filter>Views</Filter>
     </Page>
   </ItemGroup>
@@ -15,9 +23,12 @@
     <Midl Include="BindableBase.idl" />
     <Midl Include="DelegateCommand.idl" />
     <Midl Include="UwbSessionData.idl">
-      <Filter>Models</Filter>
+      <Filter>DataModels</Filter>
     </Midl>
     <Midl Include="UwbSessionDataPageViewModel.idl">
+      <Filter>ViewModels</Filter>
+    </Midl>
+    <Midl Include="SettingsPageViewModel.idl">
       <Filter>ViewModels</Filter>
     </Midl>
   </ItemGroup>
@@ -29,7 +40,7 @@
     <ClCompile Include="DelegateCommand.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="UwbSessionData.cpp">
-      <Filter>Models</Filter>
+      <Filter>DataModels</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -39,7 +50,7 @@
     <ClInclude Include="DelegateCommand.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="UwbSessionData.h">
-      <Filter>Models</Filter>
+      <Filter>DataModels</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -75,8 +86,11 @@
     <Filter Include="ViewModels">
       <UniqueIdentifier>{f292c95a-cf48-4b5d-8e4e-7ce9ce7c8376}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Models">
+    <Filter Include="DataModels">
       <UniqueIdentifier>{7523b5af-f982-401c-94a1-6f8c2221f290}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Converters">
+      <UniqueIdentifier>{2a15b595-7f2a-4b50-a47c-1e85187a3e78}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

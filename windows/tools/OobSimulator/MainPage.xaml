@@ -15,7 +15,11 @@
         <muxc:NavigationView.MenuItems>
             <muxc:NavigationViewItemHeader Content="UWB" />
             <muxc:NavigationViewItemSeparator />
-            <muxc:NavigationViewItem Tag="uwbsessiondata" Icon="Home" Content="Session Data Generator" />
+            <muxc:NavigationViewItem Tag="uwbsessiondata" Content="Session Data Generator">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xE928;" />
+                </NavigationViewItem.Icon>
+            </muxc:NavigationViewItem>
         </muxc:NavigationView.MenuItems>
         <ScrollViewer>
             <Frame x:Name="ContentFrame" IsTabStop="True" NavigationFailed="ContentFrame_NavigationFailed" Navigated="ContentFrame_Navigated"/>

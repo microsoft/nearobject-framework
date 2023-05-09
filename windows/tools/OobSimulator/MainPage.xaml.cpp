@@ -8,6 +8,7 @@
 #include "MainPage.g.cpp"
 #endif
 
+#include "SettingsPage.xaml.h"
 #include "UwbSessionDataPage.xaml.h"
 #include "winrt/Microsoft.UI.Xaml.Media.Animation.h"
 
@@ -50,8 +51,7 @@ void
 MainPage::NavView_ItemInvoked(Windows::Foundation::IInspectable const& /* sender */, muxc::NavigationViewItemInvokedEventArgs const& args)
 {
     if (args.IsSettingsInvoked()) {
-        // TODO: settings page
-        // NavView_Navigate(L"settings", args.RecommendedNavigationTransitionInfo());
+        NavView_Navigate(L"settings", args.RecommendedNavigationTransitionInfo());
     } else if (args.InvokedItemContainer()) {
         NavView_Navigate(winrt::unbox_value_or<winrt::hstring>(args.InvokedItemContainer().Tag(), L"").c_str(), args.RecommendedNavigationTransitionInfo());
     }
@@ -62,13 +62,9 @@ MainPage::NavView_Navigate(std::wstring navItemTag, Microsoft::UI::Xaml::Media::
 {
     Windows::UI::Xaml::Interop::TypeName pageTypeName;
 
-    // TOOD: settings page
-    // if (navItemTag == L"settings")
-    //{
-    //    pageTypeName = winrt::xaml_typename<NavigationViewCppWinRT::SettingsPage>();
-    //}
-    // else
-    {
+    if (navItemTag == L"settings") {
+        pageTypeName = winrt::xaml_typename<OobSimulator::SettingsPage>();
+    } else {
         for (auto&& eachPage : m_pages) {
             if (eachPage.first == navItemTag) {
                 pageTypeName = eachPage.second;
@@ -103,16 +99,11 @@ winrt::OobSimulator::implementation::MainPage::ContentFrame_Navigated(winrt::Win
 {
     NavView().IsBackEnabled(ContentFrame().CanGoBack());
 
-    // TODO: settings page
-    // if (ContentFrame().SourcePageType().Name ==
-    //    winrt::xaml_typename<NavigationViewCppWinRT::SettingsPage>().Name)
-    //{
-    //    // SettingsItem is not part of NavView.MenuItems, and doesn't have a Tag.
-    //    NavView().SelectedItem(NavView().SettingsItem().as<muxc::NavigationViewItem>());
-    //    NavView().Header(winrt::box_value(L"Settings"));
-    //}
-    // else if (ContentFrame().SourcePageType().Name != L"")
-    if (ContentFrame().SourcePageType().Name != L"") {
+    if (ContentFrame().SourcePageType().Name == winrt::xaml_typename<OobSimulator::SettingsPage>().Name) {
+        // SettingsItem is not part of NavView.MenuItems, and doesn't have a Tag.
+        NavView().SelectedItem(NavView().SettingsItem().as<muxc::NavigationViewItem>());
+        NavView().Header(winrt::box_value(L"Settings"));
+    } else if (ContentFrame().SourcePageType().Name != L"") {
         for (auto&& eachPage : m_pages) {
             if (eachPage.second.Name == args.SourcePageType().Name) {
                 for (auto&& eachMenuItem : NavView().MenuItems()) {
@@ -136,13 +127,14 @@ winrt::OobSimulator::implementation::MainPage::ContentFrame_Navigated(winrt::Win
 bool
 MainPage::TryGoBack()
 {
-    if (!ContentFrame().CanGoBack())
+    if (!ContentFrame().CanGoBack()) {
         return false;
+    }
 
     // Don't go back if the nav pane is overlayed.
-    if (NavView().IsPaneOpen() &&
-        (NavView().DisplayMode() == muxc::NavigationViewDisplayMode::Compact || NavView().DisplayMode() == muxc::NavigationViewDisplayMode::Minimal))
+    if (NavView().IsPaneOpen() && (NavView().DisplayMode() == muxc::NavigationViewDisplayMode::Compact || NavView().DisplayMode() == muxc::NavigationViewDisplayMode::Minimal)) {
         return false;
+    }
 
     ContentFrame().GoBack();
     return true;
