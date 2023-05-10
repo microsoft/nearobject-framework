@@ -1,0 +1,12 @@
+
+import "BindableBase.idl";
+
+namespace OobSimulator
+{
+    [bindable]
+    [default_interface]
+    runtimeclass SettingsPageViewModel : OobSimulator.BindableBase
+    {
+        SettingsPageViewModel();
+    }
+} // namespace OobSimulator
