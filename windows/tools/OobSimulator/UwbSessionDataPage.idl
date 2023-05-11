@@ -1,0 +1,18 @@
+// Copyright (c) Microsoft Corporation and Contributors.
+// Licensed under the MIT License.
+
+import "UwbSessionDataPageViewModel.idl";
+
+namespace OobSimulator
+{
+    [default_interface]
+    runtimeclass UwbSessionDataPage : Microsoft.UI.Xaml.Controls.Page
+    {
+        UwbSessionDataPage();
+
+        UwbSessionDataPageViewModel ViewModel
+        { 
+            get; 
+        };
+    }
+}

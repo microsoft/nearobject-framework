@@ -4,19 +4,12 @@
 #define MAIN_WINDOW_XAML_H
 
 #include "MainWindow.g.h"
-#include "OobSimulatorViewModel.h"
 
 namespace winrt::OobSimulator::implementation
 {
 struct MainWindow : MainWindowT<MainWindow>
 {
     MainWindow();
-
-    OobSimulator::OobSimulatorViewModel
-    MainViewModel();
-
-private:
-    OobSimulator::OobSimulatorViewModel m_mainViewModel;
 };
 } // namespace winrt::OobSimulator::implementation
 

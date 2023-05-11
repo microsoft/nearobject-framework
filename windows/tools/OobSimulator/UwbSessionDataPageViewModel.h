@@ -1,9 +1,11 @@
-#ifndef OOB_SIMULATOR_VIEW_MODEL_H
-#define OOB_SIMULATOR_VIEW_MODEL_H
+﻿
+#ifndef UWB_SESSION_DATA_PAGE_VIEW_MODEL_H
+#define UWB_SESSION_DATA_PAGE_VIEW_MODEL_H
 
 // clang-format off
-#include "OobSimulatorViewModel.g.h"
+#include "UwbSessionDataPageViewModel.g.h"
 #include "BindableBase.h"
+
 #include "DelegateCommand.h"
 #include "UwbSessionData.h"
 // clang-format on
@@ -11,19 +13,17 @@
 
 namespace winrt::OobSimulator::implementation
 {
-struct OobSimulatorViewModel : OobSimulatorViewModelT<OobSimulatorViewModel, BindableBase>
+struct UwbSessionDataPageViewModel : UwbSessionDataPageViewModelT<UwbSessionDataPageViewModel, OobSimulator::implementation::BindableBase>
 {
-    OobSimulatorViewModel();
+    UwbSessionDataPageViewModel();
 
     winrt::OobSimulator::UwbSessionData
     UwbSessionData();
+
     winrt::Microsoft::UI::Xaml::Input::ICommand
     SetUwbSessionDataCommand();
 
 private:
-    winrt::OobSimulator::UwbSessionData m_uwbSessionData{ nullptr };
-    OobSimulator::DelegateCommand m_setUwbSessionData{ nullptr };
-
     winrt::Windows::Foundation::IAsyncAction
     SetUwbSessionData();
 
@@ -32,14 +32,18 @@ private:
 
     uwb::protocol::fira::MultiNodeMode
     ConvertMultiNodeMode();
+
+private:
+    winrt::OobSimulator::UwbSessionData m_uwbSessionData{ nullptr };
+    OobSimulator::DelegateCommand m_setUwbSessionData{ nullptr };
 };
 } // namespace winrt::OobSimulator::implementation
 
 namespace winrt::OobSimulator::factory_implementation
 {
-struct OobSimulatorViewModel : OobSimulatorViewModelT<OobSimulatorViewModel, implementation::OobSimulatorViewModel>
+struct UwbSessionDataPageViewModel : UwbSessionDataPageViewModelT<UwbSessionDataPageViewModel, implementation::UwbSessionDataPageViewModel>
 {
 };
 } // namespace winrt::OobSimulator::factory_implementation
 
-#endif // OOB_SIMULATOR_VIEW_MODEL_H
+#endif // UWB_SESSION_DATA_PAGE_VIEW_MODEL_H
