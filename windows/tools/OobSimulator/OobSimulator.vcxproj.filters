@@ -4,20 +4,54 @@
     <ApplicationDefinition Include="App.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="MainWindow.xaml" />
+    <Page Include="UwbSessionDataPage.xaml">
+      <Filter>Views</Filter>
+    </Page>
+    <Page Include="SettingsPage.xaml">
+      <Filter>Views</Filter>
+    </Page>
+    <Page Include="MainPage.xaml">
+      <Filter>Views</Filter>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Filter>Views</Filter>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="App.idl" />
     <Midl Include="MainWindow.idl" />
+    <Midl Include="BindableBase.idl" />
+    <Midl Include="DelegateCommand.idl" />
+    <Midl Include="UwbSessionData.idl">
+      <Filter>DataModels</Filter>
+    </Midl>
+    <Midl Include="UwbSessionDataPageViewModel.idl">
+      <Filter>ViewModels</Filter>
+    </Midl>
+    <Midl Include="SettingsPageViewModel.idl">
+      <Filter>ViewModels</Filter>
+    </Midl>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
     <ClCompile Include="Utils.cxx" />
+    <ClCompile Include="BindableBase.cpp" />
+    <ClCompile Include="DelegateCommand.cpp" />
+    <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="UwbSessionData.cpp">
+      <Filter>DataModels</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="Utils.hxx" />
+    <ClInclude Include="BindableBase.h" />
+    <ClInclude Include="DelegateCommand.h" />
+    <ClInclude Include="Globals.h" />
+    <ClInclude Include="UwbSessionData.h">
+      <Filter>DataModels</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Wide310x150Logo.scale-200.png">
@@ -46,6 +80,18 @@
     <Filter Include="Assets">
       <UniqueIdentifier>{8dae6c93-ef78-4906-8dc3-e46055b28abb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Views">
+      <UniqueIdentifier>{1cb602bc-81e6-4ec2-9c0f-741fe9142298}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ViewModels">
+      <UniqueIdentifier>{f292c95a-cf48-4b5d-8e4e-7ce9ce7c8376}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataModels">
+      <UniqueIdentifier>{7523b5af-f982-401c-94a1-6f8c2221f290}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Converters">
+      <UniqueIdentifier>{2a15b595-7f2a-4b50-a47c-1e85187a3e78}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
@@ -60,5 +106,8 @@
     <None Include="packages.config" />
     <None Include="vcpkg.json" />
     <None Include="vcpkg-configuration.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natvis" />
   </ItemGroup>
 </Project>

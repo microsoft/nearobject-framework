@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
 
 #include "pch.h"
 
 #include "App.xaml.h"
+#include "MainPage.xaml.h"
 #include "MainWindow.xaml.h"
 
 using namespace winrt;
@@ -13,9 +13,6 @@ using namespace Microsoft::UI::Xaml::Controls;
 using namespace Microsoft::UI::Xaml::Navigation;
 using namespace OobSimulator;
 using namespace OobSimulator::implementation;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 /// <summary>
 /// Initializes the singleton application object.  This is the first line of authored code
@@ -40,8 +37,10 @@ App::App()
 /// </summary>
 /// <param name="e">Details about the launch request and process.</param>
 void
-App::OnLaunched(LaunchActivatedEventArgs const&)
+App::OnLaunched(LaunchActivatedEventArgs const& e)
 {
+    auto mainPage = make<MainPage>();
     window = make<MainWindow>();
+    window.Content(mainPage);
     window.Activate();
 }
