@@ -1,4 +1,5 @@
 
+#include <cstring>
 #include <functional>
 #include <ranges>
 #include <stdexcept>
