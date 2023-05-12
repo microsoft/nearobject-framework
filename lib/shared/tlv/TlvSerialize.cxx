@@ -1,4 +1,6 @@
 
+#include <bit>
+#include <climits>
 #include <iterator>
 #include <stdexcept>
 
