@@ -1,6 +1,14 @@
 
+#include <functional>
+#include <ranges>
 #include <stdexcept>
+#include <type_traits>
+#include <variant>
 
+#include <notstd/type_traits.hxx>
+
+#include <tlv/TlvBer.hxx>
+#include <tlv/TlvSerialize.hxx>
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
 #include <uwb/protocols/fira/UwbConfigurationBuilder.hxx>
 
@@ -21,12 +29,54 @@ const std::unordered_set<ResultReportConfiguration> UwbConfiguration::ResultRepo
 std::unique_ptr<encoding::TlvBer>
 UwbConfiguration::ToDataObject() const
 {
-    throw std::logic_error("not implemented");
+    using encoding::TlvBer, encoding::GetBytesBigEndianFromBitMap;
+
+    TlvBer::Builder builder{};
+
+    builder.SetTag(UwbConfiguration::Tag);
+
+    for (const auto &[parameterTag, parameterValueVariant] : m_values) {
+        auto valueBuilder = TlvBer::Builder().SetTag(notstd::to_underlying(parameterTag));
+        std::visit([&valueBuilder, &parameterTag](auto &&parameterValue) {
+            using ParameterValueT = std::decay_t<decltype(parameterValue)>;
+            if constexpr (std::is_enum_v<ParameterValueT>) {
+                valueBuilder.SetValue(notstd::to_underlying(parameterValue));
+            } else if constexpr (std::is_same_v<ParameterValueT, uint8_t> || std::is_same_v<ParameterValueT, std::array<uint8_t, StaticStsInitializationVectorLength>>) {
+                valueBuilder.SetValue(parameterValue);
+            } else if constexpr (std::is_unsigned_v<ParameterValueT>) {
+                auto valueBytes = GetBytesBigEndianFromBitMap(parameterValue, sizeof parameterValue);
+                valueBuilder.SetValue(valueBytes);
+            } else if constexpr (std::is_same_v<ParameterValueT, ::uwb::UwbMacAddress>) {
+                auto valueBytes = parameterValue.GetValue();
+                valueBuilder.SetValue(valueBytes);
+            } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<::uwb::UwbMacAddress>>) {
+                std::vector<uint8_t> valueBytes{};
+                for (const auto &uwbMacAddress : parameterValue) {
+                    auto value = parameterValue.GetValue();
+                    std::ranges::copy(valueBytes, std::back_inserter(value));
+                }
+                valueBuilder.SetValue(valueBytes);
+            } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<ResultReportConfiguration>>) {
+                uint8_t value = 0;
+                for (const auto &resultReportConfiguration : parameterValue) {
+                    value |= notstd::to_underlying(resultReportConfiguration);
+                }
+                valueBuilder.SetValue(value);
+            }
+        },
+            parameterValueVariant);
+        builder.AddTlv(valueBuilder.Build());
+    }
+
+    auto tlvBerResult = std::make_unique<TlvBer>();
+    *tlvBerResult = builder.Build();
+
+    return tlvBerResult;
 }
 
 /* static */
 UwbConfiguration
-UwbConfiguration::FromDataObject(const encoding::TlvBer& /* tlv */)
+UwbConfiguration::FromDataObject(const encoding::TlvBer & /* tlv */)
 {
     throw std::logic_error("not implemented");
 }
@@ -214,7 +264,7 @@ UwbConfiguration::GetMaxRangingRoundRetry() const noexcept
     return GetValue<uint16_t>(ParameterTag::MaxRrRetry);
 }
 
-const std::unordered_map<UwbConfiguration::ParameterTag, UwbConfiguration::ParameterTypesVariant>&
+const std::unordered_map<UwbConfiguration::ParameterTag, UwbConfiguration::ParameterTypesVariant> &
 UwbConfiguration::GetValueMap() const noexcept
 {
     return m_values;
