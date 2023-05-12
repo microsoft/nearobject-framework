@@ -32,13 +32,11 @@ struct UwbRegulatoryInformation
         OutdoorPermitted = 0x81,
         CountryCode = 0x82,
         Timestamp = 0x83,
-        Channel5 = 0x84,
-        Channel6 = 0x85,
-        Channel7 = 0x86,
-        Channel8 = 0x87,
-        Channel9 = 0x88,
-        Channel10 = 0x89,
-        Channel11 = 0x8A,
+        Channel5 = 0x86,
+        Channel6 = 0x87,
+        Channel8 = 0x88,
+        Channel9 = 0x89,
+        Channel10 = 0x8A,
         Channel12 = 0x8B,
         Channel13 = 0x8C,
         Channel14 = 0x8D,
@@ -73,7 +71,7 @@ struct UwbRegulatoryInformation
     static UwbRegulatoryInformation
     FromDataObject(const encoding::TlvBer& tlv);
 
-    InformationSource InformationSource{ InformationSource::UserDefined };
+    InformationSource Source{ InformationSource::UserDefined };
     bool OutdoorPermitted{ true };
     uint16_t CountryCode{ 0x0000U };
     uint32_t Timestamp{ 0x00000000U };

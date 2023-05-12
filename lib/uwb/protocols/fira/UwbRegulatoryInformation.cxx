@@ -1,4 +1,5 @@
 
+#include <magic_enum.hpp>
 #include <notstd/utility.hxx>
 #include <tlv/TlvSerialize.hxx>
 #include <uwb/protocols/fira/UwbRegulatoryInformation.hxx>
@@ -17,7 +18,7 @@ UwbRegulatoryInformation::ToDataObject() const
         .AddTlv(
             TlvBer::Builder()
                 .SetTag(notstd::to_underlying(ParameterTag::InformationSource))
-                .SetValue(notstd::to_underlying(InformationSource))
+                .SetValue(notstd::to_underlying(Source))
                 .Build())
         // OUTDOOR_PERMITTED
         .AddTlv(
@@ -92,7 +93,89 @@ UwbRegulatoryInformation::ToDataObject() const
 
 /* static */
 UwbRegulatoryInformation
-UwbRegulatoryInformation::FromDataObject(const encoding::TlvBer& tlv)
+UwbRegulatoryInformation::FromDataObject(const encoding::TlvBer& tlvBer)
 {
-    return {};
+     using encoding::ReadSizeTFromBytesBigEndian;
+
+    UwbRegulatoryInformation uwbRegulatoryInformation{};
+    std::vector<encoding::TlvBer> tlvBerValues = tlvBer.GetValues();
+
+    for (const auto &tlvBerValue : tlvBerValues) {
+        auto tagValue = tlvBerValue.GetTag();
+        // All tags for UwbRegulatoryInformation are 1-byte long, so ignore all others.
+        if (std::size(tagValue) != 1) {
+            continue;
+        }
+
+        // Ensure the tag has a corresponding enumeration value.
+        auto parameterTag = magic_enum::enum_cast<ParameterTag>(tagValue.front());
+        if (!parameterTag.has_value()) {
+            continue;
+        }
+
+        // Ensure all values have non-zero payload.
+        auto& parameterValue = tlvBerValue.GetValue();
+        if (std::empty(parameterValue)) {
+            continue;
+        }
+
+        switch (*parameterTag) {
+        case ParameterTag::InformationSource: {
+            auto valueEnum = magic_enum::enum_cast<InformationSource>(parameterValue.front());
+            if (valueEnum.has_value()) {
+                uwbRegulatoryInformation.Source = *valueEnum;    
+            }
+            break;
+        }
+        case ParameterTag::OutdoorPermitted: {
+            uwbRegulatoryInformation.OutdoorPermitted = !!parameterValue.front();
+            break;
+        }
+        case ParameterTag::CountryCode: {
+            uwbRegulatoryInformation.CountryCode = ReadSizeTFromBytesBigEndian<decltype(uwbRegulatoryInformation.CountryCode)>(parameterValue);
+            break;
+        }
+        case ParameterTag::Timestamp: {
+            uwbRegulatoryInformation.Timestamp = ReadSizeTFromBytesBigEndian<decltype(uwbRegulatoryInformation.Timestamp)>(parameterValue);
+            break;
+        }
+        case ParameterTag::Channel5: {
+            uwbRegulatoryInformation.MaximumTransmissionPower[Channel::C5] = parameterValue.front();
+            break;
+        }
+        case ParameterTag::Channel6: {
+            uwbRegulatoryInformation.MaximumTransmissionPower[Channel::C6] = parameterValue.front();
+            break;
+        }
+         case ParameterTag::Channel8: {
+            uwbRegulatoryInformation.MaximumTransmissionPower[Channel::C8] = parameterValue.front();
+            break;
+        }
+        case ParameterTag::Channel9: {
+            uwbRegulatoryInformation.MaximumTransmissionPower[Channel::C9] = parameterValue.front();
+            break;
+        }
+        case ParameterTag::Channel10: {
+            uwbRegulatoryInformation.MaximumTransmissionPower[Channel::C10] = parameterValue.front();
+            break;
+        }
+        case ParameterTag::Channel12: {
+            uwbRegulatoryInformation.MaximumTransmissionPower[Channel::C12] = parameterValue.front();
+            break;
+        }
+        case ParameterTag::Channel13: {
+            uwbRegulatoryInformation.MaximumTransmissionPower[Channel::C13] = parameterValue.front();
+            break;
+        }
+        case ParameterTag::Channel14: {
+            uwbRegulatoryInformation.MaximumTransmissionPower[Channel::C14] = parameterValue.front();
+            break;
+        }
+        default: {
+            break;
+        }
+        }
+    }
+
+    return uwbRegulatoryInformation;
 }
