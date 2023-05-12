@@ -14,6 +14,7 @@ target_sources(uwb-proto-fira
         ${CMAKE_CURRENT_LIST_DIR}/UwbConfiguration.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbConfigurationBuilder.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbOobConversions.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/UwbRegulatoryInformation.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbSessionData.cxx
     PUBLIC
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/ControleePreference.hxx

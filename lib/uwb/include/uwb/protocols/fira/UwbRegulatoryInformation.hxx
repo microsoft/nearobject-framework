@@ -1,11 +1,17 @@
 
-#ifndef FIRA_REGULATORY_INFORMATION_HXX
-#define FIRA_REGULATORY_INFORMATION_HXX
+#ifndef UWB_REGULATORY_INFORMATION_HXX
+#define UWB_REGULATORY_INFORMATION_HXX
 
 #include <bitset>
 #include <cstdint>
+#include <tuple>
+#include <unordered_map>
+#include <vector>
 
-namespace nearobject::protocol::fira
+#include <uwb/protocols/fira/FiraDevice.hxx>
+#include <tlv/TlvBer.hxx>
+
+namespace uwb::protocol::fira
 {
 struct UwbRegulatoryInformation
 {
@@ -50,12 +56,29 @@ struct UwbRegulatoryInformation
         OtherFiraDevice,
     };
 
+    /**
+     * @brief Convert this object into a FiRa Data Object (DO).
+     *
+     * @return std::unique_ptr<encoding::TlvBer>
+     */
+    std::unique_ptr<encoding::TlvBer>
+    ToDataObject() const;
+
+    /**
+     * @brief Attempt to create a UwbRegulatoryInformation object from a TlvBer.
+     * 
+     * @param tlv 
+     * @return UwbRegulatoryInformation 
+     */
+    static UwbRegulatoryInformation
+    FromDataObject(const encoding::TlvBer& tlv);
+
     InformationSource InformationSource{ InformationSource::UserDefined };
     bool OutdoorPermitted{ true };
     uint16_t CountryCode{ 0x0000U };
-    uint64_t Timestamp{ 0x0000000000000000U };
-    std::bitset<8> Channels{ 0b00000000 };
+    uint32_t Timestamp{ 0x00000000U };
+    std::unordered_map<Channel, uint8_t> MaximumTransmissionPower;
 };
-} // namespace nearobject::protocol::fira
+} // namespace uwb::protocol::fira
 
-#endif // FIRA_REGULATORY_INFORMATION_HXX
+#endif // UWB_REGULATORY_INFORMATION_HXX
