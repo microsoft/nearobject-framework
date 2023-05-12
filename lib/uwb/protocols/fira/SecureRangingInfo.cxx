@@ -1,4 +1,5 @@
 
+#include <magic_enum.hpp>
 #include <notstd/utility.hxx>
 #include <tlv/TlvSerialize.hxx>
 #include <uwb/protocols/fira/SecureRangingInfo.hxx>
@@ -35,7 +36,46 @@ SecureRangingInfo::ToDataObject() const
 
 /* static */
 SecureRangingInfo
-SecureRangingInfo::FromDataObject(const encoding::TlvBer& tlv)
+SecureRangingInfo::FromDataObject(const encoding::TlvBer& tlvBer)
 {
-    return {};
+    using encoding::ReadSizeTFromBytesBigEndian;
+
+    SecureRangingInfo secureRangingInfo{};
+    std::vector<encoding::TlvBer> tlvBerValues = tlvBer.GetValues();
+
+    for (const auto &tlvBerValue : tlvBerValues) {
+        auto tagValue = tlvBerValue.GetTag();
+        // All tags for SecureRangingInfo are 1-byte long, so ignore all others.
+        if (std::size(tagValue) != 1) {
+            continue;
+        }
+
+        // Ensure the tag has a corresponding enumeration value.
+        auto parameterTag = magic_enum::enum_cast<ParameterTag>(tagValue.front());
+        if (!parameterTag.has_value()) {
+            continue;
+        }
+
+        auto& parameterValue = tlvBerValue.GetValue();
+
+        switch (*parameterTag) {
+        case ParameterTag::UwbSessionKeyInfo: {
+            secureRangingInfo.UwbSessionKeyInfo = parameterValue;
+            break;
+        }
+        case ParameterTag::ResponderSpecificSubSessionKeyInfo: {
+            secureRangingInfo.ResponderSpecificSubSessionKeyInfo = parameterValue;
+            break;
+        }
+        case ParameterTag::SusAdditionalParameters: {
+            secureRangingInfo.SusAdditionalParameters = parameterValue;
+            break;
+        }
+        default: {
+            break;
+        }
+        }
+    }
+
+    return secureRangingInfo;
 }

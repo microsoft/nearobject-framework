@@ -91,5 +91,5 @@ StaticRangingInfo::FromDataObject(const encoding::TlvBer& tlvBer)
         }
     }
 
-    return  staticRangingInfo;
+    return staticRangingInfo;
 }
