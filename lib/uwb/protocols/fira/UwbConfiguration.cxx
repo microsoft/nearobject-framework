@@ -164,14 +164,16 @@ UwbConfiguration::FromDataObject(const encoding::TlvBer& tlvBer)
         case ParameterTag::SlotDuration:
         case ParameterTag::RangingInterval:
         case ParameterTag::MaxRrRetry:
-            uint16_t value = 0; // TODO: convert
+            uint16_t value = 0; // assumes endianness matches host
+            std::memcpy(&value, std::data(parameterValue), std::size(parameterValue));
             setters16.at(*parameterTag)(value);
             break;
         }
 
         // 32-bit values
         case ParameterTag::UwbInitiationTime: {
-            uint32_t value = 0; // TODO: convert
+            uint32_t value = 0; // assumes endianness matches host
+            std::memcpy(&value, std::data(parameterValue), std::size(parameterValue));
             builder.SetUwbInitiationTime(value);
             break;
         }
