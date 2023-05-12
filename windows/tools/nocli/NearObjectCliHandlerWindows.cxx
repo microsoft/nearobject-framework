@@ -136,7 +136,7 @@ NearObjectCliHandlerWindows::HandleStartRanging(::uwb::protocol::fira::DeviceTyp
     auto uwbSessionDataBuffer = dataWriter.DetachBuffer();
 
     // Create the NearObjectIdentityToken from the byte buffer
-    auto identityTokenUwb = NearObject::NearObjectIdentityToken::TryParse(uwbSessionDataBuffer);
+    winrt::Windows::Devices::NearObject::INearObjectIdentityToken identityTokenUwb = NearObject::NearObjectIdentityToken::TryParse(uwbSessionDataBuffer);
 
     // Create the NearObjectSessionConfiguration
     NearObject::NearObjectSessionConfiguration sessionConfiguration;
@@ -148,11 +148,8 @@ NearObjectCliHandlerWindows::HandleStartRanging(::uwb::protocol::fira::DeviceTyp
     // Get the result from the async operation
     NearObject::NearObjectSessionCreateResult sessionCreateResult = sessionCreateResultAsyncOperation.get();
 
-    // TODO: Check which type of session client we want to be
-    NearObject::NearObjectSessionHostClient hostClient = sessionCreateResult.HostClient();
-
     // Start the ranging session
-    hostClient.Start();
+    sessionCreateResult.HostClient().Start();
 }
 
 void
