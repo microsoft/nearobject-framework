@@ -74,7 +74,11 @@ StaticRangingInfo::FromDataObject(const encoding::TlvBer& tlvBer)
             continue;
         }
 
+        // Ensure all values have non-zero payload.
         auto& parameterValue = tlvBerValue.GetValue();
+        if (std::empty(parameterValue)) {
+            continue;
+        }
 
         switch (*parameterTag) {
         case ParameterTag::VendorId: {
