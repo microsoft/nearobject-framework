@@ -73,6 +73,7 @@ struct UwbSessionData
     uint32_t sessionId{ 0 };
     uint32_t subSessionId{ 0 };
     UwbConfiguration uwbConfiguration{};
+    bool uwbConfigurationAvailable{ false };
     std::optional<StaticRangingInfo> staticRangingInfo;
     std::optional<SecureRangingInfo> secureRangingInfo;
     std::optional<UwbRegulatoryInformation> regulatoryInformation;

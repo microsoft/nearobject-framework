@@ -3,6 +3,7 @@
 #include <cstring>
 #include <stdexcept>
 
+#include <magic_enum.hpp>
 #include <notstd/type_traits.hxx>
 #include <tlv/TlvSerialize.hxx>
 #include <uwb/protocols/fira/UwbSessionData.hxx>
@@ -44,19 +45,17 @@ UwbSessionData::ToDataObject() const
         .AddTlv(
             TlvBer::Builder()
                 .SetTag(notstd::to_underlying(ParameterTag::UwbConfigAvailable))
-                .SetValue(0x01 /* always available since we send complete config? */)
+                .SetValue(static_cast<uint8_t>(uwbConfigurationAvailable))
                 .Build());
 
     // STATIC_RANGING_INFO
     if (staticRangingInfo.has_value()) {
         builder.AddTlv(*staticRangingInfo->ToDataObject());
     }
-
     // SECURE_RANGING_INFO
     if (secureRangingInfo.has_value()) {
         builder.AddTlv(*secureRangingInfo->ToDataObject());
     }
-
     // REGULATORY_INFORMATION
     if (regulatoryInformation.has_value()) {
         builder.AddTlv(*regulatoryInformation->ToDataObject());
@@ -70,7 +69,70 @@ UwbSessionData::ToDataObject() const
 
 /* static */
 UwbSessionData
-UwbSessionData::FromDataObject(const encoding::TlvBer& /* tlv */)
+UwbSessionData::FromDataObject(const encoding::TlvBer& tlvBer)
 {
-    throw std::logic_error("not implemented");
+    using encoding::ReadSizeTFromBytesBigEndian;
+
+    UwbSessionData uwbSessionData;
+    std::vector<encoding::TlvBer> tlvBerValues = tlvBer.GetValues();
+
+    for (const auto &tlvBerValue : tlvBerValues) {
+        auto tagValue = tlvBerValue.GetTag();
+        // All tags for UwbSessionData are 1-byte long, so ignore all others.
+        if (std::size(tagValue) != 1) {
+            continue;
+        }
+
+        // Ensure the tag has a corresponding enumeration value.
+        auto parameterTag = magic_enum::enum_cast<ParameterTag>(tagValue.front());
+        if (!parameterTag.has_value()) {
+            continue;
+        }
+
+        // Ensure all values have non-zero payload.
+        auto& parameterValue = tlvBerValue.GetValue();
+        if (std::empty(parameterValue)) {
+            continue;
+        }
+
+        switch (*parameterTag) {
+        case ParameterTag::SessionDataVersion: {
+            uwbSessionData.sessionDataVersion = ReadSizeTFromBytesBigEndian<decltype(uwbSessionData.sessionDataVersion)>(parameterValue);
+            break;
+        }
+        case ParameterTag::SessionId: {
+            uwbSessionData.sessionId = ReadSizeTFromBytesBigEndian<decltype(uwbSessionData.sessionId)>(parameterValue);
+            break;
+        }
+        case ParameterTag::SubSessionId: {
+            uwbSessionData.subSessionId = ReadSizeTFromBytesBigEndian<decltype(uwbSessionData.subSessionId)>(parameterValue);
+            break;
+        }
+        case ParameterTag::ConfigurationParameters: {
+            uwbSessionData.uwbConfiguration = UwbConfiguration::FromDataObject(tlvBerValue);
+            break;
+        }
+        case ParameterTag::StaticRangingInfo: {
+            uwbSessionData.staticRangingInfo = StaticRangingInfo::FromDataObject(tlvBerValue);
+            break;
+        }
+        case ParameterTag::SecureRangingInfo: {
+            uwbSessionData.secureRangingInfo = SecureRangingInfo::FromDataObject(tlvBerValue);
+            break;
+        }
+        case ParameterTag::RegulatoryInformation: {
+            uwbSessionData.regulatoryInformation = UwbRegulatoryInformation::FromDataObject(tlvBerValue);
+            break;
+        }
+        case ParameterTag::UwbConfigAvailable: {
+            uwbSessionData.uwbConfigurationAvailable = !!parameterValue.front();
+            break;
+        }
+        default: {
+            break;
+        }
+        }
+    }
+
+    return uwbSessionData;
 }
