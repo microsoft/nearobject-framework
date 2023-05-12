@@ -287,9 +287,9 @@ TlvBer::Builder::SetValue(uint8_t value)
 }
 
 TlvBer::Builder&
-TlvBer::Builder::AddTlv(const TlvBer& tlv)
+TlvBer::Builder::AddTlv(TlvBer tlv)
 {
-    m_valuesConstructed.push_back(tlv);
+    m_valuesConstructed.push_back(std::move(tlv));
     return *this;
 }
 
