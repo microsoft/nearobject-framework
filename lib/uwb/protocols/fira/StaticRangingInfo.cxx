@@ -1,7 +1,12 @@
 
+#include <algorithm>
+#include <array>
+#include <cstring>
 #include <iomanip>
 #include <sstream>
+#include <vector>
 
+#include <magic_enum.hpp>
 #include <notstd/utility.hxx>
 #include <tlv/TlvSerialize.hxx>
 #include <uwb/protocols/fira/StaticRangingInfo.hxx>
@@ -49,8 +54,42 @@ StaticRangingInfo::ToDataObject() const
 
 /* static */
 StaticRangingInfo
-StaticRangingInfo::FromDataObject(const encoding::TlvBer& tlv)
+StaticRangingInfo::FromDataObject(const encoding::TlvBer& tlvBer)
 {
-    // TODO
-    return {};
+    using encoding::ReadSizeTFromBytesBigEndian;
+
+    StaticRangingInfo staticRangingInfo{};
+    std::vector<encoding::TlvBer> tlvBerValues = tlvBer.GetValues();
+
+    for (const auto &tlvBerValue : tlvBerValues) {
+        auto tagValue = tlvBerValue.GetTag();
+        // All tags for StaticRangingInfo are 1-byte long, so ignore all others.
+        if (std::size(tagValue) != 1) {
+            continue;
+        }
+
+        // Ensure the tag has a corresponding enumeration value.
+        auto parameterTag = magic_enum::enum_cast<ParameterTag>(tagValue.front());
+        if (!parameterTag.has_value()) {
+            continue;
+        }
+
+        auto& parameterValue = tlvBerValue.GetValue();
+
+        switch (*parameterTag) {
+        case ParameterTag::VendorId: {
+            staticRangingInfo.VendorId = ReadSizeTFromBytesBigEndian<decltype(staticRangingInfo.VendorId)>(parameterValue);
+            break;
+        }
+        case ParameterTag::StaticStsIv: {
+            std::memcpy(std::data(staticRangingInfo.InitializationVector), std::data(parameterValue), std::min(std::size(parameterValue), std::size(staticRangingInfo.InitializationVector)));
+            break;
+        }
+        default: {
+            break;
+        }
+        }
+    }
+
+    return  staticRangingInfo;
 }
