@@ -1,10 +1,14 @@
 
 #include <iomanip>
 #include <sstream>
+
+#include <tlv/TlvSerialize.hxx>
 #include <uwb/protocols/fira/StaticRangingInfo.hxx>
 
+using namespace uwb::protocol::fira;
+
 std::string
-uwb::protocol::fira::StaticRangingInfo::ToString() const
+StaticRangingInfo::ToString() const
 {
     std::ostringstream staticRangingInfoString{};
     staticRangingInfoString
@@ -15,4 +19,24 @@ uwb::protocol::fira::StaticRangingInfo::ToString() const
     }
 
     return staticRangingInfoString.str();
+}
+
+std::unique_ptr<encoding::TlvBer>
+StaticRangingInfo::ToDataObject() const
+{
+    using encoding::TlvBer, encoding::GetBytesBigEndianFromBitMap;
+
+    TlvBer::Builder builder{};
+
+    auto tlvBerResult = std::make_unique<TlvBer>();
+    *tlvBerResult = builder.Build();
+
+    return tlvBerResult;
+}
+
+/* static */
+StaticRangingInfo
+StaticRangingInfo::FromDataObject(const encoding::TlvBer& tlv)
+{
+    return {};
 }

@@ -4,7 +4,6 @@
 #include <stdexcept>
 
 #include <notstd/type_traits.hxx>
-#include <tlv/TlvBer.hxx>
 #include <tlv/TlvSerialize.hxx>
 #include <uwb/protocols/fira/UwbSessionData.hxx>
 
@@ -53,13 +52,11 @@ UwbSessionData::ToDataObject() const
 
     // STATIC_RANGING_INFO
     if (staticRangingInfo.has_value()) {
-        // TODO:
-        // builder.AddTlv(staticRangingInfo->ToDataObject());
+        builder.AddTlv(*staticRangingInfo->ToDataObject());
     }
     // SECURE_RANGING_INFO
     if (secureRangingInfo.has_value()) {
-        // TODO
-        // builder.AddTlv(secureRangingInfo->ToDataObject());
+        builder.AddTlv(*secureRangingInfo->ToDataObject());
     }
 
     auto tlvBerResult = std::make_unique<TlvBer>();
