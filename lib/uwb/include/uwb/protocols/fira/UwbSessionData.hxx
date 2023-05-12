@@ -60,10 +60,10 @@ struct UwbSessionData
     ToDataObject() const;
 
     /**
-     * @brief Attempt to create a UwbConfiguration object from a TlvBer.
-     *
-     * @param tlv
-     * @return UwbConfiguration
+     * @brief Attempt to create a UwbSessionData object from a TlvBer.
+     * 
+     * @param tlv 
+     * @return UwbSessionData 
      */
     static UwbSessionData
     FromDataObject(const encoding::TlvBer& tlv);
