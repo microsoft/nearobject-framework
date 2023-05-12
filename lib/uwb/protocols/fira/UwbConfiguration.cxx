@@ -5,6 +5,7 @@
 #include <type_traits>
 #include <variant>
 
+#include <magic_enum.hpp>
 #include <notstd/type_traits.hxx>
 
 #include <tlv/TlvBer.hxx>
@@ -35,9 +36,9 @@ UwbConfiguration::ToDataObject() const
 
     builder.SetTag(UwbConfiguration::Tag);
 
-    for (const auto &[parameterTag, parameterValueVariant] : m_values) {
+    for (const auto& [parameterTag, parameterValueVariant] : m_values) {
         auto valueBuilder = TlvBer::Builder().SetTag(notstd::to_underlying(parameterTag));
-        std::visit([&valueBuilder, &parameterTag](auto &&parameterValue) {
+        std::visit([&valueBuilder, &parameterTag](auto&& parameterValue) {
             using ParameterValueT = std::decay_t<decltype(parameterValue)>;
             if constexpr (std::is_enum_v<ParameterValueT>) {
                 valueBuilder.SetValue(notstd::to_underlying(parameterValue));
@@ -51,14 +52,14 @@ UwbConfiguration::ToDataObject() const
                 valueBuilder.SetValue(valueBytes);
             } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<::uwb::UwbMacAddress>>) {
                 std::vector<uint8_t> valueBytes{};
-                for (const auto &uwbMacAddress : parameterValue) {
+                for (const auto& uwbMacAddress : parameterValue) {
                     auto value = parameterValue.GetValue();
                     std::ranges::copy(valueBytes, std::back_inserter(value));
                 }
                 valueBuilder.SetValue(valueBytes);
             } else if constexpr (std::is_same_v<ParameterValueT, std::unordered_set<ResultReportConfiguration>>) {
                 uint8_t value = 0;
-                for (const auto &resultReportConfiguration : parameterValue) {
+                for (const auto& resultReportConfiguration : parameterValue) {
                     value |= notstd::to_underlying(resultReportConfiguration);
                 }
                 valueBuilder.SetValue(value);
@@ -74,11 +75,231 @@ UwbConfiguration::ToDataObject() const
     return tlvBerResult;
 }
 
+namespace detail
+{
+template <typename EnumT>
+void
+SetEnumValue(uint8_t parameterValue, std::function<void(EnumT)> setter)
+{
+    auto valueEnum = magic_enum::enum_cast<EnumT>(parameterValue);
+    if (valueEnum.has_value()) {
+        setter(*valueEnum);
+    }
+}
+} // namespace detail
+
 /* static */
 UwbConfiguration
-UwbConfiguration::FromDataObject(const encoding::TlvBer & /* tlv */)
+UwbConfiguration::FromDataObject(const encoding::TlvBer& tlvBer)
 {
-    throw std::logic_error("not implemented");
+    UwbConfiguration::Builder builder{};
+
+    // clang-format off
+    // setter map for 8-bit values
+    static const std::unordered_map<ParameterTag, std::function<void(uint8_t)>> setters8 {
+        { ParameterTag::KeyRotationRate, [&](uint8_t value) { builder.SetKeyRotationRate(value); }},
+        { ParameterTag::MaxContentionPhaseLength, [&](uint8_t value) { builder.SetMaxContentionPhaseLength(value); }},
+        { ParameterTag::PreambleCodeIndex, [&](uint8_t value) { builder.SetPreambleCodeIndex(value); }},
+        { ParameterTag::SlotsPerRr, [&](uint8_t value) { builder.SetMaxSlotsPerRangingRound(value); }},
+        { ParameterTag::Sp0PhySetNumber, [&](uint8_t value) { builder.SetSp0PhySetNumber(value); }},
+        { ParameterTag::Sp1PhySetNumber, [&](uint8_t value) { builder.SetSp1PhySetNumber(value); }},
+        { ParameterTag::Sp3PhySetNumber, [&](uint8_t value) { builder.SetSp3PhySetNumber(value); }},
+    };
+    // setter map for 16-bit values
+    static const std::unordered_map<ParameterTag, std::function<void(uint16_t)>> setters16 {
+        { ParameterTag::FiraMacVersion, [&](uint16_t value){ builder.SetFiraVersionMac(value); }},
+        { ParameterTag::FiraPhyVersion, [&](uint16_t value){ builder.SetFiraVersionPhy(value); }},
+        { ParameterTag::MaxRrRetry, [&](uint16_t value){ builder.SetMaxRangingRoundRetry(value); }},
+        { ParameterTag::RangingInterval, [&](uint16_t value){ builder.SetRangingInterval(value); }},
+        { ParameterTag::SlotDuration, [&](uint16_t value){ builder.SetSlotDuration(value); }},
+    };
+    // clang-format on
+
+    std::vector<encoding::TlvBer> tlvBerValues = tlvBer.GetValues();
+
+    for (const auto& tlvBerValue : tlvBerValues) {
+        auto tagValue = tlvBerValue.GetTag();
+        // All tags for UwbConfiguration are 1-byte long, so ignore all others.
+        if (std::size(tagValue) != 1) {
+            continue;
+        }
+
+        // Ensure the tag has a corresponding enumeration value.
+        auto parameterTag = magic_enum::enum_cast<ParameterTag>(tagValue.front());
+        if (!parameterTag.has_value()) {
+            continue;
+        }
+
+        auto& parameterValue = tlvBerValue.GetValue();
+
+        switch (*parameterTag) {
+        // boolean values
+        case ParameterTag::HoppingMode: {
+            bool value = !!parameterValue.front();
+            builder.SetHoppingMode(value);
+            break;
+        }
+        case ParameterTag::BlockStriding: {
+            bool value = !!parameterValue.front();
+            builder.SetBlockStriding(value);
+            break;
+        }
+
+        // 8-bit values
+        case ParameterTag::KeyRotationRate:
+        case ParameterTag::MaxContentionPhaseLength:
+        case ParameterTag::SlotsPerRr:
+        case ParameterTag::PreambleCodeIndex:
+        case ParameterTag::Sp0PhySetNumber:
+        case ParameterTag::Sp1PhySetNumber:
+        case ParameterTag::Sp3PhySetNumber: {
+            uint8_t value = parameterValue.front();
+            setters8.at(*parameterTag)(value);
+            break;
+        }
+
+        // 16-bit values
+        case ParameterTag::FiraPhyVersion:
+        case ParameterTag::FiraMacVersion: {
+        case ParameterTag::SlotDuration:
+        case ParameterTag::RangingInterval:
+        case ParameterTag::MaxRrRetry:
+            uint16_t value = 0; // TODO: convert
+            setters16.at(*parameterTag)(value);
+            break;
+        }
+
+        // 32-bit values
+        case ParameterTag::UwbInitiationTime: {
+            uint32_t value = 0; // TODO: convert
+            builder.SetUwbInitiationTime(value);
+            break;
+        }
+
+        // enumerations
+        case ParameterTag::DeviceRole: {
+            ::detail::SetEnumValue<DeviceRole>(parameterValue.front(), [&](auto&& value) {
+                builder.SetDeviceRole(value);
+            });
+            break;
+        }
+        case ParameterTag::StsConfig: {
+            ::detail::SetEnumValue<StsConfiguration>(parameterValue.front(), [&](auto&& value) {
+                builder.SetStsConfiguration(value);
+            });
+            break;
+        }
+        case ParameterTag::MultiNodeMode: {
+            ::detail::SetEnumValue<MultiNodeMode>(parameterValue.front(), [&](auto&& value) {
+                builder.SetMultiNodeMode(value);
+            });
+            break;
+        }
+        case ParameterTag::RangingTimeStruct: {
+            ::detail::SetEnumValue<RangingMode>(parameterValue.front(), [&](auto&& value) {
+                builder.SetRangingTimeStruct(value);
+            });
+            break;
+        }
+        case ParameterTag::ScheduledMode: {
+            ::detail::SetEnumValue<SchedulingMode>(parameterValue.front(), [&](auto&& value) {
+                builder.SetSchedulingMode(value);
+            });
+            break;
+        }
+        case ParameterTag::PrfMode: {
+            ::detail::SetEnumValue<PrfMode>(parameterValue.front(), [&](auto&& value) {
+                builder.SetPrfMode(value);
+            });
+            break;
+        }
+        case ParameterTag::RFrameConfig: {
+            ::detail::SetEnumValue<StsPacketConfiguration>(parameterValue.front(), [&](auto&& value) {
+                builder.SetStsPacketConfiguration(value);
+            });
+            break;
+        }
+        case ParameterTag::ChannelNumber: {
+            ::detail::SetEnumValue<Channel>(parameterValue.front(), [&](auto&& value) {
+                builder.SetChannel(value);
+            });
+            break;
+        }
+        case ParameterTag::CcConstraintLength: {
+            ::detail::SetEnumValue<ConvolutionalCodeConstraintLength>(parameterValue.front(), [&](auto&& value) {
+                builder.SetConvolutionalCodeConstraintLength(value);
+            });
+            break;
+        }
+        case ParameterTag::MacAddressMode: {
+            ::detail::SetEnumValue<uwb::UwbMacAddressType>(parameterValue.front(), [&](auto&& value) {
+                builder.SetMacAddressType(value);
+            });
+            break;
+        }
+        case ParameterTag::MacFcsType: {
+            ::detail::SetEnumValue<uwb::UwbMacAddressFcsType>(parameterValue.front(), [&](auto&& value) {
+                builder.SetMacAddressFcsType(value);
+            });
+            break;
+        }
+        case ParameterTag::RangingMethod: {
+            uint8_t value = parameterValue.front();
+            RangingDirection rangingDirection;
+            MeasurementReportMode measurementReportMode;
+
+            switch (value) {
+            case 0:
+                rangingDirection = RangingDirection::OneWay;
+                measurementReportMode = MeasurementReportMode::None;
+                break;
+            case (int)RangingRoundUsage::SingleSidedTwoWayRangingWithDeferredMode:
+                rangingDirection = RangingDirection::SingleSidedTwoWay;
+                measurementReportMode = MeasurementReportMode::Deferred;
+                break;
+            case (int)RangingRoundUsage::DoubleSidedTwoWayRangingWithDeferredMode:
+                rangingDirection = RangingDirection::DoubleSidedTwoWay;
+                measurementReportMode = MeasurementReportMode::Deferred;
+                break;
+            case (int)RangingRoundUsage::SingleSidedTwoWayRangingNonDeferredMode:
+                rangingDirection = RangingDirection::SingleSidedTwoWay;
+                measurementReportMode = MeasurementReportMode::NonDeferred;
+                break;
+            case (int)RangingRoundUsage::DoubleSidedTwoWayRangingNonDeferredMode:
+                rangingDirection = RangingDirection::DoubleSidedTwoWay;
+                measurementReportMode = MeasurementReportMode::NonDeferred;
+                break;
+            }
+
+            RangingMethod rangingMethod(rangingDirection, measurementReportMode);
+            builder.SetRangingMethod(rangingMethod);
+            break;
+        }
+
+        // special cases
+        case ParameterTag::ResultReportConfig: {
+            uint8_t value = parameterValue.front();
+            for (const auto resultReportConfiguration : magic_enum::enum_values<ResultReportConfiguration>()) {
+                if ((value & notstd::to_underlying(resultReportConfiguration)) != 0) {
+                    builder.AddResultReportConfiguration(resultReportConfiguration);
+                }
+            }
+            break;
+        }
+        case ParameterTag::ControleeShortMacAddress: {
+            std::array<uint8_t, 2> addressData{ parameterValue[0], parameterValue[1] };
+            uwb::UwbMacAddress uwbMacAddressShort(addressData);
+            builder.SetMacAddressControleeShort(uwbMacAddressShort);
+            break;
+        }
+        case ParameterTag::ControllerMacAddress:
+            break; // TODO
+        default:
+            break;
+        } // switch (parameterTag)
+    }
+
+    return builder;
 }
 
 std::optional<uint16_t>
@@ -264,7 +485,7 @@ UwbConfiguration::GetMaxRangingRoundRetry() const noexcept
     return GetValue<uint16_t>(ParameterTag::MaxRrRetry);
 }
 
-const std::unordered_map<UwbConfiguration::ParameterTag, UwbConfiguration::ParameterTypesVariant> &
+const std::unordered_map<UwbConfiguration::ParameterTag, UwbConfiguration::ParameterTypesVariant>&
 UwbConfiguration::GetValueMap() const noexcept
 {
     return m_values;
