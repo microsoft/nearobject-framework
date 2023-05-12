@@ -4,12 +4,14 @@
 #include <cstring>
 #include <iomanip>
 #include <sstream>
+#include <unordered_set>
 #include <vector>
 
 #include <magic_enum.hpp>
 #include <notstd/utility.hxx>
 #include <tlv/TlvSerialize.hxx>
 #include <uwb/protocols/fira/StaticRangingInfo.hxx>
+#include <uwb/protocols/fira/UwbException.hxx>
 
 using namespace uwb::protocol::fira;
 
@@ -59,6 +61,7 @@ StaticRangingInfo::FromDataObject(const encoding::TlvBer& tlvBer)
     using encoding::ReadSizeTFromBytesBigEndian;
 
     StaticRangingInfo staticRangingInfo{};
+    std::unordered_set<ParameterTag> parameterTagsDecoded{};
     std::vector<encoding::TlvBer> tlvBerValues = tlvBer.GetValues();
 
     for (const auto &tlvBerValue : tlvBerValues) {
@@ -75,6 +78,7 @@ StaticRangingInfo::FromDataObject(const encoding::TlvBer& tlvBer)
         }
 
         // Ensure all values have non-zero payload.
+        bool parameterValueWasDecoded = true;
         auto& parameterValue = tlvBerValue.GetValue();
         if (std::empty(parameterValue)) {
             continue;
@@ -90,9 +94,18 @@ StaticRangingInfo::FromDataObject(const encoding::TlvBer& tlvBer)
             break;
         }
         default: {
+            parameterValueWasDecoded = false;
             break;
         }
         }
+
+        if (parameterValueWasDecoded) {
+            parameterTagsDecoded.insert(*parameterTag);
+        }
+    }
+
+    if (std::size(parameterTagsDecoded) < magic_enum::enum_count<ParameterTag>()) {
+        throw UwbException(UwbStatusGeneric::SyntaxError);
     }
 
     return staticRangingInfo;

@@ -1,8 +1,11 @@
 
+#include <unordered_set>
+
 #include <magic_enum.hpp>
 #include <notstd/utility.hxx>
 #include <tlv/TlvSerialize.hxx>
 #include <uwb/protocols/fira/SecureRangingInfo.hxx>
+#include <uwb/protocols/fira/UwbException.hxx>
 
 using namespace uwb::protocol::fira;
 
@@ -41,6 +44,7 @@ SecureRangingInfo::FromDataObject(const encoding::TlvBer& tlvBer)
     using encoding::ReadSizeTFromBytesBigEndian;
 
     SecureRangingInfo secureRangingInfo{};
+    std::unordered_set<ParameterTag> parameterTagsDecoded{};
     std::vector<encoding::TlvBer> tlvBerValues = tlvBer.GetValues();
 
     for (const auto &tlvBerValue : tlvBerValues) {
@@ -56,6 +60,7 @@ SecureRangingInfo::FromDataObject(const encoding::TlvBer& tlvBer)
             continue;
         }
 
+        bool parameterValueWasDecoded = true;
         auto& parameterValue = tlvBerValue.GetValue();
 
         switch (*parameterTag) {
@@ -72,9 +77,18 @@ SecureRangingInfo::FromDataObject(const encoding::TlvBer& tlvBer)
             break;
         }
         default: {
+            parameterValueWasDecoded = false;
             break;
         }
         }
+
+        if (parameterValueWasDecoded) {
+            parameterTagsDecoded.insert(*parameterTag);
+        }
+    }
+
+    if (std::size(parameterTagsDecoded) < magic_enum::enum_count<ParameterTag>()) {
+        throw UwbException(UwbStatusGeneric::SyntaxError);
     }
 
     return secureRangingInfo;

@@ -7,6 +7,7 @@
 #include <notstd/type_traits.hxx>
 #include <tlv/TlvSerialize.hxx>
 #include <uwb/protocols/fira/UwbSessionData.hxx>
+#include <uwb/protocols/fira/UwbException.hxx>
 
 using namespace uwb::protocol::fira;
 
@@ -71,10 +72,19 @@ UwbSessionData::ToDataObject() const
 UwbSessionData
 UwbSessionData::FromDataObject(const encoding::TlvBer& tlvBer)
 {
+    static const std::unordered_set<ParameterTag> parameterTagsRequired{
+        ParameterTag::SessionDataVersion,
+        ParameterTag::SessionId,
+        ParameterTag::SubSessionId,
+        ParameterTag::ConfigurationParameters,
+    };
+
     using encoding::ReadSizeTFromBytesBigEndian;
 
     UwbSessionData uwbSessionData;
+
     std::vector<encoding::TlvBer> tlvBerValues = tlvBer.GetValues();
+    std::unordered_set<ParameterTag> parameterTagsRequiredNotSeen = parameterTagsRequired;
 
     for (const auto &tlvBerValue : tlvBerValues) {
         auto tagValue = tlvBerValue.GetTag();
@@ -90,6 +100,7 @@ UwbSessionData::FromDataObject(const encoding::TlvBer& tlvBer)
         }
 
         // Ensure all values have non-zero payload.
+        bool parameterValueWasDecoded = true;
         auto& parameterValue = tlvBerValue.GetValue();
         if (std::empty(parameterValue)) {
             continue;
@@ -129,9 +140,18 @@ UwbSessionData::FromDataObject(const encoding::TlvBer& tlvBer)
             break;
         }
         default: {
+            parameterValueWasDecoded = false;
             break;
         }
         }
+
+        if (parameterValueWasDecoded) {
+            parameterTagsRequiredNotSeen.erase(*parameterTag);
+        }
+    }
+
+    if (!std::empty(parameterTagsRequiredNotSeen)) {
+        throw UwbException(UwbStatusGeneric::SyntaxError);
     }
 
     return uwbSessionData;
