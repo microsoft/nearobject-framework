@@ -44,15 +44,8 @@ UwbSessionData::ToDataObject() const
         .AddTlv(
             TlvBer::Builder()
                 .SetTag(notstd::to_underlying(ParameterTag::UwbConfigAvailable))
-                .SetValue(0x01 /* always available? */)
+                .SetValue(0x01 /* always available since we send complete config? */)
                 .Build());
-
-    // The below tags being optional, we need to determine if when they are not
-    // present/set, whether: the TLV:
-    //      1) Can be wholly omitted (current behavior), or
-    //      2) Must be present but with a length field of 0.
-    // This won't matter when interoperating with other devices running this code, but it will
-    // matter for inter-operability.
 
     // STATIC_RANGING_INFO
     if (staticRangingInfo.has_value()) {
