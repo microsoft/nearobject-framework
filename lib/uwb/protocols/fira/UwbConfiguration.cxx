@@ -245,6 +245,8 @@ UwbConfiguration::FromDataObject(const encoding::TlvBer& tlvBer)
             });
             break;
         }
+
+        // special cases
         case ParameterTag::RangingMethod: {
             uint8_t value = parameterValue.front();
             RangingDirection rangingDirection;
@@ -278,7 +280,6 @@ UwbConfiguration::FromDataObject(const encoding::TlvBer& tlvBer)
             break;
         }
 
-        // special cases
         case ParameterTag::ResultReportConfig: {
             uint8_t value = parameterValue.front();
             for (const auto resultReportConfiguration : magic_enum::enum_values<ResultReportConfiguration>()) {
