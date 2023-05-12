@@ -18,9 +18,7 @@ UwbSessionData::ToDataObject() const
     std::array<uint8_t, sizeof Tag> tagData;
     std::memcpy(&tagData, &Tag, sizeof Tag);
 
-    TlvBer::Builder builder{};
-
-    builder
+    auto builder = TlvBer::Builder()
         .SetTag(tagData)
         // UWB_SESSION_DATA_VERSION
         .AddTlv(

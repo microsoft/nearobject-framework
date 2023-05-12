@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <sstream>
 
+#include <notstd/utility.hxx>
 #include <tlv/TlvSerialize.hxx>
 #include <uwb/protocols/fira/StaticRangingInfo.hxx>
 
@@ -26,10 +27,22 @@ StaticRangingInfo::ToDataObject() const
 {
     using encoding::TlvBer, encoding::GetBytesBigEndianFromBitMap;
 
-    TlvBer::Builder builder{};
-
     auto tlvBerResult = std::make_unique<TlvBer>();
-    *tlvBerResult = builder.Build();
+    *tlvBerResult = TlvBer::Builder()
+        .SetTag(Tag)
+        // VENDOR_ID
+        .AddTlv(
+            TlvBer::Builder()
+                .SetTag(notstd::to_underlying(ParameterTag::VendorId))
+                .SetValue(GetBytesBigEndianFromBitMap(VendorId, sizeof VendorId))
+                .Build())
+        // STATIC_STS_IV 
+        .AddTlv(
+            TlvBer::Builder()
+                .SetTag(notstd::to_underlying(ParameterTag::StaticStsIv))
+                .SetValue(InitializationVector)
+                .Build())
+        .Build();
 
     return tlvBerResult;
 }
@@ -38,5 +51,6 @@ StaticRangingInfo::ToDataObject() const
 StaticRangingInfo
 StaticRangingInfo::FromDataObject(const encoding::TlvBer& tlv)
 {
+    // TODO
     return {};
 }

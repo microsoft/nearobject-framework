@@ -33,9 +33,7 @@ UwbConfiguration::ToDataObject() const
 {
     using encoding::TlvBer, encoding::GetBytesBigEndianFromBitMap;
 
-    TlvBer::Builder builder{};
-
-    builder.SetTag(UwbConfiguration::Tag);
+    auto builder = TlvBer::Builder().SetTag(Tag);
 
     for (const auto& [parameterTag, parameterValueVariant] : m_values) {
         auto valueBuilder = TlvBer::Builder().SetTag(notstd::to_underlying(parameterTag));

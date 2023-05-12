@@ -43,9 +43,6 @@ struct StaticRangingInfo
     std::string
     ToString() const;
 
-    uint16_t VendorId;
-    std::array<uint8_t, InitializationVectorLength> InitializationVector;
-
     /**
      * @brief Convert this object into a FiRa Data Object (DO).
      *
@@ -62,6 +59,9 @@ struct StaticRangingInfo
      */
     static StaticRangingInfo
     FromDataObject(const encoding::TlvBer& tlv);
+
+    uint16_t VendorId;
+    std::array<uint8_t, InitializationVectorLength> InitializationVector;
 };
 } // namespace uwb::protocol::fira
 
