@@ -12,6 +12,7 @@
 #include <uwb/protocols/fira/SecureRangingInfo.hxx>
 #include <uwb/protocols/fira/StaticRangingInfo.hxx>
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
+#include <uwb/protocols/fira/UwbRegulatoryInformation.hxx>
 
 namespace uwb::protocol::fira
 {
@@ -74,6 +75,7 @@ struct UwbSessionData
     UwbConfiguration uwbConfiguration{};
     std::optional<StaticRangingInfo> staticRangingInfo;
     std::optional<SecureRangingInfo> secureRangingInfo;
+    std::optional<UwbRegulatoryInformation> regulatoryInformation;
 };
 
 } // namespace uwb::protocol::fira

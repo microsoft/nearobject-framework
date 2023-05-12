@@ -39,7 +39,13 @@ UwbSessionData::ToDataObject() const
                 .SetValue(GetBytesBigEndianFromBitMap(subSessionId, sizeof subSessionId))
                 .Build())
         // CONFIGURATION_PARAMETERS
-        .AddTlv(*uwbConfiguration.ToDataObject());
+        .AddTlv(*uwbConfiguration.ToDataObject())
+        // UWB_CONFIG_AVAILABLE
+        .AddTlv(
+            TlvBer::Builder()
+                .SetTag(notstd::to_underlying(ParameterTag::UwbConfigAvailable))
+                .SetValue(0x01 /* always available? */)
+                .Build());
 
     // The below tags being optional, we need to determine if when they are not
     // present/set, whether: the TLV:
@@ -52,9 +58,15 @@ UwbSessionData::ToDataObject() const
     if (staticRangingInfo.has_value()) {
         builder.AddTlv(*staticRangingInfo->ToDataObject());
     }
+
     // SECURE_RANGING_INFO
     if (secureRangingInfo.has_value()) {
         builder.AddTlv(*secureRangingInfo->ToDataObject());
+    }
+
+    // REGULATORY_INFORMATION
+    if (regulatoryInformation.has_value()) {
+        builder.AddTlv(*regulatoryInformation->ToDataObject());
     }
 
     auto tlvBerResult = std::make_unique<TlvBer>();
