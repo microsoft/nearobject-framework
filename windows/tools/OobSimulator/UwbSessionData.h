@@ -29,6 +29,10 @@ struct UwbSessionData : UwbSessionDataT<UwbSessionData>
     ControleeShortMacAddress();
     void
     ControleeShortMacAddress(hstring const& value);
+    winrt::OobSimulator::SessionDataEncoding
+    SessionDataEncoding();
+    void
+    SessionDataEncoding(winrt::OobSimulator::SessionDataEncoding const& value);
     winrt::event_token
     PropertyChanged(winrt::Microsoft::UI::Xaml::Data::PropertyChangedEventHandler const& handler);
     void
@@ -40,6 +44,7 @@ private:
     winrt::OobSimulator::MultiNodeMode m_multiNodeMode;
     winrt::hstring m_controllerMacAddress;
     winrt::hstring m_controleeShortMacAddress;
+    winrt::OobSimulator::SessionDataEncoding m_sessionDataEncoding;
 
     winrt::event<winrt::Microsoft::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;
 };

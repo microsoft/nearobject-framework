@@ -12,6 +12,11 @@ enum MultiNodeMode {
     ManyToMany,
 };
 
+enum SessionDataEncoding {
+    TlvBer,
+    MessagePack,
+};
+
 runtimeclass UwbSessionData : Microsoft.UI.Xaml.Data.INotifyPropertyChanged
 {
     UwbSessionData();
@@ -21,5 +26,6 @@ runtimeclass UwbSessionData : Microsoft.UI.Xaml.Data.INotifyPropertyChanged
     MultiNodeMode MultiNodeMode;
     String ControllerMacAddress;
     String ControleeShortMacAddress;
+    SessionDataEncoding SessionDataEncoding;
 }
 } // namespace OobSimulator

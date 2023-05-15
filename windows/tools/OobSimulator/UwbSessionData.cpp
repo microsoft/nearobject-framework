@@ -71,6 +71,19 @@ UwbSessionData::ControleeShortMacAddress(hstring const& value)
         m_propertyChanged(*this, winrt::Microsoft::UI::Xaml::Data::PropertyChangedEventArgs{ L"Controlee Short MAC Address" });
     }
 }
+winrt::OobSimulator::SessionDataEncoding
+UwbSessionData::SessionDataEncoding()
+{
+    return m_sessionDataEncoding;
+}
+void
+UwbSessionData::SessionDataEncoding(winrt::OobSimulator::SessionDataEncoding const& value)
+{
+    if (m_sessionDataEncoding != value) {
+        m_sessionDataEncoding = value;
+        m_propertyChanged(*this, winrt::Microsoft::UI::Xaml::Data::PropertyChangedEventArgs{ L"Session Data Encoding" });
+    }
+}
 winrt::event_token
 UwbSessionData::PropertyChanged(winrt::Microsoft::UI::Xaml::Data::PropertyChangedEventHandler const& handler)
 {

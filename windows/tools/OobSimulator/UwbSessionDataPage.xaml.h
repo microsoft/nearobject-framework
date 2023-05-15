@@ -14,6 +14,9 @@ struct UwbSessionDataPage : UwbSessionDataPageT<UwbSessionDataPage>
     winrt::OobSimulator::UwbSessionDataPageViewModel
     ViewModel();
 
+    void
+    OnSelectSessionDataEncoding(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const&);
+
 private:
     winrt::OobSimulator::UwbSessionDataPageViewModel m_viewModel;
 };
