@@ -58,6 +58,14 @@
             <TextBox Margin="10" VerticalAlignment="Center" Text="{x:Bind ViewModel.UwbSessionData.ControleeShortMacAddress, Mode=TwoWay}" />
         </StackPanel>
 
-        <Button Grid.Row="6" Content="Set UWB Session Data" FontSize="16" FontWeight="Bold" Margin="10" Command="{x:Bind ViewModel.SetUwbSessionDataCommand}"/>
+        <StackPanel Grid.Row="6" Orientation="Horizontal" Margin="10">
+            <TextBlock Text="Encoding: " VerticalAlignment="Center" />
+            <StackPanel Margin="10" Orientation="Horizontal">
+                <RadioButton x:Name="TlvBerRadioButton" Content="TLV-BER" GroupName="EncodingGroup" IsChecked="True" Checked="OnSelectSessionDataEncoding" VerticalAlignment="Center" />
+                <RadioButton x:Name="MsgpackRadioButton" Content="MessagePack" GroupName="EncodingGroup" Checked="OnSelectSessionDataEncoding" VerticalAlignment="Center" />
+            </StackPanel>
+        </StackPanel>
+
+        <Button Grid.Row="7" Content="Set UWB Session Data" FontSize="16" FontWeight="Bold" Margin="10" Command="{x:Bind ViewModel.SetUwbSessionDataCommand}"/>
     </Grid>
 </Page>

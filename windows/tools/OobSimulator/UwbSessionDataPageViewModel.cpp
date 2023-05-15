@@ -26,6 +26,7 @@ UwbSessionDataPageViewModel::UwbSessionDataPageViewModel()
     m_uwbSessionData.MultiNodeMode(OobSimulator::MultiNodeMode::Unicast);
     m_uwbSessionData.ControllerMacAddress(L"12:34");
     m_uwbSessionData.ControleeShortMacAddress(L"67:89");
+    m_uwbSessionData.SessionDataEncoding(OobSimulator::SessionDataEncoding::TlvBer);
 }
 
 winrt::OobSimulator::UwbSessionData
@@ -69,16 +70,35 @@ UwbSessionDataPageViewModel::SetUwbSessionData()
     auto initializeWithWindow{ fileSavePicker.as<::IInitializeWithWindow>() };
     initializeWithWindow->Initialize(g_hwnd);
 
-    // Convert the input data to JSON
-    nlohmann::json json = uwbSessionData;
+    // Get encoding type
+    auto sessionDataEncoding = m_uwbSessionData.SessionDataEncoding();
 
-    // Serialize JSON to byte array (MessagePack)
-    std::vector<uint8_t> sessionDataBytes = nlohmann::json::to_msgpack(json);
+    // Encode session data based on encoding type
+    std::vector<uint8_t> sessionDataBytes;
+    if (sessionDataEncoding == winrt::OobSimulator::SessionDataEncoding::TlvBer) {
+        // Convert the input data to TLV-BER
+        auto tlvBer = uwbSessionData.ToDataObject();
+
+        // Serialize TLV-BER to byte array
+        sessionDataBytes = tlvBer->ToBytes();
+
+        // Set file save picker options
+        fileSavePicker.FileTypeChoices().Insert(L"TLV-BER", winrt::single_threaded_vector<winrt::hstring>({ L".tlvber" }));
+        fileSavePicker.SuggestedFileName(L"uwbsessiondata.tlvber");
+    } else { // winrt::OobSimulator::SessionDataEncoding::MessagePack
+        // Convert the input data to JSON
+        nlohmann::json json = uwbSessionData;
+
+        // Serialize JSON to byte array (MessagePack)
+        sessionDataBytes = nlohmann::json::to_msgpack(json);
+
+        // Set file save picker options
+        fileSavePicker.FileTypeChoices().Insert(L"Message Pack", winrt::single_threaded_vector<winrt::hstring>({ L".msgpack" }));
+        fileSavePicker.SuggestedFileName(L"uwbsessiondata.msgpack");
+    }
 
     // Write to file
-    fileSavePicker.FileTypeChoices().Insert(L"Message Pack", winrt::single_threaded_vector<winrt::hstring>({ L".msgpack" }));
     fileSavePicker.SuggestedStartLocation(winrt::Windows::Storage::Pickers::PickerLocationId::DocumentsLibrary);
-    fileSavePicker.SuggestedFileName(L"uwbsessiondata.msgpack");
     auto file = co_await fileSavePicker.PickSaveFileAsync();
 
     if (file != nullptr) {

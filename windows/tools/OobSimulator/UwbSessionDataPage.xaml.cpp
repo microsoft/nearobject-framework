@@ -23,4 +23,16 @@ UwbSessionDataPage::ViewModel()
 {
     return m_viewModel;
 }
+
+// TODO: Move to IValueConverter for radio buttons to conform to MVVM principles
+void
+UwbSessionDataPage::OnSelectSessionDataEncoding(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const&)
+{
+    auto radioButton = sender.as<Controls::RadioButton>();
+    if (radioButton == TlvBerRadioButton()) {
+        ViewModel().UwbSessionData().SessionDataEncoding(winrt::OobSimulator::SessionDataEncoding::TlvBer);
+    } else if (radioButton == MsgpackRadioButton()) {
+        ViewModel().UwbSessionData().SessionDataEncoding(winrt::OobSimulator::SessionDataEncoding::MessagePack);
+    }
+}
 } // namespace winrt::OobSimulator::implementation
