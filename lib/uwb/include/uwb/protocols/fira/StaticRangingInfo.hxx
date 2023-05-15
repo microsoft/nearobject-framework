@@ -8,6 +8,7 @@
 #include <string>
 
 #include <notstd/hash.hxx>
+#include <tlv/TlvBer.hxx>
 
 namespace uwb::protocol::fira
 {
@@ -41,6 +42,23 @@ struct StaticRangingInfo
 
     std::string
     ToString() const;
+
+    /**
+     * @brief Convert this object into a FiRa Data Object (DO).
+     *
+     * @return std::unique_ptr<encoding::TlvBer>
+     */
+    std::unique_ptr<encoding::TlvBer>
+    ToDataObject() const;
+
+    /**
+     * @brief
+     *
+     * @param tlv
+     * @return StaticRangingInfo
+     */
+    static StaticRangingInfo
+    FromDataObject(const encoding::TlvBer& tlv);
 
     uint16_t VendorId;
     std::array<uint8_t, InitializationVectorLength> InitializationVector;

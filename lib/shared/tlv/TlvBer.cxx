@@ -118,7 +118,7 @@ TlvBer::IsPrimitive() const noexcept
 }
 
 std::vector<uint8_t>
-// Static-analysis flags false positive as ToBytes() is called no another instance, thus is not actually recursive.
+// Static-analysis flags false positive as ToBytes() is called on another instance, thus is not actually recursive.
 // NOLINTNEXTLINE(misc-no-recursion)
 TlvBer::ToBytes() const
 {
@@ -287,9 +287,9 @@ TlvBer::Builder::SetValue(uint8_t value)
 }
 
 TlvBer::Builder&
-TlvBer::Builder::AddTlv(const TlvBer& tlv)
+TlvBer::Builder::AddTlv(TlvBer tlv)
 {
-    m_valuesConstructed.push_back(tlv);
+    m_valuesConstructed.push_back(std::move(tlv));
     return *this;
 }
 
