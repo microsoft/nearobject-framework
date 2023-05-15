@@ -524,7 +524,7 @@ public:
         // clang-format off
         requires IsTlvBerDataUnitType<typename Iterable::value_type>
         Builder&
-        SetValue(Iterable& value)
+        SetValue(Iterable value)
         // clang-format on
         {
             m_data.assign(std::cbegin(value), std::cend(value));
@@ -547,7 +547,7 @@ public:
          * @return Builder& 
          */
         Builder&
-        AddTlv(const TlvBer& tlv);
+        AddTlv(TlvBer tlv);
 
         /**
          * @brief Set the field members of this builder so that when Build is called it will create a copy Of Tlv object
