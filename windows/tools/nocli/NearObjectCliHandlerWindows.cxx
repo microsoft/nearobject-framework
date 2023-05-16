@@ -113,6 +113,8 @@ NearObjectCliHandlerWindows::ResolveUwbDevice(const nearobject::cli::NearObjectC
 void
 NearObjectCliHandlerWindows::HandleStartRanging(::uwb::protocol::fira::DeviceType deviceType, std::filesystem::path sessionDataFilePath) noexcept
 {
+    using ::uwb::protocol::fira::DeviceType;
+
     std::ifstream inputFileStream(sessionDataFilePath, std::ios::binary);
     if (!inputFileStream.is_open()) {
         // TODO: Log error
@@ -140,11 +142,12 @@ NearObjectCliHandlerWindows::HandleStartRanging(::uwb::protocol::fira::DeviceTyp
 
     // Create the NearObjectSessionConfiguration
     NearObject::NearObjectSessionConfiguration sessionConfiguration;
+
     switch (deviceType) {
-    case ::uwb::protocol::fira::DeviceType::Controlee:
+    case DeviceType::Controlee:
         sessionConfiguration.SupportsRoleParticipant(true);
         break;
-    case ::uwb::protocol::fira::DeviceType::Controller:
+    case DeviceType::Controller:
         sessionConfiguration.SupportsRoleHost(true);
         break;
     default:
@@ -160,8 +163,19 @@ NearObjectCliHandlerWindows::HandleStartRanging(::uwb::protocol::fira::DeviceTyp
     // Get the result from the async operation
     NearObject::NearObjectSessionCreateResult sessionCreateResult = sessionCreateResultAsyncOperation.get();
 
+    NearObject::INearObjectSessionClient sessionClient;
+    if (deviceType == DeviceType::Controlee) {
+        sessionClient = sessionCreateResult.ParticipantClient();
+    } else if (deviceType == DeviceType::Controller) {
+        sessionClient = sessionCreateResult.HostClient();
+    }
+
     // Start the ranging session
-    sessionCreateResult.HostClient().Start();
+    if (sessionClient != nullptr) {
+        sessionClient.Start();
+    }
+
+    // TODO: need to save the returned session and client.
 }
 
 void
