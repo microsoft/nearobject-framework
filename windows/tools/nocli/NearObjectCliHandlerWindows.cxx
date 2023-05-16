@@ -140,6 +140,18 @@ NearObjectCliHandlerWindows::HandleStartRanging(::uwb::protocol::fira::DeviceTyp
 
     // Create the NearObjectSessionConfiguration
     NearObject::NearObjectSessionConfiguration sessionConfiguration;
+    switch (deviceType) {
+    case ::uwb::protocol::fira::DeviceType::Controlee:
+        sessionConfiguration.SupportsRoleParticipant(true);
+        break;
+    case ::uwb::protocol::fira::DeviceType::Controller:
+        sessionConfiguration.SupportsRoleHost(true);
+        break;
+    default:
+        std::cerr << "invalid device type '" << magic_enum::enum_name(deviceType) << "' specified; cannot start ranging" << std::endl;
+        return;
+    }
+
     sessionConfiguration.IdentityToken(identityTokenUwb);
 
     // Create the NearObjectSession
