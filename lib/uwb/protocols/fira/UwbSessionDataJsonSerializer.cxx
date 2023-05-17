@@ -1,9 +1,9 @@
 
 #include <stdexcept>
 
-#include <nearobject/serialization/UwbConfigurationJsonSerializer.hxx>
-#include <nearobject/serialization/UwbSessionDataJsonSerializer.hxx>
+#include <uwb/protocols/fira/UwbConfigurationJsonSerializer.hxx>
 #include <uwb/protocols/fira/UwbSessionData.hxx>
+#include <uwb/protocols/fira/UwbSessionDataJsonSerializer.hxx>
 
 void
 uwb::protocol::fira::to_json(nlohmann::json& json, const UwbSessionData& uwbSessionData)
