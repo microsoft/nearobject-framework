@@ -6,8 +6,11 @@
 #include <magic_enum.hpp>
 #include <notstd/type_traits.hxx>
 #include <tlv/TlvSerialize.hxx>
-#include <uwb/protocols/fira/UwbSessionData.hxx>
 #include <uwb/protocols/fira/UwbException.hxx>
+#include <uwb/protocols/fira/UwbSessionData.hxx>
+
+#include <nearobject/serialization/UwbSessionDataJsonSerializer.hxx>
+#include <nlohmann/json.hpp>
 
 using namespace uwb::protocol::fira;
 
@@ -21,33 +24,33 @@ UwbSessionData::ToDataObject() const
     std::memcpy(&tagData, &Tag, sizeof Tag);
 
     auto builder = TlvBer::Builder()
-        .SetTag(tagData)
-        // UWB_SESSION_DATA_VERSION
-        .AddTlv(
-            TlvBer::Builder()
-                .SetTag(notstd::to_underlying(ParameterTag::SessionDataVersion))
-                .SetValue(GetBytesBigEndianFromBitMap(sessionDataVersion, sizeof sessionDataVersion))
-                .Build())
-        // UWB_SESSION_ID
-        .AddTlv(
-            TlvBer::Builder()
-                .SetTag(notstd::to_underlying(ParameterTag::SessionId))
-                .SetValue(GetBytesBigEndianFromBitMap(sessionId, sizeof sessionId))
-                .Build())
-        // UWB_SUB_SESSION_ID
-        .AddTlv(
-            TlvBer::Builder()
-                .SetTag(notstd::to_underlying(ParameterTag::SubSessionId))
-                .SetValue(GetBytesBigEndianFromBitMap(subSessionId, sizeof subSessionId))
-                .Build())
-        // CONFIGURATION_PARAMETERS
-        .AddTlv(*uwbConfiguration.ToDataObject())
-        // UWB_CONFIG_AVAILABLE
-        .AddTlv(
-            TlvBer::Builder()
-                .SetTag(notstd::to_underlying(ParameterTag::UwbConfigAvailable))
-                .SetValue(static_cast<uint8_t>(uwbConfigurationAvailable))
-                .Build());
+                       .SetTag(tagData)
+                       // UWB_SESSION_DATA_VERSION
+                       .AddTlv(
+                           TlvBer::Builder()
+                               .SetTag(notstd::to_underlying(ParameterTag::SessionDataVersion))
+                               .SetValue(GetBytesBigEndianFromBitMap(sessionDataVersion, sizeof sessionDataVersion))
+                               .Build())
+                       // UWB_SESSION_ID
+                       .AddTlv(
+                           TlvBer::Builder()
+                               .SetTag(notstd::to_underlying(ParameterTag::SessionId))
+                               .SetValue(GetBytesBigEndianFromBitMap(sessionId, sizeof sessionId))
+                               .Build())
+                       // UWB_SUB_SESSION_ID
+                       .AddTlv(
+                           TlvBer::Builder()
+                               .SetTag(notstd::to_underlying(ParameterTag::SubSessionId))
+                               .SetValue(GetBytesBigEndianFromBitMap(subSessionId, sizeof subSessionId))
+                               .Build())
+                       // CONFIGURATION_PARAMETERS
+                       .AddTlv(*uwbConfiguration.ToDataObject())
+                       // UWB_CONFIG_AVAILABLE
+                       .AddTlv(
+                           TlvBer::Builder()
+                               .SetTag(notstd::to_underlying(ParameterTag::UwbConfigAvailable))
+                               .SetValue(static_cast<uint8_t>(uwbConfigurationAvailable))
+                               .Build());
 
     // STATIC_RANGING_INFO
     if (staticRangingInfo.has_value()) {
@@ -86,7 +89,7 @@ UwbSessionData::FromDataObject(const encoding::TlvBer& tlvBer)
     std::vector<encoding::TlvBer> tlvBerValues = tlvBer.GetValues();
     std::unordered_set<ParameterTag> parameterTagsRequiredNotSeen = parameterTagsRequired;
 
-    for (const auto &tlvBerValue : tlvBerValues) {
+    for (const auto& tlvBerValue : tlvBerValues) {
         auto tagValue = tlvBerValue.GetTag();
         // All tags for UwbSessionData are 1-byte long, so ignore all others.
         if (std::size(tagValue) != 1) {
@@ -155,4 +158,15 @@ UwbSessionData::FromDataObject(const encoding::TlvBer& tlvBer)
     }
 
     return uwbSessionData;
+}
+
+/* static */
+UwbSessionData
+UwbSessionData::FromMsgPack(std::span<uint8_t> msgpack)
+{
+    // Interpret the buffer data as msgpack encoding and attempt to parse it into json.
+    nlohmann::json json = nlohmann::json::from_msgpack(std::data(msgpack), std::data(msgpack) + std::size(msgpack));
+
+    // Convert json to UwbSessionData.
+    uwb::protocol::fira::UwbSessionData uwbSessionData = json;
 }

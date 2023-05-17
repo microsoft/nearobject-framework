@@ -62,12 +62,21 @@ struct UwbSessionData
 
     /**
      * @brief Attempt to create a UwbSessionData object from a TlvBer.
-     * 
-     * @param tlv 
-     * @return UwbSessionData 
+     *
+     * @param tlv
+     * @return UwbSessionData
      */
     static UwbSessionData
     FromDataObject(const encoding::TlvBer& tlv);
+
+    /**
+     * @brief Attempt to create a UwbSessionData object from a MsgPack.
+     *
+     * @param msgpack
+     * @return UwbSessionData
+     */
+    static UwbSessionData
+    FromMsgPack(std::span<uint8_t> msgpack);
 
     uint16_t sessionDataVersion{ 0 };
     uint32_t sessionId{ 0 };
