@@ -46,7 +46,6 @@ target_link_libraries(uwb-proto-fira
         jsonify
         uwb-proto-fira-uci
         magic_enum::magic_enum
-        nearobject-serialization
     PUBLIC
         notstd
         smartcard

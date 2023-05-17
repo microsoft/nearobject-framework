@@ -8,8 +8,8 @@
 #include <tlv/TlvSerialize.hxx>
 #include <uwb/protocols/fira/UwbException.hxx>
 #include <uwb/protocols/fira/UwbSessionData.hxx>
+#include <uwb/protocols/fira/UwbSessionDataJsonSerializer.hxx>
 
-#include <nearobject/serialization/UwbSessionDataJsonSerializer.hxx>
 #include <nlohmann/json.hpp>
 
 using namespace uwb::protocol::fira;
@@ -164,9 +164,5 @@ UwbSessionData::FromDataObject(const encoding::TlvBer& tlvBer)
 UwbSessionData
 UwbSessionData::FromMsgPack(std::span<uint8_t> msgpack)
 {
-    // Interpret the buffer data as msgpack encoding and attempt to parse it into json.
-    nlohmann::json json = nlohmann::json::from_msgpack(std::data(msgpack), std::data(msgpack) + std::size(msgpack));
-
-    // Convert json to UwbSessionData.
-    uwb::protocol::fira::UwbSessionData uwbSessionData = json;
+    return nlohmann::json::from_msgpack(std::data(msgpack), std::data(msgpack) + std::size(msgpack));
 }
