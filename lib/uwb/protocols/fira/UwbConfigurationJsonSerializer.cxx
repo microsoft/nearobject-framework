@@ -1,10 +1,10 @@
 
 #include <stdexcept>
 
-#include <nearobject/serialization/UwbConfigurationJsonSerializer.hxx>
-#include <nearobject/serialization/UwbMacAddressJsonSerializer.hxx>
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
 #include <uwb/protocols/fira/UwbConfigurationBuilder.hxx>
+#include <uwb/protocols/fira/UwbConfigurationJsonSerializer.hxx>
+#include <uwb/UwbMacAddressJsonSerializer.hxx>
 
 void
 uwb::protocol::fira::to_json(nlohmann::json& json, const UwbConfiguration& uwbConfiguration)
