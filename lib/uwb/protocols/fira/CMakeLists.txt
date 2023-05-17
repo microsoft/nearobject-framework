@@ -13,9 +13,12 @@ target_sources(uwb-proto-fira
         ${CMAKE_CURRENT_LIST_DIR}/UwbCapability.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbConfiguration.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbConfigurationBuilder.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/UwbConfigurationJsonSerializer.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbOobConversions.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbRegulatoryInformation.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbSessionData.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/UwbSessionDataJsonSerializer.cxx
+        
     PUBLIC
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/ControleePreference.hxx
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/FiraDevice.hxx
@@ -25,10 +28,12 @@ target_sources(uwb-proto-fira
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCapability.hxx
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbConfiguration.hxx
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbConfigurationBuilder.hxx
+        ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbConfigurationJsonSerializer.hxx
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbException.hxx
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbOobConversions.hxx
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbRegulatoryInformation.hxx
         ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionData.hxx
+        ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionDataJsonSerializer.hxx
 )
 
 target_include_directories(uwb-proto-fira
@@ -38,6 +43,7 @@ target_include_directories(uwb-proto-fira
 
 target_link_libraries(uwb-proto-fira
     PRIVATE
+        jsonify
         uwb-proto-fira-uci
         magic_enum::magic_enum
         nearobject-serialization
@@ -57,10 +63,12 @@ list(APPEND UWBPROTOFIRA_PUBLIC_HEADERS
     ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbCapability.hxx
     ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbConfiguration.hxx
     ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbConfigurationBuilder.hxx
-    ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbOobConversions.hxx
+    ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbConfigurationJsonSerializer.hxx
     ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbException.hxx
+    ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbOobConversions.hxx
     ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbRegulatoryInformation.hxx
     ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionData.hxx
+    ${UWB_PROTO_FIRA_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionDataJsonSerializer.hxx
 )
 
 set_target_properties(uwb-proto-fira PROPERTIES FOLDER lib/uwb/protocols/fira)
