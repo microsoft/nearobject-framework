@@ -8,10 +8,12 @@ target_sources(tlv
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/TlvBer.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TlvSimple.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/TlvSerialize.cxx
     PUBLIC
         ${TLV_DIR_PUBLIC_INCLUDE_PREFIX}/Tlv.hxx
         ${TLV_DIR_PUBLIC_INCLUDE_PREFIX}/TlvBer.hxx
         ${TLV_DIR_PUBLIC_INCLUDE_PREFIX}/TlvSimple.hxx
+        ${TLV_DIR_PUBLIC_INCLUDE_PREFIX}/TlvSerialize.hxx
 )
 
 target_include_directories(tlv
@@ -23,6 +25,7 @@ list(APPEND TLV_PUBLIC_HEADERS
     ${TLV_DIR_PUBLIC_INCLUDE_PREFIX}/Tlv.hxx
     ${TLV_DIR_PUBLIC_INCLUDE_PREFIX}/TlvBer.hxx
     ${TLV_DIR_PUBLIC_INCLUDE_PREFIX}/TlvSimple.hxx
+    ${TLV_DIR_PUBLIC_INCLUDE_PREFIX}/TlvSerialize.hxx
 )
 
 set_target_properties(tlv PROPERTIES FOLDER lib/shared/tlv)

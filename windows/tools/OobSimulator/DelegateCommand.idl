@@ -1,0 +1,9 @@
+// DelegateCommand.idl
+
+namespace OobSimulator
+{
+runtimeclass DelegateCommand : Microsoft.UI.Xaml.DependencyObject, Microsoft.UI.Xaml.Input.ICommand
+{
+    void RaiseCanExecuteChanged();
+}
+} // namespace OobSimulator
