@@ -28,7 +28,7 @@ using namespace winrt::Windows::Foundation;
 
 namespace winrt::nof
 {
-    using namespace winrt::Windows::Devices::NearObject;
+using namespace winrt::Windows::Devices::NearObject;
 } // namespace winrt::nof
 
 namespace detail
