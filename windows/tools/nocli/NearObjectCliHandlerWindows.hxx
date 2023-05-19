@@ -9,8 +9,8 @@
 
 #include <nearobject/cli/NearObjectCliData.hxx>
 #include <nearobject/cli/NearObjectCliHandler.hxx>
-#include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/UwbDevice.hxx>
+#include <uwb/protocols/fira/FiraDevice.hxx>
 
 #include <winrt/windows.devices.nearobject.h>
 

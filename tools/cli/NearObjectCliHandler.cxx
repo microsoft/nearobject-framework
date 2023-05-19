@@ -67,7 +67,7 @@ try {
 void
 NearObjectCliHandler::HandleStartRanging(uwb::protocol::fira::DeviceType deviceType, std::filesystem::path sessionDataFilePath) noexcept
 {
-    // Default implementation does not know how to start a NearObject Service ranging session. 
+    // Default implementation does not know how to start a NearObject Service ranging session.
     // OS-specific implementations are expected to sub-class and override this function.
 }
 
