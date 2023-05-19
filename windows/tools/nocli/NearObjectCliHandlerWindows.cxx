@@ -26,6 +26,11 @@ using namespace windows::devices;
 using namespace winrt::Windows::Devices;
 using namespace winrt::Windows::Foundation;
 
+namespace winrt::nof
+{
+    using namespace winrt::Windows::Devices::NearObject;
+} // namespace winrt::nof
+
 namespace detail
 {
 /**
@@ -158,10 +163,7 @@ NearObjectCliHandlerWindows::HandleStartRanging(::uwb::protocol::fira::DeviceTyp
     sessionConfiguration.IdentityToken(identityTokenUwb);
 
     // Create the NearObjectSession
-    IAsyncOperation<NearObject::NearObjectSessionCreateResult> sessionCreateResultAsyncOperation = NearObject::NearObjectSession::CreateAsync(sessionConfiguration);
-
-    // Get the result from the async operation
-    NearObject::NearObjectSessionCreateResult sessionCreateResult = sessionCreateResultAsyncOperation.get();
+    auto sessionCreateResult = winrt::nof::NearObjectSession::Create(sessionConfiguration);
 
     if (deviceType == DeviceType::Controlee) {
         m_sessionClient = sessionCreateResult.ParticipantClient();
