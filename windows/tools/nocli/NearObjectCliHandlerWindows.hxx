@@ -12,6 +12,8 @@
 #include <uwb/protocols/fira/FiraDevice.hxx>
 #include <uwb/UwbDevice.hxx>
 
+#include <winrt/windows.devices.nearobject.h>
+
 namespace windows::devices::uwb
 {
 class UwbDevice;
@@ -40,6 +42,7 @@ private:
 
 private:
     std::vector<std::shared_ptr<windows::devices::uwb::UwbDevice>> m_uwbDevices;
+    winrt::Windows::Devices::NearObject::INearObjectSessionClient m_sessionClient;
 };
 } // namespace nearobject::cli
 
