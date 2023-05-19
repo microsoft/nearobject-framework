@@ -3,6 +3,7 @@
 #define NEAR_OBJECT_CLI_HANDLER_HXX
 
 #include <cstdint>
+#include <filesystem>
 #include <memory>
 
 #include <nearobject/cli/NearObjectCliControlFlowContext.hxx>
@@ -59,13 +60,13 @@ struct NearObjectCliHandler
 
     /**
      * @brief Invoked by command-line driver when the request is to start a
-     * ranging session.
+     * NearObject Service ranging session.
      *
-     * @param uwbDevice The resolved uwb device to start the ranging session on.
-     * @param sessionData The data to configure the ranging session.
+     * @param deviceType The type of uwb device (Controller or Controlee) to start the ranging session on.
+     * @param sessionDataFilePath The file path to the uwb session data used to configure the ranging session.
      */
     virtual void
-    HandleStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevice, uwb::protocol::fira::UwbSessionData& sessionData) noexcept;
+    HandleStartRanging(uwb::protocol::fira::DeviceType deviceType, std::filesystem::path sessionDataFilePath) noexcept;
 
     /**
      * @brief Invoked by the command-line driver when the request is to stop an ongoing ranging session.
