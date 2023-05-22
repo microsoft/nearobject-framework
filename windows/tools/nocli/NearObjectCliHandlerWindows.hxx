@@ -2,6 +2,7 @@
 #ifndef NEAR_OBEJCT_CLI_HANDLER_WINDOWS_HXX
 #define NEAR_OBEJCT_CLI_HANDLER_WINDOWS_HXX
 
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <vector>
@@ -9,6 +10,9 @@
 #include <nearobject/cli/NearObjectCliData.hxx>
 #include <nearobject/cli/NearObjectCliHandler.hxx>
 #include <uwb/UwbDevice.hxx>
+#include <uwb/protocols/fira/FiraDevice.hxx>
+
+#include <winrt/windows.devices.nearobject.h>
 
 namespace windows::devices::uwb
 {
@@ -24,6 +28,9 @@ struct NearObjectCliHandlerWindows :
     ResolveUwbDevice(const nearobject::cli::NearObjectCliData& cliData) noexcept override;
 
     void
+    HandleStartRanging(uwb::protocol::fira::DeviceType deviceType, std::filesystem::path sessionDataFilePath) noexcept override;
+
+    void
     HandleMonitorMode() noexcept override;
 
 private:
@@ -35,6 +42,7 @@ private:
 
 private:
     std::vector<std::shared_ptr<windows::devices::uwb::UwbDevice>> m_uwbDevices;
+    winrt::Windows::Devices::NearObject::INearObjectSessionClient m_sessionClient;
 };
 } // namespace nearobject::cli
 
