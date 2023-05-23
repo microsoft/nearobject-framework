@@ -37,7 +37,17 @@ void
 NearObjectCliHandler::HandleDriverStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevice, const UwbRangingParameters& rangingParameters) noexcept
 try {
     auto controlFlowContext = (m_parent != nullptr) ? m_parent->GetControlFlowContext() : nullptr;
-    auto session = uwbDevice->CreateSession(rangingParameters.SessionId, m_sessionEventCallbacks);
+
+    auto deviceType = uwb::protocol::fira::DeviceType::Controller;
+    auto parameters = rangingParameters.ApplicationConfigurationParameters;
+    auto it = std::find_if(std::cbegin(parameters), std::cend(parameters), [](const UwbApplicationConfigurationParameter& parameter) {
+        return std::get_if<uwb::protocol::fira::DeviceType>(&parameter.Value) != nullptr;
+    });
+    if (it != std::cend(parameters)) {
+        deviceType = *(std::get_if<uwb::protocol::fira::DeviceType>(&it->Value));
+    }
+
+    auto session = uwbDevice->CreateSession(rangingParameters.SessionId, m_sessionEventCallbacks, deviceType);
     session->Configure(rangingParameters.ApplicationConfigurationParameters);
     auto applicationConfigurationParameters = session->GetApplicationConfigurationParameters({});
     PLOG_DEBUG << "Session Application Configuration Parameters: ";
