@@ -44,7 +44,7 @@ try {
         return std::get_if<uwb::protocol::fira::DeviceType>(&parameter.Value) != nullptr;
     });
     if (it != std::cend(parameters)) {
-        deviceType = *(std::get_if<uwb::protocol::fira::DeviceType>(&it->Value));
+        deviceType = std::get<uwb::protocol::fira::DeviceType>(it->Value);
     }
 
     auto session = uwbDevice->CreateSession(rangingParameters.SessionId, m_sessionEventCallbacks, deviceType);
