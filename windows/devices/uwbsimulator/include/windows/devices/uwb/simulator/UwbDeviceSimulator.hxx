@@ -12,6 +12,7 @@
 #include <UwbSimulatorDdiGlue.h>
 
 #include <cfgmgr32.h>
+#include <uwb/protocols/fira/FiraDevice.hxx>
 #include <wil/resource.h>
 #include <windows/devices/DeviceResource.hxx>
 #include <windows/devices/uwb/IUwbDeviceDdi.hxx>
@@ -60,17 +61,17 @@ public:
     GetSimulatorCapabilities();
 
     /**
-     * @brief Trigger an event for a session. 
-     * 
-     * @param triggerSessionEventArgs 
-     * @return UwbSimulatorTriggerSessionEventResult 
+     * @brief Trigger an event for a session.
+     *
+     * @param triggerSessionEventArgs
+     * @return UwbSimulatorTriggerSessionEventResult
      */
     UwbSimulatorTriggerSessionEventResult
     TriggerSessionEvent(const UwbSimulatorTriggerSessionEventArgs& triggerSessionEventArgs);
 
 private:
     virtual std::shared_ptr<::uwb::UwbSession>
-    CreateSessionImpl(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks) override;
+    CreateSessionImpl(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, ::uwb::protocol::fira::DeviceType deviceType = ::uwb::protocol::fira::DeviceType::Controller) override;
 
 private:
     const std::string m_deviceName;
