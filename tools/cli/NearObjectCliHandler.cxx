@@ -37,7 +37,17 @@ void
 NearObjectCliHandler::HandleDriverStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevice, const UwbRangingParameters& rangingParameters) noexcept
 try {
     auto controlFlowContext = (m_parent != nullptr) ? m_parent->GetControlFlowContext() : nullptr;
-    auto session = uwbDevice->CreateSession(rangingParameters.SessionId, m_sessionEventCallbacks);
+
+    auto deviceType = uwb::protocol::fira::DeviceType::Controller;
+    auto parameters = rangingParameters.ApplicationConfigurationParameters;
+    auto it = std::find_if(std::cbegin(parameters), std::cend(parameters), [](const UwbApplicationConfigurationParameter& parameter) {
+        return std::get_if<uwb::protocol::fira::DeviceType>(&parameter.Value) != nullptr;
+    });
+    if (it != std::cend(parameters)) {
+        deviceType = std::get<uwb::protocol::fira::DeviceType>(it->Value);
+    }
+
+    auto session = uwbDevice->CreateSession(rangingParameters.SessionId, m_sessionEventCallbacks, deviceType);
     session->Configure(rangingParameters.ApplicationConfigurationParameters);
     auto applicationConfigurationParameters = session->GetApplicationConfigurationParameters({});
     PLOG_DEBUG << "Session Application Configuration Parameters: ";
@@ -65,30 +75,10 @@ try {
 }
 
 void
-NearObjectCliHandler::HandleStartRanging(std::shared_ptr<uwb::UwbDevice> uwbDevice, uwb::protocol::fira::UwbSessionData& sessionData) noexcept
-try {
-    // Create a new session.
-    auto session = uwbDevice->CreateSession(sessionData.sessionId, m_sessionEventCallbacks);
-
-    // Convert configuration from OOB (UWB_SESSION_DATA) to UCI application
-    // configuration parameters and configure the session with them.
-    auto applicationConfigurationParameters = GetUciConfigParams(sessionData.uwbConfiguration, session->GetDeviceType());
-    session->Configure(applicationConfigurationParameters);
-
-    // Obtain the configured session application configuration parameters.
-    auto applicationConfigurationParametersSet = session->GetApplicationConfigurationParameters({});
-    PLOG_DEBUG << "Session Application Configuration Parameters: ";
-    for (const auto& applicationConfigurationParameter : applicationConfigurationParametersSet) {
-        PLOG_DEBUG << " > " << applicationConfigurationParameter.ToString();
-    }
-
-    // Start ranging.
-    session->StartRanging();
-
-    // Save the session reference so it stays alive while the session is active.
-    m_activeSession = std::move(session);
-} catch (...) {
-    PLOG_ERROR << "failed to start ranging";
+NearObjectCliHandler::HandleStartRanging(uwb::protocol::fira::DeviceType deviceType, std::filesystem::path sessionDataFilePath) noexcept
+{
+    // Default implementation does not know how to start a NearObject Service ranging session.
+    // OS-specific implementations are expected to sub-class and override this function.
 }
 
 void

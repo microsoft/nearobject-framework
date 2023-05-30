@@ -1,4 +1,5 @@
 
+#include <fstream>
 #include <iostream>
 #include <limits>
 #include <string>
@@ -13,11 +14,22 @@
 #include <windows/devices/uwb/UwbDevice.hxx>
 #include <windows/devices/uwb/UwbDeviceDriver.hxx>
 
+#include <winrt/Windows.Foundation.h>
+#include <winrt/Windows.Storage.Streams.h>
+#include <winrt/windows.devices.nearobject.h>
+
 #include "NearObjectCliDataWindows.hxx"
 #include "NearObjectCliHandlerWindows.hxx"
 
 using namespace nearobject::cli;
 using namespace windows::devices;
+using namespace winrt::Windows::Devices;
+using namespace winrt::Windows::Foundation;
+
+namespace winrt::nof
+{
+using namespace winrt::Windows::Devices::NearObject;
+} // namespace winrt::nof
 
 namespace detail
 {
@@ -101,6 +113,68 @@ NearObjectCliHandlerWindows::ResolveUwbDevice(const nearobject::cli::NearObjectC
     }
 
     return detail::ResolveUwbDevice(*cliDataWindows);
+}
+
+void
+NearObjectCliHandlerWindows::HandleStartRanging(::uwb::protocol::fira::DeviceType deviceType, std::filesystem::path sessionDataFilePath) noexcept
+{
+    using ::uwb::protocol::fira::DeviceType;
+
+    std::ifstream inputFileStream(sessionDataFilePath, std::ios::binary);
+    if (!inputFileStream.is_open()) {
+        PLOG_ERROR << "Could not open file: " << sessionDataFilePath;
+        return;
+    }
+
+    // Read file and store data into byte buffer
+    std::vector<uint8_t> uwbSessionDataSerialized;
+    std::string line;
+    // File only contains one line of data
+    if (std::getline(inputFileStream, line)) {
+        uwbSessionDataSerialized = std::vector<uint8_t>(std::cbegin(line), std::cend(line));
+    }
+
+    inputFileStream.close();
+
+    // Create a DataWriter to write the serialized data to an InMemoryRandomAccessStream
+    winrt::Windows::Storage::Streams::InMemoryRandomAccessStream stream;
+    winrt::Windows::Storage::Streams::DataWriter dataWriter(stream);
+    dataWriter.WriteBytes(winrt::array_view<const uint8_t>(uwbSessionDataSerialized));
+    auto uwbSessionDataBuffer = dataWriter.DetachBuffer();
+
+    // Create the NearObjectIdentityToken from the byte buffer
+    winrt::Windows::Devices::NearObject::INearObjectIdentityToken identityTokenUwb = NearObject::NearObjectIdentityToken::TryParse(uwbSessionDataBuffer);
+
+    // Create the NearObjectSessionConfiguration
+    NearObject::NearObjectSessionConfiguration sessionConfiguration;
+
+    switch (deviceType) {
+    case DeviceType::Controlee:
+        sessionConfiguration.SupportsRoleParticipant(true);
+        break;
+    case DeviceType::Controller:
+        sessionConfiguration.SupportsRoleHost(true);
+        break;
+    default:
+        PLOG_ERROR << "invalid device type '" << magic_enum::enum_name(deviceType) << "' specified; cannot start ranging";
+        return;
+    }
+
+    sessionConfiguration.IdentityToken(identityTokenUwb);
+
+    // Create the NearObjectSession
+    auto sessionCreateResult = winrt::nof::NearObjectSession::Create(sessionConfiguration);
+
+    if (deviceType == DeviceType::Controlee) {
+        m_sessionClient = sessionCreateResult.ParticipantClient();
+    } else if (deviceType == DeviceType::Controller) {
+        m_sessionClient = sessionCreateResult.HostClient();
+    }
+
+    // Start the ranging session
+    if (m_sessionClient != nullptr) {
+        m_sessionClient.Start();
+    }
 }
 
 void

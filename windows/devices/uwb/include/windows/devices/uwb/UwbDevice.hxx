@@ -79,10 +79,11 @@ private:
      *
      * @param sessionId
      * @param callbacks The event callback instance.
+     * @param deviceType
      * @return std::shared_ptr<uwb::UwbSession>
      */
     virtual std::shared_ptr<::uwb::UwbSession>
-    CreateSessionImpl(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks) override;
+    CreateSessionImpl(uint32_t sessionId, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, ::uwb::protocol::fira::DeviceType deviceType = ::uwb::protocol::fira::DeviceType::Controller) override;
 
     /**
      * @brief Attempt to resolve a session from the underlying UWB device.

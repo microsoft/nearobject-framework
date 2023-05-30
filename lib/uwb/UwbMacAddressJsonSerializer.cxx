@@ -1,8 +1,8 @@
 
 #include <stdexcept>
 
-#include <nearobject/serialization/UwbMacAddressJsonSerializer.hxx>
 #include <uwb/UwbMacAddress.hxx>
+#include <uwb/UwbMacAddressJsonSerializer.hxx>
 
 using namespace uwb;
 
