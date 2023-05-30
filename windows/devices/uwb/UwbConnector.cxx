@@ -685,11 +685,12 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
     auto handleDriver = m_notificationHandleDriver;
 
     while (!stopToken.stop_requested()) {
-        DWORD bytesRequired = sizeof(UWB_NOTIFICATION_DATA);
+        DWORD minimumNotificationSize = sizeof(UWB_NOTIFICATION_DATA);
+        DWORD bytesRequired = minimumNotificationSize;
         std::vector<uint8_t> uwbNotificationDataBuffer{};
         m_notificationOverlapped = {};
         for (const auto i : std::ranges::iota_view{ 0, 2 }) {
-            uwbNotificationDataBuffer.resize(bytesRequired);
+            uwbNotificationDataBuffer.resize(std::max(bytesRequired, minimumNotificationSize));
             PLOG_DEBUG << "IOCTL_UWB_NOTIFICATION attempt #" << (i + 1) << " with " << std::size(uwbNotificationDataBuffer) << "-byte buffer";
             BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, std::data(uwbNotificationDataBuffer), std::size(uwbNotificationDataBuffer), &bytesRequired, &m_notificationOverlapped);
             DWORD lastError = GetLastError();
@@ -705,7 +706,7 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
                         if (lastError == ERROR_INSUFFICIENT_BUFFER || lastError == ERROR_MORE_DATA) {
                             // Driver indicated buffer was too small and put required size in 'bytesRequired'. Retry with new size.
                             const UWB_NOTIFICATION_DATA& notificationDataPartial = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
-                            bytesRequired = notificationDataPartial.size;
+                            bytesRequired = std::max(notificationDataPartial.size, static_cast<uint32_t>(minimumNotificationSize));
                             LOG_VERBOSE << "IOCTL_UWB_NOTIFICATION insufficient buffer (hr=" << std::showbase << std::hex << hr << "), " << std::dec << bytesRequired << " bytes required, current size " << std::size(uwbNotificationDataBuffer) << " bytes";
                             continue;
                         } else if (lastError == ERROR_OPERATION_ABORTED) {
@@ -719,7 +720,7 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
                 } else if (lastError == ERROR_MORE_DATA || lastError == ERROR_INSUFFICIENT_BUFFER) {
                     LOG_VERBOSE << "IOCTL_UWB_NOTIFICATION insufficient buffer, " << bytesRequired << " bytes required, current size " << std::size(uwbNotificationDataBuffer) << " bytes";
                     const UWB_NOTIFICATION_DATA& notificationDataPartial = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
-                    bytesRequired = notificationDataPartial.size;
+                    bytesRequired = std::max(notificationDataPartial.size, static_cast<uint32_t>(minimumNotificationSize));
                     // Attempt to retry the ioctl with the appropriate buffer size, which is now held in bytesRequired.
                     continue;
                 } else {
