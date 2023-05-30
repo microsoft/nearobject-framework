@@ -685,7 +685,7 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
     auto handleDriver = m_notificationHandleDriver;
 
     while (!stopToken.stop_requested()) {
-        DWORD minimumNotificationSize = sizeof(UWB_NOTIFICATION_DATA);
+        static constexpr DWORD minimumNotificationSize = sizeof(UWB_NOTIFICATION_DATA);
         DWORD bytesRequired = minimumNotificationSize;
         std::vector<uint8_t> uwbNotificationDataBuffer{};
         m_notificationOverlapped = {};
