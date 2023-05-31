@@ -118,7 +118,7 @@ jobs:
       run: cmake --build --preset ${{ inputs.preset-name }} --config ${{ matrix.build-type }}
 
     - name: CMake Test (ctest)
-      if: ${{ matrix.config.arch != 'ARM64' }}
+      if: ${{ ! matrix.config.arch }}
       run: ctest --preset ${{ inputs.preset-name }} -C ${{ matrix.build-type }}
 
     - name: CMake Install
