@@ -30,12 +30,13 @@ public:
     /**
      * @brief Creates a new UWB session with no configuration nor peers.
      *
-     * @param callbacks
+     * @param sessionId
      * @param deviceType
+     * @param callbacks
      * @return std::shared_ptr<UwbSession>
      */
     std::shared_ptr<UwbSession>
-    CreateSession(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks, uwb::protocol::fira::DeviceType deviceType);
+    CreateSession(uint32_t sessionId, uwb::protocol::fira::DeviceType deviceType, std::weak_ptr<UwbSessionEventCallbacks> callbacks = {});
 
     /**
      * @brief Obtains a shared reference to a pre-existing session.
