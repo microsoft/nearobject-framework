@@ -519,7 +519,7 @@ public:
         /**
          * @brief Set the tag of the top-level/parent BerTlv.
          * 
-         * @tparam Iterable 
+         * @tparam Iterable This NEEDS to be in Big-Endian
          * @param tag 
          * @return Builder& 
          */
