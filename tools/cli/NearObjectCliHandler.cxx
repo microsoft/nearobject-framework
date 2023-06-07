@@ -47,7 +47,7 @@ try {
         deviceType = std::get<uwb::protocol::fira::DeviceType>(it->Value);
     }
 
-    auto session = uwbDevice->CreateSession(rangingParameters.SessionId, m_sessionEventCallbacks, deviceType);
+    auto session = uwbDevice->CreateSession(rangingParameters.SessionId, deviceType, m_sessionEventCallbacks);
     session->Configure(rangingParameters.ApplicationConfigurationParameters);
     auto applicationConfigurationParameters = session->GetApplicationConfigurationParameters({});
     PLOG_DEBUG << "Session Application Configuration Parameters: ";
