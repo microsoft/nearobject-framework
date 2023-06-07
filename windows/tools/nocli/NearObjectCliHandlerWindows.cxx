@@ -140,10 +140,7 @@ NearObjectCliHandlerWindows::HandleStartRanging(::uwb::protocol::fira::DeviceTyp
     winrt::Windows::Storage::Streams::InMemoryRandomAccessStream stream;
     winrt::Windows::Storage::Streams::DataWriter dataWriter(stream);
     dataWriter.WriteBytes(winrt::array_view<const uint8_t>(uwbSessionDataSerialized));
-    auto uwbSessionDataBuffer = dataWriter.DetachBuffer();
-
-    // Create the NearObjectIdentityToken from the byte buffer
-    winrt::Windows::Devices::NearObject::INearObjectIdentityToken identityTokenUwb = NearObject::NearObjectIdentityToken::TryParse(uwbSessionDataBuffer);
+    auto identityTokenUwb = dataWriter.DetachBuffer();
 
     // Create the NearObjectSessionConfiguration
     NearObject::NearObjectSessionConfiguration sessionConfiguration;
