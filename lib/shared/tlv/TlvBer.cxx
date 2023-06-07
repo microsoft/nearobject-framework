@@ -1,6 +1,7 @@
 
 #include <algorithm>
 #include <bit>
+#include <cstring>
 #include <iterator>
 #include <optional>
 #include <utility>
