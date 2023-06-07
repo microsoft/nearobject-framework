@@ -252,25 +252,6 @@ TlvBer::Builder::SetTag(uint16_t tag)
     }
 }
 
-TlvBer::Builder&
-TlvBer::Builder::SetTag(size_t tag)
-{
-    std::array<uint8_t, sizeof tag> tagData;
-    std::memcpy(&tagData, &tag, sizeof tag);
-
-    if (std::endian::native == std::endian::big) {
-        TlvBer::Builder::SetTag(tagData);
-        return *this;
-    } else {
-        std::array<uint8_t, sizeof tag> tagDataRev;
-        std::transform(std::rbegin(tagData), std::rend(tagData), std::begin(tagDataRev), [](auto&& b) {
-            return b;
-        });
-        TlvBer::Builder::SetTag(tagDataRev);
-        return *this;
-    }
-}
-
 std::vector<uint8_t>
 TlvBer::GetLengthEncoding(std::size_t length)
 {
