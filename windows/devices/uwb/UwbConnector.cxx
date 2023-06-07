@@ -680,6 +680,12 @@ UwbConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vec
 void
 UwbConnector::HandleNotifications(std::stop_token stopToken)
 {
+    // Now that the thread is running, clear the pending flag.
+    {
+        std::lock_guard m_notificationThreadLock{ m_notificationThreadGate };
+        m_notificationThreadStartPending = false;
+    }
+
     LOG_INFO << "uwb notification listener started for device " << DeviceName();
 
     auto handleDriver = m_notificationHandleDriver;
@@ -909,6 +915,20 @@ UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNo
 void
 UwbConnector::NotificationListenerStart()
 {
+    std::lock_guard m_notificationThreadLock{ m_notificationThreadGate };
+
+    // Check if the thread is already running.
+    if (m_notificationThread.joinable()) {
+        return;
+    }
+
+    // Update the start-pending flag, but exit if already pending.
+    bool notificationThreadStartPendingExpected = false;
+    if (!m_notificationThreadStartPending.compare_exchange_weak(notificationThreadStartPendingExpected, true)) {
+        return;
+    }
+
+    // Open a dedicated handle to the driver using the notification namespace name suffix.
     wil::shared_hfile notificationHandleDriver;
     const std::string notificationHandleDeviceName = m_deviceName + windows::drivers::uwbcx::UwbNotificationNamespace;
     auto hr = OpenDriverHandle(notificationHandleDriver, notificationHandleDeviceName.c_str(), true);
@@ -917,6 +937,7 @@ UwbConnector::NotificationListenerStart()
         return;
     }
 
+    // Transfer resources to member variables and start the handling thread.
     m_notificationHandleDriver = std::move(notificationHandleDriver);
     m_notificationThread = std::jthread([this](std::stop_token stopToken) {
         HandleNotifications(std::move(stopToken));
