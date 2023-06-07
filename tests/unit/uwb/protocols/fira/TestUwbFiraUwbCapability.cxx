@@ -225,7 +225,7 @@ TEST_CASE("Parsing from TlvBer", "[basic][protocol]")
 
         encoding::TlvBer::Builder builder;
         auto invalidTlv = builder.SetAsCopyOfTlv(*tlv)
-                              .SetTag(0xFF)
+                              .SetTag(uint8_t(0xFF))
                               .Build();
         REQUIRE_THROWS(UwbCapability::FromOobDataObject(invalidTlv));
     }

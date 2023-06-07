@@ -501,7 +501,25 @@ public:
         /**
          * @brief Set the tag of the top-level/parent BerTlv.
          * 
-         * @tparam Iterable 
+         * @param tag 
+         * @return Builder& 
+         */
+        Builder&
+        SetTag(uint16_t tag);
+
+        /**
+         * @brief Set the tag of the top-level/parent BerTlv.
+         * 
+         * @param tag 
+         * @return Builder& 
+         */
+        Builder&
+        SetTag(size_t tag);
+        
+        /**
+         * @brief Set the tag of the top-level/parent BerTlv.
+         * 
+         * @tparam Iterable This NEEDS to be in Big-Endian
          * @param tag 
          * @return Builder& 
          */

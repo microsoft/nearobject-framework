@@ -14,6 +14,10 @@
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 
+#include <uwb/protocols/fira/UwbSessionData.hxx>
+#include <uwb/protocols/fira/UwbConfiguration.hxx>
+#include <uwb/protocols/fira/UwbConfigurationBuilder.hxx>
+
 using namespace encoding;
 
 namespace encoding::test 
@@ -118,7 +122,7 @@ TEST_CASE("test TlvBer", "[basic][infra]")
     {
         TlvBer::Builder builder{};
         auto tlvBer = builder
-                          .SetTag(0x93)
+                          .SetTag(uint8_t(0x93))
                           .Build();
         REQUIRE(tlvBer.Tag.size() == 1);
         REQUIRE(tlvBer.Tag[0] == 0x93);
@@ -129,7 +133,7 @@ TEST_CASE("test TlvBer", "[basic][infra]")
     {
         TlvBer::Builder builder{};
         auto tlvBer = builder
-                          .SetTag(0x93)
+                          .SetTag(uint8_t(0x93))
                           .SetValue(0x94)
                           .Build();
         REQUIRE(tlvBer.Tag.size() == 1);
@@ -463,6 +467,30 @@ TEST_CASE("test TlvBer", "[basic][infra]")
         auto pValuesConstructed = parentparent.GetValues();
         auto pValuesConstructedCopy = tlvBerCopy.GetValues();
         REQUIRE(std::equal(std::cbegin(pValuesConstructed), std::cend(pValuesConstructed), std::cbegin(pValuesConstructedCopy)));
+    }
+
+    SECTION("UwbSessionData convert to TlvBer and back again works"){
+        using namespace uwb::protocol::fira;
+        uwb::protocol::fira::UwbSessionData sessionData;
+
+        sessionData.uwbConfiguration = UwbConfiguration::Builder()
+                                            .SetMacAddressController(uwb::UwbMacAddress::FromString("12:34", uwb::UwbMacAddressType::Short).value())
+                                            .SetMacAddressControleeShort(uwb::UwbMacAddress::FromString("67:89", uwb::UwbMacAddressType::Short).value())
+                                            .SetMultiNodeMode(MultiNodeMode::Unicast)
+                                            .SetDeviceRole(DeviceRole::Initiator);
+
+        sessionData.sessionDataVersion = 1;
+        sessionData.sessionId = 2;
+
+        auto tlvber = sessionData.ToDataObject();
+        REQUIRE(tlvber);
+        auto data = tlvber->ToBytes();
+
+        std::unique_ptr<TlvBer> tlvParsed;
+        auto parseResult = TlvBer::Parse(notstd::unique_ptr_out(tlvParsed), data);
+        REQUIRE(parseResult == TlvBer::ParseResult::Succeeded);
+        REQUIRE(tlvParsed);
+        REQUIRE(*tlvParsed == *tlvber);
     }
 }
 
