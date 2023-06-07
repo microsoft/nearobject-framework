@@ -506,15 +506,6 @@ public:
          */
         Builder&
         SetTag(uint16_t tag);
-
-        /**
-         * @brief Set the tag of the top-level/parent BerTlv.
-         * 
-         * @param tag 
-         * @return Builder& 
-         */
-        Builder&
-        SetTag(size_t tag);
         
         /**
          * @brief Set the tag of the top-level/parent BerTlv.
