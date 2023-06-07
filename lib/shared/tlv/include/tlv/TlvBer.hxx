@@ -244,6 +244,7 @@ public:
         if ((*dataIt & BitmaskTagFirstByte) != TagValueLongField) {
             tag.push_back(*dataIt);
             tagNumber = *dataIt & BitmaskTagShort;
+            bytesParsed++;
             return Tlv::ParseResult::Succeeded;
         }
 
