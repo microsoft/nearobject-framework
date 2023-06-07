@@ -697,8 +697,8 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
         std::vector<uint8_t> uwbNotificationDataBuffer{};
         m_notificationOverlapped = {};
         for (const auto i : std::ranges::iota_view{ 0, maxIoctlAttempts }) {
-            const auto logPrefix = std::string("IOCTL_UWB_NOTIFICATION[").append(std::to_string((i+1))).append("/").append(std::to_string(maxIoctlAttempts)).append("] ");
-            // Size the buffer to hold the last known number of bytes required, either from an initial minimum value, 
+            const auto logPrefix = std::string("IOCTL_UWB_NOTIFICATION[").append(std::to_string((i + 1))).append("/").append(std::to_string(maxIoctlAttempts)).append("] ");
+            // Size the buffer to hold the last known number of bytes required, either from an initial minimum value,
             // or from a prior call to DeviceIoControl indicating ERROR_MORE_DATA or ERROR_INSUFFICIENT_BUFFER.
             uwbNotificationDataBuffer.resize(std::max(bytesRequired, minimumNotificationSize));
             PLOG_DEBUG << logPrefix << "with " << std::size(uwbNotificationDataBuffer) << "-byte buffer";
@@ -734,14 +734,14 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
                     } else {
                         PLOG_DEBUG << logPrefix << "completed asynchronously";
                     }
-                // Check if the call requires a larger buffer.
+                    // Check if the call requires a larger buffer.
                 } else if (lastError == ERROR_MORE_DATA || lastError == ERROR_INSUFFICIENT_BUFFER) {
                     LOG_VERBOSE << logPrefix << "insufficient buffer, " << bytesRequired << " bytes required, current size " << std::size(uwbNotificationDataBuffer) << " bytes";
                     const UWB_NOTIFICATION_DATA& notificationDataPartial = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
                     bytesRequired = std::max(notificationDataPartial.size, static_cast<uint32_t>(minimumNotificationSize));
                     // Attempt to retry the ioctl with the appropriate buffer size, which is now held in bytesRequired.
                     continue;
-                // Treat all other errors as fatal.
+                    // Treat all other errors as fatal.
                 } else {
                     hr = HRESULT_FROM_WIN32(lastError);
                     PLOG_ERROR << logPrefix << "error, hr=" << std::showbase << std::hex << hr;
