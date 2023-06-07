@@ -19,12 +19,8 @@ UwbSessionData::ToDataObject() const
 {
     using encoding::TlvBer, encoding::GetBytesBigEndianFromBitMap;
 
-    // Construct the tag data.
-    std::array<uint8_t, sizeof Tag> tagData;
-    std::memcpy(&tagData, &Tag, sizeof Tag);
-
     auto builder = TlvBer::Builder()
-                       .SetTag(tagData)
+                       .SetTag(Tag)
                        // UWB_SESSION_DATA_VERSION
                        .AddTlv(
                            TlvBer::Builder()
