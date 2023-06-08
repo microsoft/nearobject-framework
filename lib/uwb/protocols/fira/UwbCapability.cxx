@@ -175,7 +175,7 @@ UwbCapability::ToOobDataObject() const
     {
         auto macRange = GetBytesBigEndianFromBitMap(FiraMacVersionRange, 4);
         auto macRangeTlv = childbuilder.Reset()
-                               .SetTag(std::size_t(ParameterTag::FiraMacVersionRange))
+                               .SetTag(notstd::to_underlying(ParameterTag::FiraMacVersionRange))
                                .SetValue(macRange)
                                .Build();
         builder.AddTlv(macRangeTlv);
