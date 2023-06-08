@@ -474,13 +474,13 @@ TEST_CASE("test TlvBer", "[basic][infra]")
         uwb::protocol::fira::UwbSessionData sessionData;
 
         sessionData.uwbConfiguration = UwbConfiguration::Builder()
-                                            .SetMacAddressController(uwb::UwbMacAddress::FromString("12:34", uwb::UwbMacAddressType::Short).value())
-                                            .SetMacAddressControleeShort(uwb::UwbMacAddress::FromString("67:89", uwb::UwbMacAddressType::Short).value())
+                                            .SetMacAddressController(uwb::UwbMacAddress::FromString("67:89", uwb::UwbMacAddressType::Short).value())
+                                            .SetMacAddressControleeShort(uwb::UwbMacAddress::FromString("12:34", uwb::UwbMacAddressType::Short).value())
                                             .SetMultiNodeMode(MultiNodeMode::Unicast)
                                             .SetDeviceRole(DeviceRole::Initiator);
 
         sessionData.sessionDataVersion = 1;
-        sessionData.sessionId = 2;
+        sessionData.sessionId = 1234;
 
         auto tlvber = sessionData.ToDataObject();
         REQUIRE(tlvber);
@@ -491,6 +491,11 @@ TEST_CASE("test TlvBer", "[basic][infra]")
         REQUIRE(parseResult == TlvBer::ParseResult::Succeeded);
         REQUIRE(tlvParsed);
         REQUIRE(*tlvParsed == *tlvber);
+
+        uwb::protocol::fira::UwbSessionData sessionDataParsed;
+        REQUIRE_NOTHROW(sessionDataParsed = UwbSessionData::FromDataObject(*tlvParsed));
+        std::hash<uwb::protocol::fira::UwbSessionData> USBhash;
+        REQUIRE(USBhash(sessionDataParsed) == USBhash(sessionData));
     }
 }
 
