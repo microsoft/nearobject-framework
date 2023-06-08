@@ -52,13 +52,24 @@ NearObjectCliControlFlowContext::OperationsWaitForComplete()
 void
 NearObjectCliControlFlowContext::RegisterStopCallback(std::function<void()> stopCallback)
 {
+    std::unique_lock stopCallbacksLock{ m_stopCallbacksGate };
     m_stopCallbacks.push_back(std::move(stopCallback));
 }
 
 void
 NearObjectCliControlFlowContext::OnStop()
 {
-    for (auto &stopCallback : m_stopCallbacks) {
+    // Move the registered stop callbacks into a local variable. This ensures
+    // the stop callbacks are only ever invoked once per program execution
+    // cycle.
+    decltype(m_stopCallbacks) stopCallbacks;
+    {
+        std::unique_lock stopCallbacksLock{ m_stopCallbacksGate };
+        stopCallbacks = std::move(m_stopCallbacks);
+    }
+
+    // Execute the removed stop callbacks.
+    for (auto &stopCallback : stopCallbacks) {
         stopCallback();
     }
 }
