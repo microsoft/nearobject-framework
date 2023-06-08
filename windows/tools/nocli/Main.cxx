@@ -30,14 +30,14 @@
 /**
  * @brief Function that will be executed by the control sequence handler on a
  * stop request (eg. Ctrl-C, Ctrl-Break, etc.). Populated by the main() function
- * once parsing is complete 
+ * once parsing is complete
  */
 static std::function<void(void)>
-OnApplicationStopRequest{ nullptr };
+    OnApplicationStopRequest{ nullptr };
 
 /**
  * @brief Control sequence handler.
- * 
+ *
  * @param controlType The type of control signal sent.
  * @return BOOL Whether the control signal was handled.
  */
@@ -75,7 +75,7 @@ try {
     nearobject::cli::NearObjectCli cli{ cliData, cliHandler };
 
     // Configure stop handler to cancel and wait for execution to complete.
-    OnApplicationStopRequest = [&]{
+    OnApplicationStopRequest = [&] {
         PLOG_VERBOSE << "handling stop request sent via control signal";
         cli.CancelExecution();
         cli.WaitForExecutionComplete();
