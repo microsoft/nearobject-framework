@@ -27,7 +27,7 @@ TEST_CASE("UwbSessionData encoding")
         using namespace uwb::protocol::fira;
         using namespace encoding;
 
-        uwb::protocol::fira::UwbSessionData sessionData;
+        UwbSessionData sessionData;
 
         sessionData.uwbConfiguration = UwbConfiguration::Builder()
                                            .SetMacAddressController(uwb::UwbMacAddress::FromString("67:89", uwb::UwbMacAddressType::Short).value())
@@ -38,19 +38,19 @@ TEST_CASE("UwbSessionData encoding")
         sessionData.sessionDataVersion = 1;
         sessionData.sessionId = 1234;
 
-        auto tlvber = sessionData.ToDataObject();
-        REQUIRE(tlvber);
-        auto data = tlvber->ToBytes();
+        auto tlvBer = sessionData.ToDataObject();
+        REQUIRE(tlvBer);
+        auto data = tlvBer->ToBytes();
 
         std::unique_ptr<TlvBer> tlvParsed;
         auto parseResult = TlvBer::Parse(notstd::unique_ptr_out(tlvParsed), data);
         REQUIRE(parseResult == TlvBer::ParseResult::Succeeded);
         REQUIRE(tlvParsed);
-        REQUIRE(*tlvParsed == *tlvber);
+        REQUIRE(*tlvParsed == *tlvBer);
 
-        uwb::protocol::fira::UwbSessionData sessionDataParsed;
+        UwbSessionData sessionDataParsed;
         REQUIRE_NOTHROW(sessionDataParsed = UwbSessionData::FromDataObject(*tlvParsed));
-        std::hash<uwb::protocol::fira::UwbSessionData> USBhash;
-        REQUIRE(USBhash(sessionDataParsed) == USBhash(sessionData));
+        std::hash<uwb::protocol::fira::UwbSessionData> usdHash;
+        REQUIRE(usdHash(sessionDataParsed) == usdHash(sessionData));
     }
 }
