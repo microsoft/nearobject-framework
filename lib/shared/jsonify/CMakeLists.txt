@@ -7,7 +7,7 @@ set(JSONIFY_PUBLIC_INCLUDE_PREFIX ${JSONIFY_PUBLIC_INCLUDE})
 target_sources(jsonify
     INTERFACE
         ${JSONIFY_PUBLIC_INCLUDE_PREFIX}/jsonify.hxx
-        ${JSONIFY_PUBLIC_INCLUDE_PREFIX}/nlohmann/std_optional_serializer.hxx
+        ${JSONIFY_PUBLIC_INCLUDE_PREFIX}/std_optional_serializer.hxx
 )
 
 target_include_directories(jsonify
@@ -22,7 +22,7 @@ target_link_libraries(jsonify
 
 list(APPEND JSONIFY_PUBLIC_HEADERS
     ${JSONIFY_PUBLIC_INCLUDE_PREFIX}/jsonify.hxx
-    ${JSONIFY_PUBLIC_INCLUDE_PREFIX}/nlohmann/std_optional_serializer.hxx
+    ${JSONIFY_PUBLIC_INCLUDE_PREFIX}/std_optional_serializer.hxx
 )
 
 set_target_properties(jsonify PROPERTIES FOLDER shared/jsonify)

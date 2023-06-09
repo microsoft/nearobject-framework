@@ -43,10 +43,10 @@ target_include_directories(uwb-proto-fira
 
 target_link_libraries(uwb-proto-fira
     PRIVATE
-        jsonify
         uwb-proto-fira-uci
         magic_enum::magic_enum
     PUBLIC
+        jsonify
         notstd
         smartcard
         tlv
