@@ -57,10 +57,14 @@ ConvertQ97FormatToIEEE(uint16_t q97)
     static const uint16_t fractionMask = ~(signMask | unsignedIntegerMask);
 
     bool sign = q97 & signMask;
-    int unsignedIntegerPart = (q97 & unsignedIntegerMask) >> 7U;
-    int fractionPart = q97 & fractionMask;
+    uint16_t unsignedIntegerPart = (q97 & unsignedIntegerMask) >> 7U;
+    uint16_t fractionPart = q97 & fractionMask;
 
-    double unsignedNumber = ((double)unsignedIntegerPart) + (((double)fractionPart) * pow2);
+    if (sign) {
+        unsignedIntegerPart = (~unsignedIntegerPart + 1U) & 0x00FF;
+    }
+
+    double unsignedNumber = static_cast<double>(unsignedIntegerPart + (fractionPart * pow2));
 
     return (sign ? -1 : 1) * unsignedNumber;
 }
