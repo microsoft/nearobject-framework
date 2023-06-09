@@ -37,6 +37,11 @@ UwbPeer::UwbPeer(UwbMacAddress address) :
     m_address(std::move(address))
 {}
 
+UwbPeer::UwbPeer(UwbMacAddress address, UwbPeerSpatialProperties spatialProperties) :
+    m_address(std::move(address)),
+    m_spatialProperties(std::move(spatialProperties))
+{}
+
 UwbPeer::UwbPeer(const uwb::protocol::fira::UwbRangingMeasurement& data) :
     m_address{ data.PeerMacAddress },
     m_spatialProperties{
