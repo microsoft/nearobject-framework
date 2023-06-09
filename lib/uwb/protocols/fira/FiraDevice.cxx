@@ -69,6 +69,27 @@ uwb::protocol::fira::StringToVersion(const std::string& input) noexcept
     return (first_byte << 8) | second_byte;
 }
 
+double
+uwb::protocol::fira::ConvertQ97FormatToIEEE(uint16_t q97)
+{
+    static const double pow2 = std::pow(2, -7);
+    static const uint16_t signMask = 0b1000'0000'0000'0000U;
+    static const uint16_t unsignedIntegerMask = 0b0111'1111'1000'0000U;
+    static const uint16_t fractionMask = ~(signMask | unsignedIntegerMask);
+
+    bool sign = q97 & signMask;
+    uint16_t unsignedIntegerPart = (q97 & unsignedIntegerMask) >> 7U;
+    uint16_t fractionPart = q97 & fractionMask;
+
+    if (sign) {
+        unsignedIntegerPart = (~unsignedIntegerPart + 1U) & 0x00FF;
+    }
+
+    double unsignedNumber = static_cast<double>(unsignedIntegerPart + (fractionPart * pow2));
+
+    return (sign ? -1 : 1) * unsignedNumber;
+}
+
 std::string
 uwb::protocol::fira::ToString(const std::unordered_set<ResultReportConfiguration>& input)
 {
@@ -161,7 +182,7 @@ std::string
 UwbRangingMeasurementData::ToString() const
 {
     std::ostringstream ss{};
-    ss << Result << " (FoM=" << +FigureOfMerit.value_or(0) << ")";
+    ss << ConvertQ97FormatToIEEE(Result) << " (FoM=" << +FigureOfMerit.value_or(0) << ")";
     return ss.str();
 }
 
