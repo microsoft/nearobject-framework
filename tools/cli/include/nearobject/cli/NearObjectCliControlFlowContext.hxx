@@ -4,6 +4,7 @@
 
 #include <functional>
 #include <latch>
+#include <mutex>
 #include <stop_token>
 #include <vector>
 
@@ -81,6 +82,7 @@ private:
     std::latch m_operationCompleteLatch;
     std::stop_source m_stopSource;
     std::stop_callback<std::function<void()>> m_stopCallback;
+    std::mutex m_stopCallbacksGate;
     std::vector<std::function<void()>> m_stopCallbacks;
 };
 } // namespace nearobject::cli

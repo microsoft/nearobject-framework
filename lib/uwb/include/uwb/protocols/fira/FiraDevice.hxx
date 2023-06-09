@@ -43,6 +43,20 @@ std::optional<uint32_t>
 StringToVersion(const std::string& input) noexcept;
 
 /**
+ * @brief Converts a Q9.7-formatted value to an IEEE 754 double precision floating point formatted value.
+ *
+ * Assuming the Arm definition of Qm.n formatting, the most significant bit is the sign, the next
+ * (m-1) bits are an integer, and the next n bits is the number to be multiplied by pow(2,n)
+ * The double equivalent will be the sum of those two results
+ * TODO write unit tests
+ *
+ * @param q97 a number in Q9.7 format
+ * @return double
+ */
+double
+ConvertQ97FormatToIEEE(uint16_t q97);
+
+/**
  * @brief See FiRa Consortium MAC Technical Requirements v1.3.0,
  * Section D.1.8 STS, Figure 19, page 70.
  */

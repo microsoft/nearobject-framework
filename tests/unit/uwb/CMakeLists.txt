@@ -14,6 +14,7 @@ target_sources(uwb-test
         ${CMAKE_CURRENT_LIST_DIR}/protocols/fira/TestUwbFiraUwbConfigurationBuilder.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestUwbDevice.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestUwbDeviceCallbacks.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/TestUwbJsonSerializers.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestUwbMacAddress.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestUwbPeer.cxx
 )

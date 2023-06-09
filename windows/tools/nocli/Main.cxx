@@ -1,5 +1,6 @@
 
 #include <cstdint>
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -26,6 +27,38 @@
 
 #include <winrt/windows.devices.nearobject.h>
 
+/**
+ * @brief Function that will be executed by the control sequence handler on a
+ * stop request (eg. Ctrl-C, Ctrl-Break, etc.). Populated by the main() function
+ * once parsing is complete
+ */
+static std::function<void(void)>
+    OnApplicationStopRequest{ nullptr };
+
+/**
+ * @brief Control sequence handler.
+ *
+ * @param controlType The type of control signal sent.
+ * @return BOOL Whether the control signal was handled.
+ */
+BOOL WINAPI
+CtrlHandler(DWORD controlType)
+{
+    switch (controlType) {
+    case CTRL_C_EVENT:
+    case CTRL_CLOSE_EVENT:
+    case CTRL_BREAK_EVENT:
+    case CTRL_LOGOFF_EVENT:
+    case CTRL_SHUTDOWN_EVENT:
+        if (OnApplicationStopRequest != nullptr) {
+            OnApplicationStopRequest();
+        }
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 int
 main(int argc, char* argv[])
 try {
@@ -40,6 +73,20 @@ try {
     auto cliHandler = std::make_shared<nearobject::cli::NearObjectCliHandlerWindows>();
 
     nearobject::cli::NearObjectCli cli{ cliData, cliHandler };
+
+    // Configure stop handler to cancel and wait for execution to complete.
+    OnApplicationStopRequest = [&] {
+        PLOG_VERBOSE << "handling stop request sent via control signal";
+        cli.CancelExecution();
+        cli.WaitForExecutionComplete();
+        PLOG_INFO << "exiting";
+    };
+
+    // Register console control signal handler.
+    {
+        static constexpr auto AddHandler = TRUE;
+        SetConsoleCtrlHandler(CtrlHandler, AddHandler);
+    }
 
     // Configure the cli parsing app with Windows-specific options.
     auto& uwbApp = cli.GetDriverUwbApp();
