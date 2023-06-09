@@ -33,11 +33,11 @@ target_include_directories(uwb
 
 target_link_libraries(uwb
     PRIVATE
-        jsonify
         magic_enum::magic_enum
         tlv
         plog::plog
     PUBLIC
+        jsonify
         notstd
         uwb-proto-fira
 )
