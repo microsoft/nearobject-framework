@@ -21,6 +21,24 @@ const std::array<UwbPeer, 2> PeersRandom = {
     UwbPeer{ UwbMacAddressesRandom[0] },
     UwbPeer{ UwbMacAddressesRandom[1] },
 };
+constexpr UwbPeerSpatialProperties UwbPeerSpatialPropertiesAllEmpty {
+    .Distance = std::nullopt,
+    .AngleAzimuth = std::nullopt,
+    .AngleElevation = std::nullopt,
+    .Elevation = std::nullopt,
+    .AngleAzimuthFom = std::nullopt,
+    .AngleElevationFom = std::nullopt,
+    .ElevationFom = std::nullopt,
+};
+constexpr UwbPeerSpatialProperties UwbPeerSpatialPropertiesAllPopulated {
+    .Distance = 1.0,
+    .AngleAzimuth = 2.0,
+    .AngleElevation = 3.0,
+    .Elevation = 4.0,
+    .AngleAzimuthFom = 0xAA,
+    .AngleElevationFom = 0xBB,
+    .ElevationFom = 0xCC,
+};
 } // namespace uwb::test
 
 TEST_CASE("uwb peer objects can be created", "[basic]")
@@ -135,38 +153,18 @@ TEST_CASE("uwb peer spatial properties serialization is stable", "[basic][uwb][s
 {
     using namespace uwb;
 
-    constexpr UwbPeerSpatialProperties UwbPeerSpatialPropertiesAllEmpty {
-        .Distance = std::nullopt,
-        .AngleAzimuth = std::nullopt,
-        .AngleElevation = std::nullopt,
-        .Elevation = std::nullopt,
-        .AngleAzimuthFom = std::nullopt,
-        .AngleElevationFom = std::nullopt,
-        .ElevationFom = std::nullopt,
-    };
-
-    constexpr UwbPeerSpatialProperties UwbPeerSpatialPropertiesAllPopulated {
-        .Distance = 1.0,
-        .AngleAzimuth = 2.0,
-        .AngleElevation = 3.0,
-        .Elevation = 4.0,
-        .AngleAzimuthFom = 0xAA,
-        .AngleElevationFom = 0xBB,
-        .ElevationFom = 0xCC,
-    };
-
     SECTION("all values empty is stable")
     {
-        const auto json = nlohmann::json(UwbPeerSpatialPropertiesAllEmpty);
+        const auto json = nlohmann::json(test::UwbPeerSpatialPropertiesAllEmpty);
         const auto uwbPeerSpatialPropertiesAllEmptylDeserialized = json.get<UwbPeerSpatialProperties>();
-        REQUIRE(uwbPeerSpatialPropertiesAllEmptylDeserialized == UwbPeerSpatialPropertiesAllEmpty);
+        REQUIRE(uwbPeerSpatialPropertiesAllEmptylDeserialized == test::UwbPeerSpatialPropertiesAllEmpty);
     }
 
     SECTION("all values populated is stable")
     {
-        const auto json = nlohmann::json(UwbPeerSpatialPropertiesAllPopulated);
+        const auto json = nlohmann::json(test::UwbPeerSpatialPropertiesAllPopulated);
         const auto uwbPeerSpatialPropertiesAllPopulatedDeserialized = json.get<UwbPeerSpatialProperties>();
-        REQUIRE(uwbPeerSpatialPropertiesAllPopulatedDeserialized == UwbPeerSpatialPropertiesAllPopulated);
+        REQUIRE(uwbPeerSpatialPropertiesAllPopulatedDeserialized == test::UwbPeerSpatialPropertiesAllPopulated);
     }
 }
 
