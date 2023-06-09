@@ -5,6 +5,7 @@
 #include <notstd/tostring.hxx>
 
 #include <magic_enum.hpp>
+#include <plog/Log.h>
 
 using namespace nearobject::cli;
 using namespace strings::ostream_operators;
@@ -52,7 +53,7 @@ operator<<(std::ostream& out, LogPrefix logPrefix)
 void
 NearObjectCliUwbSessionEventCallbacks::OnSessionEnded(::uwb::UwbSession* session, ::uwb::UwbSessionEndReason reason)
 {
-    std::cout << LogPrefix(session->GetId()) << "Session Ended (" << magic_enum::enum_name(reason) << ")" << std::endl;
+    PLOG_VERBOSE << LogPrefix(session->GetId()) << "Session Ended (" << magic_enum::enum_name(reason) << ")";
 
     if (m_onSessionEndedCallback) {
         m_onSessionEndedCallback();
@@ -62,34 +63,34 @@ NearObjectCliUwbSessionEventCallbacks::OnSessionEnded(::uwb::UwbSession* session
 void
 NearObjectCliUwbSessionEventCallbacks::OnRangingStarted(::uwb::UwbSession* session)
 {
-    std::cout << LogPrefix(session->GetId()) << "Ranging Started" << std::endl;
+    PLOG_VERBOSE << LogPrefix(session->GetId()) << "Ranging Started";
 }
 
 void
 NearObjectCliUwbSessionEventCallbacks::OnRangingStopped(::uwb::UwbSession* session)
 {
-    std::cout << LogPrefix(session->GetId()) << "Ranging Stopped" << std::endl;
+    PLOG_VERBOSE << LogPrefix(session->GetId()) << "Ranging Stopped";
 }
 
 void
 NearObjectCliUwbSessionEventCallbacks::OnPeerPropertiesChanged(::uwb::UwbSession* session, std::vector<::uwb::UwbPeer> peersChanged)
 {
-    std::cout << LogPrefix(session->GetId()) << "Peer Properties Changed" << std::endl;
+    PLOG_VERBOSE << LogPrefix(session->GetId()) << "Peer Properties Changed";
 
     for (const auto& peer : peersChanged) {
-        std::cout << ' ' << peer << std::endl;
+        PLOG_VERBOSE << " " << peer.ToString();
     }
 }
 
 void
 NearObjectCliUwbSessionEventCallbacks::OnSessionMembershipChanged(::uwb::UwbSession* session, std::vector<::uwb::UwbPeer> peersAdded, std::vector<::uwb::UwbPeer> peersRemoved)
 {
-    std::cout << LogPrefix(session->GetId()) << "Membership Changed" << std::endl;
+    PLOG_VERBOSE << LogPrefix(session->GetId()) << "Membership Changed";
 
     for (const auto& peer : peersAdded) {
-        std::cout << "+" << peer.GetAddress() << std::endl;
+        PLOG_VERBOSE << "+" << peer.GetAddress().ToString();
     }
     for (const auto& peer : peersRemoved) {
-        std::cout << "-" << peer.GetAddress() << std::endl;
+        PLOG_VERBOSE << "-" << peer.GetAddress().ToString();
     }
 }

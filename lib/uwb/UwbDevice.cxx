@@ -138,35 +138,35 @@ UwbDevice::CreateSession(uint32_t sessionId, uwb::protocol::fira::DeviceType dev
 UwbCapability
 UwbDevice::GetCapabilities()
 {
-    PLOG_INFO << "GetCapabilities()";
+    PLOG_DEBUG << "GetCapabilities()";
     return GetCapabilitiesImpl();
 }
 
 UwbDeviceInformation
 UwbDevice::GetDeviceInformation()
 {
-    PLOG_INFO << "GetDeviceInformation";
+    PLOG_DEBUG << "GetDeviceInformation";
     return GetDeviceInformationImpl();
 }
 
 uint32_t
 UwbDevice::GetSessionCount()
 {
-    PLOG_INFO << "GetSessionCount";
+    PLOG_DEBUG << "GetSessionCount";
     return GetSessionCountImpl();
 }
 
 void
 UwbDevice::Reset()
 {
-    PLOG_INFO << "Reset";
+    PLOG_DEBUG << "Reset";
     ResetImpl();
 }
 
 bool
 UwbDevice::Initialize()
 {
-    PLOG_INFO << "Initialize";
+    PLOG_DEBUG << "Initialize";
     return InitializeImpl();
 }
 

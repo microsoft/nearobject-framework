@@ -59,15 +59,25 @@ CtrlHandler(DWORD controlType)
     return FALSE;
 }
 
+/**
+ * @brief Instance IDs for PLOG loggers
+ */
+enum class LogInstanceId {
+    // Default logger is 0 and is omitted from this enum
+    Console = 1,
+    File = 2,
+};
+
 int
 main(int argc, char* argv[])
 try {
-    plog::RollingFileAppender<plog::TxtFormatter> rollingFileAppender(logging::GetLogName("nocli").c_str());
-    plog::DebugOutputAppender<plog::TxtFormatter> debugAppender;
-    plog::ColorConsoleAppender<plog::MessageOnlyFormatter> colorConsoleAppender{};
-    plog::init(plog::verbose, &rollingFileAppender)
-        .addAppender(&debugAppender)
-        .addAppender(&colorConsoleAppender);
+    static plog::ColorConsoleAppender<plog::MessageOnlyFormatter> colorConsoleAppender{};
+    plog::init<static_cast<int>(LogInstanceId::Console)>(plog::info, &colorConsoleAppender);
+
+    static plog::RollingFileAppender<plog::TxtFormatter> rollingFileAppender(logging::GetLogName("nocli").c_str());
+    plog::init<static_cast<int>(LogInstanceId::File)>(plog::verbose, &rollingFileAppender);
+
+    plog::init(plog::verbose).addAppender(plog::get<static_cast<int>(LogInstanceId::Console)>()).addAppender(plog::get<static_cast<int>(LogInstanceId::File)>());
 
     auto cliData = std::make_shared<nearobject::cli::NearObjectCliDataWindows>();
     auto cliHandler = std::make_shared<nearobject::cli::NearObjectCliHandlerWindows>();

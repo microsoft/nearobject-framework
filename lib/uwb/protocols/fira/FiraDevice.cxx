@@ -202,14 +202,14 @@ std::string
 UwbRangingMeasurement::ToString() const
 {
     std::ostringstream ss{};
-    ss << "SlotIndex: " << +SlotIndex << ", "
-       << "Distance: " << Distance << ", "
-       << "Status: " << ::ToString(Status) << ", "
-       << "Peer Mac Address: " << PeerMacAddress << ", "
-       << "Line Of Sight Indicator: " << magic_enum::enum_name(LineOfSightIndicator) << ", "
-       << "Angle of Arrival Azimuth: " << AoAAzimuth << ", "
-       << "Angle of Arrival Elevation: " << AoAElevation << ", "
-       << "Angle of Arrival Destination Azimuth: " << AoaDestinationAzimuth << ", "
+    ss << "SlotIndex: " << +SlotIndex << "\n"
+       << "Distance: " << Distance << "\n"
+       << "Status: " << ::ToString(Status) << "\n"
+       << "Peer Mac Address: " << PeerMacAddress << "\n"
+       << "Line Of Sight Indicator: " << magic_enum::enum_name(LineOfSightIndicator) << "\n"
+       << "Angle of Arrival Azimuth: " << AoAAzimuth << "\n"
+       << "Angle of Arrival Elevation: " << AoAElevation << "\n"
+       << "Angle of Arrival Destination Azimuth: " << AoaDestinationAzimuth << "\n"
        << "Angle of Arrival Destination Elevation: " << AoaDestinationElevation;
     return ss.str();
 }
@@ -218,13 +218,13 @@ std::string
 UwbRangingData::ToString() const
 {
     std::ostringstream ss{};
-    ss << "Session Id: " << SessionId << ", "
-       << "Sequence Number: " << SequenceNumber << ", "
-       << "Ranging Interval: " << CurrentRangingInterval << " "
-       << "Measurement Type: " << magic_enum::enum_name(RangingMeasurementType) << '\n'
+    ss << "Session Id: " << SessionId << "\n"
+       << "Sequence Number: " << SequenceNumber << "\n"
+       << "Ranging Interval: " << CurrentRangingInterval << "\n"
+       << "Measurement Type: " << magic_enum::enum_name(RangingMeasurementType) << "\n\n"
        << "Measurements:\n";
     for (auto rangingMeasurementIndex = 0; rangingMeasurementIndex < std::size(RangingMeasurements); rangingMeasurementIndex++) {
-        ss << "  [" << rangingMeasurementIndex << "] " << RangingMeasurements[rangingMeasurementIndex] << '\n';
+        ss << "[" << rangingMeasurementIndex << "] " << RangingMeasurements[rangingMeasurementIndex] << '\n';
     }
     return ss.str();
 }
@@ -260,13 +260,13 @@ uwb::protocol::fira::ToString(const UwbNotificationData& uwbNotificationData)
 
     std::visit([&](auto&& arg) {
         using ValueType = std::decay_t<decltype(arg)>;
-        ss << TypeNameMap.at(typeid(ValueType)) << " {";
+        ss << TypeNameMap.at(typeid(ValueType)) << "\n";
+        ss << "----------------------------------------\n";
         if constexpr (std::is_same_v<ValueType, UwbStatusDevice> || std::is_same_v<ValueType, UwbSessionStatus> || std::is_same_v<ValueType, UwbSessionUpdateMulticastListStatus> || std::is_same_v<ValueType, UwbRangingData>) {
             ss << arg;
         } else if constexpr (std::is_enum_v<ValueType>) {
             ss << magic_enum::enum_name(arg);
         }
-        ss << " }";
     },
         uwbNotificationData);
 
