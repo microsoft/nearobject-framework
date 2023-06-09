@@ -112,7 +112,7 @@ jobs:
 
     - name: CMake Configure Cross-Compile ${{ matrix.config.arch }}
       if: ${{ matrix.config.arch }}
-      run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -G"${{ matrix.config.generator }}" -A ${{ matrix.config.arch }}
+      run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DNOF_DISABLE_TESTS=TRUE -G"${{ matrix.config.generator }}" -A ${{ matrix.config.arch }}
 
     - name: CMake Build
       run: cmake --build --preset ${{ inputs.preset-name }} --config ${{ matrix.build-type }}
