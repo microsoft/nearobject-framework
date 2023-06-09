@@ -45,6 +45,14 @@ public:
     explicit UwbPeer(UwbMacAddress address);
 
     /**
+     * @brief Construct a new UwbPeer object.
+     * 
+     * @param address 
+     * @param spatialProperties 
+     */
+    explicit UwbPeer(UwbMacAddress address, UwbPeerSpatialProperties spatialProperties);
+
+    /**
      * @brief Construct a new Uwb Peer object from UwbRangingMeasurement data
      * 
      * @param data 
