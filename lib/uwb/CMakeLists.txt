@@ -16,13 +16,14 @@ target_sources(uwb
     PUBLIC
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDevice.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceEventCallbacks.hxx
+        ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbJsonSerializers.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbMacAddress.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbMacAddressJsonSerializer.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbPeer.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbPeerJsonSerializer.hxx
+        ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbRegisteredCallbacks.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSession.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionEventCallbacks.hxx
-        ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbRegisteredCallbacks.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbVersion.hxx
 )
 
@@ -45,6 +46,7 @@ target_link_libraries(uwb
 list(APPEND UWB_PUBLIC_HEADERS
     ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDevice.hxx
     ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbDeviceEventCallbacks.hxx
+    ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbJsonSerializers.hxx
     ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbMacAddress.hxx
     ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbMacAddressJsonSerializer.hxx
     ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbPeer.hxx
