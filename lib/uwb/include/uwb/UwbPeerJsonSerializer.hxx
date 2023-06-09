@@ -2,7 +2,7 @@
 #ifndef UWB_PEER_JSON_SERIALIZER_HXX
 #define UWB_PEER_JSON_SERIALIZER_HXX
 
-#include <jsonify/nlohmann/std_optional_serializer.hxx>
+#include <jsonify/std_optional_serializer.hxx>
 #include <nlohmann/json.hpp>
 
 namespace uwb
