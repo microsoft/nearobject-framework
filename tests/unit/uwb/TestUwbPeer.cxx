@@ -5,8 +5,11 @@
 #include <type_traits>
 
 #include <uwb/UwbPeer.hxx>
+#include <uwb/UwbPeerJsonSerializer.hxx>
 
 #include <catch2/catch_test_macros.hpp>
+
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 
 namespace uwb::test
 {
@@ -127,3 +130,48 @@ TEST_CASE("uwb peer spatial properties can be created", "[basic]")
         });
     }
 }
+
+TEST_CASE("uwb peer spatial properties serialization is stable", "[basic][uwb][serialize]")
+{
+    using namespace uwb;
+
+    constexpr UwbPeerSpatialProperties UwbPeerSpatialPropertiesAllEmpty {
+        .Distance = std::nullopt,
+        .AngleAzimuth = std::nullopt,
+        .AngleElevation = std::nullopt,
+        .Elevation = std::nullopt,
+        .AngleAzimuthFom = std::nullopt,
+        .AngleElevationFom = std::nullopt,
+        .ElevationFom = std::nullopt,
+    };
+
+    constexpr UwbPeerSpatialProperties UwbPeerSpatialPropertiesAllPopulated {
+        .Distance = 1.0,
+        .AngleAzimuth = 2.0,
+        .AngleElevation = 3.0,
+        .Elevation = 4.0,
+        .AngleAzimuthFom = 0xAA,
+        .AngleElevationFom = 0xBB,
+        .ElevationFom = 0xCC,
+    };
+
+    SECTION("all values empty is stable")
+    {
+        const auto json = nlohmann::json(UwbPeerSpatialPropertiesAllEmpty);
+        const auto uwbPeerSpatialPropertiesAllEmptylDeserialized = json.get<UwbPeerSpatialProperties>();
+        REQUIRE(uwbPeerSpatialPropertiesAllEmptylDeserialized == UwbPeerSpatialPropertiesAllEmpty);
+    }
+
+    SECTION("all values populated is stable")
+    {
+        const auto json = nlohmann::json(UwbPeerSpatialPropertiesAllPopulated);
+        const auto uwbPeerSpatialPropertiesAllPopulatedDeserialized = json.get<UwbPeerSpatialProperties>();
+        REQUIRE(uwbPeerSpatialPropertiesAllPopulatedDeserialized == UwbPeerSpatialPropertiesAllPopulated);
+    }
+}
+
+TEST_CASE("uwb peer serialization is stable", "[basic][uwb][serialize]")
+{
+}
+
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
