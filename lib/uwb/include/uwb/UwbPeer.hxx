@@ -103,6 +103,11 @@ public:
     UwbPeerSpatialProperties
     GetSpatialProperties() const noexcept;
 
+    /**
+     * @brief Returns a string representation of the object. 
+     * 
+     * @return std::string 
+     */
     std::string
     ToString() const;
 
