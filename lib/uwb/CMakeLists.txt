@@ -10,6 +10,7 @@ target_sources(uwb
         ${CMAKE_CURRENT_LIST_DIR}/UwbMacAddress.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbMacAddressJsonSerializer.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbPeer.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/UwbPeerJsonSerializer.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbSession.cxx
         ${CMAKE_CURRENT_LIST_DIR}/UwbVersion.cxx
     PUBLIC
@@ -18,6 +19,7 @@ target_sources(uwb
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbMacAddress.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbMacAddressJsonSerializer.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbPeer.hxx
+        ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbPeerJsonSerializer.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSession.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionEventCallbacks.hxx
         ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbRegisteredCallbacks.hxx
@@ -46,6 +48,7 @@ list(APPEND UWB_PUBLIC_HEADERS
     ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbMacAddress.hxx
     ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbMacAddressJsonSerializer.hxx
     ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbPeer.hxx
+    ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbPeerJsonSerializer.hxx
     ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSession.hxx
     ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbSessionEventCallbacks.hxx
     ${UWB_DIR_PUBLIC_INCLUDE_PREFIX}/UwbRegisteredCallbacks.hxx
