@@ -2,7 +2,7 @@
 #include <nearobject/NearObjectProfile.hxx>
 #include <nearobject/serialization/NearObjectProfileJsonSerializer.hxx>
 
-#include <jsonify/nlohmann/std_optional_serializer.hxx>
+#include <jsonify/std_optional_serializer.hxx>
 
 using namespace nearobject;
 
