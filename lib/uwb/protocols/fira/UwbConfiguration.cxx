@@ -304,12 +304,14 @@ UwbConfiguration::FromDataObject(const encoding::TlvBer& tlvBer)
             case uwb::UwbMacAddress::ShortLength: {
                 std::array<uint8_t, uwb::UwbMacAddress::ShortLength> addressData{ parameterValue[0], parameterValue[1] };
                 uwbMacAddress = UwbMacAddress(addressData);
+                break;
             }
             case uwb::UwbMacAddress::ExtendedLength: {
                 std::array<uint8_t, uwb::UwbMacAddress::ExtendedLength> addressData{ 
                     parameterValue[0], parameterValue[1], parameterValue[2], parameterValue[3], 
                     parameterValue[4], parameterValue[5], parameterValue[6], parameterValue[7] };
                 uwbMacAddress = UwbMacAddress(addressData);
+                break;
             }
             default: {
                 break;
