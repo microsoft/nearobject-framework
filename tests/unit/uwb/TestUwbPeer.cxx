@@ -13,14 +13,6 @@
 
 namespace uwb::test
 {
-const std::array<UwbMacAddress, 2> UwbMacAddressesRandom = {
-    UwbMacAddress::Random<UwbMacAddressType::Short>(),
-    UwbMacAddress::Random<UwbMacAddressType::Extended>(),
-};
-const std::array<UwbPeer, 2> PeersRandom = {
-    UwbPeer{ UwbMacAddressesRandom[0] },
-    UwbPeer{ UwbMacAddressesRandom[1] },
-};
 constexpr UwbPeerSpatialProperties UwbPeerSpatialPropertiesAllEmpty {
     .Distance = std::nullopt,
     .AngleAzimuth = std::nullopt,
@@ -31,14 +23,34 @@ constexpr UwbPeerSpatialProperties UwbPeerSpatialPropertiesAllEmpty {
     .ElevationFom = std::nullopt,
 };
 constexpr UwbPeerSpatialProperties UwbPeerSpatialPropertiesAllPopulated {
-    .Distance = 1.0,
-    .AngleAzimuth = 2.0,
-    .AngleElevation = 3.0,
-    .Elevation = 4.0,
+    .Distance = 1.1,
+    .AngleAzimuth = 2.22,
+    .AngleElevation = 3.333,
+    .Elevation = 4.4444,
     .AngleAzimuthFom = 0xAA,
     .AngleElevationFom = 0xBB,
     .ElevationFom = 0xCC,
 };
+const std::array<UwbMacAddress, 2> UwbMacAddressesRandom = {
+    UwbMacAddress::Random<UwbMacAddressType::Short>(),
+    UwbMacAddress::Random<UwbMacAddressType::Extended>(),
+};
+const auto UwbMacAddressRandomShort = UwbMacAddressesRandom[0];
+const auto UwbMacAddressRandomExtended = UwbMacAddressesRandom[1];
+
+const std::array<UwbPeer, 2> PeersRandom = {
+    UwbPeer{ UwbMacAddressesRandom[0] },
+    UwbPeer{ UwbMacAddressesRandom[1] },
+};
+const std::array<UwbPeer, 2> PeersWithFullyPopulatedSpatialProperties {
+    UwbPeer{ UwbMacAddressesRandom[0], UwbPeerSpatialPropertiesAllPopulated },
+    UwbPeer{ UwbMacAddressesRandom[1], UwbPeerSpatialPropertiesAllPopulated },
+};
+const std::array<UwbPeer, 2> PeersWithFullyEmptySpatialProperties {
+    UwbPeer{ UwbMacAddressesRandom[0], UwbPeerSpatialPropertiesAllEmpty },
+    UwbPeer{ UwbMacAddressesRandom[1], UwbPeerSpatialPropertiesAllEmpty },
+};
+
 } // namespace uwb::test
 
 TEST_CASE("uwb peer objects can be created", "[basic]")
@@ -170,6 +182,39 @@ TEST_CASE("uwb peer spatial properties serialization is stable", "[basic][uwb][s
 
 TEST_CASE("uwb peer serialization is stable", "[basic][uwb][serialize]")
 {
+    using namespace uwb;
+
+    SECTION("peer with short mac address and fully populated spatial properties is stable")
+    {
+        const UwbPeer uwbPeerOriginal{ test::UwbMacAddressRandomShort, test::UwbPeerSpatialPropertiesAllPopulated };
+        const auto json = nlohmann::json(uwbPeerOriginal);
+        const auto uwbPeerDeserialized = json.get<UwbPeer>();
+        REQUIRE(uwbPeerOriginal == uwbPeerDeserialized);
+    }
+
+    SECTION("peer with short mac address and fully empty spatial properties is stable")
+    {
+        const UwbPeer uwbPeerOriginal{ test::UwbMacAddressRandomShort, test::UwbPeerSpatialPropertiesAllEmpty };
+        const auto json = nlohmann::json(uwbPeerOriginal);
+        const auto uwbPeerDeserialized = json.get<UwbPeer>();
+        REQUIRE(uwbPeerOriginal == uwbPeerDeserialized);
+    }
+
+    SECTION("peer with extended mac address and fully populated spatial properties is stable")
+    {
+        const UwbPeer uwbPeerOriginal{ test::UwbMacAddressRandomExtended, test::UwbPeerSpatialPropertiesAllPopulated };
+        const auto json = nlohmann::json(uwbPeerOriginal);
+        const auto uwbPeerDeserialized = json.get<UwbPeer>();
+        REQUIRE(uwbPeerOriginal == uwbPeerDeserialized);
+    }
+
+    SECTION("peer with extended mac address and fully empty spatial properties is stable")
+    {
+        const UwbPeer uwbPeerOriginal{ test::UwbMacAddressRandomExtended, test::UwbPeerSpatialPropertiesAllEmpty };
+        const auto json = nlohmann::json(uwbPeerOriginal);
+        const auto uwbPeerDeserialized = json.get<UwbPeer>();
+        REQUIRE(uwbPeerOriginal == uwbPeerDeserialized);
+    }
 }
 
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
