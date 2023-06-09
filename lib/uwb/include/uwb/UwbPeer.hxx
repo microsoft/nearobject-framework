@@ -39,6 +39,11 @@ class UwbPeer
 public:
     /**
      * @brief Construct a new UwbPeer object.
+     */
+    UwbPeer() = default;
+
+    /**
+     * @brief Construct a new UwbPeer object.
      *
      * @param address
      */
