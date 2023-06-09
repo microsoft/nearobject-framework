@@ -1,71 +1,32 @@
 
 #include <stdexcept>
 
+#include <uwb/UwbMacAddress.hxx>
+#include <uwb/UwbMacAddressJsonSerializer.hxx>
 #include <uwb/UwbPeer.hxx>
 #include <uwb/UwbPeerJsonSerializer.hxx>
 
 using namespace uwb;
 
 void
-uwb::to_json(nlohmann::json& json, [[maybe_unused]] const UwbPeer& uwbPeer)
+uwb::to_json(nlohmann::json& json, const UwbPeer& uwbPeer)
 {
-    json = nlohmann::json {
-
+    json = nlohmann::json{
+        { "MacAddress", uwbPeer.GetAddress() },
+        { "SpatialProperties", uwbPeer.GetSpatialProperties() },
     };
 }
 
-
 void
-uwb::from_json([[maybe_unused]] const nlohmann::json& json, [[maybe_unused]] UwbPeer& uwbPeer)
+uwb::from_json(const nlohmann::json& json, UwbPeer& uwbPeer)
 {
+    UwbMacAddress uwbMacAddress{};
+    UwbPeerSpatialProperties uwbPeerSpatialProperties{};
+    json.at("MacAddress").get_to(uwbMacAddress);
+    json.at("SpatialProperties").get_to(uwbPeerSpatialProperties);
 
-}
-
-void
-uwb::to_json(nlohmann::json& json, [[maybe_unused]] const UwbPeerSpatialProperties& uwbPeerSpatialProperties)
-{
-    json = nlohmann::json {
-
+    uwbPeer = UwbPeer{
+        std::move(uwbMacAddress),
+        std::move(uwbPeerSpatialProperties)
     };
 }
-
-
-void
-uwb::from_json([[maybe_unused]] const nlohmann::json& json, [[maybe_unused]] UwbPeerSpatialProperties& uwbPeerSpatialProperties)
-{
-}
-
-// void
-// uwb::to_json(nlohmann::json& json, const UwbMacAddress& uwbMacAddress)
-// {
-//     json = nlohmann::json {
-//         { "Type", uwbMacAddress.GetType() },
-//         { "Value", uwbMacAddress.GetValue() },
-//     };
-// }
-
-// void
-// uwb::from_json(const nlohmann::json& json, UwbMacAddress& uwbMacAddress)
-// {
-//     UwbMacAddressType uwbMacAddressType{ UwbMacAddressType::Short }; 
-//     json.at("Type").get_to(uwbMacAddressType);
-
-//     switch (uwbMacAddressType) {
-//     case UwbMacAddressType::Short: {
-//         UwbMacAddress::ShortType value{};
-//         json.at("Value").get_to(value);
-//         uwbMacAddress = UwbMacAddress{ value };
-//         break;
-//     }
-//     case UwbMacAddressType::Extended: {
-//         UwbMacAddress::ExtendedType value{};
-//         json.at("Value").get_to(value);
-//         uwbMacAddress = UwbMacAddress{ value };
-//         break;
-//     }
-//     default: {
-//         throw std::invalid_argument("invalid UwbMacAddressType specified");
-//     }
-//     }
-// }
-
