@@ -98,10 +98,10 @@ UwbSessionData::FromDataObject(const encoding::TlvBer& tlvBer)
             continue;
         }
 
-        // Ensure all values have non-zero payload.
+        // Ensure all primitive values have non-zero payload.
         bool parameterValueWasDecoded = true;
         auto& parameterValue = tlvBerValue.GetValue();
-        if (std::empty(parameterValue)) {
+        if (tlvBerValue.IsPrimitive() && std::empty(parameterValue)) {
             continue;
         }
 
