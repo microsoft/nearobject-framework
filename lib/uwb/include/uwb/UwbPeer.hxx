@@ -51,16 +51,16 @@ public:
 
     /**
      * @brief Construct a new UwbPeer object.
-     * 
-     * @param address 
-     * @param spatialProperties 
+     *
+     * @param address
+     * @param spatialProperties
      */
     explicit UwbPeer(UwbMacAddress address, UwbPeerSpatialProperties spatialProperties);
 
     /**
      * @brief Construct a new Uwb Peer object from UwbRangingMeasurement data
-     * 
-     * @param data 
+     *
+     * @param data
      */
     explicit UwbPeer(const uwb::protocol::fira::UwbRangingMeasurement& data);
 
@@ -104,9 +104,9 @@ public:
     GetSpatialProperties() const noexcept;
 
     /**
-     * @brief Returns a string representation of the object. 
-     * 
-     * @return std::string 
+     * @brief Returns a string representation of the object.
+     *
+     * @return std::string
      */
     std::string
     ToString() const;

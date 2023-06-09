@@ -13,7 +13,7 @@
 
 namespace uwb::test
 {
-constexpr UwbPeerSpatialProperties UwbPeerSpatialPropertiesAllEmpty {
+constexpr UwbPeerSpatialProperties UwbPeerSpatialPropertiesAllEmpty{
     .Distance = std::nullopt,
     .AngleAzimuth = std::nullopt,
     .AngleElevation = std::nullopt,
@@ -22,7 +22,7 @@ constexpr UwbPeerSpatialProperties UwbPeerSpatialPropertiesAllEmpty {
     .AngleElevationFom = std::nullopt,
     .ElevationFom = std::nullopt,
 };
-constexpr UwbPeerSpatialProperties UwbPeerSpatialPropertiesAllPopulated {
+constexpr UwbPeerSpatialProperties UwbPeerSpatialPropertiesAllPopulated{
     .Distance = 1.1,
     .AngleAzimuth = 2.22,
     .AngleElevation = 3.333,
@@ -42,11 +42,11 @@ const std::array<UwbPeer, 2> PeersRandom = {
     UwbPeer{ UwbMacAddressesRandom[0] },
     UwbPeer{ UwbMacAddressesRandom[1] },
 };
-const std::array<UwbPeer, 2> PeersWithFullyPopulatedSpatialProperties {
+const std::array<UwbPeer, 2> PeersWithFullyPopulatedSpatialProperties{
     UwbPeer{ UwbMacAddressesRandom[0], UwbPeerSpatialPropertiesAllPopulated },
     UwbPeer{ UwbMacAddressesRandom[1], UwbPeerSpatialPropertiesAllPopulated },
 };
-const std::array<UwbPeer, 2> PeersWithFullyEmptySpatialProperties {
+const std::array<UwbPeer, 2> PeersWithFullyEmptySpatialProperties{
     UwbPeer{ UwbMacAddressesRandom[0], UwbPeerSpatialPropertiesAllEmpty },
     UwbPeer{ UwbMacAddressesRandom[1], UwbPeerSpatialPropertiesAllEmpty },
 };
