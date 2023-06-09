@@ -1,6 +1,4 @@
 
-#include <stdexcept>
-
 #include <uwb/UwbMacAddress.hxx>
 #include <uwb/UwbMacAddressJsonSerializer.hxx>
 #include <uwb/UwbPeer.hxx>
