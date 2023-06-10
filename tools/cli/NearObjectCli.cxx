@@ -12,6 +12,7 @@
 #include <magic_enum.hpp>
 #include <nearobject/cli/NearObjectCli.hxx>
 #include <notstd/tostring.hxx>
+#include <plog/Log.h>
 
 using namespace nearobject::cli;
 using namespace strings::ostream_operators;
@@ -258,11 +259,11 @@ ValidateNonEnumParameterValues(NearObjectCliData& cliData)
     // NumberOfControlees (mandatory)
     if (parametersData.multiNodeMode == MultiNodeMode::Unicast) {
         if (parametersData.numberOfControlees != MinimumNumberOfControlees) {
-            std::cerr << "Invalid NumberOfControlees. Only " << +MinimumNumberOfControlees << " controlee expected in Unicast mode." << std::endl;
+            PLOG_ERROR << "Invalid NumberOfControlees. Only " << +MinimumNumberOfControlees << " controlee expected in Unicast mode.";
         }
     } else {
         if (parametersData.numberOfControlees < MinimumNumberOfControlees) {
-            std::cerr << "Invalid NumberOfControlees. At least " << +MinimumNumberOfControlees << " controlees expected." << std::endl;
+            PLOG_ERROR << "Invalid NumberOfControlees. At least " << +MinimumNumberOfControlees << " controlees expected.";
         }
     }
 
@@ -270,19 +271,19 @@ ValidateNonEnumParameterValues(NearObjectCliData& cliData)
     const auto macAddressType = parametersData.macAddressMode == uwb::UwbMacAddressType::Extended ? uwb::UwbMacAddressType::Extended : uwb::UwbMacAddressType::Short;
 
     if (!parametersData.deviceMacAddress.has_value()) {
-        std::cerr << "Invalid DeviceMacAddress. Does not match format of MacAddressMode: " << ToString(macAddressType) << std::endl;
+        PLOG_ERROR << "Invalid DeviceMacAddress. Does not match format of MacAddressMode: " << ToString(macAddressType);
     }
 
     if (!parametersData.destinationMacAddresses.has_value()) {
-        std::cerr << "Invalid DestinationMacAddresses. Does not match format of MacAddressMode: " << ToString(macAddressType) << std::endl;
+        PLOG_ERROR << "Invalid DestinationMacAddresses. Does not match format of MacAddressMode: " << ToString(macAddressType);
     } else {
         if (parametersData.deviceType == DeviceType::Controller) {
             if (parametersData.destinationMacAddresses.value().size() != parametersData.numberOfControlees) {
-                std::cerr << "Invalid number of DestinationMacAddresses. Should be equal to NumberOfControlees when device is a Controller." << std::endl;
+                PLOG_ERROR << "Invalid number of DestinationMacAddresses. Should be equal to NumberOfControlees when device is a Controller.";
             }
         } else {
             if (parametersData.destinationMacAddresses.value().size() != DestinationMacAddressesCountWhenControlee) {
-                std::cerr << "Invalid number of DestinationMacAddresses. Should only contain " << DestinationMacAddressesCountWhenControlee << " mac address for the Controller when device is a Controlee." << std::endl;
+                PLOG_ERROR << "Invalid number of DestinationMacAddresses. Should only contain " << DestinationMacAddressesCountWhenControlee << " mac address for the Controller when device is a Controlee.";
             }
         }
     }
@@ -292,7 +293,7 @@ ValidateNonEnumParameterValues(NearObjectCliData& cliData)
         if (parametersData.rangeDataNotificationConfig.has_value() && parametersData.rangeDataNotificationConfig.value() == RangeDataNotificationConfiguration::EnableInProximityRange) {
             if ((!parametersData.rangeDataNotificationProximityFar.has_value() && parametersData.rangeDataNotificationProximityNear.value() > DefaultRangeDataNotificationProximityFar) ||
                 (parametersData.rangeDataNotificationProximityFar.has_value() && parametersData.rangeDataNotificationProximityNear.value() > parametersData.rangeDataNotificationProximityFar.value())) {
-                std::cerr << "Invalid RangeDataNotificationProximityNear. Should be less than or equal to RangeDataNotificationProximityFar (default: " << +DefaultRangeDataNotificationProximityFar << ")." << std::endl;
+                PLOG_ERROR << "Invalid RangeDataNotificationProximityNear. Should be less than or equal to RangeDataNotificationProximityFar (default: " << +DefaultRangeDataNotificationProximityFar << ").";
             }
         }
     }
@@ -301,7 +302,7 @@ ValidateNonEnumParameterValues(NearObjectCliData& cliData)
     if (parametersData.rangeDataNotificationProximityFar.has_value()) {
         if (parametersData.rangeDataNotificationConfig.has_value() && parametersData.rangeDataNotificationConfig.value() == RangeDataNotificationConfiguration::EnableInProximityRange) {
             if (parametersData.rangeDataNotificationProximityNear.has_value() && parametersData.rangeDataNotificationProximityFar.value() < parametersData.rangeDataNotificationProximityNear.value()) {
-                std::cerr << "Invalid RangeDataNotificationProximityFar. Should be greater than or equal to RangeDataNotificationProximityNear (default: " << +DefaultRangeDataNotificationProximityNear << ")." << std::endl;
+                PLOG_ERROR << "Invalid RangeDataNotificationProximityFar. Should be greater than or equal to RangeDataNotificationProximityNear (default: " << +DefaultRangeDataNotificationProximityNear << ").";
             }
         }
     }
@@ -310,11 +311,11 @@ ValidateNonEnumParameterValues(NearObjectCliData& cliData)
     if (parametersData.preambleCodeIndex.has_value()) {
         if (!parametersData.prfMode.has_value() || (parametersData.prfMode.has_value() && parametersData.prfMode.value() == PrfModeDetailed::Bprf62MHz)) { // Either BPRF is set or PRF_MODE is left at default (BPRF)
             if (parametersData.preambleCodeIndex.value() < MinimumPreambleCodeIndexBprf || parametersData.preambleCodeIndex.value() > MaximumPreambleCodeIndexBprf) {
-                std::cerr << "Invalid PreambleCodeIndex. Expected value range of " << +MinimumPreambleCodeIndexBprf << "-" << +MaximumPreambleCodeIndexBprf << " in BPRF mode." << std::endl;
+                PLOG_ERROR << "Invalid PreambleCodeIndex. Expected value range of " << +MinimumPreambleCodeIndexBprf << "-" << +MaximumPreambleCodeIndexBprf << " in BPRF mode.";
             }
         } else { // HPRF mode
             if (parametersData.preambleCodeIndex.value() < MinimumPreambleCodeIndexHprf || parametersData.preambleCodeIndex.value() > MaximumPreambleCodeIndexHprf) {
-                std::cerr << "Invalid PreambleCodeIndex. Expected value range of " << +MinimumPreambleCodeIndexHprf << "-" << +MaximumPreambleCodeIndexHprf << " in BPRF mode." << std::endl;
+                PLOG_ERROR << "Invalid PreambleCodeIndex. Expected value range of " << +MinimumPreambleCodeIndexHprf << "-" << +MaximumPreambleCodeIndexHprf << " in BPRF mode.";
             }
         }
     }
@@ -328,7 +329,7 @@ ValidateNonEnumParameterValues(NearObjectCliData& cliData)
                     errorMessage.append(std::to_string(val) + " ");
                 }
                 errorMessage.append("} in BPRF mode.");
-                std::cerr << errorMessage << std::endl;
+                PLOG_ERROR << errorMessage;
             }
         } else { // HPRF mode
             if (std::ranges::find(SfdIdValuesHprf, parametersData.sfdId.value()) == std::ranges::end(SfdIdValuesHprf)) {
@@ -337,44 +338,44 @@ ValidateNonEnumParameterValues(NearObjectCliData& cliData)
                     errorMessage.append(std::to_string(val) + " ");
                 }
                 errorMessage.append("} in HPRF mode.");
-                std::cerr << errorMessage << std::endl;
+                PLOG_ERROR << errorMessage;
             }
         }
     }
 
     // ResponderSlotIndex
     if (parametersData.responderSlotIndex.has_value() && parametersData.responderSlotIndex.value() < MinimumResponderSlotIndex) { // TODO: > N, where N is number of Responders
-        std::cerr << "Invalid ResponderSlotIndex. Expected value range of " << +MinimumResponderSlotIndex << "- N Responders." << std::endl;
+        PLOG_ERROR << "Invalid ResponderSlotIndex. Expected value range of " << +MinimumResponderSlotIndex << "- N Responders.";
     }
 
     // KeyRotationRate
     if (parametersData.keyRotationRate.has_value() && parametersData.keyRotationRate.value() > MaximumKeyRotationRate) {
-        std::cerr << "Invalid KeyRotationRate. Expected value range of " << +MinimumKeyRotationRate << "-" << +MaximumKeyRotationRate << std::endl;
+        PLOG_ERROR << "Invalid KeyRotationRate. Expected value range of " << +MinimumKeyRotationRate << "-" << +MaximumKeyRotationRate;
     }
 
     // SessionPriority
     if (parametersData.sessionPriority.has_value() && (parametersData.sessionPriority.value() < MinimumSessionPriority || parametersData.sessionPriority.value() > MaximumSessionPriority)) {
-        std::cerr << "Invalid SessionPriority. Expected value range of " << +MinimumSessionPriority << "-" << +MaximumSessionPriority << std::endl;
+        PLOG_ERROR << "Invalid SessionPriority. Expected value range of " << +MinimumSessionPriority << "-" << +MaximumSessionPriority;
     }
 
     // NumberOfStsSegments
     if (parametersData.numberOfStsSegments.has_value()) {
         if (parametersData.numberOfStsSegments.value() > MaximumNumberOfStsSegmentsHprf) {
-            std::cerr << "Invalid NumberOfStsSegments. Expected value range of " << +MinimumNumberOfStsSegments << "-" << +MaximumNumberOfStsSegmentsHprf << " STS segments." << std::endl;
+            PLOG_ERROR << "Invalid NumberOfStsSegments. Expected value range of " << +MinimumNumberOfStsSegments << "-" << +MaximumNumberOfStsSegmentsHprf << " STS segments.";
         }
         if (!parametersData.prfMode.has_value() || (parametersData.prfMode.has_value() && parametersData.prfMode.value() == PrfModeDetailed::Bprf62MHz)) { // Either BPRF is set or PRF_MODE is left at default (BPRF)
             if (parametersData.numberOfStsSegments.value() > MaximumNumberOfStsSegmentsBprf) {
-                std::cerr << "Invalid NumberOfStsSegments. Expected value range of " << +MinimumNumberOfStsSegments << "-" << +MaximumNumberOfStsSegmentsBprf << " in BPRF mode." << std::endl;
+                PLOG_ERROR << "Invalid NumberOfStsSegments. Expected value range of " << +MinimumNumberOfStsSegments << "-" << +MaximumNumberOfStsSegmentsBprf << " in BPRF mode.";
             }
         }
         if (parametersData.rFrameConfiguration.value() == StsPacketConfiguration::SP0 && parametersData.numberOfStsSegments != MinimumNumberOfStsSegments) {
-            std::cerr << "Invalid NumberOfStsSegments. No STS segments expected with non-STS frames" << std::endl;
+            PLOG_ERROR << "Invalid NumberOfStsSegments. No STS segments expected with non-STS frames";
         }
     }
 
     // UwbInitiationTime
     if (parametersData.uwbInitiationTime.has_value() && parametersData.uwbInitiationTime.value() > MaximumUwbInitiationTime) {
-        std::cerr << "Invalid UwbInitiationTime. Expected value range of " << +MinimumUwbInitiationTime << "-" << +MaximumUwbInitiationTime << std::endl;
+        PLOG_ERROR << "Invalid UwbInitiationTime. Expected value range of " << +MinimumUwbInitiationTime << "-" << +MaximumUwbInitiationTime;
     }
 
     // ResultReportConfig
@@ -383,7 +384,7 @@ ValidateNonEnumParameterValues(NearObjectCliData& cliData)
         if (resultReportConfigurationString.empty()) {
             return false;
         } else if (!resultReportConfigurationString.empty() && resultReportConfigurationString.length() != resultReportConfigurationSize) {
-            std::cerr << "Invalid ResultReportConfiguration length" << std::endl;
+            PLOG_ERROR << "Invalid ResultReportConfiguration length";
             return false;
         }
         return std::ranges::all_of(resultReportConfigurationString, [](const auto& c) {
@@ -403,24 +404,24 @@ ValidateNonEnumParameterValues(NearObjectCliData& cliData)
 
     // InBandTerminationAttemptCount
     if (parametersData.inBandTerminationAttemptCount.has_value() && parametersData.inBandTerminationAttemptCount.value() > MaximumInBandTerminationAttemptCount) {
-        std::cerr << "Invalid InBandTerminationAttemptCount. Expected value range of " << +MinimumInBandTerminationAttemptCount << "-" << +MaximumInBandTerminationAttemptCount << std::endl;
+        PLOG_ERROR << "Invalid InBandTerminationAttemptCount. Expected value range of " << +MinimumInBandTerminationAttemptCount << "-" << +MaximumInBandTerminationAttemptCount;
     }
 
     // SubSessionId
     if (parametersData.stsConfiguration.has_value() && parametersData.stsConfiguration.value() == StsConfiguration::DynamicWithResponderSubSessionKey) {
         if (!parametersData.subSessionId.has_value()) {
-            std::cerr << "SubSessionId is required for Dynamic STS with Responder Sub-Session Key" << std::endl;
+            PLOG_ERROR << "SubSessionId is required for Dynamic STS with Responder Sub-Session Key";
         }
     }
 
     // BprfPhrDataRate
     if (parametersData.prfMode.has_value() && parametersData.prfMode.value() != PrfModeDetailed::Bprf62MHz) {
         if (parametersData.bprfPhrDataRate.has_value()) {
-            std::cerr << "Invalid BprfPhrDataRate. Value expected only in BPRF mode" << std::endl;
+            PLOG_ERROR << "Invalid BprfPhrDataRate. Value expected only in BPRF mode";
         }
     } else {
         if (parametersData.bprfPhrDataRate.has_value() && !magic_enum::enum_contains<BprfPhrDataRate>(parametersData.bprfPhrDataRate.value())) {
-            std::cerr << "Invalid BprfPhrDataRate" << std::endl;
+            PLOG_ERROR << "Invalid BprfPhrDataRate";
         }
     }
 }
@@ -440,7 +441,7 @@ ValidateEnumParameterValue(const EnumType& applicationConfigurationParameter)
 {
     auto parameterType = magic_enum::enum_type_name<EnumType>();
     if (!magic_enum::enum_contains<EnumType>(applicationConfigurationParameter)) {
-        std::cerr << "Invalid " << parameterType << std::endl;
+        PLOG_ERROR << "Invalid " << parameterType;
     }
 }
 
@@ -458,7 +459,7 @@ ProcessApplicationConfigurationParameters(NearObjectCliData& cliData)
 
     std::vector<uwb::protocol::fira::UwbApplicationConfigurationParameter> applicationConfigurationParameters;
 
-    std::cout << "Selected parameters:" << std::endl;
+    PLOG_INFO << "Selected parameters:";
     const auto applicationConfigurationParameterValues = applicationConfigurationParameterData.GetValueMap();
     for (const auto& [applicationConfigurationParameter, applicationConfigurationParameterValue] : applicationConfigurationParameterValues) {
         std::visit([&applicationConfigurationParameter, &applicationConfigurationParameters](auto&& arg) {
@@ -486,7 +487,7 @@ ProcessApplicationConfigurationParameters(NearObjectCliData& cliData)
                 }
             }
 
-            std::cout << oss.str() << std::endl;
+            PLOG_INFO << oss.str();
         },
             applicationConfigurationParameterValue);
     }
@@ -627,17 +628,17 @@ NearObjectCli::AddSubcommandDriverUwbRawDeviceReset(CLI::App* parent)
     auto rawDeviceResetApp = parent->add_subcommand("devicereset", "Reset the UWB device")->fallthrough();
 
     rawDeviceResetApp->parse_complete_callback([this] {
-        std::cout << "device reset" << std::endl;
+        PLOG_DEBUG << "device reset";
     });
 
     rawDeviceResetApp->final_callback([this] {
         auto uwbDevice = GetUwbDevice();
         if (!uwbDevice) {
-            std::cerr << "no device found" << std::endl;
+            PLOG_ERROR << "no device found";
             return;
         }
         if (!uwbDevice->Initialize()) {
-            std::cerr << "device not initialized" << std::endl;
+            PLOG_ERROR << "device not initialized";
         }
 
         m_cliHandler->HandleDeviceReset(uwbDevice);
@@ -653,17 +654,17 @@ NearObjectCli::AddSubcommandDriverUwbRawGetDeviceInfo(CLI::App* parent)
     auto rawGetDeviceInfoApp = parent->add_subcommand("getdeviceinfo", "Get the UWB device info")->fallthrough();
 
     rawGetDeviceInfoApp->parse_complete_callback([this] {
-        std::cout << "get device info" << std::endl;
+        PLOG_DEBUG << "get device info";
     });
 
     rawGetDeviceInfoApp->final_callback([this] {
         auto uwbDevice = GetUwbDevice();
         if (!uwbDevice) {
-            std::cerr << "no device found" << std::endl;
+            PLOG_ERROR << "no device found";
             return;
         }
         if (!uwbDevice->Initialize()) {
-            std::cerr << "device not initialized" << std::endl;
+            PLOG_ERROR << "device not initialized";
         }
 
         m_cliHandler->HandleGetDeviceInfo(uwbDevice);
@@ -681,17 +682,17 @@ NearObjectCli::AddSubcommandDriverUwbRawSessionDeinitialize(CLI::App* parent)
 
     rawSessionDeinitializeApp->parse_complete_callback([this, rawSessionDeinitializeApp] {
         RegisterCliAppWithOperation(rawSessionDeinitializeApp);
-        std::cout << "deinitialize session " << m_cliData->SessionId << std::endl;
+        PLOG_DEBUG << "deinitialize session " << m_cliData->SessionId;
     });
 
     rawSessionDeinitializeApp->final_callback([this, rawSessionDeinitializeApp] {
         auto uwbDevice = GetUwbDevice();
         if (!uwbDevice) {
-            std::cerr << "no device found" << std::endl;
+            PLOG_ERROR << "no device found";
             return;
         }
         if (!uwbDevice->Initialize()) {
-            std::cerr << "device not initialized" << std::endl;
+            PLOG_ERROR << "device not initialized";
         }
 
         m_cliHandler->HandleSessionDeinitialize(uwbDevice, m_cliData->SessionId);
@@ -710,17 +711,17 @@ NearObjectCli::AddSubcommandDriverUwbRawGetSessionCount(CLI::App* parent)
 
     rawGetSessionCountApp->parse_complete_callback([this, rawGetSessionCountApp] {
         RegisterCliAppWithOperation(rawGetSessionCountApp);
-        std::cout << "get session count" << std::endl;
+        PLOG_DEBUG << "get session count";
     });
 
     rawGetSessionCountApp->final_callback([this, rawGetSessionCountApp] {
         auto uwbDevice = GetUwbDevice();
         if (!uwbDevice) {
-            std::cerr << "no device found" << std::endl;
+            PLOG_ERROR << "no device found";
             return;
         }
         if (!uwbDevice->Initialize()) {
-            std::cerr << "device not initialized" << std::endl;
+            PLOG_ERROR << "device not initialized";
         }
 
         m_cliHandler->HandleGetSessionCount(uwbDevice);
@@ -740,17 +741,17 @@ NearObjectCli::AddSubcommandDriverUwbRawGetSessionState(CLI::App* parent)
 
     rawGetSessionStateApp->parse_complete_callback([this, rawGetSessionStateApp] {
         RegisterCliAppWithOperation(rawGetSessionStateApp);
-        std::cout << "get session state of session " << m_cliData->SessionId << std::endl;
+        PLOG_DEBUG << "get session state of session " << m_cliData->SessionId;
     });
 
     rawGetSessionStateApp->final_callback([this, rawGetSessionStateApp] {
         auto uwbDevice = GetUwbDevice();
         if (!uwbDevice) {
-            std::cerr << "no device found" << std::endl;
+            PLOG_ERROR << "no device found";
             return;
         }
         if (!uwbDevice->Initialize()) {
-            std::cerr << "device not initialized" << std::endl;
+            PLOG_ERROR << "device not initialized";
         }
 
         m_cliHandler->HandleGetSessionState(uwbDevice, m_cliData->SessionId);
@@ -846,11 +847,11 @@ NearObjectCli::AddSubcommandDriverUwbRangeStart(CLI::App* parent)
     rangeStartApp->final_callback([this] {
         auto uwbDevice = GetUwbDevice();
         if (!uwbDevice) {
-            std::cerr << "no device found" << std::endl;
+            PLOG_ERROR << "no device found";
             return;
         }
         if (!uwbDevice->Initialize()) {
-            std::cerr << "device not initialized" << std::endl;
+            PLOG_ERROR << "device not initialized";
         }
 
         m_cliHandler->HandleDriverStartRanging(uwbDevice, m_cliData->RangingParameters);
@@ -866,7 +867,7 @@ NearObjectCli::AddSubcommandDriverUwbRangeStop(CLI::App* parent)
     auto rangeStopApp = parent->add_subcommand("stop", "Stop a UWB ranging session")->fallthrough();
 
     rangeStopApp->parse_complete_callback([this, rangeStopApp] {
-        std::cout << "stop ranging" << std::endl;
+        PLOG_DEBUG << "stop ranging";
         RegisterCliAppWithOperation(rangeStopApp);
     });
 
@@ -891,7 +892,7 @@ NearObjectCli::AddSubcommandServiceRangeStart(CLI::App* parent)
     rangeStartApp->add_option("--SessionDataFilePath", m_cliData->sessionDataFilePathString, "Path to file containing OOB session data")->required();
 
     rangeStartApp->parse_complete_callback([this, rangeStartApp] {
-        std::cout << "start ranging" << std::endl;
+        PLOG_DEBUG << "start ranging";
         RegisterCliAppWithOperation(rangeStartApp);
     });
 
@@ -910,7 +911,7 @@ NearObjectCli::AddSubcommandServiceRangeStop(CLI::App* parent)
     auto rangeStopApp = parent->add_subcommand("stop", "Stop a NearObject ranging session")->fallthrough();
 
     rangeStopApp->parse_complete_callback([this, rangeStopApp] {
-        std::cout << "stop ranging" << std::endl;
+        PLOG_DEBUG << "stop ranging";
         RegisterCliAppWithOperation(rangeStopApp);
     });
 

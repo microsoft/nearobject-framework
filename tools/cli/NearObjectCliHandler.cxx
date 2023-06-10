@@ -109,7 +109,7 @@ void
 NearObjectCliHandler::HandleGetDeviceInfo(std::shared_ptr<uwb::UwbDevice> uwbDevice) noexcept
 try {
     auto deviceInfo = uwbDevice->GetDeviceInformation();
-    std::cout << deviceInfo.ToString() << std::endl;
+    PLOG_INFO << deviceInfo.ToString();
 } catch (...) {
     PLOG_ERROR << "failed to obtain device information";
 }
@@ -132,7 +132,7 @@ void
 NearObjectCliHandler::HandleGetSessionCount(std::shared_ptr<::uwb::UwbDevice> uwbDevice) noexcept
 try {
     auto sessionCount = uwbDevice->GetSessionCount();
-    std::cout << "Session count: " << sessionCount << std::endl;
+    PLOG_INFO << "Session count: " << sessionCount;
 } catch (...) {
     PLOG_ERROR << "failed to get session count";
 }
@@ -147,7 +147,7 @@ try {
     }
 
     auto sessionState = session->GetSessionState();
-    std::cout << "Session state: " << magic_enum::enum_name(sessionState) << std::endl;
+    PLOG_INFO << "Session state: " << magic_enum::enum_name(sessionState);
 
 } catch (...) {
     PLOG_ERROR << "failed to get session state";

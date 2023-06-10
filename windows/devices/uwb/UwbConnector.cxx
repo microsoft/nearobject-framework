@@ -902,7 +902,7 @@ UwbConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData ranging
 void
 UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNotificationData)
 {
-    LOG_DEBUG << "received notification: " << ToString(uwbNotificationData);
+    PLOG_INFO << "Received Notification: " << ToString(uwbNotificationData) << "\n";
 
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
 
