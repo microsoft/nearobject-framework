@@ -12,7 +12,7 @@
 #include <nearobject/NearObjectIdentityToken.hxx>
 #include <nearobject/NearObjectIdentityTokenUwb.hxx>
 #include <nearobject/serialization/NearObjectIdentityTokenUwbJsonSerializer.hxx>
-#include <nearobject/serialization/UwbMacAddressJsonSerializer.hxx>
+#include <uwb/UwbMacAddressJsonSerializer.hxx>
 
 using namespace strings::ostream_operators;
 

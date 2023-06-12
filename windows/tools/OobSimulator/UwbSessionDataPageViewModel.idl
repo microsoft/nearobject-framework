@@ -1,0 +1,23 @@
+
+import "BindableBase.idl";
+import "DelegateCommand.idl";
+import "UwbSessionData.idl";
+
+namespace OobSimulator
+{
+    [bindable]
+    [default_interface]
+    unsealed runtimeclass UwbSessionDataPageViewModel : OobSimulator.BindableBase
+    {
+        UwbSessionDataPageViewModel();
+
+        UwbSessionData UwbSessionData
+        {
+            get;
+        };
+        Microsoft.UI.Xaml.Input.ICommand SetUwbSessionDataCommand
+        {
+            get;
+        };
+    }
+}

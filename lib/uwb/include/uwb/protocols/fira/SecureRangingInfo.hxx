@@ -8,6 +8,8 @@
 
 #include <notstd/hash.hxx>
 
+#include <tlv/TlvBer.hxx>
+
 namespace uwb::protocol::fira
 {
 struct SecureRangingInfo
@@ -29,6 +31,23 @@ struct SecureRangingInfo
         ResponderSpecificSubSessionKeyInfo = 0x81,
         SusAdditionalParameters = 0x82,
     };
+
+    /**
+     * @brief Convert this object into a FiRa Data Object (DO).
+     *
+     * @return std::unique_ptr<encoding::TlvBer>
+     */
+    std::unique_ptr<encoding::TlvBer>
+    ToDataObject() const;
+
+    /**
+     * @brief 
+     * 
+     * @param tlv 
+     * @return SecureRangingInfo 
+     */
+    static SecureRangingInfo
+    FromDataObject(const encoding::TlvBer& tlv);
 
     std::vector<uint8_t> UwbSessionKeyInfo;
     std::vector<uint8_t> ResponderSpecificSubSessionKeyInfo;

@@ -39,15 +39,28 @@ class UwbPeer
 public:
     /**
      * @brief Construct a new UwbPeer object.
+     */
+    UwbPeer() = default;
+
+    /**
+     * @brief Construct a new UwbPeer object.
      *
      * @param address
      */
     explicit UwbPeer(UwbMacAddress address);
 
     /**
+     * @brief Construct a new UwbPeer object.
+     *
+     * @param address
+     * @param spatialProperties
+     */
+    explicit UwbPeer(UwbMacAddress address, UwbPeerSpatialProperties spatialProperties);
+
+    /**
      * @brief Construct a new Uwb Peer object from UwbRangingMeasurement data
-     * 
-     * @param data 
+     *
+     * @param data
      */
     explicit UwbPeer(const uwb::protocol::fira::UwbRangingMeasurement& data);
 
@@ -90,6 +103,11 @@ public:
     UwbPeerSpatialProperties
     GetSpatialProperties() const noexcept;
 
+    /**
+     * @brief Returns a string representation of the object.
+     *
+     * @return std::string
+     */
     std::string
     ToString() const;
 

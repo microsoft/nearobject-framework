@@ -1,0 +1,18 @@
+// Copyright (c) Microsoft Corporation and Contributors.
+// Licensed under the MIT License.
+
+import "SettingsPageViewModel.idl";
+
+namespace OobSimulator
+{
+    [default_interface]
+    runtimeclass SettingsPage : Microsoft.UI.Xaml.Controls.Page
+    {
+        SettingsPage();
+
+        SettingsPageViewModel ViewModel
+        {
+            get;
+        };
+    }
+}

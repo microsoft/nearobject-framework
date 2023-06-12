@@ -1,6 +1,7 @@
 
 #include <algorithm>
 #include <bit>
+#include <cstring>
 #include <iterator>
 #include <optional>
 #include <utility>
@@ -118,7 +119,7 @@ TlvBer::IsPrimitive() const noexcept
 }
 
 std::vector<uint8_t>
-// Static-analysis flags false positive as ToBytes() is called no another instance, thus is not actually recursive.
+// Static-analysis flags false positive as ToBytes() is called on another instance, thus is not actually recursive.
 // NOLINTNEXTLINE(misc-no-recursion)
 TlvBer::ToBytes() const
 {
@@ -232,6 +233,25 @@ TlvBer::Builder::SetTag(uint8_t tag)
     return *this;
 }
 
+TlvBer::Builder&
+TlvBer::Builder::SetTag(uint16_t tag)
+{
+    std::array<uint8_t, sizeof tag> tagData;
+    std::memcpy(&tagData, &tag, sizeof tag);
+
+    if (std::endian::native == std::endian::big) {
+        TlvBer::Builder::SetTag(tagData);
+        return *this;
+    } else {
+        std::array<uint8_t, sizeof tag> tagDataRev;
+        std::transform(std::rbegin(tagData), std::rend(tagData), std::begin(tagDataRev), [](auto&& b) {
+            return b;
+        });
+        TlvBer::Builder::SetTag(tagDataRev);
+        return *this;
+    }
+}
+
 std::vector<uint8_t>
 TlvBer::GetLengthEncoding(std::size_t length)
 {
@@ -287,9 +307,9 @@ TlvBer::Builder::SetValue(uint8_t value)
 }
 
 TlvBer::Builder&
-TlvBer::Builder::AddTlv(const TlvBer& tlv)
+TlvBer::Builder::AddTlv(TlvBer tlv)
 {
-    m_valuesConstructed.push_back(tlv);
+    m_valuesConstructed.push_back(std::move(tlv));
     return *this;
 }
 

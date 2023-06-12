@@ -1,7 +1,8 @@
 // Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
 
-#pragma once
+#ifndef PCH_H
+#define PCH_H
+
 #include <hstring.h>
 #include <restrictederrorinfo.h>
 #include <unknwn.h>
@@ -30,4 +31,7 @@
 #include <wil/cppwinrt_helpers.h>
 // clang-format on
 
+#include "Globals.h"
 #include <nlohmann/json.hpp>
+
+#endif // PCH_H

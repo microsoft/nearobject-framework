@@ -2,9 +2,11 @@
 #ifndef UWB_DEVICE_CONNECTOR_HXX
 #define UWB_DEVICE_CONNECTOR_HXX
 
+#include <atomic>
 #include <cstdint>
 #include <future>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <shared_mutex>
 #include <string>
@@ -225,6 +227,8 @@ private:
 private:
     std::string m_deviceName{};
     std::jthread m_notificationThread;
+    std::mutex m_notificationThreadGate;
+    std::atomic<bool> m_notificationThreadStartPending{ false };
     wil::shared_hfile m_notificationHandleDriver;
     OVERLAPPED m_notificationOverlapped;
 

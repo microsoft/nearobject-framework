@@ -12,6 +12,7 @@
 #include <uwb/protocols/fira/SecureRangingInfo.hxx>
 #include <uwb/protocols/fira/StaticRangingInfo.hxx>
 #include <uwb/protocols/fira/UwbConfiguration.hxx>
+#include <uwb/protocols/fira/UwbRegulatoryInformation.hxx>
 
 namespace uwb::protocol::fira
 {
@@ -60,20 +61,31 @@ struct UwbSessionData
     ToDataObject() const;
 
     /**
-     * @brief Attempt to create a UwbConfiguration object from a TlvBer.
+     * @brief Attempt to create a UwbSessionData object from a TlvBer.
      *
      * @param tlv
-     * @return UwbConfiguration
+     * @return UwbSessionData
      */
     static UwbSessionData
     FromDataObject(const encoding::TlvBer& tlv);
+
+    /**
+     * @brief Attempt to create a UwbSessionData object from a MsgPack.
+     *
+     * @param msgpack
+     * @return UwbSessionData
+     */
+    static UwbSessionData
+    FromMsgPack(std::span<uint8_t> msgpack);
 
     uint16_t sessionDataVersion{ 0 };
     uint32_t sessionId{ 0 };
     uint32_t subSessionId{ 0 };
     UwbConfiguration uwbConfiguration{};
+    bool uwbConfigurationAvailable{ false };
     std::optional<StaticRangingInfo> staticRangingInfo;
     std::optional<SecureRangingInfo> secureRangingInfo;
+    std::optional<UwbRegulatoryInformation> regulatoryInformation;
 };
 
 } // namespace uwb::protocol::fira

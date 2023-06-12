@@ -124,9 +124,9 @@ UwbDevice::OnSessionStatusChanged(UwbSessionStatus statusSession)
 }
 
 std::shared_ptr<UwbSession>
-UwbDevice::CreateSession(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallbacks> callbacks)
+UwbDevice::CreateSession(uint32_t sessionId, uwb::protocol::fira::DeviceType deviceType, std::weak_ptr<UwbSessionEventCallbacks> callbacks)
 {
-    auto session = CreateSessionImpl(sessionId, std::move(callbacks));
+    auto session = CreateSessionImpl(sessionId, std::move(callbacks), deviceType);
     {
         std::unique_lock sessionExclusiveLock{ m_sessionsGate };
         m_sessions[session->GetId()] = std::weak_ptr<UwbSession>(session);
@@ -138,35 +138,35 @@ UwbDevice::CreateSession(uint32_t sessionId, std::weak_ptr<UwbSessionEventCallba
 UwbCapability
 UwbDevice::GetCapabilities()
 {
-    PLOG_INFO << "GetCapabilities()";
+    PLOG_DEBUG << "GetCapabilities()";
     return GetCapabilitiesImpl();
 }
 
 UwbDeviceInformation
 UwbDevice::GetDeviceInformation()
 {
-    PLOG_INFO << "GetDeviceInformation";
+    PLOG_DEBUG << "GetDeviceInformation";
     return GetDeviceInformationImpl();
 }
 
 uint32_t
 UwbDevice::GetSessionCount()
 {
-    PLOG_INFO << "GetSessionCount";
+    PLOG_DEBUG << "GetSessionCount";
     return GetSessionCountImpl();
 }
 
 void
 UwbDevice::Reset()
 {
-    PLOG_INFO << "Reset";
+    PLOG_DEBUG << "Reset";
     ResetImpl();
 }
 
 bool
 UwbDevice::Initialize()
 {
-    PLOG_INFO << "Initialize";
+    PLOG_DEBUG << "Initialize";
     return InitializeImpl();
 }
 

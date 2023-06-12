@@ -2,6 +2,18 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "nearobject-test",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/build/dev/tests/unit/Debug/nearobject-test.exe",
+            "args": [
+            ],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "console": "externalTerminal"
+        },
+        {
             "name": "cli start ranging probe",
             "type": "cppvsdbg",
             "request": "launch",
@@ -18,7 +30,7 @@
             "console": "externalTerminal"
         },
         {
-            "name": "cli start ranging",
+            "name": "cli start ranging with command line passed OOB params",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/out/build/dev/windows/tools/nocli/${input:buildFlavor}/nocli.exe",
@@ -43,6 +55,24 @@
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
+            "environment": [],
+            "console": "externalTerminal"
+        },
+        {
+            "name": "cli start ranging with SessionDataFilePath",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/build/vcpkg-dev/windows/tools/nocli/${input:buildFlavor}/nocli.exe",
+            "args": [
+                "service",
+                "range",
+                "start",
+                "--DeviceType",
+                "1",
+                "--SessionDataFilePath",
+                "${input:SessionDataFilePath}"
+            ],
+            "stopAtEntry": false,
             "environment": [],
             "console": "externalTerminal"
         },
@@ -84,6 +114,11 @@
             "id": "sessionId",
             "type": "promptString",
             "description": "sessionId to use for ranging"
+        },
+        {
+            "id": "SessionDataFilePath",
+            "type": "promptString",
+            "description": "SessionDataFilePath"
         }
     ]
 }

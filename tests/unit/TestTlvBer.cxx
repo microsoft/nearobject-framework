@@ -14,6 +14,10 @@
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 
+#include <uwb/protocols/fira/UwbSessionData.hxx>
+#include <uwb/protocols/fira/UwbConfiguration.hxx>
+#include <uwb/protocols/fira/UwbConfigurationBuilder.hxx>
+
 using namespace encoding;
 
 namespace encoding::test 
@@ -118,7 +122,7 @@ TEST_CASE("test TlvBer", "[basic][infra]")
     {
         TlvBer::Builder builder{};
         auto tlvBer = builder
-                          .SetTag(0x93)
+                          .SetTag(uint8_t(0x93))
                           .Build();
         REQUIRE(tlvBer.Tag.size() == 1);
         REQUIRE(tlvBer.Tag[0] == 0x93);
@@ -129,7 +133,7 @@ TEST_CASE("test TlvBer", "[basic][infra]")
     {
         TlvBer::Builder builder{};
         auto tlvBer = builder
-                          .SetTag(0x93)
+                          .SetTag(uint8_t(0x93))
                           .SetValue(0x94)
                           .Build();
         REQUIRE(tlvBer.Tag.size() == 1);

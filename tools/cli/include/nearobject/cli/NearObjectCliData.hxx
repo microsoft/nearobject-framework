@@ -150,6 +150,7 @@ struct NearObjectCliData
     std::string deviceMacAddressString;
     std::string destinationMacAddressesString;
     std::string resultReportConfigurationString;
+    std::string sessionDataFilePathString;
     UwbConfigurationData uwbConfiguration{};
     UwbApplicationConfigurationParameterData applicationConfigurationParametersData{};
     uwb::protocol::fira::StaticRangingInfo StaticRanging{};

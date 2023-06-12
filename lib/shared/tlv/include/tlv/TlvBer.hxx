@@ -244,6 +244,7 @@ public:
         if ((*dataIt & BitmaskTagFirstByte) != TagValueLongField) {
             tag.push_back(*dataIt);
             tagNumber = *dataIt & BitmaskTagShort;
+            bytesParsed++;
             return Tlv::ParseResult::Succeeded;
         }
 
@@ -500,7 +501,16 @@ public:
         /**
          * @brief Set the tag of the top-level/parent BerTlv.
          * 
-         * @tparam Iterable 
+         * @param tag 
+         * @return Builder& 
+         */
+        Builder&
+        SetTag(uint16_t tag);
+        
+        /**
+         * @brief Set the tag of the top-level/parent BerTlv.
+         * 
+         * @tparam Iterable This NEEDS to be in Big-Endian
          * @param tag 
          * @return Builder& 
          */
@@ -524,7 +534,7 @@ public:
         // clang-format off
         requires IsTlvBerDataUnitType<typename Iterable::value_type>
         Builder&
-        SetValue(Iterable& value)
+        SetValue(Iterable value)
         // clang-format on
         {
             m_data.assign(std::cbegin(value), std::cend(value));
@@ -547,7 +557,7 @@ public:
          * @return Builder& 
          */
         Builder&
-        AddTlv(const TlvBer& tlv);
+        AddTlv(TlvBer tlv);
 
         /**
          * @brief Set the field members of this builder so that when Build is called it will create a copy Of Tlv object
