@@ -3,8 +3,8 @@ set(WINRT_WINMD_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 # Copy the winmd file to the binary output directory.
 configure_file(
-  windows.devices.nearobject.winmd
-  windows.devices.nearobject.winmd
+  windows.devices.nearobject.internalcontract.winmd
+  windows.devices.nearobject.internalcontract.winmd
   COPYONLY
 )
 
@@ -17,7 +17,7 @@ configure_file(
 # Define target which depends on the winmd file.
 add_custom_target(windows-devices-nearobject-winrt
   DEPENDS 
-    ${WINRT_WINMD_DIR}/windows.devices.nearobject.winmd
+    ${WINRT_WINMD_DIR}/windows.devices.nearobject.internalcontract.winmd
     ${WINRT_WINMD_DIR}/windows.devices.nearobject.props
 )
 
