@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="WinRT Windows Metadata (.winmd) Local References">
-    <Reference Include="@WINRT_WINMD_DIR@\windows.devices.nearobject.winmd">
+    <Reference Include="@WINRT_WINMD_DIR@\windows.devices.nearobject.internalcontract.winmd">
       <IsWinMDFile>true</IsWinMDFile>
     </Reference>
     <!-- Uncomment if testing on device without published dll host for the winmd
