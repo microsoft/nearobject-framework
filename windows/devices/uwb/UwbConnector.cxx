@@ -902,7 +902,7 @@ UwbConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData ranging
 void
 UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNotificationData)
 {
-    LOG_DEBUG << "received notification: " << ToString(uwbNotificationData);
+    PLOG_INFO << "Received Notification: " << ToString(uwbNotificationData) << "\n";
 
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
 
@@ -915,7 +915,7 @@ UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNo
             InvokeCallbacks(m_onDeviceStatusChangedCallbacks, arg);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionStatus>) {
             InvokeCallbacks(m_onSessionStatusChangedCallbacks, arg);
-            if (arg.State == UwbSessionState::Idle) {
+            if (arg.State == UwbSessionState::Deinitialized) {
                 OnSessionEnded(arg.SessionId, ::uwb::UwbSessionEndReason::Stopped);
             }
         } else if constexpr (std::is_same_v<ValueType, UwbSessionUpdateMulticastListStatus>) {
