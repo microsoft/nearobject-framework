@@ -690,7 +690,7 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
 
     auto handleDriver = m_notificationHandleDriver;
 
-    while (!stopToken.stop_requested()) {
+    while (!stopToken.stop_requested() && handleDriver.is_valid()) {
         static constexpr DWORD minimumNotificationSize = sizeof(UWB_NOTIFICATION_DATA);
         static constexpr auto maxIoctlAttempts = 2;
         DWORD bytesRequired = minimumNotificationSize;
