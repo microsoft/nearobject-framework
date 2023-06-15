@@ -3,7 +3,7 @@
 #define UWB_OOB_CONVERSIONS_HXX
 
 #include <uwb/protocols/fira/FiraDevice.hxx>
-#include <uwb/protocols/fira/UwbConfiguration.hxx>
+#include <uwb/protocols/fira/UwbSessionData.hxx>
 
 namespace uwb::protocol::fira
 {
@@ -14,6 +14,14 @@ namespace uwb::protocol::fira
  */
 std::vector<UwbApplicationConfigurationParameter>
 GetUciConfigParams(const UwbConfiguration& uwbConfiguration, DeviceType deviceType);
+
+/**
+ * @brief Converts the given UCI application configuration parameters to the OOB UwbSessionData equivalent
+ * 
+ * @return UwbSessionData
+*/
+UwbSessionData
+GetUwbSessionData(std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters);
 
 } // namespace uwb::protocol::fira
 

@@ -157,3 +157,10 @@ UwbSession::Destroy()
     PLOG_VERBOSE << "destroy session with id " << m_sessionId;
     DestroyImpl();
 }
+
+std::vector<uint8_t>
+UwbSession::GetOobDataObject()
+{
+    PLOG_VERBOSE << "get OOB data object";
+    return GetOobDataObjectImpl();
+}

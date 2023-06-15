@@ -108,6 +108,14 @@ private:
     void
     DestroyImpl() override;
 
+    /**
+     * @brief Get the OOB data object representing the session data for this UwbSession.
+     * 
+     * @return std::vector<uint8_t>
+    */
+   virtual std::vector<uint8_t>
+   GetOobDataObjectImpl() override;
+
 protected:
     /**
      * @brief Obtain a shared instance of the device driver connector.
