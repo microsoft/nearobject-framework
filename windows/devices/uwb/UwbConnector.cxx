@@ -686,7 +686,7 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
         m_notificationThreadStartPending = false;
     }
 
-    LOG_INFO << "uwb notification listener started for device " << DeviceName();
+    PLOG_INFO << "uwb notification listener started for device " << DeviceName();
 
     auto handleDriver = m_notificationHandleDriver;
 
@@ -722,10 +722,14 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
                             // Driver indicated buffer was too small and put required size in 'bytesRequired'. Retry with new size.
                             const UWB_NOTIFICATION_DATA& notificationDataPartial = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
                             bytesRequired = std::max(notificationDataPartial.size, static_cast<uint32_t>(minimumNotificationSize));
-                            LOG_VERBOSE << logPrefix << "insufficient buffer (hr=" << std::showbase << std::hex << hr << "), " << std::dec << bytesRequired << " bytes required, current size " << std::size(uwbNotificationDataBuffer) << " bytes";
+                            PLOG_VERBOSE << logPrefix << "insufficient buffer (hr=" << std::showbase << std::hex << hr << "), " << std::dec << bytesRequired << " bytes required, current size " << std::size(uwbNotificationDataBuffer) << " bytes";
                             continue;
                         } else if (lastError == ERROR_OPERATION_ABORTED) {
-                            LOG_WARNING << logPrefix << "aborted";
+                            PLOG_WARNING << logPrefix << "aborted";
+                            break; // for({0,2})
+                        } else if (lastError == ERROR_DRIVER_PROCESS_TERMINATED) {
+                            PLOG_ERROR << logPrefix << "driver process terminated, hr=" << std::showbase << std::hex << hr;
+                            handleDriver.reset();
                             break; // for({0,2})
                         } else {
                             PLOG_ERROR << logPrefix << "error, hr=" << std::showbase << std::hex << hr;
@@ -736,11 +740,15 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
                     }
                     // Check if the call requires a larger buffer.
                 } else if (lastError == ERROR_MORE_DATA || lastError == ERROR_INSUFFICIENT_BUFFER) {
-                    LOG_VERBOSE << logPrefix << "insufficient buffer, " << bytesRequired << " bytes required, current size " << std::size(uwbNotificationDataBuffer) << " bytes";
+                    PLOG_VERBOSE << logPrefix << "insufficient buffer, " << bytesRequired << " bytes required, current size " << std::size(uwbNotificationDataBuffer) << " bytes";
                     const UWB_NOTIFICATION_DATA& notificationDataPartial = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
                     bytesRequired = std::max(notificationDataPartial.size, static_cast<uint32_t>(minimumNotificationSize));
                     // Attempt to retry the ioctl with the appropriate buffer size, which is now held in bytesRequired.
                     continue;
+                } else if (lastError == ERROR_DRIVER_PROCESS_TERMINATED) {
+                    PLOG_ERROR << logPrefix << "driver process terminated, hr=" << std::showbase << std::hex << hr;
+                    handleDriver.reset();
+                    break; // for({1,2})
                     // Treat all other errors as fatal.
                 } else {
                     hr = HRESULT_FROM_WIN32(lastError);
