@@ -110,11 +110,11 @@ private:
 
     /**
      * @brief Get the OOB data object representing the session data for this UwbSession.
-     * 
+     *
      * @return std::vector<uint8_t>
-    */
-   virtual std::vector<uint8_t>
-   GetOobDataObjectImpl() override;
+     */
+    virtual std::vector<uint8_t>
+    GetOobDataObjectImpl() override;
 
 protected:
     /**
