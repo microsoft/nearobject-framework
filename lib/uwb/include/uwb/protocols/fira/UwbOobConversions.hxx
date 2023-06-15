@@ -17,9 +17,9 @@ GetUciConfigParams(const UwbConfiguration& uwbConfiguration, DeviceType deviceTy
 
 /**
  * @brief Converts the given UCI application configuration parameters to the OOB UwbSessionData equivalent
- * 
+ *
  * @return UwbSessionData
-*/
+ */
 UwbSessionData
 GetUwbSessionData(std::vector<UwbApplicationConfigurationParameter> applicationConfigurationParameters);
 

@@ -305,6 +305,6 @@ UwbSession::GetOobDataObjectImpl()
 
     uwbSessionData.sessionId = GetId();
     auto dataObject = uwbSessionData.ToDataObject();
-    
+
     return dataObject->ToBytes();
 }

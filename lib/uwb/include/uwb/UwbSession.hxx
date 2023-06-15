@@ -168,11 +168,11 @@ public:
 
     /**
      * @brief Get the OOB data object representing the session data for this UwbSession.
-     * 
+     *
      * @return std::vector<uint8_t>
-    */
-   std::vector<uint8_t>
-   GetOobDataObject();
+     */
+    std::vector<uint8_t>
+    GetOobDataObject();
 
 protected:
     /**
@@ -281,11 +281,11 @@ private:
 
     /**
      * @brief Get the OOB data object representing the session data for this UwbSession.
-     * 
+     *
      * @return std::vector<uint8_t>
-    */
-   virtual std::vector<uint8_t>
-   GetOobDataObjectImpl() = 0;
+     */
+    virtual std::vector<uint8_t>
+    GetOobDataObjectImpl() = 0;
 
 protected:
     uwb::protocol::fira::DeviceType m_deviceType{ uwb::protocol::fira::DeviceType::Controller };
