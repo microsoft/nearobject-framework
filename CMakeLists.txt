@@ -75,7 +75,7 @@ MESSAGE(STATUS "using build environment '${NOF_BUILD_ENVIRONMENT}'")
 
 project(nearobject-framework 
   LANGUAGES CXX
-  VERSION 0.5.1
+  VERSION 0.5.2
 )
 
 # Conditional inclusion of OS-dependent source trees.
