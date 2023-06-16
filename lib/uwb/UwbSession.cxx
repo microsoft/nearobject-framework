@@ -11,11 +11,14 @@
 using namespace uwb;
 using namespace uwb::protocol::fira;
 
+/* static */
+const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> UwbSession::AllParameters = {};
+
 UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<UwbDevice> device, std::weak_ptr<UwbSessionEventCallbacks> callbacks, DeviceType deviceType) :
-    m_uwbMacAddressSelf(UwbMacAddress::Random<UwbMacAddressType::Extended>()),
-    m_callbacks(std::move(callbacks)),
     m_deviceType{ deviceType },
     m_sessionId(sessionId),
+    m_uwbMacAddressSelf(UwbMacAddress::Random<UwbMacAddressType::Extended>()),
+    m_callbacks(std::move(callbacks)),
     m_device(std::move(device))
 {}
 
@@ -156,4 +159,11 @@ UwbSession::Destroy()
 {
     PLOG_VERBOSE << "destroy session with id " << m_sessionId;
     DestroyImpl();
+}
+
+std::vector<uint8_t>
+UwbSession::GetOobDataObject()
+{
+    PLOG_VERBOSE << "get OOB data object";
+    return GetOobDataObjectImpl();
 }

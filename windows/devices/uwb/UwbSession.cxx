@@ -9,6 +9,7 @@
 #include <wil/result.h>
 
 #include <uwb/protocols/fira/UwbException.hxx>
+#include <uwb/protocols/fira/UwbOobConversions.hxx>
 #include <windows/devices/uwb/UwbConnector.hxx>
 #include <windows/devices/uwb/UwbCxDdiLrp.hxx>
 #include <windows/devices/uwb/UwbDevice.hxx>
@@ -294,4 +295,16 @@ UwbSession::DestroyImpl()
         PLOG_ERROR << "caught unexpected exception attempting to deinitialize for session id " << sessionId << " (" << e.what() << ")";
         throw e;
     }
+}
+
+std::vector<uint8_t>
+UwbSession::GetOobDataObjectImpl()
+{
+    auto applicationConfigurationParameters = GetApplicationConfigurationParameters(AllParameters);
+    auto uwbSessionData = GetUwbSessionData(applicationConfigurationParameters);
+
+    uwbSessionData.sessionId = GetId();
+    auto dataObject = uwbSessionData.ToDataObject();
+
+    return dataObject->ToBytes();
 }

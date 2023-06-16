@@ -136,6 +136,12 @@ public:
     SetSessionStatus(const uwb::protocol::fira::UwbSessionStatus& status);
 
     /**
+     * @brief Sentinel value indicating that all supported application
+     * configuration parameters should be requested.
+     */
+    static const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> AllParameters;
+
+    /**
      * @brief Get the application configuration parameters for this session.
      *
      * @param requestedTypes leave this as an empty vector to request all parameters
@@ -165,6 +171,14 @@ public:
      */
     void
     Destroy();
+
+    /**
+     * @brief Get the OOB data object representing the session data for this UwbSession.
+     *
+     * @return std::vector<uint8_t>
+     */
+    std::vector<uint8_t>
+    GetOobDataObject();
 
 protected:
     /**
@@ -270,6 +284,14 @@ private:
      */
     virtual void
     DestroyImpl() = 0;
+
+    /**
+     * @brief Get the OOB data object representing the session data for this UwbSession.
+     *
+     * @return std::vector<uint8_t>
+     */
+    virtual std::vector<uint8_t>
+    GetOobDataObjectImpl() = 0;
 
 protected:
     uwb::protocol::fira::DeviceType m_deviceType{ uwb::protocol::fira::DeviceType::Controller };
