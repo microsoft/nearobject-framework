@@ -75,7 +75,7 @@ MESSAGE(STATUS "using build environment '${NOF_BUILD_ENVIRONMENT}'")
 
 project(nearobject-framework 
   LANGUAGES CXX
-  VERSION 0.5.1
+  VERSION 0.5.2
 )
 
 # Conditional inclusion of OS-dependent source trees.
@@ -203,6 +203,12 @@ set(NOF_DIR_LIB ${CMAKE_CURRENT_LIST_DIR}/lib)
 set(NOF_DIR_LINUX ${CMAKE_CURRENT_LIST_DIR}/linux)
 set(NOF_DIR_WINDOWS ${CMAKE_CURRENT_LIST_DIR}/windows)
 
+# Add common, global compile definitions.
+add_compile_definitions(
+    MAGIC_ENUM_RANGE_MIN=0
+    MAGIC_ENUM_RANGE_MAX=255
+)
+
 # Conditional inclusion of OS-dependent source trees.
 if (BUILD_FOR_LINUX)
   add_subdirectory(linux)
@@ -240,8 +246,6 @@ elseif (BUILD_FOR_WINDOWS)
       UNICODE
       NOMINMAX
       WIN32_LEAN_AND_MEAN
-      MAGIC_ENUM_RANGE_MIN=0
-      MAGIC_ENUM_RANGE_MAX=255
   )
 
   # Allow more than default number of sections in object files.

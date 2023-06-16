@@ -78,7 +78,15 @@ struct UwbSessionData
     static UwbSessionData
     FromMsgPack(std::span<uint8_t> msgpack);
 
-    uint16_t sessionDataVersion{ 0 };
+    /**
+     * @brief Session data version v1.1 taken from example in FiRa Consortium
+     * Common Service Management Layer Technical Specification v1.0.0, Section
+     * 7.5.3.2, 'UWB Session Data structure',
+     * Table 53, page 103.
+     */
+    static constexpr uint16_t Version_1_1 = 0x0101;
+
+    uint16_t sessionDataVersion{ Version_1_1 };
     uint32_t sessionId{ 0 };
     uint32_t subSessionId{ 0 };
     UwbConfiguration uwbConfiguration{};
