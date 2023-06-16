@@ -1,4 +1,6 @@
 
+#include <magic_enum.hpp>
+#include <plog/Log.h>
 #include <uwb/protocols/fira/UwbConfigurationBuilder.hxx>
 #include <uwb/protocols/fira/UwbOobConversions.hxx>
 #include <uwb/protocols/fira/UwbSessionData.hxx>
@@ -164,9 +166,6 @@ uwb::protocol::fira::GetUwbSessionData(std::vector<UwbApplicationConfigurationPa
         case UwbApplicationConfigurationParameterType::DeviceType:
             deviceType = std::get<DeviceType>(parameterValue);
             break;
-        case UwbApplicationConfigurationParameterType::RangingRoundUsage:
-            // TODO
-            break;
         case UwbApplicationConfigurationParameterType::StsConfiguration:
             builder.SetStsConfiguration(std::get<StsConfiguration>(parameterValue));
             break;
@@ -175,9 +174,6 @@ uwb::protocol::fira::GetUwbSessionData(std::vector<UwbApplicationConfigurationPa
             break;
         case UwbApplicationConfigurationParameterType::ChannelNumber:
             builder.SetChannel(std::get<Channel>(parameterValue));
-            break;
-        case UwbApplicationConfigurationParameterType::NumberOfControlees:
-            // TODO
             break;
         case UwbApplicationConfigurationParameterType::DeviceMacAddress:
             // In case this parameter comes before DeviceType, store and set correct parameter later
@@ -188,7 +184,7 @@ uwb::protocol::fira::GetUwbSessionData(std::vector<UwbApplicationConfigurationPa
             // In case this parameter comes before DeviceType, store and set correct parameter later
             destinationMacAddresses = std::get<std::unordered_set<UwbMacAddress>>(parameterValue);
             // TODO: Do this correctly
-            builder.SetMacAddressControleeShort(*destinationMacAddresses.begin());
+            builder.SetMacAddressControleeShort(*std::begin(destinationMacAddresses));
             break;
         case UwbApplicationConfigurationParameterType::SlotDuration:
             builder.SetSlotDuration(std::get<uint16_t>(parameterValue));
@@ -196,26 +192,8 @@ uwb::protocol::fira::GetUwbSessionData(std::vector<UwbApplicationConfigurationPa
         case UwbApplicationConfigurationParameterType::RangingInterval:
             builder.SetRangingInterval(std::get<uint32_t>(parameterValue));
             break;
-        case UwbApplicationConfigurationParameterType::StsIndex:
-            // TODO
-            break;
         case UwbApplicationConfigurationParameterType::MacFcsType:
             builder.SetMacAddressFcsType(std::get<UwbMacAddressFcsType>(parameterValue));
-            break;
-        case UwbApplicationConfigurationParameterType::RangingRoundControl:
-            // TODO
-            break;
-        case UwbApplicationConfigurationParameterType::AoAResultRequest:
-            // TODO
-            break;
-        case UwbApplicationConfigurationParameterType::RangeDataNotificationConfig:
-            // TODO
-            break;
-        case UwbApplicationConfigurationParameterType::RangeDataNotificationProximityNear:
-            // TODO
-            break;
-        case UwbApplicationConfigurationParameterType::RangeDataNotificationProximityFar:
-            // TODO
             break;
         case UwbApplicationConfigurationParameterType::DeviceRole:
             builder.SetDeviceRole(std::get<DeviceRole>(parameterValue));
@@ -226,45 +204,28 @@ uwb::protocol::fira::GetUwbSessionData(std::vector<UwbApplicationConfigurationPa
         case UwbApplicationConfigurationParameterType::PreambleCodeIndex:
             builder.SetPreambleCodeIndex(std::get<uint8_t>(parameterValue));
             break;
-        case UwbApplicationConfigurationParameterType::SfdId:
-            // TODO
-            break;
-        case UwbApplicationConfigurationParameterType::PsduDataRate:
-            // TODO
-            break;
-        case UwbApplicationConfigurationParameterType::PreambleDuration:
-            // TODO
-            break;
         case UwbApplicationConfigurationParameterType::RangingTimeStruct:
             builder.SetRangingTimeStruct(std::get<RangingMode>(parameterValue));
             break;
         case UwbApplicationConfigurationParameterType::SlotsPerRangingRound:
             builder.SetMaxSlotsPerRangingRound(std::get<uint8_t>(parameterValue));
             break;
-        case UwbApplicationConfigurationParameterType::TxAdaptivePayloadPower:
-            // TODO
-            break;
-        case UwbApplicationConfigurationParameterType::ResponderSlotIndex:
-            // TODO
-            break;
         case UwbApplicationConfigurationParameterType::PrfMode:
-            if (std::get<PrfModeDetailed>(parameterValue) == PrfModeDetailed::Bprf62MHz) {
+            switch (std::get<PrfModeDetailed>(parameterValue)) {
+            case PrfModeDetailed::Bprf62MHz:
                 builder.SetPrfMode(PrfMode::Bprf);
-            } else { // PrfModeDetailed::Hprf124MHz || PrfModeDetailed::Hprf249MHz
+                break;
+            case PrfModeDetailed::Hprf124MHz:
+                [[fallthrough]];
+            case PrfModeDetailed::Hprf249MHz:
                 builder.SetPrfMode(PrfMode::Hprf);
+                break;
             }
-            break;
         case UwbApplicationConfigurationParameterType::ScheduledMode:
             builder.SetSchedulingMode(std::get<SchedulingMode>(parameterValue));
             break;
-        case UwbApplicationConfigurationParameterType::KeyRotation:
-            // TODO
-            break;
         case UwbApplicationConfigurationParameterType::KeyRotationRate:
             builder.SetKeyRotationRate(std::get<uint8_t>(parameterValue));
-            break;
-        case UwbApplicationConfigurationParameterType::SessionPriority:
-            // TODO
             break;
         case UwbApplicationConfigurationParameterType::MacAddressMode:
             builder.SetMacAddressType(std::get<UwbMacAddressType>(parameterValue));
@@ -275,20 +236,11 @@ uwb::protocol::fira::GetUwbSessionData(std::vector<UwbApplicationConfigurationPa
         case UwbApplicationConfigurationParameterType::StaticStsIv:
             sessionData.staticRangingInfo->InitializationVector = std::get<StaticStsInitializationVector>(parameterValue);
             break;
-        case UwbApplicationConfigurationParameterType::NumberOfStsSegments:
-            // TODO
-            break;
         case UwbApplicationConfigurationParameterType::MaxRangingRoundRetry:
             builder.SetMaxRangingRoundRetry(std::get<uint16_t>(parameterValue));
             break;
         case UwbApplicationConfigurationParameterType::UwbInitiationTime:
             builder.SetUwbInitiationTime(std::get<uint32_t>(parameterValue));
-            break;
-        case UwbApplicationConfigurationParameterType::HoppingMode:
-            // TODO
-            break;
-        case UwbApplicationConfigurationParameterType::BlockStrideLength:
-            // TODO
             break;
         case UwbApplicationConfigurationParameterType::ResultReportConfig: {
             auto resultReportConfigurations = std::get<std::unordered_set<ResultReportConfiguration>>(parameterValue);
@@ -297,23 +249,57 @@ uwb::protocol::fira::GetUwbSessionData(std::vector<UwbApplicationConfigurationPa
             }
             break;
         }
-        case UwbApplicationConfigurationParameterType::InBandTerminationAttemptCount:
-            // TODO
-            break;
         case UwbApplicationConfigurationParameterType::SubSessionId:
             sessionData.subSessionId = std::get<uint32_t>(parameterValue);
             break;
+        case UwbApplicationConfigurationParameterType::RangingRoundUsage:
+            [[fallthrough]];
+        case UwbApplicationConfigurationParameterType::NumberOfControlees:
+            [[fallthrough]];
+        case UwbApplicationConfigurationParameterType::StsIndex:
+            [[fallthrough]];
+        case UwbApplicationConfigurationParameterType::RangingRoundControl:
+            [[fallthrough]];
+        case UwbApplicationConfigurationParameterType::AoAResultRequest:
+            [[fallthrough]];
+        case UwbApplicationConfigurationParameterType::RangeDataNotificationConfig:
+            [[fallthrough]];
+        case UwbApplicationConfigurationParameterType::RangeDataNotificationProximityNear:
+            [[fallthrough]];
+        case UwbApplicationConfigurationParameterType::RangeDataNotificationProximityFar:
+            [[fallthrough]];
+        case UwbApplicationConfigurationParameterType::SfdId:
+            [[fallthrough]];
+        case UwbApplicationConfigurationParameterType::PsduDataRate:
+            [[fallthrough]];
+        case UwbApplicationConfigurationParameterType::PreambleDuration:
+            [[fallthrough]];
+        case UwbApplicationConfigurationParameterType::TxAdaptivePayloadPower:
+            [[fallthrough]];
+        case UwbApplicationConfigurationParameterType::ResponderSlotIndex:
+            [[fallthrough]];
+        case UwbApplicationConfigurationParameterType::KeyRotation:
+            [[fallthrough]];
+        case UwbApplicationConfigurationParameterType::SessionPriority:
+            [[fallthrough]];
+        case UwbApplicationConfigurationParameterType::NumberOfStsSegments:
+            [[fallthrough]];
+        case UwbApplicationConfigurationParameterType::HoppingMode:
+            [[fallthrough]];
+        case UwbApplicationConfigurationParameterType::BlockStrideLength:
+            [[fallthrough]];
+        case UwbApplicationConfigurationParameterType::InBandTerminationAttemptCount:
+            [[fallthrough]];
         case UwbApplicationConfigurationParameterType::BprfPhrDataRate:
-            // TODO
-            break;
+            [[fallthrough]];
         case UwbApplicationConfigurationParameterType::MaxNumberOfMeasurements:
-            // TODO
-            break;
+            [[fallthrough]];
         case UwbApplicationConfigurationParameterType::StsLength:
-            // TODO
+            [[fallthrough]];
+            PLOG_WARNING << "parameter type " << magic_enum::enum_name(parameterType) << " not implemented. Ignoring.";
             break;
         default:
-            // TODO: Log error
+            PLOG_ERROR << "Unknown parameter type: " << magic_enum::enum_name(parameterType);
             break;
         }
     }
@@ -322,9 +308,9 @@ uwb::protocol::fira::GetUwbSessionData(std::vector<UwbApplicationConfigurationPa
     //       Need to figure out how to do this correctly
     if (deviceType == DeviceType::Controller) {
         builder.SetMacAddressController(deviceMacAddress);
-        builder.SetMacAddressControleeShort(*destinationMacAddresses.begin());
+        builder.SetMacAddressControleeShort(*std::begin(destinationMacAddresses));
     } else { // DeviceType::Controlee
-        builder.SetMacAddressController(*destinationMacAddresses.begin());
+        builder.SetMacAddressController(*std::begin(destinationMacAddresses));
         builder.SetMacAddressControleeShort(deviceMacAddress);
     }
 

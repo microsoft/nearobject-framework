@@ -300,7 +300,7 @@ UwbSession::DestroyImpl()
 std::vector<uint8_t>
 UwbSession::GetOobDataObjectImpl()
 {
-    auto applicationConfigurationParameters = GetApplicationConfigurationParameters({});
+    auto applicationConfigurationParameters = GetApplicationConfigurationParameters(AllParameters);
     auto uwbSessionData = GetUwbSessionData(applicationConfigurationParameters);
 
     uwbSessionData.sessionId = GetId();

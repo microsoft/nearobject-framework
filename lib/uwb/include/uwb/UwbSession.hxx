@@ -135,6 +135,8 @@ public:
     void
     SetSessionStatus(const uwb::protocol::fira::UwbSessionStatus& status);
 
+    static constexpr std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> AllParameters = {};
+
     /**
      * @brief Get the application configuration parameters for this session.
      *

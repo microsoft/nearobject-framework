@@ -49,7 +49,7 @@ try {
 
     auto session = uwbDevice->CreateSession(rangingParameters.SessionId, deviceType, m_sessionEventCallbacks);
     session->Configure(rangingParameters.ApplicationConfigurationParameters);
-    auto applicationConfigurationParameters = session->GetApplicationConfigurationParameters({});
+    auto applicationConfigurationParameters = session->GetApplicationConfigurationParameters(uwb::UwbSession::AllParameters);
     PLOG_DEBUG << "Session Application Configuration Parameters: ";
     for (const auto& applicationConfigurationParameter : applicationConfigurationParameters) {
         PLOG_DEBUG << " > " << applicationConfigurationParameter.ToString();
