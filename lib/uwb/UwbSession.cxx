@@ -15,10 +15,10 @@ using namespace uwb::protocol::fira;
 const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> UwbSession::AllParameters = {};
 
 UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<UwbDevice> device, std::weak_ptr<UwbSessionEventCallbacks> callbacks, DeviceType deviceType) :
-    m_uwbMacAddressSelf(UwbMacAddress::Random<UwbMacAddressType::Extended>()),
-    m_callbacks(std::move(callbacks)),
     m_deviceType{ deviceType },
     m_sessionId(sessionId),
+    m_uwbMacAddressSelf(UwbMacAddress::Random<UwbMacAddressType::Extended>()),
+    m_callbacks(std::move(callbacks)),
     m_device(std::move(device))
 {}
 
