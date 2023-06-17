@@ -110,19 +110,6 @@ UwbDevice::OnDeviceStatusChanged(UwbStatusDevice statusDevice)
     }
 }
 
-void
-UwbDevice::OnSessionStatusChanged(UwbSessionStatus statusSession)
-{
-    // TODO should this be something that the session handles itself?
-    auto session = FindSession(statusSession.SessionId);
-    if (!session) {
-        PLOG_WARNING << "Ignoring StatusChanged event due to missing session";
-        return;
-    }
-
-    session->SetSessionStatus(statusSession);
-}
-
 std::shared_ptr<UwbSession>
 UwbDevice::CreateSession(uint32_t sessionId, uwb::protocol::fira::DeviceType deviceType, std::weak_ptr<UwbSessionEventCallbacks> callbacks)
 {
