@@ -919,6 +919,18 @@ UwbConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData ranging
 }
 
 void
+UwbConnector::OnStatusChanged(::uwb::protocol::fira::UwbStatus uwbStatus)
+{
+    InvokeCallbacks(m_onStatusChangedCallbacks, uwbStatus);
+}
+
+void
+UwbConnector::OnDeviceStatusChanged(::uwb::protocol::fira::UwbStatusDevice uwbStatusDevice)
+{
+    InvokeCallbacks(m_onDeviceStatusChangedCallbacks, uwbStatusDevice);
+}
+
+void
 UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNotificationData)
 {
     PLOG_INFO << "Received Notification: " << ToString(uwbNotificationData) << "\n";
@@ -929,9 +941,9 @@ UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNo
         using ValueType = std::decay_t<decltype(arg)>;
 
         if constexpr (std::is_same_v<ValueType, UwbStatus>) {
-            InvokeCallbacks(m_onStatusChangedCallbacks, arg);
+            OnStatusChanged(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbStatusDevice>) {
-            InvokeCallbacks(m_onDeviceStatusChangedCallbacks, arg);
+            OnDeviceStatusChanged(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionStatus>) {
             OnSessionStatusChanged(arg.SessionId, arg.State, arg.ReasonCode);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionUpdateMulticastListStatus>) {

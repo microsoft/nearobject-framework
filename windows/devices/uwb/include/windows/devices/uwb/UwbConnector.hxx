@@ -188,6 +188,24 @@ private:
     DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNotificationData);
 
     /**
+     * @brief Responsible for calling the relevant registered callbacks for the
+     * status changed event.
+     * 
+     * @param uwbStatus The status value.
+     */
+    void
+    OnStatusChanged(::uwb::protocol::fira::UwbStatus uwbStatus);
+
+    /**
+     * @brief Responsible for calling the relevant registered callbacks for the
+     * device status changed event.
+     * 
+     * @param uwbDeviceStatus The new device status.
+     */
+    void
+    OnDeviceStatusChanged(::uwb::protocol::fira::UwbStatusDevice uwbStatusDevice);
+
+    /**
      * @brief Responsible for calling the relevant registered callbacks for the session ended event.
      * This function assumes the caller is holding the m_eventCallbacksGate
      *
