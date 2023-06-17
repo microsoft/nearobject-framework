@@ -35,7 +35,7 @@ struct RegisteredCallbackToken
                 PLOG_WARNING << "empty callback token";
                 return;
             }
-            return deregister(this);
+            deregister(this);
         })
     {}
     virtual ~RegisteredCallbackToken() = default;
