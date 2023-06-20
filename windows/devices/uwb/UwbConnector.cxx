@@ -1228,13 +1228,14 @@ UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackTok
     if (!tokenShared) {
         return;
     }
+
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
 
     auto callbacksPresentPrior = CallbacksPresent();
 
     tokenShared->Deregister();
 
-    if ((!CallbacksPresent()) && callbacksPresentPrior) {
+    if (!CallbacksPresent() && callbacksPresentPrior) {
         NotificationListenerStop();
     }
 }
