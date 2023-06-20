@@ -42,25 +42,6 @@ UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> devic
             callbacks->OnSessionStatusChanged(this, state, reasonCode);
             return false;
         });
-    m_onRangingStartedCallback = std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted>([this]() {
-        auto callbacks = ResolveEventCallbacks();
-        if (callbacks == nullptr) {
-            PLOG_WARNING << "missing session event callback for ranging started, skipping";
-            return true;
-        }
-        callbacks->OnRangingStarted(this);
-        return false;
-    });
-    m_onRangingStoppedCallback =
-        std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped>([this]() {
-            auto callbacks = ResolveEventCallbacks();
-            if (callbacks == nullptr) {
-                PLOG_WARNING << "missing session event callback for ranging stopped, skipping";
-                return true;
-            }
-            callbacks->OnRangingStopped(this);
-            return false;
-        });
     m_onPeerPropertiesChangedCallback =
         std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged>([this](std::vector<::uwb::UwbPeer> peersChanged) {
             auto callbacks = ResolveEventCallbacks();
@@ -82,7 +63,7 @@ UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> devic
             return false;
         });
 
-    m_registeredCallbacksTokens = m_uwbSessionConnector->RegisterSessionEventCallbacks(m_sessionId, { m_onSessionEndedCallback, m_onSessionStatusChangedCallback, m_onRangingStartedCallback, m_onRangingStoppedCallback, m_onPeerPropertiesChangedCallback, m_onSessionMembershipChangedCallback });
+    m_registeredCallbacksTokens = m_uwbSessionConnector->RegisterSessionEventCallbacks(m_sessionId, { m_onSessionEndedCallback, m_onSessionStatusChangedCallback, m_onPeerPropertiesChangedCallback, m_onSessionMembershipChangedCallback });
 }
 
 UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> device, std::shared_ptr<IUwbSessionDdiConnector> uwbSessionConnector, ::uwb::protocol::fira::DeviceType deviceType) :

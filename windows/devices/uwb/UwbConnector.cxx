@@ -72,20 +72,6 @@ struct OnSessionStatusChangedToken : public RegisteredSessionCallbackToken
         Callback(std::move(callback)){};
     std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionStatusChanged> Callback;
 };
-struct OnRangingStartedToken : public RegisteredSessionCallbackToken
-{
-    OnRangingStartedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted> callback, std::function<void(RegisteredCallbackToken*)> deregister) :
-        RegisteredSessionCallbackToken(std::move(deregister), sessionId),
-        Callback(std::move(callback)){};
-    std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted> Callback;
-};
-struct OnRangingStoppedToken : public RegisteredSessionCallbackToken
-{
-    OnRangingStoppedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped> callback, std::function<void(RegisteredCallbackToken*)> deregister) :
-        RegisteredSessionCallbackToken(std::move(deregister), sessionId),
-        Callback(std::move(callback)){};
-    std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped> Callback;
-};
 struct OnPeerPropertiesChangedToken : public RegisteredSessionCallbackToken
 {
     OnPeerPropertiesChangedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged> callback, std::function<void(RegisteredCallbackToken*)> deregister) :
@@ -1188,30 +1174,6 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbRegist
             return token;
         });
 
-    auto OnRangingStartedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted>(
-        sessionId, callbacks, [](auto&& callbackStruct) {
-            return callbackStruct.OnRangingStarted;
-        },
-        [this](uint32_t sessionId, auto&& callback) {
-            auto token = std::make_shared<::uwb::OnRangingStartedToken>(sessionId, callback, [this](::uwb::RegisteredCallbackToken* token) {
-                DeregisterSessionEventCallback(token, m_onRangingStartedCallbacks);
-            });
-            InsertSessionToken(m_onRangingStartedCallbacks, sessionId, token);
-            return token;
-        });
-
-    auto OnRangingStoppedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped>(
-        sessionId, callbacks, [](auto&& callbackStruct) {
-            return callbackStruct.OnRangingStopped;
-        },
-        [this](uint32_t sessionId, auto&& callback) {
-            auto token = std::make_shared<::uwb::OnRangingStoppedToken>(sessionId, callback, [this](::uwb::RegisteredCallbackToken* token) {
-                DeregisterSessionEventCallback(token, m_onRangingStoppedCallbacks);
-            });
-            InsertSessionToken(m_onRangingStoppedCallbacks, sessionId, token);
-            return token;
-        });
-
     auto OnPeerPropertiesChangedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged>(
         sessionId, callbacks, [](auto&& callbackStruct) {
             return callbackStruct.OnPeerPropertiesChanged;
@@ -1223,6 +1185,7 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbRegist
             InsertSessionToken(m_onPeerPropertiesChangedCallbacks, sessionId, token);
             return token;
         });
+
     auto OnSessionMembershipChangedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionMembershipChanged>(
         sessionId, callbacks, [](auto&& callbackStruct) {
             return callbackStruct.OnSessionMembershipChanged;
@@ -1235,15 +1198,13 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbRegist
             return token;
         });
 
-    if (noCallbacksPrior and CallbacksPresent()) {
+    if (noCallbacksPrior && CallbacksPresent()) {
         NotificationListenerStart();
     }
 
     return {
         OnSessionEndedToken,
         OnSessionStatusChangedToken,
-        OnRangingStartedToken,
-        OnRangingStoppedToken,
         OnPeerPropertiesChangedToken,
         OnSessionMembershipChangedToken
     };
@@ -1252,16 +1213,19 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbRegist
 bool
 UwbConnector::CallbacksPresent()
 {
-    return not(m_onSessionEndedCallbacks.empty() and m_onRangingStartedCallbacks.empty() and
-        m_onRangingStoppedCallbacks.empty() and m_onPeerPropertiesChangedCallbacks.empty() and m_onSessionMembershipChangedCallbacks.empty() and
-        m_onStatusChangedCallbacks.empty() and m_onDeviceStatusChangedCallbacks.empty() and m_onSessionStatusChangedCallbacks.empty());
-}
+    return !m_onSessionEndedCallbacks.empty()
+        || !m_onSessionStatusChangedCallbacks.empty()
+        || !m_onPeerPropertiesChangedCallbacks.empty()
+        || !m_onSessionMembershipChangedCallbacks.empty()
+        || !m_onStatusChangedCallbacks.empty()
+        || !m_onDeviceStatusChangedCallbacks.empty();
+ }
 
 void
 UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackToken> token)
 {
     auto tokenShared = token.lock();
-    if (not tokenShared) {
+    if (!tokenShared) {
         return;
     }
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
@@ -1270,7 +1234,7 @@ UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackTok
 
     tokenShared->Deregister();
 
-    if ((not CallbacksPresent()) and callbacksPresentPrior) {
+    if ((!CallbacksPresent()) && callbacksPresentPrior) {
         NotificationListenerStop();
     }
 }
