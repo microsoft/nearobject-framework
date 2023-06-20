@@ -329,7 +329,7 @@ private:
 protected:
     uwb::protocol::fira::DeviceType m_deviceType{ uwb::protocol::fira::DeviceType::Controller };
     uint32_t m_sessionId{ 0 };
-    uwb::protocol::fira::UwbSessionState m_state{ uwb::protocol::fira::UwbSessionState::Deinitialized };
+    std::atomic<uwb::protocol::fira::UwbSessionState> m_state{ uwb::protocol::fira::UwbSessionState::Deinitialized };
     UwbMacAddressType m_uwbMacAddressType{ UwbMacAddressType::Extended };
     UwbMacAddress m_uwbMacAddressSelf;
     std::atomic<bool> m_rangingActive{ false };
