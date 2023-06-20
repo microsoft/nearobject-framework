@@ -43,6 +43,13 @@ private:
 private:
     std::vector<std::shared_ptr<windows::devices::uwb::UwbDevice>> m_uwbDevices;
     winrt::Windows::Devices::NearObject::INearObjectSessionClient m_sessionClient;
+
+    // Event handler tokens.
+    winrt::Windows::Devices::NearObject::INearObjectSessionEventProducer::SessionEnded_revoker m_sessionEndedEventToken;
+    winrt::Windows::Devices::NearObject::INearObjectSessionEventProducer::RangingStarted_revoker m_rangingStartedEventToken;
+    winrt::Windows::Devices::NearObject::INearObjectSessionEventProducer::RangingStopped_revoker m_rangingStoppedEventToken;
+    winrt::Windows::Devices::NearObject::INearObjectSessionEventProducer::PeerPropertiesChanged_revoker m_peerPropertiesChangedEventToken;
+    winrt::Windows::Devices::NearObject::INearObjectSessionEventProducer::SessionMembershipChanged_revoker m_sessionMemembershipChangedEventToken;
 };
 } // namespace nearobject::cli
 

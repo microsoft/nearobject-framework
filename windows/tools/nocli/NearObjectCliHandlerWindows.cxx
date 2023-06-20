@@ -1,4 +1,5 @@
 
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <limits>
@@ -14,9 +15,9 @@
 #include <windows/devices/uwb/UwbDevice.hxx>
 #include <windows/devices/uwb/UwbDeviceDriver.hxx>
 
+#include <winrt/Windows.Foundation.Collections.h>
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Storage.Streams.h>
-#include <winrt/windows.devices.nearobject.h>
 
 #include "NearObjectCliDataWindows.hxx"
 #include "NearObjectCliHandlerWindows.hxx"
@@ -167,6 +168,45 @@ NearObjectCliHandlerWindows::HandleStartRanging(::uwb::protocol::fira::DeviceTyp
     } else if (deviceType == DeviceType::Controller) {
         m_sessionClient = sessionCreateResult.HostClient();
     }
+
+    auto session = sessionCreateResult.Session();
+
+    // Register event handlers.
+    m_sessionEndedEventToken = session.SessionEnded(winrt::auto_revoke, [&](auto&& sender, auto&& sessionEndedEventArgs) {
+        PLOG_INFO << std::format("session {} ended, reason={}", session.Id(), magic_enum::enum_name(sessionEndedEventArgs.EndReason()));
+    });
+    m_rangingStartedEventToken = session.RangingStarted(winrt::auto_revoke, [&](auto&& sender, [[maybe_unused]] auto&& rangingStartedEventArgs) {
+        PLOG_INFO << std::format("sesion {} ranging started", session.Id());
+    });
+    m_rangingStoppedEventToken = session.RangingStopped(winrt::auto_revoke, [&]([[maybe_unused]] auto&& sender, [[maybe_unused]] auto&& rangingStoppedEventArgs) {
+        PLOG_INFO << std::format("sesion {} ranging stopped", session.Id());
+    });
+    m_peerPropertiesChangedEventToken = session.PeerPropertiesChanged(winrt::auto_revoke, [&](auto&& sender, auto&& peerPropertiesChangedEventArgs) {
+        PLOG_INFO << std::format("session {} peer properties changed:", session.Id());
+        for (auto&& nearObject : peerPropertiesChangedEventArgs.NearObjectsChanged()) {
+            auto spatialProperties = nearObject.SpatialProperties();
+            auto distance = spatialProperties.Distance();
+            auto angleAzimuth = spatialProperties.AngleAzimuth();
+            auto angleElevation = spatialProperties.AngleElevation();
+            auto elevation = spatialProperties.Elevation();
+            PLOG_INFO << std::format("Distance {} AngleAzimuth {} AngleElevation {} Elevation {}",
+                (distance != nullptr) ? std::to_string(distance.GetDouble()) : std::string("-"),
+                (angleAzimuth != nullptr) ? std::to_string(angleAzimuth.GetDouble()) : std::string("-"),
+                (angleElevation != nullptr) ? std::to_string(angleElevation.GetDouble()) : std::string("-"),
+                (elevation != nullptr) ? std::to_string(elevation.GetDouble()) : "-");
+        }
+    });
+    m_sessionMemembershipChangedEventToken = session.SessionMembershipChanged(winrt::auto_revoke, [&](auto&& sender, auto&& sessionMembershipChangedEventArgs) {
+        auto nearObjectsAdded = sessionMembershipChangedEventArgs.NearObjectsAdded();
+        auto nearObjectsRemoved = sessionMembershipChangedEventArgs.NearObjectsRemoved();
+        PLOG_INFO << std::format("session {} session membership changed: +{} -{}", session.Id(), nearObjectsAdded.Size(), nearObjectsRemoved.Size());
+        for (auto&& nearObjectAdded : nearObjectsAdded) {
+            // TODO: print out mac address when added to NearObject
+        }
+        for (auto&& nearObjectRemoved : nearObjectsRemoved) {
+            // TODO: print out mac address when added to NearObject
+        }
+    });
 
     // Start the ranging session
     if (m_sessionClient != nullptr) {
