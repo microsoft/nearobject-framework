@@ -22,6 +22,11 @@ namespace UwbRegisteredSessionEventCallbackTypes
 using OnSessionEnded = std::function<bool(::uwb::UwbSessionEndReason reason)>;
 
 /**
+ * @brief Invoked when the session status changes. 
+ */
+using OnSessionStatusChanged = std::function<bool(::uwb::protocol::fira::UwbSessionState, std::optional<::uwb::protocol::fira::UwbSessionReasonCode>)>;
+
+/**
  * @brief Invoked when active ranging starts.
  * @return true if this callback needs to be deregistered
  */
@@ -96,6 +101,11 @@ struct UwbRegisteredSessionEventCallbacks
     std::weak_ptr<UwbRegisteredSessionEventCallbackTypes::OnSessionEnded> OnSessionEnded;
 
     /**
+     * @brief Invoked when the session status changes.
+     */
+    std::weak_ptr<UwbRegisteredSessionEventCallbackTypes::OnSessionStatusChanged> OnStatusChanged;
+
+    /**
      * @brief Invoked when active ranging starts.
      *
      */
@@ -145,13 +155,6 @@ struct UwbRegisteredDeviceEventCallbacks
      * @param statusDevice
      */
     std::weak_ptr<UwbRegisteredDeviceEventCallbackTypes::OnDeviceStatusChanged> OnDeviceStatusChanged;
-
-    /**
-     * @brief Invoked when the status of a session changes.
-     *
-     * @param statusSession The new status of the session.
-     */
-    std::weak_ptr<UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged> OnSessionStatusChanged;
 };
 
 /**
@@ -167,6 +170,7 @@ class RegisteredCallbackToken;
 struct UwbRegisteredSessionEventCallbackTokens
 {
     std::weak_ptr<RegisteredCallbackToken> OnSessionEndedToken;
+    std::weak_ptr<RegisteredCallbackToken> OnSessionStatusChangedToken;
     std::weak_ptr<RegisteredCallbackToken> OnRangingStartedToken;
     std::weak_ptr<RegisteredCallbackToken> OnRangingStoppedToken;
     std::weak_ptr<RegisteredCallbackToken> OnPeerPropertiesChangedToken;
@@ -181,7 +185,6 @@ struct UwbRegisteredDeviceEventCallbackTokens
 {
     std::weak_ptr<RegisteredCallbackToken> OnStatusChangedToken;
     std::weak_ptr<RegisteredCallbackToken> OnDeviceStatusChangedToken;
-    std::weak_ptr<RegisteredCallbackToken> OnSessionStatusChangedToken;
 };
 
 } // namespace uwb

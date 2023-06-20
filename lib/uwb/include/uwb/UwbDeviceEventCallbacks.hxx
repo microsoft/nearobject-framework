@@ -33,14 +33,6 @@ struct UwbDeviceEventCallbacks
      */
     virtual void
     OnDeviceStatusChanged(::uwb::protocol::fira::UwbStatusDevice statusDevice) = 0;
-
-    /**
-     * @brief Invoked when the status of a session changes.
-     *
-     * @param statusSession The new status of the session.
-     */
-    virtual void
-    OnSessionStatusChanged(::uwb::protocol::fira::UwbSessionStatus statusSession) = 0;
 };
 } // namespace uwb
 

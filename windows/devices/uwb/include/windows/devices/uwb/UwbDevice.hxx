@@ -158,7 +158,6 @@ private:
     std::shared_ptr<IUwbSessionDdiConnector> m_uwbSessionConnector;
     std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged> m_onStatusChangedCallback;
     std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnDeviceStatusChanged> m_onDeviceStatusChangedCallback;
-    std::shared_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged> m_onSessionStatusChangedCallback;
     ::uwb::UwbRegisteredDeviceEventCallbackTokens m_callbacksToken;
 };
 } // namespace windows::devices::uwb
