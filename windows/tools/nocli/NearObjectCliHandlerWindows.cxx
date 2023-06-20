@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
-#include <string>
+#include <optional>
 #include <string_view>
 
 #include <magic_enum.hpp>
@@ -185,15 +185,15 @@ NearObjectCliHandlerWindows::HandleStartRanging(::uwb::protocol::fira::DeviceTyp
         PLOG_INFO << std::format("session {} peer properties changed:", session.Id());
         for (auto&& nearObject : peerPropertiesChangedEventArgs.NearObjectsChanged()) {
             auto spatialProperties = nearObject.SpatialProperties();
-            auto distance = spatialProperties.Distance();
-            auto angleAzimuth = spatialProperties.AngleAzimuth();
-            auto angleElevation = spatialProperties.AngleElevation();
-            auto elevation = spatialProperties.Elevation();
+            std::optional<double> distance = spatialProperties.Distance();
+            std::optional<double> angleAzimuth = spatialProperties.AngleAzimuth();
+            std::optional<double> angleElevation = spatialProperties.AngleElevation();
+            std::optional<double> elevation = spatialProperties.Elevation();
             PLOG_INFO << std::format("Distance {} AngleAzimuth {} AngleElevation {} Elevation {}",
-                (distance != nullptr) ? std::to_string(distance.GetDouble()) : std::string("-"),
-                (angleAzimuth != nullptr) ? std::to_string(angleAzimuth.GetDouble()) : std::string("-"),
-                (angleElevation != nullptr) ? std::to_string(angleElevation.GetDouble()) : std::string("-"),
-                (elevation != nullptr) ? std::to_string(elevation.GetDouble()) : "-");
+                distance.has_value() ? std::to_string(distance.value()) : std::string("-"),
+                angleAzimuth.has_value() ? std::to_string(angleAzimuth.value()) : std::string("-"),
+                angleElevation.has_value() ? std::to_string(angleElevation.value()) : std::string("-"),
+                elevation.has_value() ? std::to_string(elevation.value()) : "-");
         }
     });
     m_sessionMemembershipChangedEventToken = session.SessionMembershipChanged(winrt::auto_revoke, [&](auto&& sender, auto&& sessionMembershipChangedEventArgs) {
