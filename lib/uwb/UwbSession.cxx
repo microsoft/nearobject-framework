@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <stdexcept>
 
+#include <magic_enum.hpp>
 #include <plog/Log.h>
 
 #include <uwb/UwbSession.hxx>
@@ -42,7 +43,7 @@ UwbSession::SetEventCallbacks(std::weak_ptr<UwbSessionEventCallbacks> callbacks)
     }
 
     if (callbacks.lock() != nullptr) {
-        LOG_WARNING << "Session with id " << m_sessionId << " callbacks were replaced";
+        LOG_WARNING << "session " << m_sessionId << " callbacks were replaced";
     }
 }
 
@@ -76,7 +77,7 @@ UwbStatus
 UwbSession::TryAddControlee(UwbMacAddress controleeMacAddress)
 {
     std::scoped_lock peersLock{ m_peerGate };
-    PLOG_VERBOSE << "Session with id " << m_sessionId << " requesting to add controlee with mac address " << controleeMacAddress.ToString();
+    PLOG_VERBOSE << "session " << m_sessionId << " requesting to add controlee with mac address " << controleeMacAddress.ToString();
 
     auto uwbStatus = TryAddControleeImpl(std::move(controleeMacAddress));
     return uwbStatus;
@@ -85,14 +86,14 @@ UwbSession::TryAddControlee(UwbMacAddress controleeMacAddress)
 void
 UwbSession::Configure(const std::vector<protocol::fira::UwbApplicationConfigurationParameter> configParams)
 {
-    PLOG_VERBOSE << "configure session with id " << m_sessionId;
+    PLOG_VERBOSE << "session " << m_sessionId << " configure";
     try {
         ConfigureImpl(configParams);
     } catch (UwbException& uwbException) {
-        PLOG_ERROR << "error configuring session with id " << m_sessionId << ", status=" << ToString(uwbException.Status);
+        PLOG_ERROR << "error configuring session " << m_sessionId << ", status=" << ToString(uwbException.Status);
         throw uwbException;
     } catch (std::exception& e) {
-        PLOG_ERROR << "error configuring session with id " << m_sessionId << ", unexpected exception status=" << e.what();
+        PLOG_ERROR << "error configuring session " << m_sessionId << ", unexpected exception status=" << e.what();
         throw e;
     }
 }
@@ -100,7 +101,7 @@ UwbSession::Configure(const std::vector<protocol::fira::UwbApplicationConfigurat
 void
 UwbSession::StartRanging()
 {
-    PLOG_VERBOSE << "start ranging";
+    PLOG_VERBOSE << "session " << m_sessionId << " start ranging";
     bool rangingActiveExpected = false;
     const bool wasRangingInactive = m_rangingActive.compare_exchange_weak(rangingActiveExpected, true);
     if (wasRangingInactive) {
@@ -111,7 +112,7 @@ UwbSession::StartRanging()
 void
 UwbSession::StopRanging()
 {
-    PLOG_VERBOSE << "stop ranging";
+    PLOG_VERBOSE << "session " << m_sessionId << " stop ranging";
     bool rangingActiveExpected = true;
     const bool wasRangingActive = m_rangingActive.compare_exchange_weak(rangingActiveExpected, false);
     if (wasRangingActive) {
@@ -120,50 +121,80 @@ UwbSession::StopRanging()
 }
 
 void
-UwbSession::SetSessionStatus(const uwb::protocol::fira::UwbSessionStatus& status)
-{
-    PLOG_VERBOSE << "session changed state: " << m_sessionStatus.ToString() << " --> " << status.ToString();
-    m_sessionStatus = status;
-}
-
-void
 UwbSession::InsertPeerImpl(const uwb::UwbMacAddress& peerAddress)
 {
     m_peers.insert(peerAddress);
-    PLOG_VERBOSE << "Session with id " << m_sessionId << " added peer via DDI with mac address " << peerAddress.ToString();
+    PLOG_VERBOSE << "session " << m_sessionId << " added peer via DDI with mac address " << peerAddress.ToString();
 }
 
 std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter>
 UwbSession::GetApplicationConfigurationParameters(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameterType> requestedTypes)
 {
-    PLOG_VERBOSE << "get application configuration parameters";
+    PLOG_VERBOSE << "session " << m_sessionId << " get application configuration parameters";
     return GetApplicationConfigurationParametersImpl(std::move(requestedTypes));
 }
 
 void
 UwbSession::SetApplicationConfigurationParameters(std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> uwbApplicationConfigurationParameters)
 {
-    PLOG_VERBOSE << "set application configuration parameters";
+    PLOG_VERBOSE << "session " << m_sessionId << " set application configuration parameters";
     return SetApplicationConfigurationParametersImpl(std::move(uwbApplicationConfigurationParameters));
 }
 
 UwbSessionState
 UwbSession::GetSessionState()
 {
-    PLOG_VERBOSE << "get session state";
+    PLOG_VERBOSE << "session " << m_sessionId << " get state";
     return GetSessionStateImpl();
 }
 
 void
 UwbSession::Destroy()
 {
-    PLOG_VERBOSE << "destroy session with id " << m_sessionId;
+    PLOG_VERBOSE << "session " << m_sessionId << " destroy";
     DestroyImpl();
 }
 
 std::vector<uint8_t>
 UwbSession::GetOobDataObject()
 {
-    PLOG_VERBOSE << "get OOB data object";
+    PLOG_VERBOSE << "session " << m_sessionId << " get OOB data object";
     return GetOobDataObjectImpl();
+}
+
+void
+UwbSession::OnSessionStateChanged(std::shared_ptr<uwb::UwbSessionEventCallbacks> callbacks, ::uwb::protocol::fira::UwbSessionState state, std::optional<::uwb::protocol::fira::UwbSessionReasonCode> reasonCode)
+{
+    const auto stateOld = m_state.exchange(state);
+
+    PLOG_VERBOSE << "session " << m_sessionId << " changed state: " << magic_enum::enum_name(stateOld) << " --> " << magic_enum::enum_name(state);
+
+    // Check if the session transitioned into the ranging state.
+    if (stateOld != UwbSessionState::Active && state == UwbSessionState::Active) {
+        callbacks->OnRangingStarted(this);
+    // Check if the session transitioned out of the ranging state.
+    } else if (stateOld == UwbSessionState::Active && state != UwbSessionState::Active) {
+        callbacks->OnRangingStopped(this);
+    }
+}
+
+void
+UwbSession::OnSessionEnded(std::shared_ptr<uwb::UwbSessionEventCallbacks> callbacks, ::uwb::UwbSessionEndReason reason)
+{
+    PLOG_VERBOSE << "session " << m_sessionId << " ended";
+    callbacks->OnSessionEnded(this, reason);
+}
+
+void
+UwbSession::OnPeerPropertiesChanged(std::shared_ptr<uwb::UwbSessionEventCallbacks> callbacks, std::vector<::uwb::UwbPeer> peersChanged)
+{
+    PLOG_VERBOSE << "session " << m_sessionId << " peer properties changed";
+    callbacks->OnPeerPropertiesChanged(this, std::move(peersChanged));
+}
+
+void
+UwbSession::OnSessionMembershipChanged(std::shared_ptr<uwb::UwbSessionEventCallbacks> callbacks, std::vector<::uwb::UwbPeer> peersAdded, std::vector<::uwb::UwbPeer> peersRemoved)
+{
+    PLOG_VERBOSE << "session " << m_sessionId << " session membership changed";
+    callbacks->OnSessionMembershipChanged(this, std::move(peersAdded), std::move(peersRemoved));
 }

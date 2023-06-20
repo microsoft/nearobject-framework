@@ -1,5 +1,4 @@
 
-#include <iomanip>
 #include <iostream>
 #include <nearobject/cli/NearObjectCliUwbSessionEventCallbacks.hxx>
 #include <notstd/tostring.hxx>
@@ -14,46 +13,10 @@ NearObjectCliUwbSessionEventCallbacks::NearObjectCliUwbSessionEventCallbacks(std
     m_onSessionEndedCallback(std::move(onSessionEndedCallback))
 {}
 
-namespace
-{
-/**
- * @brief Helper stream manipulator to add a common log prefix.
- */
-class LogPrefix
-{
-public:
-    LogPrefix(uint32_t sessionId) :
-        m_sessionId(sessionId) {}
-
-    std::ostream&
-    operator()(std::ostream& out) const
-    {
-        return out << "[Session " << std::setw(10) << std::setfill(' ') << std::right << m_sessionId << "]: ";
-    }
-
-private:
-    uint32_t m_sessionId;
-};
-
-/**
- * @brief Stream specialization taking a LogPrefix argument, allowing
- * std::ostream << LogPrefix(value).
- *
- * @param out The stream to manipulate.
- * @param logPrefix The instance to manipulate the stream.
- * @return std::ostream&
- */
-std::ostream&
-operator<<(std::ostream& out, LogPrefix logPrefix)
-{
-    return logPrefix(out);
-}
-} // namespace
-
 void
 NearObjectCliUwbSessionEventCallbacks::OnSessionEnded(::uwb::UwbSession* session, ::uwb::UwbSessionEndReason reason)
 {
-    PLOG_VERBOSE << LogPrefix(session->GetId()) << "Session Ended (" << magic_enum::enum_name(reason) << ")";
+    PLOG_VERBOSE << "Session " << session->GetId() << " ended (" << magic_enum::enum_name(reason) << ")";
 
     if (m_onSessionEndedCallback) {
         m_onSessionEndedCallback();
@@ -61,28 +24,21 @@ NearObjectCliUwbSessionEventCallbacks::OnSessionEnded(::uwb::UwbSession* session
 }
 
 void
-NearObjectCliUwbSessionEventCallbacks::OnSessionStatusChanged(::uwb::UwbSession* session, ::uwb::protocol::fira::UwbSessionState state, std::optional<::uwb::protocol::fira::UwbSessionReasonCode> reasonCode)
-{
-    const auto reasonStr = reasonCode.has_value() ? magic_enum::enum_name(reasonCode.value()) : "None";
-    PLOG_VERBOSE << LogPrefix(session->GetId()) << "Session State Changed to '" << magic_enum::enum_name(state) << "' (Reason=" << reasonStr << ")";
-}
-
-void
 NearObjectCliUwbSessionEventCallbacks::OnRangingStarted(::uwb::UwbSession* session)
 {
-    PLOG_VERBOSE << LogPrefix(session->GetId()) << "Ranging Started";
+    PLOG_VERBOSE << "Session " << session->GetId() << " ranging started";
 }
 
 void
 NearObjectCliUwbSessionEventCallbacks::OnRangingStopped(::uwb::UwbSession* session)
 {
-    PLOG_VERBOSE << LogPrefix(session->GetId()) << "Ranging Stopped";
+    PLOG_VERBOSE << "Session " << session->GetId() << " ranging stopped";
 }
 
 void
 NearObjectCliUwbSessionEventCallbacks::OnPeerPropertiesChanged(::uwb::UwbSession* session, std::vector<::uwb::UwbPeer> peersChanged)
 {
-    PLOG_VERBOSE << LogPrefix(session->GetId()) << "Peer Properties Changed";
+    PLOG_VERBOSE << "Session " << session->GetId() << " peer properties changed";
 
     for (const auto& peer : peersChanged) {
         PLOG_VERBOSE << " " << peer.ToString();
@@ -92,7 +48,7 @@ NearObjectCliUwbSessionEventCallbacks::OnPeerPropertiesChanged(::uwb::UwbSession
 void
 NearObjectCliUwbSessionEventCallbacks::OnSessionMembershipChanged(::uwb::UwbSession* session, std::vector<::uwb::UwbPeer> peersAdded, std::vector<::uwb::UwbPeer> peersRemoved)
 {
-    PLOG_VERBOSE << LogPrefix(session->GetId()) << "Membership Changed";
+    PLOG_VERBOSE << "Session " << session->GetId() << " session membership changed";
 
     for (const auto& peer : peersAdded) {
         PLOG_VERBOSE << "+" << peer.GetAddress().ToString();

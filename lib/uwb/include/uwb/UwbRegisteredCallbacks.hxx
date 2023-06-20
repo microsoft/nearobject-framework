@@ -27,18 +27,6 @@ using OnSessionEnded = std::function<bool(::uwb::UwbSessionEndReason reason)>;
 using OnSessionStatusChanged = std::function<bool(::uwb::protocol::fira::UwbSessionState, std::optional<::uwb::protocol::fira::UwbSessionReasonCode>)>;
 
 /**
- * @brief Invoked when active ranging starts.
- * @return true if this callback needs to be deregistered
- */
-using OnRangingStarted = std::function<bool()>;
-
-/**
- * @brief Invoked when active ranging stops.
- * @return true if this callback needs to be deregistered
- */
-using OnRangingStopped = std::function<bool()>;
-
-/**
  * @brief Invoked when the properties of a peer involved in the session
  * changes. This includes the spatial properties of the peer(s).
  *
@@ -106,18 +94,6 @@ struct UwbRegisteredSessionEventCallbacks
     std::weak_ptr<UwbRegisteredSessionEventCallbackTypes::OnSessionStatusChanged> OnStatusChanged;
 
     /**
-     * @brief Invoked when active ranging starts.
-     *
-     */
-    std::weak_ptr<UwbRegisteredSessionEventCallbackTypes::OnRangingStarted> OnRangingStarted;
-
-    /**
-     * @brief Invoked when active ranging stops.
-     *
-     */
-    std::weak_ptr<UwbRegisteredSessionEventCallbackTypes::OnRangingStopped> OnRangingStopped;
-
-    /**
      * @brief Invoked when the properties of a peer involved in the session
      * changes. This includes the spatial properties of the peer(s).
      *
@@ -171,8 +147,6 @@ struct UwbRegisteredSessionEventCallbackTokens
 {
     std::weak_ptr<RegisteredCallbackToken> OnSessionEndedToken;
     std::weak_ptr<RegisteredCallbackToken> OnSessionStatusChangedToken;
-    std::weak_ptr<RegisteredCallbackToken> OnRangingStartedToken;
-    std::weak_ptr<RegisteredCallbackToken> OnRangingStoppedToken;
     std::weak_ptr<RegisteredCallbackToken> OnPeerPropertiesChangedToken;
     std::weak_ptr<RegisteredCallbackToken> OnSessionMembershipChangedToken;
 };

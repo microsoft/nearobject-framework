@@ -128,14 +128,6 @@ public:
     StopRanging();
 
     /**
-     * @brief Set the Session Status object. NOTE, this function is NOT thread safe
-     *
-     * @param status the new status
-     */
-    void
-    SetSessionStatus(const uwb::protocol::fira::UwbSessionStatus& status);
-
-    /**
      * @brief Sentinel value indicating that all supported application
      * configuration parameters should be requested.
      */
@@ -213,6 +205,47 @@ protected:
             return std::dynamic_pointer_cast<TDerived>(m_device.lock());
         }
     }
+
+    /**
+     * @brief Invoked when the session ends.
+     * 
+     * @param callbacks A resolved session event callback instance.
+     * @param reason The reason the session ended.
+     */
+    virtual void
+    OnSessionEnded(std::shared_ptr<uwb::UwbSessionEventCallbacks> callbacks, ::uwb::UwbSessionEndReason reason);
+
+    /**
+     * @brief Invoked when the session state changes. 
+     * 
+     * @param callbacks A resolved session event callback instance.
+     * @param state The new state of the session.
+     * @param reasonCode The reason the session changed state. Optional.
+     */
+    virtual void
+    OnSessionStateChanged(std::shared_ptr<uwb::UwbSessionEventCallbacks> callbacks, ::uwb::protocol::fira::UwbSessionState state, std::optional<::uwb::protocol::fira::UwbSessionReasonCode> reasonCode);
+
+    /**
+     * @brief Invoked when the properties of a peer involved in the session
+     * changes. This includes the spatial properties of the peer(s).
+     * 
+     * @param callbacks A resolved session event callback instance.
+     * @param peersChanged A list of peers whose properties changed.
+     */
+    virtual void
+    OnPeerPropertiesChanged(std::shared_ptr<uwb::UwbSessionEventCallbacks> callbacks, std::vector<::uwb::UwbPeer> peersChanged);
+
+    /**
+     * @brief Invoked when membership of one or more near peers involved in
+     * the session is changed. This can occur when peer members are either
+     * added to or removed from the session.
+     * 
+     * @param callbacks A resolved session event callback instance.
+     * @param peersAdded A list of peers that were added to the session.
+     * @param peersRemoved A list of peers that were removed from the session.
+     */
+    virtual void
+    OnSessionMembershipChanged(std::shared_ptr<uwb::UwbSessionEventCallbacks> callbacks, std::vector<::uwb::UwbPeer> peersAdded, std::vector<::uwb::UwbPeer> peersRemoved);
 
 private:
     /**
@@ -296,7 +329,7 @@ private:
 protected:
     uwb::protocol::fira::DeviceType m_deviceType{ uwb::protocol::fira::DeviceType::Controller };
     uint32_t m_sessionId{ 0 };
-    uwb::protocol::fira::UwbSessionStatus m_sessionStatus{};
+    std::atomic<uwb::protocol::fira::UwbSessionState> m_state{ uwb::protocol::fira::UwbSessionState::Deinitialized };
     UwbMacAddressType m_uwbMacAddressType{ UwbMacAddressType::Extended };
     UwbMacAddress m_uwbMacAddressSelf;
     std::atomic<bool> m_rangingActive{ false };

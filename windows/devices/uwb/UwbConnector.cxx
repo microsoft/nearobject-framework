@@ -34,7 +34,7 @@ struct RegisteredCallbackToken
      */
     RegisteredCallbackToken(std::function<void(RegisteredCallbackToken*)> deregister) :
         Deregister([this, deregister = std::move(deregister)]() {
-            if (not deregister) {
+            if (!deregister) {
                 PLOG_WARNING << "empty callback token";
                 return;
             }
@@ -71,20 +71,6 @@ struct OnSessionStatusChangedToken : public RegisteredSessionCallbackToken
         RegisteredSessionCallbackToken(std::move(deregister), sessionId),
         Callback(std::move(callback)){};
     std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionStatusChanged> Callback;
-};
-struct OnRangingStartedToken : public RegisteredSessionCallbackToken
-{
-    OnRangingStartedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted> callback, std::function<void(RegisteredCallbackToken*)> deregister) :
-        RegisteredSessionCallbackToken(std::move(deregister), sessionId),
-        Callback(std::move(callback)){};
-    std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted> Callback;
-};
-struct OnRangingStoppedToken : public RegisteredSessionCallbackToken
-{
-    OnRangingStoppedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped> callback, std::function<void(RegisteredCallbackToken*)> deregister) :
-        RegisteredSessionCallbackToken(std::move(deregister), sessionId),
-        Callback(std::move(callback)){};
-    std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped> Callback;
 };
 struct OnPeerPropertiesChangedToken : public RegisteredSessionCallbackToken
 {
@@ -148,7 +134,7 @@ UwbConnector::Reset()
     wil::unique_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
-        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << std::format("failed to obtain driver handle for {}, hr={:#08x}", m_deviceName, static_cast<uint32_t>(hr));
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     }
@@ -162,7 +148,7 @@ UwbConnector::Reset()
     BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_DEVICE_RESET, const_cast<UWB_DEVICE_RESET*>(&deviceReset), sizeof deviceReset, &status, sizeof status, nullptr, nullptr);
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-        PLOG_ERROR << "error when sending IOCTL_UWB_DEVICE_RESET, hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << std::format("error when sending IOCTL_UWB_DEVICE_RESET, hr={:#08x}", static_cast<uint32_t>(hr));
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Failed)));
         return resultFuture;
     } else {
@@ -185,9 +171,9 @@ UwbConnector::GetDeviceInformation()
     auto resultFuture = resultPromise.get_future();
 
     wil::unique_hfile handleDriver;
-    auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
+    HRESULT hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
-        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << std::format("failed to obtain driver handle for {}, hr={:#08x}", m_deviceName, static_cast<uint32_t>(hr));
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     }
@@ -202,14 +188,14 @@ UwbConnector::GetDeviceInformation()
     // second time.
     for (const auto i : std::ranges::iota_view{ 0, 2 }) {
         deviceInformationBuffer.resize(bytesRequired);
-        PLOG_DEBUG << "IOCTL_UWB_GET_DEVICE_INFO attempt #" << (i + 1) << " with " << std::size(deviceInformationBuffer) << "-byte buffer";
+        PLOG_DEBUG << std::format("IOCTL_UWB_GET_DEVICE_INFO attempt #{} with {}-byte buffer", (i+1), std::size(deviceInformationBuffer));
         BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_DEVICE_INFO, nullptr, 0, std::data(deviceInformationBuffer), std::size(deviceInformationBuffer), &bytesRequired, nullptr);
         if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
             DWORD lastError = GetLastError();
             // Treat all errors other than insufficient buffer size as fatal.
             if (lastError != ERROR_MORE_DATA) {
-                HRESULT hr = HRESULT_FROM_WIN32(lastError);
-                PLOG_ERROR << "error when sending IOCTL_UWB_GET_DEVICE_INFO, hr=" << std::showbase << std::hex << hr;
+                hr = HRESULT_FROM_WIN32(lastError);
+                PLOG_ERROR << std::format("error when sending IOCTL_UWB_GET_DEVICE_INFO, hr={:#08x}", static_cast<uint32_t>(hr));
                 resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Failed)));
                 break;
             }
@@ -243,7 +229,7 @@ UwbConnector::GetCapabilities()
     wil::shared_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
-        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << hr;
+        PLOG_ERROR << std::format("failed to obtain driver handle for {}, hr={:#08x}", m_deviceName, static_cast<uint32_t>(hr));
         return resultFuture;
     }
 
@@ -252,14 +238,14 @@ UwbConnector::GetCapabilities()
 
     for (const auto i : std::ranges::iota_view{ 0, 2 }) {
         uwbDeviceCapabilitiesBuffer.resize(bytesRequired);
-        PLOG_DEBUG << "IOCTL_UWB_GET_DEVICE_CAPABILITIES attempt #" << (i + 1) << " with " << std::size(uwbDeviceCapabilitiesBuffer) << "-byte buffer";
+        PLOG_DEBUG << std::format("IOCTL_UWB_GET_DEVICE_CAPABILITIES attempt #{} with {}-byte buffer", (i+1), std::size(uwbDeviceCapabilitiesBuffer));
         BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_DEVICE_CAPABILITIES, nullptr, 0, std::data(uwbDeviceCapabilitiesBuffer), std::size(uwbDeviceCapabilitiesBuffer), &bytesRequired, nullptr);
         if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
             DWORD lastError = GetLastError();
             // Treat all errors other than insufficient buffer size as fatal.
             if (lastError != ERROR_MORE_DATA) {
                 HRESULT hr = HRESULT_FROM_WIN32(lastError);
-                PLOG_ERROR << "error when sending IOCTL_UWB_GET_DEVICE_CAPABILITIES, hr=" << std::showbase << std::hex << hr;
+                PLOG_ERROR << std::format("error when sending IOCTL_UWB_GET_DEVICE_CAPABILITIES, hr={:#08x}", static_cast<uint32_t>(hr));
                 resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Failed)));
                 break;
             }
@@ -293,7 +279,7 @@ UwbConnector::GetSessionCount()
     wil::shared_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
-        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << std::format("failed to obtain driver handle for {}, hr={:#08x}", m_deviceName, static_cast<uint32_t>(hr));
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     }
@@ -303,8 +289,7 @@ UwbConnector::GetSessionCount()
     BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_SESSION_COUNT, nullptr, 0, &getSessionCount, sizeof getSessionCount, nullptr, nullptr);
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-        PLOG_ERROR << "error when sending IOCTL_UWB_GET_SESSION_COUNT"
-                   << ", hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << std::format("error when sending IOCTL_UWB_GET_SESSION_COUNT, hr={:#08x}", static_cast<uint32_t>(hr));
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     } else {
@@ -329,7 +314,7 @@ UwbConnector::SessionInitialize(uint32_t sessionId, UwbSessionType sessionType)
     wil::shared_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
-        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << std::format("failed to obtain driver handle for {}, hr={:#08x}", m_deviceName, static_cast<uint32_t>(hr));
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     }
@@ -344,7 +329,7 @@ UwbConnector::SessionInitialize(uint32_t sessionId, UwbSessionType sessionType)
     BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_SESSION_INIT, const_cast<UWB_SESSION_INIT*>(&sessionInit), sizeof sessionInit, &status, sizeof status, nullptr, nullptr);
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-        PLOG_ERROR << "error when sending IOCTL_UWB_SESSION_INIT for session id " << sessionId << ", hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << std::format("error when sending IOCTL_UWB_SESSION_INIT for session id {}, hr={:#08x}",  sessionId, static_cast<uint32_t>(hr));
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     } else {
@@ -369,7 +354,7 @@ UwbConnector::SessionDeinitialize(uint32_t sessionId)
     wil::shared_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
-        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << std::format("failed to obtain driver handle for {}, hr={:#08x}", m_deviceName, static_cast<uint32_t>(hr));
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     }
@@ -383,7 +368,7 @@ UwbConnector::SessionDeinitialize(uint32_t sessionId)
     BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_SESSION_DEINIT, const_cast<UWB_SESSION_DEINIT*>(&sessionDeinit), sizeof sessionDeinit, &status, sizeof status, nullptr, nullptr);
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-        PLOG_ERROR << "error when sending IOCTL_UWB_SESSION_DEINIT for session id " << sessionId << ", hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << std::format("error when sending IOCTL_UWB_SESSION_DEINIT for session id {}, hr={:#08x}", sessionId, static_cast<uint32_t>(hr));
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     } else {
@@ -408,7 +393,7 @@ UwbConnector::SessionGetState(uint32_t sessionId)
     wil::shared_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
-        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << std::format("failed to obtain driver handle for {}, hr={:#08x}", m_deviceName, static_cast<uint32_t>(hr));
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     }
@@ -422,8 +407,7 @@ UwbConnector::SessionGetState(uint32_t sessionId)
     BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_SESSION_STATE, const_cast<UWB_GET_SESSION_STATE*>(&getSessionState), sizeof getSessionState, &sessionStateStatus, sizeof sessionStateStatus, nullptr, nullptr);
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-        PLOG_ERROR << "error when sending IOCTL_UWB_GET_SESSION_STATE for session id " << sessionId
-                   << ", hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << std::format("error when sending IOCTL_UWB_GET_SESSION_STATE for session id {}, hr={:#08x}", sessionId, static_cast<uint32_t>(hr));
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     } else {
@@ -448,7 +432,7 @@ UwbConnector::SessionRangingStart(uint32_t sessionId)
     wil::shared_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
-        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << std::format("failed to obtain driver handle for {}, hr={:#08x}", m_deviceName, static_cast<uint32_t>(hr));
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     }
@@ -462,7 +446,7 @@ UwbConnector::SessionRangingStart(uint32_t sessionId)
     BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_START_RANGING_SESSION, const_cast<UWB_START_RANGING_SESSION*>(&startRanging), sizeof startRanging, &status, sizeof status, nullptr, nullptr);
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-        PLOG_ERROR << "error when sending IOCTL_UWB_START_RANGING_SESSION for session id " << sessionId << ", hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << std::format("error when sending IOCTL_UWB_START_RANGING_SESSION for session id {}, hr={:#08x}", sessionId, static_cast<uint32_t>(hr));
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     } else {
@@ -487,7 +471,7 @@ UwbConnector::SessionRangingStop(uint32_t sessionId)
     wil::shared_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
-        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << std::format("failed to obtain driver handle for {}, hr={:#08x}", m_deviceName, static_cast<uint32_t>(hr));
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     }
@@ -501,7 +485,7 @@ UwbConnector::SessionRangingStop(uint32_t sessionId)
     BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_STOP_RANGING_SESSION, const_cast<UWB_STOP_RANGING_SESSION*>(&stopRanging), sizeof stopRanging, &status, sizeof status, nullptr, nullptr);
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-        PLOG_ERROR << "error when sending IOCTL_UWB_STOP_RANGING_SESSION for session id " << sessionId << ", hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << std::format("error when sending IOCTL_UWB_STOP_RANGING_SESSION for session id {}, hr={:#08x}", sessionId, static_cast<uint32_t>(hr));
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     } else {
@@ -536,7 +520,7 @@ UwbConnector::SessionUpdateControllerMulticastList(uint32_t sessionId, UwbMultic
     wil::unique_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
-        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << std::format("failed to obtain driver handle for {}, hr={:#08x}", m_deviceName, static_cast<uint32_t>(hr));
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     }
@@ -560,7 +544,7 @@ UwbConnector::SessionUpdateControllerMulticastList(uint32_t sessionId, UwbMultic
     BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST, std::data(multicastListDdiBuffer), std::size(multicastListDdiBuffer), &status, sizeof status, nullptr, nullptr);
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-        PLOG_ERROR << "error when sending IOCTL_UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST for session id " << sessionId << ", hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << std::format("error when sending IOCTL_UWB_SESSION_UPDATE_CONTROLLER_MULTICAST_LIST for session id {}, hr={:#08x}", sessionId, static_cast<uint32_t>(hr));
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     } else {
@@ -585,7 +569,7 @@ UwbConnector::GetApplicationConfigurationParameters(uint32_t sessionId, std::vec
     wil::unique_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
-        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << std::format("failed to obtain driver handle for {}, hr={:#08x}", m_deviceName, static_cast<uint32_t>(hr));
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     }
@@ -602,14 +586,14 @@ UwbConnector::GetApplicationConfigurationParameters(uint32_t sessionId, std::vec
 
     for (const auto i : std::ranges::iota_view{ 0, 2 }) {
         getAppConfigParamsResultBuffer.resize(bytesRequired);
-        PLOG_DEBUG << "IOCTL_UWB_GET_APP_CONFIG_PARAMS attempt #" << (i + 1) << " with " << std::size(getAppConfigParamsResultBuffer) << "-byte buffer";
+        PLOG_DEBUG << std::format("IOCTL_UWB_GET_APP_CONFIG_PARAMS attempt #{} with {}-byte buffer", (i+1), std::size(getAppConfigParamsResultBuffer));
         BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_GET_APP_CONFIG_PARAMS, std::data(getAppConfigParamsBuffer), std::size(getAppConfigParamsBuffer), std::data(getAppConfigParamsResultBuffer), std::size(getAppConfigParamsResultBuffer), &bytesRequired, nullptr);
         if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
             DWORD lastError = GetLastError();
             // Treat all errors other than insufficient buffer size as fatal.
             if (lastError != ERROR_MORE_DATA) {
                 HRESULT hr = HRESULT_FROM_WIN32(lastError);
-                PLOG_ERROR << "error when sending IOCTL_UWB_GET_APP_CONFIG_PARAMS, hr=" << std::showbase << std::hex << hr;
+                PLOG_ERROR << std::format("error when sending IOCTL_UWB_GET_APP_CONFIG_PARAMS, hr={:#08x}", static_cast<uint32_t>(hr));
                 resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Failed)));
                 break;
             }
@@ -643,7 +627,7 @@ UwbConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vec
     wil::shared_hfile handleDriver;
     auto hr = OpenDriverHandle(handleDriver, m_deviceName.c_str());
     if (FAILED(hr)) {
-        PLOG_ERROR << "failed to obtain driver handle for " << m_deviceName << ", hr=" << std::showbase << std::hex << hr;
+        PLOG_ERROR << std::format("failed to obtain driver handle for {}, hr={:#08x}", m_deviceName, static_cast<uint32_t>(hr));
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     }
@@ -661,7 +645,7 @@ UwbConnector::SetApplicationConfigurationParameters(uint32_t sessionId, std::vec
     BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_SET_APP_CONFIG_PARAMS, std::data(paramsBuffer), std::size(paramsBuffer), std::data(statusBuffer), statusSize, nullptr, nullptr);
     if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
         HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-        PLOG_ERROR << "error when sending IOCTL_UWB_SET_APP_CONFIG_PARAMS with sessionId " << sessionId << ", hr = " << std::showbase << std::hex << hr;
+        PLOG_ERROR << std::format("error when sending IOCTL_UWB_SET_APP_CONFIG_PARAMS with sessionId {}, hr={:#08x}",sessionId, static_cast<uint32_t>(hr));
         resultPromise.set_exception(std::make_exception_ptr(UwbException(UwbStatusGeneric::Rejected)));
         return resultFuture;
     } else {
@@ -689,7 +673,7 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
         m_notificationThreadStartPending = false;
     }
 
-    PLOG_INFO << "uwb notification listener started for device " << DeviceName();
+    PLOG_INFO << std::format("uwb notification listener started for device {}", DeviceName());
 
     auto handleDriver = m_notificationHandleDriver;
 
@@ -711,7 +695,7 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
             // Get error information from the DeviceIoControl call now before it possibly gets overwritten by other functions that may set it.
             DWORD lastError = GetLastError();
             HRESULT hr = HRESULT_FROM_WIN32(lastError);
-            PLOG_DEBUG << std::format("{} RESPONSE(SYNC) ioResult={}, hr/err={:#08x}/{:#08x}, buffer size/required {}/{}", logPrefix, static_cast<bool>(ioResult), static_cast<uint32_t>(hr), lastError, std::size(uwbNotificationDataBuffer), bytesRequired);
+            PLOG_DEBUG << std::format("{} RESPONSE(SYNC) ioResult={}, hr={:#08x}, buffer size/required {}/{}", logPrefix, static_cast<bool>(ioResult), static_cast<uint32_t>(hr), std::size(uwbNotificationDataBuffer), bytesRequired);
 
             // All responses must be asynchronous, so validate the request was pended.
             if (ioResult == TRUE || lastError != ERROR_IO_PENDING) {
@@ -730,7 +714,7 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
             ioResult = GetOverlappedResult(handleDriver.get(), &m_notificationOverlapped, &bytesRequired, WaitSynchronously);
             lastError = GetLastError();
             hr = HRESULT_FROM_WIN32(lastError);
-            PLOG_DEBUG << std::format("{} RESPONSE(ASYNC) completed={}, hr/err={:#08x}/{:#08x}", logPrefix, static_cast<bool>(ioResult), static_cast<uint32_t>(hr), lastError);
+            PLOG_DEBUG << std::format("{} RESPONSE(ASYNC) completed={}, hr={:#08x}", logPrefix, static_cast<bool>(ioResult), static_cast<uint32_t>(hr));
 
             // Check if the request was completed.
             if (!ioResult) {
@@ -744,7 +728,7 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
                     handleDriver.reset();
                 }
 
-                PLOG_ERROR << std::format("{} unexpected GetOverlappedResult response received, hr/err={}/{}", logPrefix, static_cast<uint32_t>(hr), lastError);
+                PLOG_ERROR << std::format("{} unexpected GetOverlappedResult response received, hr={:#08x}", logPrefix, static_cast<uint32_t>(hr));
                 break; // for({ 0, maxIoctlAttempts })
             }
 
@@ -790,18 +774,18 @@ void
 InvokeCallbacks(std::vector<std::shared_ptr<TokenT>>& tokens, ArgTs&&... args)
 {
     if (tokens.empty()) {
-        PLOG_INFO << "Ignoring " << typeid(TokenT).name() << " event due to missing callbacks";
+        PLOG_INFO << std::format("Ignoring {} due to missing callbacks", typeid(TokenT).name());
     }
 
     for (auto it = std::cbegin(tokens); it != std::cend(tokens);) {
         auto token = *it;
         auto callbackWeak = token->Callback;
         auto callbackShared = callbackWeak.lock();
-        if (not callbackShared) {
+        if (!callbackShared) {
             it = tokens.erase(it);
         } else {
             auto callback = *callbackShared;
-            if (not callback) {
+            if (!callback) {
                 it = tokens.erase(it);
             } else {
                 auto remove = callback(std::forward<ArgTs>(args)...);
@@ -830,12 +814,12 @@ InvokeSessionCallbacks(std::unordered_map<uint32_t, std::vector<std::shared_ptr<
 {
     auto node = sessionMap.extract(sessionId);
     if (node.empty()) {
-        PLOG_INFO << "Ignoring " << typeid(TokenT).name() << " event due to missing callbacks";
+        PLOG_INFO << std::format("Ignoring {} due to missing callbacks", typeid(TokenT).name());
         return;
     }
     auto& tokens = node.mapped();
     InvokeCallbacks(tokens, std::forward<ArgTs>(args)...);
-    if (not tokens.empty()) {
+    if (!tokens.empty()) {
         sessionMap.insert(std::move(node));
     }
 }
@@ -843,14 +827,14 @@ InvokeSessionCallbacks(std::unordered_map<uint32_t, std::vector<std::shared_ptr<
 void
 UwbConnector::OnSessionEnded(uint32_t sessionId, ::uwb::UwbSessionEndReason sessionEndReason)
 {
-    PLOG_VERBOSE << "Session with id " << sessionId << " executing callbacks for session ended";
+    PLOG_VERBOSE << std::format("Session with id {} executing callbacks for session ended", sessionId);
     InvokeSessionCallbacks(m_onSessionEndedCallbacks, sessionId, sessionEndReason);
 }
 
 void
 UwbConnector::OnSessionStatusChanged(uint32_t sessionId, ::uwb::protocol::fira::UwbSessionState sessionState, std::optional<::uwb::protocol::fira::UwbSessionReasonCode> reasonCode)
 {
-    PLOG_VERBOSE << "Session with id " << sessionId << " executing callbacks for session status changed";
+    PLOG_VERBOSE << std::format("Session with id {} executing callbacks for session status changed", sessionId);
     InvokeSessionCallbacks(m_onSessionStatusChangedCallbacks, sessionId, sessionState, reasonCode);
 
     if (sessionState == UwbSessionState::Deinitialized) {
@@ -873,7 +857,7 @@ UwbConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpda
 
     std::vector<::uwb::UwbPeer> peersRemoved{};
 
-    PLOG_VERBOSE << "Session with id " << statusMulticastList.SessionId << " executing callback for adding peers";
+    PLOG_VERBOSE << std::format("Session with id {} executing callback for adding peers", statusMulticastList.SessionId);
 
     InvokeSessionCallbacks(m_onSessionMembershipChangedCallbacks, sessionId, peersAdded, peersRemoved);
 
@@ -882,7 +866,7 @@ UwbConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpda
     {
         for (const auto& peer : statusMulticastList.Status) {
             if (peer.Status != UwbStatusMulticast::OkUpdate) {
-                PLOG_VERBOSE << "peer has bad status: " << peer.ToString();
+                PLOG_VERBOSE << std::format("peer has bad status: {}", peer.ToString());
             }
         }
     }
@@ -893,14 +877,14 @@ UwbConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData ranging
 {
     uint32_t sessionId = rangingData.SessionId;
 
-    PLOG_VERBOSE << "Session with id " << rangingData.SessionId << " processing new ranging data";
+    PLOG_VERBOSE << std::format("Session with id {} processing new ranging data", rangingData.SessionId);
 
     // TODO there's probably a way to create a range view like we did before so we don't actually loop through the peers before checking if there's any callbacks for this
     std::vector<::uwb::UwbPeer> peersData;
     peersData.reserve(rangingData.RangingMeasurements.size());
     for (const auto& peerData : rangingData.RangingMeasurements) {
         ::uwb::UwbPeer data{ peerData };
-        PLOG_VERBOSE << "Peer data: " << data.ToString();
+        PLOG_VERBOSE << std::format("Peer data: {}", data.ToString());
         peersData.push_back(std::move(data));
     }
 
@@ -922,7 +906,7 @@ UwbConnector::OnDeviceStatusChanged(::uwb::protocol::fira::UwbStatusDevice uwbSt
 void
 UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNotificationData)
 {
-    PLOG_INFO << "Received Notification: " << ToString(uwbNotificationData) << "\n";
+    PLOG_INFO << std::format("Received Notification: {}\n", ToString(uwbNotificationData));
 
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
 
@@ -965,7 +949,7 @@ UwbConnector::NotificationListenerStart()
     const std::string notificationHandleDeviceName = m_deviceName + windows::drivers::uwbcx::UwbNotificationNamespace;
     auto hr = OpenDriverHandle(notificationHandleDriver, notificationHandleDeviceName.c_str(), true);
     if (FAILED(hr)) {
-        PLOG_ERROR << "failed to obtain driver handle for " << notificationHandleDeviceName << ", hr=" << hr;
+        PLOG_ERROR << std::format("failed to obtain driver handle for {}, hr={:#08x}", notificationHandleDeviceName, static_cast<uint32_t>(hr));
         return;
     }
 
@@ -997,7 +981,7 @@ bool
 DeregisterSessionEventCallback(::uwb::RegisteredCallbackToken* token, std::unordered_map<uint32_t, std::vector<std::shared_ptr<T>>>& tokensMap)
 {
     auto callback = dynamic_cast<T*>(token);
-    if (not callback) {
+    if (!callback) {
         return false;
     }
     auto sessionId = callback->SessionId;
@@ -1033,7 +1017,7 @@ bool
 DeregisterDeviceEventCallback(::uwb::RegisteredCallbackToken* token, std::vector<std::shared_ptr<T>>& tokens)
 {
     auto callback = dynamic_cast<T*>(token);
-    if (not callback) {
+    if (!callback) {
         return false;
     }
 
@@ -1062,11 +1046,11 @@ GetToken(::uwb::UwbRegisteredDeviceEventCallbacks callbacks, std::function<std::
 {
     auto callbackWeak = accessor(callbacks);
     auto callbackShared = callbackWeak.lock();
-    if (not callbackShared) {
+    if (!callbackShared) {
         return std::shared_ptr<::uwb::RegisteredDeviceCallbackToken>();
     }
     auto callback = *callbackShared;
-    if (not callback) {
+    if (!callback) {
         return std::shared_ptr<::uwb::RegisteredDeviceCallbackToken>();
     }
     return tokenize(callbackWeak);
@@ -1076,7 +1060,7 @@ GetToken(::uwb::UwbRegisteredDeviceEventCallbacks callbacks, std::function<std::
 UwbConnector::RegisterDeviceEventCallbacks(::uwb::UwbRegisteredDeviceEventCallbacks callbacks)
 {
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
-    bool noCallbacksPrior = not CallbacksPresent();
+    bool noCallbacksPrior = !CallbacksPresent();
 
     auto OnStatusChangedToken = GetToken<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged>(
         callbacks, [](auto&& callbackStruct) {
@@ -1102,7 +1086,7 @@ UwbConnector::RegisterDeviceEventCallbacks(::uwb::UwbRegisteredDeviceEventCallba
             return token;
         });
 
-    if (noCallbacksPrior and CallbacksPresent()) {
+    if (noCallbacksPrior && CallbacksPresent()) {
         NotificationListenerStart();
     }
 
@@ -1150,11 +1134,11 @@ GetToken(uint32_t sessionId, ::uwb::UwbRegisteredSessionEventCallbacks callbacks
 {
     auto callbackWeak = accessor(callbacks);
     auto callbackShared = callbackWeak.lock();
-    if (not callbackShared) {
+    if (!callbackShared) {
         return std::shared_ptr<::uwb::RegisteredSessionCallbackToken>();
     }
     auto callback = *callbackShared;
-    if (not callback) {
+    if (!callback) {
         return std::shared_ptr<::uwb::RegisteredSessionCallbackToken>();
     }
     return tokenize(sessionId, callbackWeak);
@@ -1164,7 +1148,7 @@ GetToken(uint32_t sessionId, ::uwb::UwbRegisteredSessionEventCallbacks callbacks
 UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbRegisteredSessionEventCallbacks callbacks)
 {
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
-    bool noCallbacksPrior = not CallbacksPresent();
+    bool noCallbacksPrior = !CallbacksPresent();
 
     auto OnSessionEndedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionEnded>(
         sessionId, callbacks, [](auto&& callbackStruct) {
@@ -1190,30 +1174,6 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbRegist
             return token;
         });
 
-    auto OnRangingStartedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted>(
-        sessionId, callbacks, [](auto&& callbackStruct) {
-            return callbackStruct.OnRangingStarted;
-        },
-        [this](uint32_t sessionId, auto&& callback) {
-            auto token = std::make_shared<::uwb::OnRangingStartedToken>(sessionId, callback, [this](::uwb::RegisteredCallbackToken* token) {
-                DeregisterSessionEventCallback(token, m_onRangingStartedCallbacks);
-            });
-            InsertSessionToken(m_onRangingStartedCallbacks, sessionId, token);
-            return token;
-        });
-
-    auto OnRangingStoppedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped>(
-        sessionId, callbacks, [](auto&& callbackStruct) {
-            return callbackStruct.OnRangingStopped;
-        },
-        [this](uint32_t sessionId, auto&& callback) {
-            auto token = std::make_shared<::uwb::OnRangingStoppedToken>(sessionId, callback, [this](::uwb::RegisteredCallbackToken* token) {
-                DeregisterSessionEventCallback(token, m_onRangingStoppedCallbacks);
-            });
-            InsertSessionToken(m_onRangingStoppedCallbacks, sessionId, token);
-            return token;
-        });
-
     auto OnPeerPropertiesChangedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged>(
         sessionId, callbacks, [](auto&& callbackStruct) {
             return callbackStruct.OnPeerPropertiesChanged;
@@ -1225,6 +1185,7 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbRegist
             InsertSessionToken(m_onPeerPropertiesChangedCallbacks, sessionId, token);
             return token;
         });
+
     auto OnSessionMembershipChangedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionMembershipChanged>(
         sessionId, callbacks, [](auto&& callbackStruct) {
             return callbackStruct.OnSessionMembershipChanged;
@@ -1237,15 +1198,13 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbRegist
             return token;
         });
 
-    if (noCallbacksPrior and CallbacksPresent()) {
+    if (noCallbacksPrior && CallbacksPresent()) {
         NotificationListenerStart();
     }
 
     return {
         OnSessionEndedToken,
         OnSessionStatusChangedToken,
-        OnRangingStartedToken,
-        OnRangingStoppedToken,
         OnPeerPropertiesChangedToken,
         OnSessionMembershipChangedToken
     };
@@ -1254,25 +1213,29 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbRegist
 bool
 UwbConnector::CallbacksPresent()
 {
-    return not(m_onSessionEndedCallbacks.empty() and m_onRangingStartedCallbacks.empty() and
-        m_onRangingStoppedCallbacks.empty() and m_onPeerPropertiesChangedCallbacks.empty() and m_onSessionMembershipChangedCallbacks.empty() and
-        m_onStatusChangedCallbacks.empty() and m_onDeviceStatusChangedCallbacks.empty() and m_onSessionStatusChangedCallbacks.empty());
-}
+    return !m_onSessionEndedCallbacks.empty()
+        || !m_onSessionStatusChangedCallbacks.empty()
+        || !m_onPeerPropertiesChangedCallbacks.empty()
+        || !m_onSessionMembershipChangedCallbacks.empty()
+        || !m_onStatusChangedCallbacks.empty()
+        || !m_onDeviceStatusChangedCallbacks.empty();
+ }
 
 void
 UwbConnector::DeregisterEventCallback(std::weak_ptr<::uwb::RegisteredCallbackToken> token)
 {
     auto tokenShared = token.lock();
-    if (not tokenShared) {
+    if (!tokenShared) {
         return;
     }
+
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
 
     auto callbacksPresentPrior = CallbacksPresent();
 
     tokenShared->Deregister();
 
-    if ((not CallbacksPresent()) and callbacksPresentPrior) {
+    if (!CallbacksPresent() && callbacksPresentPrior) {
         NotificationListenerStop();
     }
 }
