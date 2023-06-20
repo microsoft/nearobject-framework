@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <format>
 #include <ios>
 #include <memory>
 #include <numeric>
@@ -23,66 +24,51 @@ UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> devic
     m_uwbSessionConnector(std::move(uwbSessionConnector))
 {
     m_onSessionEndedCallback =
-        std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionEnded>([this](::uwb::UwbSessionEndReason reason) {
+        std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionEnded>([this, sessionId](::uwb::UwbSessionEndReason reason) {
             auto callbacks = ResolveEventCallbacks();
             if (callbacks == nullptr) {
-                PLOG_WARNING << "missing session event callback for UwbSessionEndReason, skipping";
+                PLOG_WARNING << std::format("session {}: missing session event callback for UwbSessionEndReason, skipping", sessionId);
                 return true;
             }
-            callbacks->OnSessionEnded(this, reason);
+
+            ::uwb::UwbSession::OnSessionEnded(callbacks, reason);
             return false;
         });
     m_onSessionStatusChangedCallback =
-        std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionStatusChanged>([this](::uwb::protocol::fira::UwbSessionState state, std::optional<::uwb::protocol::fira::UwbSessionReasonCode> reasonCode) {
+        std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionStatusChanged>([this, sessionId](::uwb::protocol::fira::UwbSessionState state, std::optional<::uwb::protocol::fira::UwbSessionReasonCode> reasonCode) {
             auto callbacks = ResolveEventCallbacks();
             if (callbacks == nullptr) {
-                PLOG_WARNING << "missing session event callback for session status changed, skipping";
+                PLOG_WARNING << std::format("session {}: missing session event callback for session status changed, skipping", sessionId);
                 return true;
             }
-            callbacks->OnSessionStatusChanged(this, state, reasonCode);
-            return false;
-        });
-    m_onRangingStartedCallback = std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted>([this]() {
-        auto callbacks = ResolveEventCallbacks();
-        if (callbacks == nullptr) {
-            PLOG_WARNING << "missing session event callback for ranging started, skipping";
-            return true;
-        }
-        callbacks->OnRangingStarted(this);
-        return false;
-    });
-    m_onRangingStoppedCallback =
-        std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped>([this]() {
-            auto callbacks = ResolveEventCallbacks();
-            if (callbacks == nullptr) {
-                PLOG_WARNING << "missing session event callback for ranging stopped, skipping";
-                return true;
-            }
-            callbacks->OnRangingStopped(this);
+
+            ::uwb::UwbSession::OnSessionStateChanged(callbacks, state, reasonCode);
             return false;
         });
     m_onPeerPropertiesChangedCallback =
-        std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged>([this](std::vector<::uwb::UwbPeer> peersChanged) {
+        std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged>([this, sessionId](std::vector<::uwb::UwbPeer> peersChanged) {
             auto callbacks = ResolveEventCallbacks();
             if (callbacks == nullptr) {
-                PLOG_WARNING << "missing session event callback for ranging data, skipping";
+                PLOG_WARNING << std::format("session {}: missing session event callback for ranging data, skipping", sessionId);
                 return true;
             }
-            callbacks->OnPeerPropertiesChanged(this, peersChanged);
+            
+            ::uwb::UwbSession::OnPeerPropertiesChanged(callbacks, std::move(peersChanged));
             return false;
         });
     m_onSessionMembershipChangedCallback =
-        std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionMembershipChanged>([this](std::vector<::uwb::UwbPeer> peersAdded, std::vector<::uwb::UwbPeer> peersRemoved) {
+        std::make_shared<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionMembershipChanged>([this, sessionId](std::vector<::uwb::UwbPeer> peersAdded, std::vector<::uwb::UwbPeer> peersRemoved) {
             auto callbacks = ResolveEventCallbacks();
             if (callbacks == nullptr) {
-                PLOG_WARNING << "missing session event callback for peer list changes, skipping";
+                PLOG_WARNING << std::format("session {}: missing session event callback for peer list changes, skipping", sessionId);
                 return true;
             }
-            callbacks->OnSessionMembershipChanged(this, peersAdded, peersRemoved);
+
+            ::uwb::UwbSession::OnSessionMembershipChanged(callbacks, std::move(peersAdded), std::move(peersRemoved));
             return false;
         });
 
-    m_registeredCallbacksTokens = m_uwbSessionConnector->RegisterSessionEventCallbacks(m_sessionId, { m_onSessionEndedCallback, m_onSessionStatusChangedCallback, m_onRangingStartedCallback, m_onRangingStoppedCallback, m_onPeerPropertiesChangedCallback, m_onSessionMembershipChangedCallback });
+    m_registeredCallbacksTokens = m_uwbSessionConnector->RegisterSessionEventCallbacks(m_sessionId, { m_onSessionEndedCallback, m_onSessionStatusChangedCallback, m_onPeerPropertiesChangedCallback, m_onSessionMembershipChangedCallback });
 }
 
 UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> device, std::shared_ptr<IUwbSessionDdiConnector> uwbSessionConnector, ::uwb::protocol::fira::DeviceType deviceType) :
@@ -98,33 +84,31 @@ UwbSession::GetUwbSessionConnector() noexcept
 void
 UwbSession::ConfigureImpl(const std::vector<::uwb::protocol::fira::UwbApplicationConfigurationParameter> configParams)
 {
-    PLOG_VERBOSE << "ConfigureImpl";
-
     UwbSessionType sessionType = UwbSessionType::RangingSession;
 
     // Request a new session from the driver.
     auto sessionInitResultFuture = m_uwbSessionConnector->SessionInitialize(m_sessionId, sessionType);
     if (!sessionInitResultFuture.valid()) {
-        PLOG_ERROR << "failed to initialize session";
+        PLOG_ERROR << std::format("session {}: failed to initialize", m_sessionId);
         throw UwbException(UwbStatusGeneric::Rejected);
     }
 
     UwbStatus statusSessionInit = sessionInitResultFuture.get();
     if (!IsUwbStatusOk(statusSessionInit)) {
-        LOG_ERROR << "failed to initialize session, " << ToString(statusSessionInit);
+        LOG_ERROR << std::format("session {}: failed to initialize, status={}", m_sessionId, ToString(statusSessionInit));
         throw UwbException(statusSessionInit);
     }
 
     // Set the application configuration parameters for the session.
     auto setAppConfigParamsFuture = m_uwbSessionConnector->SetApplicationConfigurationParameters(m_sessionId, configParams);
     if (!setAppConfigParamsFuture.valid()) {
-        PLOG_ERROR << "failed to set the application configuration parameters";
+        PLOG_ERROR << std::format("session {}: failed to set the application configuration parameters", m_sessionId);
         throw UwbException(UwbStatusGeneric::Rejected);
     }
 
     auto [statusSetParameters, resultSetParameters] = setAppConfigParamsFuture.get();
     if (!IsUwbStatusOk(statusSetParameters)) {
-        LOG_ERROR << "failed to set application configuration parameters, " << ToString(statusSetParameters);
+        LOG_ERROR << std::format("session {}: failed to set application configuration parameters, status={}", m_sessionId, ToString(statusSetParameters));
         throw UwbException(statusSetParameters);
     }
 
@@ -134,7 +118,7 @@ UwbSession::ConfigureImpl(const std::vector<::uwb::protocol::fira::UwbApplicatio
     //       accessor that just returns the vector entries with statusSetParameter != Ok
     for (const auto &[statusSetParameter, applicationConfigurationParameterType] : resultSetParameters) {
         if (!IsUwbStatusOk(statusSetParameter)) {
-            LOG_ERROR << "failed to set application configuration parameter " << magic_enum::enum_name(applicationConfigurationParameterType) << ", status=" << ToString(statusSetParameter);
+            LOG_ERROR << std::format("session {}: failed to set application configuration parameter {}, status={}", m_sessionId, magic_enum::enum_name(applicationConfigurationParameterType), ToString(statusSetParameter));
         }
     }
 }
@@ -147,7 +131,7 @@ UwbSession::StartRangingImpl()
     uint32_t sessionId = GetId();
     auto resultFuture = m_uwbSessionConnector->SessionRangingStart(sessionId);
     if (!resultFuture.valid()) {
-        PLOG_ERROR << "failed to start ranging for session id " << sessionId;
+        PLOG_ERROR << std::format("session {}: failed to start ranging", sessionId);
         status = UwbStatusGeneric::Failed;
         return; /* TODO: uwbStatus */
     }
@@ -155,7 +139,7 @@ UwbSession::StartRangingImpl()
     try {
         status = resultFuture.get();
     } catch (std::exception &e) {
-        PLOG_ERROR << "caught exception attempting to start ranging for session id " << sessionId << "(" << e.what() << ")";
+        PLOG_ERROR << "session {}: caught exception attempting to start ranging, error={}", sessionId, e.what();
         status = UwbStatusGeneric::Failed;
     }
 
@@ -170,7 +154,7 @@ UwbSession::StopRangingImpl()
     uint32_t sessionId = GetId();
     auto resultFuture = m_uwbSessionConnector->SessionRangingStop(sessionId);
     if (!resultFuture.valid()) {
-        PLOG_ERROR << "failed to stop ranging for session id " << sessionId;
+        PLOG_ERROR << std::format("session {}: failed to stop ranging", sessionId);
         status = UwbStatusGeneric::Failed;
         return; /* TODO: uwbStatus */
     }
@@ -178,7 +162,7 @@ UwbSession::StopRangingImpl()
     try {
         status = resultFuture.get();
     } catch (std::exception &e) {
-        PLOG_ERROR << "caught exception attempting to stop ranging for session id " << sessionId << "(" << e.what() << ")";
+        PLOG_ERROR << std::format("session {}: caught exception attempting to stop ranging, error={}", sessionId, e.what());
         status = UwbStatusGeneric::Failed;
     }
 
@@ -186,28 +170,29 @@ UwbSession::StopRangingImpl()
 }
 
 UwbStatus
-UwbSession::TryAddControleeImpl([[maybe_unused]] ::uwb::UwbMacAddress controleeMacAddress)
+UwbSession::TryAddControleeImpl(::uwb::UwbMacAddress controleeMacAddress)
 {
-    PLOG_VERBOSE << "TryAddControleeImpl";
     if (!m_uwbSessionConnector) {
-        PLOG_WARNING << "No associated connector";
+        PLOG_WARNING << std::format("session {}: no associated connector", m_sessionId);
         return UwbStatusGeneric::Failed;
     }
 
     auto params = GetApplicationConfigurationParameters({ UwbApplicationConfigurationParameterType::DestinationMacAddresses });
     if (std::size(params) != 1) {
-        throw std::runtime_error("GetApplicationConfigurationParameters() for 1 parameter did not return exactly 1 result. This is a bug!");
+        throw std::runtime_error(std::format("session {}: GetApplicationConfigurationParameters() for 1 parameter did not return exactly 1 result. This is a bug!", m_sessionId));
     }
+
     auto macAddresses = std::get<std::unordered_set<::uwb::UwbMacAddress>>(params.front().Value);
     auto [_, inserted] = macAddresses.insert(controleeMacAddress);
     if (!inserted) {
-        PLOG_INFO << "controleeMacAddress already added, skipping";
+        PLOG_INFO << std::format("session {}: controleeMacAddress already added, skipping", m_sessionId);
         return UwbStatusSession::AddressAlreadyPresent;
     }
+
     UwbApplicationConfigurationParameter dstMacAddresses{ .Type = UwbApplicationConfigurationParameterType::DestinationMacAddresses, .Value = macAddresses };
     UwbApplicationConfigurationParameter numControlees{ .Type = UwbApplicationConfigurationParameterType::NumberOfControlees, .Value = static_cast<uint8_t>(std::size(macAddresses)) };
 
-    SetApplicationConfigurationParameters({ numControlees, dstMacAddresses });
+    SetApplicationConfigurationParameters({ std::move(numControlees), std::move(dstMacAddresses ) });
 
     return UwbStatusGeneric::Ok;
 }
@@ -219,7 +204,7 @@ UwbSession::GetApplicationConfigurationParametersImpl(std::vector<::uwb::protoco
 
     auto resultFuture = m_uwbSessionConnector->GetApplicationConfigurationParameters(sessionId, requestedTypes);
     if (!resultFuture.valid()) {
-        PLOG_ERROR << "failed to obtain application configuration parameters for session id " << sessionId;
+        PLOG_ERROR << std::format("session {}: failed to obtain application configuration parameters", sessionId);
         throw UwbException(UwbStatusGeneric::Failed);
     }
 
@@ -230,10 +215,10 @@ UwbSession::GetApplicationConfigurationParametersImpl(std::vector<::uwb::protoco
         }
         return applicationConfigurationParameters;
     } catch (UwbException &uwbException) {
-        PLOG_ERROR << "caught exception attempting to obtain application configuration parameters for session id " << sessionId << " (" << ToString(uwbException.Status) << ")";
+        PLOG_ERROR << std::format("session {}: caught exception attempting to obtain application configuration parameters, status={}", sessionId, ToString(uwbException.Status));
         throw uwbException;
     } catch (std::exception &e) {
-        PLOG_ERROR << "caught unexpected exception attempting to obtain application configuration parameters for session id " << sessionId << " (" << e.what() << ")";
+        PLOG_ERROR << std::format("session {}: caught unexpected exception attempting to obtain application configuration parameters, error={}", sessionId, e.what());
         throw e;
     }
 }
@@ -252,10 +237,10 @@ UwbSession::SetApplicationConfigurationParametersImpl(std::vector<::uwb::protoco
             throw UwbException(uwbStatus);
         }
     } catch (UwbException &uwbException) {
-        PLOG_ERROR << "caught exception attempting to set application configuration parameters for session id " << sessionId << " (" << ToString(uwbException.Status) << ")";
+        PLOG_ERROR << std::format("session {}: caught exception attempting to set application configuration parameters, status={}", sessionId, ToString(uwbException.Status));
         throw uwbException;
     } catch (std::exception &e) {
-        PLOG_ERROR << "caught unexpected exception attempting to obtain application configuration parameters for session id " << sessionId << " (" << e.what() << ")";
+        PLOG_ERROR << std::format("session {}: caught unexpected exception attempting to obtain application configuration parameters, error={}", sessionId, e.what());
         throw e;
     }
 }
@@ -278,10 +263,10 @@ UwbSession::GetSessionStateImpl()
         }
         return sessionState;
     } catch (UwbException &uwbException) {
-        PLOG_ERROR << "caught exception attempting to obtain session state for session id " << sessionId << " (" << ToString(uwbException.Status) << ")";
+        PLOG_ERROR << std::format("session {}: caught exception attempting to obtain session state, status={}", sessionId, ToString(uwbException.Status));
         throw uwbException;
     } catch (std::exception &e) {
-        PLOG_ERROR << "caught unexpected exception attempting to obtain session state for session id " << sessionId << " (" << e.what() << ")";
+        PLOG_ERROR << std::format("session {}: caught unexpected exception attempting to obtain session state, error={}", sessionId, e.what());
         throw e;
     }
 }
@@ -292,17 +277,17 @@ UwbSession::DestroyImpl()
     uint32_t sessionId = GetId();
     auto resultFuture = m_uwbSessionConnector->SessionDeinitialize(sessionId);
     if (!resultFuture.valid()) {
-        PLOG_ERROR << "failed to issue device deinitialization request for session id " << sessionId;
+        PLOG_ERROR << std::format("session {}: failed to issue device deinitialization request", sessionId);
         throw UwbException(UwbStatusGeneric::Rejected);
     }
 
     try {
         resultFuture.get();
     } catch (UwbException &uwbException) {
-        PLOG_ERROR << "caught exception attempting to to deinitialize for session id " << sessionId << " (" << ToString(uwbException.Status) << ")";
+        PLOG_ERROR << std::format("session {}: caught exception attempting to to deinitialize, status={}", sessionId, ToString(uwbException.Status));
         throw uwbException;
     } catch (std::exception &e) {
-        PLOG_ERROR << "caught unexpected exception attempting to deinitialize for session id " << sessionId << " (" << e.what() << ")";
+        PLOG_ERROR << std::format("session {}: caught unexpected exception attempting to deinitialize, error={}", sessionId, e.what());
         throw e;
     }
 }
