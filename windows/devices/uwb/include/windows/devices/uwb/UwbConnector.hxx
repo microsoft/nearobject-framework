@@ -30,8 +30,6 @@ namespace uwb
  */
 class RegisteredSessionCallbackToken;
 class OnSessionEndedToken;
-class OnRangingStartedToken;
-class OnRangingStoppedToken;
 class OnPeerPropertiesChangedToken;
 class OnSessionMembershipChangedToken;
 
@@ -265,8 +263,6 @@ private:
     mutable std::shared_mutex m_eventCallbacksGate;
     std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnSessionEndedToken>>> m_onSessionEndedCallbacks;
     std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnSessionStatusChangedToken>>> m_onSessionStatusChangedCallbacks;
-    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnRangingStartedToken>>> m_onRangingStartedCallbacks;
-    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnRangingStoppedToken>>> m_onRangingStoppedCallbacks;
     std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnPeerPropertiesChangedToken>>> m_onPeerPropertiesChangedCallbacks;
     std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnSessionMembershipChangedToken>>> m_onSessionMembershipChangedCallbacks;
 

@@ -129,8 +129,6 @@ private:
     std::shared_ptr<IUwbSessionDdiConnector> m_uwbSessionConnector;
     std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionEnded> m_onSessionEndedCallback;
     std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionStatusChanged> m_onSessionStatusChangedCallback;
-    std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted> m_onRangingStartedCallback;
-    std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStopped> m_onRangingStoppedCallback;
     std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnPeerPropertiesChanged> m_onPeerPropertiesChangedCallback;
     std::shared_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionMembershipChanged> m_onSessionMembershipChangedCallback;
     ::uwb::UwbRegisteredSessionEventCallbackTokens m_registeredCallbacksTokens;
