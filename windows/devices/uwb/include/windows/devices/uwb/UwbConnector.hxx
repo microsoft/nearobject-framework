@@ -188,7 +188,25 @@ private:
     DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNotificationData);
 
     /**
-     * @brief Response for calling the relevant registered callbacks for the session ended event.
+     * @brief Responsible for calling the relevant registered callbacks for the
+     * status changed event.
+     * 
+     * @param uwbStatus The status value.
+     */
+    void
+    OnStatusChanged(::uwb::protocol::fira::UwbStatus uwbStatus);
+
+    /**
+     * @brief Responsible for calling the relevant registered callbacks for the
+     * device status changed event.
+     * 
+     * @param uwbDeviceStatus The new device status.
+     */
+    void
+    OnDeviceStatusChanged(::uwb::protocol::fira::UwbStatusDevice uwbStatusDevice);
+
+    /**
+     * @brief Responsible for calling the relevant registered callbacks for the session ended event.
      * This function assumes the caller is holding the m_eventCallbacksGate
      *
      * @param sessionId The session identifier of the session that ended.
@@ -196,6 +214,17 @@ private:
      */
     void
     OnSessionEnded(uint32_t sessionId, ::uwb::UwbSessionEndReason sessionEndReason);
+
+    /**
+     * @brief TODO
+     * This function assumes the caller is holding the m_eventCallbacksGate
+     * 
+     * @param sessionId The session identifier of the session that changed status.
+     * @param sessionState The new state of the session.
+     * @param reasonCode The reason the session changed state. May not be present.
+     */
+    void
+    OnSessionStatusChanged(uint32_t sessionId, ::uwb::protocol::fira::UwbSessionState sessionState, std::optional<::uwb::protocol::fira::UwbSessionReasonCode> reasonCode);
 
     /**
      * @brief Internal function that prepares the notification for processing by the m_sessionEventCallbacks
@@ -235,6 +264,7 @@ private:
     // the following shared_mutex is used to protect access to everything regarding the registered callbacks
     mutable std::shared_mutex m_eventCallbacksGate;
     std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnSessionEndedToken>>> m_onSessionEndedCallbacks;
+    std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnSessionStatusChangedToken>>> m_onSessionStatusChangedCallbacks;
     std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnRangingStartedToken>>> m_onRangingStartedCallbacks;
     std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnRangingStoppedToken>>> m_onRangingStoppedCallbacks;
     std::unordered_map<uint32_t, std::vector<std::shared_ptr<::uwb::OnPeerPropertiesChangedToken>>> m_onPeerPropertiesChangedCallbacks;
@@ -242,7 +272,6 @@ private:
 
     std::vector<std::shared_ptr<::uwb::OnStatusChangedToken>> m_onStatusChangedCallbacks;
     std::vector<std::shared_ptr<::uwb::OnDeviceStatusChangedToken>> m_onDeviceStatusChangedCallbacks;
-    std::vector<std::shared_ptr<::uwb::OnSessionStatusChangedToken>> m_onSessionStatusChangedCallbacks;
 };
 } // namespace windows::devices::uwb
 

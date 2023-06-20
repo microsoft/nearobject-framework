@@ -21,11 +21,6 @@ struct UwbDeviceCallbacksTest : public UwbDeviceEventCallbacks
     OnDeviceStatusChanged([[maybe_unused]] ::uwb::protocol::fira::UwbStatusDevice statusDevice) override
     {
     }
-
-    void
-    OnSessionStatusChanged([[maybe_unused]] ::uwb::protocol::fira::UwbSessionStatus statusSession) override
-    {
-    }
 };
 } // namespace uwb::test
 

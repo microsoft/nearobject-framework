@@ -1,10 +1,13 @@
 
+#include <cstdint>
 #include <exception>
+#include <format>
 #include <ios>
 #include <ranges>
 #include <stdexcept>
 #include <typeinfo>
 
+#include <magic_enum.hpp>
 #include <plog/Log.h>
 #include <wil/result.h>
 
@@ -35,7 +38,7 @@ struct RegisteredCallbackToken
                 PLOG_WARNING << "empty callback token";
                 return;
             }
-            return deregister(this);
+            deregister(this);
         })
     {}
     virtual ~RegisteredCallbackToken() = default;
@@ -61,6 +64,13 @@ struct OnSessionEndedToken : public RegisteredSessionCallbackToken
         RegisteredSessionCallbackToken(std::move(deregister), sessionId),
         Callback(std::move(callback)){};
     std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionEnded> Callback;
+};
+struct OnSessionStatusChangedToken : public RegisteredSessionCallbackToken
+{
+    OnSessionStatusChangedToken(uint32_t sessionId, std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionStatusChanged> callback, std::function<void(RegisteredCallbackToken*)> deregister) :
+        RegisteredSessionCallbackToken(std::move(deregister), sessionId),
+        Callback(std::move(callback)){};
+    std::weak_ptr<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionStatusChanged> Callback;
 };
 struct OnRangingStartedToken : public RegisteredSessionCallbackToken
 {
@@ -110,13 +120,6 @@ struct OnDeviceStatusChangedToken : public RegisteredDeviceCallbackToken
         RegisteredDeviceCallbackToken(std::move(deregister)),
         Callback(std::move(callback)){};
     std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnDeviceStatusChanged> Callback;
-};
-struct OnSessionStatusChangedToken : public RegisteredDeviceCallbackToken
-{
-    OnSessionStatusChangedToken(std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged> callback, std::function<void(RegisteredCallbackToken*)> deregister) :
-        RegisteredDeviceCallbackToken(std::move(deregister)),
-        Callback(std::move(callback)){};
-    std::weak_ptr<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged> Callback;
 };
 } // namespace uwb
 
@@ -696,72 +699,58 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
         DWORD bytesRequired = minimumNotificationSize;
         std::vector<uint8_t> uwbNotificationDataBuffer{};
         m_notificationOverlapped = {};
+
         for (const auto i : std::ranges::iota_view{ 0, maxIoctlAttempts }) {
-            const auto logPrefix = std::string("IOCTL_UWB_NOTIFICATION[").append(std::to_string((i + 1))).append("/").append(std::to_string(maxIoctlAttempts)).append("] ");
+            const auto logPrefix = std::string("IOCTL_UWB_NOTIFICATION[").append(std::to_string((i + 1))).append("/").append(std::to_string(maxIoctlAttempts)).append("]");
             // Size the buffer to hold the last known number of bytes required, either from an initial minimum value,
             // or from a prior call to DeviceIoControl indicating ERROR_MORE_DATA or ERROR_INSUFFICIENT_BUFFER.
             uwbNotificationDataBuffer.resize(std::max(bytesRequired, minimumNotificationSize));
-            PLOG_DEBUG << logPrefix << "with " << std::size(uwbNotificationDataBuffer) << "-byte buffer";
+            PLOG_DEBUG << std::format("{} SENT with {}-byte buffer", logPrefix, std::size(uwbNotificationDataBuffer));
             BOOL ioResult = DeviceIoControl(handleDriver.get(), IOCTL_UWB_NOTIFICATION, nullptr, 0, std::data(uwbNotificationDataBuffer), std::size(uwbNotificationDataBuffer), &bytesRequired, &m_notificationOverlapped);
 
             // Get error information from the DeviceIoControl call now before it possibly gets overwritten by other functions that may set it.
             DWORD lastError = GetLastError();
             HRESULT hr = HRESULT_FROM_WIN32(lastError);
-            PLOG_DEBUG << logPrefix << "with " << std::size(uwbNotificationDataBuffer) << "-byte buffer completed " << bytesRequired << " bytes required hr=" << std::showbase << std::hex << hr << " lastError " << std::showbase << std::hex << lastError;
+            PLOG_DEBUG << std::format("{} RESPONSE(SYNC) ioResult={}, hr/err={:#08x}/{:#08x}, buffer size/required {}/{}", logPrefix, static_cast<bool>(ioResult), static_cast<uint32_t>(hr), lastError, std::size(uwbNotificationDataBuffer), bytesRequired);
 
-            // Process the DeviceIoControl result.
-            if (!LOG_IF_WIN32_BOOL_FALSE(ioResult)) {
-                // Check if the I/O has been pended for asynchronous processing.
-                if (lastError == ERROR_IO_PENDING) {
-                    // I/O has been pended, wait for it synchronously, but in an interruptable manner.
-                    PLOG_DEBUG << logPrefix << "result was pended; waiting for result";
-                    if (!LOG_IF_WIN32_BOOL_FALSE(GetOverlappedResult(handleDriver.get(), &m_notificationOverlapped, &bytesRequired, TRUE /* wait */))) {
-                        lastError = GetLastError();
-                        hr = HRESULT_FROM_WIN32(lastError);
-                        if (lastError == ERROR_INSUFFICIENT_BUFFER || lastError == ERROR_MORE_DATA) {
-                            // Driver indicated buffer was too small and put required size in 'bytesRequired'. Retry with new size.
-                            const UWB_NOTIFICATION_DATA& notificationDataPartial = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
-                            bytesRequired = std::max(notificationDataPartial.size, static_cast<uint32_t>(minimumNotificationSize));
-                            PLOG_VERBOSE << logPrefix << "insufficient buffer (hr=" << std::showbase << std::hex << hr << "), " << std::dec << bytesRequired << " bytes required, current size " << std::size(uwbNotificationDataBuffer) << " bytes";
-                            continue;
-                        } else if (lastError == ERROR_OPERATION_ABORTED) {
-                            PLOG_WARNING << logPrefix << "aborted";
-                            break; // for({0,2})
-                        } else if (lastError == ERROR_DRIVER_PROCESS_TERMINATED) {
-                            PLOG_ERROR << logPrefix << "driver process terminated, hr=" << std::showbase << std::hex << hr;
-                            handleDriver.reset();
-                            break; // for({0,2})
-                        } else {
-                            PLOG_ERROR << logPrefix << "error, hr=" << std::showbase << std::hex << hr;
-                            break; // for({0,2})
-                        }
-                    } else {
-                        PLOG_DEBUG << logPrefix << "completed asynchronously";
-                    }
-                    // Check if the call requires a larger buffer.
-                } else if (lastError == ERROR_MORE_DATA || lastError == ERROR_INSUFFICIENT_BUFFER) {
-                    PLOG_VERBOSE << logPrefix << "insufficient buffer, " << bytesRequired << " bytes required, current size " << std::size(uwbNotificationDataBuffer) << " bytes";
-                    const UWB_NOTIFICATION_DATA& notificationDataPartial = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
-                    bytesRequired = std::max(notificationDataPartial.size, static_cast<uint32_t>(minimumNotificationSize));
-                    // Attempt to retry the ioctl with the appropriate buffer size, which is now held in bytesRequired.
-                    continue;
-                } else if (lastError == ERROR_DRIVER_PROCESS_TERMINATED) {
-                    PLOG_ERROR << logPrefix << "driver process terminated, hr=" << std::showbase << std::hex << hr;
+            // All responses must be asynchronous, so validate the request was pended.
+            if (ioResult == TRUE || lastError != ERROR_IO_PENDING) {
+                if (lastError == ERROR_DRIVER_PROCESS_TERMINATED || lastError == ERROR_INVALID_HANDLE) {
                     handleDriver.reset();
-                    break; // for({1,2})
-                    // Treat all other errors as fatal.
-                } else {
-                    hr = HRESULT_FROM_WIN32(lastError);
-                    PLOG_ERROR << logPrefix << "error, hr=" << std::showbase << std::hex << hr;
-                    break; // for({1,2})
                 }
-            } else {
-                PLOG_DEBUG << logPrefix << "completed synchronously";
+
+                PLOG_ERROR << std::format("{} RESPONSE with unexpected return value, aborting", logPrefix);
+                break; // for ({ 0, maxIoctlAttempts })
             }
 
-            // Ensure some data was provided by the driver.
+            // I/O has been pended, wait for it synchronously, but in an interruptable manner.
+            PLOG_DEBUG << std::format("{} result was pended; waiting for data to become available", logPrefix);
+
+            static constexpr BOOL WaitSynchronously = TRUE;
+            ioResult = GetOverlappedResult(handleDriver.get(), &m_notificationOverlapped, &bytesRequired, WaitSynchronously);
+            lastError = GetLastError();
+            hr = HRESULT_FROM_WIN32(lastError);
+            PLOG_DEBUG << std::format("{} RESPONSE(ASYNC) completed={}, hr/err={:#08x}/{:#08x}", logPrefix, static_cast<bool>(ioResult), static_cast<uint32_t>(hr), lastError);
+
+            // Check if the request was completed.
+            if (!ioResult) {
+                if (lastError == ERROR_INSUFFICIENT_BUFFER || lastError == ERROR_MORE_DATA) {
+                    // Driver indicated buffer was too small and put required size in 'bytesRequired'. Retry with new size.
+                    const UWB_NOTIFICATION_DATA& notificationDataPartial = *reinterpret_cast<UWB_NOTIFICATION_DATA*>(std::data(uwbNotificationDataBuffer));
+                    bytesRequired = std::max(notificationDataPartial.size, static_cast<uint32_t>(minimumNotificationSize));
+                    PLOG_DEBUG << std::format("{} partial response received, size={}, type={}, buffer size/required={}/{}", logPrefix, notificationDataPartial.size, magic_enum::enum_name(notificationDataPartial.notificationType), std::size(uwbNotificationDataBuffer), bytesRequired);
+                    continue;
+                } else if (ERROR_DRIVER_PROCESS_TERMINATED || ERROR_INVALID_HANDLE) {
+                    handleDriver.reset();
+                }
+
+                PLOG_ERROR << std::format("{} unexpected GetOverlappedResult response received, hr/err={}/{}", logPrefix, static_cast<uint32_t>(hr), lastError);
+                break; // for({ 0, maxIoctlAttempts })
+            }
+
+            // The request was completed. Ensure some data was provided by the driver.
             if (uwbNotificationDataBuffer.empty()) {
-                PLOG_FATAL << logPrefix << "completed but provided an empty buffer";
+                PLOG_FATAL << std::format("{} completed but provided an empty buffer", logPrefix);
                 continue;
             }
 
@@ -784,7 +773,7 @@ UwbConnector::HandleNotifications(std::stop_token stopToken)
         }
     }
 
-    LOG_INFO << "uwb notification listener stopped for device " << DeviceName();
+    LOG_INFO << std::format("uwb notification listener stopped for device {}", DeviceName());
 }
 
 /**
@@ -859,6 +848,17 @@ UwbConnector::OnSessionEnded(uint32_t sessionId, ::uwb::UwbSessionEndReason sess
 }
 
 void
+UwbConnector::OnSessionStatusChanged(uint32_t sessionId, ::uwb::protocol::fira::UwbSessionState sessionState, std::optional<::uwb::protocol::fira::UwbSessionReasonCode> reasonCode)
+{
+    PLOG_VERBOSE << "Session with id " << sessionId << " executing callbacks for session status changed";
+    InvokeSessionCallbacks(m_onSessionStatusChangedCallbacks, sessionId, sessionState, reasonCode);
+
+    if (sessionState == UwbSessionState::Deinitialized) {
+        OnSessionEnded(sessionId, ::uwb::UwbSessionEndReason::Stopped);
+    }
+}
+
+void
 UwbConnector::OnSessionMulticastListStatus(::uwb::protocol::fira::UwbSessionUpdateMulticastListStatus statusMulticastList)
 {
     uint32_t sessionId = statusMulticastList.SessionId;
@@ -908,6 +908,18 @@ UwbConnector::OnSessionRangingData(::uwb::protocol::fira::UwbRangingData ranging
 }
 
 void
+UwbConnector::OnStatusChanged(::uwb::protocol::fira::UwbStatus uwbStatus)
+{
+    InvokeCallbacks(m_onStatusChangedCallbacks, uwbStatus);
+}
+
+void
+UwbConnector::OnDeviceStatusChanged(::uwb::protocol::fira::UwbStatusDevice uwbStatusDevice)
+{
+    InvokeCallbacks(m_onDeviceStatusChangedCallbacks, uwbStatusDevice);
+}
+
+void
 UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNotificationData)
 {
     PLOG_INFO << "Received Notification: " << ToString(uwbNotificationData) << "\n";
@@ -918,14 +930,11 @@ UwbConnector::DispatchCallbacks(::uwb::protocol::fira::UwbNotificationData uwbNo
         using ValueType = std::decay_t<decltype(arg)>;
 
         if constexpr (std::is_same_v<ValueType, UwbStatus>) {
-            InvokeCallbacks(m_onStatusChangedCallbacks, arg);
+            OnStatusChanged(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbStatusDevice>) {
-            InvokeCallbacks(m_onDeviceStatusChangedCallbacks, arg);
+            OnDeviceStatusChanged(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionStatus>) {
-            InvokeCallbacks(m_onSessionStatusChangedCallbacks, arg);
-            if (arg.State == UwbSessionState::Deinitialized) {
-                OnSessionEnded(arg.SessionId, ::uwb::UwbSessionEndReason::Stopped);
-            }
+            OnSessionStatusChanged(arg.SessionId, arg.State, arg.ReasonCode);
         } else if constexpr (std::is_same_v<ValueType, UwbSessionUpdateMulticastListStatus>) {
             OnSessionMulticastListStatus(arg);
         } else if constexpr (std::is_same_v<ValueType, UwbRangingData>) {
@@ -1093,18 +1102,6 @@ UwbConnector::RegisterDeviceEventCallbacks(::uwb::UwbRegisteredDeviceEventCallba
             return token;
         });
 
-    auto OnSessionStatusChangedToken = GetToken<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnSessionStatusChanged>(
-        callbacks, [](auto&& callbackStruct) {
-            return callbackStruct.OnSessionStatusChanged;
-        },
-        [this](auto&& callback) {
-            auto token = std::make_shared<::uwb::OnSessionStatusChangedToken>(callback, [this](::uwb::RegisteredCallbackToken* token) {
-                DeregisterDeviceEventCallback(token, m_onSessionStatusChangedCallbacks);
-            });
-            m_onSessionStatusChangedCallbacks.push_back(token);
-            return token;
-        });
-
     if (noCallbacksPrior and CallbacksPresent()) {
         NotificationListenerStart();
     }
@@ -1112,7 +1109,6 @@ UwbConnector::RegisterDeviceEventCallbacks(::uwb::UwbRegisteredDeviceEventCallba
     return {
         OnStatusChangedToken,
         OnDeviceStatusChangedToken,
-        OnSessionStatusChangedToken
     };
 }
 
@@ -1182,6 +1178,18 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbRegist
             return token;
         });
 
+    auto OnSessionStatusChangedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionStatusChanged>(
+        sessionId, callbacks, [](auto&& callbackStruct) {
+            return callbackStruct.OnStatusChanged;
+        },
+        [this](uint32_t sessionId, auto&& callback) {
+            auto token = std::make_shared<::uwb::OnSessionStatusChangedToken>(sessionId, callback, [this](::uwb::RegisteredCallbackToken* token) {
+                DeregisterSessionEventCallback(token, m_onSessionStatusChangedCallbacks);
+            });
+            InsertSessionToken(m_onSessionStatusChangedCallbacks, sessionId, token);
+            return token;
+        });
+
     auto OnRangingStartedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnRangingStarted>(
         sessionId, callbacks, [](auto&& callbackStruct) {
             return callbackStruct.OnRangingStarted;
@@ -1235,6 +1243,7 @@ UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbRegist
 
     return {
         OnSessionEndedToken,
+        OnSessionStatusChangedToken,
         OnRangingStartedToken,
         OnRangingStoppedToken,
         OnPeerPropertiesChangedToken,

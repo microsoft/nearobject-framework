@@ -61,6 +61,13 @@ NearObjectCliUwbSessionEventCallbacks::OnSessionEnded(::uwb::UwbSession* session
 }
 
 void
+NearObjectCliUwbSessionEventCallbacks::OnSessionStatusChanged(::uwb::UwbSession* session, ::uwb::protocol::fira::UwbSessionState state, std::optional<::uwb::protocol::fira::UwbSessionReasonCode> reasonCode)
+{
+    const auto reasonStr = reasonCode.has_value() ? magic_enum::enum_name(reasonCode.value()) : "None";
+    PLOG_VERBOSE << LogPrefix(session->GetId()) << "Session State Changed to '" << magic_enum::enum_name(state) << "' (Reason=" << reasonStr << ")";
+}
+
+void
 NearObjectCliUwbSessionEventCallbacks::OnRangingStarted(::uwb::UwbSession* session)
 {
     PLOG_VERBOSE << LogPrefix(session->GetId()) << "Ranging Started";

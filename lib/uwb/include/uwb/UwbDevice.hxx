@@ -200,14 +200,6 @@ protected:
     void
     OnDeviceStatusChanged(::uwb::protocol::fira::UwbStatusDevice statusDevice);
 
-    /**
-     * @brief Invoked when the status of a session changes.
-     *
-     * @param statusSession The new status of the session.
-     */
-    void
-    OnSessionStatusChanged(::uwb::protocol::fira::UwbSessionStatus statusSession);
-
 private:
     ::uwb::protocol::fira::UwbStatusDevice m_status{ .State = ::uwb::protocol::fira::UwbDeviceState::Uninitialized };
     ::uwb::protocol::fira::UwbStatus m_lastError{ ::uwb::protocol::fira::UwbStatusGeneric::Ok };
