@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <stdexcept>
 
+#include <magic_enum.hpp>
 #include <plog/Log.h>
 
 #include <uwb/UwbSession.hxx>
@@ -120,13 +121,6 @@ UwbSession::StopRanging()
 }
 
 void
-UwbSession::SetSessionStatus(const uwb::protocol::fira::UwbSessionStatus& status)
-{
-    PLOG_VERBOSE << "session changed state: " << m_sessionStatus.ToString() << " --> " << status.ToString();
-    m_sessionStatus = status;
-}
-
-void
 UwbSession::InsertPeerImpl(const uwb::UwbMacAddress& peerAddress)
 {
     m_peers.insert(peerAddress);
@@ -166,4 +160,50 @@ UwbSession::GetOobDataObject()
 {
     PLOG_VERBOSE << "get OOB data object";
     return GetOobDataObjectImpl();
+}
+
+void
+UwbSession::OnSessionStateChanged(std::shared_ptr<uwb::UwbSessionEventCallbacks> callbacks, ::uwb::protocol::fira::UwbSessionState state, std::optional<::uwb::protocol::fira::UwbSessionReasonCode> reasonCode)
+{
+    // Obtain old/existing state, and update with new state.
+    // Note: no lock is needed to update m_state since the event hanlder guarantees sequential execution.
+    const auto stateOld = m_state;
+    m_state = state;
+
+    PLOG_VERBOSE << "Session with id " << m_sessionId << " state changed: " << magic_enum::enum_name(stateOld) << " --> " << magic_enum::enum_name(state);
+
+    // Check if the session transitioned into the ranging state.
+    if (state == UwbSessionState::Active) {
+        bool rangingActiveExpected = false;
+        if (m_rangingActive.compare_exchange_weak(rangingActiveExpected, true)) {
+            callbacks->OnRangingStarted(this);
+        }
+    // Check if the session transitioned out of the ranging state.
+    } else if (state == UwbSessionState::Idle) {
+        bool rangingActiveExpected = true;
+        if (m_rangingActive.compare_exchange_weak(rangingActiveExpected, false)) {
+            callbacks->OnRangingStopped(this);
+        }
+    }
+}
+
+void
+UwbSession::OnSessionEnded(std::shared_ptr<uwb::UwbSessionEventCallbacks> callbacks, ::uwb::UwbSessionEndReason reason)
+{
+    PLOG_VERBOSE << "Session with id " << m_sessionId << " ended";
+    callbacks->OnSessionEnded(this, reason);
+}
+
+void
+UwbSession::OnPeerPropertiesChanged(std::shared_ptr<uwb::UwbSessionEventCallbacks> callbacks, std::vector<::uwb::UwbPeer> peersChanged)
+{
+    PLOG_VERBOSE << "Session with id " << m_sessionId << " peer properties changed";
+    callbacks->OnPeerPropertiesChanged(this, std::move(peersChanged));
+}
+
+void
+UwbSession::OnSessionMembershipChanged(std::shared_ptr<uwb::UwbSessionEventCallbacks> callbacks, std::vector<::uwb::UwbPeer> peersAdded, std::vector<::uwb::UwbPeer> peersRemoved)
+{
+    PLOG_VERBOSE << "Session with id " << m_sessionId << " session membership changed";
+    callbacks->OnSessionMembershipChanged(this, std::move(peersAdded), std::move(peersRemoved));
 }

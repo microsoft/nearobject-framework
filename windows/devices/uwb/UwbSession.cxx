@@ -29,7 +29,8 @@ UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> devic
                 PLOG_WARNING << "missing session event callback for UwbSessionEndReason, skipping";
                 return true;
             }
-            callbacks->OnSessionEnded(this, reason);
+
+            ::uwb::UwbSession::OnSessionEnded(callbacks, reason);
             return false;
         });
     m_onSessionStatusChangedCallback =
@@ -39,7 +40,8 @@ UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> devic
                 PLOG_WARNING << "missing session event callback for session status changed, skipping";
                 return true;
             }
-            callbacks->OnSessionStatusChanged(this, state, reasonCode);
+
+            ::uwb::UwbSession::OnSessionStateChanged(callbacks, state, reasonCode);
             return false;
         });
     m_onPeerPropertiesChangedCallback =
@@ -49,7 +51,8 @@ UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> devic
                 PLOG_WARNING << "missing session event callback for ranging data, skipping";
                 return true;
             }
-            callbacks->OnPeerPropertiesChanged(this, peersChanged);
+            
+            ::uwb::UwbSession::OnPeerPropertiesChanged(callbacks, std::move(peersChanged));
             return false;
         });
     m_onSessionMembershipChangedCallback =
@@ -59,7 +62,8 @@ UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> devic
                 PLOG_WARNING << "missing session event callback for peer list changes, skipping";
                 return true;
             }
-            callbacks->OnSessionMembershipChanged(this, peersAdded, peersRemoved);
+
+            ::uwb::UwbSession::OnSessionMembershipChanged(callbacks, std::move(peersAdded), std::move(peersRemoved));
             return false;
         });
 
