@@ -62,16 +62,6 @@ struct UwbSessionEventCallbacks
     OnSessionEnded(UwbSession *session, UwbSessionEndReason reason) = 0;
 
     /**
-     * @brief Invoked when the session changes state.
-     *
-     * @param session The session for which the event occurred.
-     * @param state The new state of the session.
-     * @param reasonCode The reason the session changed state. Optional.
-     */
-    virtual void
-    OnSessionStatusChanged(UwbSession *session, ::uwb::protocol::fira::UwbSessionState state, std::optional<::uwb::protocol::fira::UwbSessionReasonCode> reasonCode) = 0;
-
-    /**
      * @brief Invoked when active ranging starts.
      *
      * @param session The session for which the event occurred.

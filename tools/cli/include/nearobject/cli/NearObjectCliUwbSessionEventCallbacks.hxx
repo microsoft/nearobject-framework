@@ -31,16 +31,6 @@ struct NearObjectCliUwbSessionEventCallbacks :
     OnSessionEnded(::uwb::UwbSession *session, ::uwb::UwbSessionEndReason reason) override;
 
     /**
-     * @brief Invoked when the session changes state.
-     *
-     * @param session The session for which the event occurred.
-     * @param state The new state of the session.
-     * @param reasonCode The reason the session changed state. Optional.
-     */
-    void
-    OnSessionStatusChanged(::uwb::UwbSession *session, ::uwb::protocol::fira::UwbSessionState state, std::optional<::uwb::protocol::fira::UwbSessionReasonCode> reasonCode) override;
-
-    /**
      * @brief Invoked when active ranging starts.
      *
      * @param session The session for which the event occurred.
