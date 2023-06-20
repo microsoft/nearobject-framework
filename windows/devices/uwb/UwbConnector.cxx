@@ -34,7 +34,7 @@ struct RegisteredCallbackToken
      */
     RegisteredCallbackToken(std::function<void(RegisteredCallbackToken*)> deregister) :
         Deregister([this, deregister = std::move(deregister)]() {
-            if (not deregister) {
+            if (!deregister) {
                 PLOG_WARNING << "empty callback token";
                 return;
             }
@@ -795,11 +795,11 @@ InvokeCallbacks(std::vector<std::shared_ptr<TokenT>>& tokens, ArgTs&&... args)
         auto token = *it;
         auto callbackWeak = token->Callback;
         auto callbackShared = callbackWeak.lock();
-        if (not callbackShared) {
+        if (!callbackShared) {
             it = tokens.erase(it);
         } else {
             auto callback = *callbackShared;
-            if (not callback) {
+            if (!callback) {
                 it = tokens.erase(it);
             } else {
                 auto remove = callback(std::forward<ArgTs>(args)...);
@@ -833,7 +833,7 @@ InvokeSessionCallbacks(std::unordered_map<uint32_t, std::vector<std::shared_ptr<
     }
     auto& tokens = node.mapped();
     InvokeCallbacks(tokens, std::forward<ArgTs>(args)...);
-    if (not tokens.empty()) {
+    if (!tokens.empty()) {
         sessionMap.insert(std::move(node));
     }
 }
@@ -995,7 +995,7 @@ bool
 DeregisterSessionEventCallback(::uwb::RegisteredCallbackToken* token, std::unordered_map<uint32_t, std::vector<std::shared_ptr<T>>>& tokensMap)
 {
     auto callback = dynamic_cast<T*>(token);
-    if (not callback) {
+    if (!callback) {
         return false;
     }
     auto sessionId = callback->SessionId;
@@ -1031,7 +1031,7 @@ bool
 DeregisterDeviceEventCallback(::uwb::RegisteredCallbackToken* token, std::vector<std::shared_ptr<T>>& tokens)
 {
     auto callback = dynamic_cast<T*>(token);
-    if (not callback) {
+    if (!callback) {
         return false;
     }
 
@@ -1060,11 +1060,11 @@ GetToken(::uwb::UwbRegisteredDeviceEventCallbacks callbacks, std::function<std::
 {
     auto callbackWeak = accessor(callbacks);
     auto callbackShared = callbackWeak.lock();
-    if (not callbackShared) {
+    if (!callbackShared) {
         return std::shared_ptr<::uwb::RegisteredDeviceCallbackToken>();
     }
     auto callback = *callbackShared;
-    if (not callback) {
+    if (!callback) {
         return std::shared_ptr<::uwb::RegisteredDeviceCallbackToken>();
     }
     return tokenize(callbackWeak);
@@ -1074,7 +1074,7 @@ GetToken(::uwb::UwbRegisteredDeviceEventCallbacks callbacks, std::function<std::
 UwbConnector::RegisterDeviceEventCallbacks(::uwb::UwbRegisteredDeviceEventCallbacks callbacks)
 {
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
-    bool noCallbacksPrior = not CallbacksPresent();
+    bool noCallbacksPrior = !CallbacksPresent();
 
     auto OnStatusChangedToken = GetToken<::uwb::UwbRegisteredDeviceEventCallbackTypes::OnStatusChanged>(
         callbacks, [](auto&& callbackStruct) {
@@ -1100,7 +1100,7 @@ UwbConnector::RegisterDeviceEventCallbacks(::uwb::UwbRegisteredDeviceEventCallba
             return token;
         });
 
-    if (noCallbacksPrior and CallbacksPresent()) {
+    if (noCallbacksPrior && CallbacksPresent()) {
         NotificationListenerStart();
     }
 
@@ -1148,11 +1148,11 @@ GetToken(uint32_t sessionId, ::uwb::UwbRegisteredSessionEventCallbacks callbacks
 {
     auto callbackWeak = accessor(callbacks);
     auto callbackShared = callbackWeak.lock();
-    if (not callbackShared) {
+    if (!callbackShared) {
         return std::shared_ptr<::uwb::RegisteredSessionCallbackToken>();
     }
     auto callback = *callbackShared;
-    if (not callback) {
+    if (!callback) {
         return std::shared_ptr<::uwb::RegisteredSessionCallbackToken>();
     }
     return tokenize(sessionId, callbackWeak);
@@ -1162,7 +1162,7 @@ GetToken(uint32_t sessionId, ::uwb::UwbRegisteredSessionEventCallbacks callbacks
 UwbConnector::RegisterSessionEventCallbacks(uint32_t sessionId, ::uwb::UwbRegisteredSessionEventCallbacks callbacks)
 {
     std::lock_guard eventCallbacksLockExclusive{ m_eventCallbacksGate };
-    bool noCallbacksPrior = not CallbacksPresent();
+    bool noCallbacksPrior = !CallbacksPresent();
 
     auto OnSessionEndedToken = GetToken<::uwb::UwbRegisteredSessionEventCallbackTypes::OnSessionEnded>(
         sessionId, callbacks, [](auto&& callbackStruct) {
