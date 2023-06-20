@@ -172,16 +172,16 @@ NearObjectCliHandlerWindows::HandleStartRanging(::uwb::protocol::fira::DeviceTyp
     auto session = sessionCreateResult.Session();
 
     // Register event handlers.
-    m_sessionEndedEventToken = session.SessionEnded(winrt::auto_revoke, [&](auto&& sender, auto&& sessionEndedEventArgs) {
+    m_sessionEndedEventToken = session.SessionEnded(winrt::auto_revoke, [session](auto&& sender, auto&& sessionEndedEventArgs) {
         PLOG_INFO << std::format("session {} ended, reason={}", session.Id(), magic_enum::enum_name(sessionEndedEventArgs.EndReason()));
     });
-    m_rangingStartedEventToken = session.RangingStarted(winrt::auto_revoke, [&](auto&& sender, [[maybe_unused]] auto&& rangingStartedEventArgs) {
+    m_rangingStartedEventToken = session.RangingStarted(winrt::auto_revoke, [session](auto&& sender, [[maybe_unused]] auto&& rangingStartedEventArgs) {
         PLOG_INFO << std::format("sesion {} ranging started", session.Id());
     });
-    m_rangingStoppedEventToken = session.RangingStopped(winrt::auto_revoke, [&]([[maybe_unused]] auto&& sender, [[maybe_unused]] auto&& rangingStoppedEventArgs) {
+    m_rangingStoppedEventToken = session.RangingStopped(winrt::auto_revoke, [session]([[maybe_unused]] auto&& sender, [[maybe_unused]] auto&& rangingStoppedEventArgs) {
         PLOG_INFO << std::format("sesion {} ranging stopped", session.Id());
     });
-    m_peerPropertiesChangedEventToken = session.PeerPropertiesChanged(winrt::auto_revoke, [&](auto&& sender, auto&& peerPropertiesChangedEventArgs) {
+    m_peerPropertiesChangedEventToken = session.PeerPropertiesChanged(winrt::auto_revoke, [session](auto&& sender, auto&& peerPropertiesChangedEventArgs) {
         PLOG_INFO << std::format("session {} peer properties changed:", session.Id());
         for (auto&& nearObject : peerPropertiesChangedEventArgs.NearObjectsChanged()) {
             auto spatialProperties = nearObject.SpatialProperties();
@@ -196,7 +196,7 @@ NearObjectCliHandlerWindows::HandleStartRanging(::uwb::protocol::fira::DeviceTyp
                 elevation.has_value() ? std::to_string(elevation.value()) : "-");
         }
     });
-    m_sessionMemembershipChangedEventToken = session.SessionMembershipChanged(winrt::auto_revoke, [&](auto&& sender, auto&& sessionMembershipChangedEventArgs) {
+    m_sessionMemembershipChangedEventToken = session.SessionMembershipChanged(winrt::auto_revoke, [session](auto&& sender, auto&& sessionMembershipChangedEventArgs) {
         auto nearObjectsAdded = sessionMembershipChangedEventArgs.NearObjectsAdded();
         auto nearObjectsRemoved = sessionMembershipChangedEventArgs.NearObjectsRemoved();
         PLOG_INFO << std::format("session {} session membership changed: +{} -{}", session.Id(), nearObjectsAdded.Size(), nearObjectsRemoved.Size());
