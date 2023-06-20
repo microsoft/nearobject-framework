@@ -167,7 +167,7 @@ UwbSession::OnSessionStateChanged(std::shared_ptr<uwb::UwbSessionEventCallbacks>
 {
     const auto stateOld = m_state.exchange(state);
 
-    PLOG_VERBOSE << "Session " << m_sessionId << " changed state: " << magic_enum::enum_name(stateOld) << " --> " << magic_enum::enum_name(state);
+    PLOG_VERBOSE << "session " << m_sessionId << " changed state: " << magic_enum::enum_name(stateOld) << " --> " << magic_enum::enum_name(state);
 
     // Check if the session transitioned into the ranging state.
     if (stateOld != UwbSessionState::Active && state == UwbSessionState::Active) {
