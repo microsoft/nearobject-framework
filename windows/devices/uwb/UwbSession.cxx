@@ -20,7 +20,7 @@ using namespace windows::devices::uwb;
 using namespace ::uwb::protocol::fira;
 
 UwbSession::UwbSession(uint32_t sessionId, std::weak_ptr<::uwb::UwbDevice> device, std::shared_ptr<IUwbSessionDdiConnector> uwbSessionConnector, std::weak_ptr<::uwb::UwbSessionEventCallbacks> callbacks, ::uwb::protocol::fira::DeviceType deviceType) :
-    ::uwb::UwbSession(sessionId, std::move(device), std::move(callbacks), deviceType),
+    ::uwb::UwbSession(sessionId, std::move(device), callbacks, deviceType),
     m_uwbSessionConnector(std::move(uwbSessionConnector))
 {
     m_onSessionEndedCallback =
